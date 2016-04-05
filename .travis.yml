@@ -18,12 +18,11 @@ before_install:
   - conda update --yes conda
 install:
   - conda install --yes python=3.4 rsmtool
-  - conda install --yes numpy=1.10.4=py34_nomkl_0
-  - conda remove --yes libgfortran
   - python setup.py install
 
 # Run test
 script:
+  - conda config --get channels
   - echo $PYTHONPATH
   - python -c 'import numpy; print(numpy.__version__); print(numpy.__file__)'
   - python -c 'import matplotlib; print(matplotlib.__version__); print(matplotlib.__file__)'
