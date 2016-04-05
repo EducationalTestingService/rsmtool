@@ -17,16 +17,11 @@ before_install:
   - conda config --add channels desilinguist
   - conda update --yes conda
 install:
-  - conda install --yes --file ${TRAVIS_BUILD_DIR}/conda_requirements.txt
-  - python setup.py install
+  - pushd ${TRAVIS_BUILD_DIR}
+  - conda install --file conda_requirements.txt --yes
+  - pip install -e .
+  - popd
 
 # Run test
 script:
-  - echo $PYTHONPATH
-  - python -c 'import sys; print(sys.path)'
-  - python -c 'import numpy; print(numpy.__version__); print(numpy.__file__)'
-  - python -c 'import matplotlib; print(matplotlib.__version__); print(matplotlib.__file__)'
-  - python -c 'import matplotlib.pyplot as plt; print(plt.__spec__)'
-  - python -c 'from matplotlib import numpy as mnp; print(mnp.__version__)'
-  - python -c 'import IPython; print(IPython.sys_info())'
-  - nosetests -v ${TRAVIS_BUILD_DIR}/tests/test_experiment.py:test_run_experiment_lr
+  - nosetests -v tests/test_experiment.py:test_run_experiment_lr
