@@ -22,8 +22,8 @@ install:
 
 # Run test
 script:
-  - conda config --get channels
   - echo $PYTHONPATH
+  - python -c 'import sys; print(sys.path)'
   - python -c 'import numpy; print(numpy.__version__); print(numpy.__file__)'
   - python -c 'import matplotlib; print(matplotlib.__version__); print(matplotlib.__file__)'
   - python -c 'import matplotlib.pyplot as plt; print(plt.__spec__)'
