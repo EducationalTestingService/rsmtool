@@ -18,6 +18,8 @@ before_install:
   - conda update --yes conda
 install:
   - conda install --yes python=3.4 rsmtool
+  - conda install numpy=1.10.4=py34_nomkl_0
+  - conda remove libgfortran
   - python setup.py install
 
 # Run test
