@@ -17,10 +17,8 @@ before_install:
   - conda config --add channels desilinguist
   - conda update --yes conda
 install:
-  - pushd ${TRAVIS_BUILD_DIR}
   - conda install --file conda_requirements.txt --yes
   - pip install -e .
-  - popd
 
 # Run test
 script:
