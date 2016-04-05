@@ -1,0 +1,7 @@
+{
+    "input_features_file": "../../files/test.csv",
+    "id_column": "ID",
+    "human_score_column": "score",
+    "experiment_dir": "test_outputs/lr-rsmtool-rsmpredict",
+    "experiment_id": "lr_rsmtool_rsmpredict"
+}

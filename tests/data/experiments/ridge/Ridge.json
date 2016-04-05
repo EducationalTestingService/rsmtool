@@ -1,0 +1,13 @@
+{
+    "train_file": "../../files/train_spkitemid.csv",
+    "trim_max": 6,
+    "description": "Using all features with a Ridge model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "train_label_column": "score",
+    "model": "Ridge",
+    "test_label_column": "score",
+    "experiment_id": "Ridge",
+    "test_file": "../../files/test_spkitemid.csv",
+    "features": "features.json"
+}

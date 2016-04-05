@@ -1,0 +1,11 @@
+{
+    "train_file": "../../files/train.csv",
+    "description": "Using all features with an LinearRegression model.",
+    "train_label_column": "score",
+    "model": "LinearRegression",
+    "test_label_column": "score",
+    "id_column": "ID",
+    "experiment_id": "lr_rsmtool_rsmpredict",
+    "test_file": "../../files/test.csv",
+    "features": "features.json"
+}

@@ -1,0 +1,19 @@
+{
+    "predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
+    "system_score_column": "score",
+    "description": "An evaluation of LinearRegression predictions.",
+    "human_score_column": "h1",
+    "second_human_score_column": "h2",
+    "id_column": "id",
+    "experiment_id": "lr_eval_with_custom_order",
+    "subgroups": "QUESTION, L1",
+    "scale_with": "asis",
+    "trim_min": 1,
+    "trim_max": 6,
+    "section_order": ["consistency",
+                      "evaluation",
+                      "evaluation_by_group",
+                      "data_description",
+                      "data_description_by_group",
+                      "sysinfo"]
+}

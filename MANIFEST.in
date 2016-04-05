@@ -1,0 +1,5 @@
+recursive-include rsmtool/notebooks *
+recursive-include doc *
+prune test_outputs
+prune rsmtool/notebooks/.ipynb_checkpoints
+prune rsmtool/notebooks/comparison/.ipynb_checkpoints

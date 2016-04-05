@@ -1,0 +1,11 @@
+{
+    "predictions_file": "../../files/predictions_raw_with_flags.csv",
+    "scale_with": "../../files/train_predictions.csv",
+    "description": "An evaluation of LinearRegression predictions using scaling and flag-based filtering.",
+    "human_score_column": "h1",
+    "system_score_column": "score",
+    "experiment_id": "lr_eval_exclude_flags",
+    "trim_min": 1,
+    "trim_max": 6,
+    "flag_column": {"flag": 0}
+}

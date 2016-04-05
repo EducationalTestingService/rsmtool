@@ -1,0 +1,13 @@
+{
+	"expID":"empWt",
+	"description": "Using all features with an empWt model.",
+	"LRmodel" : "empWt",
+	"train": "../../files/train.csv",
+	"test": "../../files/test.csv",
+	"feature": "features.json",
+	"train.lab":"score",
+	"test.lab":"score",
+	"trim.min": "1",
+	"trim.max": "6",
+	"id_column": "ID"
+}

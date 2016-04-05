@@ -1,0 +1,14 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train.csv",
+    "description": "Using all features with an PositiveLassoCV model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "PositiveLassoCV",
+    "train_label_column": "score",
+    "features": "features.json",
+    "experiment_id": "positivelassocv",
+    "trim_max": 6,
+    "test_file": "../../files/test.csv"
+}

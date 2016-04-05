@@ -1,0 +1,10 @@
+{
+    "id_column": "ID",
+    "input_features_file": "../../files/test.csv",
+    "experiment_dir": "existing_experiment",
+    "experiment_id": "lr",
+    "human_score_column": "score",
+    "second_human_score_column": "score2",
+    "subgroups": "QUESTION",
+    "flag_column": {"L1": "Klingon"}
+}

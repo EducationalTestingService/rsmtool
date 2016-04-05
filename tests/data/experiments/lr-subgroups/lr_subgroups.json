@@ -1,0 +1,15 @@
+{
+    "train_file": "../../files/train.csv",
+    "description": "Using all the features with an LinearRegression model and including subgroup analyses.",
+    "test_file": "../../files/test.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "subgroups": "QUESTION, L1",
+    "train_label_column": "score",
+    "experiment_id": "lr_subgroups",
+    "test_label_column": "score",
+    "id_column": "ID",
+    "trim_max": 6,
+    "use_scaled_predictions": true,
+    "features": "features.json"
+}

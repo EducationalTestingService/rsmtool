@@ -1,0 +1,17 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train_with_none_flagged.csv",
+    "description": "Using all features with a LinearRegression model with flag-based filtering.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "LinearRegression",
+    "train_label_column": "score",
+    "second_human_score_column": "score2",
+    "subgroups": "L1",
+    "features": "features.json",
+    "experiment_id": "lr_exclude_flags",
+    "trim_max": 6,
+    "test_file": "../../files/test_with_flags.csv",
+    "flag_column": {"flag": 0}
+}

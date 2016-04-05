@@ -1,0 +1,19 @@
+{
+    "features": [
+        {
+            "transform": "raw",
+            "feature": "FEATURE1",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE2",
+            "sign": 1
+        },
+        {
+            "transform": "addOneLn",
+            "feature": "FEATURE7",
+            "sign": -1
+        }
+    ]
+}

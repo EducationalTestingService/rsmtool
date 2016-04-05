@@ -1,0 +1,12 @@
+{
+    "train_file": "../../files/train_spkitemid.csv",
+    "trim_max": 6,
+    "description": "Using all features with a LinearSVR model.",
+    "trim_min": 1,
+    "train_label_column": "score",
+    "model": "LinearSVR",
+    "test_label_column": "score",
+    "experiment_id": "LinearSVR",
+    "test_file": "../../files/test_spkitemid.csv",
+    "features": "features.json"
+}

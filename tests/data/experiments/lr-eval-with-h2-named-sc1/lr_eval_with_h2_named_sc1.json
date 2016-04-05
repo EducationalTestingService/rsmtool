@@ -1,0 +1,12 @@
+{
+    "predictions_file": "../../files/predictions_scaled_with_subgroups_and_missing_scores.csv",
+    "system_score_column": "score",
+    "description": "An evaluation of LinearRegression predictions.",
+    "human_score_column": "h1",
+    "second_human_score_column": "sc1",
+    "id_column": "id",
+    "experiment_id": "lr_eval_with_h2_named_sc1",
+    "subgroups": "QUESTION",
+    "trim_min": 1,
+    "trim_max": 6
+}

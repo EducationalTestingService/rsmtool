@@ -1,0 +1,34 @@
+{
+    "features": [
+        {
+            "sign": 1.0,
+            "feature": "FEATURE1",
+            "transform": "raw"
+        },
+        {
+            "sign": 1.0,
+            "feature": "FEATURE2",
+            "transform": "raw"
+        },
+        {
+            "sign": 1.0,
+            "feature": "FEATURE3",
+            "transform": "raw"
+        },
+        {
+            "sign": 1.0,
+            "feature": "FEATURE4",
+            "transform": "raw"
+        },
+        {
+            "sign": 1.0,
+            "feature": "FEATURE5",
+            "transform": "raw"
+        },
+        {
+            "sign": 1.0,
+            "feature": "FEATURE6",
+            "transform": "raw"
+        }
+    ]
+}

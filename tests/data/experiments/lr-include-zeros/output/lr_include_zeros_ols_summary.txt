@@ -1,0 +1,32 @@
+
+-------------------------Summary of Regression Analysis-------------------------
+
+Formula: Y ~ <FEATURE1> + <FEATURE2> + <FEATURE3> + <FEATURE4> + <FEATURE5>
+             + <FEATURE6> + <FEATURE7> + <FEATURE8> + <intercept>
+
+Number of Observations:         498
+Number of Degrees of Freedom:   9
+
+R-squared:         0.4421
+Adj R-squared:     0.4330
+
+Rmse:              0.6443
+
+F-stat (8, 489):    48.4447, p-value:     0.0000
+
+Degrees of Freedom: model 8, resid 489
+
+-----------------------Summary of Estimated Coefficients------------------------
+      Variable       Coef    Std Err     t-stat    p-value    CI 2.5%   CI 97.5%
+--------------------------------------------------------------------------------
+      FEATURE1     0.3315     0.0363       9.14     0.0000     0.2605     0.4026
+      FEATURE2     0.0322     0.0331       0.97     0.3319    -0.0328     0.0972
+      FEATURE3     0.1895     0.0355       5.34     0.0000     0.1199     0.2590
+      FEATURE4     0.1163     0.0356       3.27     0.0012     0.0465     0.1861
+      FEATURE5     0.0198     0.0335       0.59     0.5543    -0.0459     0.0856
+--------------------------------------------------------------------------------
+      FEATURE6     0.1347     0.0328       4.11     0.0000     0.0704     0.1990
+      FEATURE7    -0.0345     0.0290      -1.19     0.2343    -0.0913     0.0223
+      FEATURE8    -0.0270     0.0291      -0.93     0.3544    -0.0841     0.0301
+     intercept     3.4036     0.0289     117.89     0.0000     3.3470     3.4602
+---------------------------------End of Summary---------------------------------

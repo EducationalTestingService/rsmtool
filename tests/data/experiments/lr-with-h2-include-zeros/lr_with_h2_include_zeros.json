@@ -1,0 +1,16 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train_with_zero_scores.csv",
+    "description": "Using all features with an LinearRegression model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "LinearRegression",
+    "train_label_column": "score",
+    "second_human_score_column": "score2",
+    "exclude_zero_scores": false,
+    "features": "features.json",
+    "experiment_id": "lr_with_h2_include_zeros",
+    "trim_max": 6,
+    "test_file": "../../files/test_with_zero_scores.csv"
+}

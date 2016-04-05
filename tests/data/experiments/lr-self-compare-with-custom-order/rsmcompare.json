@@ -1,0 +1,21 @@
+{
+    "experiment_dir_old": "lr-subgroups",
+    "experiment_id_old": "lr_subgroups",
+    "description_old": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr-subgroups",
+    "experiment_id_new": "lr_subgroups",
+    "description_new": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_new": true,
+    "subgroups": ["QUESTION"],
+    "section_order": ["preprocessed_features",
+                      "feature_descriptives",
+                      "pca",
+                      "score_distributions",
+                      "evaluation",
+                      "model",
+                      "features_by_group",
+		              "preprocessed_features_by_group",
+		              "notes",
+                      "sysinfo"]
+}

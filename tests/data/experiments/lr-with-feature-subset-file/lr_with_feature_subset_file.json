@@ -1,0 +1,15 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train.csv",
+    "description": "Using a subset of features selected using subset spec file with an LinearRegression model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "LinearRegression",
+    "train_label_column": "score",
+    "feature_subset_file": "feature_file.csv",
+    "feature_subset": "subset1",
+    "experiment_id": "lr_with_feature_subset_file",
+    "trim_max": 6,
+    "test_file": "../../files/test.csv"
+}
