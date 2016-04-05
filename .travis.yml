@@ -17,7 +17,7 @@ before_install:
   - conda config --add channels desilinguist
   - conda update --yes conda
 install:
-  - conda install --yes ${TRAVIS_BUILD_DIR}/conda_requirements.txt
+  - conda install --yes --file ${TRAVIS_BUILD_DIR}/conda_requirements.txt
   - python setup.py install
 
 # Run test
