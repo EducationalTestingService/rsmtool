@@ -22,5 +22,6 @@ install:
 
 # Run test
 script:
+  - python -c 'import numpy'
   - nosetests -v ${TRAVIS_BUILD_DIR}/tests
 
