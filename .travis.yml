@@ -6,7 +6,9 @@ notifications:
   slack: etsnlp:TLmcZ7JGkPMv5eEpGxUuFm5k
 
 # run on the new Travis infrastructure
-sudo: false
+sudo: required
+dist: trusty
+#sudo: false
 
 # Install stuff
 before_install:
