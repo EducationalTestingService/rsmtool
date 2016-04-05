@@ -10,22 +10,17 @@ sudo: false
 
 # Install stuff
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda2/bin:$PATH
+  - export PATH=/home/travis/miniconda3/bin:$PATH
   - conda config --add channels desilinguist
   - conda update --yes conda
 install:
   - conda install --yes python=3.4 rsmtool
-  # Have to use pip for nose-cov because its entry points are not supported by conda yet
-  - pip install nose-cov
   - python setup.py install
 
 # Run test
 script:
-  - nosetests -v --with-cov --cov skll --cov-config .coveragerc --logging-level=DEBUG
+  - nosetests -v ${TRAVIS_BUILD_DIR}/${TRAVIS_REPO_SLUG}/tests
 
-# Calculate coverage
-after_success:
-  - coveralls --config_file .coveragerc
