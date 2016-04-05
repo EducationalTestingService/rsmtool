@@ -23,7 +23,8 @@ install:
 # Run test
 script:
   - echo $PYTHONPATH
-  - python -c 'import numpy; print(numpy.__file__)'
-  - python -c 'import matplotlib.pyplot as plt'
-  - nosetests -v ${TRAVIS_BUILD_DIR}/tests
-
+  - python -c 'import numpy; print(numpy.__version__); print(numpy.__file__)'
+  - python -c 'import matplotlib; print(matplotlib.__version__); print(matplotlib.__file__)'
+  - python -c 'import matplotlib.pyplot as plt; print(plt.__spec__)'
+  - python -c 'from matplotlib import numpy as mnp; print(mnp.__version__)'
+  - nosetests -v ${TRAVIS_BUILD_DIR}/tests/test_experiment.py:test_run_experiment_lr
