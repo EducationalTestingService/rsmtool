@@ -5,12 +5,12 @@ dependencies:
     - chmod +x miniconda.sh
     - ./miniconda.sh -b
     - export PATH=/home/ubuntu/miniconda3/bin:$PATH
-    - conda config --add channels desilinguist
-    - conda update --yes conda
-    - conda install --file conda_requirements.txt --yes
-    - pip install -e .
+    - /home/ubuntu/miniconda3/bin/conda config --add channels desilinguist
+    - /home/ubuntu/miniconda3/bin/conda update --yes conda
+    - /home/ubuntu/miniconda3/bin/conda install --file conda_requirements.txt --yes
+    - /home/ubuntu/miniconda3/bin/pip install -e .
 
 # Run test
 test:
   override:
-    - nosetests -v tests/test_experiment.py:test_run_experiment_lr
+    - /home/ubuntu/miniconda3/bin/nosetests -v tests/test_experiment.py:test_run_experiment_lr
