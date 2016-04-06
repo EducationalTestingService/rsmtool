@@ -16,4 +16,4 @@ dependencies:
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/bin/nosetests -v tests/test_experiment.py:test_run_experiment_lr
+    - ${HOME}/miniconda3/bin/nosetests -v tests
