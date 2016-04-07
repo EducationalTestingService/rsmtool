@@ -1,5 +1,5 @@
 """
-Functions dealing with training R or SKLL models
+Functions dealing with training built-in or SKLL models
 
 :author: Nitin Madnani (nmadnani@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -153,7 +153,7 @@ def create_fake_skll_learner(df_coefficients):
     fake_fs = FeatureSet('fake', ids=['1'], labels=[1.0], features=fake_features)
     learner.train(fake_fs, grid_search=False)
 
-    # now create its parameters from the coefficients from the R model
+    # now create its parameters from the coefficients from the built-in model
     learner.model.coef_ = learner.feat_vectorizer.transform(coefdict).toarray()[0]
     learner.model.intercept_ = intercept
     return learner
