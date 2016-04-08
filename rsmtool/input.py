@@ -860,14 +860,23 @@ def load_and_filter_data(csv_file,
     logger = logging.getLogger(__name__)
 
     # read the csv file into a data frame but we want to make
-    # sure to read in the `id_column`, candidate_column and
+    # sure to read in the `id_column`, `candidate_column` and
     # subgroups (if any) as a string to ensure
     # that we do not lose information, e.g., initial zeros
-
     string_columns = [id_column, candidate_column] + subgroups
     converter_dict = dict([(column, str) for column in string_columns if column])
 
+    # read in the CSV file
     df = pd.read_csv(csv_file, converters=converter_dict)
+
+    # it is possible for the `id_column` and `candidate_column` to be
+    # set to the same column name in the CSV file, e.g., if there is
+    # only one response per candidate. If this happens, we neeed to
+    # create a duplicate column for candidates for the downstream
+    # processing to work as usual.
+    if id_column == candidate_column:
+        df['candidate'] = df['ID'].copy()
+        candidate_column = 'candidate'
 
     # make sure that the columns specified in the config file actually exist
     columns_to_check = [id_column, label_column]
