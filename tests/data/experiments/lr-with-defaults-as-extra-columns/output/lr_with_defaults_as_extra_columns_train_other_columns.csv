@@ -1,4 +1,4 @@
-##spkitemid##,spkitemid,##length##,QUESTION,L1,##sc1##,##sc2##,h2
+spkitemid,##spkitemid##,##length##,QUESTION,L1,##sc1##,##sc2##,h2
 RESPONSE_1,RESPONSE_1,279,QUESTION_1,Esperanto,3,3,3
 RESPONSE_2,RESPONSE_2,434,QUESTION_1,Klingon,4,4,4
 RESPONSE_3,RESPONSE_3,261,QUESTION_1,Navi,3,3,3
