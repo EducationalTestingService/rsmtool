@@ -159,17 +159,17 @@ def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
     away from the `mean`.
     """
 
-    # We use pandas functions instead of np (1) for consistency with
-    # other functions
+    # convert data to a numpy float array before doing any clamping
+    new_data = np.array(data, dtype=np.float)
+
     if not mean:
-        mean = data.mean()
+        mean = new_data.mean()
     if not sd:
-        sd = data.std()
+        sd = new_data.std()
 
     floor = mean - sd_multiplier * sd
     ceiling = mean + sd_multiplier * sd
 
-    new_data = data.copy()
     new_data[new_data > ceiling] = ceiling
     new_data[new_data < floor] = floor
 
