@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from nose.tools import assert_raises, eq_, ok_, raises
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal
 from pandas.util.testing import assert_frame_equal
 
 _my_dir = dirname(__file__)
@@ -20,8 +20,9 @@ from rsmtool.preprocess import (apply_inverse_transform,
                                 apply_add_one_log_transform,
                                 apply_add_one_inverse_transform,
                                 filter_on_column,
-                                transform_feature,
-                                filter_on_flag_columns)
+                                filter_on_flag_columns,
+                                remove_outliers,
+                                transform_feature)
 
 
 def test_filter_on_column():
@@ -190,3 +191,12 @@ def test_filter_on_flag_column_nothing_left():
     flag_dict = {'flag1': ['0'], 'flag2': ['1', '2', '3']}
 
     df_new, df_excluded = filter_on_flag_columns(bad_df, flag_dict)
+
+
+def test_remove_outliers():
+    # we want to test that even if we pass in a list of
+    # integers, we still get the right clamped output
+    data = [1, 1, 2, 2, 1, 1]*10 + [10]
+    ceiling = np.mean(data) + 4*np.std(data)
+    clamped_data = remove_outliers(data)
+    assert_almost_equal(clamped_data[-1], ceiling)
