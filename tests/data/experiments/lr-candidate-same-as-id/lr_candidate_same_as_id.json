@@ -1,7 +1,7 @@
 {
     "test_label_column": "score",
     "train_file": "../../files/train.csv",
-    "description": "Using all features with an LinearRegression model.",
+    "description": "Using all features with a LinearRegression model.",
     "use_scaled_predictions": true,
     "trim_min": 1,
     "id_column": "ID",
