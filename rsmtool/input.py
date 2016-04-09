@@ -886,11 +886,18 @@ def load_and_filter_data(csv_file,
     # it is possible for the `id_column` and `candidate_column` to be
     # set to the same column name in the CSV file, e.g., if there is
     # only one response per candidate. If this happens, we neeed to
-    # create a duplicate column for candidates for the downstream
+    # create a duplicate column for candidates or id for the downstream
     # processing to work as usual.
     if id_column == candidate_column:
-        df['candidate'] = df[id_column].copy()
-        candidate_column = 'candidate'
+        # if the name for both columns is `candidate`, we need to
+        # create a separate id_column name
+        if id_column == 'candidate':
+            df['spkitemid'] = df['candidate'].copy()
+            id_column = 'spkitemid'
+        # else we create a separate `candidate` column
+        else:
+            df['candidate'] = df[id_column].copy()
+            candidate_column = 'candidate'
 
     df = rename_default_columns(df,
                                 requested_feature_names,
@@ -1054,13 +1061,8 @@ def load_and_filter_data(csv_file,
         if exclude_zero_scores:
             df_filtered_human_scores['sc2'] = df_filtered_human_scores['sc2'].replace(0, nan)
 
-    # remove spkitemid from `not_other_columns`
-    # since we want that column in the `other_columns`
-    # data frame
-    not_other_columns.remove('spkitemid')
-
-    # now extract all other columns
-    other_columns = [column for column in df_filtered.columns
+    # now extract all other columns and add 'spkitemid'
+    other_columns = ['spkitemid'] + [column for column in df_filtered.columns
                      if column not in not_other_columns]
     df_filtered_other_columns = df_filtered[other_columns]
 
