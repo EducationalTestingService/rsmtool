@@ -32,11 +32,22 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
                                    default_feature_sign)
 
+
 def locate_custom_sections(custom_report_section_paths, configpath):
     """
-    Get the absolute paths for custom report sections
-    and check that the files exist
+    Get the absolute paths for custom report sections and check that
+    the files exist. If a file does not exist, raise an exception.
+
+    :param custom_report_section_paths: list of paths to ipython notebook
+      files representing the custom sections.
+    :type custom_report_section_paths: `list` of `str`
+    :param configpath: the path to the config file
+    :type configpath: `str`
+    :returns: a list of absolute paths to the custom section notebooks
+    :rtype: `list` of `str`
+    :raises: FileNotFoundError
     """
+
     custom_report_sections = []
     for cs_path in custom_report_section_paths:
         cs_location = locate_file(cs_path, configpath)
@@ -51,7 +62,15 @@ def locate_custom_sections(custom_report_section_paths, configpath):
 def normalize_json_fields(json_obj):
     """
     Normalize the the field names in `json_obj` in order to
-    maintain backwards compatibility with old config files
+    maintain backwards compatibility with old config files.
+
+    :param json_obj: the JSON object containing the fields from the
+        original configuration file, possibly with the keys being
+        old-style RSMTool field names.
+    :type json_obj: `dict`
+    :returns: a JSON object containing the new-style names for all
+        fields and their specified values.
+    :rtype: `dict`
     """
     logger = logging.getLogger(__name__)
 
@@ -132,9 +151,22 @@ def normalize_json_fields(json_obj):
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     """
-    Ensure that all required fields are specified,
-    add default to values for all other fields, and
-    ensure that all specified fields are valid.
+    Ensure that all required fields are specified, add default values
+    values for all unspecified fields, and ensure that all specified
+    fields are valid. Raises an exception if it finds that required
+    fields are not specified or that the values are not valid.
+
+    :param json_obj: a JSON object containing the values specified in
+        the configuration file, with normalized field names
+    :type json_obj: `dict`
+    :param context: the context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval', 'rsmpredict', 'rsmcompare'},
+        defaults to 'rsmtool'
+    :type context: str, optional
+    :returns: a JSON object containing the originally specified values
+        and default values for fields that were not specified
+    :rtype: `dict`
+    :raises: ValueError
     """
 
     logger = logging.getLogger(__name__)
@@ -257,11 +289,18 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
 
 def process_json_fields(json_obj):
     """
-    Converts json fields which are read in
-    string to an appropriate format. Fields which
-    can take multiple values lists are converted to lists
+    Converts fields which are read in as string to the appropriate format.
+    Fields which can take multiple values lists are converted to lists
     if they have not been already formatted as such.
+
+    :param json_obj: a JSON object containing the fields and their values
+        from the configuration file
+    :type json_obj: `dict`
+    :returns: a JSON object with the string values converted to lists, where
+        necessary.
+    :rtype: `dict`
     """
+
     # convert multiple values into lists
     list_fields = ['feature_prefix',
                    'general_sections',
@@ -279,18 +318,26 @@ def process_json_fields(json_obj):
 
     return new_json_obj
 
-# method to parse json config file but removes the comments first
-# (http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html)
+
 def parse_json_with_comments(filename):
-    """ Parse a JSON file
-        First remove comments and then use the json module package
-        Comments look like :
-            // ...
-        or
-            /*
-            ...
-            */
     """
+    Parse a JSON file after removing any comments.
+    Comments can look like :
+        // ...
+    or
+        /*
+        ...
+        */
+
+    Adapted from:
+    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
+
+    :param filename: the path to the configuration file
+    :type filename: `str`
+    :returns: a JSON object representing the configuration file
+    :rtype: `dict`
+    """
+
     # Regular expression to identify comments
     comment_re = re.compile(
         '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
@@ -314,10 +361,20 @@ def parse_json_with_comments(filename):
 def normalize_and_validate_feature_file(feature_json):
 
     """
-    Normalize the the field names in `feature_json`
-    in order to maintain backwards compatibility
-    with old config files.
+    Normalize the the field names in `feature_json` in order to maintain
+    backwards compatibility with old config files. Raises exceptions
+    if it finds missing fields or duplicate feature names.
+
+    :param feature_json: a JSON object containing the information
+        specified in the feature file, possibly containing the old-style
+        names for feature fields
+    :type feature_json: `dict`
+    :returns: a JSON object with all old style names normalized to
+        new style names
+    :rtype: `dict`
+    :raises: KeyError, ValueError
     """
+
     field_mapping = {'wt': 'sign',
                      'featN': 'feature',
                      'trans': 'transform'}
@@ -354,6 +411,16 @@ def normalize_and_validate_feature_file(feature_json):
     return new_json_obj
 
 def read_json_file(json_file):
+    """
+    Read the configuration json file into a JSON object. Raises an
+    exception if it finds any formatting errors.
+
+    :param json_file: path to configuration JSON file
+    :type json_file: `str`
+    :returns: a JSON object
+    :rtype: `dict`
+    :raises: ValueError
+    """
     try:
         obj = parse_json_with_comments(json_file)
     except ValueError:
@@ -368,10 +435,22 @@ def read_json_file(json_file):
 def check_main_config(obj, context='rsmtool'):
 
     """
-    Normalize all fields in main config file, check for
-    all required fields, add the default values, and convert
-    all strings to appropriate objects.
+    The driver function that creates the final JSON object from the
+    configuration file. Normalizes all fields in main config file, checks
+    for all required fields, adds the default values, and convert all
+    strings to appropriate objects.
+
+    :param obj: the JSON object from the configuration file
+    :type obj: `dict`
+    :param context: the context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval', 'rsmpredict', 'rsmcompare'},
+        defaults to 'rsmtool'
+    :type context: str, optional
+    :returns: the final JSON object with normalized and validated fields
+        and converted values
+    :rtype: `dict`
     """
+
     obj = normalize_json_fields(obj)
     obj = validate_and_populate_json_fields(obj, context=context)
     obj = process_json_fields(obj)
@@ -381,10 +460,16 @@ def check_main_config(obj, context='rsmtool'):
 def locate_file(filepath, configpath):
 
     """
-    Try to locate an experiment file. If the given path
-    doesn't exist, then may be the path is relative to
-    the path of the config file. If neither exists, then
-    return None.
+    Try to locate an experiment file. If the given path doesn't exist,
+    then may be the path is relative to the path of the config file.
+    If neither exists, then return None.
+
+    :param filepath: name of the experiment file we want to locate
+    :type filepath: `str`
+    :param configpath: the path to the configuration file
+    :type configpath: `str`
+    :returns: the absoluate path to the experiment file or `None`
+    :rtype: `str` or `None`
     """
 
     # the feature config file can be in the 'feature' directory
@@ -409,9 +494,19 @@ def locate_file(filepath, configpath):
 def check_subgroups(df, subgroups):
 
     """
-    Check that all subgroups, if specified, correspond to
-    columns in the provided data frame, and replace all NaNs
-    in subgroups values with 'No info' for later convenience.
+    Check that all subgroups, if specified, correspond to columns in the
+    provided data frame, and replace all NaNs in subgroups values with
+    'No info' for later convenience. Raises an excetion if any specified
+    subgroup columns are missing.
+
+    :param df: the input data frame containing the feature values
+    :type df: `pandas` DataFrame
+    :param subgroups: list of column names that contain grouping
+        information
+    :type subgroups: `list` of `str`
+    :returns: the modified data frame with NaNs replaced.
+    :rtype: `pandas` DataFrame
+    :raises: KeyError
     """
 
     missing_subgroup_columns = set(subgroups).difference(df.columns)
@@ -429,15 +524,19 @@ def check_subgroups(df, subgroups):
     # replace any empty values in subgroups values by "No info"
     empty_value = re.compile(r"^\s*$")
     df[subgroups] = df[subgroups].replace(to_replace=empty_value, value='No info')
-    return(df)
-
+    return df
 
 
 def get_trim_min_max(config_obj):
-
     """
-    Get the specified trim min and max, if any and make sure
-    they are numeric.
+    Get the specified trim min and max, if any and make sure they are
+    numeric.
+
+    :param config_obj: a JSON object containing the values from
+        the configuration file
+    :type config_obj: `dict`
+    :returns: the specified trim min and max values
+    :rtype: {`float`, `float`}
     """
 
     spec_trim_min = config_obj.get('trim_min', None)
@@ -447,15 +546,22 @@ def get_trim_min_max(config_obj):
         spec_trim_min = float(spec_trim_min)
     if spec_trim_max:
         spec_trim_max = float(spec_trim_max)
-    return(spec_trim_min, spec_trim_max)
+    return (spec_trim_min, spec_trim_max)
 
 
 def check_flag_column(config_obj):
-
     """
-    make sure the flag_column field is in the correct format.
-    Get flag columns and values for filtering if any
-    and convert single values to lists
+    Make sure the `flag_column` field is in the correct format. Get
+    flag columns and values for filtering if any and convert single
+    values to lists. Raises an exception if `flag_column` is not
+    correctly specified.
+
+    :param config_obj: a JSON object containing the information from
+        the configuration file
+    :type config_obj: `dict`
+    :returns: a properly formatted `flag_column` dictionary
+    :rtype: `dict`
+    :raises: ValueError
     """
 
     logger = logging.getLogger(__name__)
@@ -495,11 +601,20 @@ def check_flag_column(config_obj):
 
     return new_filtering_dict
 
-def check_feature_subset_file(feature_specs,
-                              subset=None,
-                              sign=None):
+def check_feature_subset_file(feature_specs, subset=None, sign=None):
+    """
+    Check that the file is in the correct format and contains all
+    the requested values. Raises an exception if it finds any errors.
 
-    # check that the file is in the correct format and contains all the requested values
+    :param feature_specs: a data frame containing the feature specifications
+    :type feature_specs: `pandas` DataFrame
+    :param subset: the name of a pre-defined feature subset, defaults to None
+    :type subset: `str`, optional
+    :param sign: the value of the sign, defaults to None
+    :type sign: `str`, optional
+    :raises: ValueError
+    """
+
     if 'Feature' not in feature_specs.columns:
         raise ValueError("The feature_subset_file must contain a column named 'Feature' "
                          "containing the feature names.")
@@ -519,12 +634,19 @@ def check_feature_subset_file(feature_specs,
             raise ValueError("The sign columns in feature file can only contain - or +")
 
 
-
-def load_experiment_data(main_config_file, outdir):
-
+def load_experiment_data(main_config_file, output_dir):
     """
-    Set up the experiment by loading the training
-    and evaluation data sets and preprocessing them.
+    The main function that sets up the experiment by loading the
+    training and evaluation data sets and preprocessing them. Raises
+    appropriate exceptions.
+
+    :param main_config_file: the path to the experiment configuration
+        file
+    :type main_config_file: `str`
+    :param output_dir: the path to the output directory that will
+        contain the experiment output
+    :type output_dir: `str`
+    :raises: ValueError, FileNotFoundError
     """
 
     logger = logging.getLogger(__name__)
@@ -1094,10 +1216,35 @@ def rename_default_columns(df,
                            length_column,
                            system_score_column,
                            candidate_column):
-
     """
-    Standardize all column names and rename all columns
-    with default names to ##NAME##.
+    Standardize all column names and rename all columns with default
+    names to ##NAME##.
+
+    :param df: the input data frame containing all the feature columns
+    :type df: `pandas` DataFrame
+    :param requested_feature_names: the list of feature column names that
+        the user wants to include in the scoring model
+    :type requested_feature_names: `list` of `str`
+    :param id_column: the column name containing the response IDs
+    :type id_column: `str`
+    :param first_human_score_column: the column name containing the
+        H1 scores
+    :type first_human_score_column: `str`
+    :param second_human_score_column: the column name containing the
+        H2 scores. Should be `None` if no H2 scores are available
+    :type second_human_score_column: `str`
+    :param length_column: the column name containing the response
+        length information. Should be `None` if lengths are not available
+    :type length_column: `str`
+    :param system_score_column: the column name containing the score
+        predicted by the system. This is only used for RSMEval.
+    :type system_score_column: `str`
+    :param candidate_column: the column name containing identifying
+        information at the candidate level. Should be `None` if such
+        information is not available.
+    :type candidate_column: `str`
+    :returns: the output data frame with all approrimate renamings
+    :rtype: `pandas` DataFrame
     """
 
     columns = [id_column,
