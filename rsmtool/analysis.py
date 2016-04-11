@@ -12,6 +12,15 @@ def compute_basic_descriptives(df, selected_features):
     """
     Compute basic descriptive statistics for the columns
     in the given data frame.
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param selected_features: list of feature names for which to compute
+        the descriptives
+    :type selected_features: `list` of `str`
+    :returns: a data frame containing the descriptives for each of
+        the features
+    :rtype: `pandas` DataFrame
     """
 
     # select only feature columns
@@ -48,6 +57,15 @@ def compute_percentiles(df, selected_features):
     """
     Compute percentiles and outlier descriptives for the
     given data frame using the columns with the given names
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param selected_features: list of feature names for which to compute
+        the percentile descriptives
+    :type selected_features: `list` of `str`
+    :returns: a data frame containing the percentile information for
+        each of the features
+    :rtype: `pandas` DataFrame
     """
 
     # select only feature columns
@@ -96,6 +114,15 @@ def compute_outliers(df, selected_features):
     Compute the number and percentage of outliers
     outside mean +/- 4 SD for the given columns with
     in the given data frame
+
+    :param df: input data frame`
+    :type df: `pandas` DataFrame
+    :param selected_features: list of feature names for which to compute
+        outlier information
+    :type selected_features: `list` of `str`
+    :returns: a data frame containing outlier information for each of
+        the features
+    :rtype: `pandas` DataFrame
     """
 
     # select only feature columns
@@ -169,7 +196,8 @@ def correlation_helper(df, target_variable, grouping_variable, include_length=Fa
             df_target_partcors,
             df_target_partcors_no_length)
 
-def compute_correlations_by_group(df, selected_features,
+def compute_correlations_by_group(df,
+                                  selected_features,
                                   target_variable,
                                   grouping_variable,
                                   include_length=False):
@@ -177,7 +205,25 @@ def compute_correlations_by_group(df, selected_features,
     Compute various marginal and partial correlations of the given columns
     in the given data frame against the `target_variable` for all data
     and for each level of the `grouping_variable`.
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param selected_features: list of feature names for which to compute
+        the correlations
+    :type selected_features: `list` of `str`
+    :param target_variable: the feature name indicating the target variable
+        e.g., the dependent variable
+    :type target_variable: `str`
+    :param grouping_variable: the feature name that contain the grouping
+        information
+    :type grouping_variable: `str`
+    :param include_length: whether or not to include the length when
+        computing the partial correlations, defaults to False
+    :type include_length: bool, optional
+    :returns: a data frame containing the correlations
+    :rtype: `pandas` DataFrame
     """
+
     df_desc = df.copy()
 
     columns = selected_features + [target_variable, grouping_variable]
@@ -207,6 +253,15 @@ def compute_pca(df, selected_features):
     """
     Compute the PCA decomposition of the given data
     frame and restrict to the given columns.
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param selected_features: list of feature names to be used in the
+        PCA decomposition
+    :type selected_features: `list` of `str`
+    :returns: two data frames, the first containing the PCA components,
+        and the second containing the variance
+    :rtype: {`pandas` DataFrame, `pandas` DataFrame}
     """
     # remove the spkitemid and sc1 column
 
@@ -368,17 +423,35 @@ def compute_metrics(df,
                     use_scaled_predictions=False,
                     include_second_score=False):
     """
-    Compute the evaluation metrics for the scores
-    in the given data frame. This function compute metrics
-    for all score types. If `include_second_score` is True,
-    then assume that a column called `sc2` containing a second
-    human score is available and use that to compute the human-human
-    evaluation stats and the performance degradation stats.
+    Compute the evaluation metrics for the scores in the given data frame.
+
+    This function compute metrics for all score types.
+    If `include_second_score` is True, then assume that a column called
+    `sc2` containing a second human score is available and use that to
+    compute the human-human evaluation stats and the performance
+    degradation stats.
 
     If `compute_shortened` is set to True, then this function also
     computes a shortened version of the full human-machine metrics data
     frame. See `filter_metrics()` for a description of the default
     columns included in the shortened data frame.
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param compute_shortened: also compute a shortened version of the full
+        metrics data frame, defaults to False
+    :type compute_shortened: bool, optional
+    :param use_scaled_predictions: include scaled predictions for evaluation
+        statistics, defaults to False
+    :type use_scaled_predictions: bool, optional
+    :param include_second_score: second human score available, defaults to False
+    :type include_second_score: bool, optional
+    :returns: three data frames, the first contains the full set of evaluation
+        metrics, the second contains the human-human statistics but is an
+        empty dataframe if `include_second_score` is `False, and the third
+        is a shortened version of the first data frame but is empty if
+        `compute_shortened` is False.
+    :rtype: {`pandas` DataFrame, `pandas` DataFrame, `pandas` DataFrame}
     """
 
     # if the second human score column is available, the values are
@@ -448,9 +521,27 @@ def compute_metrics_by_group(df_test,
                              include_second_score=False):
     """
     Compute a subset of the evaluation metrics for the scores
-    in the given data frame by group specified in grouping variables.
+    in the given data frame by group specified in `grouping_variable`.
+
     See `filter_metrics()` above for a description of the subset
     that is selected.
+
+    :param df_test: input data frame
+    :type df_test: `pandas` DataFrame
+    :param grouping_variable: the feature name indicating the column
+        that contains grouping information
+    :type grouping_variable: `str`
+    :param use_scaled_predictions: include scaled predictions when computing
+        the correlation statistics, defaults to False
+    :type use_scaled_predictions: bool, optional
+    :param include_second_score: include human-human correlation
+        statistics, defaults to False
+    :type include_second_score: bool, optional
+    :returns: two data frames, the first containing the correlation
+        human-machine correlation statistics and the second either contains
+        the human-human statistics or is an empty data frame, depending on
+        whether `include_second_score` is `True`.
+    :rtype: {`pandas` DataFrame, `pandas` DataFrame}
     """
 
     # create a duplicate data frame to compute evaluations
@@ -495,12 +586,21 @@ def compute_metrics_by_group(df_test,
 def compute_degradation(df, use_all_responses=True):
     """
     Compute the degradation in performance when using the machine
-    to predict the score instead of a second human. For this, we can
-    compute the machine performance either only on the double scored
-    data or on the full dataset. Both options have their pros and cons.
-    The default is to use the full dataset. This function also assumes
-    that the `sc2` column exists in the given data frame, in addition to
-    `sc1` and the various types of predictions.
+    to predict the score instead of a second human.
+
+    For this, we can compute the machine performance either only on the
+    double scored data or on the full dataset. Both options have their
+    pros and cons. The default is to use the full dataset. This function
+    also assumes that the `sc2` column exists in the given data frame,
+    in addition to `sc1` and the various types of predictions.
+
+    :param df: input data frame
+    :type df: `pandas` DataFrame
+    :param use_all_responses: use the full data set instead of only
+        using the double-scored subset, defaults to True
+    :type use_all_responses: bool, optional
+    :returns: a data frame containing the degradation statistics
+    :rtype: `pandas` DataFrame
     """
 
     if use_all_responses:
@@ -532,10 +632,33 @@ def run_training_analyses(df_train_all,
                           length_column,
                           selected_features,
                           subgroups):
-
     """
     Run all of the analyses on the training data
+
+    :param df_train_all: the data frame containing all of the training
+        set features
+    :type df_train_all: `pandas` DataFrame
+    :param df_train_all_metadata: the data frame containing all of the
+        training set metadata (e.g., subgroups)
+    :type df_train_all_metadata: `pandas` DataFrame
+    :param df_train_all_preprocessed_features: the data frame containing
+        all of the pre-processed training set features
+    :type df_train_all_preprocessed_features: `pandas` DataFrame
+    :param df_train_length: the data frame containing the length information
+        for all responses in the training set
+    :type df_train_length: `pandas` DataFrame
+    :param length_column: the name of the column containing the `length`
+        information
+    :type length_column: `str`
+    :param selected_features: list of features for which to compute
+        all of the analyses
+    :type selected_features: `list` of `str`
+    :param subgroups: list of columns containing grouping information
+    :type subgroups: `list` of `str`
+    :returns: a list of data frames, each containing a different
+        analysis of the training set
     """
+
 
     # only use the features selected by the model but keep their order the same
     # as in the original file as ordering may affect the sign in pca
@@ -630,10 +753,30 @@ def run_prediction_analyses(df_test,
                             df_test_human_scores,
                             subgroups,
                             second_human_score_column,
-                            exclude_zero_scores=True,
                             use_scaled_predictions=False):
     """
-    Run all the analyses on the predictions
+    Run all the analyses on the machine predictions.
+
+    :param df_test: the data frame containing the predictions of the
+        model on the test set
+    :type df_test:`pandas` DataFrame
+    :param df_test_metadata: the data frame containing the test set
+        metadata
+    :type df_test_metadata: `pandas` DataFrame
+    :param df_test_human_scores: the data frame containing the human
+        scores for the test set
+    :type df_test_human_scores: `pandas` DataFrame
+    :param subgroups: a list of names indicating columns in the test
+        data containing grouping information
+    :type subgroups: `list` of `str`
+    :param second_human_score_column: the column name that contains the
+        second human scores for the test set
+    :type second_human_score_column: `str`
+    :param use_scaled_predictions: include scaled predictions when computing
+        computing the evaluation statistics, defaults to False
+    :type use_scaled_predictions: bool, optional
+    :returns: a list of data frames, each containing a different
+        analysis of the test set
     """
 
     df_preds = pd.merge(df_test, df_test_metadata, on='spkitemid')
@@ -709,8 +852,26 @@ def run_prediction_analyses(df_test,
             df_confmatrix,
             df_score_dist)
 
-def analyze_excluded_responses(df, features, header,
-                               exclude_zero_scores=True):
+def analyze_excluded_responses(df, features, header, exclude_zero_scores=True):
+    """
+    Compute statistics on the responses that were excluded from
+    analyses, either in the training set or in the test set.
+
+    :param df: the data frame containing the excluded responses
+    :type df: `pandas` DataFrame
+    :param features: the list of column names containing the features
+        to which we want to restrict the analyses
+    :type features: `list` of `str`
+    :param header: a string to be used as the table header for the
+        output data frame
+    :type header: `str`
+    :param exclude_zero_scores: whether or not the zero-score responses
+        should be counted in the exclusion statistics, defaults to True
+    :type exclude_zero_scores: bool, optional
+    :returns: a two-dimensional data frame containing the exclusion
+        statistics
+    :rtype:`pandas` DataFrame
+    """
 
     #create an empty output data frame
     df_full_crosstab = pd.DataFrame({'all features numeric': [0, 0, 0],
@@ -745,7 +906,8 @@ def analyze_excluded_responses(df, features, header,
     df_full_crosstab.loc['numeric non-zero human score',
                          'all features numeric'] = '-'
 
-    # if we are not excluding the zeros, rename the corresponding cells so that they are not set to zero
+    # if we are not excluding the zeros, rename the corresponding cells
+    # so that they are not set to zero
     if not exclude_zero_scores:
         assert(df_full_crosstab.loc['zero human score',
                                     'all features numeric'] == 0)
@@ -756,6 +918,26 @@ def analyze_excluded_responses(df, features, header,
 
 
 def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
+    """
+    Compute statistics on the responses that were used in
+    analyses, either in the training set or in the test set.
+
+    :param df_train: the data frame containing the response information
+        for the training set
+    :type df_train:`pandas` DataFrame
+    :param df_test: the data frame containing the response information
+        for the test set
+    :type df_test: `pandas` DataFrame
+    :param subgroups: list of column names that contain grouping
+        information
+    :type subgroups: `list` of `str`
+    :param candidate_column: the column name that contains candidate
+        identification information
+    :type candidate_column: `str`
+    :returns: a data frame containing information about the used
+        responses
+    :rtype:`pandas` DataFrame
+    """
 
     # create a basic data frame for responses only
     train_responses = set(df_train['spkitemid'])
@@ -791,6 +973,22 @@ def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
 
 
 def analyze_used_predictions(df_test, subgroups, candidate_column):
+    """
+    Compute statistics on the predictions that were used in
+    analyses.
+
+    :param df_test: the data frame containing the predictions
+    :type df_test: `pandas` DataFrame
+    :param subgroups: list of column names that contain grouping
+        information
+    :type subgroups: `list` of `str`
+    :param candidate_column: the column name that contains candidate
+        identification information
+    :type candidate_column: `str`
+    :returns: a data frame containing information about the used
+        predictions
+    :rtype: `pandas` DataFrame
+    """
 
     rows = [{'partition': 'Evaluation', 'responses': df_test['spkitemid'].size}]
 
@@ -805,7 +1003,7 @@ def analyze_used_predictions(df_test, subgroups, candidate_column):
         df_analysis[group] = [df_test[group].unique().size]
 
     df_analysis = df_analysis[df_columns]
-    return(df_analysis)
+    return df_analysis
 
 
 def run_data_composition_analyses_for_rsmtool(df_train_metadata,
@@ -816,8 +1014,37 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
                                               subgroups,
                                               candidate_column,
                                               exclude_zero_scores=True):
+    """
+    Run all data composition analyses for RSMTool.
 
-    ''' Run all data composition analyses for RSMTool'''
+    :param df_train_metadata: the data frame containing the metadata
+        information about the responses in the training set
+    :type df_train_metadata: `pandas` DataFrame
+    :param df_test_metadata: the data frame containing the metadata
+        information about the responses in the test set
+    :type df_test_metadata: `pandas` DataFrame
+    :param df_train_excluded: the data frame containing the responses
+        from the training set that were excludeds
+    :type df_train_excluded: `pandas` DataFrame
+    :param df_test_excluded: the data frame containing the responses
+        from the test set that were excluded
+    :type df_test_excluded: `pandas` DataFrame
+    :param features: the list of column names containing the features
+        to which we want to restrict the analyses
+    :type features: `list` of `str`
+    :param subgroups: list of column names that contain grouping
+        information
+    :type subgroups: `list` of `str`
+    :param candidate_column: the column name that contains candidate
+        identification information
+    :type candidate_column: `str`
+    :param exclude_zero_scores: whether or not the zero-score responses
+        should be excluded from the various analyses, defaults to True
+    :type exclude_zero_scores: bool, optional
+    :returns: a list of data frames, each containing a different
+        data composition analysis
+    """
+
 
     df_train_excluded_analysis = analyze_excluded_responses(df_train_excluded,
                                                             features,
@@ -863,7 +1090,10 @@ def run_data_composition_analyses_for_rsmeval(df_test_metadata,
                                               candidate_column,
                                               exclude_zero_scores=True):
 
-    '''  Run all data composition analyses for RSMEval'''
+    """
+    Similar to `run_data_composition_analyses_for_rsmtool()`
+    but for RSMEval.
+    """
 
     # analyze excluded responses
     df_test_excluded_analysis = analyze_excluded_responses(df_test_excluded,

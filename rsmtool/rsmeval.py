@@ -390,7 +390,6 @@ def run_evaluation(config_file, output_dir):
                                               df_test_human_scores,
                                               subgroups,
                                               second_human_score_column,
-                                              exclude_zero_scores=exclude_zero_scores,
                                               use_scaled_predictions=use_scaled_predictions)
 
     write_experiment_output([df_human_machine_eval,
