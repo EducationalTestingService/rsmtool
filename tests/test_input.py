@@ -74,6 +74,51 @@ def test_validate_and_populate_unspecified_fields():
 
 
 @raises(ValueError)
+def test_validate_experiment_id_1():
+    data = {'experiment_id': 'test experiment',
+            'train_file': 'data/rsmtool_smTrain.csv',
+            'test_file': 'data/rsmtool_smEval.csv',
+            'model': 'LinearRegression'}
+    validate_and_populate_json_fields(data)
+
+
+@raises(ValueError)
+def test_validate_experiment_id_2():
+    data = {'experiment_id': 'test experiment',
+            'predictions_file': 'data/foo',
+            'system_score_column': 'h1',
+            'trim_min': 1,
+            'trim_max': 5}
+    validate_and_populate_json_fields(data, context='rsmeval')
+
+
+@raises(ValueError)
+def test_validate_experiment_id_3():
+    data = {'experiment_id': 'test experiment',
+            'experiment_dir': 'data/foobar',
+            'input_features_file': 'data/feats'}
+    validate_and_populate_json_fields(data, context='rsmpredict')
+
+
+@raises(ValueError)
+def test_validate_experiment_id_4():
+    data = {'experiment_id_old': 'old experiment',
+            'experiment_dir_old': 'data/old',
+            'experiment_id_new': 'new experiment',
+            'experiment_dir_new': 'data/new',}
+    validate_and_populate_json_fields(data, context='rsmcompare')
+
+
+@raises(ValueError)
+def test_validate_experiment_id_5():
+    data = {'experiment_id_old': 'old_experiment',
+            'experiment_dir_old': 'data/old',
+            'experiment_id_new': 'new experiment',
+            'experiment_dir_new': 'data/new',}
+    validate_and_populate_json_fields(data, context='rsmcompare')
+
+
+@raises(ValueError)
 def test_validate_and_populate_unknown_fields():
     data = {'experiment_id': 'experiment_1',
             'train_file': 'data/rsmtool_smTrain.csv',

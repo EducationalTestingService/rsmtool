@@ -144,13 +144,15 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     # 1. Check to make sure all required fields are specified
     if context == 'rsmtool':
         required_fields = ['experiment_id',
-                           'model', 'train_file',
+                           'model',
+                           'train_file',
                            'test_file']
     elif context == 'rsmeval':
         required_fields = ['experiment_id',
                            'predictions_file',
                            'system_score_column',
-                           'trim_min', 'trim_max']
+                           'trim_min',
+                           'trim_max']
     elif context == 'rsmpredict':
         required_fields = ['experiment_id',
                            'experiment_dir',
@@ -163,7 +165,13 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         if field not in new_json_obj:
             raise ValueError("The config file must specify '{}'".format(field))
 
-    # 2. Add default values for all unspecified fields
+    # 2. Check to make sure that no experiment IDs contain spaces
+    experiment_id_values = [new_json_obj[k] for k in new_json_obj
+                            if k.startswith('experiment_id')]
+    if any([re.search(r'\s', v) for v in experiment_id_values]):
+        raise ValueError("Experiment IDs cannot contain any spaces.")
+
+    # 3. Add default values for all unspecified fields
     defaults = {'id_column': 'spkitemid',
                 'description': '',
                 'description_old': '',
@@ -199,12 +207,12 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         if field not in new_json_obj:
             new_json_obj[field] = defaults[field]
 
-    # 3. Check to make sure no unrecognized fields are specified
+    # 4. Check to make sure no unrecognized fields are specified
     for field in new_json_obj:
         if field not in defaults and field not in required_fields:
             raise ValueError("Unrecognized field '{}' in json file".format(field))
 
-    # 4. Check for fields that must be specified together and try to use the default feature file:
+    # 5. Check for fields that must be specified together and try to use the default feature file:
     if new_json_obj['feature_subset'] and not new_json_obj['feature_subset_file']:
 
         # Check if we have the default subset file from rsmextra
