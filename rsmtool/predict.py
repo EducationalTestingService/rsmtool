@@ -5,6 +5,7 @@ Functions dealing with making predictions
 :author: Anastassia Loukina (aloukina@ets.org)
 :organization: ETS
 """
+
 import logging
 
 import numpy as np
@@ -18,6 +19,20 @@ def predict_with_model(model, df):
     """
     Get the raw predictions of the `model` on the data
     contained in the data frame `df`.
+
+    Parameters
+    ----------
+    model : skll Learner object
+        The SKLL model with which to make the predictions.
+    df : pandas DataFrame
+        Data frame containing features on which to make
+        the predictions.
+
+    Returns
+    -------
+    df_predictions: pandas DataFrame
+        Data frame containing the raw predictions, the IDs,
+        and the human scores.
     """
 
     logger = logging.getLogger(__name__)
@@ -48,6 +63,28 @@ def generate_train_and_test_predictions(model, df_train, df_test, trim_min, trim
     """
     Generate raw, scaled, and trimmed predictions of `model`
     on the given training and testing data.
+
+    Parameters
+    ----------
+    model : skll Learner object
+        The SKLL model with which to generate the predictions.
+    df_train : pandas DataFrame
+        Data frame containing the pre-processed training
+        set features.
+    df_test : pandas DataFrame
+        Data frame containing the pre-processed test
+        set features.
+    trim_min : float
+        The lowest score on the score point, used for
+        trimming the raw regression predictions.
+    trim_max : float
+        The highest score on the score point, used for
+        trimming the raw regression predictions.
+
+    Returns
+    -------
+    List of data frames containing predictions and other
+    information.
     """
 
     logger = logging.getLogger(__name__)
@@ -87,6 +124,34 @@ def process_predictions(df_test_predictions,
     """
     Process predictions to create scaled, trimmed
     and rounded predictions.
+
+    Parameters
+    ----------
+    df_test_predictions : pandas DataFrame
+        Data frame containing the test set predictions.
+    train_predictions_mean : float
+        The mean of the predictions on the training set.
+    train_predictions_sd : float
+        The std. dev. of the predictions on the training
+        set.
+    human_labels_mean : float
+        The mean of the human scores used to train the
+        model.
+    human_labels_sd : float
+        The std. dev. of the human scores used to train
+        the model.
+    trim_min : float
+        The lowest score on the score point, used for
+        trimming the raw regression predictions.
+    trim_max : float
+        The highest score on the score point, used for
+        trimming the raw regression predictions.
+
+    Returns
+    -------
+    df_pred_processed: pandas DataFrame
+        Data frame containing the various trimmed
+        and rounded predictions.
     """
 
     # rescale the test set predictions by boosting

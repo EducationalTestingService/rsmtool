@@ -57,7 +57,24 @@ class LogFormatter(logging.Formatter):
 
 
 def covariance_to_correlation(m):
-    """This is a port of the R `cov2cor` function"""
+    """
+    This is a port of the R `cov2cor` function.
+
+    Parameters
+    ----------
+    m : numpy array
+        The covariance matrix.
+
+    Returns
+    -------
+    retval : numpy array
+        The cross-correlation matrix.
+
+    Raises
+    ------
+    ValueError
+        If the input matrix is not square.
+    """
 
     # make sure the matrix is square
     numrows, numcols = m.shape
@@ -72,14 +89,22 @@ def covariance_to_correlation(m):
 
 def partial_correlations(df):
     """
-    This is a python port of the `pcor` function
-    implemented in the `ppcor` R package, which
-    computes partial correlations of each pair
-    of variables in the given data frame `df`,
+    This is a python port of the `pcor` function implemented in
+    the `ppcor` R package, which computes partial correlations
+    of each pair of variables in the given data frame `df`,
     excluding all other variables.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Data frame containing the feature values.
+
+    Returns
+    -------
+    df_pcor : pandas DataFrame
+        Data frame containing the partial correlations.
     """
     numrows, numcols = df.shape
-    gp = numcols - 2
     df_cov = df.cov()
     columns = df_cov.columns
 
@@ -111,6 +136,15 @@ def agreement(score1, score2, tolerance=0):
     This function computes the agreement between
     two raters, taking into account the provided
     tolerance.
+
+    Parameters
+    ----------
+    score1 : list of int
+        List of rater 1 scores
+    score2 : list of int
+        List of rater 2 scores
+    tolerance : int, optional
+        Difference in scores that is acceptable.
     """
 
     # make sure the two sets of scores
@@ -123,17 +157,32 @@ def agreement(score1, score2, tolerance=0):
     return (float(num_agreements) / len(score1)) * 100
 
 
-def write_experiment_output(data_frames, suffixes,
-                            experiment_id, csvdir,
+def write_experiment_output(data_frames,
+                            suffixes,
+                            experiment_id,
+                            csvdir,
                             reset_index=False):
-
     """
-    Write out the given data frames in the list
-    `data_frames` generated as part of running
-    the experiment to csv files under `csvdir`.
-    All files are prefixed with `experiment_id`.
-    Indexes in the data frames are reset if
-    `reset_index` is True.
+    Write out the given data frames in the list `data_frames`
+    generated as part of running the experiment to csv files
+    under `csvdir`. All files are prefixed with `experiment_id`.
+    Indexes in the data frames are reset if `reset_index` is True.
+
+    Parameters
+    ----------
+    data_frames : list of pandas DataFrame
+        List of data frames to write out.
+    suffixes : list of str
+        List of suffixes, one for each of the data frames.
+    experiment_id : str
+        The experiment ID.
+    csvdir : str
+        Path to `output` experiment output directory
+        that will contain the CSV files corresponding
+        to each of the data frames.
+    reset_index : bool, optional
+        Whether to reset the index of each data frame
+        before writing to disk. Defaults to False.
     """
     for df, suffix in zip(data_frames, suffixes):
 
@@ -151,8 +200,25 @@ def write_experiment_output(data_frames, suffixes,
         df.to_csv(outfile, index=False)
 
 
-def write_feature_json(feature_specs, selected_features,
-                       experiment_id, featuredir):
+def write_feature_json(feature_specs,
+                       selected_features,
+                       experiment_id,
+                       featuredir):
+    """
+    Write out the feature JSON file to disk.
+
+    Parameters
+    ----------
+    feature_specs : dict
+        Dictionary containing the specifications of the features.
+    selected_features : list of str
+        List of features that were selected for model building.
+    experiment_id : str
+        The experiment ID.
+    featuredir : str
+        Path to the `feature` experiment output directory
+        where the feature JSON fill will be saved.
+    """
     feature_specs_selected = {}
     feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
 
@@ -162,7 +228,8 @@ def write_feature_json(feature_specs, selected_features,
         json.dump(feature_specs_selected, outfile, indent=4, separators=(',', ': '))
 
 
-def scale_coefficients(intercept, coefficients,
+def scale_coefficients(intercept,
+                       coefficients,
                        feature_names,
                        train_predictions_mean,
                        train_predictions_sd,
@@ -172,6 +239,27 @@ def scale_coefficients(intercept, coefficients,
     prediction on the training set. This procedure approximates
     what is done in operational setting but does not apply
     trimming to predictions.
+
+    Parameters
+    ----------
+    intercept : float
+        The model intercept value.
+    coefficients : numpy array
+        Numpy array containing the model coefficients.
+    feature_names : list of str
+        List of feature names corresponding to the coefficients.
+    train_predictions_mean : float
+        The mean of the predictions on the training set.
+    train_predictions_sd : float
+        The std. dev. of the predictions on the training set.
+    h1_sd : float
+        The std. dev. of the H1 scores.
+
+    Returns
+    -------
+    df_scaled_coefficients : pandas DataFrame
+        Data frame containing the scaled coefficients
+        and the feature names, along with the intercept.
     """
 
     # scale the coefficients and the intercept
