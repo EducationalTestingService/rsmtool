@@ -848,11 +848,11 @@ def load_experiment_data(main_config_file, output_dir):
     section_order = config_obj['section_order']
 
     chosen_notebook_files = get_ordered_notebook_files(general_report_sections,
-                                                       model_type,
                                                        special_report_sections,
                                                        custom_report_sections,
                                                        section_order,
                                                        subgroups,
+                                                       model_type=model_type,
                                                        context='rsmtool')
 
     # Read in the feature configurations.
