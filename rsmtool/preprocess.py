@@ -14,7 +14,8 @@ import pandas as pd
 def trim(values, trim_min, trim_max):
     """
     Trim the values contained in the given vector
-    `values` to `trim_min` and `trim_max`
+    `values` to `trim_min`-0.49998 as the floor
+    and `trim_max`+0.49998 as the ceiling.
 
     Parameters
     ----------
@@ -273,8 +274,9 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
     data : numpy array
         Numpy array containing the feature values.
     sd_multiplier : int, optional
-        Use this std. dev. multiplier when applying
-        the inverse transform.
+        Use this std. dev. multiplier to compute the ceiling
+        and floor for outlier removal and check that these
+        are not equal to zero.
 
     Returns
     -------
@@ -286,8 +288,8 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
     ------
     ValueError
         If the transform is applied to a feature that can
-        be zero or to a feature that can be either positive
-        or negative.
+        be zero or to a feature that can have different
+        signs.
     """
 
     if np.any(data == 0):
@@ -337,7 +339,7 @@ def apply_sqrt_transform(name, data):
     ------
     ValueError
         If the transform is applied to a feature
-        that can be zero.
+        that has negative values.
     """
 
     # check if the feature has any negative values
@@ -526,7 +528,7 @@ def preprocess_feature(data,
     feature_mean : float
         Mean value to use for outlier detection instead
         of the mean of the given feature values.
-    feature_sd : TYPE
+    feature_sd : float
         Std. dev. value to use for outlier detection instead
         of the std. dev. of the given feature values.
     exclude_zero_sd : bool, optional

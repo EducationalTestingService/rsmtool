@@ -122,7 +122,7 @@ def compute_percentiles(df, selected_features):
 def compute_outliers(df, selected_features):
     """
     Compute the number and percentage of outliers
-    outside mean +/- 4 SD for the given columns with
+    outside mean +/- 4 SD for the given columns
     in the given data frame.
 
     Parameters
@@ -470,10 +470,10 @@ def compute_metrics(df,
         Also compute a shortened version of the full
         metrics data frame, defaults to False.
     use_scaled_predictions : bool, optional
-        Include scaled predictions for evaluation
-        statistics, defaults to False.
+        Use evaluations based on scaled predictions in
+        the shortened version of the metrics data frame.
     include_second_score : bool, optional
-        Second human score available, defaults to False
+        Second human score available, defaults to False.
 
     Returns
     -------
@@ -569,18 +569,18 @@ def compute_metrics_by_group(df_test,
         contains grouping information.
     use_scaled_predictions : bool, optional
         Include scaled predictions when computing
-        the correlation statistics, defaults to False.
+        the evaluation metrics, defaults to False.
     include_second_score : bool, optional
-        Include human-human correlation statistics,
+        Include human-human association statistics,
         defaults to False.
 
     Returns
     -------
     df_human_machine_eval_by_group : pandas DataFrame
         Data frame containing the correlation
-        human-machine correlation statistics.
+        human-machine association statistics.
     df_human_human_eval_by_group : pandas DataFrame
-        Dat frame that either contains the human-human
+        Data frame that either contains the human-human
         statistics or is an empty data frame, depending
         on whether `include_second_score` is True.
     """
@@ -646,8 +646,7 @@ def compute_degradation(df, use_all_responses=True):
     Returns
     -------
     df_degradation : pandas DataFrame
-        Data frame containing the degradation
-        statistics pandas DataFrame,
+        Data frame containing the degradation statistics.
     """
 
     if use_all_responses:
@@ -823,9 +822,8 @@ def run_prediction_analyses(df_test,
     second_human_score_column : str
         Column name that contains the second human scores.
     use_scaled_predictions : bool, optional
-        Include scaled predictions when computing
-        computing the evaluation statistics, defaults
-        to False.
+        Use scaled predictions for computing in-depth
+        analyses.
 
     Returns
     -------
@@ -1095,9 +1093,9 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
     df_test_metadata : pandas DataFrame
         Data frame containing the metadata information
         about the responses in the test set.
-    df_train_excluded : data frame containing the responses
-        from the training set that were excludeds
     df_train_excluded : pandas DataFrame
+        Data frame containing the responses
+        from the training set that were excluded.
     df_test_excluded : pandas DataFrame
         Data frame containing the responses from the
         test set that were excluded.

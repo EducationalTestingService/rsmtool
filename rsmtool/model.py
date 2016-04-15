@@ -46,19 +46,19 @@ skll_models = ['AdaBoostRegressor',
 
 def ols_coefficients_to_dataframe(coefs):
     """
-    Convert a series containing OLS coefficients and convert it
+    Take a series containing OLS coefficients and convert it
     to a data frame.
 
     Parameters
     ----------
-    coefs : `pandas` Series
+    coefs : pandas Series
         a series with feature names in the index and
     the coefficient values as the data, obtained from
     a linear model trained using `statsmodels.OLS`.
 
     Returns
     -------
-    df_coef : `pandas` DataFrame
+    df_coef : pandas DataFrame
         a data frame with two columns, the first being
     the feature name and the second being coefficient
     value. The first row in the output data frame is
@@ -98,11 +98,11 @@ def skll_learner_params_to_dataframe(learner):
 
     Parameters
     ----------
-    learner : `skll` Learner object
+    learner : skll Learner object
 
     Returns
     -------
-    df_coef : `pandas` DataFrame
+    df_coef : pandas DataFrame
         a data frame containing the model parameters
         from the given SKLL learner object.
     """
@@ -140,13 +140,13 @@ def create_featureset_from_dataframe(df):
 
     Parameters
     ----------
-    df : `pandas` DataFrame
+    df : pandas DataFrame
         a data frame containing feature names and values
         as well as response IDs and human scores.
 
     Returns
     -------
-    fs : `skll` FeatureSet object
+    fs : skll FeatureSet object
         a FeatureSet object with IDs, labels, and
         feature values obtained from the data frame.
     """

@@ -70,7 +70,7 @@ def locate_custom_sections(custom_report_section_paths, configpath):
 
 def normalize_json_fields(json_obj):
     """
-    Normalize the the field names in `json_obj` in order to
+    Normalize the field names in `json_obj` in order to
     maintain backwards compatibility with old config files.
 
     Parameters
@@ -315,9 +315,9 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
 def process_json_fields(json_obj):
     """
     Converts fields which are read in as string to the
-    appropriate format. Fields which can take multiple values
-    lists are converted to lists if they have not been already
-    formatted as such.
+    appropriate format. Fields which can take multiple
+    string values are converted to lists if they have
+    not been already formatted as such.
 
     Parameters
     ----------
@@ -398,7 +398,7 @@ def parse_json_with_comments(filename):
 
 def normalize_and_validate_feature_file(feature_json):
     """
-    Normalize the the field names in `feature_json` in order to maintain
+    Normalize the field names in `feature_json` in order to maintain
     backwards compatibility with old config files. Raises exceptions
     if it finds missing fields or duplicate feature names.
 
@@ -491,9 +491,9 @@ def check_main_config(obj, context='rsmtool'):
 
     """
     The driver function that creates the final JSON object from the
-    configuration file. Normalizes all fields in main config file, checks
-    for all required fields, adds the default values, and convert all
-    strings to appropriate objects.
+    configuration file. Normalizes all fields in main config file,
+    checks for all required fields, adds the default values, and
+    converts all strings to appropriate objects.
 
     Parameters
     ----------
@@ -563,7 +563,7 @@ def check_subgroups(df, subgroups):
     """
     Check that all subgroups, if specified, correspond to columns in the
     provided data frame, and replace all NaNs in subgroups values with
-    'No info' for later convenience. Raises an excetion if any specified
+    'No info' for later convenience. Raises an exception if any specified
     subgroup columns are missing.
 
     Parameters

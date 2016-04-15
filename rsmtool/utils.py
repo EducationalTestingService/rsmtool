@@ -145,6 +145,11 @@ def agreement(score1, score2, tolerance=0):
         List of rater 2 scores
     tolerance : int, optional
         Difference in scores that is acceptable.
+
+    Returns
+    -------
+    agreement_value : float
+        The percentage agreement between the two scores.
     """
 
     # make sure the two sets of scores
@@ -154,7 +159,8 @@ def agreement(score1, score2, tolerance=0):
     num_agreements = sum([int(abs(s1-s2) <= tolerance)
                           for s1, s2 in zip(score1, score2)])
 
-    return (float(num_agreements) / len(score1)) * 100
+    agreement_value = (float(num_agreements) / len(score1)) * 100
+    return agreement_value
 
 
 def write_experiment_output(data_frames,
