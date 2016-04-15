@@ -1,0 +1,13 @@
+{
+    "predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
+    "system_score_column": "score",
+    "description": "An evaluation of LinearRegression predictions.",
+    "human_score_column": "h1",
+    "id_column": "id",
+    "experiment_id": "lr_eval_with_missing_h2_column",
+    "candidate_column": "CAND",
+    "subgroups": "QUESTION",
+    "scale_with": "asis",
+    "trim_min": 1,
+    "trim_max": 6
+}

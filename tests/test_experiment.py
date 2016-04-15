@@ -1755,6 +1755,37 @@ def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
     do_run_evaluation(source, experiment_id, config_file)
 
 
+@raises(KeyError)
+def test_run_experiment_eval_lr_with_missing_h2_column():
+
+    # rsmeval experiment with `second_human_score_column`
+    # set to a column that does not exist in the given
+    # predictions file
+    source = 'lr-eval-with-missing-h2-column'
+    experiment_id = 'lr_eval_with_missing_h2_column'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+
+@raises(KeyError)
+def test_run_experiment_eval_lr_with_missing_candidate_column():
+
+    # rsmeval experiment with `candidate_column`
+    # set to a column that does not exist in the given
+    # predictions file
+    source = 'lr-eval-with-missing-candidate-column'
+    experiment_id = 'lr_eval_with_missing_candidate_column'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
 @raises(ValueError)
 def test_run_experiment_lr_one_fully_non_numeric_feature():
 

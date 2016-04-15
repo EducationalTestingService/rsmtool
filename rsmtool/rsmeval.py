@@ -192,9 +192,17 @@ def run_evaluation(config_file, output_dir):
         df_pred = pd.read_csv(predictions_file_location, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
-    missing_columns = set([id_column,
-                           human_score_column,
-                           system_score_column]).difference(df_pred.columns)
+
+    # make sure that the columns specified in the config file actually exist
+    columns_to_check = [id_column, human_score_column, system_score_column]
+
+    if second_human_score_column:
+        columns_to_check.append(second_human_score_column)
+
+    if candidate_column:
+        columns_to_check.append(candidate_column)
+
+    missing_columns = set(columns_to_check).difference(df_pred.columns)
     if missing_columns:
         raise KeyError('Columns {} from the config file do not exist '
                        'in the predictions file.'.format(missing_columns))
@@ -382,7 +390,6 @@ def run_evaluation(config_file, output_dir):
                                               df_test_human_scores,
                                               subgroups,
                                               second_human_score_column,
-                                              exclude_zero_scores=exclude_zero_scores,
                                               use_scaled_predictions=use_scaled_predictions)
 
     write_experiment_output([df_human_machine_eval,

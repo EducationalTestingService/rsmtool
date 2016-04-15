@@ -106,6 +106,13 @@ def merge_notebooks(notebook_files, output_file):
     A utility function to merge the given notebooks
     into a single notebook named `output_file`.
     Inspired by: http://stackoverflow.com/questions/20454668/how-to-merge-two-ipython-notebooks-correctly-without-getting-json-error
+
+    Parameters
+    ----------
+    notebook_files : list of str
+        List of IPython notebook files
+    output_file : str
+        Output IPython notebook file
     """
 
     # Merging ipython notebooks basically means
@@ -126,7 +133,29 @@ def merge_notebooks(notebook_files, output_file):
 def check_section_names(specified_sections,
                         section_type,
                         context='rsmtool'):
+    """
+    Check whether the specified section names are valid
+    and raise an exception if they are not.
 
+    Parameters
+    ----------
+    specified_sections : list of str
+        List of report section names.
+    section_type : str
+        'general' or 'special'
+    context : str, optional
+        Context in which we are validating the section
+        names. Possible values are {'rsmtool',
+                                    'rsmeval',
+                                    'rsmcompare'}
+        Defaults to 'rsmtool'.
+
+    Raises
+    ------
+    ValueError
+        If any of the section names of the given type
+        are not valid in the context of the given tool.
+    """
     master_section_list = master_section_dict[section_type][context]
     invalid_section_names = set(specified_sections).difference(master_section_list)
     if invalid_section_names:
@@ -139,6 +168,22 @@ def check_section_names(specified_sections,
 
 
 def check_section_order(chosen_sections, section_order):
+    """
+    Check the order of the specified sections.
+
+    Parameters
+    ----------
+    chosen_sections : list of str
+        List of chosen section names.
+    section_order : list of str
+        An ordered list of the chosen section names.
+
+    Raises
+    ------
+    ValueError
+        If any sections specifed in the order are missing
+        from the list of chosen sections or vice versa.
+    """
     if sorted(chosen_sections) != sorted(section_order):
 
         # check for discrepancies and create a helpful error message
@@ -159,7 +204,6 @@ def check_section_order(chosen_sections, section_order):
                                    "{}".format(', '.join(extra_sections)))
 
         # raise an appropriate error message or a combination of messages
-
         if missing_sections and not extra_sections:
             raise ValueError(error_message_missing)
         elif extra_sections and not missing_sections:
@@ -177,6 +221,35 @@ def determine_chosen_sections(general_sections,
     """
     Determine the section names that have been chosen
     by the user and that will be generated in the report.
+
+    Parameters
+    ----------
+    general_sections : list of str
+        List of specified general section names.
+    special_sections : str
+        List of specified special section names, if any.
+    custom_sections : list of str
+        List of specified custom sections, if any.
+    subgroups : list of str
+        List of column names that contain grouping
+        information.
+    context : str, optional
+        Context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
+        Defaults to 'rsmtool'.
+
+    Returns
+    -------
+    chosen_sections : list of str
+        Final list of chosen sections that are to
+        be included in the HTML report.
+
+    Raises
+    ------
+    ValueError
+        If a subgroup report section is requested but
+        no subgroups were specified in the configuration
+        file.
     """
 
     # 1. Include all general sections unless we are asked to include
@@ -238,9 +311,29 @@ def get_section_file_map(special_sections,
                          custom_sections,
                          model_type=None,
                          context='rsmtool'):
-
     """
-    Map the section names to file names
+    Map the section names to IPython notebook filenames.
+
+    Parameters
+    ----------
+    special_sections : list of str
+        List of special sections.
+    custom_sections : list of str
+        List of custom sections.
+    model_type : None, optional
+        Type of the model. Possible values are
+        {'BUILTIN', 'SKLL'}. We allow None here so that
+        RSMEval can use the same function.
+    context : str, optional
+        Context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
+        Defaults to 'rsmtool'
+
+    Returns
+    -------
+    section_file_map : dict
+        Dictionary mapping each section name to the
+        corresponding IPython notebook filename.
     """
 
     # create the original section file map for general sections
@@ -256,10 +349,10 @@ def get_section_file_map(special_sections,
         section_file_map['data_description'] = join(selected_notebook_path,
                                                     'data_description_eval.ipynb')
 
-    # update the file map to point the 'model section to either the R
+    # update the file map to point the 'model section to either the built-in
     # or the SKLL model notebook depending on the model type that
     # was passed in
-    if context == 'rsmtool':
+    if context == 'rsmtool' and model_type:
         section_file_map['model'] = join(selected_notebook_path,
                                          '{}_model.ipynb'.format(model_type.lower()))
 
@@ -285,12 +378,40 @@ def get_ordered_notebook_files(general_sections,
                                subgroups=[],
                                model_type=None,
                                context='rsmtool'):
-
     """
     Check all section names and section order,
     combine all section names with the appropriate file mapping,
     and generate an ordered list of notebook files that are
     needed to generate the final report.
+
+    Parameters
+    ----------
+    general_sections : str
+        List of specified general sections.
+    special_sections : list, optional
+        List of specified special sections, if any.
+    custom_sections : list, optional
+        List of specified custom sections, if any.
+    section_order : None, optional
+        Ordered list in which the user wants the specified
+        sections.
+    subgroups : list, optional
+        List of column names that contain grouping
+        information.
+    model_type : None, optional
+        Type of the model. Possible values are
+        {'BUILTIN', 'SKLL'}. We allow None here so that
+        RSMEval can use the same function.
+    context : str, optional
+        Context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
+        Defaults to 'rsmtool'
+
+    Returns
+    -------
+    chosen_notebook_files : list of str
+        List of the IPython notebook files that have
+        to be rendered into the HTML report.
     """
 
     chosen_sections = determine_chosen_sections(general_sections,
@@ -349,8 +470,8 @@ def create_report(experiment_id, description,
                   exclude_zero_scores=True,
                   use_scaled_predictions=False):
     """
-    Generate the final RSMTool report the experiment
-    defined by the given arguments.
+    The main driver function to generate the RSMTool HTML
+    report the experiment as defined by the given arguments.
     """
 
     logger = logging.getLogger(__name__)
@@ -400,7 +521,8 @@ def create_comparison_report(experiment_id_old, description_old,
                              use_scaled_predictions_old=False,
                              use_scaled_predictions_new=False):
     """
-    Generate a report comparing the two RSMTool experiments
+    The main driver function to generate a comparison
+    report comparing the two RSMTool experiments as
     defined by the given arguments.
     """
 
@@ -445,6 +567,13 @@ def convert_ipynb_to_html(notebook_file, html_file):
     """
     Convert the given `notebook_file` to HTML and
     write it to `html_file`.
+
+    Parameters
+    ----------
+    notebook_file : str
+        Input IPython notebook file.
+    html_file : str
+        Output HTML file.
     """
 
     # set a high timeout for datasets with a large number of features
@@ -459,8 +588,6 @@ def convert_ipynb_to_html(notebook_file, html_file):
 
 
 def main():
-
-    logger = logging.getLogger(__name__)
 
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='render_notebook')
