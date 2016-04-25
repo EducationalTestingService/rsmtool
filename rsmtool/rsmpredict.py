@@ -32,6 +32,7 @@ from rsmtool.preprocess import (filter_on_column,
 from rsmtool.utils import LogFormatter
 
 from skll import Learner
+from rsmtool.version import __version__
 
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
@@ -332,6 +333,9 @@ def main():
                              "version of the features",
                         required=False,
                         default=None)
+
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
     args = parser.parse_args()

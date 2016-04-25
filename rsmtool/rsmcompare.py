@@ -24,6 +24,7 @@ from rsmtool.report import (create_comparison_report,
                             get_ordered_notebook_files)
 
 from rsmtool.utils import LogFormatter
+from rsmtool.version import __version__
 
 
 def run_comparison(config_file, output_dir):
@@ -134,6 +135,9 @@ def main():
     parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
                         help="The output directory where the report "
                              "files for this comparison will be stored")
+
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
     args = parser.parse_args()

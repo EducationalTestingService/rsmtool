@@ -30,6 +30,7 @@ from rsmtool.utils import (scale_coefficients,
                            write_experiment_output,
                            write_feature_json)
 from rsmtool.utils import LogFormatter
+from rsmtool.version import __version__
 
 def run_experiment(config_file, output_dir):
     """
@@ -398,6 +399,9 @@ def main():
     parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
                         help="The output directory where all the files "
                              "for this experiment will be stored")
+
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
     args = parser.parse_args()
