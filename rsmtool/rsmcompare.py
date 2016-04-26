@@ -127,7 +127,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmcompare.py')
+    parser = argparse.ArgumentParser(prog='rsmcompare')
 
     parser.add_argument('config_file', help="The JSON config file for "
                                             "this comparison")

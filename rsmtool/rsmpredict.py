@@ -320,7 +320,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmpredict.py')
+    parser = argparse.ArgumentParser(prog='rsmpredict')
 
     parser.add_argument('config_file', help="The JSON config file "
                                             "needed to run rsmpredict")

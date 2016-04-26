@@ -385,7 +385,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmtool.py')
+    parser = argparse.ArgumentParser(prog='rsmtool')
 
     parser.add_argument('-f', '--force', dest='force_write',
                         action='store_true', default=False,
