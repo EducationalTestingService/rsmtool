@@ -334,7 +334,7 @@ def main():
                         required=False,
                         default=None)
 
-    parser.add_argument('--version', action='version',
+    parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments

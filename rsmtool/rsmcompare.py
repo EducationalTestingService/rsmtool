@@ -136,7 +136,7 @@ def main():
                         help="The output directory where the report "
                              "files for this comparison will be stored")
 
-    parser.add_argument('--version', action='version',
+    parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
