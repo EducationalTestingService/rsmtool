@@ -468,7 +468,8 @@ def create_report(experiment_id, description,
                   chosen_notebook_files,
                   feature_subset_file=None,
                   exclude_zero_scores=True,
-                  use_scaled_predictions=False):
+                  use_scaled_predictions=False,
+                  context='rsmtool'):
     """
     The main driver function to generate the RSMTool HTML
     report the experiment as defined by the given arguments.
@@ -479,6 +480,7 @@ def create_report(experiment_id, description,
     # set the environment variables we want
     os.environ['EXPERIMENT_ID'] = experiment_id
     os.environ['DESCRIPTION'] = description
+    os.environ['CONTEXT'] = context
     os.environ['TRAIN_FILE_LOCATION'] = train_file_location
     os.environ['TEST_FILE_LOCATION'] = test_file_location
     os.environ['OUTPUT_DIR'] = csvdir

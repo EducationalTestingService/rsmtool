@@ -434,7 +434,8 @@ def run_evaluation(config_file, output_dir):
                   second_human_score_column,
                   chosen_notebook_files,
                   exclude_zero_scores=exclude_zero_scores,
-                  use_scaled_predictions=use_scaled_predictions)
+                  use_scaled_predictions=use_scaled_predictions,
+                  context='rsmeval')
 
 
 def main():
