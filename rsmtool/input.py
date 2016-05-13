@@ -1146,7 +1146,7 @@ def load_and_filter_data(csv_file,
     these are generated based on column names and subset information
     if available. The function then excludes non-numeric values for
     any feature. If the user requested to exclude candidates with less
-    than min_responses_per_candidates, such candidates are excluded.
+    than min_items_per_candidates, such candidates are excluded.
     It also generates fake labels between 1 and 10 if
     `use_fake_parameters` is set to True. Finally, it renames the id
     and label column and splits the data into the data frame with
@@ -1174,6 +1174,9 @@ def load_and_filter_data(csv_file,
 
     if second_human_score_column:
         columns_to_check.append(second_human_score_column)
+
+    if candidate_column:
+        columns_to_check.append(candidate_column)
 
     missing_columns = set(columns_to_check).difference(df.columns)
     if missing_columns:
@@ -1329,7 +1332,7 @@ def load_and_filter_data(csv_file,
 
     # if requested, exclude the candidates with less than X responses
     # left after filtering
-    if min_responses_per_candidate:
+    if min_items_per_candidate:
         (df_filtered_candidates,
          df_excluded_candidates) = select_candidates_min_responses(df_filtered,
                                                                    min_responses_per_candidate)
