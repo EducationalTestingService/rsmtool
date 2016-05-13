@@ -343,12 +343,6 @@ def get_section_file_map(special_sections,
     section_file_map = {s: join(selected_notebook_path, '{}.ipynb'.format(s))
                         for s in general_sections + ['header', 'footer']}
 
-    # update the file map to point to the correct 'data_description'
-    # notebook depending on the context (i.e., rsmeval or rsmtool).
-    if context == 'rsmeval':
-        section_file_map['data_description'] = join(selected_notebook_path,
-                                                    'data_description_eval.ipynb')
-
     # update the file map to point the 'model section to either the built-in
     # or the SKLL model notebook depending on the model type that
     # was passed in
