@@ -856,7 +856,10 @@ def load_experiment_data(main_config_file, output_dir):
 
     # check if we are excluding candidates based on number of responses
     # and convert
+    exclude_listwise = False
     min_items = config_obj['min_items_per_candidate']
+    if min_items:
+        exclude_listwise=True
  
     # get the name of the model that we want to train and
     # check that it's valid
@@ -1031,6 +1034,7 @@ def load_experiment_data(main_config_file, output_dir):
                                            feature_subset_specs=feature_subset_specs,
                                            feature_subset=feature_subset,
                                            feature_prefix=feature_prefix,
+                                           min_items_per_candidate=min_items,
                                            use_fake_labels=use_fake_train_labels)
 
     # Generate feature specifications now that we
@@ -1115,6 +1119,8 @@ def load_experiment_data(main_config_file, output_dir):
             used_trim_min, used_trim_max,
             use_scaled_predictions, exclude_zero_scores,
             select_features_automatically,
+            exclude_listwise,
+            min_items,
             chosen_notebook_files)
 
 
@@ -1334,20 +1340,20 @@ def load_and_filter_data(csv_file,
     # left after filtering
     if min_items_per_candidate:
         (df_filtered_candidates,
-         df_excluded_candidates) = select_candidates_min_responses(df_filtered,
-                                                                   min_responses_per_candidate)
+         df_excluded_candidates) = select_candidates_with_N_or_more_items(df_filtered,
+                                                                          min_items_per_candidate)
         # check that there are still responses left for analysis
         if len(df_filtered) == 0:
             raise ValueError("After filtering non-numeric scores and "
                              "non-numeric feature values there were "
                              "no candidates with {} or more responses "
-                             "left for analysis".format(str(min_responses_per_candidate)))
+                             "left for analysis".format(str(min_items_per_candidate)))
 
         # redefine df_filtered
         df_filtered = df_filtered_candidates.copy()
 
         # update df_excluded
-        df_excluded = pd.condat[df_excluded, df_excluded_candidates] 
+        df_excluded = pd.concat([df_excluded, df_excluded_candidates])
 
     # create separate data-frames for features and sc1, all other
     # information, and responses excluded during filtering

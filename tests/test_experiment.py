@@ -886,6 +886,33 @@ def test_run_experiment_lr_with_defaults_as_extra_columns():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_exclude_listwise():
+
+    # basic rsmtool experiment with listwise exclusion of candidates
+
+    source = 'lr-exclude-listwise'
+    experiment_id = 'lr_exclude_listwise'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
 def test_run_experiment_lr_eval_with_missing_scores():
 
     # basic rsmeval experiment with missing human scores
