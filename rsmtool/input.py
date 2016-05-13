@@ -32,6 +32,50 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
                                    default_feature_sign)
 
+def select_candidates_with_N_or_more_items(df,
+                                           N,
+                                           candidate_column='candidate'):
+    
+    """
+    Only select candidates which have N or more responses
+
+    Parameters
+    ----------
+    df : padans DataFrame
+        data frame with row for each responses
+
+    N: int
+        minimal number of responses per candidate
+
+    candidate_score_column :  string
+        name of the column which contains candidate ids
+
+    Returns
+    --------
+    df_included: pandas DataFrame
+        Data frame with responses from candidates with N or more responses
+
+    df_excluded: pandas DataFrame
+        Data frame with responses from candidates with less than N responses 
+    """
+
+    items_per_candidate = df[candidate_column].value_counts()
+
+    selected_candidates = items_per_candidate[items_per_candidate >= N].index
+
+    df_included = df[df[candidate_column].isin(selected_candidates)].copy()
+    df_excluded = df[~df[candidate_column].isin(selected_candidates)].copy()
+
+    # reset indices
+    df_included.reset_index(drop=True, inplace=True)
+    df_excluded.reset_index(drop=True, inplace=True)
+
+    return (df_included,
+            df_excluded)
+    
+
+
+
 
 def locate_custom_sections(custom_report_section_paths, configpath):
     """
@@ -258,7 +302,8 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
                 'trim_max': None,
                 'subgroups': [],
                 'section_order': None,
-                'flag_column': None}
+                'flag_column': None,
+                'min_items_per_candidate': None}
 
     for field in defaults:
         if field not in new_json_obj:
@@ -269,7 +314,8 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         if field not in defaults and field not in required_fields:
             raise ValueError("Unrecognized field '{}' in json file".format(field))
 
-    # 5. Check for fields that must be specified together and try to use the default feature file:
+    # 5. Check for fields that require feature_subset _file and try to use the default feature file:
+
     if new_json_obj['feature_subset'] and not new_json_obj['feature_subset_file']:
 
         # Check if we have the default subset file from rsmextra
@@ -303,7 +349,13 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
             and not new_json_obj['sign']):
             new_json_obj['sign'] = default_feature_sign
 
-    # 5. Check the fields that requires rsmextra
+    # 6. Check for fields that must be specified together
+    if new_json_obj['min_items_per_candidate'] and not new_json_obj['candidate_column']:
+        raise ValueError("If you want to filter out candidates with responses to less than X "
+                         "items, you need to specify the name of the column "
+                         "which contains candidate ids.")
+
+    # 7. Check the fields that requires rsmextra
     if not HAS_RSMEXTRA:
         if new_json_obj['special_sections']:
             raise ValueError("Special sections are only available to ETS"
@@ -802,6 +854,10 @@ def load_experiment_data(main_config_file, output_dir):
                          "'second_human_score_column' cannot have the "
                          "same value.")
 
+    # check if we are excluding candidates based on number of responses
+    # and convert
+    min_items = config_obj['min_items_per_candidate']
+ 
     # get the name of the model that we want to train and
     # check that it's valid
     model_name = config_obj['model']
@@ -1038,6 +1094,7 @@ def load_experiment_data(main_config_file, output_dir):
                                          subgroups,
                                          exclude_zero_scores=exclude_zero_scores,
                                          exclude_zero_sd=False,
+                                         min_items_per_candidate=min_items,
                                          use_fake_labels=use_fake_test_labels)
 
     return (df_train_features, df_test_features,
@@ -1078,6 +1135,7 @@ def load_and_filter_data(csv_file,
                          feature_subset_specs=None,
                          feature_subset=None,
                          feature_prefix=None,
+                         min_items_per_candidate=None,
                          use_fake_labels=False):
     """
     Load the data from `csv_file` and filters it to remove
@@ -1087,11 +1145,13 @@ def load_and_filter_data(csv_file,
     are missing from the data. If no feature_names are specified,
     these are generated based on column names and subset information
     if available. The function then excludes non-numeric values for
-    any feature. It also generates fake labels between 1 and 10 if
+    any feature. If the user requested to exclude candidates with less
+    than min_responses_per_candidates, such candidates are excluded.
+    It also generates fake labels between 1 and 10 if
     `use_fake_parameters` is set to True. Finally, it renames the id
     and label column and splits the data into the data frame with
-    feature values and score label and the data frame with other
-    available metadata.
+    feature values and score label, the data frame with
+    subgroup.candidate metadata and the data frame with all other columns.
     """
 
     logger = logging.getLogger(__name__)
@@ -1266,6 +1326,25 @@ def load_and_filter_data(csv_file,
                                                                     length_column))
         df_filtered.rename(columns={'length': '##{}##'.format(length_column)},
                            inplace=True)
+
+    # if requested, exclude the candidates with less than X responses
+    # left after filtering
+    if min_responses_per_candidate:
+        (df_filtered_candidates,
+         df_excluded_candidates) = select_candidates_min_responses(df_filtered,
+                                                                   min_responses_per_candidate)
+        # check that there are still responses left for analysis
+        if len(df_filtered) == 0:
+            raise ValueError("After filtering non-numeric scores and "
+                             "non-numeric feature values there were "
+                             "no candidates with {} or more responses "
+                             "left for analysis".format(str(min_responses_per_candidate)))
+
+        # redefine df_filtered
+        df_filtered = df_filtered_candidates.copy()
+
+        # update df_excluded
+        df_excluded = pd.condat[df_excluded, df_excluded_candidates] 
 
     # create separate data-frames for features and sc1, all other
     # information, and responses excluded during filtering
