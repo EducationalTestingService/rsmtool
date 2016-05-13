@@ -855,7 +855,6 @@ def load_experiment_data(main_config_file, output_dir):
                          "same value.")
 
     # check if we are excluding candidates based on number of responses
-    # and convert
     exclude_listwise = False
     min_items = config_obj['min_items_per_candidate']
     if min_items:
@@ -1343,7 +1342,7 @@ def load_and_filter_data(csv_file,
          df_excluded_candidates) = select_candidates_with_N_or_more_items(df_filtered,
                                                                           min_items_per_candidate)
         # check that there are still responses left for analysis
-        if len(df_filtered) == 0:
+        if len(df_filtered_candidates) == 0:
             raise ValueError("After filtering non-numeric scores and "
                              "non-numeric feature values there were "
                              "no candidates with {} or more responses "
