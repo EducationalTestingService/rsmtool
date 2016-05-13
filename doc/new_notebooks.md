@@ -22,6 +22,8 @@ When writing such notebooks, some or all of the python variables below will be a
 
 - `groups_eval`: A list containing the names of metadata or subgroup columns as specified in the config file. 
 
+- `min_items`: minimal number of items expected from each candidate. The value if set to 0 if the user did not specify a minimal number.
+
 - `df_features`: A data frame containing information about the features that were specified for model training. [`rsmtool` only]
 
 - `features_used`: A list containing the names of all the features that are used for training the model. [`rsmtool` only]

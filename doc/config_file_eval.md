@@ -46,6 +46,9 @@ default: `true`
 `flag_column`: this field makes it possible to only use responses with particular values in a given column (e.g. only responses with `0` in `ADVISORY`). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. E.g. `"flag_column": {"ADVISORY": 0}` will mean that the `rsmtool` will only use responses for which the `ADIVSORY` column has the numeric value `0`. If the `flag_column` specifies several conditions (e.g. `"flag_column": {"ADVISORY": 0, "ERROR": 0}`) only responses which satisfy all conditions will be selected for further analysis  (in this example the responses where`ADVISORY` == 0 AND `ERROR` == 0).
 default: `None`
 
+`min_items_per_candidate`: integer value for the minimal number of items expceted from each candidate. If any candidates have less than the specified minimal number of responses left for analysis after applying all filters, all responses from such candidates will be excluded listwise from further analysis. 
+default: `None` 
+
 
 
 ### System score post-processing
