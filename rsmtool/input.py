@@ -37,15 +37,15 @@ def select_candidates_with_N_or_more_items(df,
                                            candidate_column='candidate'):
     
     """
-    Only select candidates which have N or more responses
+    Only select candidates which have responses to N or more items
 
     Parameters
     ----------
-    df : padans DataFrame
-        data frame with row for each responses
+    df : pandas DataFrame
+        data frame with each row corresponding to a response to one item
 
     N: int
-        minimal number of responses per candidate
+        minimal number of items per candidate
 
     candidate_score_column :  string
         name of the column which contains candidate ids
@@ -53,10 +53,10 @@ def select_candidates_with_N_or_more_items(df,
     Returns
     --------
     df_included: pandas DataFrame
-        Data frame with responses from candidates with N or more responses
+        Data frame with responses from candidates with responses to N or more items
 
     df_excluded: pandas DataFrame
-        Data frame with responses from candidates with less than N responses 
+        Data frame with responses from candidates with responses to less than N items 
     """
 
     items_per_candidate = df[candidate_column].value_counts()
@@ -1155,8 +1155,8 @@ def load_and_filter_data(csv_file,
     It also generates fake labels between 1 and 10 if
     `use_fake_parameters` is set to True. Finally, it renames the id
     and label column and splits the data into the data frame with
-    feature values and score label, the data frame with
-    subgroup.candidate metadata and the data frame with all other columns.
+    feature values and score label, the data frame with information about
+    subgroup and candidate (metadata) and the data frame with all other columns.
     """
 
     logger = logging.getLogger(__name__)
@@ -1346,7 +1346,7 @@ def load_and_filter_data(csv_file,
             raise ValueError("After filtering non-numeric scores and "
                              "non-numeric feature values there were "
                              "no candidates with {} or more responses "
-                             "left for analysis".format(str(min_items_per_candidate)))
+                             "left for analysis".format(min_items_per_candidate))
 
         # redefine df_filtered
         df_filtered = df_filtered_candidates.copy()
