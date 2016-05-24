@@ -904,7 +904,9 @@ def run_prediction_analyses(df_test,
             df_confmatrix,
             df_score_dist)
 
-def analyze_excluded_responses(df, features, header, exclude_zero_scores=True):
+def analyze_excluded_responses(df, features, header,
+                              exclude_zero_scores=True,
+                              exclude_listwise=False):
     """
     Compute statistics on the responses that were excluded from
     analyses, either in the training set or in the test set.
@@ -923,6 +925,9 @@ def analyze_excluded_responses(df, features, header, exclude_zero_scores=True):
         Whether or not the zero-score responses
         should be counted in the exclusion statistics,
         defaults to True.
+    exclude_listwise : bool, optional
+        Whether or not the candidates were excluded
+        based on minimal number of responses
 
     Returns
     -------
@@ -958,19 +963,20 @@ def analyze_excluded_responses(df, features, header, exclude_zero_scores=True):
         df_full_crosstab.update(df_crosstab)
         df_full_crosstab.insert(0, header, df_full_crosstab.index)
 
-    # rename the first cell so that it is not set to zero
-    assert(df_full_crosstab.loc['numeric non-zero human score',
-                                'all features numeric'] == 0)
-    df_full_crosstab.loc['numeric non-zero human score',
-                         'all features numeric'] = '-'
-
-    # if we are not excluding the zeros, rename the corresponding cells
-    # so that they are not set to zero
-    if not exclude_zero_scores:
-        assert(df_full_crosstab.loc['zero human score',
+    if not exclude_listwise:
+        # if we are not excluding listwise, rename the first cell so that it is not set to zero
+        assert(df_full_crosstab.loc['numeric non-zero human score',
                                     'all features numeric'] == 0)
-        df_full_crosstab.loc['zero human score',
+        df_full_crosstab.loc['numeric non-zero human score',
                              'all features numeric'] = '-'
+
+        # if we are not excluding the zeros, rename the corresponding cells
+        # so that they are not set to zero. We do not do this for listwise exclusion
+        if not exclude_zero_scores:
+            assert(df_full_crosstab.loc['zero human score',
+                                        'all features numeric'] == 0)
+            df_full_crosstab.loc['zero human score',
+                                 'all features numeric'] = '-'
 
     return df_full_crosstab
 
@@ -1081,7 +1087,8 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
                                               features,
                                               subgroups,
                                               candidate_column,
-                                              exclude_zero_scores=True):
+                                              exclude_zero_scores=True,
+                                              exclude_listwise=False):
     """
     Run all data composition analyses for RSMTool.
 
@@ -1112,6 +1119,9 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
         Whether or not the zero-score responses
         should be excluded from the various analyses,
         defaults to True.
+    exclude_listwise : bool, optional
+        Whether or not all candidates with less than a certain
+        number of responses were excluded from the analysis
 
     Returns
     -------
@@ -1123,11 +1133,13 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
     df_train_excluded_analysis = analyze_excluded_responses(df_train_excluded,
                                                             features,
                                                             'Score/Features',
-                                                            exclude_zero_scores=exclude_zero_scores)
+                                                            exclude_zero_scores=exclude_zero_scores,
+                                                            exclude_listwise=exclude_listwise)
     df_test_excluded_analysis = analyze_excluded_responses(df_test_excluded,
                                                            features,
                                                            'Score/Features',
-                                                           exclude_zero_scores=exclude_zero_scores)
+                                                           exclude_zero_scores=exclude_zero_scores,
+                                                           exclude_listwise=exclude_listwise)
     df_data_composition = analyze_used_responses(df_train_metadata,
                                                  df_test_metadata,
                                                  subgroups, candidate_column)
@@ -1162,7 +1174,8 @@ def run_data_composition_analyses_for_rsmeval(df_test_metadata,
                                               df_test_excluded,
                                               subgroups,
                                               candidate_column,
-                                              exclude_zero_scores=True):
+                                              exclude_zero_scores=True,
+                                              exclude_listwise=False):
 
     """
     Similar to `run_data_composition_analyses_for_rsmtool()`
@@ -1172,7 +1185,8 @@ def run_data_composition_analyses_for_rsmeval(df_test_metadata,
     # analyze excluded responses
     df_test_excluded_analysis = analyze_excluded_responses(df_test_excluded,
                                                            ['raw'], 'Human/System',
-                                                           exclude_zero_scores=exclude_zero_scores)
+                                                           exclude_zero_scores=exclude_zero_scores,
+                                                           exclude_listwise=exclude_listwise)
     # rename the columns and index in the analysis data frame
     df_test_excluded_analysis.rename(columns={'all features numeric': 'numeric system score',
                                               'non-numeric feature values': 'non-numeric system score'},
