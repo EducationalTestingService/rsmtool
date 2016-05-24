@@ -71,6 +71,8 @@ def run_experiment(config_file, output_dir):
      use_scaled_predictions,
      exclude_zero_scores,
      select_features_automatically,
+     exclude_listwise,
+     min_items,
      chosen_notebook_files) = load_experiment_data(config_file, output_dir)
 
     # preprocess each feature for the training and testing data
@@ -124,7 +126,8 @@ def run_experiment(config_file, output_dir):
                                                                                  features,
                                                                                  subgroups,
                                                                                  candidate_column,
-                                                                                 exclude_zero_scores=exclude_zero_scores)
+                                                                                 exclude_zero_scores=exclude_zero_scores,
+                                                                                 exclude_listwise=exclude_listwise)
     write_experiment_output([df_train_excluded_analysis,
                              df_test_excluded_analysis,
                              df_data_composition],
@@ -367,6 +370,7 @@ def run_experiment(config_file, output_dir):
                   subgroups,
                   length_column,
                   second_human_score_column,
+                  min_items,
                   feature_subset_file=feature_subset_file,
                   chosen_notebook_files=chosen_notebook_files,
                   exclude_zero_scores=exclude_zero_scores,

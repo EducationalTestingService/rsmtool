@@ -464,10 +464,7 @@ def test_get_ordered_notebook_files_default_rsmeval():
                         if not s.endswith('by_group')]
     section_list = ['header'] + no_subgroup_list + ['footer']
 
-    # replace data_description section with data_description_eval
-    updated_section_list = [sname+'_eval' if sname == 'data_description' else sname
-                            for sname in section_list]
-    general_section_plus_extension = ['{}.ipynb'.format(s) for s in updated_section_list]
+    general_section_plus_extension = ['{}.ipynb'.format(s) for s in section_list]
     expected_notebook_files = [join(notebook_path_dict['general']['rsmeval'], s)
                                for s in
                                general_section_plus_extension]
@@ -560,7 +557,7 @@ def test_get_section_file_map_rsmeval():
     section_file_map = get_section_file_map(special_sections,
                                             custom_sections,
                                             context='rsmeval')
-    eq_(section_file_map['data_description'], join(notebook_path, 'data_description_eval.ipynb'))
+    eq_(section_file_map['data_description'], join(notebook_path, 'data_description.ipynb'))
     eq_(section_file_map['notebook'], '/path/notebook.ipynb')
     eq_(section_file_map['placeholder'], normpath('special_notebook_path/placeholder.ipynb'))
 

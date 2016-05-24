@@ -344,12 +344,6 @@ def get_section_file_map(special_sections,
     section_file_map = {s: join(selected_notebook_path, '{}.ipynb'.format(s))
                         for s in general_sections + ['header', 'footer']}
 
-    # update the file map to point to the correct 'data_description'
-    # notebook depending on the context (i.e., rsmeval or rsmtool).
-    if context == 'rsmeval':
-        section_file_map['data_description'] = join(selected_notebook_path,
-                                                    'data_description_eval.ipynb')
-
     # update the file map to point the 'model section to either the built-in
     # or the SKLL model notebook depending on the model type that
     # was passed in
@@ -466,6 +460,7 @@ def create_report(experiment_id, description,
                   subgroups,
                   length_column,
                   second_human_score_column,
+                  min_items_per_candidate,
                   chosen_notebook_files,
                   feature_subset_file=None,
                   exclude_zero_scores=True,
@@ -492,6 +487,7 @@ def create_report(experiment_id, description,
     os.environ['EXCLUDE_ZEROS'] = '1' if exclude_zero_scores else '0'
     os.environ['LENGTH_COLUMN'] = '' if length_column == None else length_column
     os.environ['H2_COLUMN'] = '' if second_human_score_column == None else second_human_score_column
+    os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate == None else str(min_items_per_candidate)
     os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file == None else feature_subset_file
 
     # we define separate groups to allow future flexibility in defining

@@ -10,7 +10,8 @@ from rsmtool.input import (normalize_json_fields,
                            validate_and_populate_json_fields,
                            check_flag_column,
                            check_subgroups,
-                           check_feature_subset_file)
+                           check_feature_subset_file,
+                           select_candidates_with_N_or_more_items)
 
 
 def test_normalize_fields():
@@ -58,6 +59,17 @@ def test_normalize_fields():
 def test_validate_and_populate_missing_fields():
     data = {'expID': 'test'}
     validate_and_populate_json_fields(data)
+
+
+@raises(ValueError)
+def test_validate_and_populate_min_responses_but_no_candidate():
+    data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'min_responses_per_candidate': 5}
+    validate_and_populate_json_fields(data)
+
 
 
 def test_validate_and_populate_unspecified_fields():
@@ -284,3 +296,46 @@ def test_check_feature_subset_file_wrong_values_in_sign():
     feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
                                   'sign_SYS1': ['+1', '-1', '+1']})
     check_feature_subset_file(feature_specs, sign='SYS1')
+
+
+def test_select_candidates_with_N_or_more_items():
+    data = pd.DataFrame({'candidate': ['a']*3 + ['b']*2 + ['c'],
+                         'sc1' : [2, 3, 1, 5, 6, 1]})
+    df_included_expected = pd.DataFrame({'candidate': ['a']*3 + ['b']*2,
+                                         'sc1' : [2, 3, 1, 5, 6]})
+    df_excluded_expected = pd.DataFrame({'candidate': ['c'],
+                                         'sc1' : [1]})
+    (df_included,
+     df_excluded) = select_candidates_with_N_or_more_items(data, 2)
+    assert_frame_equal(df_included, df_included_expected)
+    assert_frame_equal(df_excluded, df_excluded_expected)
+
+
+def test_select_candidates_with_N_or_more_items_all_included():
+    data = pd.DataFrame({'candidate': ['a']*2 + ['b']*2 + ['c']*2,
+                         'sc1' : [2, 3, 1, 5, 6, 1]})
+    (df_included,
+     df_excluded) = select_candidates_with_N_or_more_items(data, 2)
+    assert_frame_equal(df_included, data)
+    assert_equal(len(df_excluded), 0)
+
+
+def test_select_candidates_with_N_or_more_items_all_excluded():
+    data = pd.DataFrame({'candidate': ['a']*3 + ['b']*2 + ['c'],
+                         'sc1' : [2, 3, 1, 5, 6, 1]})
+    (df_included,
+     df_excluded) = select_candidates_with_N_or_more_items(data, 4)
+    assert_frame_equal(df_excluded, data)
+    assert_equal(len(df_included), 0)
+
+def test_select_candidates_with_N_or_more_items_custom_name():
+    data = pd.DataFrame({'ID': ['a']*3 + ['b']*2 + ['c'],
+                         'sc1' : [2, 3, 1, 5, 6, 1]})
+    df_included_expected = pd.DataFrame({'ID': ['a']*3 + ['b']*2,
+                                         'sc1' : [2, 3, 1, 5, 6]})
+    df_excluded_expected = pd.DataFrame({'ID': ['c'],
+                                         'sc1' : [1]})
+    (df_included,
+     df_excluded) = select_candidates_with_N_or_more_items(data, 2, 'ID')
+    assert_frame_equal(df_included, df_included_expected)
+    assert_frame_equal(df_excluded, df_excluded_expected)
