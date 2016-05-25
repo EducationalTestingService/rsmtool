@@ -85,6 +85,13 @@ def run_evaluation(config_file, output_dir):
     human_score_column = config_obj['human_score_column']
     system_score_column = config_obj['system_score_column']
 
+    # if the human score column is the same as the
+    # system score column, raise an error
+    if human_score_column == system_score_column:
+        raise ValueError("'human_score_column' and "
+                         "'system_score_column' "
+                         "cannot have the same value.")
+
     # get the name of the optional column that
     # contains the second human score
     second_human_score_column = config_obj['second_human_score_column']
