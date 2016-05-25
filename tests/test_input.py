@@ -202,6 +202,13 @@ def test_rename_candidate_column():
     df = rename_default_columns(df, [], 'spkitemid', 'sc1', 'sc2', None, None, 'apptNo')
     assert_array_equal(df.columns, ['spkitemid', 'sc1', 'sc2', '##length##', 'candidate', 'feature1', 'feature2'])
 
+
+def test_rename_candidate_named_sc2():
+    df = pd.DataFrame(columns=['id', 'sc1', 'sc2', 'question', 'l1', 'score'])
+    df_renamed = rename_default_columns(df, [], 'id', 'sc1', None, None, 'score', 'sc2')
+    assert_array_equal(df_renamed.columns, ['spkitemid', 'sc1', 'candidate', 'question', 'l1', 'raw'])
+
+
 def test_check_flag_column():
     input_dict = {"advisory flag": ['0']}
     config = {"flag_column": input_dict}

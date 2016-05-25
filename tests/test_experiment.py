@@ -1812,6 +1812,21 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
                        '{}.json'.format(experiment_id))
     do_run_evaluation(source, experiment_id, config_file)
 
+@raises(ValueError)
+def test_run_experiment_lr_eval_same_system_human_score():
+
+    # rsmeval experiment with the same value supplied 
+    # for both human score ans system score
+
+    source = 'lr-eval-same-system-human-score'
+    experiment_id = 'lr_eval_same_system_human_score'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
 
 @raises(ValueError)
 def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
