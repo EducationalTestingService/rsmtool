@@ -997,7 +997,7 @@ def load_experiment_data(main_config_file, output_dir):
         reserved_column_names.append(length_column)
         reserved_column_names.append('length')
     if candidate_column:
-        reserved_column_names_append(candidate_column)
+        reserved_column_names.append(candidate_column)
         reserved_column_names.append('candidate')
 
     # remove duplicates (if any) from the list of reserved column names
