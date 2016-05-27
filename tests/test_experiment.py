@@ -1565,6 +1565,23 @@ def test_run_experiment_lr_compare():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_compare_with_h2():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself where the rsmtool report contains 
+    # h2 information
+    source = 'lr-self-compare-with-h2'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_with_h2.report.html')
+    yield check_report, html_report
+
+
 def test_run_experiment_lr_compare_with_custom_order():
 
     # basic rsmcompare experiment comparing a LinearRegression

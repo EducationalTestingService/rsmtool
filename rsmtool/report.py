@@ -54,6 +54,7 @@ else:
                                        'features_by_group',
                                        'preprocessed_features',
                                        'preprocessed_features_by_group',
+                                       'consistency',
                                        'score_distributions',
                                        'model',
                                        'evaluation',
