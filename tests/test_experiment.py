@@ -1565,7 +1565,7 @@ def test_run_experiment_lr_compare():
     yield check_report, html_report
 
 
-def test_run_experiment_lr_compare():
+def test_run_experiment_lr_compare_with_h2():
 
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself where the rsmtool report contains 
