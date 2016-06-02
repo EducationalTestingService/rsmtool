@@ -984,15 +984,24 @@ def load_experiment_data(main_config_file, output_dir):
                                       id_column] + subgroups + list(flag_column_dict.keys())))
 
     # if `second_human_score_column` is specified, then
-    # we need to add `sc2` to the list of reserved column
+    # we need to add the original name as well as `sc2` to the list of reserved column
     # names. And same for 'length' and 'candidate', if `length_column`
-    # and `candidate_column` are specified
+    # and `candidate_column` are specified. We add both names to 
+    # simplify thigns downstream since neither the original name nor
+    # the standardized name should be used as feature names
+
     if second_human_score_column:
+        reserved_column_names.append(second_human_score_column)
         reserved_column_names.append('sc2')
     if length_column:
+        reserved_column_names.append(length_column)
         reserved_column_names.append('length')
     if candidate_column:
+        reserved_column_names.append(candidate_column)
         reserved_column_names.append('candidate')
+
+    # remove duplicates (if any) from the list of reserved column names
+    reserved_column_names = list(set(reserved_column_names))
 
     # Make sure that the training data as specified in the
     # config file actually exists on disk and if it does,
@@ -1229,6 +1238,8 @@ def load_and_filter_data(csv_file,
     else:
         feature_names = requested_feature_names
 
+    print(feature_names)
+    print(df.columns)
     # make sure that feature names do not contain reserved column names
     illegal_feature_names = set(feature_names).intersection(reserved_column_names)
     if illegal_feature_names:
