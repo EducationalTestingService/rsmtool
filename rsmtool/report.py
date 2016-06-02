@@ -121,9 +121,9 @@ def merge_notebooks(notebook_files, output_file):
     # notebook and then add in the cells
     # from all the other notebooks.
     first_notebook = notebook_files[0]
-    merged_notebook = json.loads(open(first_notebook, 'r').read())
+    merged_notebook = json.loads(open(first_notebook, 'r', encoding='utf-8').read())
     for notebook in notebook_files[1:]:
-        section_cells = json.loads(open(notebook, 'r').read())["cells"]
+        section_cells = json.loads(open(notebook, 'r', encoding='utf-8').read())["cells"]
         merged_notebook['cells'].extend(section_cells)
 
     # output the merged cells into a report
