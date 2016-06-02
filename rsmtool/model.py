@@ -44,6 +44,30 @@ skll_models = ['AdaBoostRegressor',
                'SVR']
 
 
+def model_fit_to_dataframe(fit):
+    """
+    Take an object containing OLS model fit and convert it
+    to a data frame.
+
+    Parameters
+    ----------
+    fit : a model fit object
+        model fit object obtained from
+        a linear model trained using `statsmodels.OLS`.
+
+    Returns
+    -------
+    df_fit : pandas DataFrame
+        a data frame with main model fit metrics.
+    """
+
+    df_fit = pd.DataFrame({"N responses": [fit.nobs]})
+    df_fit['N features'] = fit.df_model
+    df_fit['r2'] = fit.rsquared
+    df_fit['r2_adjusted'] = fit.rsquared_adj
+    return df_fit
+
+
 def ols_coefficients_to_dataframe(coefs):
     """
     Take a series containing OLS coefficients and convert it
@@ -442,7 +466,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         # we used only the non-zero features
         used_features = non_zero_features
 
-    # LassoFixedLambdaThenNNLS (formerly empWtDropNegLasso): First do
+    # LassoFixedLambdaThenNNLR (formerly empWtDropNegLasso): First do
     # feature selection using lasso regression and positive only weights.
     # Then fit an NNLR (see above) on those features.
     elif model_name == 'LassoFixedLambdaThenNNLR':
@@ -581,6 +605,11 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
             pickle.dump(fit, olsf)
             summf.write(str(fit.summary()))
+
+        # create a data frame with main model fit metrics and save to the file
+        df_model_fit = model_fit_to_dataframe(fit)
+        model_fit_file = join(csvdir, '{}_model_fit.csv'.format(experiment_id))
+        df_model_fit.to_csv(model_fit_file, index=False)
 
     # save the SKLL model to a file
     model_file = join(csvdir, '{}.model'.format(experiment_id))

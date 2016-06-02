@@ -21,6 +21,7 @@ human_scores = pd.Series(prng.randint(1, 5, size=10))
 system_scores = pd.Series(prng.random_sample(10)*5)
 same_human_scores = pd.Series([3]*10)
 
+
 def test_correlation_helper():
     # test that there are no nans for data frame with 10 values
     retval = correlation_helper(df_features, 'sc1', 'group')
@@ -28,11 +29,13 @@ def test_correlation_helper():
     assert_equal(retval[1].isnull().values.sum(), 0)
 
 
+
 def test_that_correlation_helper_works_for_data_with_one_row():
     # this should return two data frames with nans
     retval = correlation_helper(df_features[:1], 'sc1', 'group')
     assert_equal(retval[0].isnull().values.sum(), 3)
     assert_equal(retval[1].isnull().values.sum(), 3)
+
 
 
 def test_that_correlation_helper_works_for_data_with_two_rows():
@@ -43,12 +46,14 @@ def test_that_correlation_helper_works_for_data_with_two_rows():
     assert_equal(retval[1].isnull().values.sum(), 3)
 
 
+
 def test_that_correlation_helper_works_for_data_with_three_rows():
     # this should compute marginal correlations but return Nans for
     # partial correlations
     retval = correlation_helper(df_features[:3], 'sc1', 'group')
     assert_equal(retval[0].isnull().values.sum(), 0)
     assert_equal(retval[1].isnull().values.sum(), 3)
+
 
 def test_that_correlation_helper_works_for_data_with_four_rows():
     # this should compute marginal correlations and return a unity
@@ -57,16 +62,20 @@ def test_that_correlation_helper_works_for_data_with_four_rows():
     assert_equal(retval[0].isnull().values.sum(), 0)
     assert_almost_equal(abs(retval[1].values).sum(), 3)
 
+
 def test_that_correlation_helper_works_for_data_with_the_same_label():
     # this should return two data frames with nans
     retval = correlation_helper(df_features_same_score, 'sc1', 'group')
     assert_equal(retval[0].isnull().values.sum(), 3)
     assert_equal(retval[1].isnull().values.sum(), 3)
 
+
 def test_that_metrics_helper_works_for_data_with_one_row():
     # There should be NaNs for SMD, correlations and both sds
     evals = metrics_helper(human_scores[0:1], system_scores[0:1])
     assert_equal(evals.isnull().values.sum(), 4)
+
+
 
 def test_that_metrics_helper_works_for_data_with_the_same_label():
     # There should be NaNs for correlation.

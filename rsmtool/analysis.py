@@ -5,6 +5,8 @@ from scipy.stats import kurtosis, pearsonr
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix
 from skll.metrics import kappa
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 
 from rsmtool.utils import agreement, partial_correlations
 
@@ -361,6 +363,11 @@ def metrics_helper(human_scores, system_scores):
     denominator = np.sqrt((system_score_sd**2 + human_score_sd**2)/2)
     SMD = numerator/denominator
 
+    # compute r2 and MSE
+    r2 = r2_score(human_scores, system_scores)
+    mse = mean_squared_error(human_scores, system_scores)
+    rmse = np.sqrt(mse)
+
     # return everything as a series
     return pd.Series({'kappa': unweighted_kappa,
                       'wtkappa': quadratic_weighted_kappa,
@@ -368,6 +375,8 @@ def metrics_helper(human_scores, system_scores):
                       'adj_agr': human_system_adjacent_agreement,
                       'SMD': SMD,
                       'corr': correlations,
+                      'r2': r2,
+                      'RMSE': rmse,
                       'sys_min': min_system_score,
                       'sys_max': max_system_score,
                       'sys_mean': mean_system_score,
@@ -392,7 +401,7 @@ def filter_metrics(df_metrics,
     for them. The full list is:
 
         ['corr', 'kappa', 'wtkappa', 'exact_agr', 'adj_agr', 'SMD',
-         'corr', 'sys_min', 'sys_max', 'sys_mean',
+         'RMSE', 'r2', 'sys_min', 'sys_max', 'sys_mean',
          'sys_sd', 'h_min', 'h_max', 'h_mean',
          'h_sd', 'N']
 
@@ -402,7 +411,7 @@ def filter_metrics(df_metrics,
     metrics, is used:
 
     {'raw/scale_trim': ['N', 'h_mean', 'h_sd', 'sys_mean', 'sys_sd',
-                        'corr', 'SMD'],
+                        'corr', 'RMSE', 'r2', SMD'],
      'raw/scale_trim_round': ['sys_mean', 'sys_sd', 'wtkappa', 'kappa',
                               'exact_agr', 'adj_agr', 'SMD']}
 
@@ -423,7 +432,9 @@ def filter_metrics(df_metrics,
                                                            'sys_mean',
                                                            'sys_sd',
                                                            'corr',
-                                                           'SMD'],
+                                                           'SMD',
+                                                           'RMSE', 
+                                                           'r2'],
                           '{}_trim_round'.format(score_prefix): ['sys_mean',
                                                                  'sys_sd',
                                                                  'wtkappa',
@@ -506,11 +517,13 @@ def compute_metrics(df,
                                                            'h_min', 'h_max',
                                                            'sys_mean', 'sys_sd',
                                                            'sys_min', 'sys_max',
-                                                           'corr','wtkappa',
+                                                           'corr','wtkappa', 'r2',
                                                            'kappa', 'exact_agr',
-                                                           'adj_agr', 'SMD'])
+                                                           'adj_agr', 'SMD', 'RMSE'])
         # rename `h_*` -> `h1_*` and `sys_*` -> `h2_*`
         df_human_human_eval.rename(lambda c: c.replace('h_', 'h1_').replace('sys_', 'h2_'), inplace=True)
+        # drop RMSE and r2 because they are not meaningful for human raters
+        df_human_human_eval.drop(['r2', 'RMSE'], inplace=True)
         df_human_human_eval = df_human_human_eval.transpose()
         df_human_human_eval.index = ['']
     else:
@@ -527,9 +540,9 @@ def compute_metrics(df,
                       'sys_mean', 'sys_sd',
                       'sys_min', 'sys_max',
                       'corr',
-                      'wtkappa', 'kappa',
+                      'wtkappa', 'r2', 'kappa',
                       'exact_agr', 'adj_agr',
-                      'SMD']]
+                      'SMD', 'RMSE']]
 
     all_rows_order = ['raw', 'raw_trim', 'raw_trim_round', 'scale', 'scale_trim', 'scale_trim_round']
     existing_rows_index = [row for row in all_rows_order if row in df_human_machine_eval.index]
