@@ -20,9 +20,9 @@
 
 ### Linear models with automatic feature selection and no negative coefficients
     
-* `NNLS` - empirical OLS regression weights with feature selection using non-negative least squares regression. Note that only the coefficients are constrained to be positive: the intercept can be either positive or negative. 
+* `NNLR` - empirical OLS regression weights with feature selection using non-negative least squares regression. Note that only the coefficients are constrained to be positive: the intercept can be either positive or negative. 
 
-* `LassoFixedLambdaThenNNLS` - empirical OLS regression weights with feature selection using Lasso regression as above. After the features are fit into OLS regression, the coefficients are checked for sign and all features with negative coefficients are removed from selection. The model is then re-fit using the remaining features. Note that this procedure is only applied once to remove features which have very small contribution to the model. This means that there still may be negative coefficients after second attempt. In this case it is advisable to examine the data to identify the best way to proceed. 
+* `LassoFixedLambdaThenNNLR` - empirical OLS regression weights with feature selection using Lasso regression as above. After the features are fit into OLS regression, the coefficients are checked for sign and all features with negative coefficients are removed from selection. The model is then re-fit using the remaining features. Note that this procedure is only applied once to remove features which have very small contribution to the model. This means that there still may be negative coefficients after second attempt. In this case it is advisable to examine the data to identify the best way to proceed. 
 
 * `LassoFixedLambda` - same as `LassoFixedLambdaThenLR` but the model uses the original Lasso weights. Please note: the coefficients in Lasso model are estimated using an optimization routine which may produce slightly different results on different systems. 
 

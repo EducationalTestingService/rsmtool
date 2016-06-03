@@ -86,6 +86,8 @@ The results in these files are computed on the training set.
 
 * `*_betas.csv`- standardized and relative coefficients linear models only)
 
+* `*_model_fit.csv` -  R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding. 
+
 * `*_.model` - SKLL object with fitted model (before scaling the coeffcients)
 
 * `*_.ols` - a pickled object containing a fitted model of type `pandas.stats.ols.OLS` (for built-in linear models, excluding `LassoFixedLabmda` and `PositiveLassoCV`)
@@ -93,6 +95,7 @@ The results in these files are computed on the training set.
 * `*_ols_summary.txt` - a text file containing a summary of the above model (for built-in linear models, excluding `LassoFixedLabmda` and `PositiveLassoCV`)
 
 * `*_postprocessing_params.csv` - the parameters for trimming and scaling predicted scores for new predictions. 
+
 
 
 ## Predictions [rsmtool, rsmeval]
@@ -116,14 +119,16 @@ The results in these files are computed on evaluation set.
     - corr [raw/scale trim]
     - sys_mean [raw/scale trim]
     - sys_sd [raw/scale trim]
-    - SMD (raw/scale trim)
-    - adj_agr (raw/scale trim_round)
+    - SMD [raw/scale trim]
+    - adj_agr [raw/scale trim_round]
     - exact_agr [raw/scale trim_round]
     - kappa [raw/scale trim_round]
     - wtkappa [raw/scale trim_round]
     - sys_mean [raw/scale trim_round]
     - sys_sd [raw/scale trim_round]
-    - SMD (raw/scale trim_round)
+    - SMD [raw/scale trim_round]
+    - R2 [raw/scale trim]
+    - RMSE [raw/scale trim]
     ```
 
 * `*_score_dist.csv` - distribution of rounded predicted and human scores using raw/scaled scores as specified in the configuration file. 

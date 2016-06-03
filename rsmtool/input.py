@@ -381,25 +381,49 @@ def process_json_fields(json_obj):
     -------
     new_json_obj : dict
         JSON object with the string values converted to
-        lists, where necessary.
+        lists or boolean, as necessary.
 
+    Raises
+    -------
+    ValueError
     """
 
-    # convert multiple values into lists
+    
     list_fields = ['feature_prefix',
                    'general_sections',
                    'special_sections',
                    'custom_sections',
                    'subgroups', 'section_order']
 
+    boolean_fields = ['exclude_zero_scores',
+                      'use_scaled_predictions',
+                      'use_scaled_predictions_old',
+                      'use_scaled_predictions_new',
+                      'select_transformations']
+
     new_json_obj = json_obj.copy()
 
+    # convert multiple values into lists
     for field in list_fields:
         if new_json_obj[field]:
             if type(new_json_obj[field]) != list:
                 new_json_obj[field] = new_json_obj[field].split(',')
                 new_json_obj[field] = [prefix.strip() for prefix in new_json_obj[field]]
 
+    # make sure all boolean values are boolean
+    for field in boolean_fields:
+        error_message = "Field {} can only be set to True or False.".format(field)
+        if new_json_obj[field]:
+            if type(new_json_obj[field]) != bool:
+                # we first convert the value to string to avoid
+                # attribute errors in case the user supplied an integer.
+                given_value = str(new_json_obj[field]).strip()
+                m = re.match(r'^(true|false)$', given_value, re.I)
+                if not m:
+                    raise ValueError(error_message)
+                else:
+                    bool_value = json.loads(m.group().lower())
+                    new_json_obj[field] = bool_value
     return new_json_obj
 
 
@@ -987,7 +1011,7 @@ def load_experiment_data(main_config_file, output_dir):
     # we need to add the original name as well as `sc2` to the list of reserved column
     # names. And same for 'length' and 'candidate', if `length_column`
     # and `candidate_column` are specified. We add both names to 
-    # simplify thigns downstream since neither the original name nor
+    # simplify things downstream since neither the original name nor
     # the standardized name should be used as feature names
 
     if second_human_score_column:
@@ -1238,8 +1262,6 @@ def load_and_filter_data(csv_file,
     else:
         feature_names = requested_feature_names
 
-    print(feature_names)
-    print(df.columns)
     # make sure that feature names do not contain reserved column names
     illegal_feature_names = set(feature_names).intersection(reserved_column_names)
     if illegal_feature_names:

@@ -1,2 +1,2 @@
-,N,SMD.scale_trim,SMD.scale_trim_round,adj_agr.scale_trim_round,corr.scale_trim,exact_agr.scale_trim_round,h_mean,h_sd,kappa.scale_trim_round,sys_mean.scale_trim,sys_mean.scale_trim_round,sys_sd.scale_trim,sys_sd.scale_trim_round,wtkappa.scale_trim_round
-0,200.0,0.0296595631699419,0.005347182887542452,99.0,0.7801784515527461,63.5,3.5,0.9242680113386591,0.46313660599374884,3.527568892202369,3.505,0.9347247133541572,0.9457522065429742,0.7729885057471264
+,N,R2.scale_trim,RMSE.scale_trim,SMD.scale_trim,SMD.scale_trim_round,adj_agr.scale_trim_round,corr.scale_trim,exact_agr.scale_trim_round,h_mean,h_sd,kappa.scale_trim_round,sys_mean.scale_trim,sys_mean.scale_trim_round,sys_sd.scale_trim,sys_sd.scale_trim_round,wtkappa.scale_trim_round
+0,200,0.5543608385157424,0.6154618487458171,0.029659563169942383,0.005347182887542452,99.0,0.7801784515527461,63.5,3.5,0.9242680113386591,0.46313660599374884,3.5275688922023694,3.505,0.934724713354157,0.9457522065429742,0.7729885057471264
