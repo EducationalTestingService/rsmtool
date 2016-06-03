@@ -423,7 +423,7 @@ def process_json_fields(json_obj):
                     raise ValueError(error_message)
                 else:
                     bool_value = json.loads(m.group().lower())
-                new_json_obj[field] = bool_value
+                    new_json_obj[field] = bool_value
     return new_json_obj
 
 
