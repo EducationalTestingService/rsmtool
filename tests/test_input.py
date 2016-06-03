@@ -183,7 +183,7 @@ def test_process_fields_with_integer():
             'use_scaled_predictions': 'True',
             'feature_prefix': '1gram, 2gram',
             'subgroups': 'native language, GPA_range',
-            'exclude_zero_scores': '0'}
+            'exclude_zero_scores': 1}
 
     newdata = process_json_fields(validate_and_populate_json_fields(data))
 

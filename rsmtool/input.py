@@ -417,18 +417,13 @@ def process_json_fields(json_obj):
             if type(new_json_obj[field]) != bool:
                 # we first convert the value to string to avoid
                 # attribute errors in case the user supplied an integer.
-                # We the convert the field value to lower case
-                # to cover cases like 'True' and 'TRUE'
-                lower_case_value = str(new_json_obj[field]).lower()
-                try:
-                    new_json_obj[field] = json.loads(lower_case_value)
-                except ValueError:
+                given_value = str(new_json_obj[field]).strip()
+                m = re.match(r'^(true|false)$', given_value, re.I)
+                if not m:
                     raise ValueError(error_message)
-
-                # confirm that the new value is a boolean since
-                # json will also parse an integer as integer
-                if not type(new_json_obj[field]) == bool:
-                    raise ValueError(error_message)
+                else:
+                    bool_value = json.loads(m.group().lower())
+                new_json_obj[field] = bool_value
     return new_json_obj
 
 
