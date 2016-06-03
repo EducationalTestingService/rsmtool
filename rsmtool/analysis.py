@@ -525,6 +525,8 @@ def compute_metrics(df,
         # drop RMSE and R2 because they are not meaningful for human raters
         df_human_human_eval.drop(['R2', 'RMSE'], inplace=True)
         df_human_human_eval = df_human_human_eval.transpose()
+        # convert N to integer
+        df_human_human_eval['N'] = df_human_human_eval['N'].astype(int)
         df_human_human_eval.index = ['']
     else:
         df_human_machine_eval = df.apply(lambda s: metrics_helper(df['sc1'], s))
@@ -976,8 +978,10 @@ def analyze_excluded_responses(df, features, header,
         df_crosstab = pd.crosstab(df['score_category'],
                                   df['feat_category'])
         df_full_crosstab.update(df_crosstab)
-        df_full_crosstab.insert(0, header, df_full_crosstab.index)
+        # convert back to integers as these are all counts
         df_full_crosstab = df_full_crosstab.astype(int)
+        df_full_crosstab.insert(0, header, df_full_crosstab.index)
+
 
     if not exclude_listwise:
         # if we are not excluding listwise, rename the first cell so that it is not set to zero
