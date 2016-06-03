@@ -76,7 +76,6 @@ def test_that_metrics_helper_works_for_data_with_one_row():
     assert_equal(evals.isnull().values.sum(), 4)
 
 
-
 def test_that_metrics_helper_works_for_data_with_the_same_label():
     # There should be NaNs for correlation.
     # Note that for a dataset with a single response

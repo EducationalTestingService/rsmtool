@@ -525,8 +525,11 @@ def compute_metrics(df,
         # drop RMSE and R2 because they are not meaningful for human raters
         df_human_human_eval.drop(['R2', 'RMSE'], inplace=True)
         df_human_human_eval = df_human_human_eval.transpose()
-        # convert N to integer
-        df_human_human_eval['N'] = df_human_human_eval['N'].astype(int)
+        # convert N to integer if it's not empty else set to 0
+        try:
+            df_human_human_eval['N'] = df_human_human_eval['N'].astype(int)
+        except ValueError:
+            df_human_human_eval['N'] = 0
         df_human_human_eval.index = ['']
     else:
         df_human_machine_eval = df.apply(lambda s: metrics_helper(df['sc1'], s))
@@ -546,7 +549,7 @@ def compute_metrics(df,
                                                    'exact_agr', 'adj_agr',
                                                    'SMD', 'RMSE']]
 
-    # make N column an integer
+    # make N column an integer if it's not NaN else set it to 0
     df_human_machine_eval['N'] = df_human_machine_eval['N'].astype(int)
     all_rows_order = ['raw', 'raw_trim', 'raw_trim_round', 'scale', 'scale_trim', 'scale_trim_round']
     existing_rows_index = [row for row in all_rows_order if row in df_human_machine_eval.index]
