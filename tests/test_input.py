@@ -148,11 +148,44 @@ def test_process_fields():
             'model': 'empWt',
             'use_scaled_predictions': 'True',
             'feature_prefix': '1gram, 2gram',
-            'subgroups': 'native language, GPA_range'}
+            'subgroups': 'native language, GPA_range',
+            'exclude_zero_scores': 'false'}
 
     newdata = process_json_fields(validate_and_populate_json_fields(data))
     assert_array_equal(newdata['feature_prefix'], ['1gram', '2gram'])
     assert_array_equal(newdata['subgroups'], ['native language', 'GPA_range'])
+    eq_(type(newdata['use_scaled_predictions']), bool)
+    eq_(newdata['use_scaled_predictions'], True)
+    eq_(newdata['exclude_zero_scores'], False)
+
+
+@raises(ValueError)
+def test_process_fields_with_non_boolean():
+    data = {'experiment_id': 'experiment_1',
+            'train_file': 'data/rsmtool_smTrain.csv',
+            'test_file': 'data/rsmtool_smEval.csv',
+            'description': 'Test',
+            'model': 'empWt',
+            'use_scaled_predictions': 'True',
+            'feature_prefix': '1gram, 2gram',
+            'subgroups': 'native language, GPA_range',
+            'exclude_zero_scores': 'Yes'}
+
+    newdata = process_json_fields(validate_and_populate_json_fields(data))
+
+@raises(ValueError)
+def test_process_fields_with_integer():
+    data = {'experiment_id': 'experiment_1',
+            'train_file': 'data/rsmtool_smTrain.csv',
+            'test_file': 'data/rsmtool_smEval.csv',
+            'description': 'Test',
+            'model': 'empWt',
+            'use_scaled_predictions': 'True',
+            'feature_prefix': '1gram, 2gram',
+            'subgroups': 'native language, GPA_range',
+            'exclude_zero_scores': '0'}
+
+    newdata = process_json_fields(validate_and_populate_json_fields(data))
 
 
 def test_rename_no_columns():

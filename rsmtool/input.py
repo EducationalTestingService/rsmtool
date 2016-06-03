@@ -381,25 +381,54 @@ def process_json_fields(json_obj):
     -------
     new_json_obj : dict
         JSON object with the string values converted to
-        lists, where necessary.
+        lists or boolean, as necessary.
 
+    Raises
+    -------
+    ValueError
     """
 
-    # convert multiple values into lists
+    
     list_fields = ['feature_prefix',
                    'general_sections',
                    'special_sections',
                    'custom_sections',
                    'subgroups', 'section_order']
 
+    boolean_fields = ['exclude_zero_scores',
+                      'use_scaled_predictions',
+                      'use_scaled_predictions_old',
+                      'use_scaled_predictions_new',
+                      'select_transformations']
+
     new_json_obj = json_obj.copy()
 
+    # convert multiple values into lists
     for field in list_fields:
         if new_json_obj[field]:
             if type(new_json_obj[field]) != list:
                 new_json_obj[field] = new_json_obj[field].split(',')
                 new_json_obj[field] = [prefix.strip() for prefix in new_json_obj[field]]
 
+    # make sure all boolean values are boolean
+    for field in boolean_fields:
+        error_message = "Field {} can only be set to True or False.".format(field)
+        if new_json_obj[field]:
+            if type(new_json_obj[field]) != bool:
+                # we first convert the value to string to avoid
+                # attribute errors in case the user supplied an integer.
+                # We the convert the field value to lower case
+                # to cover cases like 'True' and 'TRUE'
+                lower_case_value = str(new_json_obj[field]).lower()
+                try:
+                    new_json_obj[field] = json.loads(lower_case_value)
+                except ValueError:
+                    raise ValueError(error_message)
+
+                # confirm that the new value is a boolean since
+                # json will also parse an integer as integer
+                if not type(new_json_obj[field]) == bool:
+                    raise ValueError(error_message)
     return new_json_obj
 
 

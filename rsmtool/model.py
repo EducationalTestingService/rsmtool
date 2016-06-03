@@ -61,10 +61,10 @@ def model_fit_to_dataframe(fit):
         a data frame with main model fit metrics.
     """
 
-    df_fit = pd.DataFrame({"N responses": [fit.nobs]})
-    df_fit['N features'] = fit.df_model
-    df_fit['r2'] = fit.rsquared
-    df_fit['r2_adjusted'] = fit.rsquared_adj
+    df_fit = pd.DataFrame({"N responses": [int(fit.nobs)]})
+    df_fit['N features'] = int(fit.df_model)
+    df_fit['R2'] = fit.rsquared
+    df_fit['R2_adjusted'] = fit.rsquared_adj
     return df_fit
 
 
