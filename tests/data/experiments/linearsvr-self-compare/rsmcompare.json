@@ -1,0 +1,10 @@
+{
+    "experiment_dir_old": "linearsvr",
+    "experiment_id_old": "LinearSVR",
+    "description_old": "Using all features with a LinearSVR model.",
+    "use_scaled_predictions_old": false,
+    "experiment_dir_new": "linearsvr",
+    "experiment_id_new": "LinearSVR",
+    "description_new": "Using all features with a LinearSVR model.",
+    "use_scaled_predictions_new": false
+}

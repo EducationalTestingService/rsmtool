@@ -1663,6 +1663,21 @@ def test_run_experiment_lr_compare_with_custom_sections_and_custom_order():
     yield check_report, html_report
 
 
+def test_run_experiment_linearsvr_compare():
+
+    # basic rsmcompare experiment comparing an experiment
+    # which uses a SKLL model to itself
+    source = 'linearsvr-self-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'LinearSVR_vs_LinearSVR.report.html')
+    yield check_report, html_report
+
 @raises(ValueError)
 def test_run_experiment_lr_length_column_and_feature():
 
