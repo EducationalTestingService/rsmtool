@@ -1,9 +1,9 @@
 package:
   name: rsmtool
-  version: 4.6.0
+  version: 5.0.0
 
 source:
-  path: ../../../rsmtool-rewrite
+  path: ../../../../rsmtool
 
 build:
   number: 0
@@ -16,7 +16,6 @@ build:
     - rsmeval = rsmtool.rsmeval:main
     - rsmpredict = rsmtool.rsmpredict:main
     - render_notebook = rsmtool.report:main
-    - factor_analysis = rsmtool.factor_analysis:main
 
 requirements:
   build:
@@ -32,7 +31,7 @@ requirements:
     - pandas 0.18.0
     - scikit-learn 0.17.1
     - seaborn 0.7.0
-    - skll 1.2
+    - skll 1.2.1
     - statsmodels 0.6.1
     - zeromq 4.1.3
     - setuptools
@@ -50,7 +49,7 @@ requirements:
     - pandas 0.18.0
     - scikit-learn 0.17.1
     - seaborn 0.7.0
-    - skll 1.2
+    - skll 1.2.1
     - statsmodels 0.6.1
     - zeromq 4.1.3
 

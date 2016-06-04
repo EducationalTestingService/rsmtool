@@ -4,25 +4,25 @@
 
 ### New features
 
-* Evaluations on the test set now include R2 and RMSE 
+* Evaluations on the test set now include R2 and RMSE.
 
-* The tool now reports model fit parameters (R2 and adj. R2) for the training set
+* The tool now reports model fit parameters (R2 and adjusted R2) for the training set.
 
-* It is now possible to exclude candidates with less than X responses from model training/evaluation
+* It is now possible to exclude candidates with less than X responses from model training/evaluation.
 
-* RSMCompare can now handle experiments which used SKLL models
+* RSMCompare can now handle experiments which used SKLL models.
 
-* RSMCompare now includes a notebook for consistency between human raters
+* RSMCompare now includes a notebook for consistency between human raters.
 
 ### Main bug fixes
 
-* Correct handling of repeated feature names in the feature .json file
+* Correct handling of repeated feature names in the feature .json file.
 
-* Correct printing coefficients for SKLL models
+* Correct printing of feature coefficients for SKLL models.
 
-* Correct handling of quoted boolean values in config .json
+* Correct handling of quoted boolean values in config .json file.
 
-* Fixed rounding and highlighting in feature correlation table
+* Fixed rounding and highlighting in feature correlation table.
 
 ## v4.6.0 (April 4, 2016)
 
