@@ -3,7 +3,7 @@ package:
   version: 5.0.0
 
 source:
-  path: ../../../rsmtool-rewrite
+  path: ../../../../rsmtool
 
 build:
   number: 0
@@ -16,7 +16,6 @@ build:
     - rsmeval = rsmtool.rsmeval:main
     - rsmpredict = rsmtool.rsmpredict:main
     - render_notebook = rsmtool.report:main
-    - factor_analysis = rsmtool.factor_analysis:main
 
 requirements:
   build:
