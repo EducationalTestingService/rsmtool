@@ -886,6 +886,64 @@ def test_run_experiment_lr_with_defaults_as_extra_columns():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_exclude_listwise():
+
+    # basic rsmtool experiment with listwise exclusion of candidates
+
+    source = 'lr-exclude-listwise'
+    experiment_id = 'lr_exclude_listwise'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_exclude_listwise():
+
+    # basic rsmeval experiment with listwise exclusion of candidates
+
+    source = 'lr-eval-exclude-listwise'
+    experiment_id = 'lr_eval_exclude_listwise'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
+
+
+
 def test_run_experiment_lr_eval_with_missing_scores():
 
     # basic rsmeval experiment with missing human scores
@@ -1209,6 +1267,38 @@ def test_run_experiment_lr_eval_exclude_flags():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_use_all_features():
+
+    # rsmtool experiment with no feature file specified:
+    # the tool should be using all columns not assigned to 
+    # anything else. 
+
+    source = 'lr-use-all-features'
+    experiment_id = 'lr_use_all_features'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
 def test_run_experiment_equalweightslr_model():
     # basic rsmtool experiment test using the EqualWeightsLR model
 
@@ -1433,6 +1523,64 @@ def test_run_experiment_positivelassocv_model():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_candidate_same_as_id():
+    # basic LR experiment but with `candidate_column` set to the
+    # same value as `id_column`
+
+    source = 'lr-candidate-same-as-id'
+    experiment_id = 'lr_candidate_same_as_id'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_candidate_same_as_id_candidate():
+    # basic LR experiment but with `candidate_column` set to the
+    # same value as `id_column` and both values are set to 'candidate'
+
+    source = 'lr-candidate-same-as-id-candidate'
+    experiment_id = 'lr_candidate_same_as_id_candidate'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
 def test_run_experiment_lr_compare():
 
     # basic rsmcompare experiment comparing a LinearRegression
@@ -1446,6 +1594,23 @@ def test_run_experiment_lr_compare():
     do_run_comparison(source, config_file)
 
     html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_compare_with_h2():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself where the rsmtool report contains 
+    # h2 information
+    source = 'lr-self-compare-with-h2'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_with_h2.report.html')
     yield check_report, html_report
 
 
@@ -1497,6 +1662,21 @@ def test_run_experiment_lr_compare_with_custom_sections_and_custom_order():
     html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
     yield check_report, html_report
 
+
+def test_run_experiment_linearsvr_compare():
+
+    # basic rsmcompare experiment comparing an experiment
+    # which uses a SKLL model to itself
+    source = 'linearsvr-self-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'LinearSVR_vs_LinearSVR.report.html')
+    yield check_report, html_report
 
 @raises(ValueError)
 def test_run_experiment_lr_length_column_and_feature():
@@ -1679,6 +1859,21 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
                        '{}.json'.format(experiment_id))
     do_run_evaluation(source, experiment_id, config_file)
 
+@raises(ValueError)
+def test_run_experiment_lr_eval_same_system_human_score():
+
+    # rsmeval experiment with the same value supplied 
+    # for both human score ans system score
+
+    source = 'lr-eval-same-system-human-score'
+    experiment_id = 'lr_eval_same_system_human_score'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
 
 @raises(ValueError)
 def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
@@ -1696,6 +1891,37 @@ def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
                        '{}.json'.format(experiment_id))
     do_run_evaluation(source, experiment_id, config_file)
 
+
+@raises(KeyError)
+def test_run_experiment_eval_lr_with_missing_h2_column():
+
+    # rsmeval experiment with `second_human_score_column`
+    # set to a column that does not exist in the given
+    # predictions file
+    source = 'lr-eval-with-missing-h2-column'
+    experiment_id = 'lr_eval_with_missing_h2_column'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+
+@raises(KeyError)
+def test_run_experiment_eval_lr_with_missing_candidate_column():
+
+    # rsmeval experiment with `candidate_column`
+    # set to a column that does not exist in the given
+    # predictions file
+    source = 'lr-eval-with-missing-candidate-column'
+    experiment_id = 'lr_eval_with_missing_candidate_column'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
 
 @raises(ValueError)
 def test_run_experiment_lr_one_fully_non_numeric_feature():

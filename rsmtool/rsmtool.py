@@ -30,6 +30,7 @@ from rsmtool.utils import (scale_coefficients,
                            write_experiment_output,
                            write_feature_json)
 from rsmtool.utils import LogFormatter
+from rsmtool.version import __version__
 
 def run_experiment(config_file, output_dir):
     """
@@ -70,6 +71,8 @@ def run_experiment(config_file, output_dir):
      use_scaled_predictions,
      exclude_zero_scores,
      select_features_automatically,
+     exclude_listwise,
+     min_items,
      chosen_notebook_files) = load_experiment_data(config_file, output_dir)
 
     # preprocess each feature for the training and testing data
@@ -123,7 +126,8 @@ def run_experiment(config_file, output_dir):
                                                                                  features,
                                                                                  subgroups,
                                                                                  candidate_column,
-                                                                                 exclude_zero_scores=exclude_zero_scores)
+                                                                                 exclude_zero_scores=exclude_zero_scores,
+                                                                                 exclude_listwise=exclude_listwise)
     write_experiment_output([df_train_excluded_analysis,
                              df_test_excluded_analysis,
                              df_data_composition],
@@ -330,7 +334,6 @@ def run_experiment(config_file, output_dir):
                                               df_test_human_scores,
                                               subgroups,
                                               second_human_score_column,
-                                              exclude_zero_scores=exclude_zero_scores,
                                               use_scaled_predictions=use_scaled_predictions)
 
     write_experiment_output([df_human_machine_eval,
@@ -367,6 +370,7 @@ def run_experiment(config_file, output_dir):
                   subgroups,
                   length_column,
                   second_human_score_column,
+                  min_items,
                   feature_subset_file=feature_subset_file,
                   chosen_notebook_files=chosen_notebook_files,
                   exclude_zero_scores=exclude_zero_scores,
@@ -385,7 +389,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmtool.py')
+    parser = argparse.ArgumentParser(prog='rsmtool')
 
     parser.add_argument('-f', '--force', dest='force_write',
                         action='store_true', default=False,
@@ -399,6 +403,9 @@ def main():
     parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
                         help="The output directory where all the files "
                              "for this experiment will be stored")
+
+    parser.add_argument('-V', '--version', action='version',
+                        version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
     args = parser.parse_args()

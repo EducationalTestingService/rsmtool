@@ -1,0 +1,19 @@
+ {
+	"experiment_id": "lr_use_all_features",
+	"train_file": "../../files/train.csv",
+	"test_file": "../../files/test.csv",
+	"model": "LinearRegression",
+	"description": "Using all features with a LinearRegression model without feature file specified.",
+	"id_column": "ID",
+	"train_label_column": "score",
+	"test_label_column": "score",
+	"use_scaled_predictions": true,
+	"subgroups": "L1, QUESTION",
+	"second_human_score_column": "score2",
+	"trim_min": "1",
+	"trim_max": "6",
+	"exclude_zero_scores": true,
+	"select_transformations": false,
+	"length_column": "LENGTH"
+}
+

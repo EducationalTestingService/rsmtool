@@ -1,0 +1,12 @@
+{
+	"experiment_id": "lr_evaluation",
+	"predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
+	"system_score_column": "score",
+	"trim_min": "1",
+	"trim_max": "4",
+	"id_column": "id",
+	"human_score_column": "score",
+	"candidate_column": "h2",
+	"exclude_zero_scores": true,
+	"subgroups": "QUESTION"
+}

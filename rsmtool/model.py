@@ -1,10 +1,11 @@
 """
-Functions dealing with training R or SKLL models
+Functions dealing with training built-in or SKLL models
 
 :author: Nitin Madnani (nmadnani@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
 :organization: ETS
 """
+
 import logging
 import pickle
 
@@ -21,14 +22,14 @@ from sklearn.linear_model import LassoCV
 from skll import FeatureSet, Learner
 
 builtin_models = ['LinearRegression',
-                 'EqualWeightsLR',
-                 'RebalancedLR',
-                 'NNLR',
-                 'LassoFixedLambdaThenNNLR',
-                 'LassoFixedLambdaThenLR',
-                 'PositiveLassoCVThenLR',
-                 'LassoFixedLambda',
-                 'PositiveLassoCV']
+                  'EqualWeightsLR',
+                  'RebalancedLR',
+                  'NNLR',
+                  'LassoFixedLambdaThenNNLR',
+                  'LassoFixedLambdaThenLR',
+                  'PositiveLassoCVThenLR',
+                  'LassoFixedLambda',
+                  'PositiveLassoCV']
 
 skll_models = ['AdaBoostRegressor',
                'DecisionTreeRegressor',
@@ -42,14 +43,51 @@ skll_models = ['AdaBoostRegressor',
                'SGDRegressor',
                'SVR']
 
+
+def model_fit_to_dataframe(fit):
+    """
+    Take an object containing OLS model fit and convert it
+    to a data frame.
+
+    Parameters
+    ----------
+    fit : a model fit object
+        model fit object obtained from
+        a linear model trained using `statsmodels.OLS`.
+
+    Returns
+    -------
+    df_fit : pandas DataFrame
+        a data frame with main model fit metrics.
+    """
+
+    df_fit = pd.DataFrame({"N responses": [int(fit.nobs)]})
+    df_fit['N features'] = int(fit.df_model)
+    df_fit['R2'] = fit.rsquared
+    df_fit['R2_adjusted'] = fit.rsquared_adj
+    return df_fit
+
+
 def ols_coefficients_to_dataframe(coefs):
     """
-    Take the given series with feature names in the index and
-    the coefficient values as the data, obtained from a linear model
-    trained using `pandas.ols` and convert it to a data frame with
-    two columns, the first being the feature name and the second being
-    the coefficient value. The first row in the output data frame is
-    always for the intercept and the rest are sorted by feature name.
+    Take a series containing OLS coefficients and convert it
+    to a data frame.
+
+    Parameters
+    ----------
+    coefs : pandas Series
+        a series with feature names in the index and
+    the coefficient values as the data, obtained from
+    a linear model trained using `statsmodels.OLS`.
+
+    Returns
+    -------
+    df_coef : pandas DataFrame
+        a data frame with two columns, the first being
+    the feature name and the second being coefficient
+    value. The first row in the output data frame is
+    always for the intercept and the rest are sorted by
+    feature name.
     """
     # first create a sorted data frame for all the non-intercept features
     non_intercept_columns = [c for c in coefs.index if c != 'const']
@@ -72,14 +110,26 @@ def ols_coefficients_to_dataframe(coefs):
 
 def skll_learner_params_to_dataframe(learner):
     """
-    Take the given SKLL learner object and return a data frame containing its
-    parameters. Note that we use underlying sklearn model to get
-    at the coefficients and the intercept because the `model_params`
-    attribute of the SKLL model ignores zero coefficients, which we do
-    not want. The first row in the output data frame is always for the
-    intercept and the rest are sorted by feature name.
-    """
+    Take the given SKLL learner object and return a data
+    frame containing its parameters.
 
+    Note that we use underlying sklearn model to get
+    at the coefficients and the intercept because the
+    `model_params` attribute of the SKLL model ignores
+    zero coefficients, which we do not want. The first
+    row in the output data frame is always for the
+    intercept and the rest are sorted by feature name.
+
+    Parameters
+    ----------
+    learner : skll Learner object
+
+    Returns
+    -------
+    df_coef : pandas DataFrame
+        a data frame containing the model parameters
+        from the given SKLL learner object.
+    """
     # get the intercept, coefficients, and feature names
     intercept = learner.model.intercept_
     coefficients = learner.model.coef_
@@ -105,11 +155,25 @@ def skll_learner_params_to_dataframe(learner):
 
 def create_featureset_from_dataframe(df):
     """
-    Take the given dataframe and construct a SKLL FeatureSet instance.
-    It is assumed that the dataframe contains the 'spkitemid' and 'sc1'
-    columns, along with other columns containing the feature values.
-    """
+    Take the given dataframe and construct a SKLL
+    FeatureSet instance.
 
+    It is assumed that the dataframe contains the
+    `spkitemid` and `sc1` columns, along with other
+    columns containing the feature values.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        a data frame containing feature names and values
+        as well as response IDs and human scores.
+
+    Returns
+    -------
+    fs : skll FeatureSet object
+        a FeatureSet object with IDs, labels, and
+        feature values obtained from the data frame.
+    """
     # Separate out the features, ids and labels and create a FeatureSet
     feature_columns = [c for c in df.columns if c not in ['sc1', 'spkitemid']]
     features = df[feature_columns].to_dict(orient='records')
@@ -119,9 +183,22 @@ def create_featureset_from_dataframe(df):
 
 
 def create_fake_skll_learner(df_coefficients):
+
     """
     Create fake SKLL linear regression learner object
     using the coefficients in the given data frame.
+
+    Parameters
+    ----------
+    df_coefficients : pandas DataFrame
+        Data frame containing the linear coefficients
+        we want to create the fake SKLL model with.
+
+    Returns
+    -------
+    learner: skll Learner object
+        SKLL LinearRegression Learner object containing
+        with the specified coefficients.
     """
 
     # get the logger
@@ -153,14 +230,37 @@ def create_fake_skll_learner(df_coefficients):
     fake_fs = FeatureSet('fake', ids=['1'], labels=[1.0], features=fake_features)
     learner.train(fake_fs, grid_search=False)
 
-    # now create its parameters from the coefficients from the R model
+    # now create its parameters from the coefficients from the built-in model
     learner.model.coef_ = learner.feat_vectorizer.transform(coefdict).toarray()[0]
     learner.model.intercept_ = intercept
     return learner
 
 
 def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
+    """
+    Train one of the built-in linear regression models.
 
+    Parameters
+    ----------
+    model_name : str
+        Name of the built-in model to train.
+    df_train : pandas DataFrame
+        Data frame containing the features on which
+        to train the model.
+    experiment_id : str
+        The experiment ID.
+    csvdir : str
+        Path to the `output` experiment output directory.
+    figdir : str
+        Path to the `figure` experiment output directory.
+
+    Returns
+    -------
+    learner : skll Learner object
+        SKLL LinearRegression Learner object containing
+        the coefficients learned by training the built-in
+        model.
+    """
     # get the columns that actually contain the feature values
     feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
 
@@ -366,7 +466,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         # we used only the non-zero features
         used_features = non_zero_features
 
-    # LassoFixedLambdaThenNNLS (formerly empWtDropNegLasso): First do
+    # LassoFixedLambdaThenNNLR (formerly empWtDropNegLasso): First do
     # feature selection using lasso regression and positive only weights.
     # Then fit an NNLR (see above) on those features.
     elif model_name == 'LassoFixedLambdaThenNNLR':
@@ -506,6 +606,11 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
             pickle.dump(fit, olsf)
             summf.write(str(fit.summary()))
 
+        # create a data frame with main model fit metrics and save to the file
+        df_model_fit = model_fit_to_dataframe(fit)
+        model_fit_file = join(csvdir, '{}_model_fit.csv'.format(experiment_id))
+        df_model_fit.to_csv(model_fit_file, index=False)
+
     # save the SKLL model to a file
     model_file = join(csvdir, '{}.model'.format(experiment_id))
     learner.save(model_file)
@@ -514,7 +619,28 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
 
 def train_skll_model(model_name, df_train, experiment_id, csvdir, figdir):
+    """
+    Train a SKLL regression model.
 
+    Parameters
+    ----------
+    model_name : str
+        Name of the SKLL model to train.
+    df_train : pandas DataFrame
+        Data frame containing the features on which
+        to train the model.
+    experiment_id : str
+        The experiment ID.
+    csvdir : str
+        Path to the `output` experiment output directory.
+    figdir : str
+        Path to the `figure` experiment output directory.
+
+    Returns
+    -------
+    learner : skll Learner object
+        SKLL Learner object of the appropriate type.
+    """
     # instantiate the given SKLL learner
     learner = Learner(model_name)
 
@@ -550,6 +676,29 @@ def train_skll_model(model_name, df_train, experiment_id, csvdir, figdir):
 
 
 def train_model(model_name, df_train, experiment_id, csvdir, figdir):
+    """
+    The main driver function to train the given model on the given
+    data and save the results in the given directories using the
+    given experiment ID as the prefix.
+
+    parameters
+    ----------
+    model_name : str
+        Name of the model to train.
+    df_train : pandas DataFrame
+        Data frame containing the features on which
+        to train the model.
+    experiment_id : str
+        The experiment ID.
+    csvdir : str
+        Path to the `output` experiment output directory.
+    figdir : str
+        Path to the `figure` experiment output directory.
+
+    Returns
+    -------
+    name : SKLL Learner object
+    """
     call_args = [model_name, df_train, experiment_id, csvdir, figdir]
     model = train_builtin_model(*call_args) if model_name in builtin_models \
              else train_skll_model(*call_args)
@@ -558,8 +707,24 @@ def train_model(model_name, df_train, experiment_id, csvdir, figdir):
 
 def check_model_name(model_name):
     """
-    Check that the given model name is valid and determine its type
+    Check that the given model name is valid and determine its type.
+
+    Parameters
+    ----------
+    model_name : str
+        Name of the model.
+
+    Returns
+    -------
+    model_type: str
+        One of `BUILTIN` or `SKLL`.
+
+    Raises
+    ------
+    ValueError
+        If the model is not supported.
     """
+
     if model_name in builtin_models:
         model_type = 'BUILTIN'
     elif model_name in skll_models:

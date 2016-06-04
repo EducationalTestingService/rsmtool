@@ -32,11 +32,75 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
                                    default_feature_sign)
 
+def select_candidates_with_N_or_more_items(df,
+                                           N,
+                                           candidate_column='candidate'):
+    
+    """
+    Only select candidates which have responses to N or more items
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        data frame with each row corresponding to a response to one item
+
+    N: int
+        minimal number of items per candidate
+
+    candidate_score_column :  string
+        name of the column which contains candidate ids
+
+    Returns
+    --------
+    df_included: pandas DataFrame
+        Data frame with responses from candidates with responses to N or more items
+
+    df_excluded: pandas DataFrame
+        Data frame with responses from candidates with responses to less than N items 
+    """
+
+    items_per_candidate = df[candidate_column].value_counts()
+
+    selected_candidates = items_per_candidate[items_per_candidate >= N].index
+
+    df_included = df[df[candidate_column].isin(selected_candidates)].copy()
+    df_excluded = df[~df[candidate_column].isin(selected_candidates)].copy()
+
+    # reset indices
+    df_included.reset_index(drop=True, inplace=True)
+    df_excluded.reset_index(drop=True, inplace=True)
+
+    return (df_included,
+            df_excluded)
+    
+
+
+
+
 def locate_custom_sections(custom_report_section_paths, configpath):
     """
-    Get the absolute paths for custom report sections
-    and check that the files exist
+    Get the absolute paths for custom report sections and check that
+    the files exist. If a file does not exist, raise an exception.
+
+    Parameters
+    ----------
+    custom_report_section_paths : list of str
+        List of paths to IPython notebook
+        files representing the custom sections.
+    configpath : str
+        Path to the experiment configuration file.
+
+    Returns
+    -------
+    custom_report_sections :  list of str
+        List of absolute paths to the custom section
+        notebooks.
+
+    Raises
+    ------
+    FileNotFoundError
     """
+
     custom_report_sections = []
     for cs_path in custom_report_section_paths:
         cs_location = locate_file(cs_path, configpath)
@@ -50,8 +114,22 @@ def locate_custom_sections(custom_report_section_paths, configpath):
 
 def normalize_json_fields(json_obj):
     """
-    Normalize the the field names in `json_obj` in order to
-    maintain backwards compatibility with old config files
+    Normalize the field names in `json_obj` in order to
+    maintain backwards compatibility with old config files.
+
+    Parameters
+    ----------
+    json_obj : dict
+        JSON object containing the fields from the
+        original configuration file, possibly with
+        the keys being old-style RSMTool field names.
+
+    Returns
+    -------
+    new_json_obj : dict
+        JSON object containing the new-style names
+        for all fields and their originally specified
+        values.
     """
     logger = logging.getLogger(__name__)
 
@@ -132,9 +210,32 @@ def normalize_json_fields(json_obj):
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     """
-    Ensure that all required fields are specified,
-    add default to values for all other fields, and
-    ensure that all specified fields are valid.
+    Ensure that all required fields are specified, add default values
+    values for all unspecified fields, and ensure that all specified
+    fields are valid.
+
+    Parameters
+    ----------
+    json_obj : dict
+        JSON object containing the values specified
+        in the configuration file, with normalized
+        field names.
+    context : str, optional
+        Context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval',
+                             'rsmpredict', 'rsmcompare'}
+        Defaults to 'rsmtool'.
+
+    Returns
+    -------
+    new_json_obj : dict
+        JSON object containing the originally specified
+        values and default values for fields that were
+        not specified.
+
+    Raises
+    ------
+    ValueError
     """
 
     logger = logging.getLogger(__name__)
@@ -144,13 +245,15 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     # 1. Check to make sure all required fields are specified
     if context == 'rsmtool':
         required_fields = ['experiment_id',
-                           'model', 'train_file',
+                           'model',
+                           'train_file',
                            'test_file']
     elif context == 'rsmeval':
         required_fields = ['experiment_id',
                            'predictions_file',
                            'system_score_column',
-                           'trim_min', 'trim_max']
+                           'trim_min',
+                           'trim_max']
     elif context == 'rsmpredict':
         required_fields = ['experiment_id',
                            'experiment_dir',
@@ -163,7 +266,13 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         if field not in new_json_obj:
             raise ValueError("The config file must specify '{}'".format(field))
 
-    # 2. Add default values for all unspecified fields
+    # 2. Check to make sure that no experiment IDs contain spaces
+    experiment_id_values = [new_json_obj[k] for k in new_json_obj
+                            if k.startswith('experiment_id')]
+    if any([re.search(r'\s', v) for v in experiment_id_values]):
+        raise ValueError("Experiment IDs cannot contain any spaces.")
+
+    # 3. Add default values for all unspecified fields
     defaults = {'id_column': 'spkitemid',
                 'description': '',
                 'description_old': '',
@@ -193,18 +302,20 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
                 'trim_max': None,
                 'subgroups': [],
                 'section_order': None,
-                'flag_column': None}
+                'flag_column': None,
+                'min_items_per_candidate': None}
 
     for field in defaults:
         if field not in new_json_obj:
             new_json_obj[field] = defaults[field]
 
-    # 3. Check to make sure no unrecognized fields are specified
+    # 4. Check to make sure no unrecognized fields are specified
     for field in new_json_obj:
         if field not in defaults and field not in required_fields:
             raise ValueError("Unrecognized field '{}' in json file".format(field))
 
-    # 4. Check for fields that must be specified together and try to use the default feature file:
+    # 5. Check for fields that require feature_subset _file and try to use the default feature file:
+
     if new_json_obj['feature_subset'] and not new_json_obj['feature_subset_file']:
 
         # Check if we have the default subset file from rsmextra
@@ -238,7 +349,13 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
             and not new_json_obj['sign']):
             new_json_obj['sign'] = default_feature_sign
 
-    # 5. Check the fields that requires rsmextra
+    # 6. Check for fields that must be specified together
+    if new_json_obj['min_items_per_candidate'] and not new_json_obj['candidate_column']:
+        raise ValueError("If you want to filter out candidates with responses to less than X "
+                         "items, you need to specify the name of the column "
+                         "which contains candidate ids.")
+
+    # 7. Check the fields that requires rsmextra
     if not HAS_RSMEXTRA:
         if new_json_obj['special_sections']:
             raise ValueError("Special sections are only available to ETS"
@@ -249,40 +366,91 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
 
 def process_json_fields(json_obj):
     """
-    Converts json fields which are read in
-    string to an appropriate format. Fields which
-    can take multiple values lists are converted to lists
-    if they have not been already formatted as such.
+    Converts fields which are read in as string to the
+    appropriate format. Fields which can take multiple
+    string values are converted to lists if they have
+    not been already formatted as such.
+
+    Parameters
+    ----------
+    json_obj : dict
+        JSON object containing the fields and their
+        values from the configuration file.
+
+    Returns
+    -------
+    new_json_obj : dict
+        JSON object with the string values converted to
+        lists or boolean, as necessary.
+
+    Raises
+    -------
+    ValueError
     """
-    # convert multiple values into lists
+
+    
     list_fields = ['feature_prefix',
                    'general_sections',
                    'special_sections',
                    'custom_sections',
                    'subgroups', 'section_order']
 
+    boolean_fields = ['exclude_zero_scores',
+                      'use_scaled_predictions',
+                      'use_scaled_predictions_old',
+                      'use_scaled_predictions_new',
+                      'select_transformations']
+
     new_json_obj = json_obj.copy()
 
+    # convert multiple values into lists
     for field in list_fields:
         if new_json_obj[field]:
             if type(new_json_obj[field]) != list:
                 new_json_obj[field] = new_json_obj[field].split(',')
                 new_json_obj[field] = [prefix.strip() for prefix in new_json_obj[field]]
 
+    # make sure all boolean values are boolean
+    for field in boolean_fields:
+        error_message = "Field {} can only be set to True or False.".format(field)
+        if new_json_obj[field]:
+            if type(new_json_obj[field]) != bool:
+                # we first convert the value to string to avoid
+                # attribute errors in case the user supplied an integer.
+                given_value = str(new_json_obj[field]).strip()
+                m = re.match(r'^(true|false)$', given_value, re.I)
+                if not m:
+                    raise ValueError(error_message)
+                else:
+                    bool_value = json.loads(m.group().lower())
+                    new_json_obj[field] = bool_value
     return new_json_obj
 
-# method to parse json config file but removes the comments first
-# (http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html)
+
 def parse_json_with_comments(filename):
-    """ Parse a JSON file
-        First remove comments and then use the json module package
-        Comments look like :
-            // ...
-        or
-            /*
-            ...
-            */
     """
+    Parse a JSON file after removing any comments.
+    Comments can look like :
+        // ...
+    or
+        /*
+        ...
+        */
+
+    Adapted from:
+    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
+
+    Parameters
+    ----------
+    filename : str
+        Path to a JSON configuration file.
+
+    Returns
+    -------
+    ans : dict
+        JSON object representing the configuration file.
+    """
+
     # Regular expression to identify comments
     comment_re = re.compile(
         '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
@@ -292,7 +460,7 @@ def parse_json_with_comments(filename):
     with open(filename) as f:
         content = ''.join(f.readlines())
 
-        ## Looking for comments
+        # Looking for comments
         match = comment_re.search(content)
         while match:
             # single line comment
@@ -300,16 +468,36 @@ def parse_json_with_comments(filename):
             match = comment_re.search(content)
 
         # Return json file
-        return json.loads(content)
+        ans = json.loads(content)
+        return ans
 
 
 def normalize_and_validate_feature_file(feature_json):
+    """
+    Normalize the field names in `feature_json` in order to maintain
+    backwards compatibility with old config files. Raises exceptions
+    if it finds missing fields or duplicate feature names.
 
+    Parameters
+    ----------
+    feature_json : dict
+        JSON object containing the information
+        specified in the feature file, possibly
+        containing the old-style names for feature
+        fields.
+
+    Returns
+    -------
+    new_json_obj : dict
+        JSON object with all old style names normalized to
+        new style names.
+
+    Raises
+    ------
+    KeyError
+    ValueError
     """
-    Normalize the the field names in `feature_json`
-    in order to maintain backwards compatibility
-    with old config files.
-    """
+
     field_mapping = {'wt': 'sign',
                      'featN': 'feature',
                      'trans': 'transform'}
@@ -346,6 +534,24 @@ def normalize_and_validate_feature_file(feature_json):
     return new_json_obj
 
 def read_json_file(json_file):
+    """
+    Read the configuration json file into a JSON object. Raises an
+    exception if it finds any formatting errors.
+
+    Parameters
+    -----------
+    json_file : str
+        Path to a configuration JSON file
+
+    Returns
+    -------
+    obj : dict
+        JSON object
+
+    Raises
+    ------
+    ValueError
+    """
     try:
         obj = parse_json_with_comments(json_file)
     except ValueError:
@@ -360,10 +566,28 @@ def read_json_file(json_file):
 def check_main_config(obj, context='rsmtool'):
 
     """
-    Normalize all fields in main config file, check for
-    all required fields, add the default values, and convert
-    all strings to appropriate objects.
+    The driver function that creates the final JSON object from the
+    configuration file. Normalizes all fields in main config file,
+    checks for all required fields, adds the default values, and
+    converts all strings to appropriate objects.
+
+    Parameters
+    ----------
+    obj : dict
+        JSON object representing the configuration file.
+    context : str, optional
+        Context of the tool in which we are validating.
+        Possible values are {'rsmtool', 'rsmeval',
+                             'rsmpredict', 'rsmcompare'}
+        Defaults to 'rsmtool'.
+
+    Returns
+    -------
+    obj : dict
+        Final JSON object with normalized and validated fields
+        and converted values.
     """
+
     obj = normalize_json_fields(obj)
     obj = validate_and_populate_json_fields(obj, context=context)
     obj = process_json_fields(obj)
@@ -373,10 +597,22 @@ def check_main_config(obj, context='rsmtool'):
 def locate_file(filepath, configpath):
 
     """
-    Try to locate an experiment file. If the given path
-    doesn't exist, then may be the path is relative to
-    the path of the config file. If neither exists, then
-    return None.
+    Try to locate an experiment file. If the given path doesn't exist,
+    then may be the path is relative to the path of the config file.
+    If neither exists, then return None.
+
+    Parameters
+    ----------
+    filepath : str
+        Name of the experiment file we want to locate.
+    configpath : str
+        Path to the experiment configuration file.
+
+    Returns
+    --------
+    retval :  str or None
+        Absolute path to the experiment file or None
+        if the file could not be located.
     """
 
     # the feature config file can be in the 'feature' directory
@@ -401,9 +637,27 @@ def locate_file(filepath, configpath):
 def check_subgroups(df, subgroups):
 
     """
-    Check that all subgroups, if specified, correspond to
-    columns in the provided data frame, and replace all NaNs
-    in subgroups values with 'No info' for later convenience.
+    Check that all subgroups, if specified, correspond to columns in the
+    provided data frame, and replace all NaNs in subgroups values with
+    'No info' for later convenience. Raises an exception if any specified
+    subgroup columns are missing.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Input data frame containing the feature values.
+    subgroups : list of str
+        List of column names that contain grouping
+        information.
+
+    Returns
+    -------
+    df : pandas DataFrame
+         Modified input data frame with NaNs replaced.
+
+    Raises
+    ------
+    KeyError
     """
 
     missing_subgroup_columns = set(subgroups).difference(df.columns)
@@ -421,15 +675,26 @@ def check_subgroups(df, subgroups):
     # replace any empty values in subgroups values by "No info"
     empty_value = re.compile(r"^\s*$")
     df[subgroups] = df[subgroups].replace(to_replace=empty_value, value='No info')
-    return(df)
-
+    return df
 
 
 def get_trim_min_max(config_obj):
-
     """
-    Get the specified trim min and max, if any and make sure
-    they are numeric.
+    Get the specified trim min and max, if any and make sure they are
+    numeric.
+
+    Parameters
+    ----------
+    config_obj : dict
+        JSON object containing the values from
+        the configuration file.
+
+    Returns
+    -------
+    spec_trim_min : float
+        Specified trim min value
+    spec_trim_max : float
+        Specified trim max value
     """
 
     spec_trim_min = config_obj.get('trim_min', None)
@@ -439,15 +704,30 @@ def get_trim_min_max(config_obj):
         spec_trim_min = float(spec_trim_min)
     if spec_trim_max:
         spec_trim_max = float(spec_trim_max)
-    return(spec_trim_min, spec_trim_max)
+    return (spec_trim_min, spec_trim_max)
 
 
 def check_flag_column(config_obj):
-
     """
-    make sure the flag_column field is in the correct format.
-    Get flag columns and values for filtering if any
-    and convert single values to lists
+    Make sure the `flag_column` field is in the correct format. Get
+    flag columns and values for filtering if any and convert single
+    values to lists. Raises an exception if `flag_column` is not
+    correctly specified.
+
+    Parameters
+    ----------
+    config_obj : dict
+        JSON object containing the `flag_column` field
+        from the configuration file.
+
+    Returns
+    -------
+    new_filtering_dict : dict
+        Properly formatted `flag_column` dictionary.
+
+    Raises
+    ------
+    ValueError
     """
 
     logger = logging.getLogger(__name__)
@@ -487,11 +767,27 @@ def check_flag_column(config_obj):
 
     return new_filtering_dict
 
-def check_feature_subset_file(feature_specs,
-                              subset=None,
-                              sign=None):
+def check_feature_subset_file(feature_specs, subset=None, sign=None):
+    """
+    Check that the file is in the correct format and contains all
+    the requested values. Raises an exception if it finds any errors
+    but otherwise returns nothing.
 
-    # check that the file is in the correct format and contains all the requested values
+    Parameters
+    ----------
+    feature_specs : pandas DataFrame
+        Data frame containing the feature specifications.
+    subset : str, optional
+        Name of a pre-defined feature subset, defaults
+        to None.
+    sign : str, optional
+        Value of the sign, defaults to None.
+
+    Raises
+    ------
+    ValueError
+    """
+
     if 'Feature' not in feature_specs.columns:
         raise ValueError("The feature_subset_file must contain a column named 'Feature' "
                          "containing the feature names.")
@@ -511,12 +807,29 @@ def check_feature_subset_file(feature_specs,
             raise ValueError("The sign columns in feature file can only contain - or +")
 
 
-
-def load_experiment_data(main_config_file, outdir):
-
+def load_experiment_data(main_config_file, output_dir):
     """
-    Set up the experiment by loading the training
-    and evaluation data sets and preprocessing them.
+    The main function that sets up the experiment by loading the
+    training and evaluation data sets and preprocessing them. Raises
+    appropriate exceptions .
+
+    Parameters
+    ----------
+    main_config_file : str
+        Path to the experiment configuration file.
+    output_dir : str
+        Path to the output directory that will
+        contain the experiment output.
+
+    Returns
+    -------
+    List of dataframes and other variables representing
+    the experiment.
+
+    Raises
+    ------
+    FileNotFoundError
+    ValueError
     """
 
     logger = logging.getLogger(__name__)
@@ -565,6 +878,12 @@ def load_experiment_data(main_config_file, outdir):
                          "'second_human_score_column' cannot have the "
                          "same value.")
 
+    # check if we are excluding candidates based on number of responses
+    exclude_listwise = False
+    min_items = config_obj['min_items_per_candidate']
+    if min_items:
+        exclude_listwise=True
+ 
     # get the name of the model that we want to train and
     # check that it's valid
     model_name = config_obj['model']
@@ -689,15 +1008,24 @@ def load_experiment_data(main_config_file, outdir):
                                       id_column] + subgroups + list(flag_column_dict.keys())))
 
     # if `second_human_score_column` is specified, then
-    # we need to add `sc2` to the list of reserved column
+    # we need to add the original name as well as `sc2` to the list of reserved column
     # names. And same for 'length' and 'candidate', if `length_column`
-    # and `candidate_column` are specified
+    # and `candidate_column` are specified. We add both names to 
+    # simplify things downstream since neither the original name nor
+    # the standardized name should be used as feature names
+
     if second_human_score_column:
+        reserved_column_names.append(second_human_score_column)
         reserved_column_names.append('sc2')
     if length_column:
+        reserved_column_names.append(length_column)
         reserved_column_names.append('length')
     if candidate_column:
+        reserved_column_names.append(candidate_column)
         reserved_column_names.append('candidate')
+
+    # remove duplicates (if any) from the list of reserved column names
+    reserved_column_names = list(set(reserved_column_names))
 
     # Make sure that the training data as specified in the
     # config file actually exists on disk and if it does,
@@ -738,6 +1066,7 @@ def load_experiment_data(main_config_file, outdir):
                                            feature_subset_specs=feature_subset_specs,
                                            feature_subset=feature_subset,
                                            feature_prefix=feature_prefix,
+                                           min_items_per_candidate=min_items,
                                            use_fake_labels=use_fake_train_labels)
 
     # Generate feature specifications now that we
@@ -801,6 +1130,7 @@ def load_experiment_data(main_config_file, outdir):
                                          subgroups,
                                          exclude_zero_scores=exclude_zero_scores,
                                          exclude_zero_sd=False,
+                                         min_items_per_candidate=min_items,
                                          use_fake_labels=use_fake_test_labels)
 
     return (df_train_features, df_test_features,
@@ -821,6 +1151,8 @@ def load_experiment_data(main_config_file, outdir):
             used_trim_min, used_trim_max,
             use_scaled_predictions, exclude_zero_scores,
             select_features_automatically,
+            exclude_listwise,
+            min_items,
             chosen_notebook_files)
 
 
@@ -841,6 +1173,7 @@ def load_and_filter_data(csv_file,
                          feature_subset_specs=None,
                          feature_subset=None,
                          feature_prefix=None,
+                         min_items_per_candidate=None,
                          use_fake_labels=False):
     """
     Load the data from `csv_file` and filters it to remove
@@ -850,23 +1183,25 @@ def load_and_filter_data(csv_file,
     are missing from the data. If no feature_names are specified,
     these are generated based on column names and subset information
     if available. The function then excludes non-numeric values for
-    any feature. It also generates fake labels between 1 and 10 if
+    any feature. If the user requested to exclude candidates with less
+    than min_items_per_candidates, such candidates are excluded.
+    It also generates fake labels between 1 and 10 if
     `use_fake_parameters` is set to True. Finally, it renames the id
     and label column and splits the data into the data frame with
-    feature values and score label and the data frame with other
-    available metadata.
+    feature values and score label, the data frame with information about
+    subgroup and candidate (metadata) and the data frame with all other columns.
     """
 
     logger = logging.getLogger(__name__)
 
     # read the csv file into a data frame but we want to make
-    # sure to read in the `id_column`, candidate_column and
+    # sure to read in the `id_column`, `candidate_column` and
     # subgroups (if any) as a string to ensure
     # that we do not lose information, e.g., initial zeros
-
     string_columns = [id_column, candidate_column] + subgroups
     converter_dict = dict([(column, str) for column in string_columns if column])
 
+    # read in the CSV file
     df = pd.read_csv(csv_file, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
@@ -878,10 +1213,29 @@ def load_and_filter_data(csv_file,
     if second_human_score_column:
         columns_to_check.append(second_human_score_column)
 
+    if candidate_column:
+        columns_to_check.append(candidate_column)
+
     missing_columns = set(columns_to_check).difference(df.columns)
     if missing_columns:
         raise KeyError("Columns {} from the config file "
                        "do not exist in the data.".format(missing_columns))
+
+    # it is possible for the `id_column` and `candidate_column` to be
+    # set to the same column name in the CSV file, e.g., if there is
+    # only one response per candidate. If this happens, we neeed to
+    # create a duplicate column for candidates or id for the downstream
+    # processing to work as usual.
+    if id_column == candidate_column:
+        # if the name for both columns is `candidate`, we need to
+        # create a separate id_column name
+        if id_column == 'candidate':
+            df['spkitemid'] = df['candidate'].copy()
+            id_column = 'spkitemid'
+        # else we create a separate `candidate` column
+        else:
+            df['candidate'] = df[id_column].copy()
+            candidate_column = 'candidate'
 
     df = rename_default_columns(df,
                                 requested_feature_names,
@@ -1014,6 +1368,25 @@ def load_and_filter_data(csv_file,
         df_filtered.rename(columns={'length': '##{}##'.format(length_column)},
                            inplace=True)
 
+    # if requested, exclude the candidates with less than X responses
+    # left after filtering
+    if min_items_per_candidate:
+        (df_filtered_candidates,
+         df_excluded_candidates) = select_candidates_with_N_or_more_items(df_filtered,
+                                                                          min_items_per_candidate)
+        # check that there are still responses left for analysis
+        if len(df_filtered_candidates) == 0:
+            raise ValueError("After filtering non-numeric scores and "
+                             "non-numeric feature values there were "
+                             "no candidates with {} or more responses "
+                             "left for analysis".format(min_items_per_candidate))
+
+        # redefine df_filtered
+        df_filtered = df_filtered_candidates.copy()
+
+        # update df_excluded
+        df_excluded = pd.concat([df_excluded, df_excluded_candidates])
+
     # create separate data-frames for features and sc1, all other
     # information, and responses excluded during filtering
     not_other_columns = set()
@@ -1045,13 +1418,8 @@ def load_and_filter_data(csv_file,
         if exclude_zero_scores:
             df_filtered_human_scores['sc2'] = df_filtered_human_scores['sc2'].replace(0, nan)
 
-    # remove spkitemid from `not_other_columns`
-    # since we want that column in the `other_columns`
-    # data frame
-    not_other_columns.remove('spkitemid')
-
-    # now extract all other columns
-    other_columns = [column for column in df_filtered.columns
+    # now extract all other columns and add 'spkitemid'
+    other_columns = ['spkitemid'] + [column for column in df_filtered.columns
                      if column not in not_other_columns]
     df_filtered_other_columns = df_filtered[other_columns]
 
@@ -1075,10 +1443,40 @@ def rename_default_columns(df,
                            length_column,
                            system_score_column,
                            candidate_column):
-
     """
-    Standardize all column names and rename all columns
-    with default names to ##NAME##.
+    Standardize all column names and rename all columns with default
+    names to ##NAME##.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Input data frame containing all the feature
+        columns.
+        List of feature column names that we want
+        to include in the scoring model.
+    id_column : str
+        Column name containing the response IDs.
+    first_human_score_column : str or None
+        Column name containing the H1 scores.
+    second_human_score_column : str or None
+        Column name containing the H2 scores.
+        Should be None if no H2 scores are available.
+    length_column : str or None
+        Column name containing response lengths.
+        Should be None if lengths are not available.
+    system_score_column : str
+        Column name containing the score predicted
+        by the system. This is only used for RSMEval.
+    candidate_column : str or None
+        Column name containing identifying information
+        at the candidate level. Should be None if such
+        information is not available.
+
+    Returns
+    -------
+    df : pandas DataFrame
+        Modified input data frame with all the approrimate
+        renamings.
     """
 
     columns = [id_column,

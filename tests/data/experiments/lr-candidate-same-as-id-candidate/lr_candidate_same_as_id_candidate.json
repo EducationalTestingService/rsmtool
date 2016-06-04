@@ -1,0 +1,15 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train_with_candidate.csv",
+    "description": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "candidate",
+    "model": "LinearRegression",
+    "train_label_column": "score",
+    "features": "features.json",
+    "experiment_id": "lr_candidate_same_as_id_candidate",
+    "trim_max": 6,
+    "candidate_column": "candidate",
+    "test_file": "../../files/test_with_candidate.csv"
+}

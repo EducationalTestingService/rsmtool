@@ -29,7 +29,8 @@ from rsmtool.input import (check_main_config,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column,
-                           locate_custom_sections)
+                           locate_custom_sections, 
+                           select_candidates_with_N_or_more_items)
 
 from rsmtool.predict import process_predictions
 
@@ -42,6 +43,8 @@ from rsmtool.report import (create_report,
 from rsmtool.utils import write_experiment_output
 
 from rsmtool.utils import LogFormatter
+
+from rsmtool.version import __version__
 
 
 def run_evaluation(config_file, output_dir):
@@ -82,6 +85,13 @@ def run_evaluation(config_file, output_dir):
     human_score_column = config_obj['human_score_column']
     system_score_column = config_obj['system_score_column']
 
+    # if the human score column is the same as the
+    # system score column, raise an error
+    if human_score_column == system_score_column:
+        raise ValueError("'human_score_column' and "
+                         "'system_score_column' "
+                         "cannot have the same value.")
+
     # get the name of the optional column that
     # contains the second human score
     second_human_score_column = config_obj['second_human_score_column']
@@ -106,6 +116,12 @@ def run_evaluation(config_file, output_dir):
 
     # get the candidate column if any and convert it to string
     candidate_column = config_obj['candidate_column']
+
+    # check if we are excluding candidates based on number of responses
+    exclude_listwise = False
+    min_items_per_candidate = config_obj['min_items_per_candidate']
+    if min_items_per_candidate:
+        exclude_listwise=True
 
     general_report_sections = config_obj['general_sections']
 
@@ -192,9 +208,17 @@ def run_evaluation(config_file, output_dir):
         df_pred = pd.read_csv(predictions_file_location, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
-    missing_columns = set([id_column,
-                           human_score_column,
-                           system_score_column]).difference(df_pred.columns)
+
+    # make sure that the columns specified in the config file actually exist
+    columns_to_check = [id_column, human_score_column, system_score_column]
+
+    if second_human_score_column:
+        columns_to_check.append(second_human_score_column)
+
+    if candidate_column:
+        columns_to_check.append(candidate_column)
+
+    missing_columns = set(columns_to_check).difference(df_pred.columns)
     if missing_columns:
         raise KeyError('Columns {} from the config file do not exist '
                        'in the predictions file.'.format(missing_columns))
@@ -257,6 +281,25 @@ def run_evaluation(config_file, output_dir):
                          "can be run. ")
 
     df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+
+    # if requested, exclude the candidates with less than X responses
+    # left after filtering
+    if exclude_listwise:
+        (df_filtered_candidates,
+         df_excluded_candidates) = select_candidates_with_N_or_more_items(df_filtered_pred,
+                                                                          min_items_per_candidate)
+        # check that there are still responses left for analysis
+        if len(df_filtered_candidates) == 0:
+            raise ValueError("After filtering non-numeric human and system scores "
+                             "there were "
+                             "no candidates with {} or more responses "
+                             "left for analysis".format(str(min_items_per_candidate)))
+
+        # redefine df_filtered_pred
+        df_filtered_pred = df_filtered_candidates.copy()
+
+        # update df_excluded
+        df_excluded = pd.concat([df_excluded, df_excluded_candidates])
 
     # set default values for scaling
     scale_pred_mean = 0
@@ -355,7 +398,8 @@ def run_evaluation(config_file, output_dir):
                                                                                  df_excluded,
                                                                                  subgroups,
                                                                                  candidate_column,
-                                                                                 exclude_zero_scores=exclude_zero_scores)
+                                                                                 exclude_zero_scores=exclude_zero_scores,
+                                                                                 exclude_listwise=exclude_listwise)
 
     write_experiment_output([df_test_excluded_analysis,
                              df_data_composition],
@@ -382,7 +426,6 @@ def run_evaluation(config_file, output_dir):
                                               df_test_human_scores,
                                               subgroups,
                                               second_human_score_column,
-                                              exclude_zero_scores=exclude_zero_scores,
                                               use_scaled_predictions=use_scaled_predictions)
 
     write_experiment_output([df_human_machine_eval,
@@ -423,9 +466,11 @@ def run_evaluation(config_file, output_dir):
                   subgroups,
                   None,
                   second_human_score_column,
+                  min_items_per_candidate,
                   chosen_notebook_files,
                   exclude_zero_scores=exclude_zero_scores,
-                  use_scaled_predictions=use_scaled_predictions)
+                  use_scaled_predictions=use_scaled_predictions,
+                  context='rsmeval')
 
 
 def main():
@@ -455,6 +500,9 @@ def main():
     parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
                         help="The output directory where all the files "
                              "for this experiment will be stored")
+
+    parser.add_argument('-V', '--version', action='version',
+                        version='%(prog)s {0}'.format(__version__))
 
     # parse given command line arguments
     args = parser.parse_args()

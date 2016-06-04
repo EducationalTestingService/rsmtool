@@ -19,6 +19,7 @@
                       "features_by_group",
                       "evaluation",
                       "model",
+                      "consistency",
                       "custom2",
                       "sysinfo"]
 }

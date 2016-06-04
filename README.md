@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master.svg?style=shield)](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master)
+
 ## Introduction
 
 RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. 
