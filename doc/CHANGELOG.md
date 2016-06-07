@@ -1,5 +1,11 @@
 # Release Notes
 
+## v5.0.1 (June 7, 2016)
+
+### Bugfixes
+
+* RSMCompare now does not switch the old and new experiments in the report.
+
 ## v5.0.0 (June 3, 2016)
 
 ### New features
