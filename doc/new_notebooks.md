@@ -1,6 +1,6 @@
 # Guide to writing new IPython notebooks
 
-`rsmtool` allows developers and users to contribute new analysis sections to `rsmtool` and `rsmeval` as *custom sections* (see report_sections.md for further information). 
+RSMTool allows developers and users to contribute new analysis sections to `rsmtool` and `rsmeval` as *custom sections* (see report_sections.md for further information). 
 
 When writing such notebooks, some or all of the python variables below will be available in the notebook and so can be used in the notebooks. 
 
