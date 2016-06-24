@@ -25,10 +25,6 @@ David M. Williamson, Xiaoming Xi, and F. Jay Breyer. 2012. A Framework for Evalu
 
 ## Installation
 
-If you want to use RSMTool on your own machine, either as a user or a developer, follow the appropriate instructions below. Note that RSMTool only works with Python 3.4 and higher. 
-
-### For users
-
 Currently, the best way to install RSMTool is by using the `conda` package manager. If you have the `conda` package manager already installed, you can skip straight to Step 2. 
 
 1. To install the `conda` package manager, follow the instructions on [this page](http://conda.pydata.org/docs/install/quick.html).  
@@ -39,21 +35,23 @@ Currently, the best way to install RSMTool is by using the `conda` package manag
 
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by `rsmtool` will only be used when you want to run `rsmtool` experiments and will not affect other projects. 
 
-### For developers
+Note that RSMTool only works with Python 3.4 and higher. 
 
-The instructions below are only if you are developing new features or functionality for RSMTool.
+## Contributing
 
-1. Pull the latest version of rsmtool from github and switch to the develop branch. 
+Contributions to RSMTool are very welcome. You can use the instructions below to get started on developing new features or functionality for RSMTool.
+
+1. Pull the latest version of rsmtool from github and switch to the `master` branch. 
 
 2. If you already have the `conda` package manager installed, skip to the next step. If you do not, follow the instructions on [this page](http://conda.pydata.org/docs/install/quick.html) to install `conda`. 
 
-3. Create a new conda environment (say, `rsmtool`) and install the packages specified in the `conda_requirements.txt` file by running `conda create -n rsmtool -c desilinguist --file conda_requirements.txt`. Use `conda_requirements_windows.txt` if you are on Windows. The two conda requirements file will be consolidated with the next version.
+3. Create a new conda environment (say, `rsmtool`) and install the packages specified in the `conda_requirements.txt` file by running `conda create -n rsmtool -c desilinguist --file conda_requirements.txt`. Use `conda_requirements_windows.txt` if you are on Windows. There are two versions because RSMTool currently does not use MKL on non-Windows platforms.
 
 4. Activate the environment using `source activate rsmtool` (use `activate rsmtool` if you are on Windows).
 
 5. Run `pip install -e .` to install rsmtool into the environment in editable mode which is what we need for development.  
 
-6. Run `nosetests -v tests` to run the tests.  
+6. Run `nosetests -v tests` to run the tests. 
 
 ## Available documentation
 
