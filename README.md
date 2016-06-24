@@ -6,7 +6,7 @@ RSMTool is a python package for facilitating research on building and evaluating
 
 Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. The various numbers and figures in the report are highlighted based on whether they exceed or fall short of the recommendations laid out by Williamson et al. (2012). However, these can be easily customized if the user wishes to use different set of recommendations.
 
-Finally, since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. [Here's](http://bit.ly/rsmtool) an example RSMTool report for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
+Finally, since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
 
 
 RSMTool provides the following main scripts:
@@ -36,6 +36,15 @@ Currently, the best way to install RSMTool is by using the `conda` package manag
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by `rsmtool` will only be used when you want to run `rsmtool` experiments and will not affect other projects. 
 
 Note that RSMTool only works with Python 3.4 and higher. 
+
+## Example
+
+You can out RSMTool as follows:
+
+1. Go to the `example` folder. This folder contains the training and test set features for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
+2. Make sure to activate the conda environment where you installed rsmtool (e.g., `source activate rsmtool`)
+3. Run RSMTool: `rsmtool config.json`
+4. Since no output directory was specfied, `rsmtool` will create the three output folders in the current directory: `figure`, `output`, and `report`. You can examine the HTML report `report/ASAP2_report.html`. It should look like [this](https://s3.amazonaws.com/sample-rsmtool-report/ASAP2_report.html).
 
 ## Contributing
 
