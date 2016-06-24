@@ -44,20 +44,18 @@ When writing such notebooks, some or all of the python variables below will be a
 
 - `df_train_metadata` and `df_test_metadata`: Data frames containing the `*_train_metadata.csv` and `*_test_metadata.csv`  files respectively as explained in `doc/output_csv.md`. [`rsmtool`: both data frames, `rsmeval`: test data only] 
 
-
 - `df_train_length`: A data frame containing `spkitemid` and response lengths (`length`) for the training data. These are *only* available (a) if  `length_column` was specified in the config file, (b) if no values in that column are missing and, (c) if the values in that column are not distributed with a standard deviation <= 0. [`rsmtool` only]
 
 - `df_test_human_scores`: A data frame containing `spkitemid`, test label (`sc1`) and the second human score (`sc2`) for the test data. This frame is *only* available if `second_human_score_column` was specified in the config file. Note that the data frame will contain `NaN`s for the responses for which no numeric second human score was available or for which the second score was 0 and exclude_zero_scores was set to `True`. 
 
 - `df_pred_preproc`: A data frame containing the `*_pred_processed.csv` file as explained in `doc/output_csv.md`.
 
-- `df_feature_subset_specs`: a data frame containing the content of `feature_subset_file` if it was specified in config file. `None` if not specified in the config file.
-[`rsmtool` only]
+- `df_feature_subset_specs`: a data frame containing the content of `feature_subset_file` if it was specified in config file. `None` if not specified in the config file. [`rsmtool` only]
 
 In addition, the following variables are also available but you should *not* re-read the files under these directories which are already available as data frames.
 
 - `output_dir`: The output directory for the experiment that contains all the generated CSV files. 
-- 
+
 - `figure_dir`: The figure directory for the experiment that contains all the generated SVG and PNG figures.
 
 ## Notes: 
