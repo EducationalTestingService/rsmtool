@@ -53,7 +53,6 @@ When writing such notebooks, some or all of the python variables below will be a
 - `df_feature_subset_specs`: a data frame containing the content of `feature_subset_file` if it was specified in config file. `None` if not specified in the config file. [`rsmtool` only]
 
 In addition, the following variables are also available but you should *not* re-read the files under these directories which are already available as data frames.
-
 - `output_dir`: The output directory for the experiment that contains all the generated CSV files. 
 
 - `figure_dir`: The figure directory for the experiment that contains all the generated SVG and PNG figures.
