@@ -39,7 +39,7 @@ Note that RSMTool only works with Python 3.4 and higher.
 
 ## Example
 
-You can out RSMTool as follows:
+You can try out RSMTool as follows:
 
 1. Go to the `example` folder. This folder contains the training and test set features for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
 2. Make sure to activate the conda environment where you installed rsmtool (e.g., `source activate rsmtool`)
