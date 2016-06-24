@@ -2,7 +2,7 @@
 
 ## Introduction
 
-RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. 
+RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. See [rsmtool.pdf](doc/rsmtool.pef) for background information. 
 
 Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. The various numbers and figures in the report are highlighted based on whether they exceed or fall short of the recommendations laid out by Williamson et al. (2012). However, these can be easily customized if the user wishes to use different set of recommendations.
 
