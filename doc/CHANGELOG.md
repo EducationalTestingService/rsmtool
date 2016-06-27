@@ -1,5 +1,9 @@
 # Release Notes
 
+## v5.0.2 (June 27, 2016)
+
+Added files needed for [Journal of Open Source Software](http://joss.theoj.org/) submission.
+
 ## v5.0.1 (June 7, 2016)
 
 ### Bugfixes
