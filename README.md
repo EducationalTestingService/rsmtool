@@ -2,11 +2,11 @@
 
 ## Introduction
 
-RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. 
+RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. See [rsmtool.pdf](doc/rsmtool.pdf) for background information. 
 
 Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. The various numbers and figures in the report are highlighted based on whether they exceed or fall short of the recommendations laid out by Williamson et al. (2012). However, these can be easily customized if the user wishes to use different set of recommendations.
 
-Finally, since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. [Here's](http://bit.ly/rsmtool) an example RSMTool report for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
+Finally, since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
 
 
 RSMTool provides the following main scripts:
@@ -25,10 +25,6 @@ David M. Williamson, Xiaoming Xi, and F. Jay Breyer. 2012. A Framework for Evalu
 
 ## Installation
 
-If you want to use RSMTool on your own machine, either as a user or a developer, follow the appropriate instructions below. Note that RSMTool only works with Python 3.4 and higher. 
-
-### For users
-
 Currently, the best way to install RSMTool is by using the `conda` package manager. If you have the `conda` package manager already installed, you can skip straight to Step 2. 
 
 1. To install the `conda` package manager, follow the instructions on [this page](http://conda.pydata.org/docs/install/quick.html).  
@@ -39,25 +35,36 @@ Currently, the best way to install RSMTool is by using the `conda` package manag
 
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by `rsmtool` will only be used when you want to run `rsmtool` experiments and will not affect other projects. 
 
-### For developers
+Note that RSMTool only works with Python 3.4 and higher. 
 
-The instructions below are only if you are developing new features or functionality for RSMTool.
+## Example
 
-1. Pull the latest version of rsmtool from github and switch to the develop branch. 
+You can try out RSMTool as follows:
+
+1. Go to the `example` folder. This folder contains the training and test set features for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
+2. Make sure to activate the conda environment where you installed rsmtool (e.g., `source activate rsmtool`)
+3. Run RSMTool: `rsmtool config.json`
+4. Since no output directory was specfied, `rsmtool` will create the three output folders in the current directory: `figure`, `output`, and `report`. You can examine the HTML report `report/ASAP2_report.html`. It should look like [this](https://s3.amazonaws.com/sample-rsmtool-report/ASAP2_report.html).
+
+## Contributing
+
+Contributions to RSMTool are very welcome. You can use the instructions below to get started on developing new features or functionality for RSMTool.
+
+1. Pull the latest version of rsmtool from github and switch to the `master` branch. 
 
 2. If you already have the `conda` package manager installed, skip to the next step. If you do not, follow the instructions on [this page](http://conda.pydata.org/docs/install/quick.html) to install `conda`. 
 
-3. Create a new conda environment (say, `rsmtool`) and install the packages specified in the `conda_requirements.txt` file by running `conda create -n rsmtool -c desilinguist --file conda_requirements.txt`. Use `conda_requirements_windows.txt` if you are on Windows. The two conda requirements file will be consolidated with the next version.
+3. Create a new conda environment (say, `rsmtool`) and install the packages specified in the `conda_requirements.txt` file by running `conda create -n rsmtool -c desilinguist --file conda_requirements.txt`. Use `conda_requirements_windows.txt` if you are on Windows. There are two versions because RSMTool currently does not use MKL on non-Windows platforms.
 
 4. Activate the environment using `source activate rsmtool` (use `activate rsmtool` if you are on Windows).
 
 5. Run `pip install -e .` to install rsmtool into the environment in editable mode which is what we need for development.  
 
-6. Run `nosetests -v tests` to run the tests.  
+6. Run `nosetests -v tests` to run the tests. 
 
 ## Available documentation
 
-## Usage documentation for main scripts
+### Usage documentation for main scripts
 
 * [rsmtool](doc/rsmtool.md) 
 
@@ -67,7 +74,7 @@ The instructions below are only if you are developing new features or functional
 
 * [rsmcompare](doc/rsmcompare.md) 
 
-## Description of configuration files
+### Description of configuration files
 
 * [RSMTool configuration file](doc/config_file.md) - main configuration file for `rsmtool`
 
@@ -79,7 +86,7 @@ The instructions below are only if you are developing new features or functional
 
 * [Feature file](doc/feature_file.md) - feature file
 
-## Lists of available options
+### Lists of available options
 
 * [Available models](doc/available_models.md) - list of models available to `rsmtool`
 
@@ -89,7 +96,7 @@ The instructions below are only if you are developing new features or functional
 
 * [Output CSV files](doc/output_csv.md) - .csv files generated by `rsmtool` and `rsmeval`
 
-## Documentation for developers
+### Documentation for developers
 
 * [New notebooks](doc/new_notebooks.md) - the variables and data frames available for use in custom report sections.
 

@@ -1,0 +1,44 @@
+{
+    "features": [
+        {
+            "transform": "raw",
+            "feature": "FEATURE1",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE2",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE3",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE4",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE5",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE6",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE7",
+            "sign": 1
+        },
+        {
+            "transform": "raw",
+            "feature": "FEATURE8",
+            "sign": 1
+        }
+    ]
+}
