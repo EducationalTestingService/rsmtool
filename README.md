@@ -1,4 +1,6 @@
 [![Circle CI](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master.svg?style=shield)](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master)
+[![DOI](https://zenodo.org/badge/22127/EducationalTestingService/rsmtool.svg)](https://zenodo.org/badge/latestdoi/22127/EducationalTestingService/rsmtool)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/LICENSE)
 
 ## Introduction
 
