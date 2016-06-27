@@ -10,7 +10,7 @@
       "affiliation": "Educational Testing Service"
     },
     {
-      "@id": "",
+      "@id": "0000-0002-8213-3362",
       "@type": "Person",
       "email": "aloukina@ets.org",
       "name": "Anastassia Loukina",
@@ -19,12 +19,12 @@
   ],
   "identifier": "",
   "codeRepository": "https://github.com/EducationalTestingService/rsmtool",
-  "datePublished": "2016-06-24",
-  "dateModified": "2016-06-24",
-  "dateCreated": "2016-06-24",
+  "datePublished": "2016-06-27",
+  "dateModified": "2016-06-27",
+  "dateCreated": "2016-06-27",
   "description": "RSMTool is a collection of tools for researchers working on statistical models for automated scoring of written and spoken responses in an educational context.",
   "keywords": "educational applications, scoring models, statistics, visualization",
   "license": "Apache 2.0",
   "title": "RSMTool",
-  "version": "5.0.1"
+  "version": "5.0.2"
 }

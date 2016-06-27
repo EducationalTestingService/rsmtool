@@ -12,7 +12,7 @@ authors:
  - name: Anastassia Loukin
    orcid: 0000-0002-8213-3362
    affiliation: Educational Testing Service
-date: 23 June 2016
+date: 27 June 2016
 bibliography: paper.bib
 ---
 
