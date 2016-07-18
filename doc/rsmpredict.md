@@ -9,7 +9,7 @@
 
 `rsmpredict` requires the following input:
 
-* File with feature values. The file must be in .csv format and should contain an id column and feature values for each response. 
+* File with feature values. The files must be in .csv format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition there should be a column with a unique id for each response. 
 
 * Model files generated when training the original model. These files must be stored in the same directory. 
     

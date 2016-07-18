@@ -19,7 +19,7 @@ Most common use cases:
 
 `rsmtool` requires the following input:
 
-- The data files for training and evaluation sets. The files must be in .csv format and should contain an id column, human score and feature values for each response.
+- The data files for training and evaluation sets. The files must be in .csv format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition there should be a column with a unique id and a column with human score for each response. The column names are defined in the configuration file. 
 
 - Configuration file in .json format with the description of the data and the model. See [config_file.md](config_file.md) for further information. 
 

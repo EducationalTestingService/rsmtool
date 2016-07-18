@@ -12,7 +12,7 @@ Most common use cases:
 
 `rsmeval` requires the following input:
 
-* File with predictions. The file must be in .csv format and should contain an id column, human score and predicted score for each response. The names of these columns are defined in the configuration file.
+* File with predictions. The files must be in .csv format. Each row should correspond to a single response and contain the numeric system score predicted for this response. In addition there should be a column with a unique id and a column with human score for each response. The column names are defined in the configuration file. 
 
 * Configuration file in .json format with the settings for `rsmeval`. See [config_file_eval.md](config_file_eval.md) for further information.
 

@@ -4,26 +4,35 @@
 
 ## Introduction
 
-RSMTool is a python package for facilitating research on building and evaluating scoring models (SMs) for automated scoring engines. It allows the integration of educational measurement practices with the automated scoring and model building process. See [rsmtool.pdf](doc/rsmtool.pdf) for background information. 
+RSMTool is a python package which automates and combines in a single pipeline multiple analyses commonly conducted when building and evaluating scoring models (SMs) for automated scoring engines as shown in the following figure: 
 
-Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. The various numbers and figures in the report are highlighted based on whether they exceed or fall short of the recommendations laid out by Williamson et al. (2012). However, these can be easily customized if the user wishes to use different set of recommendations.
+![rsmtool_pipeline](pipeline.png)
 
-Finally, since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
+The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. (See doc/rsmtool.pdf for further detail about the evaluations). 
+
+The user can choose to run all the analyses or select a subset applicable to their particular study. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
+
+Note that although the analyses included into the tool as well as wording of the report have been customized for automated scoring models, the tool can be used for any application where numeric feature values are mapped onto numeric label. 
+
+RSMTool has two main use cases illustrated by the following examples:
+
+* Use case 1: a researcher *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores. She also processed these responses and extracted a set of numeric features either using systems such as Coh-Metrix, TextEvaluator, OpenSmile or by manually creating a new set of features. 
+She uses *RSMTool* to quickly build a regression-based system which predicts the scores based on the extracted features, to compute descriptive statistics for all features, to generate scores for a held-out evaluation set, and to obtain a comprehensive evaluation of system performance. She can then use the tool outputs for further exploratory analysis of her model. 
+
+* Use case 2: A researcher *has* developed an automated scoring system for grading short responses. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as conduct additional analyses to evaluate system fairness and compare it to human-human agreement.
+He *uses* RSMTool to set up customized evaluation report using a combination of existing and custom sections and then runs *RSMEval* to quickly produce a new report for each version of his system.  
 
 
-RSMTool provides the following main scripts:
+RSMTool provides the following main scripts. The documentation for each of these tools is provided separately (see below). 
 
-* `rsmtool` - the tool for training and evaluating scoring models. 
+* `rsmtool` - the tool for training and evaluating scoring models as described in Use case 1
 
-* `rsmeval` - the tool for evaluating predictions obtained from other systems. 
+* `rsmeval` - the tool for evaluating predictions obtained from other systems as described in use case 2. 
 
-* `rsmpredict` - the tool for generating new predictions based on an existing models. 
+* `rsmpredict` - the tool for generating new predictions based on an existing models. For researchers who are already using `rsmtool` to build scoring model, this tool allows generating predictions for new data using an existing model. 
 
-* `rsmcompare` -  for comparing two `rsmtool` runs.
+* `rsmcompare` -  for comparing two `rsmtool` runs. This tool compares two models trained using `rsmtool`. It is most commonly used to compare model performance after adding new features.
 
-
-*References*:
-David M. Williamson, Xiaoming Xi, and F. Jay Breyer. 2012. A Framework for Evaluation and Use of Automated Scoring. Educational Measurement: Issues and Practice, 31(1):2–13.
 
 ## Installation
 
