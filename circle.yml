@@ -15,3 +15,5 @@ dependencies:
 test:
   override:
     - ${HOME}/miniconda3/bin/nosetests -v tests
+  post:
+    - bash <(curl -s https://codecov.io/bash)
