@@ -1,3 +1,8 @@
+# Set up the machine
+machine:
+    environment:
+        COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
+
 # Install stuff
 dependencies:
   cache_directories:
@@ -17,4 +22,4 @@ test:
   override:
     - ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
   post:
-    - coveralls --config_file .coveragerc
+    - cd ${HOME}/rsmtool && ${HOME}/miniconda3/bin/coveralls
