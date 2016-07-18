@@ -8,8 +8,7 @@ RSMTool is a python package which automates and combines in a single pipeline mu
 
 ![rsmtool_pipeline](pipeline.png)
 
-The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. (See doc/rsmtool.pdf for further detail about the evaluations). 
-
+Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. (See doc/rsmtool.pdf for further detail about the evaluations). 
 The user can choose to run all the analyses or select a subset applicable to their particular study. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
 
 Note that although the analyses included into the tool as well as wording of the report have been customized for automated scoring models, the tool can be used for any application where numeric feature values are mapped onto numeric label. 
@@ -19,8 +18,8 @@ RSMTool has two main use cases illustrated by the following examples:
 * Use case 1: a researcher *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores. She also processed these responses and extracted a set of numeric features either using systems such as Coh-Metrix, TextEvaluator, OpenSmile or by manually creating a new set of features. 
 She uses *RSMTool* to quickly build a regression-based system which predicts the scores based on the extracted features, to compute descriptive statistics for all features, to generate scores for a held-out evaluation set, and to obtain a comprehensive evaluation of system performance. She can then use the tool outputs for further exploratory analysis of her model. 
 
-* Use case 2: A researcher *has* developed an automated scoring system for grading short responses. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as conduct additional analyses to evaluate system fairness and compare it to human-human agreement.
-He *uses* RSMTool to set up customized evaluation report using a combination of existing and custom sections and then runs *RSMEval* to quickly produce a new report for each version of his system.  
+* Use case 2: A researcher *has* an automated scoring system for grading short responses. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as conduct additional analyses to evaluate system fairness and compare it to human-human agreement.
+He *uses* RSMTool to set up customized evaluation report using a combination of existing and custom sections and then runs RSMEval to quickly produce a new report for each version of his system. 
 
 
 RSMTool provides the following main scripts. The documentation for each of these tools is provided separately (see below). 
