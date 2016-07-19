@@ -1691,11 +1691,11 @@ def test_run_experiment_lr_eval_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr-eval-with-h2_vs_lr-eval-with-h2-compare.report.html')
+    html_report = join('test_outputs', source, 'lr_eval_with_h2_vs_lr_eval_with_h2.report.html')
     yield check_report, html_report
 
 
-  def test_run_experiment_lr_eval_tool_compare():
+def test_run_experiment_lr_eval_tool_compare():
 
     # basic rsmcompare experiment comparing an rsmeval 
     # experiment to an rsmtool experiment 
