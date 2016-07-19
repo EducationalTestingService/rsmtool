@@ -1,0 +1,11 @@
+{
+    "experiment_dir_old": "lr-with-h2",
+    "experiment_id_old": "lr_with_h2",
+    "description_old": "RSMTool experiment.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr-eval-with-h2",
+    "experiment_id_new": "lr_eval_with_h2",
+    "description_new": "RSMEval experiment.",
+    "use_scaled_predictions_new": true,
+    "subgroups": ["QUESTION"]
+}
