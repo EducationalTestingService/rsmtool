@@ -1707,7 +1707,7 @@ def test_run_experiment_lr_eval_tool_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
     yield check_report, html_report
 
 @raises(ValueError)
