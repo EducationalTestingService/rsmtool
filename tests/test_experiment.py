@@ -1678,6 +1678,38 @@ def test_run_experiment_linearsvr_compare():
     html_report = join('test_outputs', source, 'LinearSVR_vs_LinearSVR.report.html')
     yield check_report, html_report
 
+
+def test_run_experiment_lr_eval_compare():
+
+    # basic rsmcompare experiment comparing an rsmeval 
+    # experiment to itself 
+    source = 'lr-eval-self-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr-eval-with-h2_vs_lr-eval-with-h2-compare.report.html')
+    yield check_report, html_report
+
+
+  def test_run_experiment_lr_eval_tool_compare():
+
+    # basic rsmcompare experiment comparing an rsmeval 
+    # experiment to an rsmtool experiment 
+    source = 'lr-eval-tool-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    yield check_report, html_report
+
 @raises(ValueError)
 def test_run_experiment_lr_length_column_and_feature():
 

@@ -1,0 +1,11 @@
+{
+    "experiment_dir_old": "lr-eval-with-h2",
+    "experiment_id_old": "lr-eval-with-h2",
+    "description_old": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr_eval_with_h2",
+    "experiment_id_new": "lr_eval_with_h2",
+    "description_new": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_new": true,
+    "subgroups": ["QUESTION"]
+}
