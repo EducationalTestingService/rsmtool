@@ -4,21 +4,23 @@
 
 ## Introduction
 
-RSMTool is a python package which automates and combines in a single pipeline multiple analyses commonly conducted when building and evaluating scoring models (SMs) for automated scoring engines as shown in the following figure: 
+RSMTool is a python package which automates and combines in a single pipeline multiple analyses commonly conducted when building and evaluating scoring models for educational applications. RSMTool is designed as a platform which on one hand makes it simple to run multiple standard analyses using a single command but at the same time offers multiple customization opportunities for each step allowing the user to adapt the analyses to their purposes. 
+
+The figure gives an overview of the main pipeline implemented in RSMTool:  
 
 ![rsmtool_pipeline](pipeline.png)
 
 Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models (including Ridge, SVR, AdaBoost and Random Forest) to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. (See doc/rsmtool.pdf for further detail about the evaluations). 
-The user can choose to run all the analyses or select a subset applicable to their particular study. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
+The user can choose to run all the analyses or select a subset applicable to their particular study by changing the settings in the configuration file. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
 
 Note that although the analyses included into the tool as well as wording of the report have been customized for automated scoring models, the tool can be used for any application where numeric feature values are mapped onto numeric label. 
 
 RSMTool has two main use cases illustrated by the following examples:
 
 * Use case 1: a researcher *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores. She also processed these responses and extracted a set of numeric features either using systems such as Coh-Metrix, TextEvaluator, OpenSmile or by manually creating a new set of features. 
-She uses *RSMTool* to quickly build a regression-based system which predicts the scores based on the extracted features, to compute descriptive statistics for all features, to generate scores for a held-out evaluation set, and to obtain a comprehensive evaluation of system performance. She can then use the tool outputs for further exploratory analysis of her model. 
+She uses *RSMTool* to build a regression-based system which predicts the scores based on the extracted features using different types of regressions, to compute descriptive statistics for all features, to generate scores for a held-out evaluation set, and to obtain a comprehensive evaluation of system performance. She can then use the tool outputs for further exploratory analysis of her model. 
 
-* Use case 2: A researcher *has* an automated scoring system for grading short responses. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as conduct additional analyses to evaluate system fairness and compare it to human-human agreement.
+* Use case 2: A researcher *has* an automated scoring system for grading short responses that extracts the features and computes the score. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as to conduct additional analyses to evaluate system fairness and compare system performance to human-human agreement.
 He *uses* RSMTool to set up customized evaluation report using a combination of existing and custom sections and then runs RSMEval to quickly produce a new report for each version of his system. 
 
 
@@ -51,10 +53,12 @@ Note that RSMTool only works with Python 3.4 and higher.
 
 You can try out RSMTool as follows:
 
-1. Go to the `example` folder. This folder contains the training and test set features for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
+1. Go to the `example/rsmtool` folder. This folder contains the training and test set features for a simple scoring system built to automatically score the responses from the [2012 Kaggle Automated Student Assessment Prize competition](https://www.kaggle.com/c/asap-aes). 
 2. Make sure to activate the conda environment where you installed rsmtool (e.g., `source activate rsmtool`)
-3. Run RSMTool: `rsmtool config.json`
+3. We first try the whole pipeline by running RSMTool: `rsmtool config.json`
 4. Since no output directory was specfied, `rsmtool` will create the three output folders in the current directory: `figure`, `output`, and `report`. You can examine the HTML report `report/ASAP2_report.html`. It should look like [this](https://s3.amazonaws.com/sample-rsmtool-report/ASAP2_report.html).
+5. Now we will use `RSMPredict` to re-generate the scores for the test set without re-training the model. We will store these in `predictions.csv`: go to `../rsmpredict` and run `rsmpredict config_rsmpredict.json predictions.csv`. Note that to run this command you need to first train the model using rsmtool. 
+6. We will use `RSMEval` to evaluate these new predictions: go to `../rsmeval` and run `rsmeval config_rsmeval.json`
 
 ## Contributing
 
