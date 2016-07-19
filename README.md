@@ -58,8 +58,9 @@ You can try out RSMTool as follows:
 2. Make sure to activate the conda environment where you installed rsmtool (e.g., `source activate rsmtool`)
 3. We first try the whole pipeline by running RSMTool: `rsmtool config.json`
 4. Since no output directory was specfied, `rsmtool` will create the three output folders in the current directory: `figure`, `output`, and `report`. You can examine the HTML report `report/ASAP2_report.html`. It should look like [this](https://s3.amazonaws.com/sample-rsmtool-report/ASAP2_report.html).
-5. Now we will use `RSMPredict` to re-generate the scores for the test set without re-training the model. We will store these in `predictions.csv`: go to `../rsmpredict` and run `rsmpredict config_rsmpredict.json predictions.csv`. Note that to run this command you need to first train the model using rsmtool. 
-6. We will use `RSMEval` to evaluate these new predictions: go to `../rsmeval` and run `rsmeval config_rsmeval.json`
+5. Now we will use `rsmpredict` to re-generate the scores for the test set without re-training the model. We will store these new predictions in `predictions.csv`: go to `../rsmpredict` and run `rsmpredict config_rsmpredict.json predictions.csv`. The tool will create a new file called `predictions.csv` which contains the predictions. 
+6. We will use `rsmeval` to evaluate these new predictions: go to `../rsmeval` and run `rsmeval config_rsmeval.json` .`rsmeval` will create the three output folders in the current directory: `figure`, `output`, and `report`. 
+7. Finally, we will compare the two sets of predictions by running `RSMCompare`: go to `../rsmcompare` and run `rsmcompare config_rsmcompare.json`. The tool will create an `.html` report in the current directory since no output directory was specified. This report compare the analyses generated at steps (4) and (5). Note that since for `rsmeval` we used existing predictions, no information is available about feature distributions of model parameters. 
 
 ## Contributing
 
