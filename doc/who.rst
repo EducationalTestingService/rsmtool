@@ -9,9 +9,12 @@ She can then run an RSMTool "experiment" to build a regression-based scoring mod
 
 While she could use ``R``, ``SPSS`` or other tools to perform each of the RSMTool analyses individually and compile a report herself, RSMTool does all of this work for her with just a single command. Furthermore, the analyses included into the tool highlight educational measurement criteria important to building automated scoring models. If she wishes, she can conduct further exploratory analysis using ``R`` or ``SPSS`` by using the output of RSMTool as a starting point.
 
-Since RSMTool is designed to be customizable, the user can choose to either run all of the default analyses or select *only* the subset applicable to her particular study by changing the appropriate settings in a configuration file. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool provides explicit support for adding custom notebooks to the report, if the user has some analysis in mind that is not already provided via RSMTool.
+RSMTool is designed to be customizable:
 
-While training and evaluating a scoring model represents the default use case for RSMTool, it can do a lot more for :doc:`advanced users <advanced_usage>`.
+1. The user can choose to either run all of the default analyses or select *only* the subset applicable to her particular study by changing the appropriate settings in a configuration file.
+2. RSMTool provides explicit support for adding custom analyses to the report if the user has some analysis in mind that is not already provided by RSMTool.
+
+While training and evaluating a scoring model represents the most common use case for RSMTool, it can do a lot more for :doc:`advanced users <advanced_usage>` such as evaluating predictions obtained using an external scoring engine, generating predictions for new data, and comparing two different scoring models.
 
 
 

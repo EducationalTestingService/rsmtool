@@ -8,16 +8,9 @@ Input
 
 ``rsmtool`` requires the following two inputs to run an experiment:
 
-1. Data files for training and evaluation sets in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The names for these two columns are defined in the configuration file.
+1. Data files for training and evaluation sets in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response.
 
 2. A configuration file in ``.json`` format with paths to the training and evaluation files, the type of regressor to use, and other information required by ``rsmtool``. See :ref:`experiment configuration file <config_file>` for more details.
-
-By default, ``rsmtool`` will use all of the features present in the training CSV file. If you want to use a specific set of features, you need to provide a second ``.json`` file specifying the list of features. See :ref:`feature file <feature_file>` for more details.
-
-``rsmtool`` does the following:
-
-preprocesses the training data (outlier truncation, normalization), learns a scoring model on the pre-processed training data, and generates a report with the description of the model and in-depth evaluation of its performance on the evaluation data.
-
 
 .. _config_file:
 
@@ -28,7 +21,7 @@ This file provides an overall configuration for the experiment. The file must be
 
 <example>
 
-There are four required fields.
+There are four required fields and rest are all optional.
 
 experiment_id
 """""""""""""
@@ -36,7 +29,7 @@ An identifier for the experiment that will be used to name the report and all in
 
 model
 """""
-The machine learner you want to use to build the regressi. See [available models](available_models.md) for the list of available learners.
+The machine learner you want to use to build the scoring model. Possible values include :doc:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
 
 train_file
 """"""""""
@@ -49,6 +42,14 @@ The path to the evaluation data in ``.csv`` format. Can be absolute or relative 
 description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. This is blank by default.
+
+features *(Optional)*
+"""""""""""""""""""""
+By default, ``rsmtool`` will use all of the features present in the training and evaluation CSV files. If you want to use a specific set of features, you need to provide a second ``.json`` file specifying the list of features. The value for this field is the path to this ``.json`` file. It can be absolute or relative to the location of config file.
+
+.. note::
+
+    See :doc:`selecting features <feature_selection>` for more details.
 
 id_column *(Optional)*
 """"""""""""""""""""""
@@ -70,15 +71,7 @@ The name for the column containing the human scores in the training data. If set
 
     All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation.
 
-
-features *(Optional)*
-"""""""""""""""""""""
-The path to the ``.json`` file containing the list of features and transformations, if any . Can be absolute or relative to the location of config file.
-
-.. note::
-
-    By default, ``rsmtool`` uses *all* columns in the training file as features except for the ones with the following names: ``spkitemid``, ``spkitemlab``, ``itemType``, `r1`, `r2`, `score`, `sc`, `sc1`, `adj`, and the column names specified in the config file  (e.g. `length_column`, `subgroups` as well as `train_label_column` and `test_label_column`). The final set of features will be saved in the features/ folder.
-
+.. _length_column:
 
 length_column *(Optional)*
 """"""""""""""""""""""""""
@@ -88,9 +81,15 @@ second_human_score_column *(Optional)*
 """"""""""""""""""""""""""""""""""""""
 The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores` option below will apply to this column too.
 
-candidate_column *(Optional)*
-"""""""""""""""""""""""""""""
-The name for an optionalc column in the training and test data containing unique candidate IDs. Note that these are currently only used for data description.
+.. _flag_column:
+
+flag_column *(Optional)*
+""""""""""""""""""""""""
+This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
+
+.. note::
+
+    If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responsess which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
 
 .. _exclude_zero_scores:
 
@@ -98,61 +97,104 @@ exclude_zero_scores *(Optional)*
 """"""""""""""""""""""""""""""""
 By default, responses with human scores of 0 will be excluded from both training and evaluation set. Set this field to ``false`` if you want to keep responses with scores of 0. Defaults to ``true``.
 
-flag_column *(Optional)*
-""""""""""""""""""""""""
-This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0.  If  several conditions are specified (e.g., `` {"ADVISORY": 0, "ERROR": 0}``) only those responsess which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0). Defaults to ``None``.
+trim_min *(Optional)*
+"""""""""""""""""""""
+The single numeric value for the lowest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the lowest observed human score in the training data or 1 if there are no numeric human scores available.
+
+trim_max *(Optional)*
+"""""""""""""""""""""
+The single numeric value for the highest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
+
+use_scaled_predictions *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, certain evaluations (confusion matrices, score distributions, subgroup analyses) will use the scaled machine scores. If set to ``false``, these evaluations will use the raw machine scores. Defaults to ``false``.
+
+.. note::
+
+    All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
+
+
+.. _subgroups:
+
+subgroups *(Optional)*
+""""""""""""""""""""""
+A list of grouping variables used to generating analyses by those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in both training *and* evaluation data.
+If subgroups are specified, ``rsmtool`` will generate:
+
+    - description of the data by each subgroup;
+    - boxplots showing the feature distribution for each subgroup on the training set; and
+    - tables and barplots showing system-human agreement for each subgroup on the evaluation set.
+
+.. _general_sections:
+
+general_sections *(Optional)*
+"""""""""""""""""""""""""""""
+A list specifying which sections should be included into the final report. By default, all of the sections below are included.
+
+    - ``data_description``: Shows the total number of responses in training and evaluation set, along with any responses have been excluded due to non-numeric features/scores or :ref:`flag columns <flag_column>`.
+
+    - ``data_description_by_group``: Shows the total number of responses in training and evaluation set for each of the :ref:`subgroups <subgroups>` specified in the configuration file. This section only covers the responses used to train/evaluate the model.
+
+    - ``feature_descriptives``: Shows the descriptive statistics for all raw  feature values included in the model:
+
+        - a table showing mean, standard deviation, min, max, correlation with human score etc.;
+        - a table with percentiles and outliers; and
+        - a barplot showing he number of truncated outliers for each feature.
+
+    - ``features_by_group``: Shows boxplots with distributions of raw feature values by each of the :ref:`subgroups <subgroups>` specified in the configuration file.
+
+    - ``preprocessed_features``: Shows analyses of preprocessed features:
+
+        - histograms showing the distributions of preprocessed features values;
+        - the correlation matrix between all features and the human score;
+        - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column>` is specified in the config file.
+
+    - ``pca``: Shows the results of principal components analysis on the processed feature values:
+
+        - the principal components themselves;
+        - the variances; and
+        - a Scree plot.
+
+    - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
+
+    - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
+
+       - a table showing system-human association metrics;
+       - the confusion matrix; and
+       - a barplot showing the distributions for both human and machine scores.
+
+    - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
+
+    - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
+
+.. _custom_sections:
+
+custom_sections *(Optional)*
+""""""""""""""""""""""""""""
+A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :doc:`pre-defined variables <new_notebooks>`.
+
+.. _special_sections:
+
+special_sections *(Optional)*
+"""""""""""""""""""""""""""""
+A list specifying special ETS-only sections to be included into the final report. These sections are available *only* to ETS employees via the `rsmextra` package.
+
+
+section_order *(Optional)*
+""""""""""""""""""""""""""
+A list containing the order in which the sections in the report should be generated. Possible values are:
+
+    - either *all* of :ref:`pre-defined sections <general_sections>` in a specified order; OR
+    - the subset of :ref:`pre-defined sections <general_sections>` AND *all* :ref:`custom sections <custom_sections>` names (file prefixes only, without the path and without the `.ipynb` extension) AND *all* :ref:`special sections <special_sections>`, in a specified order.
+
+
+candidate_column *(Optional)*
+"""""""""""""""""""""""""""""
+The name for an optional column in the training and test data containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
 
 min_items_per_candidate *(Optional)*
 """"""""""""""""""""""""""""""""""""
-An integer value for the minimal number of items expected from each candidate. If any candidates have less than the specified minimal number of responses left for analysis after applying all filters, all responses from such candidates will be excluded listwise from further analysis. Defaults to ``None``.
-
-
-
-`feature_subset_file`: a master file which lists all features that should be used for feature selection. The file should be in .csv format with features listed in a column named `Feature`. It can also optionally give the expected correlation between each feature and human score. This option is only meaningful in combination with `feature_subset` or `sign` below.
-Default: None
-
-The feature list can be further constrained by using `feature_prefix` and `feature_subset`. These fields are mutually exclusive and cannot be used in the same experiment.
-
-`feature_subset`: The supplied feature file can specify feature subsets. These should be defined as columns in `feature_file` where the name of the column is the name of the subset and each feature is assigned 1 (included into the subset) or 0 (not included into the subset). Only one subset can be specified for each experiment.
-
-`feature_prefix`: The feature subset can also be specified by a common prefix separated by `\t`. For example, `feature_subset: 1gram, 2gram` will create a model based only on features named 1gram\t* and 2gram\t*. Several subsets can be separated by commas.
-
-`select_transformations`:  `true`/`false`. If this option is set to `true` the system will select the most suitable transformation based on best correlation with human score. Note that `inv` is never used for features with positive values.
-Default: `false`
-
-`sign`: the guidelines to scoring models require that all coefficients in the model are positive and all features have positive correlation with human score. It is possible to specify the expected correlation for each feature in `feature_subset_file`. In this case the features with expected negative correlation will be multiplied by -1 before adding them to the model. To use this option the `feature_subset_file` must contain a column named `Sign_X` where `X` is the value of `sign` field. This column can only takes `-` or `+`.
-
-
-### Score post-processing
-
-`trim_min`: single numeric value for the lowest possible machine score. This value will be used to compute trimmed (bound) machine scores.
-Default: the lowest observed human score in the training data or 1 if there are no numeric human scores.
-
-`trim_max`: single numeric value for the highest possible machine score. This value will be used to compute trimmed (bound) machine scores.
-Default: the highest observed human score in the training data or 10 if there are no numeric human scores.
-
-`use_scaled_predictions`: `true` if you want to use scaled machine scores for the in-depth evaluations (confusion matrices, score distribution, per-prompt evaluation). Omit this field if you want to use raw scores for these evaluations. Main evaluation metrics is always computed for both scaled and raw scores.
-Default: `false`
-
-### Subgroup analysis
-
-`subgroups`: a list of grouping variables for generating analyses by prompt or subgroup analyses. For example, `"prompt, gender, native_language, test_country"`. These subgroup columns need to be present in both training and evaluation data. If subgroups are specified, `rsmtool` will generate: (1) description of the data by group; (2) boxplots showing feature distribution for each subgroup on the training set; and (3) tables and barplots showing system-human agreement for each subgroup on the evaluation set.
-Default: no subgroups specified
-
-### Report generation
-
-`general_sections`: a list of general sections to be included into the final report.
-See [report_sections](report_sections.md) for the list of available sections.
-Default: all sections available for `rsmtool`.
-
-`special_sections`: a list of special sections to be included into the final report. These are the sections available to all local users via `rsmextra` package. See the documentation to `rsmextra` for the list of available sections.
-Default: no special sections.
-
-`custom_sections`: a list of custom user-defined sections (`.ipynb` files) to be included into the final report. These are the notebooks created by the user. Note that the list must contains paths to the `.ipynb` files, either absolute or relative to the config file. These notebooks have access to all of the information as described in [new_notebooks](new_notebooks.md).
-Default: no custom sections.
-
-`section_order`: a list containing the order in which the sections in the report should be generated. Note that 'section_order' must list: (a) either *all* of appropriate general sections appropriate for `rsmtool`, or a subset specified using 'sections', and (b) *all* sections specified under 'special_sections', and (c) *all* 'custom_sections' names (file name only, without the path and `.ipynb` extension).
-
+An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
 
 
 .. _feature_file:

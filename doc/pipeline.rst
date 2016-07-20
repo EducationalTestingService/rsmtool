@@ -1,7 +1,7 @@
 Overview of RSMTool Pipeline
 ============================
 
-The following figure gives an overview of the main RSMTool pipeline implemented:
+The following figure gives an overview of the RSMTool pipeline:
 
 .. image:: pipeline.png
    :alt: RSMTool processing pipeline
