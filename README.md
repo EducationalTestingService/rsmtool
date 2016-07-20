@@ -3,26 +3,42 @@
 [![DOI](https://zenodo.org/badge/22127/EducationalTestingService/rsmtool.svg)](https://zenodo.org/badge/latestdoi/22127/EducationalTestingService/rsmtool)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/LICENSE)
 
-## Introduction
+## RSMTool
 
-RSMTool is a python package which automates and combines in a single pipeline multiple analyses commonly conducted when building and evaluating scoring models for educational applications. RSMTool is designed as a platform which on one hand makes it simple to run multiple standard analyses using a single command but at the same time offers multiple customization opportunities for each step allowing the user to adapt the analyses to their purposes. 
+Automated scoring of written and spoken test responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include [Project Essay Grade](http://pegwriting.com/about) for written responses and [SpeechRater](https://www.ets.org/research/topics/as_nlp/speech/) for spoken responses.
 
-The figure gives an overview of the main pipeline implemented in RSMTool:  
+RSMTool is a python package which automates and combines in a single pipeline multiple analyses that are commonly conducted when building and evaluating such scoring models.  The output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model. While RSMTool does makes it really simple to run a set of standard analyses using a single command, it is also fully customizable and allows users to easily exclude unneeded analyses, modify the default analyses, and even include custom analyses in the report.
 
-![rsmtool_pipeline](pipeline.png)
+We expect the primary users of RSMTool to be researchers working on developing new automated scoring engines or on improving existing ones. Note that RSMTool is not a scoring engine by itself but rather a tool for building and evaluating machine learning models that may be used in such engines. 
 
-Specifically, RSMTool takes a feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models (including Ridge, SVR, AdaBoost and Random Forest) to try and predict the human score from the features. The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup analyses, model statistics, as well as several different evaluation measures illustrating model efficacy. (See doc/rsmtool.pdf for further detail about the evaluations). 
-The user can choose to run all the analyses or select a subset applicable to their particular study by changing the settings in the configuration file. Since the report is based on IPython notebooks, it can be easily customized. In addition, RSMTool explicitly provides support for adding custom notebooks to the report. 
+For details on usage and installation, please see the official [documentation](http://rsmtool.readthedocs.io). 
 
-Note that although the analyses included into the tool as well as wording of the report have been customized for automated scoring models, the tool can be used for any application where numeric feature values are mapped onto numeric label. 
+## Requirements
 
-RSMTool has two main use cases illustrated by the following examples:
+- Python 3.4 or higher
+- `numpy`
+- `scipy`
+- `scikit-learn`
+- `statsmodels`
+- `skll`
+- `pandas`
+- `ipython`
+- `jupyter`
+- `notebook`
+- `seaborn`
+- `setuptools`
 
-* Use case 1: a researcher *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores. She also processed these responses and extracted a set of numeric features either using systems such as Coh-Metrix, TextEvaluator, OpenSmile or by manually creating a new set of features. 
-She uses *RSMTool* to build a regression-based system which predicts the scores based on the extracted features using different types of regressions, to compute descriptive statistics for all features, to generate scores for a held-out evaluation set, and to obtain a comprehensive evaluation of system performance. While she could use `R`, `SPSS` or other tools to perform these analyses, `RSMTool` allows her to do so by running a single command. Furthermore, the analyses included into the tool highlight the issues that need to be considered when building automated scoring models. She can then use the tool outputs for further exploratory analysis of her model. 
+## Contributing
 
-* Use case 2: A researcher *has* an automated scoring system for grading short responses that extracts the features and computes the score. He wants to evaluate the system performance using metrics commonly used in educational community but not always available in standard machine learning packages as well as to conduct additional analyses to evaluate system fairness and compare system performance to human-human agreement.
-He *uses* RSMTool to set up customized evaluation report using a combination of existing and custom sections and then runs RSMEval to quickly produce a new report for each version of his system.
+Contributions to RSMTool are very welcome. Please refer to the [documentation](http://rsmtool.readthedocs.io/en/latest/contributing.html) for how to get started on developing new features or functionality for RSMTool.
+
+
+## Changelog
+See [GitHub Releases](https://github.com/EducationalTestingService/rsmtool/releases).
+
+**Use case 2**: A researcher *has* a proprietary automated scoring system (using a machine learning model that is not available in RSMTool) for grading short responses that extracts the features and computes the score. He wants to evaluate the system performance using analyses recommended by the educational measurement community that are not always available in standard machine learning packages. In addition, he also wants to conduct additional analyses to evaluate system fairness and compare whether his system agrees with the human grader as well as a second human grader would.
+
+He *uses* RSMTool to set up a customized evaluation report using a combination of existing and custom sections and then runs RSMEval to quickly produce a new report for each version of his system.
 
 
 RSMTool provides the following main scripts. The documentation for each of these tools is provided separately (see below). 
@@ -35,20 +51,6 @@ RSMTool provides the following main scripts. The documentation for each of these
 
 * `rsmcompare` -  for comparing two `rsmtool` runs. This tool compares two models trained using `rsmtool`. It is most commonly used to compare model performance after adding new features.
 
-
-## Installation
-
-Currently, the best way to install RSMTool is by using the `conda` package manager. If you have the `conda` package manager already installed, you can skip straight to Step 2. 
-
-1. To install the `conda` package manager, follow the instructions on [this page](http://conda.pydata.org/docs/install/quick.html).  
-
-2. Create a new conda environment (say, `rsmtool`) and install the `rsmtool` conda package by running `conda create -n rsmtool -c desilinguist python=3.4 rsmtool`.
-
-3. Activate this conda environment by running `source activate rsmtool`. You should now have all of the four tools above in your path.
-
-4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by `rsmtool` will only be used when you want to run `rsmtool` experiments and will not affect other projects. 
-
-Note that RSMTool only works with Python 3.4 and higher. 
 
 ## Example
 
