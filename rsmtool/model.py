@@ -655,10 +655,7 @@ def train_skll_model(model_name, df_train, experiment_id, csvdir, figdir):
 
     # if it's a regression model, then our grid objective should be
     # pearson and otherwise it should be accuracy
-    if model_name in ["AdaBoostRegressor", "DecisionTreeRegressor", "ElasticNet",
-                      "GradientBoostingRegressor", "KNeighborsRegressor", "Lasso",
-                      "LinearRegression", "RandomForestRegressor", "Ridge",
-                      "SGDRegressor", "LinearSVR", "SVR"]:
+    if model_name in skll_models:
         objective = 'pearson'
     else:
         objective = 'f1_score_micro'
