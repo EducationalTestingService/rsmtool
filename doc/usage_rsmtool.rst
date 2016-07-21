@@ -6,20 +6,15 @@ For most users, the primary means of using RSMTool will be via the command-line 
 Input
 -----
 
-``rsmtool`` requires the following two inputs to run an experiment:
+``rsmtool`` requires a single input to run an experiment: a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmtool`` will use the current directory as the output directory.
 
-1. Data files for training and evaluation sets in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response.
-
-2. A configuration file in ``.json`` format with paths to the training and evaluation files, the type of regressor to use, and other information required by ``rsmtool``. See :ref:`experiment configuration file <config_file>` for more details.
 
 .. _config_file:
 
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This file provides an overall configuration for the experiment. The file must be in ``.json`` format. Here's an example of a configuration file.
-
-<example>
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. An example configuration file can be found here.
 
 There are four required fields and rest are all optional.
 
@@ -29,15 +24,15 @@ An identifier for the experiment that will be used to name the report and all in
 
 model
 """""
-The machine learner you want to use to build the scoring model. Possible values include :doc:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
+The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
 
 train_file
 """"""""""
-The path to the training data in ``.csv`` format. Can be absolute or relative to the location of config file.
+The path to the training data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. Can be absolute or relative to the location of config file.
 
 test_file
 """""""""
-The path to the evaluation data in ``.csv`` format. Can be absolute or relative to the location of config file.
+The path to the evaluation data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. Can be absolute or relative to the location of config file.
 
 description *(Optional)*
 """"""""""""""""""""""""
@@ -197,24 +192,30 @@ min_items_per_candidate *(Optional)*
 An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
 
 
-.. _feature_file:
-
-Feature file
-^^^^^^^^^^^^
-
-
 Output
 ------
 
+``rsmtool`` produces set of folders in the output directory.
 
-Most common use cases:
+report
+^^^^^^
+This folder contains the final RSMTool report in HTML format as well as a Jupyter notebook (a ``.ipynb`` file).
 
-- Train and evaluate a new scoring model for new data
+output
+^^^^^^
+This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files.
 
-- Re-train an existing model on new data
 
-- Evaluate the model performance after adding a new feature
+figure
+^^^^^^
+This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
 
-- Generate descriptive statistics for feature distributions and correlations
 
-`rsmtool` contains a series of in-built models and also supports all regressors implemented in [SKLL](http://skll.readthedocs.org/en/latest/run_experiment.html#learners)(see [available models](available_models.md) for the full list).
+.. _feature_selection:
+
+Selecting Features
+------------------
+
+.. include:: intermediate_files_rsmtool.rst
+
+.. include:: builtin_models.rst

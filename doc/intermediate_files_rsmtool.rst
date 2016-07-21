@@ -1,0 +1,206 @@
+.. _intermediate_files_rsmtool:
+
+Intermediate CSV files
+----------------------
+
+Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as ``.csv`` files in the ``output`` directory.
+
+The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original ``.csv`` files. This is because RSMTool standardizes these column names internally for convenience. These values are:
+
+- `spkitemid` for the column containing response IDs.
+- `sc1` for the column containing the human scores used as training labels.
+- `sc2` for the column containing the second human scores, if this column was specified in the configuration file.
+- `length` for the column containing response length, if this column was specified in the configuration file.
+- `candidate` for the column containing candidate IDs, if this column was specified in the configuration file.
+
+
+Features values
+^^^^^^^^^^^^^^^
+filenames: ``train_features.csv``, ``test_features.csv``, ``train_preprocessed_features.csv``, ``test_preprocessed_features.csv``
+
+These files contain the raw and pre-processed feature values for the training and evaluation sets. They include *only* includes the rows that were used for training/evaluating the models after filtering. For models with feature selection, these files *only* include the features that ended up being included in the model.
+
+.. note::
+
+    By default RSMTool filters out non-numeric feature values and non-numeric/zero human scores from both the training and evaluation sets. Zero scores can be kept by setting the `exclude_zero_scores` to `false`.
+
+Flagged responses
+^^^^^^^^^^^^^^^^^
+filenames: ``train_responses_with_excluded_flags.csv``, ``test_responses_with_excluded_flags.csv``
+
+These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column>`.  Note that the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+
+Excluded responses
+^^^^^^^^^^^^^^^^^^
+filenames: ``train_excluded_responses.csv``, ``test_excluded_responses.csv``
+
+These files contain all of the rows in the training and evaluation sets that were filtered out because of feature values or scores. For models with feature selection, these files *only* include the features that ended up being included in the model.
+
+Response metadata
+^^^^^^^^^^^^^^^^^
+filenames: ``train_metadata.csv``, ``test_metadata.csv``
+
+These files contain the metadata columns (``id_column``,  ``subgroups`` if provided) for the rows in the training and evaluation sets that were *not* excluded for some reason.
+
+Unused columns
+^^^^^^^^^^^^^^
+filenames: ``train_other_columns.csv``, ``test_other_columns.csv``
+
+These files contain all of the the columns from the original features files that are not present in the ``*_feature.csv`` and ``*_metadata.csv`` files. They only includes the rows from the training and evaluation sets that were not filtered out. Note that the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+
+Response length
+^^^^^^^^^^^^^^^
+filename: ``train_response_lengths.csv``
+
+If `length_column` is specified, then this file contains the values from that column for the training data under a column called ``length`` with the response IDs under the ``spkitemid`` column.
+
+Human scores
+^^^^^^^^^^^^
+filename: ``test_human_scores.csv``
+
+This file contains the human scores for the evaluation data under a column called ``sc1`` with the response IDs under the ``spkitemid`` column. If ``second_human_score_column`` was specfied, then it also contains the values from that column under a column called ``sc2``. Only the rows that were not filtered out are included.
+
+.. note::
+
+    If ``exclude_zero_scores``  was set to ``true`` (the default value), all zero scores in the ``second_human_score_column`` will be replaced by ``nan``.
+
+Data composition
+^^^^^^^^^^^^^^^^
+filename: ``data_composition.csv``
+
+This file contains the total responses in training and evaluation set and the number of overlapping responses. If applicable, the table will also include the number of different subgroups for each set.
+
+Excluded data composition
+^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames: ``train_excluded_composition.csv``, ``test_excluded_composition.csv``
+
+These files contain the composition of the set of excluded responses for the training and evaluation sets, e.g., why were they excluded and how many for each such exclusion.
+
+Missing features
+^^^^^^^^^^^^^^^^
+filename: ``train_missing_feature_values.csv``
+
+This file contains the total number of non-numeric values for each feature. The counts in this table are based only on those responses that have a numeric human score in the training data.
+
+Subgroup composition
+^^^^^^^^^^^^^^^^^^^^
+filename: ``data_composition_by_<SUBGROUP>.csv``
+
+There will be one such file for each of the specified subgroups and it contains the total number of responses in each that subgroup in both the training and evaluation sets.
+
+Feature descriptives
+^^^^^^^^^^^^^^^^^^^^^
+filenames: ``feature_descriptives.csv``, ``feature_descriptivesExtra.csv``
+
+The first file contains the main descriptive statistics (mean,std. dev., correlation with human score etc.) for all features included in the final model. The second file contains percentiles, mild, and extreme outliers for the same set of features. The values in both files are computed on raw feature values before pre-processing.
+
+Feature outliers
+^^^^^^^^^^^^^^^^
+filename: ``feature_outliers.csv``
+
+This file contains the number and percentage of outlier values truncated to [MEAN-4\*SD, MEAN+4\*SD] during feature pre-processing for each feature included in the final model.
+
+Inter-feature and score correlations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames: ``cors_orig.csv``, ``cors_processed.csv``
+
+The first file contains the pearson correlations between each pair of (raw) features and between each (raw) feature and the human score. The second file is the same but with the pre-processed feature values instead of the raw values.
+
+Marginal and partial correlations with score
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames: ``margcor_score_all_data.csv``, ``pcor_score_all_data.csv``, ```pcor_score_no_length_all_data.csv``
+
+The first file contains the marginal correlations between each pre-processed feature and human score. The second file contains the partial correlation between each pre-processed feature and human score after controlling for all other features. The third file contains the partial correlations between each pre-processed feature and human score after controlling for response length, if ``length_column`` was specified in the configuration file.
+
+Marginal and partial correlations with length
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames: ``margcor_length_all_data.csv``, ``pcor_length_all_data.csv``
+
+The first file contains the marginal correlations between each pre-processed feature and response length, if ``length_column`` was specified. The second file contains the partial correlations between each pre-processed feature and response length after controlling for all other features, if ``length_column`` was specified in the configuration file.
+
+Principal components analyses
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+filenames: ``pca.csv``, ``pcavar.csv``
+
+The first file contains the the results of a Principal Components Analysis (PCA) using pre-processed feature values from the training set and its singular value decomposition. The second file contains the eigenvalues and variance explained by each component.
+
+Various correlations by subgroups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Each of following files may be produced for every subgroup, assuming all other information was also available.
+
+- ``margcor_score_by_<SUBGROUP>.csv``: the marginal correlations between each pre-processed feature and human score, computed separately for the subgroup.
+
+- ``pcor_score_by_<SUBGROUP>.csv``: the partial correlations between pre-processed features and human score after controlling for all other features, computed separately for the subgroup.
+
+- ``pcor_score_no_length_by_<SUBGROUP>.csv``: the partial correlations between each pre-processed feature and human score after controlling for response length (if available), computed separately for the subgroup.
+
+- ``margcor_length_by_<SUBGROUP>.csv``: the marginal correlations between each feature and response length (if available), computed separately for each subgroup.
+
+- ``pcor_length_by_<SUBGROUP>.csv``: partial correlations between each feature and response length (if available) after controlling for all other features, computed separately for each subgroup.
+
+.. note::
+
+    All of the feature descriptive statistics, correlations (including those for subgroups), and PCA are computed *only* on the training set.
+
+Model information
+^^^^^^^^^^^^^^^^^
+
+- ``feature.csv``: pre-processing parameters for all features used in the model.
+
+- ``coefficients.csv``: model coefficients and intercept (for :ref:`built-in models <builtin_models>` only).
+
+- ``coefficients_scaled.csv``: scaled model coefficients and intercept (linear models only). Although RSMTool generates scaled scores by scaling the predictions of the model, it is also possible to achieve the same result by scaling the coefficients instead. This file shows those scaled coefficients.
+
+- ``betas.csv``: standardized and relative coefficients (for built-in models only).
+
+- ``model_fit.csv``: R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding.
+
+- ``.model``: the serialized SKLL ``Learner`` object containing the fitted model (before scaling the coeffcients).
+
+- ``.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model (for built-in models excluding ``LassoFixedLambda`` and ``PositiveLassoCV``).
+
+- ``ols_summary.txt``: a text file containing a summary of the above model (for built-in models excluding ``LassoFixedLabmda`` and ``PositiveLassoCV``)
+
+- ``postprocessing_params.csv``: the parameters for trimming and scaling predicted scores. Useful for generating predictions on new data.
+
+Predictions
+^^^^^^^^^^^
+filenames: ``pred_processed.csv``, ``pred_train.csv``
+
+The first file contains the predicted scores for the evaluation set: the raw scores as well as different types of post-processed scores. The second file contains the predicted scores for the responses in the training set.
+
+Evaluation metrics
+^^^^^^^^^^^^^^^^^^
+- ``eval.csv``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the pre-processed scores.
+
+- ``eval_by_<SUBGROUP>.csv``: the same information as in `*_eval.csv` computed separately for each subgroup.
+
+- ``eval_short.csv`` -  a shortened version of ``eval.csv`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
+
+    - h_mean
+    - h_sd
+    - corr
+    - sys_mean [raw/scale trim]
+    - sys_sd [raw/scale trim]
+    - SMD [raw/scale trim]
+    - adj_agr [raw/scale trim_round]
+    - exact_agr [raw/scale trim_round]
+    - kappa [raw/scale trim_round]
+    - wtkappa [raw/scale trim_round]
+    - sys_mean [raw/scale trim_round]
+    - sys_sd [raw/scale trim_round]
+    - SMD [raw/scale trim_round]
+    - R2 [raw/scale trim]
+    - RMSE [raw/scale trim]
+
+- ``score_dist.csv``: the distributions of the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+
+- ``confMatrix.csv``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+
+Human-human Consistency
+^^^^^^^^^^^^^^^^^^^^^^^
+These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
+
+- ``consistency.csv``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
+
+- ``degradation.csv``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.

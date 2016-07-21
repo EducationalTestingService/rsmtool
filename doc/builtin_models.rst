@@ -1,8 +1,10 @@
+.. _builtin_models:
+
 Built-in RSMTool Linear Regression Models
-=========================================
+-----------------------------------------
 
 Models which use the full feature set
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``LinearRegression``: A model that learns empirical regression weights using ordinary least squares regression (OLS).
 
@@ -12,7 +14,7 @@ Models which use the full feature set
 
 
 Models with automatic feature selection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``LassoFixedLambdaThenLR``: A model that learns empirical OLS regression weights with feature selection using Lasso regression with all coefficients set to positive. The hyperparameter ``lambda`` is set to ``sqrt(n-lg(p))``. This approach was chosen to balance the penalties for error vs. penalty for two many coefficients to foce Lasso perform more aggressive feature selection, so it may not necessarily achieve the best possible performance. The feature set selected by LASSO is then used to fit an OLS linear regression. Note that while the original Lasso model is constrained to positive coefficients only, small negative coefficients may appear when the coefficients are re-estimated using OLS regression.
 
