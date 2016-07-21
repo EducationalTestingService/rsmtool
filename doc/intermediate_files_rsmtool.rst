@@ -30,7 +30,7 @@ Flagged responses
 ^^^^^^^^^^^^^^^^^
 filenames: ``train_responses_with_excluded_flags.csv``, ``test_responses_with_excluded_flags.csv``
 
-These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column>`.  Note that the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column>`.  Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
@@ -48,7 +48,7 @@ Unused columns
 ^^^^^^^^^^^^^^
 filenames: ``train_other_columns.csv``, ``test_other_columns.csv``
 
-These files contain all of the the columns from the original features files that are not present in the ``*_feature.csv`` and ``*_metadata.csv`` files. They only includes the rows from the training and evaluation sets that were not filtered out. Note that the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+These files contain all of the the columns from the original features files that are not present in the ``*_feature.csv`` and ``*_metadata.csv`` files. They only include the rows from the training and evaluation sets that were not filtered out. Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Response length
 ^^^^^^^^^^^^^^^
@@ -70,7 +70,7 @@ Data composition
 ^^^^^^^^^^^^^^^^
 filename: ``data_composition.csv``
 
-This file contains the total responses in training and evaluation set and the number of overlapping responses. If applicable, the table will also include the number of different subgroups for each set.
+This file contains the total number of responses in training and evaluation set and the number of overlapping responses. If applicable, the table will also include the number of different subgroups for each set.
 
 Excluded data composition
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -88,7 +88,7 @@ Subgroup composition
 ^^^^^^^^^^^^^^^^^^^^
 filename: ``data_composition_by_<SUBGROUP>.csv``
 
-There will be one such file for each of the specified subgroups and it contains the total number of responses in each that subgroup in both the training and evaluation sets.
+There will be one such file for each of the specified subgroups and it contains the total number of responses in  that subgroup in both the training and evaluation sets.
 
 Feature descriptives
 ^^^^^^^^^^^^^^^^^^^^^

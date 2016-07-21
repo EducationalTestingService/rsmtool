@@ -17,11 +17,11 @@ The machine learner you want to use to build the scoring model. Possible values 
 
 train_file
 """"""""""
-The path to the training data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. Can be absolute or relative to the location of config file.
+The path to the training data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
 test_file
 """""""""
-The path to the evaluation data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. Can be absolute or relative to the location of config file.
+The path to the evaluation data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
 description *(Optional)*
 """"""""""""""""""""""""
@@ -55,7 +55,7 @@ The name for the column containing the human scores in the training data. If set
 
 .. note::
 
-    All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation.
+    All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation. By default, zero scores in either ``train_label_column`` or ``test_label_column`` will also be excluded. See :ref:`exclude_zero_scores` if you want to keep responses with zero scores. 
 
 .. _length_column:
 
@@ -75,7 +75,7 @@ This field makes it possible to only use responses with particular values in a g
 
 .. note::
 
-    If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responsess which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
+    If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responses which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
 
 .. _exclude_zero_scores:
 

@@ -7,7 +7,7 @@ A researcher already *has* a set of responses such as essays or recorded spoken 
 
 She can then run an RSMTool "experiment" to build a regression-based scoring model (using one of many available regressors) and produce a report. The report includes descriptive statistics for all her features, diagnostic information about the trained regression model, and a comprehensive evaluation of model performance on a held-out set of responses.
 
-While she could use ``R``, ``SPSS`` or other tools to perform each of the RSMTool analyses individually and compile a report herself, RSMTool does all of this work for her with just a single command. Furthermore, the analyses included into the tool highlight educational measurement criteria important to building automated scoring models. If she wishes, she can conduct further exploratory analysis using her preferred tools for data analysis by using the output of RSMTool as a starting point.
+While she could use ``R``, ``PASW`` (``SPSS``) or other tools to perform each of the RSMTool analyses individually and compile a report herself, RSMTool does all of this work for her with just a single command. Furthermore, the analyses included into the tool highlight educational measurement criteria important to building automated scoring models. If she wishes, she can conduct further exploratory analysis using her preferred tools for data analysis by using the output of RSMTool as a starting point.
 
 RSMTool is designed to be customizable:
 
