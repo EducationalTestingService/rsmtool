@@ -13,6 +13,8 @@ Models which use the full feature set
 - ``RebalancedLR`` -  empirical regression weights are rebalanced by using a small portion of positive weights to replace negative beta values. This model has no negative coefficients.
 
 
+.. _automatic_feature_selection_models:
+
 Models with automatic feature selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

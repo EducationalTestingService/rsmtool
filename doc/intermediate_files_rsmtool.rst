@@ -3,18 +3,20 @@
 Intermediate CSV files
 ----------------------
 
-Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as ``.csv`` files in the ``output`` directory.
+Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as ``.csv`` files in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
-The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original ``.csv`` files. This is because RSMTool standardizes these column names internally for convenience. These values are:
+.. note::
 
-- `spkitemid` for the column containing response IDs.
-- `sc1` for the column containing the human scores used as training labels.
-- `sc2` for the column containing the second human scores, if this column was specified in the configuration file.
-- `length` for the column containing response length, if this column was specified in the configuration file.
-- `candidate` for the column containing candidate IDs, if this column was specified in the configuration file.
+    The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original ``.csv`` files. This is because RSMTool standardizes these column names internally for convenience. These values are:
+
+    - ``spkitemid`` for the column containing response IDs.
+    - ``sc1`` for the column containing the human scores used as training labels.
+    - ``sc2`` for the column containing the second human scores, if this column was specified in the configuration file.
+    - ``length`` for the column containing response length, if this column was specified in the configuration file.
+    - ``candidate`` for the column containing candidate IDs, if this column was specified in the configuration file.
 
 
-Features values
+Feature values
 ^^^^^^^^^^^^^^^
 filenames: ``train_features.csv``, ``test_features.csv``, ``train_preprocessed_features.csv``, ``test_preprocessed_features.csv``
 
