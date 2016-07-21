@@ -5,7 +5,7 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. An example configuration file can be found here.
 
-There are four required fields and rest are all optional.
+There are four required fields and the rest are all optional.
 
 experiment_id
 """""""""""""
@@ -27,13 +27,15 @@ description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. This is blank by default.
 
+.. _feature_file:
+
 features *(Optional)*
 """""""""""""""""""""
 By default, ``rsmtool`` will use all of the features present in the training and evaluation CSV files. If you want to use a specific set of features, you need to provide a second ``.json`` file specifying the list of features. The value for this field is the path to this ``.json`` file. It can be absolute or relative to the location of config file.
 
 .. note::
 
-    See :doc:`selecting features <feature_selection>` for more details.
+    See :ref:`selecting features <feature_selection>` for more details.
 
 id_column *(Optional)*
 """"""""""""""""""""""

@@ -6,7 +6,7 @@ For most users, the primary means of using RSMTool will be via the command-line 
 Input
 -----
 
-``rsmtool`` requires a single input to run an experiment: a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmtool`` will use the current directory as the output directory.
+``rsmtool`` requires a single argument to run an experiment: the path to the configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmtool`` will use the current directory as the output directory.
 
 .. include:: config_rsmtool.rst
 
