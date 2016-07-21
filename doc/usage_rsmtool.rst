@@ -6,7 +6,7 @@ For most users, the primary means of using RSMTool will be via the command-line 
 Input
 -----
 
-``rsmtool`` requires a single input to run an experiment: a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmtool`` will use the current directory as the output directory.
+``rsmtool`` requires a single argument to run an experiment: the path to the configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmtool`` will use the current directory as the output directory.
 
 
 .. _config_file:
@@ -16,7 +16,7 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. An example configuration file can be found here.
 
-There are four required fields and rest are all optional.
+There are four required fields and the rest are all optional.
 
 experiment_id
 """""""""""""
