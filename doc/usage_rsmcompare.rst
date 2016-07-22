@@ -3,34 +3,24 @@
 ``rsmcompare`` - Compare scoring models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmcompare`` command-line utility to compare two models and and generate a report with a comparison all the built-in analyses. This can be useful in scenarios where the user wants to use more sophisticated machine learning algorithms not available in RSMTool to build the scoring model but still wants to be able to evaluate that model's predictions using the standard analyses.
+RSMTool provides the ``rsmcompare`` command-line utility to compare two models and to generate a report with a comparison. This can be useful in scenarios where the user wants to compare the changes in model performance after adding a new feature. To use ``rsmcompare`` the user must first run two experiments using ``rsmtool`` or ``rsmeval``. ``rsmcompare`` can then be used to compare the outputs of these two experiments.  
 
-For example, say a researcher *has* an existing automated scoring engine for grading short responses that extracts the features and computes the predicted score. This engine uses a large number of binary, sparse features. He cannot use ``rsmtool`` to train his model since it requires numeric features. So, he uses ``scikit-learn`` to train his model.
+.. note::
+    Currently ``rsmcompare`` takes the outputs of the analyses generated during the original experiments and creates comparison tables. These comparison tables were designed to compare a baseline model with the model which includes new feature. While the tool can be used to evaluate other changes, the researcher needs to make a judgement whether a given comparison is meanigful for their experiments. 
 
-Once the model is trained, the researcher wants to evaluate his engine's performance using the analyses recommended by the educational measurement community as well as conduct additional investigations for specific subgroups of test-takers. However, these kinds of analyses are not available in ``scikit-learn``. He can use ``rsmeval`` to set up a customized report using a combination of existing and custom sections and quickly produce the evaluation that is useful to him.
+The ``rsmcompare`` can be used to compare two ``rsmtool`` experiments as well as two ``rsmeval`` evaluations or an ``rsmtool`` evaluation with an ``rsmeval`` evaluation. 
+
+.. note::
+    We strongly recommend that the original experiments and the comparison are done using the same version of the tool. 
 
 Input
 """""
 
-``rsmeval`` requires a single argument to run an experiment: the path to a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmeval`` will use the current directory as the output directory.
+``rsmcompare`` requires a single argument to run an experiment: the path to a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmcompare`` will use the current directory as the output directory.
 
-.. include:: config_rsmeval.rst
+.. include:: config_rsmcompare.rst
 
 Output
 """"""
 
-``rsmeval`` produces set of folders in the output directory.
-
-report
-~~~~~~
-This folder contains the final RSMEval report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
-
-output
-~~~~~~
-This folder contains all of the :ref:`intermediate files <intermediate_files_rsmeval>` produced as part of the various analyses performed, saved as ``.csv`` files.
-
-figure
-~~~~~~
-This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
-
-.. include:: intermediate_files_rsmeval.rst
+``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
