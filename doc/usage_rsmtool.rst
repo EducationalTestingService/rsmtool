@@ -13,7 +13,7 @@ Input
 Output
 ------
 
-``rsmtool`` produces set of folders in the output directory.
+``rsmtool`` produces set of folders in the experiment output directory. This is either the current directory in which ``rsmtool`` is run or the directory specified as the second optional command-line argument.
 
 report
 ^^^^^^
@@ -23,11 +23,13 @@ output
 ^^^^^^
 This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files.
 
-
 figure
 ^^^^^^
 This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
 
+feature *(Optional)*
+^^^^^^^^^^^^^^^^^^^^
+This folder is only created if manual or automatic :ref:`feature selection <feature_selection>` is used.
 
 .. include:: feature_selection_rsmtool.rst
 

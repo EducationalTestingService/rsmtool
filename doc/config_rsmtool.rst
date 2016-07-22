@@ -91,6 +91,23 @@ trim_max *(Optional)*
 """""""""""""""""""""
 The single numeric value for the highest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
 
+select_transformations *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If this option is set to ``true`` the system will try apply feature transformations to each of the features and then choose the transformation for each feature that yields the highest correlation with human score. The possible transformations are:
+
+    * ``raw``: no transformation, use original feature value
+    * ``org``: same as raw
+    * ``inv``: 1/x
+    * ``sqrt``: square root
+    * ``addOneInv``: 1/(x+1)
+    * ``addOneLn``: ln(x+1)
+
+Note that ``inv`` is never used for features with positive values. Defaults to ``false``.
+
+.. seealso::
+
+    It is also possible to manually apply transformations to any feature as part of the :ref:`manual feature selection <manual_feature_selection>` process.
+
 use_scaled_predictions *(Optional)*
 """""""""""""""""""""""""""""""""""
 If set to ``true``, certain evaluations (confusion matrices, score distributions, subgroup analyses) will use the scaled machine scores. If set to ``false``, these evaluations will use the raw machine scores. Defaults to ``false``.
@@ -181,3 +198,21 @@ The name for an optional column in the training and test data containing unique 
 min_items_per_candidate *(Optional)*
 """"""""""""""""""""""""""""""""""""
 An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
+
+.. _feature_subset_file:
+
+feature_subset_file *(Optional)*
+""""""""""""""""""""""""""""""""
+
+
+.. _feature_subset:
+
+feature_subset *(Optional)*
+"""""""""""""""""""""""""""
+
+
+.. _sign:
+
+sign *(Optional)*
+"""""""""""""""""
+To see how to use these advanced options, please see :ref:`subset-based feature selection <subset_feature_selection>`.
