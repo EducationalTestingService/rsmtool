@@ -88,7 +88,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
                     'usage_rsmeval.rst',
                     'intermediate_files_rsmeval.rst',
                     'config_rsmpredict.rst',
-                    'usage_rsmpredict.rst']
+                    'usage_rsmpredict.rst',
+                    'usage_rsmcompare.rst']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

@@ -15,7 +15,7 @@ RSMTool is designed to be customizable:
 
 2. RSMTool provides explicit support for adding custom analyses to the report if the user has some analysis in mind that is not already provided by RSMTool. These analyses can then be automatically included in all subsequent experiments.
 
-While training and evaluating a scoring model represents the most common use case for RSMTool, it can do a lot more for :doc:`advanced users <advanced_usage>` such as evaluating predictions obtained using an external scoring engine, generating predictions for new data, and comparing two different scoring models.
+While training and evaluating a scoring model represents the most common use case for RSMTool, it can do a lot more for advanced users such as :ref:`evaluating predictions obtained using an external scoring engine <usage_rsmeval>`, :ref:`generating predictions for new data <usage_rsmpredict>`, and :ref:`comparing two different scoring models <usage_rsmcompare>`.
 
 
 

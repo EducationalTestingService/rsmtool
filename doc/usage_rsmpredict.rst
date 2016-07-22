@@ -1,3 +1,5 @@
+.. _usage_rsmpredict:
+
 ``rsmpredict`` - Generate new predictions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
