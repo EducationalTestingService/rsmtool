@@ -2,7 +2,7 @@ import warnings
 
 import pandas as pd
 
-from nose.tools import (assert_almost_equal, assert_equal, with_setup)
+from nose.tools import (assert_almost_equal, assert_equal)
 from numpy.random import RandomState
 
 from rsmtool.analysis import (correlation_helper,
@@ -30,26 +30,15 @@ def test_correlation_helper():
     assert_equal(retval[0].isnull().values.sum(), 0)
     assert_equal(retval[1].isnull().values.sum(), 0)
 
-def setup_correlation_one_row():
-    """
-    Temporarily disable runtime warnings since they are
-    expected for this particular test function with
-    a single row of data/
-    """
-    warnings.filterwarnings('ignore', category=RuntimeWarning)
 
-def teardown_correlation_one_row():
-    """
-    Re-enable warnings now that the test function has run.
-    """
-    warnings.filterwarnings('always', category=RuntimeWarning)
-
-@with_setup(setup_correlation_one_row, teardown_correlation_one_row)
 def test_that_correlation_helper_works_for_data_with_one_row():
     # this should return two data frames with nans
-    retval = correlation_helper(df_features[:1], 'sc1', 'group')
-    assert_equal(retval[0].isnull().values.sum(), 3)
-    assert_equal(retval[1].isnull().values.sum(), 3)
+    # we expect a runtime warning here so let's suppress it
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        retval = correlation_helper(df_features[:1], 'sc1', 'group')
+        assert_equal(retval[0].isnull().values.sum(), 3)
+        assert_equal(retval[1].isnull().values.sum(), 3)
 
 
 def test_that_correlation_helper_works_for_data_with_two_rows():

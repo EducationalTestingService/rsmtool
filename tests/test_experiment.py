@@ -1,10 +1,9 @@
-import os
 import warnings
 
 from glob import glob
 from os.path import basename, dirname, exists, join
 
-from nose.tools import raises, with_setup
+from nose.tools import raises
 
 from rsmtool.test_utils import (check_csv_output,
                                 check_report,
@@ -49,15 +48,6 @@ def test_run_experiment_lr():
     yield check_report, html_report
 
 
-def setup_run_old_config():
-    """
-    Temporarily disable deprecation warnings since they are
-    expected for this particular test function using the old
-    configuration format.
-    """
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-@with_setup(setup_run_old_config, None)
 def test_run_experiment_lr_old_config():
     # basic experiment with a LinearRegression model but using an
     # old style configuration file
@@ -69,22 +59,26 @@ def test_run_experiment_lr_old_config():
                        'experiments',
                        source,
                        '{}.json'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+    # run this experiment but suppress the expected deprecation warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        do_run_experiment(source, experiment_id, config_file)
+        output_dir = join('test_outputs', source, 'output')
+        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-        if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+        csv_files = glob(join(output_dir, '*.csv'))
+        for csv_file in csv_files:
+            csv_filename = basename(csv_file)
+            expected_csv_file = join(expected_output_dir, csv_filename)
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
+            if exists(expected_csv_file):
+                yield check_csv_output, csv_file, expected_csv_file
+
+        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+        yield check_scaled_coefficients, source, experiment_id
+        yield check_report, html_report
 
 
 def test_run_experiment_lr_subset_features():
@@ -304,24 +298,27 @@ def test_run_experiment_lr_subgroups_with_edge_cases():
                        'experiments',
                        source,
                        '{}.json'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    # run this experiment but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_experiment(source, experiment_id, config_file)
+        output_dir = join('test_outputs', source, 'output')
+        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+        csv_files = glob(join(output_dir, '*.csv'))
+        for csv_file in csv_files:
+            csv_filename = basename(csv_file)
+            expected_csv_file = join(expected_output_dir, csv_filename)
 
-        if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            if exists(expected_csv_file):
+                yield check_csv_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_subgroup_outputs, output_dir, experiment_id, ['group_edge_cases']
-    yield check_report, html_report
+        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+        yield check_scaled_coefficients, source, experiment_id
+        yield check_subgroup_outputs, output_dir, experiment_id, ['group_edge_cases']
+        yield check_report, html_report
 
 
 def test_run_experiment_lr_predict():
