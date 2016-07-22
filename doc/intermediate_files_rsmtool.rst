@@ -30,7 +30,11 @@ Flagged responses
 ^^^^^^^^^^^^^^^^^
 filenames: ``train_responses_with_excluded_flags.csv``, ``test_responses_with_excluded_flags.csv``
 
-These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column_rsmtool>`.  Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column_rsmtool>`.
+
+.. note::
+
+    If the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
@@ -48,7 +52,11 @@ Unused columns
 ^^^^^^^^^^^^^^
 filenames: ``train_other_columns.csv``, ``test_other_columns.csv``
 
-These files contain all of the the columns from the original features files that are not present in the ``*_feature.csv`` and ``*_metadata.csv`` files. They only include the rows from the training and evaluation sets that were not filtered out. Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+These files contain all of the the columns from the original features files that are not present in the ``*_feature.csv`` and ``*_metadata.csv`` files. They only include the rows from the training and evaluation sets that were not filtered out.
+
+.. note::
+
+    If the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Response length
 ^^^^^^^^^^^^^^^
@@ -173,7 +181,7 @@ The first file contains the predicted scores for the evaluation set: the raw sco
 
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
-- ``eval.csv``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the pre-processed scores.
+- ``eval.csv``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
 
 - ``eval_by_<SUBGROUP>.csv``: the same information as in `*_eval.csv` computed separately for each subgroup.
 

@@ -17,7 +17,7 @@ Output
 
 report
 ^^^^^^
-This folder contains the final RSMTool report in HTML format as well as a Jupyter notebook (a ``.ipynb`` file).
+This folder contains the final RSMTool report in HTML format as well in the form of a Jupyter notebook (a ``.ipynb`` file).
 
 output
 ^^^^^^

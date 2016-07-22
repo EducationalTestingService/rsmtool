@@ -9,7 +9,7 @@ There are four required fields and the rest are all optional.
 
 experiment_id
 """""""""""""
-An identifier for the experiment that will be used to name the report and all intermediate CSV files. It can be any combination of alphanumeric values and must *not* contain spaces.
+An identifier for the experiment that will be used to name the report and all :ref:`intermediate CSV files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values and must *not* contain spaces.
 
 model
 """""
@@ -25,7 +25,7 @@ The path to the evaluation data feature file in ``.csv`` format. Each row should
 
 description *(Optional)*
 """"""""""""""""""""""""
-A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. This is blank by default.
+A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
 .. _feature_file_rsmtool:
 

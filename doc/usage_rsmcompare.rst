@@ -1,0 +1,2 @@
+``rsmcompare`` - Compare scoring models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

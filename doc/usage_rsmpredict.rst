@@ -1,5 +1,5 @@
-``rsmpredict`` - Generating new predictions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``rsmpredict`` - Generate new predictions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 RSMTool provides the ``rsmpredict`` command-line utility to generate predictions for new data using a model already trained using the ``rsmtool`` utility. This can be useful when processing a new set of responses to the same task without needing to retrain the model.
 
