@@ -82,7 +82,7 @@ release = version
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
                     'config_rsmtool.rst', 'builtin_models.rst',
-                    'feature_selection_rsmtool.rst',
+                    'column_selection_rsmtool.rst',
                     'intermediate_files_rsmtool.rst',
                     'config_rsmeval.rst',
                     'usage_rsmeval.rst',
