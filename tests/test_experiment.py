@@ -1,7 +1,10 @@
+import os
+import warnings
+
 from glob import glob
 from os.path import basename, dirname, exists, join
 
-from nose.tools import raises
+from nose.tools import raises, with_setup
 
 from rsmtool.test_utils import (check_csv_output,
                                 check_report,
@@ -46,6 +49,21 @@ def test_run_experiment_lr():
     yield check_report, html_report
 
 
+def setup_run_old_config():
+    """
+    Temporarily disable deprecation warnings since they are
+    expected for this particular test function using the old
+    configuration format.
+    """
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+def teardown_run_old_config():
+    """
+    Re-enable warnings now that the test function has run.
+    """
+    warnings.filterwarnings('always', category=DeprecationWarning)
+
+@with_setup(setup_run_old_config, teardown_run_old_config)
 def test_run_experiment_lr_old_config():
     # basic experiment with a LinearRegression model but using an
     # old style configuration file
@@ -1270,8 +1288,8 @@ def test_run_experiment_lr_eval_exclude_flags():
 def test_run_experiment_lr_use_all_features():
 
     # rsmtool experiment with no feature file specified:
-    # the tool should be using all columns not assigned to 
-    # anything else. 
+    # the tool should be using all columns not assigned to
+    # anything else.
 
     source = 'lr-use-all-features'
     experiment_id = 'lr_use_all_features'
@@ -1600,7 +1618,7 @@ def test_run_experiment_lr_compare():
 def test_run_experiment_lr_compare_with_h2():
 
     # basic rsmcompare experiment comparing a LinearRegression
-    # experiment to itself where the rsmtool report contains 
+    # experiment to itself where the rsmtool report contains
     # h2 information
     source = 'lr-self-compare-with-h2'
     config_file = join(test_dir,
@@ -1681,8 +1699,8 @@ def test_run_experiment_linearsvr_compare():
 
 def test_run_experiment_lr_eval_compare():
 
-    # basic rsmcompare experiment comparing an rsmeval 
-    # experiment to itself 
+    # basic rsmcompare experiment comparing an rsmeval
+    # experiment to itself
     source = 'lr-eval-self-compare'
     config_file = join(test_dir,
                        'data',
@@ -1697,8 +1715,8 @@ def test_run_experiment_lr_eval_compare():
 
 def test_run_experiment_lr_eval_tool_compare():
 
-    # basic rsmcompare experiment comparing an rsmeval 
-    # experiment to an rsmtool experiment 
+    # basic rsmcompare experiment comparing an rsmeval
+    # experiment to an rsmtool experiment
     source = 'lr-eval-tool-compare'
     config_file = join(test_dir,
                        'data',
@@ -1707,7 +1725,7 @@ def test_run_experiment_lr_eval_tool_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
     yield check_report, html_report
 
 @raises(ValueError)
@@ -1894,7 +1912,7 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
 @raises(ValueError)
 def test_run_experiment_lr_eval_same_system_human_score():
 
-    # rsmeval experiment with the same value supplied 
+    # rsmeval experiment with the same value supplied
     # for both human score ans system score
 
     source = 'lr-eval-same-system-human-score'
