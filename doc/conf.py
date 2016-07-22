@@ -83,7 +83,12 @@ release = version
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
                     'config_rsmtool.rst', 'builtin_models.rst',
                     'feature_selection_rsmtool.rst',
-                    'intermediate_files_rsmtool.rst']
+                    'intermediate_files_rsmtool.rst',
+                    'config_rsmeval.rst',
+                    'usage_rsmeval.rst',
+                    'intermediate_files_rsmeval.rst',
+                    'config_rsmpredict.rst',
+                    'usage_rsmpredict.rst']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

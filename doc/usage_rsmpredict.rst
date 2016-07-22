@@ -1,20 +1,21 @@
-RSMPredict
-^^^^^^^
+``rsmpredict`` - Generating new predictions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``rsmpredict`` generates new predictions based on an existing model including feature pre-processing and score post-processing as specified by the user. Its most common use is to generate predictions for a new data set using previously trained model. The model must be trained by using a recent version of ``rsmtool``.
+RSMTool provides the ``rsmpredict`` command-line utility to generate predictions for new data using a model already trained using the ``rsmtool`` utility. This can be useful when processing a new set of responses to the same task without needing to retrain the model.
 
-.. note::
-``rsmpredict`` will generate predictions for all responses in the supplied feature matrix which have numeric feature values for features included into the model. It does not require human labels. If you have the human scores and want to evaluate the new predictions, run `rsmeval <usage_rsmeval>` after you generated the predictions. Note that `rsmeval` will only do the evaluations for the responses which received numeric non-zero human score. 
+``rsmpredict`` pre-processes the feature values according to user specifications before using them to generate the predicted scores. The generated scores are post-processed in the same manner as they are in ``rsmtool`` output.
+
 
 Input
 """""
+``rsmpredict`` requires two arguments to generate predictions: the path to a configuration file and the path to the output file where the generated predictions are saved in ``.csv`` format.
 
-``rsmpredict`` requires two arguments to generate predictions: the path to the configuration file and the path to the output file where ``rsmpredict`` will save the new predictions.  If you also want to save the pre-processed features,``rsmpredict`` can also take a third optional arguments ``-- features`` which should specify the optional path to file for saving the pre-processed feature values.
+If you also want to save the pre-processed feature values,``rsmpredict`` can take a third optional argument ``--features`` to specify the path to a ``.csv`` file to save these values.
 
 .. include:: config_rsmpredict.rst
 
 Output
 """"""
 
-``rsmpredict`` produces a ``.csv`` file with predictions for all responses in new data optionally a .csv file with pre-processed feature values requested by using ``--feature ``flag.
+``rsmpredict`` produces a ``.csv`` file with predictions for all responses in new data set, and, optionally, a ``.csv`` file with pre-processed feature values.
 

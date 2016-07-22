@@ -1,4 +1,4 @@
-.. _config_file:
+.. _config_file_rsmtool:
 
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -27,7 +27,7 @@ description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. This is blank by default.
 
-.. _feature_file:
+.. _feature_file_rsmtool:
 
 features *(Optional)*
 """""""""""""""""""""
@@ -41,13 +41,13 @@ id_column *(Optional)*
 """"""""""""""""""""""
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmtool`` will look for a column called ``spkitemid`` in the training and evaluation files.
 
-.. _train_label_column:
+.. _train_label_column_rsmtool:
 
 train_label_column *(Optional)*
 """""""""""""""""""""""""""""""
 The name for the column containing the human scores in the training data. If set to to ``fake``, fake scores will be generated using randomly sampled integers. This option may be useful if you only need descriptive statistics for the data and do not care about the other analyses. Defaults to ``sc1``.
 
-.. _test_label_column:
+.. _test_label_column_rsmtool:
 
 test_label_column *(Optional)*
 """"""""""""""""""""""""""""""
@@ -55,19 +55,19 @@ The name for the column containing the human scores in the training data. If set
 
 .. note::
 
-    All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation. By default, zero scores in either ``train_label_column`` or ``test_label_column`` will also be excluded. See :ref:`exclude_zero_scores` if you want to keep responses with zero scores. 
+    All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation. By default, zero scores in either ``train_label_column`` or ``test_label_column`` will also be excluded. See :ref:`exclude_zero_scores_rsmtool` if you want to keep responses with zero scores.
 
-.. _length_column:
+.. _length_column_rsmtool:
 
 length_column *(Optional)*
 """"""""""""""""""""""""""
-The name for the optional column in the training and evaluation data containing response length. If specified, length is included in the inter-feature and partial correlation analyses. Note that this field *should not* be specified if you want to use the length column as an actual feature in the model. In the latter scenario, the length column will automatically be included in the analyses, like any other feature. If you specify ``length_column`` *and* include the same column name as  a feature in the :ref:`feature file <feature_file>`, ``rsmtool`` will ignore the ``length_column`` setting. In addition, if ``length_column`` has missing values or if its standard deviation is 0 (both somewhat unlikely scenarios), ``rsmtool`` will *not* include any length-based analyses in the report.
+The name for the optional column in the training and evaluation data containing response length. If specified, length is included in the inter-feature and partial correlation analyses. Note that this field *should not* be specified if you want to use the length column as an actual feature in the model. In the latter scenario, the length column will automatically be included in the analyses, like any other feature. If you specify ``length_column`` *and* include the same column name as  a feature in the :ref:`feature file <feature_file_rsmtool>`, ``rsmtool`` will ignore the ``length_column`` setting. In addition, if ``length_column`` has missing values or if its standard deviation is 0 (both somewhat unlikely scenarios), ``rsmtool`` will *not* include any length-based analyses in the report.
 
 second_human_score_column *(Optional)*
 """"""""""""""""""""""""""""""""""""""
-The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores` option below will apply to this column too.
+The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_rsmtool` option below will apply to this column too.
 
-.. _flag_column:
+.. _flag_column_rsmtool:
 
 flag_column *(Optional)*
 """"""""""""""""""""""""
@@ -77,7 +77,7 @@ This field makes it possible to only use responses with particular values in a g
 
     If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responses which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
 
-.. _exclude_zero_scores:
+.. _exclude_zero_scores_rsmtool:
 
 exclude_zero_scores *(Optional)*
 """"""""""""""""""""""""""""""""
@@ -117,26 +117,25 @@ If set to ``true``, certain evaluations (confusion matrices, score distributions
     All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
 
 
-.. _subgroups:
+.. _subgroups_rsmtool:
 
 subgroups *(Optional)*
 """"""""""""""""""""""
-A list of grouping variables used to generating analyses by those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in both training *and* evaluation data.
-If subgroups are specified, ``rsmtool`` will generate:
+A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in both training *and* evaluation data. If subgroups are specified, ``rsmtool`` will generate:
 
     - description of the data by each subgroup;
     - boxplots showing the feature distribution for each subgroup on the training set; and
     - tables and barplots showing system-human agreement for each subgroup on the evaluation set.
 
-.. _general_sections:
+.. _general_sections_rsmtool:
 
 general_sections *(Optional)*
 """""""""""""""""""""""""""""
 A list specifying which sections should be included into the final report. By default, all of the sections below are included.
 
-    - ``data_description``: Shows the total number of responses in training and evaluation set, along with any responses have been excluded due to non-numeric features/scores or :ref:`flag columns <flag_column>`.
+    - ``data_description``: Shows the total number of responses in training and evaluation set, along with any responses have been excluded due to non-numeric features/scores or :ref:`flag columns <flag_column_rsmtool>`.
 
-    - ``data_description_by_group``: Shows the total number of responses in training and evaluation set for each of the :ref:`subgroups <subgroups>` specified in the configuration file. This section only covers the responses used to train/evaluate the model.
+    - ``data_description_by_group``: Shows the total number of responses in training and evaluation set for each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file. This section only covers the responses used to train/evaluate the model.
 
     - ``feature_descriptives``: Shows the descriptive statistics for all raw  feature values included in the model:
 
@@ -144,13 +143,13 @@ A list specifying which sections should be included into the final report. By de
         - a table with percentiles and outliers; and
         - a barplot showing he number of truncated outliers for each feature.
 
-    - ``features_by_group``: Shows boxplots with distributions of raw feature values by each of the :ref:`subgroups <subgroups>` specified in the configuration file.
+    - ``features_by_group``: Shows boxplots with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
     - ``preprocessed_features``: Shows analyses of preprocessed features:
 
         - histograms showing the distributions of preprocessed features values;
         - the correlation matrix between all features and the human score;
-        - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column>` is specified in the config file.
+        - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
     - ``pca``: Shows the results of principal components analysis on the processed feature values:
 
@@ -170,25 +169,24 @@ A list specifying which sections should be included into the final report. By de
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
-.. _custom_sections:
+.. _custom_sections_rsmtool:
 
 custom_sections *(Optional)*
 """"""""""""""""""""""""""""
 A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :doc:`pre-defined variables <new_notebooks>`.
 
-.. _special_sections:
+.. _special_sections_rsmtool:
 
 special_sections *(Optional)*
 """""""""""""""""""""""""""""
 A list specifying special ETS-only sections to be included into the final report. These sections are available *only* to ETS employees via the `rsmextra` package.
 
-
 section_order *(Optional)*
 """"""""""""""""""""""""""
 A list containing the order in which the sections in the report should be generated. Possible values are:
 
-    - either *all* of :ref:`pre-defined sections <general_sections>` in a specified order; OR
-    - the subset of :ref:`pre-defined sections <general_sections>` AND *all* :ref:`custom sections <custom_sections>` names (file prefixes only, without the path and without the `.ipynb` extension) AND *all* :ref:`special sections <special_sections>`, in a specified order.
+    - either *all* of :ref:`pre-defined sections <general_sections_rsmtool>` in a specified order; OR
+    - the subset of :ref:`pre-defined sections <general_sections_rsmtool>` AND *all* :ref:`custom sections <custom_sections_rsmtool>` names (file prefixes only, without the path and without the `.ipynb` extension) AND *all* :ref:`special sections <special_sections_rsmtool>`, in a specified order.
 
 
 candidate_column *(Optional)*

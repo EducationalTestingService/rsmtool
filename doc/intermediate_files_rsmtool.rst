@@ -30,7 +30,7 @@ Flagged responses
 ^^^^^^^^^^^^^^^^^
 filenames: ``train_responses_with_excluded_flags.csv``, ``test_responses_with_excluded_flags.csv``
 
-These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column>`.  Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column_rsmtool>`.  Note that if the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
