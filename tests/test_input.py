@@ -1,6 +1,8 @@
+import warnings
+
 import pandas as pd
 
-from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
+from nose.tools import assert_equal, assert_raises, eq_, ok_, raises, with_setup
 from numpy.testing import assert_array_equal
 from pandas.util.testing import assert_frame_equal
 
@@ -14,6 +16,14 @@ from rsmtool.input import (normalize_json_fields,
                            select_candidates_with_N_or_more_items)
 
 
+def setup_normalize_fields():
+    """
+    Temporarily disable deprecation warnings since they are
+    expected for this particular test function for normalizing fields.
+    """
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+@with_setup(setup_normalize_fields, None)
 def test_normalize_fields():
     data = {'expID': 'experiment_1',
             'train': 'data/rsmtool_smTrain.csv',
