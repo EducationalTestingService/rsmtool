@@ -3,6 +3,7 @@
 :organization: ETS
 """
 
+import os
 import re
 import warnings
 
@@ -76,7 +77,9 @@ __all__ = ['compute_basic_descriptives',
            'write_feature_json']
 
 # Make sure that DeprecationWarnings are always shown
-# within this package.
-warnings.filterwarnings('always',
-                        category=DeprecationWarning,
-                        module='^{0}\.'.format(re.escape(__name__)))
+# within this package unless we are in test mode in
+# which case do not enable them by default.
+if 'TEST_MODE' not in os.environ:
+    warnings.filterwarnings('always',
+                            category=DeprecationWarning,
+                            module='^{0}\.'.format(re.escape(__name__)))
