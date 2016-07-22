@@ -1,9 +1,14 @@
 .. _feature_selection:
 
-Selecting Features
-------------------
+Selecting Feature Columns
+-------------------------
 
-By default, ``rsmtool`` will use all of the features provided in the training and evaluation ``.csv`` files. However, it is possible for you to either manually choose a subset of features or to have ``rsmtool`` perform automatic feature selection.
+By default, ``rsmtool`` will use all columns included in the training and evaluation ``.csv`` files as features. The only exception are the columns specified in the :ref:`rsmtool configuration file <flag_column_rsmtool>` as containing ``id``, ``train_label``, ``subgroups`` or other information. However, it is possible for you to define a subset of columns to be used as features. You can then either use all these features in the final model or use one of the built-in models that perform :ref:`automatic feature selection <automatic_feature_selection_models>`.
+
+.. note::
+
+    For all feature selection methods ``rsmtool`` will pre-process the data to remove all responses with non-numeric feature values for any of the features before trying to train a model. If your data set includes a column containing character (string) values and you do not specify this column as an ``id`` column, ``candidate`` column or ``subgroup`` column, ``rsmtool`` will assume that this column contains a feature and will filter out all responses in the data set. 
+
 
 .. note::
 
@@ -11,9 +16,9 @@ By default, ``rsmtool`` will use all of the features provided in the training an
 
 .. _manual_feature_selection:
 
-Manual Feature selection
-^^^^^^^^^^^^^^^^^^^^^^^^
-To manually select a subset of features, you must provide a ``.json`` file specifying information about what features should be included in the final scoring model. For additional flexibility, the same file also allows you to describe transformations to be applied to the raw features before being included in the model.
+Defining Feature Columns using ``.json`` file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To manually select a subset of columns to be used as features, you can provide a ``.json`` file specifying information about what columns should be included as features in the final scoring model. For additional flexibility, the same file also allows you to describe transformations to be applied to the raw features before being included in the model.
 
 Here's an example of what this file looks like.
 
@@ -64,35 +69,43 @@ When determining the sign, you should take into account the correlation between 
 
 To ensure that this is working as expected, you can check the sign of correlations for both raw and processed features in the final report.
 
-Automatic Feature selection
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-No feature file is necessary for models with automatic feature selection. You simply need to pick one of the built-in models that performs :ref:`automatic feature selection <automatic_feature_selection_models>`.
-
 .. _subset_feature_selection:
 
-Subset-based Feature Selection
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-For more advanced users, ``rsmtool`` offers the ability to define feature subsets and then select groups of features by simply specifying the pre-defined subset to use.
+Defining Feature Columns using ``.csv`` file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For more advanced users, ``rsmtool`` offers the ability to define feature subsets in a ``.csv`` file and then select groups of columns to be used as features by simply specifying the pre-defined subset to use.
 
-To define feature subsets, you must provide a master ``.csv`` file which lists *all* features that should be used for feature selection. Each feature name should be listed under a column named ``Feature``. Then each subset is an additional column with the value of either ``0`` (denoting that the feature does *not* belong to the subset named by that column) or ``1`` (denoting that the feature does belong to the subset).
+This function can be useful if the software you use for feature extraction generates many features, you want to build scoring models to score different types of questions, and for each type of question you only want to use a subset of features. In this case you would need to either pre-process your data to remove the columns with unused features or define the list of columns to use as features. While you can generate a separate :ref:`json file <manual_feature_selection>` to list features you want to use for each type of questions, this can be a cumbersome process if the subsets are large. 
+
+Instead you can define feature subsets by providing a master ``.csv`` file which lists *all* feature names that you might want to use under a column named ``Feature``. Then each subset is an additional column with the value of either ``0`` (denoting that the feature does *not* belong to the subset named by that column) or ``1`` (denoting that the feature does belong to the subset). 
 
 This ``.csv`` file can be provided to ``rsmtool`` using the :ref:`feature_subset_file <feature_subset_file>` field in the configuration file. Then, to select a particular pre-defined subset of features, you can simply set the :ref:`feature_subset  <feature_subset>` field in the configuration file to the name of the subset that you wish to use.
 
-Most guidelines for building scoring models require that all coefficients in the model are positive and that all features have a positive correlation with human score. ``rsmtool`` can automatically flip the signs for any pre-defined feature subset. To use this functionality, the feature subset ``.csv`` file should provide the expected correlation sign between each feature and human score under a column called ``sign_<SUBSET>`` where ``<SUBSET>`` is the name of the feature subset. Then, to tell ``rsmtool`` to flip the signs, you need to set the :ref:`sign <sign>` field in the configuration file to ``<SUBSET>``.
+Unlike :ref:`json file <manual_feature_selection>`, ``.csv`` file does not contain information about transformation and sign for each feature. 
+
+RSMTool can automatically select transformation for each feature by applying all possible transforms and identifying the one which gives the highest correlation with the human score. To use this functionality set the :ref:`select_transformations <select_transformations>` field in the configuration file to ``true``. 
+
+Most guidelines for building scoring models require that all coefficients in the model are positive and that all features have a positive correlation with human score. ``rsmtool`` can automatically flip the sign for any pre-defined feature subset. To use this functionality, the feature subset ``.csv`` file should provide the expected correlation sign between each feature and human score under a column called ``sign_<SUBSET>`` where ``<SUBSET>`` is the name of the feature subset. Then, to tell ``rsmtool`` to flip the the sign, you need to set the :ref:`sign <sign>` field in the configuration file to ``<SUBSET>``. 
+
+.. note::
+
+    If :ref:`select_transformations <select_transformations>` is set to ``true``, ``rsmtool`` will take into account the transformation applied to the features. Thus if the expected correlation sign for a given feature is negative, ``rsmtool`` will multiply the feature values by ``-1`` if no transformation is applied. However, no such multiplication will be applied if the feature is transformed using ``inverse`` tranform, which already changes the polarity of the feature. 
+
+
 
 Example
 """""""
 
-It's best to illustrate subset-based selection with an example. Let's say that that we have a feature subset definition file called ``subset.csv``:
+It's best to illustrate subset-based selection with an example. Let's say that we have a feature subset definition file called ``subset.csv``:
 
 .. code-block:: text
 
-    Feature,A,sign_A
-    feature1,0,+
-    feature2,1,-
-    feature3,1,+
+    Feature,A,B,sign_A
+    feature1,0,1,+
+    feature2,1,1,-
+    feature3,1,1,+
 
-Then, in order to use the subset "A" of features in an experiment with the sign of ``feature3`` flipped appropriately (multiplied by -1) to ensure positive correlations with score and positive model coefficients, we need to set the following three fields in our experiment configuration file:
+Then, in order to use the subset "A" of features in an experiment (``feature2`` and `feature3` only) with the sign of ``feature3`` flipped appropriately (multiplied by -1) to ensure positive correlations with score and positive model coefficients, we need to set the following three fields in our experiment configuration file:
 
 .. code-block:: javascript
 
@@ -103,3 +116,7 @@ Then, in order to use the subset "A" of features in an experiment with the sign 
         "sign": "A"
         ...
     }
+
+.. note::
+
+    While for most users different ``sign`` values will correspond to different ``subsets``, this is not a requirement. You can have ``sign`` set to ``A`` while setting ``subset`` to ``B``.
