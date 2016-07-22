@@ -57,13 +57,7 @@ def setup_run_old_config():
     """
     warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-def teardown_run_old_config():
-    """
-    Re-enable warnings now that the test function has run.
-    """
-    warnings.filterwarnings('always', category=DeprecationWarning)
-
-@with_setup(setup_run_old_config, teardown_run_old_config)
+@with_setup(setup_run_old_config, None)
 def test_run_experiment_lr_old_config():
     # basic experiment with a LinearRegression model but using an
     # old style configuration file
@@ -1725,7 +1719,7 @@ def test_run_experiment_lr_eval_tool_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
     yield check_report, html_report
 
 @raises(ValueError)
