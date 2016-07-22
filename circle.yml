@@ -20,6 +20,6 @@ dependencies:
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+    - TEST_MODE=1 ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/bin/coveralls
