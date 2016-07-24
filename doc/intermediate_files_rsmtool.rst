@@ -16,8 +16,10 @@ Although the primary output of RSMTool is an HTML report, we also want the user 
     - ``candidate`` for the column containing candidate IDs, if this column was specified in the configuration file.
 
 
+.. _rsmtool_feature_values:
+
 Feature values
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 filenames: ``train_features.csv``, ``test_features.csv``, ``train_preprocessed_features.csv``, ``test_preprocessed_features.csv``
 
 These files contain the raw and pre-processed feature values for the training and evaluation sets. They include *only* includes the rows that were used for training/evaluating the models after filtering. For models with feature selection, these files *only* include the features that ended up being included in the model.
@@ -25,6 +27,8 @@ These files contain the raw and pre-processed feature values for the training an
 .. note::
 
     By default RSMTool filters out non-numeric feature values and non-numeric/zero human scores from both the training and evaluation sets. Zero scores can be kept by setting the `exclude_zero_scores` to `false`.
+
+.. _rsmtool_flagged_responses:
 
 Flagged responses
 ^^^^^^^^^^^^^^^^^
@@ -47,6 +51,8 @@ Response metadata
 filenames: ``train_metadata.csv``, ``test_metadata.csv``
 
 These files contain the metadata columns (``id_column``,  ``subgroups`` if provided) for the rows in the training and evaluation sets that were *not* excluded for some reason.
+
+.. _rsmtool_unused_columns:
 
 Unused columns
 ^^^^^^^^^^^^^^
@@ -155,11 +161,15 @@ Each of following files may be produced for every subgroup, assuming all other i
 Model information
 ^^^^^^^^^^^^^^^^^
 
+.. _rsmtool_feature_csv:
+
 - ``feature.csv``: pre-processing parameters for all features used in the model.
 
 - ``coefficients.csv``: model coefficients and intercept (for :ref:`built-in models <builtin_models>` only).
 
 - ``coefficients_scaled.csv``: scaled model coefficients and intercept (linear models only). Although RSMTool generates scaled scores by scaling the predictions of the model, it is also possible to achieve the same result by scaling the coefficients instead. This file shows those scaled coefficients.
+
+.. _rsmtool_betas_csv:
 
 - ``betas.csv``: standardized and relative coefficients (for built-in models only).
 
@@ -172,6 +182,8 @@ Model information
 - ``ols_summary.txt``: a text file containing a summary of the above model (for built-in models excluding ``LassoFixedLabmda`` and ``PositiveLassoCV``)
 
 - ``postprocessing_params.csv``: the parameters for trimming and scaling predicted scores. Useful for generating predictions on new data.
+
+.. _rsmtool_predictions:
 
 Predictions
 ^^^^^^^^^^^

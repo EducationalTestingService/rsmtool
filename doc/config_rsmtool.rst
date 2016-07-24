@@ -131,7 +131,7 @@ A list of column names indicating grouping variables used for generating analyse
 
 general_sections *(Optional)*
 """""""""""""""""""""""""""""
-A list specifying which sections should be included into the final report. By default, all of the sections below are included.
+RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by default, all of them are included in the report. However, you can choose a subset of these pre-defined sections by specifying a list as the value for this field.
 
     - ``data_description``: Shows the total number of responses in training and evaluation set, along with any responses have been excluded due to non-numeric features/scores or :ref:`flag columns <flag_column_rsmtool>`.
 
@@ -173,7 +173,7 @@ A list specifying which sections should be included into the final report. By de
 
 custom_sections *(Optional)*
 """"""""""""""""""""""""""""
-A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :doc:`pre-defined variables <new_notebooks>`.
+A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :ref:`pre-defined variables <custom_notebooks>`.
 
 .. _special_sections_rsmtool:
 
@@ -183,10 +183,13 @@ A list specifying special ETS-only sections to be included into the final report
 
 section_order *(Optional)*
 """"""""""""""""""""""""""
-A list containing the order in which the sections in the report should be generated. Possible values are:
+A list containing the order in which the sections in the report should be generated. Any specified order must explicitly list:
 
-    - either *all* of :ref:`pre-defined sections <general_sections_rsmtool>` in a specified order; OR
-    - the subset of :ref:`pre-defined sections <general_sections_rsmtool>` AND *all* :ref:`custom sections <custom_sections_rsmtool>` names (file prefixes only, without the path and without the `.ipynb` extension) AND *all* :ref:`special sections <special_sections_rsmtool>`, in a specified order.
+    1. Either *all* pre-defined sections if a value for the :ref:`general_sections <general_sections_rsmtool>` field is not specified OR the sections specified using :ref:`general_sections <general_sections_rsmtool>`, and
+
+    2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmtool>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
+
+    3. *All* special sections specified using :ref:`special_sections <special_sections_rsmtool>`.
 
 
 candidate_column *(Optional)*

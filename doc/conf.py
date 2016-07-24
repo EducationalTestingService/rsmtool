@@ -81,7 +81,8 @@ release = version
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
-                    'config_rsmtool.rst', 'builtin_models.rst',
+                    'config_rsmtool.rst',
+                    'builtin_models.rst',
                     'feature_selection_rsmtool.rst',
                     'intermediate_files_rsmtool.rst',
                     'config_rsmeval.rst',
@@ -89,7 +90,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
                     'intermediate_files_rsmeval.rst',
                     'config_rsmpredict.rst',
                     'usage_rsmpredict.rst',
-                    'usage_rsmcompare.rst']
+                    'usage_rsmcompare.rst',
+                    'config_rsmcompare.rst']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

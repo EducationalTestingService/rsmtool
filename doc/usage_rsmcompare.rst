@@ -3,15 +3,22 @@
 ``rsmcompare`` - Compare scoring models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmcompare`` command-line utility to compare two models and to generate a report with a comparison. This can be useful in scenarios where the user wants to compare the changes in model performance after adding a new feature. To use ``rsmcompare`` the user must first run two experiments using ``rsmtool`` or ``rsmeval``. ``rsmcompare`` can then be used to compare the outputs of these two experiments.  
+RSMTool provides the ``rsmcompare`` command-line utility to compare two models and to generate a comparison report. This can be useful in many scenarios, e.g., say the user wants to compare the changes in model performance after adding a new feature into the model. To use ``rsmcompare``, the user must first run two experiments using either :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`. ``rsmcompare`` can then be used to compare the outputs of these two experiments to each other.
 
 .. note::
-    Currently ``rsmcompare`` takes the outputs of the analyses generated during the original experiments and creates comparison tables. These comparison tables were designed to compare a baseline model with the model which includes new feature. While the tool can be used to evaluate other changes, the researcher needs to make a judgement whether a given comparison is meanigful for their experiments. 
 
-The ``rsmcompare`` can be used to compare two ``rsmtool`` experiments as well as two ``rsmeval`` evaluations or an ``rsmtool`` evaluation with an ``rsmeval`` evaluation. 
+    Currently ``rsmcompare`` takes the outputs of the analyses generated during the original experiments and creates comparison tables. These comparison tables were designed with a specific comparison scenario in mind: comparing a baseline model with a model which includes new feature(s). The tool can certianly be used for other comparison scenarios if the researcher feels that the generated comparison output is appropriate.
+
+``rsmcompare`` can be used to compare:
+
+1. Two ``rsmtool`` experiments, or
+2. Two ``rsmeval`` experiments, or
+3. An ``rsmtool`` experiment with an ``rsmeval`` experiment (in this case, only the evaluation analyses will be compared).
+
 
 .. note::
-    We strongly recommend that the original experiments and the comparison are done using the same version of the tool. 
+
+    It is strongly recommend that the original experiments as well as the comparison experiment are all done using the same version of RSMTool.
 
 Input
 """""
@@ -23,4 +30,4 @@ Input
 Output
 """"""
 
-``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
+``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file) in the output directory.
