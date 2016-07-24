@@ -63,7 +63,7 @@ Contributions to RSMTool are very welcome. You can use the instructions below to
 
 5. Run `pip install -e .` to install rsmtool into the environment in editable mode which is what we need for development.  
 
-6. Run `TEST_MODE=1 nosetests -v tests` to run the tests. We need the `TEST_MODE` environment variable in order to suppress expected but unnecessary warnings during the test. If you do not set that variable, you might see some deprecation warnings.
+6. Run `nosetests -v tests` to run the tests. 
 
 ## Available documentation
 
