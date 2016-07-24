@@ -73,6 +73,7 @@ def test_filter_on_column_std_epsilon_zero():
 def test_transform_feature():
     name = 'dpsec'
     data = random.gauss(0, 1)
+    # run the test but suppress the expected runtime warnings
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
         assert_raises(ValueError, transform_feature, name, data, 'add_one_inverse')
