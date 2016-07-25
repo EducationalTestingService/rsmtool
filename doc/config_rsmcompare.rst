@@ -3,7 +3,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. An example configuration file can be found here.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. An example configuration file can be found `here <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmcompare/config_rsmcompare.json>`_.
 
 There are six required fields and the rest are all optional.
 
