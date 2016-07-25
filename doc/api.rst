@@ -24,24 +24,24 @@ From :py:mod:`~rsmtool.preprocess` Module
 .. autofunction:: rsmtool.transform_feature
 .. autofunction:: rsmtool.preprocess_feature
 
-From :py:mod:`~rsmtool:create_features.py` Module
+From :py:mod:`~rsmtool.create_features` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.generate_default_specs
 .. autofunction:: rsmtool.find_feature_transformation
 
-From :py:mod:`~rsmtool:input.py` Module
+From :py:mod:`~rsmtool.input` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.parse_json_with_comments
 
-From :py:mod:`~rsmtool:model.py` Module
+From :py:mod:`~rsmtool.model` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.model_fit_to_dataframe
 .. autofunction:: rsmtool.ols_coefficients_to_dataframe
 .. autofunction:: rsmtool.skll_learner_params_to_dataframe
-..autofunction:: rsmtool.train_builtin_model
+.. autofunction:: rsmtool.train_builtin_model
 
 
-From :py:mod:`~rsmtool:predict.py` Module
+From :py:mod:`~rsmtool.predict` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.predict_with_model
 
