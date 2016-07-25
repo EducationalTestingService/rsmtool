@@ -163,7 +163,7 @@ Model information
 
 .. _rsmtool_feature_csv:
 
-- ``feature.csv``: pre-processing parameters for all features used in the model.
+- ``feature.csv``: ref:`pre-processing parameters <preprocessing_parameters>` for all features used in the model.
 
 - ``coefficients.csv``: model coefficients and intercept (for :ref:`built-in models <builtin_models>` only).
 

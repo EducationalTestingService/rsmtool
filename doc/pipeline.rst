@@ -7,11 +7,54 @@ The following figure gives an overview of the RSMTool pipeline:
    :alt: RSMTool processing pipeline
    :align: center
 
-As its primary input, RSMTool takes a CSV feature file with numeric, non-sparse features and a human score as input and lets you try several different regression models (including Ridge, SVR, AdaBoost, and Random Forests) to try and predict the human score from the features.
+
+As its primary input, RSMTool takes a CSV feature file with numeric, non-sparse features and a human score as input, :ref:`preprocesses <preprocessing_steps>` them and lets you try several different regression models (including Ridge, SVR, AdaBoost, and Random Forests) to try and predict the human score from the features.
+The model is then applied to generate scores for the new data set preprocessed using the same :ref:`preprocessing parameters <preprocessing_parameters>`. 
 
 The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup comparisons, model statistics, as well as several different evaluation measures illustrating model efficacy. Details about these various analyses are provided in a separate `technical paper <https://github.com/EducationalTestingService/rsmtool/raw/master/doc/rsmtool.pdf>`_.
 
-In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as CSV files.
+In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as :ref:`CSV files <intermediate_files_rsmtool>`.
+
+.. _preprocessing_steps:
+
+Preprocessing steps
+"""""""""""""""""""
+
+Data filtering
+~~~~~~~~~~~~~~
+
+1. Remove all responses with non-numeric values for at least one of the features (see :ref:`column selection methods <column_selection_rsmtool>` for different ways to select features).
+
+2. Remove all responses with non-numeric values of :ref:`train_label_column <train_label_column_rsmtool>` or :ref:`test_label_column <test_label_column_rsmtool>`. 
+
+3. Remove all responses with zero values in :ref:`train_label_column <train_label_column_rsmtool>` or :ref:`test_label_column <test_label_column_rsmtool>`. Zero scored responses are removed since in many scoring rubrics zero scores are different from other numeric scores. Set :ref:`exclude_zero_scores <exclude_zero_scores_rsmtool>` to ``false`` if you want to keep responses with scores of 0. 
+
+4. Remove all feature with constant values (standard deviation equals 0). 
 
 
+Data preprocessing
+~~~~~~~~~~~~~~~~~~
 
+1. Truncate outliers defined as mean + or - 4*standard deviation.
+
+2. Apply ``transformations`` defined in :ref:`feature .json file <json_column_selection>` or identified automatically when using :ref:`subset-based column selection <subset_transformation>`.
+
+3.  Flip feature ``sign`` as defined in :ref:`feature .json file <json_column_selection>` or (if applicable) in :ref:`feature subset file <subset_sign>`.
+
+4. Standardize all transformed feature values into *z*-scores.  
+
+.. _preprocessing_parameters:
+
+Preprocessing parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The same preprocessing steps are applied to both training and evaluation set. 
+The following parameters are learnt on the training set and used when pre-processing the evaluation set:
+
+- Mean and standard deviation of raw feature values. These are used to compute ''ceiling'' and ''floor'' values and truncate outliers on the evaluation set;
+
+- ``Transformation`` and ``sign`` used to pre-process the data on the training set;
+
+- Mean and standard deviation of transformed feature values. These are used to convert feature values in the evaluation set to *z*-scores using mean and standard deviation computed on the training set.
+
+All preprocessing parameters are saved in :ref:`*_feature.csv file <rsmtool_feature_csv>`.
