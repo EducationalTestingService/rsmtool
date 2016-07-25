@@ -1,7 +1,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. An example configuration file can be found `here <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmeval/config_rsmeval.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmeval/config_rsmeval.json>`_.
 
 There are four required fields and the rest are all optional.
 
@@ -19,7 +19,7 @@ The name for the column containing the scores predicted by the system. These sco
 
 trim_min
 ~~~~~~~~
-The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - 0.49998. 
+The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - 0.49998.
 
 trim_max
 ~~~~~~~~

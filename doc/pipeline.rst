@@ -8,47 +8,48 @@ The following figure gives an overview of the RSMTool pipeline:
    :align: center
 
 
-As its primary input, RSMTool takes a CSV feature file with numeric, non-sparse features and a human score as input, :ref:`preprocesses <preprocessing_steps>` them and lets you try several different regression models (including Ridge, SVR, AdaBoost, and Random Forests) to try and predict the human score from the features.
-The model is then applied to generate scores for the new data set preprocessed using the same :ref:`preprocessing parameters <preprocessing_parameters>`. In addition to ``raw`` predicted scores, the ``prediction analysis`` component of the RSMTool generates several types of :ref:`post-processed scores <score_postprocessing>` commonly used in automated scoring. 
+As its primary input, RSMTool takes a CSV feature file with numeric, non-sparse features and a human score as input, :ref:`pre-processes <feature_preprocessing>` them and lets you train a regression-based **Scoring Model** to predict the human score from the features. Available regression models include Ridge, SVR, AdaBoost, and Random Forests, among many others.
 
-The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including feature descriptives, subgroup comparisons, model statistics, as well as several different evaluation measures illustrating model efficacy. Details about these various analyses are provided in a separate `technical paper <https://github.com/EducationalTestingService/rsmtool/raw/master/doc/rsmtool.pdf>`_.
+This trained model can then be used to generate scores for a held-out evaluation data whose feature values are pre-processed using the same :ref:`Pre-processing Parameters <preprocessing_parameters>`. In addition to the ``raw`` scores predicted by the model, the **Prediction Analysis** component of the pipline generates several additional :ref:`post-processed scores <score_postprocessing>` that are commonly used in automated scoring.
+
+The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different evaluation measures illustrating model efficacy. Details of these various analyses are provided in a separate `technical paper <https://github.com/EducationalTestingService/rsmtool/raw/master/doc/rsmtool.pdf>`_.
 
 In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as :ref:`CSV files <intermediate_files_rsmtool>`.
 
-.. _preprocessing_steps:
+.. _feature_preprocessing:
 
-Preprocessing steps
-"""""""""""""""""""
+Feature pre-processing
+""""""""""""""""""""""
 
 Data filtering
 ~~~~~~~~~~~~~~
 
-1. Remove all responses with non-numeric values for at least one of the features (see :ref:`column selection methods <column_selection_rsmtool>` for different ways to select features).
+1. Remove all training and evaluation responses that have non-numeric for any of the features (see :ref:`column selection methods <column_selection_rsmtool>` for different ways to select features).
 
-2. Remove all responses with non-numeric values of :ref:`train_label_column <train_label_column_rsmtool>` or :ref:`test_label_column <test_label_column_rsmtool>`. 
+2. Remove all training and evaluation responses with non-numeric values for human scores.
 
-3. Remove all responses with zero values in :ref:`train_label_column <train_label_column_rsmtool>` or :ref:`test_label_column <test_label_column_rsmtool>`. Zero scored responses are removed since in many scoring rubrics zero scores are different from other numeric scores. Set :ref:`exclude_zero_scores <exclude_zero_scores_rsmtool>` to ``false`` if you want to keep responses with scores of 0. 
+3. Optionally emove all training and evaluation responses with zero values for human scores. Zero scored responses are usually removed since in many scoring rubrics, zero scores usually indicate off-topic or garbled responses.
 
-4. Remove all feature with constant values (standard deviation equals 0). 
+4. Remove all features with values that do not change across responses (i.e., those with a standard deviation close to 0).
 
 
 Data preprocessing
 ~~~~~~~~~~~~~~~~~~
 
-1. Truncate outliers defined as mean + or - 4*standard deviation.
+1. Truncate/clamp any outlier feature values, where outliers are defined as :math:`\mu \pm 4*\sigma`, where :math:`\mu` is the mean and :math:`\sigma` is the standard deviation.
 
-2. Apply ``transformations`` defined in :ref:`feature .json file <json_column_selection>` or identified automatically when using :ref:`subset-based column selection <subset_transformation>`.
+2. Apply pre-specified transformations to feature values.
 
-3.  Flip feature ``sign`` as defined in :ref:`feature .json file <json_column_selection>` or (if applicable) in :ref:`feature subset file <subset_sign>`.
+3. Flip the signs for feature values if necessary.
 
-4. Standardize all transformed feature values into *z*-scores.  
+4. Standardize all transformed feature values into *z*-scores.
 
 .. _preprocessing_parameters:
 
-Preprocessing parameters
+Pre-processing parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The same preprocessing steps are applied to both training and evaluation set. 
+The same preprocessing steps are applied to both training and evaluation set.
 The following parameters are learnt on the training set and used when pre-processing the evaluation set:
 
 - Mean and standard deviation of raw feature values. These are used to compute ''ceiling'' and ''floor'' values and truncate outliers on the evaluation set;
@@ -69,7 +70,7 @@ RSMTool computes six different versions of scores commonly used in different app
 
 - ``raw`` - raw predictions generated by the model.
 
-- ``raw_trim`` - ``raw`` predictions "trimmed" to be in the score range acceptable for the item. The scores are trimmed to be within the following range: :ref:`trim_min <trim_min_rsmtool>` - 0.49998 and :ref:`trim_max <trim_max_rsmtool>` + 0.49998. This approach is the compromise between preserving additional information added by real-value scores in comparison to integer human scores and making sure that when rounded the final scores fall within the expected scale.  
+- ``raw_trim`` - ``raw`` predictions "trimmed" to be in the score range acceptable for the item. The scores are trimmed to be within the following range: :ref:`trim_min <trim_min_rsmtool>` - 0.49998 and :ref:`trim_max <trim_max_rsmtool>` + 0.49998. This approach is the compromise between preserving additional information added by real-value scores in comparison to integer human scores and making sure that when rounded the final scores fall within the expected scale.
 
 - ``raw_trim_round`` - ``raw_trim`` predictions rounded to the nearest integer. The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <http://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
 
@@ -77,7 +78,7 @@ RSMTool computes six different versions of scores commonly used in different app
 
 - ``scale_trim`` - ``scale`` scores trimmed in the same way as ``raw_trim`` scores.
 
-- ``scale_trim_round`` scores - ``scale_trim`` scores rounded to the nearest integer. 
+- ``scale_trim_round`` scores - ``scale_trim`` scores rounded to the nearest integer.
 
 All postprocessing parameters are saved in :ref:`*_postprocessing_params.csv file <rsmtool_postprocessing_params_csv>`.
 

@@ -121,6 +121,7 @@ Transformations
 Unlike in :ref:`fine-grained selection <json_column_selection>`, the subset ``.csv`` file does not list any transformations to be applied to the feature columns. However, you can automatically select transformation for each feature *in the selected subset* by applying all possible transforms and identifying the one which gives the highest correlation with the human score. To use this functionality set the :ref:`select_transformations <select_transformations_rsmtool>` field in the configuration file to ``true``.
 
 .. _subset_sign:
+
 Signs
 """""
 Some guidelines for building scoring models require all coefficients in the model to be positive and all features to have a positive correlation with human score. ``rsmtool`` can automatically flip the sign for any pre-defined feature subset. To use this functionality, the feature subset ``.csv`` file should provide the expected correlation sign between each feature and human score under a column called ``sign_<SUBSET>`` where ``<SUBSET>`` is the name of the feature subset. Then, to tell ``rsmtool`` to flip the the sign for this subset, you need to set the :ref:`sign <sign>` field in the configuration file to ``<SUBSET>``.
