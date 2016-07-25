@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 
 from nose.tools import (assert_almost_equal, assert_equal)
@@ -29,13 +31,14 @@ def test_correlation_helper():
     assert_equal(retval[1].isnull().values.sum(), 0)
 
 
-
 def test_that_correlation_helper_works_for_data_with_one_row():
     # this should return two data frames with nans
-    retval = correlation_helper(df_features[:1], 'sc1', 'group')
-    assert_equal(retval[0].isnull().values.sum(), 3)
-    assert_equal(retval[1].isnull().values.sum(), 3)
-
+    # we expect a runtime warning here so let's suppress it
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        retval = correlation_helper(df_features[:1], 'sc1', 'group')
+        assert_equal(retval[0].isnull().values.sum(), 3)
+        assert_equal(retval[1].isnull().values.sum(), 3)
 
 
 def test_that_correlation_helper_works_for_data_with_two_rows():
