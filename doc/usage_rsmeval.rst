@@ -5,9 +5,9 @@
 
 RSMTool provides the ``rsmeval`` command-line utility to evaluate existing predictions and generate a report with all the built-in analyses. This can be useful in scenarios where the user wants to use more sophisticated machine learning algorithms not available in RSMTool to build the scoring model but still wants to be able to evaluate that model's predictions using the standard analyses.
 
-For example, say a researcher *has* an existing automated scoring engine for grading short responses that extracts the features and computes the predicted score. This engine uses a large number of binary, sparse features. He cannot use ``rsmtool`` to train his model since it requires numeric features. So, he uses ``scikit-learn`` to train his model.
+For example, say a researcher *has* an existing automated scoring engine for grading short responses that extracts the features and computes the predicted score. This engine uses a large number of binary, sparse features. She cannot use ``rsmtool`` to train her model since it requires numeric features. So, she uses `scikit-learn <http://scikit-learn.org/>`_ to train her model.
 
-Once the model is trained, the researcher wants to evaluate his engine's performance using the analyses recommended by the educational measurement community as well as conduct additional investigations for specific subgroups of test-takers. However, these kinds of analyses are not available in ``scikit-learn``. He can use ``rsmeval`` to set up a customized report using a combination of existing and custom sections and quickly produce the evaluation that is useful to him.
+Once the model is trained, the researcher wants to evaluate her engine's performance using the analyses recommended by the educational measurement community as well as conduct additional investigations for specific subgroups of test-takers. However, these kinds of analyses are not available in ``scikit-learn``. She can use ``rsmeval`` to set up a customized report using a combination of existing and custom sections and quickly produce the evaluation that is useful to her.
 
 Input
 """""

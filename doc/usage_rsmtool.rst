@@ -1,3 +1,5 @@
+.. _usage_rsmtool:
+
 Using RSMTool
 =============
 
