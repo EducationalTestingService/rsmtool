@@ -39,13 +39,13 @@ use_scaled_predictions_new *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Set to ``true`` if the experiment with the new model used scaled machine scores for confusion matrices, score distributions, subgroup analyses, etc. Defaults to ``false``.
 
-.. note::
+.. warning::
 
-    For ``rsmtool`` and ``rsmeval``, main evaluations are computed for both scaled and raw scores, but in-depth evaluations such as confusion matrix are only computed for one type of scores as defined in the field ``use_scaled_predictions`` .  ``rsmcompare`` uses the existing outputs and does not perform any additional evaluations. Therefore if this field was set to ``true`` in the original experiment and to ``false`` for ``rsmcompare``, the report will be inconsistent: main evaluations will be displayed for raw scores, while in-depth evaluations will be displayed for scaled scores. 
+    For ``rsmtool`` and ``rsmeval``, primary evaluation analyses are computed on both raw and scaled scores, but some analyses (e.g., the confusion matrix) are only computed for either raw or re-scaled scores based on the value of ``use_scaled_predictions``. ``rsmcompare`` uses the existing outputs and does not perform any additional evaluations. Therefore if this field was set to ``true`` in the original experiment but is set to ``false`` for ``rsmcompare``, the report will be internally inconsistent: some evaluations use raw scores whereas others will use scaled scores.
 
 subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
-A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``. 
+A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``.
 
 .. note::
 
@@ -62,7 +62,7 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
         - a table showing mean, standard deviation, skewness and kurtosis;
         - a table showing the number of truncated outliers for each feature; and
         - a table with percentiles and outliers;
-        
+
 
     - ``features_by_group``: Shows boxplots for both experiments with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
@@ -75,9 +75,9 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``preprocessed_features_by_group``: Compares analyses of preprocessed features by subgroups: marginal and partial correlations between each feature and human score for each subgroup.
 
-    - ``consistency``: tables showing main evaluation metrics for human-human agreement and the difference ('degradataion') between the human-human and human-system agreement. 
+    - ``consistency``: Compares metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
 
-    - ``score_distributions``: 
+    - ``score_distributions``:
 
         - tables showing the distributions for both human and machine scores; and
 

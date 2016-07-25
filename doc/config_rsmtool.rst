@@ -151,7 +151,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
-     - ``consistency``: shows main evaluation metrics for human-human agreement and the difference ('degradataion') between the human-human and human-system agreement. 
+     - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 

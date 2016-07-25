@@ -93,7 +93,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: shows main evaluation metrics for human-human agreement and the difference ('degradataion') between the human-human and human-system agreement. 
+    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
 
     - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
 
