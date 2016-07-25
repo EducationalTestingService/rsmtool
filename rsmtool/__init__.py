@@ -14,7 +14,10 @@ except ImportError:
 else:
     HAS_RSMEXTRA = True
 
-from .analysis import compute_basic_descriptives
+from .analysis import (compute_basic_descriptives,
+                       compute_percentiles,
+                       compute_outliers,
+                       compute_pca)
 from .rsmtool import run_experiment
 
 __all__ = ['run_experiment', 'compute_basic_descriptives']

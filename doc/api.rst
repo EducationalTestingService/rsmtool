@@ -10,4 +10,7 @@ The primary method of using RSMTool is via the command-line scripts ``rsmtool``,
 From :py:mod:`~rsmtool.analysis` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.compute_basic_descriptives
+.. autofunction:: rsmtool.compute_percentiles
+.. autofunction:: rsmtool.compute_outliers
+.. autofunction:: rsmtool.compute_pca
 

@@ -18,14 +18,14 @@ def compute_basic_descriptives(df, selected_features):
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute
         the descriptives.
 
     Returns
     -------
-    df : pandas DataFrame
+    df_desc : pandas DataFrame
         Data frame containing the descriptives for
         each of the features.
     """
@@ -63,12 +63,12 @@ def compute_basic_descriptives(df, selected_features):
 def compute_percentiles(df, selected_features):
     """
     Compute percentiles and outlier descriptives for the
-    given data frame using the columns with the given names
+    given data frame using the columns with the given names.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute the
         percentile descriptives.
@@ -76,8 +76,8 @@ def compute_percentiles(df, selected_features):
     Returns
     -------
     df_output : pandas DataFrame
-        Data frame containing the percentile information.
-        for each of the features
+        Data frame containing the percentile information
+        for each of the features.
     """
 
     # select only feature columns
@@ -130,7 +130,7 @@ def compute_outliers(df, selected_features):
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute
         outlier information.
@@ -273,16 +273,16 @@ def compute_correlations_by_group(df,
 
 def compute_pca(df, selected_features):
     """
-    Compute the PCA decomposition of the given data
-    frame and restrict to the given columns.
+    Compute the PCA decomposition of features in the given data
+    frame, restricted to the given columns.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing feature values.
     selected_features : list of str
         List of feature names to be used in the
-        PCA decomposition
+        PCA decomposition.
 
     Returns
     -------
@@ -291,6 +291,7 @@ def compute_pca(df, selected_features):
     df_variance : pandas DataFrame
         Data frame containing the variance information.
     """
+
     # remove the spkitemid and sc1 column
 
     df_pca = df[selected_features]
@@ -433,7 +434,7 @@ def filter_metrics(df_metrics,
                                                            'sys_sd',
                                                            'corr',
                                                            'SMD',
-                                                           'RMSE', 
+                                                           'RMSE',
                                                            'R2'],
                           '{}_trim_round'.format(score_prefix): ['sys_mean',
                                                                  'sys_sd',
