@@ -10,9 +10,33 @@ RSMTool provides the ``rsmpredict`` command-line utility to generate predictions
 
 Input
 """""
-``rsmpredict`` requires two arguments to generate predictions: the path to a configuration file and the path to the output file where the generated predictions are saved in ``.csv`` format.
+``rsmpredict`` requires two arguments to generate predictions: the path to :ref:`a configuration file <config_file_rsmpredict>` and the path to the output file where the generated predictions are saved in ``.csv`` format.
 
 If you also want to save the pre-processed feature values,``rsmpredict`` can take a third optional argument ``--features`` to specify the path to a ``.csv`` file to save these values.
+
+Here are all the arguments to the ``rsmpredict`` command-line script.
+
+.. program:: rsmpredict
+
+.. option:: config_file
+
+    The :ref:`JSON configuration file <config_file_rsmpredict>` for this experiment.
+
+.. option:: output_file
+
+    The output ``.csv`` file where predictions will be saved.
+
+.. option:: --features <preproc_feats_file>
+
+    If specified, the pre-processed values for the input features will also be saved in this ``.csv`` file.
+
+.. option:: -h, --help
+
+    Show help message and exist.
+
+.. option:: -V, --version
+
+    Show version number and exit.
 
 .. include:: config_rsmpredict.rst
 

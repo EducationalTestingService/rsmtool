@@ -1,3 +1,5 @@
+.. _config_file_rsmpredict:
+
 Experiment configuration file
 """""""""""""""""""""""""""""
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmpredict`` experiment. An example configuration file can be found here.
