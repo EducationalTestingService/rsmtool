@@ -46,19 +46,19 @@ skll_models = ['AdaBoostRegressor',
 
 def model_fit_to_dataframe(fit):
     """
-    Take an object containing OLS model fit and extact the main
-    model fit metrics into a data frame.
+    Take an object containing a statsmodels OLS model fit and extact
+    the main model fit metrics into a data frame.
 
     Parameters
     ----------
-    fit : a model fit object
-        model fit object obtained from
-        a linear model trained using `statsmodels.OLS`.
+    fit : a statsmodels fit object
+        Model fit object obtained from a linear model trained using
+        `statsmodels.OLS`.
 
     Returns
     -------
     df_fit : pandas DataFrame
-        a data frame with main model fit metrics.
+        Data frame with the main model fit metrics.
     """
 
     df_fit = pd.DataFrame({"N responses": [int(fit.nobs)]})
@@ -76,18 +76,20 @@ def ols_coefficients_to_dataframe(coefs):
     Parameters
     ----------
     coefs : pandas Series
-        a series with feature names in the index and
-    the coefficient values as the data, obtained from
-    a linear model trained using `statsmodels.OLS`.
+        Series with feature names in the index and the coefficient
+        values as the data, obtained from a linear model trained
+        using `statsmodels.OLS`.
 
     Returns
     -------
     df_coef : pandas DataFrame
-        a data frame with two columns, the first being
-    the feature name and the second being coefficient
-    value. The first row in the output data frame is
-    always for the intercept and the rest are sorted by
-    feature name.
+        Data frame with two columns, the first being the feature name
+        and the second being the coefficient value.
+
+    Note
+    ----
+    The first row in the output data frame is always for the intercept
+    and the rest are sorted by feature name.
     """
     # first create a sorted data frame for all the non-intercept features
     non_intercept_columns = [c for c in coefs.index if c != 'const']
@@ -113,13 +115,6 @@ def skll_learner_params_to_dataframe(learner):
     Take the given SKLL learner object and return a data
     frame containing its parameters.
 
-    Note that we use underlying sklearn model to get
-    at the coefficients and the intercept because the
-    `model_params` attribute of the SKLL model ignores
-    zero coefficients, which we do not want. The first
-    row in the output data frame is always for the
-    intercept and the rest are sorted by feature name.
-
     Parameters
     ----------
     learner : skll Learner object
@@ -129,6 +124,16 @@ def skll_learner_params_to_dataframe(learner):
     df_coef : pandas DataFrame
         a data frame containing the model parameters
         from the given SKLL learner object.
+
+    Note
+    ----
+    1. We use underlying `sklearn` model object to get at the
+    coefficients and the intercept because the `model_params` attribute
+    of the SKLL model ignores zero coefficients, which we do not want.
+
+    2. The first row in the output data frame is always for the intercept
+    and the rest are sorted by feature name.
+
     """
     # get the intercept, coefficients, and feature names
     intercept = learner.model.intercept_
@@ -238,7 +243,7 @@ def create_fake_skll_learner(df_coefficients):
 
 def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
     """
-    Train one of the built-in linear regression models.
+    Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
     Parameters
     ----------
@@ -257,10 +262,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
     Returns
     -------
-    learner : skll Learner object
-        SKLL LinearRegression Learner object containing
-        the coefficients learned by training the built-in
-        model.
+    learner : `Learner` object
+        SKLL `LinearRegression` `Learner <http://skll.readthedocs.io/en/latest/api/skll.html#skll.Learner>`_ object containing the
+        coefficients learned by training the built-in model.
     """
     # get the columns that actually contain the feature values
     feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
