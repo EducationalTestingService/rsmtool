@@ -14,3 +14,7 @@ From :py:mod:`~rsmtool.analysis` Module
 .. autofunction:: rsmtool.compute_outliers
 .. autofunction:: rsmtool.compute_pca
 
+From :py:mod:`~rsmtool.preprocess` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.trim
+.. autofunction:: rsmtool.remove_outliers

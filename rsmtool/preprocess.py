@@ -13,9 +13,8 @@ import pandas as pd
 
 def trim(values, trim_min, trim_max):
     """
-    Trim the values contained in the given vector
-    `values` to `trim_min`-0.49998 as the floor
-    and `trim_max`+0.49998 as the ceiling.
+    Trim the values contained in the given numpy array to `trim_min` - 0.49998 as the floor and `trim_max` + 0.49998
+    as the ceiling.
 
     Parameters
     ----------
@@ -33,6 +32,7 @@ def trim(values, trim_min, trim_max):
     trimmed_values : list of float
         List of trimmed values.
     """
+
     new_max = trim_max + 0.49998
     new_min = trim_min - 0.49998
     trimmed_values = values.copy()
@@ -219,15 +219,22 @@ def filter_on_column(df,
     return (df_filtered, df_excluded)
 
 
-def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
+def remove_outliers(values, mean=None, sd=None, sd_multiplier=4):
     """
-    Clamp any values in `data` (numpy array) that
-    are +/- `sd_multiplier` standard deviations (`sd`)
-    away from the `mean`.
+    Clamp any values in the given numpy array that are
+    +/- `sd_multiplier` (:math:`m`) standard deviations (:math:`\\sigma`) away
+    from the mean (:math:`\\mu`). Use given `mean` and `sd` instead
+    of computing :math:`\\sigma` and :math:`\\mu`, if specified.
+
+    The values are clamped to the interval:
+
+    .. math::
+
+        [\\mu - m * \\sigma, \\mu + m * \\sigma]
 
     Parameters
     ----------
-    data : numpy array
+    values : numpy array
         Numpy array containing values for a feature.
     mean : None, optional
         Use the given mean value when computing outliers
@@ -242,25 +249,25 @@ def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
 
     Returns
     -------
-    new_data : numpy array
+    new_values : numpy array
         Numpy array with the outliers clamped.
     """
 
     # convert data to a numpy float array before doing any clamping
-    new_data = np.array(data, dtype=np.float)
+    new_values = np.array(values, dtype=np.float)
 
     if not mean:
-        mean = new_data.mean()
+        mean = new_values.mean()
     if not sd:
-        sd = new_data.std()
+        sd = new_values.std()
 
     floor = mean - sd_multiplier * sd
     ceiling = mean + sd_multiplier * sd
 
-    new_data[new_data > ceiling] = ceiling
-    new_data[new_data < floor] = floor
+    new_values[new_values > ceiling] = ceiling
+    new_values[new_values < floor] = floor
 
-    return new_data
+    return new_values
 
 
 def apply_inverse_transform(name, data, sd_multiplier=4):

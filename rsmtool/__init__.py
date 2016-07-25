@@ -18,9 +18,16 @@ from .analysis import (compute_basic_descriptives,
                        compute_percentiles,
                        compute_outliers,
                        compute_pca)
+from .preprocess import remove_outliers, trim
 from .rsmtool import run_experiment
 
-__all__ = ['run_experiment', 'compute_basic_descriptives']
+__all__ = ['compute_basic_descriptives',
+           'compute_percentiles',
+           'compute_outliers',
+           'compute_pca',
+           'remove_outliers',
+           'trim',
+           'run_experiment']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package
