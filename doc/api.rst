@@ -25,12 +25,12 @@ From :py:mod:`~rsmtool.preprocess` Module
 .. autofunction:: rsmtool.preprocess_feature
 
 From :py:mod:`~rsmtool.create_features` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.generate_default_specs
 .. autofunction:: rsmtool.find_feature_transformation
 
 From :py:mod:`~rsmtool.input` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.parse_json_with_comments
 
 From :py:mod:`~rsmtool.model` Module

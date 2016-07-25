@@ -225,7 +225,7 @@ def write_feature_json(feature_specs,
         The experiment ID.
     featuredir : str
         Path to the `feature` experiment output directory
-        where the feature JSON fill will be saved.
+        where the feature JSON file will be saved.
     """
     feature_specs_selected = {}
     feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
