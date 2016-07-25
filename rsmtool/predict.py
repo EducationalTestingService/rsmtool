@@ -26,7 +26,8 @@ def predict_with_model(model, df):
         The SKLL model with which to make the predictions.
     df : pandas DataFrame
         Data frame containing features on which to make
-        the predictions.
+        the predictions. The data must contain pre-processed feature values,
+        an ID column named `spkitemid` and the label column named `sc1`.
 
     Returns
     -------

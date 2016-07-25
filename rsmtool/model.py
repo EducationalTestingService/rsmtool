@@ -46,8 +46,8 @@ skll_models = ['AdaBoostRegressor',
 
 def model_fit_to_dataframe(fit):
     """
-    Take an object containing OLS model fit and convert it
-    to a data frame.
+    Take an object containing OLS model fit and extact the main
+    model fit metrics into a data frame.
 
     Parameters
     ----------
@@ -246,7 +246,8 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         Name of the built-in model to train.
     df_train : pandas DataFrame
         Data frame containing the features on which
-        to train the model.
+        to train the model. The data frame must contain the ID column named
+        `spkitemid` and the numeric label column named `sc1`.
     experiment_id : str
         The experiment ID.
     csvdir : str
