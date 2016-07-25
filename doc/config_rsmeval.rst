@@ -19,11 +19,11 @@ The name for the column containing the scores predicted by the system. These sco
 
 trim_min
 ~~~~~~~~
-The single numeric value for the lowest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores.
+The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - 0.49998. 
 
 trim_max
 ~~~~~~~~
-The single numeric value for the highest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores.
+The single numeric value for the highest possible integer score that the machine should predict. This value will be used to compute the ceiling value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + 0.49998.
 
 .. note::
 
@@ -67,7 +67,7 @@ By default, responses with human scores of 0 will be excluded from evaluations. 
 
 scale_with *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-In many scoring applications, system scores are re-scaled so that their mean and standard deviation match those of the human scores for the training data.
+In many scoring applications, system scores are :ref:`re-scaled <score_postprocessing>` so that their mean and standard deviation match those of the human scores for the training data.
 
 If you want ``rsmeval`` to re-scale the supplied predictions, you need to provide -- as the value for this field -- the path to a second ``.csv`` file containing the human scores and predictions of the same system on its training data. This file *must* have two columns: the human scores under the ``sc1`` column and the predicted score under the ``prediction``.
 

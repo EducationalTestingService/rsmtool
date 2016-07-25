@@ -181,6 +181,8 @@ Model information
 
 - ``ols_summary.txt``: a text file containing a summary of the above model (for built-in models excluding ``LassoFixedLabmda`` and ``PositiveLassoCV``)
 
+.. _rsmtool_prostprocessing_params_csv:
+
 - ``postprocessing_params.csv``: the parameters for trimming and scaling predicted scores. Useful for generating predictions on new data.
 
 .. _rsmtool_predictions:
