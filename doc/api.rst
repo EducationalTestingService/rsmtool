@@ -44,3 +44,7 @@ From :py:mod:`~rsmtool:model.py` Module
 From :py:mod:`~rsmtool:predict.py` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.predict_with_model
+
+From :py:mod:`~rsmtool:report.py` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.merge_notebooks
