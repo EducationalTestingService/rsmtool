@@ -363,6 +363,41 @@ def metrics_helper(human_scores, system_scores):
     """
     This is a helper function that computes some basic
     metrics for the system_scores against the human_scores.
+
+    Parameters
+    ----------
+    human_scores : pandas Series
+        Series containing numeric human (reference) scores.
+
+    system_scores: pandas Series
+        Series containing numeric system scores matching human_scores
+
+    Returns
+    -------
+    metrics: pandas Series
+        Series containing different evaluation metrics comparing human
+        and system scores.
+        The following metrics is included:
+
+        - `kappa` - unweighted Cohen's kappa
+        - `wtkappa` - quadratic weighted kappa
+        - `exact_agr` - exact agreement
+        - `adj_agr` - adjacent agreement with tolerance set to 1
+        - `SMD` - standardized mean difference (absolute difference
+            in mean human and machine scores divided by the square root
+            of the summed squared standard deviations divided by two)
+        - `corr` - Pearson's r
+        - `R2` - r squared
+        - `RMSE` - root mean square error
+        - `sys_min` - min system score
+        - `sys_max` - max system score
+        - `sys_mean` - mean system score (ddof=1)
+        - `sys_sd` - standard deviation of system scores (ddof=1)
+        - `h_min` - min human score
+        - `h_max` - max human score
+        - `h_mean` - mean human score (ddof=1)
+        - `h_sd` - standard deviation of human scores (ddof=1)
+        - `N` - total number of responses
     """
 
     # compute the kappas
@@ -408,7 +443,8 @@ def metrics_helper(human_scores, system_scores):
     rmse = np.sqrt(mse)
 
     # return everything as a series
-    return pd.Series({'kappa': unweighted_kappa,
+
+    metrcs = pd.Series({'kappa': unweighted_kappa,
                       'wtkappa': quadratic_weighted_kappa,
                       'exact_agr': human_system_agreement,
                       'adj_agr': human_system_adjacent_agreement,
@@ -425,6 +461,8 @@ def metrics_helper(human_scores, system_scores):
                       'h_mean': mean_human_score,
                       'h_sd': human_score_sd,
                       'N': len(system_scores)})
+
+    return metrics
 
 
 def filter_metrics(df_metrics,

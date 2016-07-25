@@ -13,6 +13,8 @@ From :py:mod:`~rsmtool.analysis` Module
 .. autofunction:: rsmtool.compute_percentiles
 .. autofunction:: rsmtool.compute_outliers
 .. autofunction:: rsmtool.compute_pca
+.. autofunction:: rsmtool.correlation_helper
+.. autofunction:: rsmtool.metrics_helper
 
 From :py:mod:`~rsmtool.preprocess` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
