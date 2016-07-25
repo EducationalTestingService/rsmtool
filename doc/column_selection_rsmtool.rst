@@ -17,18 +17,14 @@ While fine-grained column selection is better for a single experiment, subset-ba
 
 .. warning::
 
-    For both column selection methods, ``rsmtool`` will filter the training and evaluation data to remove any responses with non-numeric values in any of the selected columns before training the model. If your data includes a column containing string values and you do *not* specify this column as the ``id_column`` or the ``candidate_column``  or a ``subgroup`` column, ``rsmtool`` might filter out *all* the responses in the data.
-
-.. note::
-
-        For all column selection methods, the final set of features will be saved in the ``feature`` folder in the experiment output directory.
+    ``rsmtool`` will filter the training and evaluation data to remove any responses with non-numeric values in any of the feature columns before training the model. If your data includes a column containing string values and you do *not* use any of these methods of feature selection *nor* specify this column as the ``id_column`` or the ``candidate_column``  or a ``subgroup`` column, ``rsmtool`` will filter out *all* the responses in the data.
 
 
 .. _json_column_selection:
 
 Fine-grained column selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To manually select columns to be used as features, you can provide a ``.json`` file specifying the names of the columns that should be included in the final scoring model. For additional flexibility, the same file also allows you to describe transformations to be applied to the the values in these feature columns before being used in the model.
+To manually select columns to be used as features, you can provide a ``.json`` file specifying the names of the columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the the values in these feature columns before being used in the model.
 
 Here's an example of what such a file might look like.
 
@@ -130,7 +126,7 @@ To understand this, let's re-examine our earlier example of a subset definition 
     feature2,1,1,-
     feature3,1,0,+
 
-Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an experiment with the sign of ``feature3`` flipped appropriately (multiplied by -1) to ensure positive correlations with score and positive model coefficients, we need to set the following three fields in our experiment configuration file:
+Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an experiment with the sign of ``feature3`` flipped appropriately (multiplied by -1) to ensure positive correlations with score, we need to set the following three fields in our experiment configuration file:
 
 .. code-block:: javascript
 
