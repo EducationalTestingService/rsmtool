@@ -102,7 +102,9 @@ def partial_correlations(df):
     Returns
     -------
     df_pcor : pandas DataFrame
-        Data frame containing the partial correlations.
+        Data frame containing the partial correlations of of each
+        pair of variables in the given data frame `df`,
+        excluding all other variables.
     """
     numrows, numcols = df.shape
     df_cov = df.cov()

@@ -2,7 +2,7 @@
 
 API Documentation
 -----------------
-The primary method of using RSMTool is via the command-line scripts ``rsmtool``, ``rsmeval``, ``rsmpredict``, and ``rsmcompare``. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users.
+The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, and :ref:`rsmcompare <usage_rsmcompare>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
 
 :mod:`rsmtool` Package
 ======================
@@ -45,6 +45,17 @@ From :py:mod:`~rsmtool:predict.py` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.predict_with_model
 
-From :py:mod:`~rsmtool:report.py` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+From :py:mod:`~rsmtool.report` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.convert_ipynb_to_html
 .. autofunction:: rsmtool.merge_notebooks
+
+
+From :py:mod:`~rsmtool.utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.partial_correlations
+.. autofunction:: rsmtool.agreement
+.. autofunction:: rsmtool.write_experiment_output
+.. autofunction:: rsmtool.write_feature_json
+
