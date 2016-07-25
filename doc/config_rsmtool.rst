@@ -31,11 +31,27 @@ A brief description of the experiment. This will be included in the report. The 
 
 features *(Optional)*
 """""""""""""""""""""
-By default, ``rsmtool`` will use all of the features present in the training and evaluation CSV files. If you want to use a specific set of features, you need to provide a second ``.json`` file specifying the list of features. The value for this field is the path to this ``.json`` file. It can be absolute or relative to the location of config file.
 
-.. note::
 
-    See :ref:`selecting features <feature_selection>` for more details.
+.. _feature_subset_file:
+
+feature_subset_file *(Optional)*
+""""""""""""""""""""""""""""""""
+
+
+.. _feature_subset:
+
+feature_subset *(Optional)*
+"""""""""""""""""""""""""""
+
+
+.. _sign:
+
+sign *(Optional)*
+"""""""""""""""""
+By default, ``rsmtool`` will use all of the columns present in the training and evaluation CSV files as features except for any columns explicitly identified in the configuration file (see below). These fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+
+.. _id_column_rsmtool:
 
 id_column *(Optional)*
 """"""""""""""""""""""
@@ -91,6 +107,8 @@ trim_max *(Optional)*
 """""""""""""""""""""
 The single numeric value for the highest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
 
+.. _select_transformations_rsmtool:
+
 select_transformations *(Optional)*
 """""""""""""""""""""""""""""""""""
 If this option is set to ``true`` the system will try apply feature transformations to each of the features and then choose the transformation for each feature that yields the highest correlation with human score. The possible transformations are:
@@ -106,7 +124,7 @@ Note that ``inv`` is never used for features with positive values. Defaults to `
 
 .. seealso::
 
-    It is also possible to manually apply transformations to any feature as part of the :ref:`manual feature selection <manual_feature_selection>` process.
+    It is also possible to manually apply transformations to any feature as part of the :ref:`feature column selection <json_column_selection>` process.
 
 use_scaled_predictions *(Optional)*
 """""""""""""""""""""""""""""""""""
@@ -197,20 +215,3 @@ min_items_per_candidate *(Optional)*
 """"""""""""""""""""""""""""""""""""
 An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
 
-.. _feature_subset_file:
-
-feature_subset_file *(Optional)*
-""""""""""""""""""""""""""""""""
-
-
-.. _feature_subset:
-
-feature_subset *(Optional)*
-"""""""""""""""""""""""""""
-
-
-.. _sign:
-
-sign *(Optional)*
-"""""""""""""""""
-To see how to use these advanced options, please see :ref:`subset-based feature selection <subset_feature_selection>`.

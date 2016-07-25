@@ -32,4 +32,6 @@ Models with automatic feature selection
 
 .. note::
 
-    ``NNLR``, ``LassoFixedLambdaThenNNLR``, ``LassoFixedLambda`` and ``PositiveLassoCV`` all have no negative coefficients.
+    1. ``NNLR``, ``LassoFixedLambdaThenNNLR``, ``LassoFixedLambda`` and ``PositiveLassoCV`` all have no negative coefficients.
+
+    2. For all feature selection models, the final set of features will be saved in the ``feature`` folder in the experiment output directory.
