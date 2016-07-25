@@ -177,6 +177,44 @@ def correlation_helper(df, target_variable, grouping_variable, include_length=Fa
     data frame against the `target_variable`. If `include_length`
     is True, compute additional partial correlations of each column
     in the data frame against sc1 only partialling out length.
+
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Input data frame containing numeric feature values, the numeric
+         `target variable` and the `grouping variable`. 
+
+    target_variable: str
+        The name of the column used as a reference for computing correlations. 
+
+    grouping_variable: str
+        The name of the column defining groups in the data
+
+    include_length: bool
+        If True compute additional partial correlations of each column
+        in the data frame against `target variable` only partialling out `length`
+        column.
+
+
+    Returns
+    -------
+    df_target_cors : pandas DataFrame
+        Data frame containing Pearson's correlation coefficients for marginal
+        correlations between features and `target_variable`.
+
+    df_target_partcors : pandas DataFrame
+        Data frame containing Pearson's correlation coefficients for partial
+        correlations between each feature and `target_variable` after controlling
+        for all other features. If include_length is set to True, `length`
+        will not be included into partial correlation comutation.
+
+    df_target_partcors_no_length: pandas DataFrame
+        If `include_length` is set to `true`: Data frame containing Pearson's correlation coefficients for partial
+        correlations between each feature and `target_variable` after controlling for
+        `length`.
+        Else: empty data frame. 
+    
     """
 
     # group by the group columns
