@@ -170,19 +170,23 @@ def compute_outliers(df, selected_features):
     return df_output
 
 
-def correlation_helper(df, target_variable, grouping_variable, include_length=False):
+def correlation_helper(df,
+                       target_variable,
+                       grouping_variable,
+                       include_length=False):
     """
-    A helper function to compute marginal and partial correlations by
-    the `grouping_variable` of all the columns in the given
-    data frame against the `target_variable`. If `include_length`
-    is True, compute additional partial correlations of each column
-    in the data frame against sc1 only partialling out length.
+    A helper function to compute marginal and partial correlations of
+    all the columns in the given data frame against the target variable
+    separately for each level in the the grouping variable.
+    If `include_length` is True, it additionally computes partial
+    correlations of each column in the data frame against the target
+    variable after controlling for the `length` column.
 
     Parameters
     ----------
     df : pandas DataFrame
         Input data frame containing numeric feature values, the numeric
-         `target variable` and the `grouping variable`.
+        `target variable` and the `grouping variable`.
 
     target_variable: str
         The name of the column used as a reference for computing correlations.
@@ -257,10 +261,9 @@ def compute_correlations_by_group(df,
                                   grouping_variable,
                                   include_length=False):
     """
-    Compute various marginal and partial correlations of
-    the given columns in the given data frame against the
-    `target_variable` for all data and for each level of the
-    `grouping_variable`.
+    Compute various marginal and partial correlations of the given
+    columns in the given data frame against the target variable for all
+    data and for each level of the grouping variable.
 
     Parameters
     ----------
@@ -361,8 +364,9 @@ def compute_pca(df, selected_features):
 
 def metrics_helper(human_scores, system_scores):
     """
-    This is a helper function that computes some basic
-    metrics for the system_scores against the human_scores.
+    This is a helper function that computes some basic agreement
+    and association metrics between the system scores and the
+    human scores.
 
     Parameters
     ----------
@@ -370,34 +374,33 @@ def metrics_helper(human_scores, system_scores):
         Series containing numeric human (reference) scores.
 
     system_scores: pandas Series
-        Series containing numeric system scores matching human_scores
+        Series containing numeric scores predicted by the model.
 
     Returns
     -------
     metrics: pandas Series
         Series containing different evaluation metrics comparing human
-        and system scores.
-        The following metrics is included:
+        and system scores. The following metrics are included:
 
-        - `kappa` - unweighted Cohen's kappa
-        - `wtkappa` - quadratic weighted kappa
-        - `exact_agr` - exact agreement
-        - `adj_agr` - adjacent agreement with tolerance set to 1
-        - `SMD` - standardized mean difference (absolute difference
-            in mean human and machine scores divided by the square root
-            of the summed squared standard deviations divided by two)
-        - `corr` - Pearson's r
-        - `R2` - r squared
-        - `RMSE` - root mean square error
-        - `sys_min` - min system score
-        - `sys_max` - max system score
-        - `sys_mean` - mean system score (ddof=1)
-        - `sys_sd` - standard deviation of system scores (ddof=1)
-        - `h_min` - min human score
-        - `h_max` - max human score
-        - `h_mean` - mean human score (ddof=1)
-        - `h_sd` - standard deviation of human scores (ddof=1)
-        - `N` - total number of responses
+        - `kappa` :  unweighted Cohen's kappa
+        - `wtkappa` :  quadratic weighted kappa
+        - `exact_agr` : exact agreement
+        - `adj_agr` : adjacent agreement with tolerance set to 1
+        - `SMD` : standardized mean difference (absolute difference
+          between mean human and machine scores divided by the square root
+          of the summed squared standard deviations divided by two)
+        - `corr` : Pearson's r
+        - `R2` : r squared
+        - `RMSE` : root mean square error
+        - `sys_min` : min system score
+        - `sys_max` : max system score
+        - `sys_mean` : mean system score (ddof=1)
+        - `sys_sd` : standard deviation of system scores (ddof=1)
+        - `h_min` : min human score
+        - `h_max` : max human score
+        - `h_mean` : mean human score (ddof=1)
+        - `h_sd` : standard deviation of human scores (ddof=1)
+        - `N` : total number of responses
     """
 
     # compute the kappas

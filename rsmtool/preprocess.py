@@ -131,36 +131,38 @@ def filter_on_column(df,
                      exclude_zeros=False,
                      exclude_zero_sd=False):
     """
-    Flter out the rows in the data frame `df` that contain
-    non-numeric (or zero, if specified) values contained in
-    `column`. If specified, exclude the columns if it has
-    stdev == 0.
+    Flter out the rows in the given data frame that contain non-numeric
+    (or zero, if specified) values in the specified column. Additionally,
+    it may exclude any columns if they have a standard deviation
+    (:math:`\\sigma`) of 0.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Data frame containing the feature values.
+        Input data frame containing the feature values.
     column : str
-        Name of the column from which to filter
-        out values.
+        Name of the column from which to filter out values.
     id_column : str
-        Name of the column containing response IDs.
+        Name of the column containing the unique response IDs.
     exclude_zeros : bool, optional
         Whether to exclude responses containing zeros
-        in the specified column. Defaults to False.
+        in the specified column. Defaults to `False`.
     exclude_zero_sd : bool, optional
-        Whether to perform the additional filtering
-        step of removing columns that have zero
-        std. dev. Defaults to False.
+        Whether to perform the additional filtering step of removing
+        columns that have :math:`\\sigma = 0`. Defaults to `False`.
 
     Returns
     -------
     df_filtered : pandas DataFrame
-        Data frame containing the responses remaining
-        after the filtering.
+        Data frame containing the responses that were *not* filtered out.
     df_excluded : pandas DataFrame
-        Data frame containing the responses removed
-        due to the filtering.
+        Data frame containing the non-numeric or zero responses that
+        were filtered out.
+
+    Note
+    ----
+    The columns with :math:`\\sigma=0` are removed from both output
+    data frames.
     """
 
     logger = logging.getLogger(__name__)
@@ -469,13 +471,9 @@ def apply_add_one_log_transform(name, data):
 
 def transform_feature(name, data, transform):
     """
-    The main driver function that applies `transform`
-    to all of the values in `data` for the feature `name`.
-
-    Note that many of these transformations may be meaningless
-    for features which span both negative and positive values.
-    Some transformations may throw errors for negative feature
-    values.
+    Applies the given transform to all of the values in the given
+    numpy array. The values are assumed to be for the feature with
+    the given name.
 
     Parameters
     ----------
@@ -496,6 +494,13 @@ def transform_feature(name, data, transform):
     ------
     ValueError
         If the given transform is not recognized.
+
+    Note
+    ----
+    Many of these transformations may be meaningless for features which
+    span both negative and positive values. Some transformations may
+    throw errors for negative feature values.
+
     """
     transform_functions = {'inv': apply_inverse_transform,
                            'sqrt': apply_sqrt_transform,
@@ -521,8 +526,9 @@ def preprocess_feature(data,
                        feature_sd,
                        exclude_zero_sd=False):
     """
-    The main pre-processing driver function that
-    removes outliers and transform the values in `data`.
+    Remove outliers and transform the values in the given numpy array
+    using the given outlier and transformation parameters. The values
+    are assumed for the given feature name.
 
     Parameters
     ----------
@@ -551,8 +557,8 @@ def preprocess_feature(data,
     Raises
     ------
     ValueError
-        If `data` has zero std. dev. and
-        `exclude_zero_sd` is set to True.
+        If the given values have zero standard deviation and
+        `exclude_zero_sd` is set to `True`.
     """
 
     # clamp any outlier values that are 4 standard deviations

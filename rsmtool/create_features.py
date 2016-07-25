@@ -94,19 +94,26 @@ def generate_feature_names(df,
 def generate_default_specs(feature_names):
 
     """
-    Generate default feature specifications for feature .json with
-    no transformations or change of sign.
+    Generate default feature specifications for feature `.json` with
+    no transformations and no changes in sign.
 
     Parameters
     ----------
-    feature_names: List
-        A list of feature names
+    feature_names: list
+        List of feature names for which to generate specifications.
 
     Returns
-    --------
-    feature_specs: Dict
-        A dictionary of feature specification that can be saved as a 
-        .json file. 
+    -------
+    feature_specs: dict
+        Dictionary of feature specifications that can be saved as a
+        `.json` file.
+
+    Note
+    ----
+    Since these are default specifications, the values for the
+    `transform` field for each feature will be `"raw"` and the value
+    for the `sign` field will be `1`.
+
     """
 
     feature_specs = {'features': []}
@@ -147,22 +154,22 @@ def find_feature_transformation(feature_name, feature_value, scores):
 
     Parameters
     ----------
-
     feature_name: str
-        Feature name
+        Name of feature for which to find the transformation.
 
     feature_value: pandas Series
-        Numeric feature values
+        Series containing feature values.
 
     scores: pandas Series
-        Numeric human scores
+        Numeric human scores.
 
     Returns
     -------
-    best_transformation
+    best_transformation: str
         The name of the transformation which gives the highest correlation
-        between the feature value and the human scores. See documentation 
-        for the full list of transformations. 
+        between the feature values and the human scores. See
+        :ref:`documentation <select_transformations_rsmtool>` for the
+        full list of transformations.
     """
 
     # Do not use sqrt and ln for potential negative features.
