@@ -36,6 +36,7 @@ Documentation
    usage_rsmtool
    advanced_usage
    custom_notebooks
+   api
    contributing
 
 Indices and tables

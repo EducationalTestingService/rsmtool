@@ -1,0 +1,13 @@
+.. _api:
+
+API Documentation
+-----------------
+The primary method of using RSMTool is via the command-line scripts ``rsmtool``, ``rsmeval``, ``rsmpredict``, and ``rsmcompare``. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users.
+
+:mod:`rsmtool` Package
+======================
+
+From :py:mod:`~rsmtool.analysis` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.compute_basic_descriptives
+
