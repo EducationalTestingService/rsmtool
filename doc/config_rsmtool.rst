@@ -151,11 +151,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
-    - ``pca``: Shows the results of principal components analysis on the processed feature values:
-
-        - the principal components themselves;
-        - the variances; and
-        - a Scree plot.
+     - ``consistency``: shows main evaluation metrics for human-human agreement and the difference ('degradataion') between the human-human and human-system agreement. 
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 
@@ -166,6 +162,12 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
        - a barplot showing the distributions for both human and machine scores.
 
     - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
+
+    - ``pca``: Shows the results of principal components analysis on the processed feature values:
+
+        - the principal components themselves;
+        - the variances; and
+        - a Scree plot.
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
