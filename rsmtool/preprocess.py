@@ -539,7 +539,7 @@ def preprocess_feature(data,
         Std. dev. value to use for outlier detection instead
         of the std. dev. of the given feature values.
     exclude_zero_sd : bool, optional
-        Check whether there are features that have a zero
+        Check `data` has a zero
         std. dev. Defaults to False.
 
     Returns
@@ -551,7 +551,7 @@ def preprocess_feature(data,
     Raises
     ------
     ValueError
-        If there are any features with zero std. dev. and
+        If `data` has zero std. dev. and
         `exclude_zero_sd` is set to True.
     """
 
