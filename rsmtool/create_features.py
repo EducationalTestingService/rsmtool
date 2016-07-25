@@ -94,8 +94,19 @@ def generate_feature_names(df,
 def generate_default_specs(feature_names):
 
     """
-    Generate default feature specifications with
-    no transformation or change of sign.
+    Generate default feature specifications for feature .json with
+    no transformations or change of sign.
+
+    Parameters
+    ----------
+    feature_names: List
+        A list of feature names
+
+    Returns
+    --------
+    feature_specs: Dict
+        A dictionary of feature specification that can be saved as a 
+        .json file. 
     """
 
     feature_specs = {'features': []}
@@ -133,6 +144,25 @@ def find_feature_transformation(feature_name, feature_value, scores):
     """
     Identify the best transformation based on the
     highest absolute Pearson correlation with human score.
+
+    Parameters
+    ----------
+
+    feature_name: str
+        Feature name
+
+    feature_value: pandas Series
+        Numeric feature values
+
+    scores: pandas Series
+        Numeric human scores
+
+    Returns
+    -------
+    best_transformation
+        The name of the transformation which gives the highest correlation
+        between the feature value and the human scores. See documentation 
+        for the full list of transformations. 
     """
 
     # Do not use sqrt and ln for potential negative features.
@@ -151,7 +181,8 @@ def find_feature_transformation(feature_name, feature_value, scores):
             # If the transformation returns an error, append 0.
             correlations.append(0)
     best = np.argmax(correlations)
-    return applicable_transformations[best]
+    best_transformation = applicable_transformations[best]
+    return best_transformation
 
 
 def generate_specs_from_data(feature_names,

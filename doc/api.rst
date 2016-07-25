@@ -20,3 +20,8 @@ From :py:mod:`~rsmtool.preprocess` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.trim
 .. autofunction:: rsmtool.remove_outliers
+
+From :py:mod:`~rsmtool:create_features.py` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.generate_default_specs
+.. autofunction:: rsmtool.find_feature_transformation

@@ -759,8 +759,8 @@ def compute_degradation(df, use_all_responses=True):
                                             include_second_score=True)
 
     # we only care about the degradation in these metrics
-    degradation_metrics = ['corr','kappa','wtkappa',
-                           'exact_agr','adj_agr','SMD']
+    degradation_metrics = ['corr', 'kappa', 'wtkappa',
+                           'exact_agr', 'adj_agr', 'SMD']
     df_human_machine_eval = df_human_machine_eval[degradation_metrics]
     df_human_human_eval = df_human_human_eval[degradation_metrics]
     df_degradation = df_human_machine_eval.apply(lambda row: row - df_human_human_eval.loc[''], axis=1)
