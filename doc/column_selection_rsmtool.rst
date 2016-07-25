@@ -76,7 +76,7 @@ To ensure that this is working as expected, you can check the sign of correlatio
 
 .. note::
 
-        You can use fine-grained method of feature selection in combination with a :ref:`model with automatic feature selection <automatic_feature_selection_models>`. In this case, if not all features are used in the final model, ``rsmtool`` will create a new ``.json`` file the ``feature`` folder in the experiment output directory. This file will only contain the information about the features included into the model. 
+        You can use the fine-grained method of column selection in combination with a :ref:`model with automatic feature selection <automatic_feature_selection_models>`. In this case, if not all features are used in the final model, ``rsmtool`` will create a new ``.json`` file in the ``feature`` folder in the experiment output directory. This file will only contain information about the features included in the final model.
 
 .. _subset_column_selection:
 
@@ -145,8 +145,6 @@ Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an e
 
 .. note::
 
-    If :ref:`select_transformations <select_transformations_rsmtool>` is set to ``true``, ``rsmtool`` is intelligent enough to take it into account when flipping the signs. For example, if the expected correlation sign for a given feature is negative, ``rsmtool`` will multiply the feature values by ``-1`` if the ``sqrt`` transform has the highest correlation with score. However, if the best transformation turns out to be ``inv`` -- which already changes the polarity of the feature -- no such multiplication will take place.
+    1. If :ref:`select_transformations <select_transformations_rsmtool>` is set to ``true``, ``rsmtool`` is intelligent enough to take it into account when flipping the signs. For example, if the expected correlation sign for a given feature is negative, ``rsmtool`` will multiply the feature values by ``-1`` if the ``sqrt`` transform has the highest correlation with score. However, if the best transformation turns out to be ``inv`` -- which already changes the polarity of the feature -- no such multiplication will take place.
 
-.. note::
-
-        If you use subset-based feature selection, ``rsmtool`` will create a new ``.json`` file in the ``feature`` folder in the experiment output directory listing all features, signs and transformation as used in the final model. Note this file will only contain the information about the features included into the final model.
+    2. If you use subset-based feature selection, ``rsmtool`` will create a new ``.json`` file in the ``feature`` folder in the experiment output directory listing all features, signs and transformation as used in the final model. This file will only contain information about the features included in the final model.
