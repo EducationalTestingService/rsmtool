@@ -29,7 +29,7 @@ This folder contains all of the figures generated as part of the various analyse
 
 feature *(Optional)*
 ^^^^^^^^^^^^^^^^^^^^
-This folder is only created if you use :ref:`feature column selection <column_selection_rsmtool>`.
+This folder is only created if you use :ref:`feature column selection <column_selection_rsmtool>` or a :ref:`model with automatic feature selection <automatic_feature_selection_models>`.
 
 .. include:: column_selection_rsmtool.rst
 
