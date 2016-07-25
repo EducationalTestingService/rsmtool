@@ -19,6 +19,7 @@ from .analysis import (compute_basic_descriptives,
                        compute_outliers,
                        compute_pca)
 from .preprocess import remove_outliers, trim
+from .report import convert_ipynb_to_html
 from .rsmtool import run_experiment
 
 __all__ = ['compute_basic_descriptives',
@@ -27,6 +28,7 @@ __all__ = ['compute_basic_descriptives',
            'compute_pca',
            'remove_outliers',
            'trim',
+           'convert_ipynb_to_html',
            'run_experiment']
 
 # Make sure that DeprecationWarnings are always shown

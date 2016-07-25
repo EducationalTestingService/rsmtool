@@ -564,15 +564,20 @@ def create_comparison_report(experiment_id_old, description_old,
 
 def convert_ipynb_to_html(notebook_file, html_file):
     """
-    Convert the given `notebook_file` to HTML and
-    write it to `html_file`.
+    Convert the given Jupyter notebook file (``.ipynb``)
+    to HTML and write it out as the given ``.html`` file.
 
     Parameters
     ----------
     notebook_file : str
-        Input IPython notebook file.
+        Path to input Jupyter notebook file.
     html_file : str
-        Output HTML file.
+        Path to output HTML file.
+
+    Note
+    ----
+    This function is also exposed as the :ref:`render_notebook <render_notebook>` command-line utility.
+
     """
 
     # set a high timeout for datasets with a large number of features
