@@ -1,3 +1,5 @@
+.. _tutorial:
+
 Tutorial
 ========
 
@@ -70,7 +72,7 @@ Let's take a look at the options in our configuration file.
 - **Line 13**: This field indicates that scores from a second set of human graders are also available (useful for comparing the agreement between human-machine scores to the agreement between two sets of humans) and are located in the ``score2`` column in the test set ``.csv`` file.
 - **Line 14**: This field indicates that response lengths are also available for the training data in a column named ``LENGTH``.
 
-Documentation for all of the available configuration options is :ref:`available <config_file_rsmtool>`.
+Documentation for all of the available configuration options is available :ref:`here <config_file_rsmtool>`.
 
 .. note::
 
