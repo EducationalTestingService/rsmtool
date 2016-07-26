@@ -510,6 +510,8 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
             coefs, rnorm = nnls(X_plus_intercept, y)
 
         # separate the intercept and feature coefficients
+        # even though we do not use intercept in the code
+        # we define it here for readability
         intercept = coefs[0]
         coefficients = coefs[1:].tolist()
 
@@ -541,7 +543,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
