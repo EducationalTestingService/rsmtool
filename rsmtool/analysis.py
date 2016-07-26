@@ -10,6 +10,7 @@ from sklearn.metrics import r2_score
 
 from rsmtool.utils import agreement, partial_correlations
 
+
 def compute_basic_descriptives(df, selected_features):
     """
     Compute basic descriptive statistics for the columns
@@ -255,6 +256,7 @@ def correlation_helper(df,
             df_target_partcors,
             df_target_partcors_no_length)
 
+
 def compute_correlations_by_group(df,
                                   selected_features,
                                   target_variable,
@@ -412,8 +414,8 @@ def metrics_helper(human_scores, system_scores):
     # compute the agreement statistics
     human_system_agreement = agreement(human_scores, system_scores)
     human_system_adjacent_agreement = agreement(human_scores,
-                                             system_scores,
-                                             tolerance=1)
+                                                system_scores,
+                                                tolerance=1)
 
     # compute the pearson correlation after removing
     # any cases where either of the scores are NaNs.
@@ -437,7 +439,7 @@ def metrics_helper(human_scores, system_scores):
     # compute standardized mean difference as recommended
     # by Williamson et al (2012)
     numerator = mean_system_score - mean_human_score
-    denominator = np.sqrt((system_score_sd**2 + human_score_sd**2)/2)
+    denominator = np.sqrt((system_score_sd**2 + human_score_sd**2) / 2)
     SMD = numerator/denominator
 
     # compute r2 and MSE
@@ -448,22 +450,22 @@ def metrics_helper(human_scores, system_scores):
     # return everything as a series
 
     metrics = pd.Series({'kappa': unweighted_kappa,
-                      'wtkappa': quadratic_weighted_kappa,
-                      'exact_agr': human_system_agreement,
-                      'adj_agr': human_system_adjacent_agreement,
-                      'SMD': SMD,
-                      'corr': correlations,
-                      'R2': r2,
-                      'RMSE': rmse,
-                      'sys_min': min_system_score,
-                      'sys_max': max_system_score,
-                      'sys_mean': mean_system_score,
-                      'sys_sd': system_score_sd,
-                      'h_min': min_human_score,
-                      'h_max': max_human_score,
-                      'h_mean': mean_human_score,
-                      'h_sd': human_score_sd,
-                      'N': len(system_scores)})
+                         'wtkappa': quadratic_weighted_kappa,
+                         'exact_agr': human_system_agreement,
+                         'adj_agr': human_system_adjacent_agreement,
+                         'SMD': SMD,
+                         'corr': correlations,
+                         'R2': r2,
+                         'RMSE': rmse,
+                         'sys_min': min_system_score,
+                         'sys_max': max_system_score,
+                         'sys_mean': mean_system_score,
+                         'sys_sd': system_score_sd,
+                         'h_min': min_human_score,
+                         'h_max': max_human_score,
+                         'h_mean': mean_human_score,
+                         'h_sd': human_score_sd,
+                         'N': len(system_scores)})
 
     return metrics
 
@@ -597,7 +599,7 @@ def compute_metrics(df,
                                                            'h_min', 'h_max',
                                                            'sys_mean', 'sys_sd',
                                                            'sys_min', 'sys_max',
-                                                           'corr','wtkappa', 'R2',
+                                                           'corr', 'wtkappa', 'R2',
                                                            'kappa', 'exact_agr',
                                                            'adj_agr', 'SMD', 'RMSE'])
         # rename `h_*` -> `h1_*` and `sys_*` -> `h2_*`
@@ -704,10 +706,10 @@ def compute_metrics_by_group(df_test,
         df_group = df_group.drop(grouping_variable, 1)
         (df_group_human_machine_metrics,
          df_group_human_machine_metrics_short,
-         df_group_human_human_metrics)  = compute_metrics(df_group,
-                                                          compute_shortened=True,
-                                                          use_scaled_predictions=use_scaled_predictions,
-                                                          include_second_score=include_second_score)
+         df_group_human_human_metrics) = compute_metrics(df_group,
+                                                         compute_shortened=True,
+                                                         use_scaled_predictions=use_scaled_predictions,
+                                                         include_second_score=include_second_score)
 
         # we need to convert the shortened data frame to a series here
         df_human_machine_eval_by_group[group] = df_group_human_machine_metrics_short.iloc[0]
@@ -808,7 +810,6 @@ def run_training_analyses(df_train_all,
     List of data frames, each containing a different
         analysis of the training set
     """
-
 
     # only use the features selected by the model but keep their order the same
     # as in the original file as ordering may affect the sign in pca
@@ -935,7 +936,6 @@ def run_prediction_analyses(df_test,
 
     assert len(df_preds.index) == len(df_test.index) == len(df_test_metadata.index)
 
-
     # set a general boolean flag indicating if
     # we should include the second human score
     include_second_score = not df_test_human_scores.empty
@@ -1004,9 +1004,10 @@ def run_prediction_analyses(df_test,
             df_confmatrix,
             df_score_dist)
 
+
 def analyze_excluded_responses(df, features, header,
-                              exclude_zero_scores=True,
-                              exclude_listwise=False):
+                               exclude_zero_scores=True,
+                               exclude_listwise=False):
     """
     Compute statistics on the responses that were excluded from
     analyses, either in the training set or in the test set.
@@ -1064,7 +1065,6 @@ def analyze_excluded_responses(df, features, header,
         # convert back to integers as these are all counts
         df_full_crosstab = df_full_crosstab.astype(int)
         df_full_crosstab.insert(0, header, df_full_crosstab.index)
-
 
     if not exclude_listwise:
         # if we are not excluding listwise, rename the first cell so that it is not set to zero
@@ -1128,8 +1128,8 @@ def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
         train_candidates = set(df_train['candidate'])
         test_candidates = set(df_test['candidate'])
         df_analysis['candidates'] = [len(train_candidates), len(test_candidates),
-                                    len(train_candidates & test_candidates),
-                                    len(train_candidates | test_candidates)]
+                                     len(train_candidates & test_candidates),
+                                     len(train_candidates | test_candidates)]
 
         columns = ['partition', 'responses', 'candidates'] + subgroups
 
@@ -1231,7 +1231,6 @@ def run_data_composition_analyses_for_rsmtool(df_train_metadata,
     List of data frames, each containing a different
     data composition analysis
     """
-
 
     df_train_excluded_analysis = analyze_excluded_responses(df_train_excluded,
                                                             features,

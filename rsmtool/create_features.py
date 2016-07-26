@@ -208,7 +208,8 @@ def generate_specs_from_data(feature_names,
     # get feature sign info if available
     if feature_sign:
         # Convert to dictionary {feature:sign}
-        sign_dict = dict(zip(feature_subset_specs.Feature, feature_subset_specs['Sign_'+feature_sign]))
+        sign_dict = dict(zip(feature_subset_specs.Feature,
+                             feature_subset_specs['Sign_{}'.format(feature_sign)]))
     # else create an empty dictionary
     else:
         sign_dict = {}
