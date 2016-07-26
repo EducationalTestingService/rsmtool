@@ -36,8 +36,6 @@ def predict_with_model(model, df):
         human scores.
     """
 
-    logger = logging.getLogger(__name__)
-
     feature_columns = [c for c in df.columns if c not in ['spkitemid', 'sc1']]
     features = df[feature_columns].to_dict(orient='records')
     ids = df['spkitemid'].tolist()

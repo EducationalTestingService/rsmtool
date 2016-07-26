@@ -6,7 +6,9 @@
 import re
 import warnings
 
-# do we have rsmextra installed?
+# do we have rsmextra installed? we try to import rsmextra here
+# to avoid doing this in each module.
+
 try:
     import rsmextra
 except ImportError:

@@ -447,7 +447,7 @@ def metrics_helper(human_scores, system_scores):
 
     # return everything as a series
 
-    metrcs = pd.Series({'kappa': unweighted_kappa,
+    metrics = pd.Series({'kappa': unweighted_kappa,
                       'wtkappa': quadratic_weighted_kappa,
                       'exact_agr': human_system_agreement,
                       'adj_agr': human_system_adjacent_agreement,
