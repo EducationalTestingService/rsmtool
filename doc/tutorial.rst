@@ -1,14 +1,18 @@
 Tutorial
 ========
 
-Before doing anything below, you'll want to :ref:`install RSMTool <install>`.
+First you'll want to :ref:`install RSMTool <install>`.
 
 Workflow
 --------
 
-In general, there are four steps to using RSMTool:
+.. important::
 
-1.  Generate features for your training as well as your evaluation data using your NLP/Speech pipeline in ``.csv`` format.
+    Although this tutorial provides feature values for the purposes of illustration, RSMTool is *not* designed to extract features; it is designed for researchers who use their own NLP/Speech processing pipeline to extract features for their data.
+
+Once you have the features extracted your data, using RSMTool is fairly straightforward:
+
+1. Make sure your data is split into a training set and a held-out evaluation set. You will need two ``.csv`` files containing the feature values: one for each set.
 2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describing the modeling experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmtool <usage_rsmtool>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmtool>`.
 4. Examine HTML report to check various aspects of model performance.
@@ -39,9 +43,9 @@ For more examples of what features might look like, we refer the reader to this 
 - ``ORGANIZATION``: indicates whether the response is organized well.
 
 .. note::
-     These features were extracted using proprietory sofware for text analysis. RSMTool does not include any NLP/speech analysis components for feature extraction.
 
-For the purpose of this tutorial, it is not important to describe *exactly* how those features were extracted. RSMTool is designed for researchers who use their own NLP/Speech processing pipeline to extract their own features.
+     These features were extracted using proprietary NLP software. To reiterate, RSMTool does *not* include any NLP/speech components for feature extraction.
+
 
 Create a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
