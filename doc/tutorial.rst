@@ -8,9 +8,9 @@ Workflow
 
 .. important::
 
-    Although this tutorial provides feature values for the purposes of illustration, RSMTool is *not* designed to extract features; it is designed for researchers who use their own NLP/Speech processing pipeline to extract features for their data.
+    Although this tutorial provides feature values for the purpose of illustration, RSMTool does *not* provide any functionality for feature extraction; the tool is designed for researchers who use their own NLP/Speech processing pipeline to extract features for their data.
 
-Once you have the features extracted your data, using RSMTool is fairly straightforward:
+Once you have the features extracted from your data, using RSMTool is fairly straightforward:
 
 1. Make sure your data is split into a training set and a held-out evaluation set. You will need two ``.csv`` files containing the feature values: one for each set.
 2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describing the modeling experiment you would like to run.
