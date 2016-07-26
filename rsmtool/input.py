@@ -32,10 +32,11 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
                                    default_feature_sign)
 
+
 def select_candidates_with_N_or_more_items(df,
                                            N,
                                            candidate_column='candidate'):
-    
+
     """
     Only select candidates which have responses to N or more items
 
@@ -56,7 +57,7 @@ def select_candidates_with_N_or_more_items(df,
         Data frame with responses from candidates with responses to N or more items
 
     df_excluded: pandas DataFrame
-        Data frame with responses from candidates with responses to less than N items 
+        Data frame with responses from candidates with responses to less than N items
     """
 
     items_per_candidate = df[candidate_column].value_counts()
@@ -72,9 +73,6 @@ def select_candidates_with_N_or_more_items(df,
 
     return (df_included,
             df_excluded)
-    
-
-
 
 
 def locate_custom_sections(custom_report_section_paths, configpath):
@@ -146,7 +144,7 @@ def normalize_json_fields(json_obj):
                           'scale': 'use_scaled_predictions',
                           'feature.subset': 'feature_subset'}
 
-    model_name_mapping = {'empWt':'LinearRegression',
+    model_name_mapping = {'empWt': 'LinearRegression',
                           'eqWt': 'EqualWeightsLR',
                           'empWtBalanced': 'RebalancedLR',
                           'empWtDropNeg': '',
@@ -346,7 +344,7 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     # and sign has not been specified in the config file
     if HAS_RSMEXTRA:
         if (new_json_obj['feature_subset_file'] == default_feature_subset_file
-            and not new_json_obj['sign']):
+                and not new_json_obj['sign']):
             new_json_obj['sign'] = default_feature_sign
 
     # 6. Check for fields that must be specified together
@@ -388,7 +386,6 @@ def process_json_fields(json_obj):
     ValueError
     """
 
-    
     list_fields = ['feature_prefix',
                    'general_sections',
                    'special_sections',
@@ -430,25 +427,22 @@ def process_json_fields(json_obj):
 def parse_json_with_comments(filename):
     """
     Parse a JSON file after removing any comments.
-    Comments can look like :
-        // ...
-    or
-        /*
-        ...
-        */
-
-    Adapted from:
-    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
+    Comments can use either ``//`` for single-line
+    comments or or ``/* ... */`` for multi-line comments.
 
     Parameters
     ----------
     filename : str
-        Path to a JSON configuration file.
+        Path to the input JSON file.
 
     Returns
     -------
-    ans : dict
-        JSON object representing the configuration file.
+    obj : dict
+        JSON object representing the input file.
+
+    Note
+    ----
+    This code was adapated from: http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html.
     """
 
     # Regular expression to identify comments
@@ -532,6 +526,7 @@ def normalize_and_validate_feature_file(feature_json):
                          "in the feature file: {}".format(duplicate_features))
 
     return new_json_obj
+
 
 def read_json_file(json_file):
     """
@@ -767,6 +762,7 @@ def check_flag_column(config_obj):
 
     return new_filtering_dict
 
+
 def check_feature_subset_file(feature_specs, subset=None, sign=None):
     """
     Check that the file is in the correct format and contains all
@@ -799,9 +795,9 @@ def check_feature_subset_file(feature_specs, subset=None, sign=None):
             raise ValueError("The subset columns in feature file can only contain 0 or 1")
 
     if sign:
-        if not 'Sign_'+sign in feature_specs.columns:
+        if not 'Sign_{}'.format(sign) in feature_specs.columns:
                 raise ValueError("The feature_subset_file does not contain the requested "
-                                 "sign column {}".format('Sign_'+sign))
+                                 "sign column 'Sign_{}'".format(sign))
 
         if not feature_specs[subset].isin(['-', '+']).all():
             raise ValueError("The sign columns in feature file can only contain - or +")
@@ -882,8 +878,8 @@ def load_experiment_data(main_config_file, output_dir):
     exclude_listwise = False
     min_items = config_obj['min_items_per_candidate']
     if min_items:
-        exclude_listwise=True
- 
+        exclude_listwise = True
+
     # get the name of the model that we want to train and
     # check that it's valid
     model_name = config_obj['model']
@@ -923,7 +919,7 @@ def load_experiment_data(main_config_file, output_dir):
     if custom_report_section_paths:
         logger.info('Locating custom report sections')
         custom_report_sections = locate_custom_sections(custom_report_section_paths,
-                                                         configpath)
+                                                        configpath)
     else:
         custom_report_sections = []
 
@@ -961,7 +957,6 @@ def load_experiment_data(main_config_file, output_dir):
     else:
         feature_subset_specs = None
 
-
     # Do we need to automatically find the best transformations/change sign?
     select_transformations = config_obj['select_transformations']
     feature_sign = config_obj['sign']
@@ -990,12 +985,12 @@ def load_experiment_data(main_config_file, output_dir):
     # check to make sure that `length_column` or `second_human_score_column`
     # are not also included in the requested features, if they are specified
     if (length_column and
-        length_column in requested_features):
+            length_column in requested_features):
         raise ValueError("The value of 'length_column' ('{}') cannot be "
                          "used as a model feature.".format(length_column))
 
     if (second_human_score_column and
-        second_human_score_column in requested_features):
+            second_human_score_column in requested_features):
         raise ValueError("The value of 'second_human_score_column' ('{}') cannot be "
                          "used as a model feature.".format(second_human_score_column))
 
@@ -1010,7 +1005,7 @@ def load_experiment_data(main_config_file, output_dir):
     # if `second_human_score_column` is specified, then
     # we need to add the original name as well as `sc2` to the list of reserved column
     # names. And same for 'length' and 'candidate', if `length_column`
-    # and `candidate_column` are specified. We add both names to 
+    # and `candidate_column` are specified. We add both names to
     # simplify things downstream since neither the original name nor
     # the standardized name should be used as feature names
 
@@ -1359,7 +1354,7 @@ def load_and_filter_data(csv_file,
     # ##ORIGINAL_NAME##.
     if (length_column and
         (len(df_filtered[df_filtered['length'].isnull()]) != 0 or
-             df_filtered['length'].std() <= 0)):
+            df_filtered['length'].std() <= 0)):
         logger.warning("The {} column either has missing values or a standard"
                        " deviation <= 0. No length-based analysis will be"
                        " provided. The column will be renamed as ##{}## and"
@@ -1420,7 +1415,7 @@ def load_and_filter_data(csv_file,
 
     # now extract all other columns and add 'spkitemid'
     other_columns = ['spkitemid'] + [column for column in df_filtered.columns
-                     if column not in not_other_columns]
+                                     if column not in not_other_columns]
     df_filtered_other_columns = df_filtered[other_columns]
 
     return (df_filtered_features,
@@ -1488,8 +1483,8 @@ def rename_default_columns(df,
     defaults = ['spkitemid', 'sc1', 'sc2', 'length', 'raw', 'candidate']
 
     # create a dictionary of name mapping for used columns
-    name_mapping = dict(filter(lambda t: t[0] !=None, zip(columns,
-                                                          defaults)))
+    name_mapping = dict(filter(lambda t: t[0] is not None, zip(columns,
+                                                               defaults)))
 
     # find the columns where the names match the default names
     columns_with_correct_default_names = [column for (column, default) in name_mapping.items()
@@ -1527,4 +1522,3 @@ def rename_default_columns(df,
                       inplace=True)
 
     return df
-

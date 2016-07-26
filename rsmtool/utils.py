@@ -16,9 +16,9 @@ package_path = os.path.dirname(__file__)
 # Adapted from: http://stackoverflow.com/questions/1343227/can-pythons-logging-format-be-modified-depending-on-the-message-log-level
 class LogFormatter(logging.Formatter):
 
-    err_fmt  = "ERROR: %(msg)s"
+    err_fmt = "ERROR: %(msg)s"
     warn_fmt = "WARNING: %(msg)s"
-    dbg_fmt  = "DBG: %(module)s: %(lineno)d: %(msg)s"
+    dbg_fmt = "DBG: %(module)s: %(lineno)d: %(msg)s"
     info_fmt = "%(msg)s"
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):
@@ -81,7 +81,7 @@ def covariance_to_correlation(m):
     if not numrows == numcols:
         raise ValueError('Input matrix must be square')
 
-    Is = np.sqrt(1/np.diag(m))
+    Is = np.sqrt(1 / np.diag(m))
     retval = Is * m * np.repeat(Is, numrows).reshape(numrows, numrows)
     np.fill_diagonal(retval, 1.0)
     return retval
@@ -102,7 +102,9 @@ def partial_correlations(df):
     Returns
     -------
     df_pcor : pandas DataFrame
-        Data frame containing the partial correlations.
+        Data frame containing the partial correlations of of each
+        pair of variables in the given data frame `df`,
+        excluding all other variables.
     """
     numrows, numcols = df.shape
     df_cov = df.cov()
@@ -156,7 +158,7 @@ def agreement(score1, score2, tolerance=0):
     # are for the same number of items
     assert len(score1) == len(score2)
 
-    num_agreements = sum([int(abs(s1-s2) <= tolerance)
+    num_agreements = sum([int(abs(s1 - s2) <= tolerance)
                           for s1, s2 in zip(score1, score2)])
 
     agreement_value = (float(num_agreements) / len(score1)) * 100
@@ -169,10 +171,12 @@ def write_experiment_output(data_frames,
                             csvdir,
                             reset_index=False):
     """
-    Write out the given data frames in the list `data_frames`
-    generated as part of running the experiment to csv files
-    under `csvdir`. All files are prefixed with `experiment_id`.
-    Indexes in the data frames are reset if `reset_index` is True.
+    Write out each of the given list of data frames as a ``.csv`` file
+    in the given directory. Each data frame was generated as part of
+    running an RSMTool exepriment. All ``.csv`` files are prefixed with
+    the given experiment ID and suffixed with the corresponding value in
+    the list of suffixes. Additionally, the indexes in the data frames
+    are reset if so specified.
 
     Parameters
     ----------
@@ -183,12 +187,11 @@ def write_experiment_output(data_frames,
     experiment_id : str
         The experiment ID.
     csvdir : str
-        Path to `output` experiment output directory
-        that will contain the CSV files corresponding
-        to each of the data frames.
+        Path to the `output` experiment sub-directory that will
+        contain the CSV files corresponding to each of the data frames.
     reset_index : bool, optional
         Whether to reset the index of each data frame
-        before writing to disk. Defaults to False.
+        before writing to disk. Defaults to `False`.
     """
     for df, suffix in zip(data_frames, suffixes):
 
@@ -211,7 +214,7 @@ def write_feature_json(feature_specs,
                        experiment_id,
                        featuredir):
     """
-    Write out the feature JSON file to disk.
+    Write out the feature ``.json`` file to disk.
 
     Parameters
     ----------
@@ -222,14 +225,14 @@ def write_feature_json(feature_specs,
     experiment_id : str
         The experiment ID.
     featuredir : str
-        Path to the `feature` experiment output directory
-        where the feature JSON fill will be saved.
+        Path to the `feature` experiment output directory where the
+        feature JSON file will be saved.
     """
     feature_specs_selected = {}
     feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
 
     makedirs(featuredir, exist_ok=True)
-    outjson = join(featuredir, experiment_id+'_selected.json')
+    outjson = join(featuredir, '{}_selected.json'.format(experiment_id))
     with open(outjson, 'w') as outfile:
         json.dump(feature_specs_selected, outfile, indent=4, separators=(',', ': '))
 

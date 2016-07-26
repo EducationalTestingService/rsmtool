@@ -104,21 +104,23 @@ notebook_path_dict = {'general': {'rsmtool': notebook_path,
 
 def merge_notebooks(notebook_files, output_file):
     """
-    A utility function to merge the given notebooks
-    into a single notebook named `output_file`.
-    Inspired by: http://stackoverflow.com/questions/20454668/how-to-merge-two-ipython-notebooks-correctly-without-getting-json-error
+    Merge the given Jupyter notebooks into a single Jupyter notebook.
 
     Parameters
     ----------
     notebook_files : list of str
-        List of IPython notebook files
+        List of paths to the input Jupyter notebook files.
     output_file : str
-        Output IPython notebook file
+        Path to output Jupyter notebook file
+
+    Note
+    ----
+    Adapted from: http://stackoverflow.com/questions/20454668/how-to-merge-two-ipython-notebooks-correctly-without-getting-json-error.
+
     """
 
-    # Merging ipython notebooks basically means
-    # that we keep the metadata from the "first"
-    # notebook and then add in the cells
+    # Merging ipython notebooks basically means that we keep the
+    # metadata from the "first" notebook and then add in the cells
     # from all the other notebooks.
     first_notebook = notebook_files[0]
     merged_notebook = json.loads(open(first_notebook, 'r', encoding='utf-8').read())
@@ -263,7 +265,7 @@ def determine_chosen_sections(general_sections,
         check_section_names(general_sections, 'general', context)
         chosen_general_sections = [s for s in general_sections
                                    if s in general_section_list]
-        all_general_sections=False
+        all_general_sections = False
 
     # 2. Exclude the subgroup sections if we do not have subgroup information.
 
@@ -285,7 +287,6 @@ def determine_chosen_sections(general_sections,
         # subgroup sections
         chosen_general_sections = [section for section in chosen_general_sections
                                    if not section in subgroup_sections]
-
 
     # 3. Include the specified (and valid) subset of the special sections
     chosen_special_sections = []
@@ -485,10 +486,10 @@ def create_report(experiment_id, description,
     os.environ['MODEL_TYPE'] = model_type
     os.environ['SCALED'] = '1' if use_scaled_predictions else '0'
     os.environ['EXCLUDE_ZEROS'] = '1' if exclude_zero_scores else '0'
-    os.environ['LENGTH_COLUMN'] = '' if length_column == None else length_column
-    os.environ['H2_COLUMN'] = '' if second_human_score_column == None else second_human_score_column
-    os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate == None else str(min_items_per_candidate)
-    os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file == None else feature_subset_file
+    os.environ['LENGTH_COLUMN'] = '' if length_column is None else length_column
+    os.environ['H2_COLUMN'] = '' if second_human_score_column is None else second_human_score_column
+    os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate is None else str(min_items_per_candidate)
+    os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file is None else feature_subset_file
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
@@ -564,15 +565,20 @@ def create_comparison_report(experiment_id_old, description_old,
 
 def convert_ipynb_to_html(notebook_file, html_file):
     """
-    Convert the given `notebook_file` to HTML and
-    write it to `html_file`.
+    Convert the given Jupyter notebook file (``.ipynb``)
+    to HTML and write it out as the given ``.html`` file.
 
     Parameters
     ----------
     notebook_file : str
-        Input IPython notebook file.
+        Path to input Jupyter notebook file.
     html_file : str
-        Output HTML file.
+        Path to output HTML file.
+
+    Note
+    ----
+    This function is also exposed as the :ref:`render_notebook <render_notebook>` command-line utility.
+
     """
 
     # set a high timeout for datasets with a large number of features

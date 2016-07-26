@@ -1,0 +1,10 @@
+{
+    "experiment_id_old": "ASAP2",
+    "experiment_dir_old": "../rsmtool/",
+    "description_old": "RSMTool experiment.",
+    "use_scaled_predictions_old": true,
+    "experiment_id_new": "ASAP2",
+    "experiment_dir_new": "../rsmtool",
+    "description_new": "RSMTool experiment (copy).",
+    "use_scaled_predictions_new": true
+}

@@ -34,10 +34,26 @@ from rsmtool.utils import LogFormatter
 from skll import Learner
 from rsmtool.version import __version__
 
+
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
-    Generate predictions using the information in the config file
-    and save them into the given output file.
+    Run ``rsmpredict`` with given configuration file and generate
+    predictions (and, optionally, pre-processed feature values).
+
+    Parameters
+    ----------
+    config_file : str
+        Path to the experiment configuration file.
+    output_file : str
+        Path to the output file for saving predictions.
+    feats_file (optional): str
+        Path to the output file for saving preprocessed feature values.
+
+    Raises
+    ------
+    ValueError
+        If any of the required fields are missing or ill-specified.
+
     """
 
     logger = logging.getLogger(__name__)
@@ -162,8 +178,6 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     # check that the id_column contains unique values
     if df_input['spkitemid'].size != df_input['spkitemid'].unique().size:
         raise ValueError("The data contains repeated response IDs in {}. Please make sure all response IDs are unique and re-run the tool.".format(id_column))
-
-
 
     # now we need to pre-process these features using
     # the parameters that are already stored in the
@@ -316,9 +330,6 @@ def main():
     logging.root.addHandler(hdlr)
     logging.root.setLevel(logging.INFO)
 
-    # get a logger
-    logger = logging.getLogger(__name__)
-
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='rsmpredict')
 
@@ -355,4 +366,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
