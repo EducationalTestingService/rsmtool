@@ -36,8 +36,8 @@ from rsmtool.version import __version__
 
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
-    Compute predictions using RSMPredict and the given configuration
-    file and saved them in the output file.
+    Run ``rsmpredict`` with given configuration file and generate
+    predictions (and, optionally, pre-processed feature values).
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     output_file : str
         Path to the output file for saving predictions.
     feats_file (optional): str
-        Path to the output file for saving preprocessed feature values
+        Path to the output file for saving preprocessed feature values.
 
     Raises
     ------
