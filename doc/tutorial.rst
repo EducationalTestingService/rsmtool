@@ -8,7 +8,7 @@ Workflow
 
 .. important::
 
-    Although this tutorial provides feature values for the purpose of illustration, RSMTool does *not* provide any functionality for feature extraction; the tool is designed for researchers who use their own NLP/Speech processing pipeline to extract features for their data.
+    Although this tutorial provides feature values for the purpose of illustration, RSMTool does *not* include any functionality for feature extraction; the tool is :ref:`designed for researchers <who_rsmtool>` who use their own NLP/Speech processing pipeline to extract features for their data.
 
 Once you have the features extracted from your data, using RSMTool is fairly straightforward:
 
@@ -24,7 +24,7 @@ ASAP Example
 
 Let's see how we can apply this basic RSMTool workflow to a simple example based on a 2012 Kaggle competition on automated essay scoring called the `Automated Student Assessment Prize (ASAP) contest <https://www.kaggle.com/c/asap-aes>`_. As part of that contest, responses to 8 different essay questions written by students in grades 6-10 were provided. The responses were scored by humans and given a holistic score indicating the English proficiency of the student. The goal of the contest was to build an automated scoring model with the highest accuracy on held-out evaluation data.
 
-For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a model and evaluate its performance.
+For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a model and evaluate its performance. All of the data we refer to below can be found in the ``examples/rsmtool`` folder in the `github repository <https://github.com/EducationalTestingService/rsmtool/tree/master/examples/rsmtool>`_.
 
 Extract features
 ^^^^^^^^^^^^^^^^
@@ -107,7 +107,20 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-Once the run finishes, you will see the ``output``, ``figure``, ``report``, and ``feature`` sub-directories in the current directory. Each of these directories contain :ref:`useful information <output_dirs_rsmtool>` but we are specifically interested in the ``report`` directory.
+Once the run finishes, you will see the ``output``, ``figure``, ``report``, and ``feature`` sub-directories in the current directory. Each of these directories contain :ref:`useful information <output_dirs_rsmtool>` but we are specifically interested in the ``report/ASAP2_report.html`` file, which is the final RSMTool experiment report.
+
+Examine the report
+^^^^^^^^^^^^^^^^^^
+Our experiment report contains all the information we would need to determine how well our linear regression model with four features is doing. It includes:
+
+1. Descriptive feature statistics.
+2. Inter-feature correlations.
+3. Model fit and diagnostics.
+4. Several different metrics indicating how well the machine's scores agree with the humans'.
+
+... and much more.
+
+If we are not satisfied with the performance of the model, we can then take specific action, e.g., either add new features or perhaps try a more sophisticated model.
 
 
 .. rubric:: References
