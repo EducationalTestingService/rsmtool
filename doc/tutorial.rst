@@ -81,7 +81,27 @@ Now that we have our features in ``.csv`` format and our configuration file in `
     $ cd examples/rsmtool
     $ rsmtool config_rsmtool.json
 
-This should produce output like:
+This should produce output like::
+
+    Output directory: /Users/nmadnani/work/rsmtool/examples/rsmtool
+    Loading experiment data
+    Reading configuration file: /Users/nmadnani/work/rsmtool/examples/rsmtool/config_rsmtool.json
+    Reading training data: /Users/nmadnani/work/rsmtool/examples/rsmtool/train.csv
+    Reading evaluation data: /Users/nmadnani/work/rsmtool/examples/rsmtool/test.csv
+    Pre-processing training and test set features
+    Saving training and test set data to disk
+    Training LinearRegression model
+    The exact solution is  x = 0
+    Running analyses on training set
+    Generating training and test set predictions
+    Processing test set predictions
+    Saving training and test set predictions to disk
+    Scaling the coefficients and saving them to disk
+    Running analyses on test set predictions
+    Starting report generation
+    Merging sections
+    Exporting HTML
+    Executing notebook with kernel: python3
 
 
 
