@@ -20,6 +20,8 @@ RSMTool provides the ``rsmcompare`` command-line utility to compare two models a
 
     It is strongly recommend that the original experiments as well as the comparison experiment are all done using the same version of RSMTool.
 
+.. include:: tutorial_rsmcompare.rst
+
 Input
 """""
 
@@ -49,7 +51,4 @@ Here are all the arguments to the ``rsmcompare`` command-line script.
 
 Output
 """"""
-
 ``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file) in the output directory.
-
-.. include:: tutorial_rsmcompare.rst

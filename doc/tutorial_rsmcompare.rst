@@ -3,15 +3,14 @@
 Tutorial
 """"""""
 
-To use the ``rsmcompare`` you need to :ref:`install RSMTool <install>`.
+For this tutorial, you first need to :ref:`install RSMTool <install>`.
 
 Workflow
 ~~~~~~~~
 
-``rsmcompare`` is designed to compare two existing ``rsmtool`` experiments. To use ``rsmcompare`` you need:
+``rsmcompare`` is designed to compare two existing ``rsmtool`` or ``rsmeval`` experiments. To use ``rsmcompare`` you need:
 
-
-1. Run two experiments using :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`. 
+1. Two experiments that were run using :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`.
 2. Create an :ref:`experiment configuration file <config_file_rsmcompare>` describing the comparison experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmcompare <usage_rsmcompare>` and generate the comparison experiment HTML report.
 4. Examine HTML report to compare the two models.
@@ -20,17 +19,19 @@ Note that the above workflow does not use the customization features of ``rsmcom
 
 ASAP Example
 ~~~~~~~~~~~~
+We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
 
-We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for :ref:`rsmtool tutorial <tutorial>`. 
+Run ``rsmtool`` (or ``rsmeval``) experiments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``rsmcompare`` compares the results of the two existing ``rsmtool`` (or ``rsmeval``) experiments. For this tutorial, we will compare model trained in the :ref:`rsmtool tutorial <tutorial>` to itself.
 
-Run ``rsmtool`` experiments
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``rsmcompare`` compares the results of the two existing ``rsmtool`` or ``rsmeval`` experiments. For this tutorial we will compare the outputs generated during the experiment in :ref:`rsmtool tutorial <tutorial>` to itself. If you have not already completed that tutorial first, please do so now. We will be using the output generated during the tutorial, so you will also need to complete the tutorial if you have already deleted the output files. 
+.. note::
 
+    If you have not already completed that tutorial, please do so now. You may need to complete it again if you deleted the output files.
 
 Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The next step is to create an :ref:`rsmcompare experiment configuration file <config_file_rsmcompare>` in ``.json`` format.
+The next step is to create an :ref:`experiment configuration file <config_file_rsmcompare>` in ``.json`` format.
 
 .. _asap_config_rsemcompare:
 
@@ -40,46 +41,47 @@ The next step is to create an :ref:`rsmcompare experiment configuration file <co
 
 Let's take a look at the options in our configuration file.
 
-- **Line 2**: We provide the ``experiment_id`` for the experiment we want to use as a baseline. 
-- **Line 3**: We also give the path to the directory containing the output of the original "baseline" experiment. 
-- **Line 4**: We give a short description of this experiment. This will be shown in the report. 
-- **Line 5**: This field indicates that the original experiment used scaled scores for detailed analyses. 
-- **Line 6**: We provide the ``experiment_id`` for the new experiment. In our case we give the same id because we are comparing the experiment to itself. 
-- **Line 7**: We also give the path to the directory containing the output of the new experiment. As above, we give the same path because we are comparing the experiment to itself- **Line 8**: We give a short description of this experiment. This will be shown in the report. 
-- **Line 9**: This field indicates that the original experiment used scaled scores for detailed analyses. 
+- **Line 2**: We provide the ``experiment_id`` for the experiment we want to use as a baseline.
+- **Line 3**: We also give the path to the directory containing the output of the original baseline experiment.
+- **Line 4**: We give a short description of this baseline experiment. This will be shown in the report.
+- **Line 5**: This field indicates that the baseline experiment used scaled scores for some evaluation analyses.
+- **Line 6**: We provide the ``experiment_id`` for the new experiment. We use the same experiment ID for both experiments since we are comparing the experiment to itself.
+- **Line 7**: We also give the path to the directory containing the output of the new experiment. As above, we use the same path because we are comparing the experiment to itself.
+- **Line 8**: We give a short description of the new experiment. This will also be shown in the report.
+- **Line 9**: This field indicates that the new experiment also used scaled scores for some evaluation analyses.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmcompare>`.
 
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
-Now that we have our scores in ``.csv`` format and our configuration file in ``.json`` format, we can use the :ref:`rsmcompare <usage_rsmcompare>` command-line script to run our modeling experiment.
+Now that we have the two experiments we want to compare and our configuration file in ``.json`` format, we can use the :ref:`rsmcompare <usage_rsmcompare>` command-line script to run our comparison experiment.
 
 .. code-block:: bash
 
     $ cd examples/rsmcompare
-    $ rsmtool config_rsmcompare.json
+    $ rsmcompare config_rsmcompare.json
 
 This should produce output like::
 
-    Output directory: /home/aloukina/proj/rsmtool/rsmtool-github/examples/rsmcompare
+    Output directory: /Users/nmadnani/work/rsmtool/examples/rsmcompare
     Starting report generation
     Merging sections
     Exporting HTML
     Executing notebook with kernel: python3
 
-
-Once the run finishes, you will see the a report named ``ASAP2_vs_ASAP2.report.html``. This is the final ``rsmcompare`` comparison report.
+Once the run finishes, you will see an HTML file named ``ASAP2_vs_ASAP2.report.html``. This is the final ``rsmcompare`` comparison report.
 
 Examine the report
 ~~~~~~~~~~~~~~~~~~
-Our experiment report contains all the information we would need to evaluate the system scores against the human scores. It includes:
+Our experiment report contains all the information we would need to compare the new model to the baseline model. It includes:
 
-1. Comparison of feature distributions including differences between the two models. 
-2. Comparison of model coefficients including differences between the two models.
-3. Comparison of model performance including differences between the two models.
+1. Comparison of feature distributions between the two experiments.
+2. Comparison of model coefficients between the two experiments.
+3. Comparison of model performance between the two experiments.
 
 .. note::
-    Since we are comparing the experiment to itself, there is no change between the models and therefore the values are always 0.
+
+    Since we are comparing the experiment to itself, the comparison is not very interesting, e.g., the differences between various values will always be 0.
 
 
 

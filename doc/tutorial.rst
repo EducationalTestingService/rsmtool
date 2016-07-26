@@ -17,7 +17,7 @@ Once you have the features extracted from your data, using RSMTool is fairly str
 1. Make sure your data is split into a training set and a held-out evaluation set. You will need two ``.csv`` files containing the feature values: one for each set.
 2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describing the modeling experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmtool <usage_rsmtool>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmtool>`.
-4. Examine HTML report to check various aspects of model performance.
+4. Examine the HTML report to check various aspects of model performance.
 
 Note that the above workflow does not use the customization features of RSMTool, e.g., :ref:`choosing which sections to include in the report <general_sections_rsmtool>` or :ref:`adding custom analyses sections <custom_notebooks>` etc. However, we will stick with this workflow for our tutorial since it is likely to be the most common use case.
 
@@ -68,7 +68,7 @@ Let's take a look at the options in our configuration file.
 - **Lines 7-8**: These two fields indicate that the human scores in the two ``.csv`` files are located in columns named ``score``.
 - **Lines 9**: Next, we indicate that we would like to use the :ref:`scaled scores <score_postprocessing>` for our evaluation analyses.
 - **Lines 10-11**: These fields indicate that the lowest score on the scoring scale is a 1 and the highest score is a 6. This information is usually part of the rubric used by human graders.
-- **Line 12**: This field indicates that the unique IDs for the responses in the two ``.csv`` files are located in a column named ``ID``.
+- **Line 12**: This field indicates that the unique IDs for the responses in the two ``.csv`` files are located in columns named ``ID``.
 - **Line 13**: This field indicates that scores from a second set of human graders are also available (useful for comparing the agreement between human-machine scores to the agreement between two sets of humans) and are located in the ``score2`` column in the test set ``.csv`` file.
 - **Line 14**: This field indicates that response lengths are also available for the training data in a column named ``LENGTH``.
 

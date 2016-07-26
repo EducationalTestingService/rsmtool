@@ -9,6 +9,8 @@ For example, say a researcher *has* an existing automated scoring engine for gra
 
 Once the model is trained, the researcher wants to evaluate her engine's performance using the analyses recommended by the educational measurement community as well as conduct additional investigations for specific subgroups of test-takers. However, these kinds of analyses are not available in ``scikit-learn``. She can use ``rsmeval`` to set up a customized report using a combination of existing and custom sections and quickly produce the evaluation that is useful to her.
 
+.. include:: tutorial_rsmeval.rst
+
 Input
 """""
 
@@ -40,12 +42,12 @@ Here are all the arguments to the ``rsmeval`` command-line script.
 
 .. include:: config_rsmeval.rst
 
+.. _output_dirs_rsmeval:
+
 Output
 """"""
 
-``rsmeval`` produces set of folders in the output directory.
-
-.. _output_dirs_rsmeval:
+``rsmeval`` produces a set of folders in the output directory.
 
 report
 ~~~~~~
@@ -61,4 +63,3 @@ This folder contains all of the figures generated as part of the various analyse
 
 .. include:: intermediate_files_rsmeval.rst
 
-.. include:: tutorial_rsmeval.rst

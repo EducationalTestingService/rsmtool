@@ -1,8 +1,8 @@
 {
+    "experiment_dir": "../rsmtool",
     "experiment_id": "ASAP2",
-    "experiment_dir": "../rsmtool", 
-    "input_features_file": "../rsmtool/test.csv", 
-    "id_column": "ID",    
-    "human_score_column": "score", 
+    "input_features_file": "../rsmtool/test.csv",
+    "id_column": "ID",
+    "human_score_column": "score",
     "second_human_score_column": "score2"
 }
