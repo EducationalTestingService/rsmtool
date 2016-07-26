@@ -29,7 +29,7 @@ from rsmtool.version import __version__
 
 def run_comparison(config_file, output_dir):
     """
-    Run RSMCompare experiment using the given configuration
+    Run an ``rsmcompare`` experiment using the given configuration
     file and generate the report in the given directory.
 
     Parameters

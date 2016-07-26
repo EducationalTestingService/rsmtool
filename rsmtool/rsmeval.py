@@ -29,7 +29,7 @@ from rsmtool.input import (check_main_config,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column,
-                           locate_custom_sections, 
+                           locate_custom_sections,
                            select_candidates_with_N_or_more_items)
 
 from rsmtool.predict import process_predictions
@@ -49,7 +49,7 @@ from rsmtool.version import __version__
 
 def run_evaluation(config_file, output_dir):
     """
-    Run RSMEval experiment using the given configuration
+    Run an `rsmeval` experiment using the given configuration
     file and generate all outputs in the given directory.
 
     Parameters
