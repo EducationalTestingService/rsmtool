@@ -1,3 +1,5 @@
+.. _who_rsmtool:
+
 Who is RSMTool for?
 ===================
 

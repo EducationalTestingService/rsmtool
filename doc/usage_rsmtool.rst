@@ -37,10 +37,12 @@ Here are all the arguments to the ``rsmtool`` command-line script.
 
 .. include:: config_rsmtool.rst
 
+.. _output_dirs_rsmtool:
+
 Output
 ------
 
-``rsmtool`` produces set of folders in the experiment output directory. This is either the current directory in which ``rsmtool`` is run or the directory specified as the second optional command-line argument.
+``rsmtool`` produces a set of folders in the experiment output directory. This is either the current directory in which ``rsmtool`` is run or the directory specified as the second optional command-line argument.
 
 report
 ^^^^^^

@@ -33,6 +33,7 @@ Documentation
    who
    pipeline
    getting_started
+   tutorial
    usage_rsmtool
    advanced_usage
    custom_notebooks
