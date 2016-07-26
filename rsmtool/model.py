@@ -511,6 +511,8 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
             coefs, rnorm = nnls(X_plus_intercept, y)
 
         # separate the intercept and feature coefficients
+        # even though we do not use intercept in the code
+        # we define it here for readability
         intercept = coefs[0]
         coefficients = coefs[1:].tolist()
 

@@ -330,9 +330,6 @@ def main():
     logging.root.addHandler(hdlr)
     logging.root.setLevel(logging.INFO)
 
-    # get a logger
-    logger = logging.getLogger(__name__)
-
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='rsmpredict')
 
