@@ -45,7 +45,7 @@ For the purpose of this tutorial, it is not important to describe *exactly* how 
 
 Create a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The next step is to create an :ref:`RSMTool configuration file <config_file_rsmtool>` in ``.json`` format.
+The next step is to create an :ref:`RSMTool experiment configuration file <config_file_rsmtool>` in ``.json`` format.
 
 .. _asap_config:
 
@@ -61,8 +61,29 @@ Let's take a look at the options in our configuration file.
 - **Line 6**: We also provide a description which will be included in the experiment report.
 - **Lines 7-8**: These two fields indicate that the human scores in the two ``.csv`` files are located in columns named ``score``.
 - **Lines 9**: Next, we indicate that we would like to use the :ref:`scaled scores <score_postprocessing>` for our evaluation analyses.
-- **Lines 10-11**: We indicate that the lowest score on the scoring scale is a 1 and the highest score is a 6. This information is usually part of the rubric used by human graders.
-- **Line 12**: We indicate that the unique IDs for the responses in the two ``.csv`` files are located in a column named ``ID``.
+- **Lines 10-11**: These fields indicate that the lowest score on the scoring scale is a 1 and the highest score is a 6. This information is usually part of the rubric used by human graders.
+- **Line 12**: This field indicates that the unique IDs for the responses in the two ``.csv`` files are located in a column named ``ID``.
+- **Line 13**: This field indicates that scores from a second set of human graders are also available (useful for comparing the agreement between human-machine scores to the agreement between two sets of humans) and are located in the ``score2`` column in the test set ``.csv`` file.
+- **Line 14**: This field indicates that response lengths are also available for the training data in a column named ``LENGTH``.
+
+Documentation for all of the available configuration options is :ref:`available <config_file_rsmtool>`.
+
+.. note::
+
+    For this example, we are using *all* of the non-metadata columns in the training and evaluation ``.csv`` files as features in the model. However, it is also possible to :ref:`choose specific columns <column_selection_rsmtool>` to be used for training the model.
+
+Run the experiment
+^^^^^^^^^^^^^^^^^^
+Now that we have our features in ``.csv`` format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
+
+.. code-block:: bash
+
+    $ cd examples/rsmtool
+    $ rsmtool config_rsmtool.json
+
+This should produce output like:
+
+
 
 
 .. rubric:: References

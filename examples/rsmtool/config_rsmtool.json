@@ -1,7 +1,7 @@
 {
     "experiment_id": "ASAP2",
-    "train_file": "train.csv",
-    "test_file": "test.csv",
+    "train_file": "train2.csv",
+    "test_file": "test2.csv",
     "model": "LinearRegression",
     "description": "A model which uses all features and a LinearRegression.",
     "test_label_column": "score",
@@ -11,5 +11,5 @@
     "trim_max": 6,
     "id_column": "ID",
     "second_human_score_column": "score2",
-    "length_column": "LENGTH",
+    "length_column": "LENGTH"
 }
