@@ -54,6 +54,8 @@ feature
 """""""
 The exact name of the column in the training and evaluation ``.csv`` files, including capitalization. Column names cannot contain hyphens. The following strings are reserved and cannot not be used as feature column names: ``spkitemid``, ``spkitemlab``, ``itemType``, ``r1``, ``r2``, ``score``, ``sc``, ``sc1``, and ``adj``. In addition, any column names provided as values for  ``id_column``, ``train_label_column``, ``test_label_column``, ``length_column``, ``candidate_column``, and ``subgroups`` may also not be used as feature column names.
 
+.. _json_transformation:
+
 transform
 """""""""
 A transformation that should be applied to the column values before using it in the model. Possible values are:
@@ -113,10 +115,13 @@ Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an e
         ...
     }
 
+.. _subset_transformation:
 
 Transformations
 """""""""""""""
 Unlike in :ref:`fine-grained selection <json_column_selection>`, the subset ``.csv`` file does not list any transformations to be applied to the feature columns. However, you can automatically select transformation for each feature *in the selected subset* by applying all possible transforms and identifying the one which gives the highest correlation with the human score. To use this functionality set the :ref:`select_transformations <select_transformations_rsmtool>` field in the configuration file to ``true``.
+
+.. _subset_sign:
 
 Signs
 """""

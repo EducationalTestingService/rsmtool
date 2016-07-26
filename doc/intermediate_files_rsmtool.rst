@@ -163,7 +163,7 @@ Model information
 
 .. _rsmtool_feature_csv:
 
-- ``feature.csv``: pre-processing parameters for all features used in the model.
+- ``feature.csv``: ref:`pre-processing parameters <preprocessing_parameters>` for all features used in the model.
 
 - ``coefficients.csv``: model coefficients and intercept (for :ref:`built-in models <builtin_models>` only).
 
@@ -180,6 +180,8 @@ Model information
 - ``.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model (for built-in models excluding ``LassoFixedLambda`` and ``PositiveLassoCV``).
 
 - ``ols_summary.txt``: a text file containing a summary of the above model (for built-in models excluding ``LassoFixedLabmda`` and ``PositiveLassoCV``)
+
+.. _rsmtool_postprocessing_params_csv:
 
 - ``postprocessing_params.csv``: the parameters for trimming and scaling predicted scores. Useful for generating predictions on new data.
 
