@@ -11,7 +11,7 @@ While he could use ``R``, ``PASW`` (``SPSS``) or other tools to perform each of 
 
 RSMTool is designed to be customizable:
 
-1. The user can choose to either run all of the default analyses or select *only* the subset applicable to her particular study by changing the appropriate settings in a configuration file.
+1. The user can choose to either run all of the default analyses or select *only* the subset applicable to his particular study by changing the appropriate settings in a configuration file.
 
 
 2. RSMTool provides explicit support for adding :ref:`custom analyses <custom_notebooks>` to the report if the user has some analysis in mind that is not already provided by RSMTool. These analyses can then be automatically included in all subsequent experiments.
