@@ -1,10 +1,12 @@
 {
     "experiment_id": "ASAP2_evaluation",
-    "description": "Evaluation of the new scores generated using rsmpredict.",
-    "predictions_file": "../rsmpredict/predictions.csv",
-    "system_score_column": "scale",
+    "description": "Evaluation of the scores generated using rsmtool.",
+    "predictions_file": "ASAP2_scores.csv",
+    "system_score_column": "system",
+    "human_score_column": "human",
+    "id_column": "ID",
     "trim_min": 1,
     "trim_max": 6,
-    "second_human_score_column": "sc2",
+    "second_human_score_column": "human2",
     "scale_with": "asis"
 }

@@ -1,7 +1,7 @@
 {
     "experiment_id": "ASAP2",
-    "train_file": "train2.csv",
-    "test_file": "test2.csv",
+    "train_file": "train.csv",
+    "test_file": "test.csv",
     "model": "LinearRegression",
     "description": "A model which uses all features and a LinearRegression.",
     "test_label_column": "score",
