@@ -1,3 +1,5 @@
+import warnings
+
 from glob import glob
 from os.path import basename, dirname, exists, join
 
@@ -57,22 +59,26 @@ def test_run_experiment_lr_old_config():
                        'experiments',
                        source,
                        '{}.json'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+    # run this experiment but suppress the expected deprecation warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        do_run_experiment(source, experiment_id, config_file)
+        output_dir = join('test_outputs', source, 'output')
+        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-        if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+        csv_files = glob(join(output_dir, '*.csv'))
+        for csv_file in csv_files:
+            csv_filename = basename(csv_file)
+            expected_csv_file = join(expected_output_dir, csv_filename)
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
+            if exists(expected_csv_file):
+                yield check_csv_output, csv_file, expected_csv_file
+
+        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+        yield check_scaled_coefficients, source, experiment_id
+        yield check_report, html_report
 
 
 def test_run_experiment_lr_subset_features():
@@ -292,24 +298,27 @@ def test_run_experiment_lr_subgroups_with_edge_cases():
                        'experiments',
                        source,
                        '{}.json'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    # run this experiment but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_experiment(source, experiment_id, config_file)
+        output_dir = join('test_outputs', source, 'output')
+        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+        csv_files = glob(join(output_dir, '*.csv'))
+        for csv_file in csv_files:
+            csv_filename = basename(csv_file)
+            expected_csv_file = join(expected_output_dir, csv_filename)
 
-        if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            if exists(expected_csv_file):
+                yield check_csv_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_subgroup_outputs, output_dir, experiment_id, ['group_edge_cases']
-    yield check_report, html_report
+        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+        yield check_scaled_coefficients, source, experiment_id
+        yield check_subgroup_outputs, output_dir, experiment_id, ['group_edge_cases']
+        yield check_report, html_report
 
 
 def test_run_experiment_lr_predict():
@@ -1270,8 +1279,8 @@ def test_run_experiment_lr_eval_exclude_flags():
 def test_run_experiment_lr_use_all_features():
 
     # rsmtool experiment with no feature file specified:
-    # the tool should be using all columns not assigned to 
-    # anything else. 
+    # the tool should be using all columns not assigned to
+    # anything else.
 
     source = 'lr-use-all-features'
     experiment_id = 'lr_use_all_features'
@@ -1600,7 +1609,7 @@ def test_run_experiment_lr_compare():
 def test_run_experiment_lr_compare_with_h2():
 
     # basic rsmcompare experiment comparing a LinearRegression
-    # experiment to itself where the rsmtool report contains 
+    # experiment to itself where the rsmtool report contains
     # h2 information
     source = 'lr-self-compare-with-h2'
     config_file = join(test_dir,
@@ -1681,8 +1690,8 @@ def test_run_experiment_linearsvr_compare():
 
 def test_run_experiment_lr_eval_compare():
 
-    # basic rsmcompare experiment comparing an rsmeval 
-    # experiment to itself 
+    # basic rsmcompare experiment comparing an rsmeval
+    # experiment to itself
     source = 'lr-eval-self-compare'
     config_file = join(test_dir,
                        'data',
@@ -1697,8 +1706,8 @@ def test_run_experiment_lr_eval_compare():
 
 def test_run_experiment_lr_eval_tool_compare():
 
-    # basic rsmcompare experiment comparing an rsmeval 
-    # experiment to an rsmtool experiment 
+    # basic rsmcompare experiment comparing an rsmeval
+    # experiment to an rsmtool experiment
     source = 'lr-eval-tool-compare'
     config_file = join(test_dir,
                        'data',
@@ -1707,7 +1716,7 @@ def test_run_experiment_lr_eval_tool_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
     yield check_report, html_report
 
 @raises(ValueError)
@@ -1894,7 +1903,7 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
 @raises(ValueError)
 def test_run_experiment_lr_eval_same_system_human_score():
 
-    # rsmeval experiment with the same value supplied 
+    # rsmeval experiment with the same value supplied
     # for both human score ans system score
 
     source = 'lr-eval-same-system-human-score'
