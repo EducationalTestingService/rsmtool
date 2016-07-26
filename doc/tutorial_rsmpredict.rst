@@ -29,7 +29,7 @@ We are going to use the same example from 2012 Kaggle competition on automated e
 We are now going to use this model to generate scores for new data.   
 
 Extract features
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 We will first need to generate features for the new set of responses for which we need to generate system scores.  For this experiment we will simply re-use the test set from our RSMTool tutorial. 
 
 .. note::
