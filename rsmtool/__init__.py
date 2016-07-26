@@ -41,7 +41,13 @@ from .preprocess import (filter_on_column,
 
 from .report import convert_ipynb_to_html, merge_notebooks
 
+from .rsmcompare import run_comparison
+
+from .rsmeval import run_evaluation
+
 from .rsmtool import run_experiment
+
+from .rsmpredict import compute_and_save_predictions
 
 from .utils import (agreement,
                     partial_correlations,
@@ -70,6 +76,9 @@ __all__ = ['compute_basic_descriptives',
            'convert_ipynb_to_html',
            'merge_notebooks',
            'run_experiment',
+           'run_evaluation',
+           'run_comparison',
+           'compute_and_save_predictions',
            'agreement',
            'partial_correlations',
            'write_experiment_output',

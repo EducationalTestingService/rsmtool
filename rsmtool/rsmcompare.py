@@ -29,9 +29,21 @@ from rsmtool.version import __version__
 
 def run_comparison(config_file, output_dir):
     """
-    Run a comparison between the two RSMTool experiments
-    specified in the config file and write out the
-    comparison report to the output directory.
+    Run RSMCompare experiment using the given configuration
+    file and generate the report in the given directory.
+
+    Parameters
+    ----------
+    config_file : str
+        Path to the experiment configuration file.
+    output_dir : str
+        Path to the experiment output directory.
+
+    Raises
+    ------
+    ValueError
+        If any of the required fields are missing or ill-specified.
+
     """
 
     logger = logging.getLogger(__name__)
