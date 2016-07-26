@@ -107,7 +107,7 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-
+Once the run finishes, you will see the ``output``, ``figure``, ``report``, and ``feature`` sub-directories in the current directory. Each of these directories contain :ref:`useful information <output_dirs_rsmtool>` but we are specifically interested in the ``report`` directory.
 
 
 .. rubric:: References

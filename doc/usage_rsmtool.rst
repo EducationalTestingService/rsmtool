@@ -37,6 +37,8 @@ Here are all the arguments to the ``rsmtool`` command-line script.
 
 .. include:: config_rsmtool.rst
 
+.. _output_dirs_rsmtool:
+
 Output
 ------
 
