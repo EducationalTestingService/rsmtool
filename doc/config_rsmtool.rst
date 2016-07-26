@@ -31,25 +31,27 @@ A brief description of the experiment. This will be included in the report. The 
 
 features *(Optional)*
 """""""""""""""""""""
-
+See below.
 
 .. _feature_subset_file:
 
 feature_subset_file *(Optional)*
 """"""""""""""""""""""""""""""""
-
+See below.
 
 .. _feature_subset:
 
 feature_subset *(Optional)*
 """""""""""""""""""""""""""
-
+See below.
 
 .. _sign:
 
 sign *(Optional)*
 """""""""""""""""
-By default, ``rsmtool`` will use all of the columns present in the training and evaluation CSV files as features except for any columns explicitly identified in the configuration file (see below). These fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+See below.
+
+By default, ``rsmtool`` will use all of the columns present in the training and evaluation CSV files as features except for any columns explicitly identified in the configuration file (see below). These four fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _id_column_rsmtool:
 
