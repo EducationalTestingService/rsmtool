@@ -94,8 +94,9 @@ def generate_feature_names(df,
 def generate_default_specs(feature_names):
 
     """
-    Generate default feature specifications for feature `.json` with
-    no transformations and no changes in sign.
+    Generate default feature "specifications" for the features
+    with the given names. The specifications are given by three fields:
+    "feature", "transform", and "sign".
 
     Parameters
     ----------
@@ -106,7 +107,7 @@ def generate_default_specs(feature_names):
     -------
     feature_specs: dict
         Dictionary of feature specifications that can be saved as a
-        `.json` file.
+        :ref:`feature JSON file <example_feature_json>`.
 
     Note
     ----

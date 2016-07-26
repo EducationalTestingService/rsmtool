@@ -7,6 +7,8 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 :mod:`rsmtool` Package
 ======================
 
+.. autofunction:: rsmtool.run_experiment
+
 From :py:mod:`~rsmtool.analysis` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.compute_basic_descriptives

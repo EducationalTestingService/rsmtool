@@ -26,8 +26,9 @@ Fine-grained column selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To manually select columns to be used as features, you can provide a ``.json`` file specifying the names of the columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the the values in these feature columns before being used in the model.
 
-Here's an example of what such a file might look like.
+.. _example_feature_json:
 
+Here's an example of what such a file might look like.
 
 .. code-block:: javascript
 
