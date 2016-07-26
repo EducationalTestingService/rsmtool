@@ -23,7 +23,27 @@ RSMTool provides the ``rsmcompare`` command-line utility to compare two models a
 Input
 """""
 
-``rsmcompare`` requires a single argument to run an experiment: the path to a configuration file. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmcompare`` will use the current directory as the output directory.
+``rsmcompare`` requires a single argument to run an experiment: the path to :ref:`a configuration file <config_file_rsmcompare>`. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmcompare`` will use the current directory as the output directory.
+
+Here are all the arguments to the ``rsmcompare`` command-line script.
+
+.. program:: rsmcompare
+
+.. option:: config_file
+
+    The :ref:`JSON configuration file <config_file_rsmcompare>` for this experiment.
+
+.. option:: output_dir (optional)
+
+    The output directory where the report files for this comparison will be stored.
+
+.. option:: -h, --help
+
+    Show help message and exist.
+
+.. option:: -V, --version
+
+    Show version number and exit.
 
 .. include:: config_rsmcompare.rst
 

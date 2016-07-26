@@ -35,7 +35,7 @@ if HAS_RSMEXTRA:
 def select_candidates_with_N_or_more_items(df,
                                            N,
                                            candidate_column='candidate'):
-    
+
     """
     Only select candidates which have responses to N or more items
 
@@ -56,7 +56,7 @@ def select_candidates_with_N_or_more_items(df,
         Data frame with responses from candidates with responses to N or more items
 
     df_excluded: pandas DataFrame
-        Data frame with responses from candidates with responses to less than N items 
+        Data frame with responses from candidates with responses to less than N items
     """
 
     items_per_candidate = df[candidate_column].value_counts()
@@ -72,7 +72,7 @@ def select_candidates_with_N_or_more_items(df,
 
     return (df_included,
             df_excluded)
-    
+
 
 
 
@@ -388,7 +388,7 @@ def process_json_fields(json_obj):
     ValueError
     """
 
-    
+
     list_fields = ['feature_prefix',
                    'general_sections',
                    'special_sections',
@@ -430,25 +430,22 @@ def process_json_fields(json_obj):
 def parse_json_with_comments(filename):
     """
     Parse a JSON file after removing any comments.
-    Comments can look like :
-        // ...
-    or
-        /*
-        ...
-        */
-
-    Adapted from:
-    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
+    Comments can use either ``//`` for single-line
+    comments or or ``/* ... */`` for multi-line comments.
 
     Parameters
     ----------
     filename : str
-        Path to a JSON configuration file.
+        Path to the input JSON file.
 
     Returns
     -------
-    ans : dict
-        JSON object representing the configuration file.
+    obj : dict
+        JSON object representing the input file.
+
+    Note
+    ----
+    This code was adapated from: http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html.
     """
 
     # Regular expression to identify comments
@@ -883,7 +880,7 @@ def load_experiment_data(main_config_file, output_dir):
     min_items = config_obj['min_items_per_candidate']
     if min_items:
         exclude_listwise=True
- 
+
     # get the name of the model that we want to train and
     # check that it's valid
     model_name = config_obj['model']
@@ -1010,7 +1007,7 @@ def load_experiment_data(main_config_file, output_dir):
     # if `second_human_score_column` is specified, then
     # we need to add the original name as well as `sc2` to the list of reserved column
     # names. And same for 'length' and 'candidate', if `length_column`
-    # and `candidate_column` are specified. We add both names to 
+    # and `candidate_column` are specified. We add both names to
     # simplify things downstream since neither the original name nor
     # the standardized name should be used as feature names
 

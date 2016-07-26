@@ -102,7 +102,9 @@ def partial_correlations(df):
     Returns
     -------
     df_pcor : pandas DataFrame
-        Data frame containing the partial correlations.
+        Data frame containing the partial correlations of of each
+        pair of variables in the given data frame `df`,
+        excluding all other variables.
     """
     numrows, numcols = df.shape
     df_cov = df.cov()
@@ -169,10 +171,12 @@ def write_experiment_output(data_frames,
                             csvdir,
                             reset_index=False):
     """
-    Write out the given data frames in the list `data_frames`
-    generated as part of running the experiment to csv files
-    under `csvdir`. All files are prefixed with `experiment_id`.
-    Indexes in the data frames are reset if `reset_index` is True.
+    Write out each of the given list of data frames as a ``.csv`` file
+    in the given directory. Each data frame was generated as part of
+    running an RSMTool exepriment. All ``.csv`` files are prefixed with
+    the given experiment ID and suffixed with the corresponding value in
+    the list of suffixes. Additionally, the indexes in the data frames
+    are reset if so specified.
 
     Parameters
     ----------
@@ -183,12 +187,11 @@ def write_experiment_output(data_frames,
     experiment_id : str
         The experiment ID.
     csvdir : str
-        Path to `output` experiment output directory
-        that will contain the CSV files corresponding
-        to each of the data frames.
+        Path to the `output` experiment sub-directory that will
+        contain the CSV files corresponding to each of the data frames.
     reset_index : bool, optional
         Whether to reset the index of each data frame
-        before writing to disk. Defaults to False.
+        before writing to disk. Defaults to `False`.
     """
     for df, suffix in zip(data_frames, suffixes):
 
@@ -211,7 +214,7 @@ def write_feature_json(feature_specs,
                        experiment_id,
                        featuredir):
     """
-    Write out the feature JSON file to disk.
+    Write out the feature ``.json`` file to disk.
 
     Parameters
     ----------
@@ -222,8 +225,8 @@ def write_feature_json(feature_specs,
     experiment_id : str
         The experiment ID.
     featuredir : str
-        Path to the `feature` experiment output directory
-        where the feature JSON fill will be saved.
+        Path to the `feature` experiment output directory where the
+        feature JSON file will be saved.
     """
     feature_specs_selected = {}
     feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]

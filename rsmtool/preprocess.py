@@ -13,9 +13,8 @@ import pandas as pd
 
 def trim(values, trim_min, trim_max):
     """
-    Trim the values contained in the given vector
-    `values` to `trim_min`-0.49998 as the floor
-    and `trim_max`+0.49998 as the ceiling.
+    Trim the values contained in the given numpy array to `trim_min` - 0.49998 as the floor and `trim_max` + 0.49998
+    as the ceiling.
 
     Parameters
     ----------
@@ -33,6 +32,7 @@ def trim(values, trim_min, trim_max):
     trimmed_values : list of float
         List of trimmed values.
     """
+
     new_max = trim_max + 0.49998
     new_min = trim_min - 0.49998
     trimmed_values = values.copy()
@@ -131,36 +131,38 @@ def filter_on_column(df,
                      exclude_zeros=False,
                      exclude_zero_sd=False):
     """
-    Flter out the rows in the data frame `df` that contain
-    non-numeric (or zero, if specified) values contained in
-    `column`. If specified, exclude the columns if it has
-    stdev == 0.
+    Flter out the rows in the given data frame that contain non-numeric
+    (or zero, if specified) values in the specified column. Additionally,
+    it may exclude any columns if they have a standard deviation
+    (:math:`\\sigma`) of 0.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Data frame containing the feature values.
+        Input data frame containing the feature values.
     column : str
-        Name of the column from which to filter
-        out values.
+        Name of the column from which to filter out values.
     id_column : str
-        Name of the column containing response IDs.
+        Name of the column containing the unique response IDs.
     exclude_zeros : bool, optional
         Whether to exclude responses containing zeros
-        in the specified column. Defaults to False.
+        in the specified column. Defaults to `False`.
     exclude_zero_sd : bool, optional
-        Whether to perform the additional filtering
-        step of removing columns that have zero
-        std. dev. Defaults to False.
+        Whether to perform the additional filtering step of removing
+        columns that have :math:`\\sigma = 0`. Defaults to `False`.
 
     Returns
     -------
     df_filtered : pandas DataFrame
-        Data frame containing the responses remaining
-        after the filtering.
+        Data frame containing the responses that were *not* filtered out.
     df_excluded : pandas DataFrame
-        Data frame containing the responses removed
-        due to the filtering.
+        Data frame containing the non-numeric or zero responses that
+        were filtered out.
+
+    Note
+    ----
+    The columns with :math:`\\sigma=0` are removed from both output
+    data frames.
     """
 
     logger = logging.getLogger(__name__)
@@ -219,15 +221,22 @@ def filter_on_column(df,
     return (df_filtered, df_excluded)
 
 
-def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
+def remove_outliers(values, mean=None, sd=None, sd_multiplier=4):
     """
-    Clamp any values in `data` (numpy array) that
-    are +/- `sd_multiplier` standard deviations (`sd`)
-    away from the `mean`.
+    Clamp any values in the given numpy array that are
+    +/- `sd_multiplier` (:math:`m`) standard deviations (:math:`\\sigma`) away
+    from the mean (:math:`\\mu`). Use given `mean` and `sd` instead
+    of computing :math:`\\sigma` and :math:`\\mu`, if specified.
+
+    The values are clamped to the interval:
+
+    .. math::
+
+        [\\mu - m * \\sigma, \\mu + m * \\sigma]
 
     Parameters
     ----------
-    data : numpy array
+    values : numpy array
         Numpy array containing values for a feature.
     mean : None, optional
         Use the given mean value when computing outliers
@@ -242,25 +251,25 @@ def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
 
     Returns
     -------
-    new_data : numpy array
+    new_values : numpy array
         Numpy array with the outliers clamped.
     """
 
     # convert data to a numpy float array before doing any clamping
-    new_data = np.array(data, dtype=np.float)
+    new_values = np.array(values, dtype=np.float)
 
     if not mean:
-        mean = new_data.mean()
+        mean = new_values.mean()
     if not sd:
-        sd = new_data.std()
+        sd = new_values.std()
 
     floor = mean - sd_multiplier * sd
     ceiling = mean + sd_multiplier * sd
 
-    new_data[new_data > ceiling] = ceiling
-    new_data[new_data < floor] = floor
+    new_values[new_values > ceiling] = ceiling
+    new_values[new_values < floor] = floor
 
-    return new_data
+    return new_values
 
 
 def apply_inverse_transform(name, data, sd_multiplier=4):
@@ -462,13 +471,9 @@ def apply_add_one_log_transform(name, data):
 
 def transform_feature(name, data, transform):
     """
-    The main driver function that applies `transform`
-    to all of the values in `data` for the feature `name`.
-
-    Note that many of these transformations may be meaningless
-    for features which span both negative and positive values.
-    Some transformations may throw errors for negative feature
-    values.
+    Applies the given transform to all of the values in the given
+    numpy array. The values are assumed to be for the feature with
+    the given name.
 
     Parameters
     ----------
@@ -489,6 +494,13 @@ def transform_feature(name, data, transform):
     ------
     ValueError
         If the given transform is not recognized.
+
+    Note
+    ----
+    Many of these transformations may be meaningless for features which
+    span both negative and positive values. Some transformations may
+    throw errors for negative feature values.
+
     """
     transform_functions = {'inv': apply_inverse_transform,
                            'sqrt': apply_sqrt_transform,
@@ -514,8 +526,9 @@ def preprocess_feature(data,
                        feature_sd,
                        exclude_zero_sd=False):
     """
-    The main pre-processing driver function that
-    removes outliers and transform the values in `data`.
+    Remove outliers and transform the values in the given numpy array
+    using the given outlier and transformation parameters. The values
+    are assumed for the given feature name.
 
     Parameters
     ----------
@@ -532,7 +545,7 @@ def preprocess_feature(data,
         Std. dev. value to use for outlier detection instead
         of the std. dev. of the given feature values.
     exclude_zero_sd : bool, optional
-        Check whether there are features that have a zero
+        Check `data` has a zero
         std. dev. Defaults to False.
 
     Returns
@@ -544,8 +557,8 @@ def preprocess_feature(data,
     Raises
     ------
     ValueError
-        If there are any features with zero std. dev. and
-        `exclude_zero_sd` is set to True.
+        If the given values have zero standard deviation and
+        `exclude_zero_sd` is set to `True`.
     """
 
     # clamp any outlier values that are 4 standard deviations

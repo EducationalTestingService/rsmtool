@@ -104,21 +104,23 @@ notebook_path_dict = {'general': {'rsmtool': notebook_path,
 
 def merge_notebooks(notebook_files, output_file):
     """
-    A utility function to merge the given notebooks
-    into a single notebook named `output_file`.
-    Inspired by: http://stackoverflow.com/questions/20454668/how-to-merge-two-ipython-notebooks-correctly-without-getting-json-error
+    Merge the given Jupyter notebooks into a single Jupyter notebook.
 
     Parameters
     ----------
     notebook_files : list of str
-        List of IPython notebook files
+        List of paths to the input Jupyter notebook files.
     output_file : str
-        Output IPython notebook file
+        Path to output Jupyter notebook file
+
+    Note
+    ----
+    Adapted from: http://stackoverflow.com/questions/20454668/how-to-merge-two-ipython-notebooks-correctly-without-getting-json-error.
+
     """
 
-    # Merging ipython notebooks basically means
-    # that we keep the metadata from the "first"
-    # notebook and then add in the cells
+    # Merging ipython notebooks basically means that we keep the
+    # metadata from the "first" notebook and then add in the cells
     # from all the other notebooks.
     first_notebook = notebook_files[0]
     merged_notebook = json.loads(open(first_notebook, 'r', encoding='utf-8').read())
@@ -564,15 +566,20 @@ def create_comparison_report(experiment_id_old, description_old,
 
 def convert_ipynb_to_html(notebook_file, html_file):
     """
-    Convert the given `notebook_file` to HTML and
-    write it to `html_file`.
+    Convert the given Jupyter notebook file (``.ipynb``)
+    to HTML and write it out as the given ``.html`` file.
 
     Parameters
     ----------
     notebook_file : str
-        Input IPython notebook file.
+        Path to input Jupyter notebook file.
     html_file : str
-        Output HTML file.
+        Path to output HTML file.
+
+    Note
+    ----
+    This function is also exposed as the :ref:`render_notebook <render_notebook>` command-line utility.
+
     """
 
     # set a high timeout for datasets with a large number of features

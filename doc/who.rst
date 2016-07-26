@@ -7,11 +7,11 @@ A researcher already *has* a set of responses such as essays or recorded spoken 
 
 He can then run an RSMTool "experiment" to build a regression-based scoring model (using one of many available regressors) and produce a report. The report includes descriptive statistics for all his features, diagnostic information about the trained regression model, and a comprehensive evaluation of model performance on a held-out set of responses.
 
-While he could use ``R``, ``PASW`` (``SPSS``) or other tools to perform each of the RSMTool analyses individually and compile a report herself, RSMTool does all of this work for him with just a single command. Furthermore, the analyses included into the tool highlight educational measurement criteria important to building automated scoring models. If he wishes, he can conduct further exploratory analysis using his preferred tools for data analysis by using the output of RSMTool as a starting point.
+While he could use ``R``, ``PASW`` (``SPSS``) or other tools to perform each of the RSMTool analyses individually and compile a report himself, RSMTool does all of this work for him with just a single command. Furthermore, the analyses included into the tool highlight educational measurement criteria important to building automated scoring models. If he wishes, he can conduct further exploratory analysis using his preferred tools for data analysis by using the output of RSMTool as a starting point.
 
 RSMTool is designed to be customizable:
 
-1. The user can choose to either run all of the default analyses or select *only* the subset applicable to her particular study by changing the appropriate settings in a configuration file.
+1. The user can choose to either run all of the default analyses or select *only* the subset applicable to his particular study by changing the appropriate settings in a configuration file.
 
 
 2. RSMTool provides explicit support for adding :ref:`custom analyses <custom_notebooks>` to the report if the user has some analysis in mind that is not already provided by RSMTool. These analyses can then be automatically included in all subsequent experiments.

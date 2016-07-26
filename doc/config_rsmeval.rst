@@ -1,3 +1,5 @@
+.. _config_file_rsmeval:
+
 Experiment configuration file
 """""""""""""""""""""""""""""
 

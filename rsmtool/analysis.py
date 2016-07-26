@@ -18,14 +18,14 @@ def compute_basic_descriptives(df, selected_features):
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute
         the descriptives.
 
     Returns
     -------
-    df : pandas DataFrame
+    df_desc : pandas DataFrame
         Data frame containing the descriptives for
         each of the features.
     """
@@ -63,12 +63,12 @@ def compute_basic_descriptives(df, selected_features):
 def compute_percentiles(df, selected_features):
     """
     Compute percentiles and outlier descriptives for the
-    given data frame using the columns with the given names
+    given data frame using the columns with the given names.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute the
         percentile descriptives.
@@ -76,8 +76,8 @@ def compute_percentiles(df, selected_features):
     Returns
     -------
     df_output : pandas DataFrame
-        Data frame containing the percentile information.
-        for each of the features
+        Data frame containing the percentile information
+        for each of the features.
     """
 
     # select only feature columns
@@ -130,7 +130,7 @@ def compute_outliers(df, selected_features):
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing the feature values.
     selected_features : list of str
         List of feature names for which to compute
         outlier information.
@@ -170,13 +170,55 @@ def compute_outliers(df, selected_features):
     return df_output
 
 
-def correlation_helper(df, target_variable, grouping_variable, include_length=False):
+def correlation_helper(df,
+                       target_variable,
+                       grouping_variable,
+                       include_length=False):
     """
-    A helper function to compute marginal and partial correlations by
-    the `grouping_variable` of all the columns in the given
-    data frame against the `target_variable`. If `include_length`
-    is True, compute additional partial correlations of each column
-    in the data frame against sc1 only partialling out length.
+    A helper function to compute marginal and partial correlations of
+    all the columns in the given data frame against the target variable
+    separately for each level in the the grouping variable.
+    If `include_length` is True, it additionally computes partial
+    correlations of each column in the data frame against the target
+    variable after controlling for the `length` column.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        Input data frame containing numeric feature values, the numeric
+        `target variable` and the `grouping variable`.
+
+    target_variable: str
+        The name of the column used as a reference for computing correlations.
+
+    grouping_variable: str
+        The name of the column defining groups in the data
+
+    include_length: bool
+        If True compute additional partial correlations of each column
+        in the data frame against `target variable` only partialling out
+        `length` column.
+
+
+    Returns
+    -------
+    df_target_cors : pandas DataFrame
+        Data frame containing Pearson's correlation coefficients for
+        marginal correlations between features and `target_variable`.
+
+    df_target_partcors : pandas DataFrame
+        Data frame containing Pearson's correlation coefficients for
+        partial correlations between each feature and `target_variable`
+        after controlling for all other features. If include_length is
+        set to True, `length` will not be included into partial
+        correlation comutation.
+
+    df_target_partcors_no_length: pandas DataFrame
+        If `include_length` is set to `true`: Data frame containing
+        Pearson's correlation coefficients for partial correlations
+        between each feature and `target_variable` after controlling
+        for `length`. Otherwise, it will be an empty data frame.
+
     """
 
     # group by the group columns
@@ -219,10 +261,9 @@ def compute_correlations_by_group(df,
                                   grouping_variable,
                                   include_length=False):
     """
-    Compute various marginal and partial correlations of
-    the given columns in the given data frame against the
-    `target_variable` for all data and for each level of the
-    `grouping_variable`.
+    Compute various marginal and partial correlations of the given
+    columns in the given data frame against the target variable for all
+    data and for each level of the grouping variable.
 
     Parameters
     ----------
@@ -273,16 +314,16 @@ def compute_correlations_by_group(df,
 
 def compute_pca(df, selected_features):
     """
-    Compute the PCA decomposition of the given data
-    frame and restrict to the given columns.
+    Compute the PCA decomposition of features in the given data
+    frame, restricted to the given columns.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame.
+        Input data frame containing feature values.
     selected_features : list of str
         List of feature names to be used in the
-        PCA decomposition
+        PCA decomposition.
 
     Returns
     -------
@@ -291,6 +332,7 @@ def compute_pca(df, selected_features):
     df_variance : pandas DataFrame
         Data frame containing the variance information.
     """
+
     # remove the spkitemid and sc1 column
 
     df_pca = df[selected_features]
@@ -322,8 +364,43 @@ def compute_pca(df, selected_features):
 
 def metrics_helper(human_scores, system_scores):
     """
-    This is a helper function that computes some basic
-    metrics for the system_scores against the human_scores.
+    This is a helper function that computes some basic agreement
+    and association metrics between the system scores and the
+    human scores.
+
+    Parameters
+    ----------
+    human_scores : pandas Series
+        Series containing numeric human (reference) scores.
+
+    system_scores: pandas Series
+        Series containing numeric scores predicted by the model.
+
+    Returns
+    -------
+    metrics: pandas Series
+        Series containing different evaluation metrics comparing human
+        and system scores. The following metrics are included:
+
+        - `kappa` :  unweighted Cohen's kappa
+        - `wtkappa` :  quadratic weighted kappa
+        - `exact_agr` : exact agreement
+        - `adj_agr` : adjacent agreement with tolerance set to 1
+        - `SMD` : standardized mean difference (absolute difference
+          between mean human and machine scores divided by the square root
+          of the summed squared standard deviations divided by two)
+        - `corr` : Pearson's r
+        - `R2` : r squared
+        - `RMSE` : root mean square error
+        - `sys_min` : min system score
+        - `sys_max` : max system score
+        - `sys_mean` : mean system score (ddof=1)
+        - `sys_sd` : standard deviation of system scores (ddof=1)
+        - `h_min` : min human score
+        - `h_max` : max human score
+        - `h_mean` : mean human score (ddof=1)
+        - `h_sd` : standard deviation of human scores (ddof=1)
+        - `N` : total number of responses
     """
 
     # compute the kappas
@@ -369,7 +446,8 @@ def metrics_helper(human_scores, system_scores):
     rmse = np.sqrt(mse)
 
     # return everything as a series
-    return pd.Series({'kappa': unweighted_kappa,
+
+    metrcs = pd.Series({'kappa': unweighted_kappa,
                       'wtkappa': quadratic_weighted_kappa,
                       'exact_agr': human_system_agreement,
                       'adj_agr': human_system_adjacent_agreement,
@@ -386,6 +464,8 @@ def metrics_helper(human_scores, system_scores):
                       'h_mean': mean_human_score,
                       'h_sd': human_score_sd,
                       'N': len(system_scores)})
+
+    return metrics
 
 
 def filter_metrics(df_metrics,
@@ -433,7 +513,7 @@ def filter_metrics(df_metrics,
                                                            'sys_sd',
                                                            'corr',
                                                            'SMD',
-                                                           'RMSE', 
+                                                           'RMSE',
                                                            'R2'],
                           '{}_trim_round'.format(score_prefix): ['sys_mean',
                                                                  'sys_sd',
@@ -682,8 +762,8 @@ def compute_degradation(df, use_all_responses=True):
                                             include_second_score=True)
 
     # we only care about the degradation in these metrics
-    degradation_metrics = ['corr','kappa','wtkappa',
-                           'exact_agr','adj_agr','SMD']
+    degradation_metrics = ['corr', 'kappa', 'wtkappa',
+                           'exact_agr', 'adj_agr', 'SMD']
     df_human_machine_eval = df_human_machine_eval[degradation_metrics]
     df_human_human_eval = df_human_human_eval[degradation_metrics]
     df_degradation = df_human_machine_eval.apply(lambda row: row - df_human_human_eval.loc[''], axis=1)
