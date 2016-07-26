@@ -3,7 +3,7 @@
     "train_file": "train.csv",
     "test_file": "test.csv",
     "model": "LinearRegression",
-    "description": "Using all features with a LinearRegression model.",
+    "description": "A model which uses all features and a LinearRegression.",
     "test_label_column": "score",
     "train_label_column": "score",
     "use_scaled_predictions": true,

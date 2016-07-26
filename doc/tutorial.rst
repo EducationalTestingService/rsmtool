@@ -8,10 +8,10 @@ Workflow
 
 In general, there are four steps to using RSMTool:
 
-1.  Generate features for your training as well as your evaluation data using your NLP/Speech pipline in ``.csv`` format.
-2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describe the modeling experiment you would like to run.
+1.  Generate features for your training as well as your evaluation data using your NLP/Speech pipeline in ``.csv`` format.
+2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describing the modeling experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmtool <usage_rsmtool>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmtool>`.
-4. Examine HTML report for model efficacy.
+4. Examine HTML report to check various aspects of model performance.
 
 Note that the above workflow does not use the customization features of RSMTool, e.g., :ref:`choosing which sections to include in the report <general_sections_rsmtool>` or :ref:`adding custom analyses sections <custom_notebooks>` etc. However, we will stick with this workflow for our tutorial since it is likely to be the most common use case.
 
@@ -24,21 +24,24 @@ For our tutorial, we will use one of the questions from this data to illustrate 
 
 Extract features
 ^^^^^^^^^^^^^^^^
-Kaggle provides the actual text of the responses along with the human scores in a ``.tsv`` file. The first step, as with any automated scoring approach, is to extract features from the written (or spoken) responses that might be useful in predicting the score we are interested in. For example, some features that might be useful for predicting the English proficiency of a response are:
+Kaggle provides the actual text of the responses along with the human scores in a ``.tsv`` file. The first step, as with any automated scoring approaches, is to extract features from the written (or spoken) responses that might be useful in predicting the score we are interested in. For example, some features that might be useful for predicting the English proficiency of a response are:
 
 - Does the response contain any grammatical errors and if so, how many and of what kind since some grammatical errors are more serious than others.
 - Is the response is well organized, e.g., whether there is a clear thesis statement and a conclusion, etc.
 - Is the response coherent, i.e., do the ideas expressed in the various paragraphs well connected?
 - Does the response contain any spelling errors?
 
-For more examples of what features might look like, we refer the reader to this paper by Attali & Burstein [#]_. For our ASAP2 data, we extract the following four features:
+For more examples of what features might look like, we refer the reader to this paper by Attali & Burstein [#]_. For our ASAP2 data, we extracted the following four features:
 
 - ``GRAMMAR``: indicates how grammatically fluent the responses is.
 - ``MECHANICS``: indicates how free of mechanical errors (e.g., spelling errors) the response is.
 - ``DISCOURSE``: indicates whether the discourse transitions in the response make sense.
 - ``ORGANIZATION``: indicates whether the response is organized well.
 
-For the purpose of this tutorial, it is not important to describe *exactly* how those features were extracted. You would likely use your own NLP/Speech processing pipeline to extract your own features.
+.. note::
+     These features were extracted using proprietory sofware for text analysis. RSMTool does not include any NLP/speech analysis components for feature extraction.
+
+For the purpose of this tutorial, it is not important to describe *exactly* how those features were extracted. RSMTool is designed for researchers who use their own NLP/Speech processing pipeline to extract their own features.
 
 Create a configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
