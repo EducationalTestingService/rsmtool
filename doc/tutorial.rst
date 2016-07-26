@@ -24,7 +24,7 @@ ASAP Example
 
 Let's see how we can apply this basic RSMTool workflow to a simple example based on a 2012 Kaggle competition on automated essay scoring called the `Automated Student Assessment Prize (ASAP) contest <https://www.kaggle.com/c/asap-aes>`_. As part of that contest, responses to 8 different essay questions written by students in grades 6-10 were provided. The responses were scored by humans and given a holistic score indicating the English proficiency of the student. The goal of the contest was to build an automated scoring model with the highest accuracy on held-out evaluation data.
 
-For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a model and evaluate its performance. All of the data we refer to below can be found in the ``examples/rsmtool`` folder in the `github repository <https://github.com/EducationalTestingService/rsmtool/tree/master/examples/rsmtool>`_.
+For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a scoring model and evaluate its performance. All of the data we refer to below can be found in the ``examples/rsmtool`` folder in the `github repository <https://github.com/EducationalTestingService/rsmtool/tree/master/examples/rsmtool>`_.
 
 Extract features
 ^^^^^^^^^^^^^^^^
@@ -118,10 +118,13 @@ Our experiment report contains all the information we would need to determine ho
 3. Model fit and diagnostics.
 4. Several different metrics indicating how well the machine's scores agree with the humans'.
 
-... and much more.
+... and :ref:`much more <general_sections_rsmtool>`.
 
-If we are not satisfied with the performance of the model, we can then take specific action, e.g., either add new features or perhaps try a more sophisticated model.
+If we are not satisfied with the performance of the model, we can then take specific action, e.g., either add new features or perhaps try a more sophisticated model. And then run ``rsmtool`` again and examine the report. Building a scoring model is generally an iterative process.
 
+What's next?
+------------
+Next, you should read the detailed documentation on :ref:`rsmtool <usage_rsmtool>` since the tutorial only covered a very basic example. If you are interested in RSMTool but your use case is more nuanced, we have probably got you :ref:`covered <advanced_usage>`.
 
 .. rubric:: References
 

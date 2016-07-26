@@ -1,3 +1,5 @@
+.. _advanced_usage:
+
 Advanced Uses of RSMTool
 ------------------------
 
