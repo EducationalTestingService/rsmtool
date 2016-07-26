@@ -3,7 +3,7 @@
 Tutorial
 ========
 
-First you'll want to :ref:`install RSMTool <install>`.
+First you'll want to :ref:`install RSMTool <install>` and make sure you have activated the ``rsmtool`` conda environment before you start the tutorial.
 
 Workflow
 --------
