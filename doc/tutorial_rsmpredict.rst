@@ -76,7 +76,7 @@ This should produce output like::
     Generating predictions
     Rescaling predictions
     Trimming and rounding predictions
-    Saving predictions to /home/aloukina/proj/rsmtool/rsmtool-github/examples/rsmpredict/predictions.csv
+    Saving predictions to /Users/nmadnani/work/rsmtool/examples/rsmpredict/predictions.csv
 
 You should now see a file named ``predictions.csv`` in the current directory which contains the predicted scores for the new data in the ``predictions`` column.
 
