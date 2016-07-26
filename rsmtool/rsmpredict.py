@@ -34,6 +34,7 @@ from rsmtool.utils import LogFormatter
 from skll import Learner
 from rsmtool.version import __version__
 
+
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
     Run ``rsmpredict`` with given configuration file and generate
@@ -177,8 +178,6 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     # check that the id_column contains unique values
     if df_input['spkitemid'].size != df_input['spkitemid'].unique().size:
         raise ValueError("The data contains repeated response IDs in {}. Please make sure all response IDs are unique and re-run the tool.".format(id_column))
-
-
 
     # now we need to pre-process these features using
     # the parameters that are already stored in the
@@ -370,4 +369,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

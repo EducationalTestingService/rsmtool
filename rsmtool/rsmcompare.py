@@ -102,7 +102,7 @@ def run_comparison(config_file, output_dir):
     if custom_report_section_paths:
         logger.info('Locating custom report sections')
         custom_report_sections = locate_custom_sections(custom_report_section_paths,
-                                                         configpath)
+                                                        configpath)
     else:
         custom_report_sections = []
 
@@ -125,6 +125,7 @@ def run_comparison(config_file, output_dir):
                              chosen_notebook_files,
                              use_scaled_predictions_old=use_scaled_predictions_old,
                              use_scaled_predictions_new=use_scaled_predictions_new)
+
 
 def main():
 

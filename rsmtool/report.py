@@ -265,7 +265,7 @@ def determine_chosen_sections(general_sections,
         check_section_names(general_sections, 'general', context)
         chosen_general_sections = [s for s in general_sections
                                    if s in general_section_list]
-        all_general_sections=False
+        all_general_sections = False
 
     # 2. Exclude the subgroup sections if we do not have subgroup information.
 
@@ -287,7 +287,6 @@ def determine_chosen_sections(general_sections,
         # subgroup sections
         chosen_general_sections = [section for section in chosen_general_sections
                                    if not section in subgroup_sections]
-
 
     # 3. Include the specified (and valid) subset of the special sections
     chosen_special_sections = []
@@ -487,10 +486,10 @@ def create_report(experiment_id, description,
     os.environ['MODEL_TYPE'] = model_type
     os.environ['SCALED'] = '1' if use_scaled_predictions else '0'
     os.environ['EXCLUDE_ZEROS'] = '1' if exclude_zero_scores else '0'
-    os.environ['LENGTH_COLUMN'] = '' if length_column == None else length_column
-    os.environ['H2_COLUMN'] = '' if second_human_score_column == None else second_human_score_column
-    os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate == None else str(min_items_per_candidate)
-    os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file == None else feature_subset_file
+    os.environ['LENGTH_COLUMN'] = '' if length_column is None else length_column
+    os.environ['H2_COLUMN'] = '' if second_human_score_column is None else second_human_score_column
+    os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate is None else str(min_items_per_candidate)
+    os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file is None else feature_subset_file
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
