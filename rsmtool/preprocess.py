@@ -11,6 +11,7 @@ import logging
 import numpy as np
 import pandas as pd
 
+
 def trim(values, trim_min, trim_max):
     """
     Trim the values contained in the given numpy array to `trim_min` - 0.49998 as the floor and `trim_max` + 0.49998
@@ -323,7 +324,7 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
                          "applied to feature {} where the values can"
                          "have different signs".format(name))
 
-    new_data =  1/data
+    new_data = 1 / data
     return new_data
 
 

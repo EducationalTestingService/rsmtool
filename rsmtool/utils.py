@@ -16,9 +16,9 @@ package_path = os.path.dirname(__file__)
 # Adapted from: http://stackoverflow.com/questions/1343227/can-pythons-logging-format-be-modified-depending-on-the-message-log-level
 class LogFormatter(logging.Formatter):
 
-    err_fmt  = "ERROR: %(msg)s"
+    err_fmt = "ERROR: %(msg)s"
     warn_fmt = "WARNING: %(msg)s"
-    dbg_fmt  = "DBG: %(module)s: %(lineno)d: %(msg)s"
+    dbg_fmt = "DBG: %(module)s: %(lineno)d: %(msg)s"
     info_fmt = "%(msg)s"
 
     def __init__(self, fmt="%(levelno)s: %(msg)s"):
@@ -81,7 +81,7 @@ def covariance_to_correlation(m):
     if not numrows == numcols:
         raise ValueError('Input matrix must be square')
 
-    Is = np.sqrt(1/np.diag(m))
+    Is = np.sqrt(1 / np.diag(m))
     retval = Is * m * np.repeat(Is, numrows).reshape(numrows, numrows)
     np.fill_diagonal(retval, 1.0)
     return retval
@@ -158,7 +158,7 @@ def agreement(score1, score2, tolerance=0):
     # are for the same number of items
     assert len(score1) == len(score2)
 
-    num_agreements = sum([int(abs(s1-s2) <= tolerance)
+    num_agreements = sum([int(abs(s1 - s2) <= tolerance)
                           for s1, s2 in zip(score1, score2)])
 
     agreement_value = (float(num_agreements) / len(score1)) * 100
@@ -232,7 +232,7 @@ def write_feature_json(feature_specs,
     feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
 
     makedirs(featuredir, exist_ok=True)
-    outjson = join(featuredir, experiment_id+'_selected.json')
+    outjson = join(featuredir, '{}_selected.json'.format(experiment_id))
     with open(outjson, 'w') as outfile:
         json.dump(feature_specs_selected, outfile, indent=4, separators=(',', ': '))
 
