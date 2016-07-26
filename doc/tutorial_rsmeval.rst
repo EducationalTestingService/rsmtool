@@ -1,4 +1,4 @@
-.. _tutorial_rsmeval
+.. _tutorial_rsmeval:
 
 Tutorial
 """"""""

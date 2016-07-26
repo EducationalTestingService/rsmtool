@@ -45,6 +45,8 @@ Output
 
 ``rsmeval`` produces set of folders in the output directory.
 
+.. _output_dirs_rsmeval:
+
 report
 ~~~~~~
 This folder contains the final RSMEval report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).

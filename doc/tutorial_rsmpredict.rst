@@ -1,4 +1,4 @@
-.. _tutorial_rsmpredict
+.. _tutorial_rsmpredict:
 
 Tutorial
 """"""""

@@ -1,4 +1,4 @@
-.. _tutorial_rsmcompare
+.. _tutorial_rsmcompare:
 
 Tutorial
 """"""""
@@ -34,7 +34,7 @@ The next step is to create an :ref:`rsmcompare experiment configuration file <co
 
 .. _asap_config_rsemcompare:
 
-.. literalinclude:: ../examples/rsmeval/config_rsmcompare.json
+.. literalinclude:: ../examples/rsmcompare/config_rsmcompare.json
     :language: javascript
     :linenos:
 
@@ -71,7 +71,7 @@ This should produce output like::
 Once the run finishes, you will see the a report named ``ASAP2_vs_ASAP2.report.html``. This is the final ``rsmcompare`` comparison report.
 
 Examine the report
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 Our experiment report contains all the information we would need to evaluate the system scores against the human scores. It includes:
 
 1. Comparison of feature distributions including differences between the two models. 
