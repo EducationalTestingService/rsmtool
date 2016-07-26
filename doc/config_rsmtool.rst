@@ -3,7 +3,7 @@
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. An example configuration file can be found `here <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmtool/config_rsmtool.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an example configuration file for `rsmtool <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmtool/config_rsmtool.json>`_.
 
 There are four required fields and the rest are all optional.
 
@@ -99,13 +99,18 @@ exclude_zero_scores *(Optional)*
 """"""""""""""""""""""""""""""""
 By default, responses with human scores of 0 will be excluded from both training and evaluation set. Set this field to ``false`` if you want to keep responses with scores of 0. Defaults to ``true``.
 
+.. _trim_min_rsmtool:
+
 trim_min *(Optional)*
 """""""""""""""""""""
-The single numeric value for the lowest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the lowest observed human score in the training data or 1 if there are no numeric human scores available.
+The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - 0.49998. Defaults to the lowest observed human score in the training data or 1 if there are no numeric human scores available.
+
+
+.. _trim_max_rsmtool:
 
 trim_max *(Optional)*
 """""""""""""""""""""
-The single numeric value for the highest possible score that the machine should predict. This value will be used to compute trimmed (bound) machine scores. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
+The single numeric value for the highest possible integer score that the machine should predict. This value will be used to compute the ceiling value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + 0.49998. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
 
 .. _select_transformations_rsmtool:
 
@@ -125,6 +130,8 @@ Note that ``inv`` is never used for features with positive values. Defaults to `
 .. seealso::
 
     It is also possible to manually apply transformations to any feature as part of the :ref:`feature column selection <json_column_selection>` process.
+
+.. _use_scaled_predictions_rsmtool:
 
 use_scaled_predictions *(Optional)*
 """""""""""""""""""""""""""""""""""
