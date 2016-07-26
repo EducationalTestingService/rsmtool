@@ -32,6 +32,7 @@ from rsmtool.utils import (scale_coefficients,
 from rsmtool.utils import LogFormatter
 from rsmtool.version import __version__
 
+
 def run_experiment(config_file, output_dir):
     """
     Run RSMTool experiment using the given configuration
@@ -253,9 +254,9 @@ def run_experiment(config_file, output_dir):
                                 reset_index=True)
 
         length_marg_cors, length_part_cors, _ = length_correlation_by_group_dict.get(group,
-                                                                                  (pd.DataFrame(),
-                                                                                   pd.DataFrame(),
-                                                                                   pd.DataFrame()))
+                                                                                     (pd.DataFrame(),
+                                                                                      pd.DataFrame(),
+                                                                                      pd.DataFrame()))
         write_experiment_output([length_marg_cors, length_part_cors],
                                 ['margcor_length_by_{}'.format(group),
                                  'pcor_length_by_{}'.format(group)],
@@ -270,7 +271,7 @@ def run_experiment(config_file, output_dir):
     # Tell the user that they will get the mismatch warning if
     # the model features do not match the original data
 
-    if len(selected_features) != len(df_test_preprocessed_features.columns)-2:
+    if len(selected_features) != len(df_test_preprocessed_features.columns) - 2:
         logger.warning("You specified a model with automatic feature "
                        "selection and therefore some of the original "
                        "features were excluded from the final model. If this "
@@ -389,6 +390,7 @@ def run_experiment(config_file, output_dir):
                   exclude_zero_scores=exclude_zero_scores,
                   use_scaled_predictions=use_scaled_predictions)
 
+
 def main():
 
     # set up the basic logging config
@@ -458,4 +460,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

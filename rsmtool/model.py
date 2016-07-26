@@ -103,12 +103,13 @@ def ols_coefficients_to_dataframe(coefs):
                                   'coefficient': coefs['const']}])
 
     # append the non-intercept frame to the intercept one
-    df_coef =  df_intercept.append(df_non_intercept, ignore_index=True)
+    df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
 
     # we always want to have the feature column first
     df_coef = df_coef[['feature', 'coefficient']]
 
     return df_coef
+
 
 def skll_learner_params_to_dataframe(learner):
     """
@@ -150,7 +151,7 @@ def skll_learner_params_to_dataframe(learner):
                                   'coefficient': intercept}])
 
     # append the non-intercept frame to the intercept one
-    df_coef =  df_intercept.append(df_non_intercept, ignore_index=True)
+    df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
 
     # we always want to have the feature column first
     df_coef = df_coef[['feature', 'coefficient']]
@@ -364,7 +365,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -480,7 +481,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -705,7 +706,7 @@ def train_model(model_name, df_train, experiment_id, csvdir, figdir):
     """
     call_args = [model_name, df_train, experiment_id, csvdir, figdir]
     model = train_builtin_model(*call_args) if model_name in builtin_models \
-             else train_skll_model(*call_args)
+        else train_skll_model(*call_args)
     return model
 
 
@@ -739,5 +740,3 @@ def check_model_name(model_name):
                          "check the spelling.".format(model_name))
 
     return model_type
-
-

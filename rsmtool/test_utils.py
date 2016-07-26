@@ -113,6 +113,7 @@ def do_run_comparison(source, config_file):
     experiment_dir = join(source_output_dir, source)
     run_comparison(config_file, experiment_dir)
 
+
 def check_csv_output(csv1, csv2):
     """
     Check if two experiment CSV files have values that are
@@ -150,7 +151,7 @@ def check_csv_output(csv1, csv2):
     if csv1.endswith('pca.csv') or csv1.endswith('factor_correlations.csv'):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
-            df.loc[:,msk] = df.loc[:,msk].abs()
+            df.loc[:, msk] = df.loc[:, msk].abs()
 
     assert_frame_equal(df1.sort_index(axis=1),
                        df2.sort_index(axis=1),
@@ -191,9 +192,9 @@ def check_scaled_coefficients(source, experiment_id):
         The experiment ID.
     """
     preprocessed_test_file = join('test_outputs',
-                                   source,
-                                   'output',
-                                   '{}_test_preprocessed_features.csv'.format(experiment_id))
+                                  source,
+                                  'output',
+                                  '{}_test_preprocessed_features.csv'.format(experiment_id))
     scaled_coefficients_file = join('test_outputs',
                                     source,
                                     'output',

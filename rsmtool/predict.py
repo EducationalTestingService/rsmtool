@@ -15,6 +15,7 @@ from skll import FeatureSet
 
 from rsmtool.preprocess import trim
 
+
 def predict_with_model(model, df):
     """
     Get the raw predictions of the given SKLL model on the data
@@ -57,6 +58,7 @@ def predict_with_model(model, df):
         df_predictions['sc1'] = labels
 
     return df_predictions
+
 
 def generate_train_and_test_predictions(model, df_train, df_test, trim_min, trim_max):
     """
