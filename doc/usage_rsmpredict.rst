@@ -45,3 +45,4 @@ Output
 
 ``rsmpredict`` produces a ``.csv`` file with predictions for all responses in new data set, and, optionally, a ``.csv`` file with pre-processed feature values.
 
+.. include:: tutorial_rsmpredict.rst

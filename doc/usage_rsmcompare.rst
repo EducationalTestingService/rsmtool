@@ -51,3 +51,5 @@ Output
 """"""
 
 ``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file) in the output directory.
+
+.. include:: tutorial_rsmcompare.rst
