@@ -3,7 +3,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmeval/config_rsmeval.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_.
 
 There are four required fields and the rest are all optional.
 

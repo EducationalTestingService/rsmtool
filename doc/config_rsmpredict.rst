@@ -2,7 +2,7 @@
 
 Experiment configuration file
 """""""""""""""""""""""""""""
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmpredict`` experiment. Here's an example configuration file for `rsmpredict <https://github.com/EducationalTestingService/rsmtool/blob/master/example/rsmpredict/config_rsmpredict.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmpredict`` experiment. Here's an example configuration file for `rsmpredict <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmpredict/config_rsmpredict.json>`_.
 
 There are three required fields and the rest are all optional.
 
