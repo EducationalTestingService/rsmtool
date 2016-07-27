@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 
 from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
@@ -27,17 +29,21 @@ def test_normalize_fields():
             'test.lab': 'r1',
             'scale': 'scale'}
 
-    newdata = normalize_json_fields(data)
-    ok_('experiment_id' in newdata.keys())
-    assert_equal(newdata['experiment_id'], 'experiment_1')
-    assert_equal(newdata['use_scaled_predictions'], True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        newdata = normalize_json_fields(data)
+        ok_('experiment_id' in newdata.keys())
+        assert_equal(newdata['experiment_id'], 'experiment_1')
+        assert_equal(newdata['use_scaled_predictions'], True)
 
     # test for non-standard scaling value
     data = {'expID': 'experiment_1',
             'train': 'data/rsmtool_smTrain.csv',
             'LRmodel': 'LinearRegression',
             'scale': 'Yes'}
-    assert_raises(ValueError, normalize_json_fields, data)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        assert_raises(ValueError, normalize_json_fields, data)
 
     # test when no scaling is specified
     data = {'expID': 'experiment_1',
@@ -51,8 +57,10 @@ def test_normalize_fields():
             'crossvalidate': 'yes',
             'test.lab': 'r1'}
 
-    newdata = normalize_json_fields(data)
-    ok_('use_scaled_predictions' not in newdata.keys())
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        newdata = normalize_json_fields(data)
+        ok_('use_scaled_predictions' not in newdata.keys())
 
 
 @raises(ValueError)

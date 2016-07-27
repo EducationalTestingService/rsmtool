@@ -1,3 +1,8 @@
+# Set up the machine
+machine:
+    environment:
+        COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
+
 # Install stuff
 dependencies:
   cache_directories:
@@ -9,9 +14,12 @@ dependencies:
     - ${HOME}/miniconda3/bin/conda config --add channels desilinguist
     - ${HOME}/miniconda3/bin/conda update --yes conda
     - ${HOME}/miniconda3/bin/conda install --file conda_requirements.txt --yes
+    - ${HOME}/miniconda3/bin/pip install nose-cov python-coveralls
     - ${HOME}/miniconda3/bin/pip install -e .
 
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/bin/nosetests -v tests
+    - ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+  post:
+    - cd ${HOME}/rsmtool && ${HOME}/miniconda3/bin/coveralls

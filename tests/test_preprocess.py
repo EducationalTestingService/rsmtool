@@ -1,5 +1,6 @@
 import random
 import sys
+import warnings
 
 from os.path import dirname, join, normpath
 
@@ -72,10 +73,13 @@ def test_filter_on_column_std_epsilon_zero():
 def test_transform_feature():
     name = 'dpsec'
     data = random.gauss(0, 1)
-    assert_raises(ValueError, transform_feature, name, data, 'add_one_inverse')
-    assert_array_equal(transform_feature(name, data, 'inv'), 1/data)
-    assert_array_equal(transform_feature(name, data, 'raw'), data)
-    assert_array_equal(transform_feature(name, data, 'org'), data)
+    # run the test but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        assert_raises(ValueError, transform_feature, name, data, 'add_one_inverse')
+        assert_array_equal(transform_feature(name, data, 'inv'), 1/data)
+        assert_array_equal(transform_feature(name, data, 'raw'), data)
+        assert_array_equal(transform_feature(name, data, 'org'), data)
 
 
 def test_apply_inverse_transform():

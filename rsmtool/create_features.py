@@ -94,8 +94,27 @@ def generate_feature_names(df,
 def generate_default_specs(feature_names):
 
     """
-    Generate default feature specifications with
-    no transformation or change of sign.
+    Generate default feature "specifications" for the features
+    with the given names. The specifications are given by three fields:
+    "feature", "transform", and "sign".
+
+    Parameters
+    ----------
+    feature_names: list
+        List of feature names for which to generate specifications.
+
+    Returns
+    -------
+    feature_specs: dict
+        Dictionary of feature specifications that can be saved as a
+        :ref:`feature JSON file <example_feature_json>`.
+
+    Note
+    ----
+    Since these are default specifications, the values for the
+    `transform` field for each feature will be `"raw"` and the value
+    for the `sign` field will be `1`.
+
     """
 
     feature_specs = {'features': []}
@@ -133,6 +152,25 @@ def find_feature_transformation(feature_name, feature_value, scores):
     """
     Identify the best transformation based on the
     highest absolute Pearson correlation with human score.
+
+    Parameters
+    ----------
+    feature_name: str
+        Name of feature for which to find the transformation.
+
+    feature_value: pandas Series
+        Series containing feature values.
+
+    scores: pandas Series
+        Numeric human scores.
+
+    Returns
+    -------
+    best_transformation: str
+        The name of the transformation which gives the highest correlation
+        between the feature values and the human scores. See
+        :ref:`documentation <select_transformations_rsmtool>` for the
+        full list of transformations.
     """
 
     # Do not use sqrt and ln for potential negative features.
@@ -151,7 +189,8 @@ def find_feature_transformation(feature_name, feature_value, scores):
             # If the transformation returns an error, append 0.
             correlations.append(0)
     best = np.argmax(correlations)
-    return applicable_transformations[best]
+    best_transformation = applicable_transformations[best]
+    return best_transformation
 
 
 def generate_specs_from_data(feature_names,
@@ -169,7 +208,8 @@ def generate_specs_from_data(feature_names,
     # get feature sign info if available
     if feature_sign:
         # Convert to dictionary {feature:sign}
-        sign_dict = dict(zip(feature_subset_specs.Feature, feature_subset_specs['Sign_'+feature_sign]))
+        sign_dict = dict(zip(feature_subset_specs.Feature,
+                             feature_subset_specs['Sign_{}'.format(feature_sign)]))
     # else create an empty dictionary
     else:
         sign_dict = {}

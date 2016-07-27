@@ -29,7 +29,7 @@ from rsmtool.input import (check_main_config,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column,
-                           locate_custom_sections, 
+                           locate_custom_sections,
                            select_candidates_with_N_or_more_items)
 
 from rsmtool.predict import process_predictions
@@ -49,8 +49,21 @@ from rsmtool.version import __version__
 
 def run_evaluation(config_file, output_dir):
     """
-    Run RSMTool evaluation experiment using the given configuration
-    file and generate all evaluation outputs in the given directory.
+    Run an `rsmeval` experiment using the given configuration
+    file and generate all outputs in the given directory.
+
+    Parameters
+    ----------
+    config_file : str
+        Path to the experiment configuration file.
+    output_dir : str
+        Path to the experiment output directory.
+
+    Raises
+    ------
+    ValueError
+        If any of the required fields are missing or ill-specified.
+
     """
 
     logger = logging.getLogger(__name__)
@@ -121,7 +134,7 @@ def run_evaluation(config_file, output_dir):
     exclude_listwise = False
     min_items_per_candidate = config_obj['min_items_per_candidate']
     if min_items_per_candidate:
-        exclude_listwise=True
+        exclude_listwise = True
 
     general_report_sections = config_obj['general_sections']
 
@@ -176,11 +189,11 @@ def run_evaluation(config_file, output_dir):
     #                  'scale', 'scale_trim' and 'scale_trim_round'.
 
     # we need to scale if and only if a CSV file is specified
-    do_scaling = (scale_with != None and scale_with != 'asis')
+    do_scaling = (scale_with is not None and scale_with != 'asis')
 
     # use scaled predictions for the analyses unless
     # we were told not to
-    use_scaled_predictions = (scale_with != None)
+    use_scaled_predictions = (scale_with is not None)
 
     # log an appropriate message
     if scale_with is None:
@@ -269,7 +282,6 @@ def run_evaluation(config_file, output_dir):
                                              'raw',
                                              'spkitemid',
                                              exclude_zeros=False)
-
 
     del df_filtered
     df_filtered_pred = newdf
@@ -541,4 +553,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
