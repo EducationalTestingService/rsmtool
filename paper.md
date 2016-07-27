@@ -9,7 +9,7 @@ authors:
  - name: Nitin Madnani
    orcid: 0000-0001-9354-6851
    affiliation: Educational Testing Service
- - name: Anastassia Loukin
+ - name: Anastassia Loukina
    orcid: 0000-0002-8213-3362
    affiliation: Educational Testing Service
 date: 27 June 2016
