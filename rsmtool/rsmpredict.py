@@ -266,7 +266,11 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                                              exclude_zero_sd=False)
                     del df_features_preprocessed
                     df_features_preprocessed = newdf
-                    df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the preprocessed
+                    # ones
+                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
+                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
 
         # now standardize the feature values
         df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd

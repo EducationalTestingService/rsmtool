@@ -359,7 +359,8 @@ def test_run_experiment_lr_predict_missing_values():
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
 
-    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+    for csv_file in ['predictions.csv', 'predictions_excluded_responses.csv',
+                     'preprocessed_features.csv']:
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
@@ -398,14 +399,14 @@ def test_run_experiment_lr_predict_illegal_transformations():
     config_file = join(test_dir,
                        'data',
                        'experiments',
-                        source,
+                       source,
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
 
-    for csv_file in ['predictions.csv', 'predictions_excluded_responses.csv', 
+    for csv_file in ['predictions.csv', 'predictions_excluded_responses.csv',
                      'preprocessed_features.csv']:
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
