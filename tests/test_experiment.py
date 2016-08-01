@@ -388,6 +388,31 @@ def test_run_experiment_lr_predict_with_subgroups():
         yield check_csv_output, output_file, expected_output_file
 
 
+def test_run_experiment_lr_predict_illegal_transformations():
+
+    # rsmpredict experiment where the transformations applied to
+    # the new data lead to inf or NaN values. This responses should
+    # be treated as if the feature values are missing.
+
+    source = 'lr-predict-illegal-transformations'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                        source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'predictions_excluded_responses.csv', 
+                     'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
+
 def test_run_experiment_lr_rsmtool_and_rsmpredict():
 
     # this test is to make sure that both rsmtool
