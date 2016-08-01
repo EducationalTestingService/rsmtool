@@ -273,8 +273,9 @@ def remove_outliers(values, mean=None, sd=None, sd_multiplier=4):
     return new_values
 
 
-def apply_inverse_transform(name, data, sd_multiplier=4,
-                            raise_error=True):
+def apply_inverse_transform(name, data,
+                            raise_error=True,
+                            sd_multiplier=4,):
     """
     Apply the inverse transform to `data`.
 
@@ -284,13 +285,14 @@ def apply_inverse_transform(name, data, sd_multiplier=4,
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that can be zero or to a feature that can have different signs.
     sd_multiplier : int, optional
         Use this std. dev. multiplier to compute the ceiling
         and floor for outlier removal and check that these
         are not equal to zero.
-    raise_error : bool, optional
-        When set to true, raises an error if the transform is applied to
-         a feature that can be zero or to a feature that can have different signs.
+
 
     Returns
     -------

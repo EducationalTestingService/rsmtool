@@ -93,7 +93,14 @@ def test_transform_feature_with_warning():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
         assert_array_equal(transform_feature(name, data, 'sqrt', raise_error=False),
                            np.sqrt(data))
-
+        assert_array_equal(transform_feature(name, data, 'inv', raise_error=False),
+                           1/data)
+        assert_array_equal(transform_feature(name, data, 'addOneInv', raise_error=False),
+                           1/(data+1))        
+        assert_array_equal(transform_feature(name, data, 'log', raise_error=False),
+                           np.log(data))        
+        assert_array_equal(transform_feature(name, data, 'addOneLn', raise_error=False),
+                           np.log(data+1))
 
 def test_transform_feature_with_error():
     name = 'dpsec'
@@ -102,6 +109,11 @@ def test_transform_feature_with_error():
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
         assert_raises(ValueError, transform_feature, name, data, 'sqrt')
+        assert_raises(ValueError, transform_feature, name, data, 'inv')
+        assert_raises(ValueError, transform_feature, name, data, 'addOneInv')
+        assert_raises(ValueError, transform_feature, name, data, 'log')
+        assert_raises(ValueError, transform_feature, name, data, 'addOneLn')
+
 
 
 def test_apply_inverse_transform():
