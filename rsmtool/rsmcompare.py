@@ -9,6 +9,7 @@ Script to compare two RSMTool experiments
 #!/usr/bin/env python
 
 import argparse
+import glob
 import logging
 import os
 import sys
@@ -25,6 +26,39 @@ from rsmtool.report import (create_comparison_report,
 
 from rsmtool.utils import LogFormatter
 from rsmtool.version import __version__
+
+
+def check_experiment_id(experiment_dir, experiment_id):
+    """
+    Check that the supplied ``experiment_dir`` contains
+    the outputs for the supplied ``experiment_id``
+
+    Parameters
+    ----------
+    experiment_id : str
+        experiment_id of the original experiment used to generate the
+        output
+    experiment_dir : str
+        path to the directory with the experiment output
+
+    Raises
+    FileNotFoundError
+        if the ``experument_dir`` does not contain any outputs
+        for the ``experiment_id``
+    """
+
+    # list all possible output files which start with
+    # experiment_id
+    outputs = glob.glob(join(experiment_dir,
+                             'output',
+                             '{}_*.*'.format(experiment_id)))
+
+    # raise an error if none exists
+    if len(outputs) == 0:
+        raise FileNotFoundError("The directory {} does not contain "
+                                "any outputs of an rsmtool experiment "
+                                "{}".format(experiment_dir, experiment_id))
+
 
 
 def run_comparison(config_file, output_dir):
@@ -73,6 +107,9 @@ def run_comparison(config_file, output_dir):
             raise FileNotFoundError("The directory {} does not contain "
                                     "the output of an rsmtool "
                                     "experiment.".format(experiment_dir_old))
+
+    check_experiment_id(experiment_dir_old, experiment_id_old)
+
     use_scaled_predictions_old = config_obj['use_scaled_predictions_old']
 
     # get the information about the "new" experiment
@@ -89,6 +126,9 @@ def run_comparison(config_file, output_dir):
             raise FileNotFoundError("The directory {} does not contain "
                                     "the output of an rsmtool "
                                     "experiment.".format(experiment_dir_new))
+    
+    check_experiment_id(experiment_dir_new, experiment_id_new)
+
     use_scaled_predictions_new = config_obj['use_scaled_predictions_new']
 
     # are there specific general report sections we want to include?
