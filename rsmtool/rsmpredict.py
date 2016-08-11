@@ -111,7 +111,8 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
     if experiment_id not in experiment_ids:
-        raise FileNotFoundError('{} does not contain a model for the experiment "{}". '                                 'The following experiments are contained in this '
+        raise FileNotFoundError('{} does not contain a model for the experiment "{}". '
+                                'The following experiments are contained in this '
                                 'directory: {}'.format(experiment_output_dir,
                                                        experiment_id,
                                                        experiment_ids))
