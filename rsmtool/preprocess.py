@@ -305,7 +305,7 @@ def apply_inverse_transform(name, data,
     ValueError
         If the transform is applied to a feature that can
         be zero or to a feature that can have different
-        signs and raise_error is set to 'Trie'
+        signs and `raise_error` is set to 'True'
     """
 
     if np.any(data == 0):
@@ -370,7 +370,7 @@ def apply_sqrt_transform(name, data, raise_error=True):
     ------
     ValueError
         If the transform is applied to a feature
-        that has negative values and raise_error is set to true.
+        that has negative values and `raise_error` is set to true.
     """
 
     # check if the feature has any negative values
@@ -413,7 +413,7 @@ def apply_log_transform(name, data, raise_error=True):
     ------
     ValueError
         If the transform is applied to a feature that
-        can be zero or negative and raise_error is set to true.
+        can be zero or negative and `raise_error` is set to true.
     """
 
     # check if the feature has any zeros
@@ -470,7 +470,7 @@ def apply_add_one_inverse_transform(name, data, raise_error=True):
     ------
     ValueError
         If the transform is applied to a feature
-        that can be negative and raise_error is set to True.
+        that can be negative and `raise_error` is set to True.
     """
 
     # check if the feature has any negative values
@@ -549,7 +549,7 @@ def transform_feature(name, data, transform, raise_error=True):
     transform : str
         Name of the transform to apply.
     raise_error : bool, optional
-        Raise a ValueError if a transformation leads to inf values or may
+        Raise a ValueError if a transformation leads to `Inf` values or may
         change the ranking of the responses
 
     Returns
