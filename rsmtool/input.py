@@ -221,7 +221,8 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     context : str, optional
         Context of the tool in which we are validating.
         Possible values are {'rsmtool', 'rsmeval',
-                             'rsmpredict', 'rsmcompare'}
+                             'rsmpredict', 'rsmcompare',
+                             'rsmsumm'}
         Defaults to 'rsmtool'.
 
     Returns
@@ -260,13 +261,17 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         required_fields = ['experiment_id_old', 'experiment_dir_old',
                            'experiment_id_new', 'experiment_dir_new']
 
+    elif context == 'rsmsumm':
+        required_fields = ['summary_id', 'experiment_dirs']
+
     for field in required_fields:
         if field not in new_json_obj:
             raise ValueError("The config file must specify '{}'".format(field))
 
     # 2. Check to make sure that no experiment IDs contain spaces
     experiment_id_values = [new_json_obj[k] for k in new_json_obj
-                            if k.startswith('experiment_id')]
+                            if k.startswith('experiment_id') or
+                            k == 'summary_id']
     if any([re.search(r'\s', v) for v in experiment_id_values]):
         raise ValueError("Experiment IDs cannot contain any spaces.")
 
@@ -390,7 +395,8 @@ def process_json_fields(json_obj):
                    'general_sections',
                    'special_sections',
                    'custom_sections',
-                   'subgroups', 'section_order']
+                   'subgroups', 'section_order',
+                   'experiment_dirs']
 
     boolean_fields = ['exclude_zero_scores',
                       'use_scaled_predictions',
@@ -402,7 +408,7 @@ def process_json_fields(json_obj):
 
     # convert multiple values into lists
     for field in list_fields:
-        if new_json_obj[field]:
+        if field in new_json_obj and new_json_obj[field] is not None:
             if type(new_json_obj[field]) != list:
                 new_json_obj[field] = new_json_obj[field].split(',')
                 new_json_obj[field] = [prefix.strip() for prefix in new_json_obj[field]]
@@ -410,7 +416,7 @@ def process_json_fields(json_obj):
     # make sure all boolean values are boolean
     for field in boolean_fields:
         error_message = "Field {} can only be set to True or False.".format(field)
-        if new_json_obj[field]:
+        if field in new_json_obj and new_json_obj[field] is not None:
             if type(new_json_obj[field]) != bool:
                 # we first convert the value to string to avoid
                 # attribute errors in case the user supplied an integer.
@@ -834,6 +840,11 @@ def load_experiment_data(main_config_file, output_dir):
     logger.info('Reading configuration file: {}'.format(main_config_file))
     config_obj = read_json_file(main_config_file)
     config_obj = check_main_config(config_obj)
+
+    # save a copy of the main config into the output directory
+    outjson = join(output_dir, 'output', '{}_rsmtool.json'.format(config_obj['experiment_id']))
+    with open(outjson, 'w') as outfile:
+        json.dump(config_obj, outfile, indent=4, separators=(',', ': '))
 
     # get the directory where the config file lives
     configpath = dirname(main_config_file)

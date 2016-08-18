@@ -14,7 +14,8 @@ from rsmtool.test_utils import (check_csv_output,
                                 do_run_experiment,
                                 do_run_evaluation,
                                 do_run_prediction,
-                                do_run_comparison)
+                                do_run_comparison,
+                                do_run_summary)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
@@ -1745,6 +1746,70 @@ def test_run_experiment_lr_eval_tool_compare():
     html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
     yield check_report, html_report
 
+
+def test_run_experiment_lr_summary():
+
+    # basic rsmcumm experiment comparing several rsmtool experiments
+    source = 'lr-self-summary'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsumm.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    yield check_report, html_report
+
+
+def test_run_experiment_linearsvr_summary():
+
+    # basic rsmsumm experiment comparing an experiment
+    # which uses a SKLL model to itself
+    source = 'linearsvr-self-summary'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsumm.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_summary():
+
+    # basic rsmsumm experiment comparing an rsmtool and rsmeval experiments
+    source = 'lr-self-eval-summary'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsumm.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
+
+    # basic rsmsumm experiment comparing a LinearRegression
+    # experiment to itself with a custom list of sections
+    source = 'lr-self-summary-with-custom-sections'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsumm.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    yield check_report, html_report
+
+
+
 @raises(ValueError)
 def test_run_experiment_lr_length_column_and_feature():
 
@@ -1990,6 +2055,7 @@ def test_run_experiment_eval_lr_with_missing_candidate_column():
                        '{}.json'.format(experiment_id))
     do_run_evaluation(source, experiment_id, config_file)
 
+
 @raises(ValueError)
 def test_run_experiment_lr_one_fully_non_numeric_feature():
 
@@ -2129,5 +2195,18 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
                        'experiments',
                        source,
                        'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+@raises(FileNotFoundError)
+def test_run_experiment_summary_wrong_directory():
+
+    # rsmsummary experiment where the specified directory
+    # does not contain any rsmtool experiments
+    source = 'summary-wrong-directory'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummary.json')
     do_run_comparison(source, config_file)
 

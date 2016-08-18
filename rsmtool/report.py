@@ -23,13 +23,16 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (special_section_list_rsmtool,
                                    special_section_list_rsmeval,
                                    special_section_list_rsmcompare,
+                                   special_section_list_rsmsumm,
                                    ordered_section_list_with_special_sections_rsmtool,
                                    ordered_section_list_with_special_sections_rsmeval,
                                    ordered_section_list_with_special_sections_rsmcompare,
+                                   ordered_section_list_with_special_sections_rsmsumm,
                                    special_notebook_path)
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
     ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
+    ordered_section_list_rsmsumm = ordered_section_list_with_special_sections_rsmsumm
 else:
     ordered_section_list_rsmtool = ['data_description',
                                     'data_description_by_group',
@@ -61,9 +64,15 @@ else:
                                        'pca',
                                        'notes',
                                        'sysinfo']
+
+    ordered_section_list_rsmsumm = ['model'
+                                    'evaluation',
+                                    'sysinfo']
+
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
+    special_section_list_rsmsumm = []
     special_notebook_path = ""
 
 package_path = dirname(__file__)
@@ -72,6 +81,9 @@ template_path = join(notebook_path, 'templates')
 comparison_notebook_path = abspath(join(package_path,
                                         'notebooks',
                                         'comparison'))
+summary_notebook_path = abspath(join(package_path,
+                                     'notebooks',
+                                     'summary'))
 
 # Define the general section list
 
@@ -84,22 +96,30 @@ general_section_list_rsmeval = [section for section in ordered_section_list_rsme
 general_section_list_rsmcompare = [section for section in ordered_section_list_rsmcompare
                                    if section not in special_section_list_rsmcompare]
 
+general_section_list_rsmsumm = [section for section in ordered_section_list_rsmsumm
+                                if section not in special_section_list_rsmsumm]
+
+
 # define a mapping from the tool name to the master
 # list for both general and special sections
 master_section_dict = {'general': {'rsmtool': general_section_list_rsmtool,
                                    'rsmeval': general_section_list_rsmeval,
-                                   'rsmcompare': general_section_list_rsmcompare},
+                                   'rsmcompare': general_section_list_rsmcompare,
+                                   'rsmsumm': general_section_list_rsmsumm},
                        'special': {'rsmtool': special_section_list_rsmtool,
                                    'rsmeval': special_section_list_rsmeval,
-                                   'rsmcompare': special_section_list_rsmcompare}}
+                                   'rsmcompare': special_section_list_rsmcompare,
+                                   'rsmsumm': special_section_list_rsmsumm}}
 
 # define the mapping for section paths
 notebook_path_dict = {'general': {'rsmtool': notebook_path,
                                   'rsmeval': notebook_path,
-                                  'rsmcompare': comparison_notebook_path},
+                                  'rsmcompare': comparison_notebook_path,
+                                  'rsmsumm': summary_notebook_path},
                       'special': {'rsmtool': special_notebook_path,
                                   'rsmeval': special_notebook_path,
-                                  'rsmcompare': special_notebook_path}}
+                                  'rsmcompare': special_notebook_path,
+                                  'rsmsumm': special_notebook_path}}
 
 
 def merge_notebooks(notebook_files, output_file):
@@ -430,6 +450,8 @@ def get_ordered_notebook_files(general_sections,
         ordered_section_list = ordered_section_list_rsmeval
     elif context == 'rsmcompare':
         ordered_section_list = ordered_section_list_rsmcompare
+    elif context == 'rsmsumm':
+        ordered_section_list = ordered_section_list_rsmsumm
 
     # add all custom sections to the end of the default ordered list
     ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
@@ -550,6 +572,44 @@ def create_comparison_report(experiment_id_old, description_old,
     os.makedirs(output_dir, exist_ok=True)
     report_name = '{}_vs_{}.report'.format(experiment_id_old,
                                            experiment_id_new)
+    merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+
+    # merge all the given sections
+    logger.info('Merging sections')
+    merge_notebooks(chosen_notebook_files, merged_notebook_file)
+
+    # run the merged notebook and save the output as
+    # an HTML file in the report directory
+    logger.info('Exporting HTML')
+    convert_ipynb_to_html(merged_notebook_file,
+                          join(output_dir, '{}.html'.format(report_name)))
+
+
+def create_summary_report(summary_id, description,
+                          all_experiments,
+                          output_dir, subgroups,
+                          chosen_notebook_files):
+    """
+    The main function to generate a summary
+    report comparing several RSMTool experiments as
+    defined by the given arguments.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    # set the environment variables we want
+    os.environ['SUMMARY_ID'] = summary_id
+    os.environ['DESCRIPTION'] = description
+    os.environ['JSONS'] = '%%'.join(all_experiments)
+
+    # we define separate groups to allow future flexibility in defining
+    # what groups are used for descriptives and evaluations
+    os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
+    os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+
+    # create the output directory
+    os.makedirs(output_dir, exist_ok=True)
+    report_name = '{}_report'.format(summary_id)
     merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections
