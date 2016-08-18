@@ -1,9 +1,9 @@
 .. _usage_rsmcompare:
 
-``rsmcompare`` - Compare scoring models
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``rsmcompare`` - Create a detailed comparison of two scoring models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmcompare`` command-line utility to compare two models and to generate a comparison report. This can be useful in many scenarios, e.g., say the user wants to compare the changes in model performance after adding a new feature into the model. To use ``rsmcompare``, the user must first run two experiments using either :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`. ``rsmcompare`` can then be used to compare the outputs of these two experiments to each other.
+RSMTool provides the ``rsmcompare`` command-line utility to compare two models and to generate a detailed comparison report including differences between the two models. This can be useful in many scenarios, e.g., say the user wants to compare the changes in model performance after adding a new feature into the model. To use ``rsmcompare``, the user must first run two experiments using either :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`. ``rsmcompare`` can then be used to compare the outputs of these two experiments to each other.
 
 .. note::
 

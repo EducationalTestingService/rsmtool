@@ -1,0 +1,82 @@
+.. _tutorial_rsmsumm:
+
+Tutorial
+""""""""
+
+For this tutorial, you first need to :ref:`install RSMTool <install>` and make sure the conda environment in which you installed it is activated.
+
+Workflow
+~~~~~~~~
+
+``rsmsumm`` is designed to compare sevearl existing ``rsmtool`` or ``rsmeval`` experiments. To use ``rsmsumm`` you need:
+
+1. Two or more experiments that were run using :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`.
+2. Create an :ref:`experiment configuration file <config_file_rsmsumm>` describing the comparison experiment you would like to run.
+3. Run that configuration file with :ref:`rsmsumm <usage_rsmsumm>` and generate the comparison experiment HTML report.
+4. Examine HTML report to compare the models.
+
+Note that the above workflow does not use the customization features of ``rsmsumm``, e.g., :ref:`choosing which sections to include in the report <general_sections_rsmsumm>` or :ref:`adding custom analyses sections <custom_notebooks>` etc. However, we will stick with this workflow for our tutorial since it is likely to be the most common use case.
+
+ASAP Example
+~~~~~~~~~~~~
+We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
+
+Run ``rsmtool`` (or ``rsmeval``) experiments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``rsmsumm`` compares the results of the two or more existing ``rsmtool`` (or ``rsmeval``) experiments. For this tutorial, we will compare model trained in the :ref:`rsmtool tutorial <tutorial>` to itself.
+
+.. note::
+
+    If you have not already completed that tutorial, please do so now. You may need to complete it again if you deleted the output files.
+
+Create a configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The next step is to create an :ref:`experiment configuration file <config_file_rsmsumm>` in ``.json`` format.
+
+.. _asap_config_rsmsumm:
+
+.. literalinclude:: ../examples/rsmcompare/config_rsmsumm.json
+    :language: javascript
+    :linenos:
+
+Let's take a look at the options in our configuration file.
+
+- **Line 2**: We provide the ``summary_id`` for the comparison
+- **Line 3**: We give a short description of this comparison experiment. This will be shown in the report.
+- **Line 4**: We also give the list of paths to the directories containing the outputs of the experiments we want to compare.
+
+Documentation for all of the available configuration options is available :ref:`here <config_file_rsmsumm>`.
+
+Run the experiment
+~~~~~~~~~~~~~~~~~~
+Now that we have the list of the experiments we want to compare and our configuration file in ``.json`` format, we can use the :ref:`rsmsumm <usage_rsmsumm>` command-line script to run our comparison experiment.
+
+.. code-block:: bash
+
+    $ cd examples/rsmsumm
+    $ rsmsumm config_rsmsumm.json
+
+This should produce output like::
+
+    Output directory: /Users/nmadnani/work/rsmtool/examples/rsmsumm
+    Starting report generation
+    Merging sections
+    Exporting HTML
+    Executing notebook with kernel: python3
+
+Once the run finishes, you will see an HTML file named ``model_comparison_report.html``. This is the final ``rsmsumm`` comparison report.
+
+Examine the report
+~~~~~~~~~~~~~~~~~~
+Our experiment report contains the overview of main aspects of model performance. It includes:
+
+1. Brief summary table for all experiments.
+2. Model fit for all experiments.
+3. Model performance for all experiments. 
+
+
+.. note::
+
+    Since we are comparing the experiment to itself, the comparison is not very interesting, since all rows contain the same numbers.
+
+
