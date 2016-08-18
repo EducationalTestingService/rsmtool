@@ -35,7 +35,7 @@ The next step is to create an :ref:`experiment configuration file <config_file_r
 
 .. _asap_config_rsmsumm:
 
-.. literalinclude:: ../examples/rsmcompare/config_rsmsumm.json
+.. literalinclude:: ../examples/rsmsumm/config_rsmsumm.json
     :language: javascript
     :linenos:
 

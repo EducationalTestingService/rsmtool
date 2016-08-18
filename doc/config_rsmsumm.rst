@@ -3,7 +3,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmcsumm`` experiment. Here's an example configuration file for `rsmcompare <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmsumm/config_rsmsumm.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmcsumm`` experiment. Here's an example configuration file for `rsmsumm <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmsumm/config_rsmsumm.json>`_.
 
 There are two required fields and the rest are all optional.
 
