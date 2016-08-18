@@ -14,10 +14,8 @@ import logging
 import os
 import sys
 
-from os import listdir
 from os.path import abspath, dirname, exists, join, normpath
 
-import pandas as pd
 
 from rsmtool.input import (check_main_config,
                            locate_file,
@@ -27,9 +25,6 @@ from rsmtool.input import (check_main_config,
 from rsmtool.report import (create_summary_report,
                             get_ordered_notebook_files)
 
-from rsmtool.utils import (scale_coefficients,
-                           write_experiment_output,
-                           write_feature_json)
 
 from rsmtool.utils import LogFormatter
 
