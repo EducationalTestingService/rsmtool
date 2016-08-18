@@ -21,13 +21,13 @@ ASAP Example
 ~~~~~~~~~~~~
 We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
 
-Run ``rsmtool`` (or ``rsmeval``) experiments
+Run ``rsmtool`` and ``rsmeval`` experiments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``rsmsumm`` compares the results of the two or more existing ``rsmtool`` (or ``rsmeval``) experiments. For this tutorial, we will compare model trained in the :ref:`rsmtool tutorial <tutorial>` to itself.
+``rsmsumm`` compares the results of the two or more existing ``rsmtool`` (or ``rsmeval``) experiments. For this tutorial, we will compare model trained in the :ref:`rsmtool tutorial <tutorial>` to the evaluations we obtained in the  :ref:`rsmeval tutorial <tutorial_rsmeval>`.
 
 .. note::
 
-    If you have not already completed that tutorial, please do so now. You may need to complete it again if you deleted the output files.
+    If you have not already completed these tutorials, please do so now. You may need to complete them again if you deleted the output files.
 
 Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,13 +70,13 @@ Examine the report
 ~~~~~~~~~~~~~~~~~~
 Our experiment report contains the overview of main aspects of model performance. It includes:
 
-1. Brief summary table for all experiments.
-2. Model fit for all experiments.
+1. Brief description of all experiments.
+2. Information about model parameters and model fit for all ``rsmtool`` experiments.
 3. Model performance for all experiments. 
 
 
 .. note::
 
-    Since we are comparing the experiment to itself, the comparison is not very interesting, since all rows contain the same numbers.
+    Some of the information such as model fit and model parameters are only available for ``rsmtool`` experiments. 
 
 
