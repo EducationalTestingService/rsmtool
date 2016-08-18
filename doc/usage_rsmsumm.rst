@@ -21,13 +21,13 @@ RSMTool provides the ``rsmsumm`` command-line utility to compare multiple models
 Input
 """""
 
-When used without any arguments, ``rsmsumm`` will compare all models in the current directory and generate a comparison report named ``model_comparison_report.html``. You can specify which models you want to compare and the name of the report by supplying the path to :ref:`a configuration file <config_file_rsmsumm>`. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmsumm`` will use the current directory as the output directory.
+``rsmsumm`` requires a single argument to run an experiment: the path to :ref:`a configuration file <config_file_rsmsumm>`. You can specify which models you want to compare and the name of the report by supplying the path to :ref:`a configuration file <config_file_rsmsumm>`. It can also take an output directory as an optional second argument. If the latter is not specified, ``rsmsumm`` will use the current directory as the output directory.
 
 Here are all the arguments to the ``rsmsumm`` command-line script.
 
 .. program:: rsmsumm
 
-.. option:: config_file (optional)
+.. option:: config_file 
 
     The :ref:`JSON configuration file <config_file_rsmsumm>` for this experiment.
 
@@ -43,7 +43,7 @@ Here are all the arguments to the ``rsmsumm`` command-line script.
 
     Show version number and exit.
 
-.. include:: config_rsmcompare.rst
+.. include:: config_rsmsumm.rst
 
 Output
 """"""
