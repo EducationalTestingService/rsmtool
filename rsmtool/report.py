@@ -542,7 +542,7 @@ def create_comparison_report(experiment_id_old, description_old,
     os.environ['OUTPUT_DIR_NEW'] = csvdir_new
     os.environ['FIGURE_DIR_NEW'] = figdir_new
     os.environ['SCALED_NEW'] = '1' if use_scaled_predictions_new else '0'
-    os.environ['JAVASCRIPT_DIR'] = join(dirname(abspath(__file__)), "notebooks", "javascript")
+    os.environ['JAVASCRIPT_PATH'] = javascript_path
     
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
