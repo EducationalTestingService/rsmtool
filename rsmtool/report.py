@@ -69,6 +69,7 @@ else:
 package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, 'notebooks'))
 template_path = join(notebook_path, 'templates')
+javascript_path = join(package_path, 'notebooks', 'javascript')
 comparison_notebook_path = abspath(join(package_path,
                                         'notebooks',
                                         'comparison'))
@@ -490,7 +491,7 @@ def create_report(experiment_id, description,
     os.environ['H2_COLUMN'] = '' if second_human_score_column is None else second_human_score_column
     os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate is None else str(min_items_per_candidate)
     os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file is None else feature_subset_file
-    os.environ['JAVASCRIPT_DIR'] = join(dirname(abspath(__file__)), "notebooks", "javascript")
+    os.environ['JAVASCRIPT_PATH'] = javascript_path
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
