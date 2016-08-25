@@ -46,19 +46,19 @@ skll_models = ['AdaBoostRegressor',
 
 def model_fit_to_dataframe(fit):
     """
-    Take an object containing OLS model fit and convert it
-    to a data frame.
+    Take an object containing a statsmodels OLS model fit and extact
+    the main model fit metrics into a data frame.
 
     Parameters
     ----------
-    fit : a model fit object
-        model fit object obtained from
-        a linear model trained using `statsmodels.OLS`.
+    fit : a statsmodels fit object
+        Model fit object obtained from a linear model trained using
+        `statsmodels.OLS`.
 
     Returns
     -------
     df_fit : pandas DataFrame
-        a data frame with main model fit metrics.
+        Data frame with the main model fit metrics.
     """
 
     df_fit = pd.DataFrame({"N responses": [int(fit.nobs)]})
@@ -76,18 +76,20 @@ def ols_coefficients_to_dataframe(coefs):
     Parameters
     ----------
     coefs : pandas Series
-        a series with feature names in the index and
-    the coefficient values as the data, obtained from
-    a linear model trained using `statsmodels.OLS`.
+        Series with feature names in the index and the coefficient
+        values as the data, obtained from a linear model trained
+        using `statsmodels.OLS`.
 
     Returns
     -------
     df_coef : pandas DataFrame
-        a data frame with two columns, the first being
-    the feature name and the second being coefficient
-    value. The first row in the output data frame is
-    always for the intercept and the rest are sorted by
-    feature name.
+        Data frame with two columns, the first being the feature name
+        and the second being the coefficient value.
+
+    Note
+    ----
+    The first row in the output data frame is always for the intercept
+    and the rest are sorted by feature name.
     """
     # first create a sorted data frame for all the non-intercept features
     non_intercept_columns = [c for c in coefs.index if c != 'const']
@@ -101,24 +103,18 @@ def ols_coefficients_to_dataframe(coefs):
                                   'coefficient': coefs['const']}])
 
     # append the non-intercept frame to the intercept one
-    df_coef =  df_intercept.append(df_non_intercept, ignore_index=True)
+    df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
 
     # we always want to have the feature column first
     df_coef = df_coef[['feature', 'coefficient']]
 
     return df_coef
 
+
 def skll_learner_params_to_dataframe(learner):
     """
     Take the given SKLL learner object and return a data
     frame containing its parameters.
-
-    Note that we use underlying sklearn model to get
-    at the coefficients and the intercept because the
-    `model_params` attribute of the SKLL model ignores
-    zero coefficients, which we do not want. The first
-    row in the output data frame is always for the
-    intercept and the rest are sorted by feature name.
 
     Parameters
     ----------
@@ -129,6 +125,16 @@ def skll_learner_params_to_dataframe(learner):
     df_coef : pandas DataFrame
         a data frame containing the model parameters
         from the given SKLL learner object.
+
+    Note
+    ----
+    1. We use underlying `sklearn` model object to get at the
+    coefficients and the intercept because the `model_params` attribute
+    of the SKLL model ignores zero coefficients, which we do not want.
+
+    2. The first row in the output data frame is always for the intercept
+    and the rest are sorted by feature name.
+
     """
     # get the intercept, coefficients, and feature names
     intercept = learner.model.intercept_
@@ -145,7 +151,7 @@ def skll_learner_params_to_dataframe(learner):
                                   'coefficient': intercept}])
 
     # append the non-intercept frame to the intercept one
-    df_coef =  df_intercept.append(df_non_intercept, ignore_index=True)
+    df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
 
     # we always want to have the feature column first
     df_coef = df_coef[['feature', 'coefficient']]
@@ -238,7 +244,7 @@ def create_fake_skll_learner(df_coefficients):
 
 def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
     """
-    Train one of the built-in linear regression models.
+    Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
     Parameters
     ----------
@@ -246,7 +252,8 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         Name of the built-in model to train.
     df_train : pandas DataFrame
         Data frame containing the features on which
-        to train the model.
+        to train the model. The data frame must contain the ID column named
+        `spkitemid` and the numeric label column named `sc1`.
     experiment_id : str
         The experiment ID.
     csvdir : str
@@ -256,10 +263,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
     Returns
     -------
-    learner : skll Learner object
-        SKLL LinearRegression Learner object containing
-        the coefficients learned by training the built-in
-        model.
+    learner : `Learner` object
+        SKLL `LinearRegression` `Learner <http://skll.readthedocs.io/en/latest/api/skll.html#skll.Learner>`_ object containing the
+        coefficients learned by training the built-in model.
     """
     # get the columns that actually contain the feature values
     feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -359,7 +365,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -475,7 +481,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -505,6 +511,8 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
             coefs, rnorm = nnls(X_plus_intercept, y)
 
         # separate the intercept and feature coefficients
+        # even though we do not use intercept in the code
+        # we define it here for readability
         intercept = coefs[0]
         coefficients = coefs[1:].tolist()
 
@@ -536,7 +544,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train  = create_featureset_from_dataframe(df_train)
+        fs_train = create_featureset_from_dataframe(df_train)
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -655,10 +663,7 @@ def train_skll_model(model_name, df_train, experiment_id, csvdir, figdir):
 
     # if it's a regression model, then our grid objective should be
     # pearson and otherwise it should be accuracy
-    if model_name in ["AdaBoostRegressor", "DecisionTreeRegressor", "ElasticNet",
-                      "GradientBoostingRegressor", "KNeighborsRegressor", "Lasso",
-                      "LinearRegression", "RandomForestRegressor", "Ridge",
-                      "SGDRegressor", "LinearSVR", "SVR"]:
+    if model_name in skll_models:
         objective = 'pearson'
     else:
         objective = 'f1_score_micro'
@@ -701,7 +706,7 @@ def train_model(model_name, df_train, experiment_id, csvdir, figdir):
     """
     call_args = [model_name, df_train, experiment_id, csvdir, figdir]
     model = train_builtin_model(*call_args) if model_name in builtin_models \
-             else train_skll_model(*call_args)
+        else train_skll_model(*call_args)
     return model
 
 
@@ -735,5 +740,3 @@ def check_model_name(model_name):
                          "check the spelling.".format(model_name))
 
     return model_type
-
-

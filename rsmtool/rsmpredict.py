@@ -34,10 +34,26 @@ from rsmtool.utils import LogFormatter
 from skll import Learner
 from rsmtool.version import __version__
 
+
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
-    Generate predictions using the information in the config file
-    and save them into the given output file.
+    Run ``rsmpredict`` with given configuration file and generate
+    predictions (and, optionally, pre-processed feature values).
+
+    Parameters
+    ----------
+    config_file : str
+        Path to the experiment configuration file.
+    output_file : str
+        Path to the output file for saving predictions.
+    feats_file (optional): str
+        Path to the output file for saving preprocessed feature values.
+
+    Raises
+    ------
+    ValueError
+        If any of the required fields are missing or ill-specified.
+
     """
 
     logger = logging.getLogger(__name__)
@@ -163,8 +179,6 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     if df_input['spkitemid'].size != df_input['spkitemid'].unique().size:
         raise ValueError("The data contains repeated response IDs in {}. Please make sure all response IDs are unique and re-run the tool.".format(id_column))
 
-
-
     # now we need to pre-process these features using
     # the parameters that are already stored in the
     # _features.csv file.
@@ -220,7 +234,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     df_features_preprocessed = df_features.copy()
     for feature_name in required_features:
 
-        feature_values = df_features[feature_name].values
+        feature_values = df_features_preprocessed[feature_name].values
 
         feature_transformation = df_feature_info.loc[feature_name]['transform']
         feature_weight = df_feature_info.loc[feature_name]['sign']
@@ -237,7 +251,26 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                                                     feature_transformation,
                                                                     train_feature_mean,
                                                                     train_feature_sd,
-                                                                    exclude_zero_sd=False)
+                                                                    exclude_zero_sd=False,
+                                                                    raise_transformation_error=False)
+
+        # filter the feature values once again to remove possible NaN and inf values that
+        # might have emerged when applying transformations.
+        # We do not need to do that if no transformation was applied.
+        if not feature_transformation in ['raw', 'org']:
+            # check that there are indeed inf or Nan values
+            if np.isnan(df_features_preprocessed[feature_name]).any() or \
+               np.isinf(df_features_preprocessed[feature_name]).any():
+                    newdf, newdf_excluded = filter_on_column(df_features_preprocessed, feature_name, 'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocessed
+                    df_features_preprocessed = newdf
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the preprocessed
+                    # ones
+                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
+                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
 
         # now standardize the feature values
         df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
@@ -316,9 +349,6 @@ def main():
     logging.root.addHandler(hdlr)
     logging.root.setLevel(logging.INFO)
 
-    # get a logger
-    logger = logging.getLogger(__name__)
-
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='rsmpredict')
 
@@ -355,4 +385,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

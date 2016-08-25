@@ -1,5 +1,6 @@
 import random
 import sys
+import warnings
 
 from os.path import dirname, join, normpath
 
@@ -71,37 +72,92 @@ def test_filter_on_column_std_epsilon_zero():
 
 def test_transform_feature():
     name = 'dpsec'
-    data = random.gauss(0, 1)
-    assert_raises(ValueError, transform_feature, name, data, 'add_one_inverse')
-    assert_array_equal(transform_feature(name, data, 'inv'), 1/data)
-    assert_array_equal(transform_feature(name, data, 'raw'), data)
-    assert_array_equal(transform_feature(name, data, 'org'), data)
+    data = np.array([1, 2, 3, 4])
+    # run the test but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        assert_raises(ValueError, transform_feature, name, data, 'add_one_inverse')
+        assert_array_equal(transform_feature(name, data, 'inv'), 1/data)
+        assert_array_equal(transform_feature(name, data, 'raw'), data)
+        assert_array_equal(transform_feature(name, data, 'org'), data)
+        assert_array_equal(transform_feature(name, data, 'log'), np.log(data))
+        assert_array_equal(transform_feature(name, data, 'addOneInv'), 1/(data+1))
+        assert_array_equal(transform_feature(name, data, 'addOneLn'), np.log(data+1))
+
+
+def test_transform_feature_with_warning():
+    name = 'dpsec'
+    data = np.array([-1, 0, 2, 3])
+    # run the test but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        assert_array_equal(transform_feature(name, data, 'sqrt', raise_error=False),
+                           np.sqrt(data))
+        assert_array_equal(transform_feature(name, data, 'inv', raise_error=False),
+                           1/data)
+        assert_array_equal(transform_feature(name, data, 'addOneInv', raise_error=False),
+                           1/(data+1))        
+        assert_array_equal(transform_feature(name, data, 'log', raise_error=False),
+                           np.log(data))        
+        assert_array_equal(transform_feature(name, data, 'addOneLn', raise_error=False),
+                           np.log(data+1))
+
+def test_transform_feature_with_error():
+    name = 'dpsec'
+    data = np.array([-1, 0, 2, 3])
+    # run the test but suppress the expected runtime warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        assert_raises(ValueError, transform_feature, name, data, 'sqrt')
+        assert_raises(ValueError, transform_feature, name, data, 'inv')
+        assert_raises(ValueError, transform_feature, name, data, 'addOneInv')
+        assert_raises(ValueError, transform_feature, name, data, 'log')
+        assert_raises(ValueError, transform_feature, name, data, 'addOneLn')
+
 
 
 def test_apply_inverse_transform():
     assert_raises(ValueError, apply_inverse_transform, 'name', np.array([0, 1, 2]))
     assert_raises(ValueError, apply_inverse_transform, 'name', np.array([-2, -3, 1, 2]))
+    assert_array_equal(apply_inverse_transform('name', np.array([0, 2, 4]), raise_error=False),
+                       np.array([np.inf, 0.5, 0.25]))
+    assert_array_equal(apply_inverse_transform('name', np.array([-2, -4, 1]), raise_error=False),
+                       np.array([-0.5, -0.25, 1]))
     assert_array_equal(apply_inverse_transform('name', np.array([2, 4])), np.array([0.5, 0.25]))
     assert_array_equal(apply_inverse_transform('name', np.array([-2, -4])), np.array([-0.5, -0.25]))
 
+
 def test_apply_sqrt_transform():
     assert_raises(ValueError, apply_sqrt_transform, 'name', np.array([-2, -3, 1, 2]))
+    assert_array_equal(apply_sqrt_transform('name', np.array([-1, 2, 4]), raise_error=False),
+                       np.array([np.nan, np.sqrt(2), 2]))
     assert_array_equal(apply_sqrt_transform('name', np.array([2, 4])), np.array([np.sqrt(2), 2]))
     assert_array_equal(apply_sqrt_transform('name', np.array([0.5, 4])), np.array([np.sqrt(0.5), 2]))
     assert_array_equal(apply_sqrt_transform('name', np.array([0, 4])), np.array([0, 2]))
 
+
 def test_apply_log_transform():
     assert_raises(ValueError, apply_log_transform, 'name', np.array([-1, 2, 3]))
     assert_raises(ValueError, apply_log_transform, 'name', np.array([0, 2, 3]))
+    assert_array_equal(apply_log_transform('name', np.array([-1, 1, 4]), raise_error=False),
+                       np.array([np.nan, np.log(1), np.log(4)]))
+    assert_array_equal(apply_log_transform('name', np.array([0, 1, 4]), raise_error=False),
+                       np.array([-np.inf, np.log(1), np.log(4)]))
     assert_array_equal(apply_log_transform('name', np.array([1, 4])), np.array([np.log(1), np.log(4)]))
+
 
 def test_apply_add_one_inverse_transform():
     assert_raises(ValueError, apply_add_one_inverse_transform, 'name', np.array([-1, -2, 3, 5]))
+    assert_array_equal(apply_add_one_inverse_transform('name', np.array([-2, -3, 1, 4]), raise_error=False),
+                       np.array([-1, -1/2, 1/2, 1/5]))
     assert_array_equal(apply_add_one_inverse_transform('name', np.array([1, 4])), np.array([1/2, 1/5]))
     assert_array_equal(apply_add_one_inverse_transform('name', np.array([0, 4])), np.array([1, 1/5]))
 
+
 def test_apply_add_one_log_transform():
     assert_raises(ValueError, apply_add_one_log_transform, 'name', np.array([-2, -3, 2, 3]))
+    assert_array_equal(apply_add_one_log_transform('name', np.array([-2, -0.5, 2, 4]), raise_error=False),
+                       np.array([np.nan, np.log(0.5), np.log(3), np.log(5)]))
     assert_array_equal(apply_add_one_log_transform('name', np.array([2, 4])), np.array([np.log(3), np.log(5)]))
     assert_array_equal(apply_add_one_log_transform('name', np.array([0, 4])), np.array([0, np.log(5)]))
 

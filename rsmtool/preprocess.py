@@ -11,11 +11,11 @@ import logging
 import numpy as np
 import pandas as pd
 
+
 def trim(values, trim_min, trim_max):
     """
-    Trim the values contained in the given vector
-    `values` to `trim_min`-0.49998 as the floor
-    and `trim_max`+0.49998 as the ceiling.
+    Trim the values contained in the given numpy array to `trim_min` - 0.49998 as the floor and `trim_max` + 0.49998
+    as the ceiling.
 
     Parameters
     ----------
@@ -33,6 +33,7 @@ def trim(values, trim_min, trim_max):
     trimmed_values : list of float
         List of trimmed values.
     """
+
     new_max = trim_max + 0.49998
     new_min = trim_min - 0.49998
     trimmed_values = values.copy()
@@ -131,36 +132,38 @@ def filter_on_column(df,
                      exclude_zeros=False,
                      exclude_zero_sd=False):
     """
-    Flter out the rows in the data frame `df` that contain
-    non-numeric (or zero, if specified) values contained in
-    `column`. If specified, exclude the columns if it has
-    stdev == 0.
+    Flter out the rows in the given data frame that contain non-numeric
+    (or zero, if specified) values in the specified column. Additionally,
+    it may exclude any columns if they have a standard deviation
+    (:math:`\\sigma`) of 0.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Data frame containing the feature values.
+        Input data frame containing the feature values.
     column : str
-        Name of the column from which to filter
-        out values.
+        Name of the column from which to filter out values.
     id_column : str
-        Name of the column containing response IDs.
+        Name of the column containing the unique response IDs.
     exclude_zeros : bool, optional
         Whether to exclude responses containing zeros
-        in the specified column. Defaults to False.
+        in the specified column. Defaults to `False`.
     exclude_zero_sd : bool, optional
-        Whether to perform the additional filtering
-        step of removing columns that have zero
-        std. dev. Defaults to False.
+        Whether to perform the additional filtering step of removing
+        columns that have :math:`\\sigma = 0`. Defaults to `False`.
 
     Returns
     -------
     df_filtered : pandas DataFrame
-        Data frame containing the responses remaining
-        after the filtering.
+        Data frame containing the responses that were *not* filtered out.
     df_excluded : pandas DataFrame
-        Data frame containing the responses removed
-        due to the filtering.
+        Data frame containing the non-numeric or zero responses that
+        were filtered out.
+
+    Note
+    ----
+    The columns with :math:`\\sigma=0` are removed from both output
+    data frames.
     """
 
     logger = logging.getLogger(__name__)
@@ -219,15 +222,22 @@ def filter_on_column(df,
     return (df_filtered, df_excluded)
 
 
-def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
+def remove_outliers(values, mean=None, sd=None, sd_multiplier=4):
     """
-    Clamp any values in `data` (numpy array) that
-    are +/- `sd_multiplier` standard deviations (`sd`)
-    away from the `mean`.
+    Clamp any values in the given numpy array that are
+    +/- `sd_multiplier` (:math:`m`) standard deviations (:math:`\\sigma`) away
+    from the mean (:math:`\\mu`). Use given `mean` and `sd` instead
+    of computing :math:`\\sigma` and :math:`\\mu`, if specified.
+
+    The values are clamped to the interval:
+
+    .. math::
+
+        [\\mu - m * \\sigma, \\mu + m * \\sigma]
 
     Parameters
     ----------
-    data : numpy array
+    values : numpy array
         Numpy array containing values for a feature.
     mean : None, optional
         Use the given mean value when computing outliers
@@ -242,28 +252,30 @@ def remove_outliers(data, mean=None, sd=None, sd_multiplier=4):
 
     Returns
     -------
-    new_data : numpy array
+    new_values : numpy array
         Numpy array with the outliers clamped.
     """
 
     # convert data to a numpy float array before doing any clamping
-    new_data = np.array(data, dtype=np.float)
+    new_values = np.array(values, dtype=np.float)
 
     if not mean:
-        mean = new_data.mean()
+        mean = new_values.mean()
     if not sd:
-        sd = new_data.std()
+        sd = new_values.std()
 
     floor = mean - sd_multiplier * sd
     ceiling = mean + sd_multiplier * sd
 
-    new_data[new_data > ceiling] = ceiling
-    new_data[new_data < floor] = floor
+    new_values[new_values > ceiling] = ceiling
+    new_values[new_values < floor] = floor
 
-    return new_data
+    return new_values
 
 
-def apply_inverse_transform(name, data, sd_multiplier=4):
+def apply_inverse_transform(name, data,
+                            raise_error=True,
+                            sd_multiplier=4,):
     """
     Apply the inverse transform to `data`.
 
@@ -273,10 +285,14 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that can be zero or to a feature that can have different signs.
     sd_multiplier : int, optional
         Use this std. dev. multiplier to compute the ceiling
         and floor for outlier removal and check that these
         are not equal to zero.
+
 
     Returns
     -------
@@ -289,13 +305,19 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
     ValueError
         If the transform is applied to a feature that can
         be zero or to a feature that can have different
-        signs.
+        signs and `raise_error` is set to 'True'
     """
 
     if np.any(data == 0):
-        raise ValueError("The inverse transformation should not be "
-                         "applied to feature {} which can have a "
-                         "value of 0".format(name))
+        if raise_error:
+            raise ValueError("The inverse transformation should not be "
+                             "applied to feature {} which can have a "
+                             "value of 0".format(name))
+        else:
+            logging.warning("The inverse transformation was applied "
+                            "feature {} which has a value of 0 for "
+                            "some responses. No system score will be "
+                            "generated for such responses".format(name))
 
     # check if the floor or ceiling are zero
     data_mean = np.mean(data)
@@ -310,15 +332,21 @@ def apply_inverse_transform(name, data, sd_multiplier=4):
     all_positive = np.all(np.abs(data) == data)
     all_negative = np.all(np.abs(data) == -data)
     if not (all_positive or all_negative):
-        raise ValueError("The inverse transformation should not be "
-                         "applied to feature {} where the values can"
-                         "have different signs".format(name))
+        if raise_error:
+            raise ValueError("The inverse transformation should not be "
+                             "applied to feature {} where the values can "
+                             "have different signs".format(name))
+        else:
+            logging.warning("The inverse transformation was "
+                            "applied to feature {} where the values can"
+                            "have different signs. This can change "
+                            "the ranking of the responses".format(name))
 
-    new_data =  1/data
+    new_data = 1 / data
     return new_data
 
 
-def apply_sqrt_transform(name, data):
+def apply_sqrt_transform(name, data, raise_error=True):
     """
     Apply the `sqrt` transform to `data`.
 
@@ -328,6 +356,9 @@ def apply_sqrt_transform(name, data):
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that can have negative values.
 
     Returns
     -------
@@ -339,20 +370,26 @@ def apply_sqrt_transform(name, data):
     ------
     ValueError
         If the transform is applied to a feature
-        that has negative values.
+        that has negative values and `raise_error` is set to true.
     """
 
     # check if the feature has any negative values
     if np.any(data < 0):
-        raise ValueError("The sqrt transformation should not be "
-                         "applied to feature {} which can have "
-                         "negative values".format(name))
+        if raise_error:
+            raise ValueError("The sqrt transformation should not be "
+                             "applied to feature {} which can have "
+                             "negative values".format(name))
+        else:
+            logging.warning("The sqrt transformation was "
+                            "applied to feature {} which has "
+                            "negative values for some responses. No system score "
+                            "will be generated for such responses".format(name))
 
     new_data = np.sqrt(data)
     return new_data
 
 
-def apply_log_transform(name, data):
+def apply_log_transform(name, data, raise_error=True):
     """
     Apply the `log` transform to `data`.
 
@@ -362,6 +399,9 @@ def apply_log_transform(name, data):
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that has zero or negative values.
 
     Returns
     -------
@@ -373,26 +413,40 @@ def apply_log_transform(name, data):
     ------
     ValueError
         If the transform is applied to a feature that
-        can be zero or negative.
+        can be zero or negative and `raise_error` is set to true.
     """
 
     # check if the feature has any zeros
     if np.any(data == 0):
-        raise ValueError("The log transformation should not be "
-                         "applied to feature {} which can have a "
-                         "value of 0".format(name))
+        if raise_error:
+            raise ValueError("The log transformation should not be "
+                             "applied to feature {} which can have a "
+                             "value of 0".format(name))
+        else:
+            logging.warning("The log transformation was "
+                            "applied to feature {} which has a "
+                            "value of 0 for some responses. No system "
+                            "score will "
+                            "be generated for such responses".format(name))
 
     # check if the feature has any negative values
     if np.any(data < 0):
-        raise ValueError("The log transformation should not be "
-                         "applied to feature {} which can have "
-                         "negative values".format(name))
+        if raise_error:
+            raise ValueError("The log transformation should not be "
+                             "applied to feature {} which can have "
+                             "negative values".format(name))
+        else:
+            logging.warning("The log transformation was "
+                            "applied to feature {} which has "
+                            "negative values for some responses. No system "
+                            "score will "
+                            "be generated for such responses".format(name))
 
     new_data = np.log(data)
     return new_data
 
 
-def apply_add_one_inverse_transform(name, data):
+def apply_add_one_inverse_transform(name, data, raise_error=True):
     """
     Apply the add one and invert transform to `data`.
 
@@ -402,6 +456,9 @@ def apply_add_one_inverse_transform(name, data):
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that has zero or negative values.
 
     Returns
     -------
@@ -413,20 +470,26 @@ def apply_add_one_inverse_transform(name, data):
     ------
     ValueError
         If the transform is applied to a feature
-        that can be negative.
+        that can be negative and `raise_error` is set to True.
     """
 
     # check if the feature has any negative values
     if np.any(data < 0):
-        raise ValueError("The addOneInv transformation should not "
-                         "be applied to feature {} which can have "
-                         "negative values".format(name))
+        if raise_error:
+            raise ValueError("The addOneInv transformation should not "
+                             "be applied to feature {} which can have "
+                             "negative values".format(name))
+        else:
+            logging.warning("The addOneInv transformation was "
+                            "applied to feature {} which has "
+                            "negative values for some responses. This can "
+                            "change the ranking of the responses".format(name))
 
     new_data = 1/(data + 1)
     return new_data
 
 
-def apply_add_one_log_transform(name, data):
+def apply_add_one_log_transform(name, data, raise_error=True):
     """
     Apply the add one and log transform to `data`.
 
@@ -436,6 +499,9 @@ def apply_add_one_log_transform(name, data):
         Name of the feature to transform.
     data : numpy array
         Numpy array containing the feature values.
+    raise_error : bool, optional
+        When set to true, raises an error if the transform is applied to
+         a feature that has zero or negative values.
 
     Returns
     -------
@@ -452,23 +518,27 @@ def apply_add_one_log_transform(name, data):
 
     # check if the feature has any negative values
     if np.any(data < 0):
-        raise ValueError("The addOneLn transformation should not "
-                         "be applied to feature {} which can have "
-                         "negative values".format(name))
+        if raise_error:
+            raise ValueError("The addOneLn transformation should not "
+                             "be applied to feature {} which can have "
+                             "negative values".format(name))
+        else:
+            logging.warning("The log transformation was "
+                            "applied to feature {} which has "
+                            "negative values for some responses. "
+                            "If the feature value remains negative "
+                            "after adding one, no score will "
+                            "be generated for such responses".format(name))
 
     new_data = np.log(data + 1)
     return new_data
 
 
-def transform_feature(name, data, transform):
+def transform_feature(name, data, transform, raise_error=True):
     """
-    The main driver function that applies `transform`
-    to all of the values in `data` for the feature `name`.
-
-    Note that many of these transformations may be meaningless
-    for features which span both negative and positive values.
-    Some transformations may throw errors for negative feature
-    values.
+    Applies the given transform to all of the values in the given
+    numpy array. The values are assumed to be for the feature with
+    the given name.
 
     Parameters
     ----------
@@ -478,6 +548,9 @@ def transform_feature(name, data, transform):
         Numpy array containing the feature values.
     transform : str
         Name of the transform to apply.
+    raise_error : bool, optional
+        Raise a ValueError if a transformation leads to `Inf` values or may
+        change the ranking of the responses
 
     Returns
     -------
@@ -489,21 +562,28 @@ def transform_feature(name, data, transform):
     ------
     ValueError
         If the given transform is not recognized.
+
+    Note
+    ----
+    Many of these transformations may be meaningless for features which
+    span both negative and positive values. Some transformations may
+    throw errors for negative feature values.
+
     """
     transform_functions = {'inv': apply_inverse_transform,
                            'sqrt': apply_sqrt_transform,
                            'log': apply_log_transform,
                            'addOneInv': apply_add_one_inverse_transform,
                            'addOneLn': apply_add_one_log_transform,
-                           'raw': lambda name, data: data,
-                           'org': lambda name, data: data}
+                           'raw': lambda name, data, raise_error: data,
+                           'org': lambda name, data, raise_error: data}
 
     # make sure we have a valid transform function
     if transform is None or transform not in transform_functions:
         raise ValueError('Unrecognized feature transformation: {}'.format(transform))
 
     transformer = transform_functions.get(transform)
-    new_data = transformer(name, data)
+    new_data = transformer(name, data, raise_error)
     return new_data
 
 
@@ -512,10 +592,12 @@ def preprocess_feature(data,
                        feature_transform,
                        feature_mean,
                        feature_sd,
-                       exclude_zero_sd=False):
+                       exclude_zero_sd=False,
+                       raise_transformation_error=True):
     """
-    The main pre-processing driver function that
-    removes outliers and transform the values in `data`.
+    Remove outliers and transform the values in the given numpy array
+    using the given outlier and transformation parameters. The values
+    are assumed for the given feature name.
 
     Parameters
     ----------
@@ -532,8 +614,11 @@ def preprocess_feature(data,
         Std. dev. value to use for outlier detection instead
         of the std. dev. of the given feature values.
     exclude_zero_sd : bool, optional
-        Check whether there are features that have a zero
+        Check `data` has a zero
         std. dev. Defaults to False.
+    raise_transformation_error : bool, optional
+        Raise error if any of the transformations lead to inf values
+        or may change the ranking of feature values.
 
     Returns
     -------
@@ -544,8 +629,8 @@ def preprocess_feature(data,
     Raises
     ------
     ValueError
-        If there are any features with zero std. dev. and
-        `exclude_zero_sd` is set to True.
+        If the given values have zero standard deviation and
+        `exclude_zero_sd` is set to `True`.
     """
 
     # clamp any outlier values that are 4 standard deviations
@@ -553,7 +638,10 @@ def preprocess_feature(data,
     features_no_outliers = remove_outliers(data, mean=feature_mean, sd=feature_sd)
 
     # apply the requested transformation to the feature
-    transformed_feature = transform_feature(feature_name, features_no_outliers, feature_transform)
+    transformed_feature = transform_feature(feature_name,
+                                            features_no_outliers,
+                                            feature_transform,
+                                            raise_error=raise_transformation_error)
 
     # check the standard deviation of the transformed feature
     # we set ddof to 1 so that np.std gave the same result as pandas .std

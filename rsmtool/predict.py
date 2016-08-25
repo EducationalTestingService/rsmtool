@@ -15,27 +15,27 @@ from skll import FeatureSet
 
 from rsmtool.preprocess import trim
 
+
 def predict_with_model(model, df):
     """
-    Get the raw predictions of the `model` on the data
-    contained in the data frame `df`.
+    Get the raw predictions of the given SKLL model on the data
+    contained in the given data frame.
 
     Parameters
     ----------
     model : skll Learner object
         The SKLL model with which to make the predictions.
     df : pandas DataFrame
-        Data frame containing features on which to make
-        the predictions.
+        Data frame containing features on which to make the predictions.
+        The data must contain pre-processed feature values, an ID column
+        named `spkitemid`, and a label column named `sc1`.
 
     Returns
     -------
     df_predictions: pandas DataFrame
-        Data frame containing the raw predictions, the IDs,
-        and the human scores.
+        Data frame containing the raw predictions, the IDs, and the
+        human scores.
     """
-
-    logger = logging.getLogger(__name__)
 
     feature_columns = [c for c in df.columns if c not in ['spkitemid', 'sc1']]
     features = df[feature_columns].to_dict(orient='records')
@@ -58,6 +58,7 @@ def predict_with_model(model, df):
         df_predictions['sc1'] = labels
 
     return df_predictions
+
 
 def generate_train_and_test_predictions(model, df_train, df_test, trim_min, trim_max):
     """
