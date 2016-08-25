@@ -490,6 +490,7 @@ def create_report(experiment_id, description,
     os.environ['H2_COLUMN'] = '' if second_human_score_column is None else second_human_score_column
     os.environ['MIN_ITEMS'] = '0' if min_items_per_candidate is None else str(min_items_per_candidate)
     os.environ['FEATURE_SUBSET_FILE'] = '' if feature_subset_file is None else feature_subset_file
+    os.environ['JAVASCRIPT_DIR'] = join(dirname(abspath(__file__)), "notebooks", "javascript")
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
@@ -540,7 +541,8 @@ def create_comparison_report(experiment_id_old, description_old,
     os.environ['OUTPUT_DIR_NEW'] = csvdir_new
     os.environ['FIGURE_DIR_NEW'] = figdir_new
     os.environ['SCALED_NEW'] = '1' if use_scaled_predictions_new else '0'
-
+    os.environ['JAVASCRIPT_DIR'] = join(dirname(abspath(__file__)), "notebooks", "javascript")
+    
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
     os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
