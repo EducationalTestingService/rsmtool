@@ -12,6 +12,7 @@ from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
 from pandas.util.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
+import warnings
 
 from rsmtool.comparison import (process_confusion_matrix,
                                 compute_correlations_between_versions)
@@ -100,6 +101,26 @@ def test_compute_correlations_between_versions_no_matching_feature():
                                                     human_score='r1', id_column='id')
 
 
+def test_compute_correlations_between_versions_extra_data():
+    df_old = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                           'feature1': [1.3, 1.5, 2.1, 5],
+                           'feature2': [1.1, 6.2, 2.1, 1],
+                           'feature3': [3, 5, 6, 7],
+                           'sc1': [2, 3, 4, 3]})
+    df_new = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'e'],
+                           'feature1': [-1.3, -1.5, -2.1, 2],
+                           'feature2': [1.1, 6.2, 2.1, 8],
+                           'feature4': [1, 3, 6, 7],
+                           'sc1': [2, 3, 4, 3]})
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')
+        df_cors = compute_correlations_between_versions(df_old, df_new)
+    assert_equal(df_cors.get_value('feature1', 'old_new'), -1.0)
+    assert_equal(df_cors.get_value('feature2', 'old_new'), 1.0)
+    assert_equal(df_cors.get_value('feature1', "N"), 3)
+    assert_equal(len(df_cors), 2)
+
+
 @raises(ValueError)
 def test_compute_correlations_between_versions_no_matching_ids():
     df_old = pd.DataFrame({'id': ['a', 'b', 'c'],
@@ -112,3 +133,6 @@ def test_compute_correlations_between_versions_no_matching_ids():
                            'r1': [2, 3, 4]})
     df_cors = compute_correlations_between_versions(df_old, df_new,
                                                     human_score='r1', id_column='id')
+
+
+
