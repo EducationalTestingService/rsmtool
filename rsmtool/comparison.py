@@ -9,9 +9,13 @@ Functions for comparing outputs of two rsmtool experiments.
 import base64
 import numpy as np
 import pandas as pd
+import warnings
 
 from collections import defaultdict
+from scipy.stats import pearsonr
 from os.path import exists, join
+
+
 
 _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
                                  "sys_mean.raw_trim",
@@ -82,6 +86,92 @@ def make_summary_stat_df(df):
     return res
 
 
+def compute_correlations_between_versions(df_old, df_new,
+                                          human_score='sc1',
+                                          id_column='spkitemid'):
+    """
+    Computes correlations in feature values between the two versions
+    as well as the correlations between feature values and human score
+    for each version
+    Parameters
+    ----------
+    df_old : pandas DataFrame
+        Data frame with feature values for the 'old' model
+
+    df_new : pandas DataFrame
+        Data frame with feature valeus for the 'new' model
+
+    human_score : str
+        Name of the column containing human score. Defaults to 'sc1'.
+        Must be the same for both data sets.
+
+    id_column : str
+        Name of the column containing id for each response. Defaults to 'spkitemid'
+        Must be the same for both data sets.
+
+    Returns
+    -------
+    df_correlations: pandas DataFrame
+        Data frame with a row for each feature and the following columns:
+        N -  total N cases
+        human_old - correlation with human score in the old version
+        human_new - correlation with human score in the new version
+        old_new - correlation between old and new version
+
+    Raises
+    ------
+    ValueError
+        If there are no shared features between the two sets or if there are 
+        no share responses between the two sets
+    """
+    # Only use features that appear in both datasets
+
+    features_old = [column for column in df_old if not column in [id_column, human_score]]
+    features_new = [column for column in df_new if not column in [id_column, human_score]]
+    features = list(set(features_old).intersection(features_new))
+
+    if len(features) == 0:
+        raise ValueError("There are no matching features in these two data sets.")
+
+    columns = features + [id_column, human_score]
+
+    # merge the two data sets and display a warning if there are non-matching
+    # ids
+    df_merged = pd.merge(df_old[columns], df_new[columns],
+                         on=[id_column], suffixes=['%%%old', '%%%new'])
+
+    if len(df_merged) == 0:
+        raise ValueError("There are no shared ids between these two datasets")
+
+    if len(df_merged) != len(df_old):
+        warnings.warn("Some responses from the old data "
+                      "were not present in the new data and therefore "
+                      "were excluded from the analysis")
+    if len(df_merged) != len(df_new):
+        warnings.warn("Some responses from the new data "
+                      "were not present in the old data and therefore "
+                      "were excluded from the analysis")
+
+    # compute correlations between each feature and human score.
+    # we are using the same approach as used in analysis.py
+    correlation_list = []
+    for feature in features:
+        # compute correlations
+        df_cor = pd.DataFrame({'Feature': [feature],
+                               'N': len(df_merged),
+                               'human_old': pearsonr(df_merged['{}%%%old'.format(human_score)],
+                                                     df_merged['{}%%%old'.format(feature)])[0],
+                               'human_new': pearsonr(df_merged['{}%%%new'.format(human_score)],
+                                                     df_merged['{}%%%new'.format(feature)])[0],
+                               'old_new': pearsonr(df_merged['{}%%%new'.format(feature)],
+                                                   df_merged['{}%%%old'.format(feature)])[0]})
+        correlation_list.append(df_cor)
+
+    df_correlations = pd.concat(correlation_list)
+    df_correlations.index=df_correlations['Feature']
+    return(df_correlations)
+
+
 def process_confusion_matrix(conf_matrix):
     """
     Process confusion matrix to add 'human' and 'machine'
@@ -133,6 +223,11 @@ def load_rsmtool_output(csvdir, figdir, experiment_id, prefix, groups_eval):
     figs = {}
 
     # feature distributions and the inter-feature correlations
+
+    feature_train_file = join(csvdir, '{}_train_features.csv'.format(experiment_id))
+    if exists(feature_train_file):
+        res['df_train_features'] = pd.read_csv(feature_train_file)
+
     feature_distplots_file = join(figdir, '{}_distrib.svg'.format(experiment_id))
     if exists(feature_distplots_file):
         with open(feature_distplots_file, 'rb') as f:
