@@ -27,8 +27,7 @@ general_sections *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 RSMTool provides pre-defined sections for ``rsmsumm`` (listed below) and, by default, all of them are included in the report. However, you can choose a subset of these pre-defined sections by specifying a list as the value for this field.
 
-
-    - ``consistency``: Compares metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
+    - ``preprocessed_features`` : compares marginal and partial correlations between all features and the human score, and optionally response length if this was computed for any of the models.
 
     - ``model``: Compares the parameters of the two regression models. For linear models, it also includes the standardized and relative coefficients.
 

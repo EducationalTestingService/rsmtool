@@ -65,7 +65,8 @@ else:
                                        'notes',
                                        'sysinfo']
 
-    ordered_section_list_rsmsumm = ['model',
+    ordered_section_list_rsmsumm = ['preprocessed_features',
+                                    'model',
                                     'evaluation',
                                     'sysinfo']
 
