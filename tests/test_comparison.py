@@ -5,6 +5,9 @@ Unit tests for testing functions in ``comparison.py``.
 :author: Nitin Madnani (nmadnani@ets.org)
 :organization: ETS
 """
+import warnings
+
+from os.path import dirname, join
 
 import pandas as pd
 
@@ -12,10 +15,10 @@ from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
 from pandas.util.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
-import warnings
-
-from rsmtool.comparison import (process_confusion_matrix,
-                                compute_correlations_between_versions)
+from rsmtool.test_utils import do_run_experiment
+from rsmtool.comparison import (compute_correlations_between_versions,
+                                load_rsmtool_output,
+                                process_confusion_matrix)
 
 
 def test_process_confusion_matrix():
@@ -138,5 +141,44 @@ def test_compute_correlations_between_versions_no_matching_ids():
                                                     human_score='r1',
                                                     id_column='id')
 
+def test_load_rsmtool_output():
+    source = 'lr'
+    experiment_id = 'lr'
+    test_dir = dirname(__file__)
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
 
+    csvs, figs = load_rsmtool_output('test_outputs/lr/output',
+                                     'test_outputs/lr/figure',
+                                     'lr',
+                                     'scale',
+                                     [])
 
+    expected_csv_keys = ['df_coef',
+                         'df_confmatrix',
+                         'df_descriptives',
+                         'df_eval',
+                         'df_eval_for_degradation',
+                         'df_feature_cors',
+                         'df_mcor_sc1',
+                         'df_mcor_sc1_overview',
+                         'df_model_fit',
+                         'df_outliers',
+                         'df_pca',
+                         'df_pcavar',
+                         'df_pcor_sc1',
+                         'df_pcor_sc1_overview',
+                         'df_percentiles',
+                         'df_score_dist',
+                         'df_scores',
+                         'df_train_features']
+
+    expected_fig_keys = ['betas', 'feature_distplots', 'pca_scree_plot']
+
+    assert_equal(expected_csv_keys, sorted(list(csvs.keys())))
+    assert_equal(expected_fig_keys, sorted(list(figs.keys())))
