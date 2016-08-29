@@ -292,7 +292,7 @@ def load_rsmtool_output(csvdir, figdir, experiment_id, prefix, groups_eval):
 
     # use the raw columns or the scale columns depending on the prefix
     existing_eval_cols = _df_eval_columns_existing_raw if prefix == 'raw' else _df_eval_columns_existing_scale
-    renamedict = raw_renamedict if prefix == 'raw' else scale_renamedict
+    rename_dict = raw_rename_dict if prefix == 'raw' else scale_rename_dict
 
     # read in the short version of the evaluation metrics for all data
     short_metrics_list = ["N", "Adj. Agmt.(br)", "Agmt.(br)", "K(br)",
@@ -301,7 +301,7 @@ def load_rsmtool_output(csvdir, figdir, experiment_id, prefix, groups_eval):
     if exists(eval_file_short):
         df_eval = pd.read_csv(eval_file_short, index_col=0)
         df_eval = df_eval[existing_eval_cols]
-        df_eval = df_eval.rename(columns=renamedict)
+        df_eval = df_eval.rename(columns=rename_dict)
         csvs['df_eval'] = df_eval[short_metrics_list]
         csvs['df_eval'].index.name = None
 
@@ -315,7 +315,7 @@ def load_rsmtool_output(csvdir, figdir, experiment_id, prefix, groups_eval):
         if exists(group_eval_file):
             df_eval = pd.read_csv(group_eval_file, index_col=0)
             df_eval = df_eval[existing_eval_cols]
-            df_eval = df_eval.rename(columns=renamedict)
+            df_eval = df_eval.rename(columns=rename_dict)
             csvs['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
             csvs['df_eval_by_{}'.format(group)].index.name = None
             csvs['df_eval_by_{}_overview'.format(group)] = make_summary_stat_df(csvs['df_eval_by_{}'.format(group)])
