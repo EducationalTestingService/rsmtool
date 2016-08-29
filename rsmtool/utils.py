@@ -7,14 +7,19 @@ import pandas as pd
 
 from os import makedirs
 from os.path import join
+from string import Template
+
 
 # get the path to this file
 package_path = os.path.dirname(__file__)
 
 
-# Custom logging formatter
-# Adapted from: http://stackoverflow.com/questions/1343227/can-pythons-logging-format-be-modified-depending-on-the-message-log-level
 class LogFormatter(logging.Formatter):
+    """
+    Custom logging formatter.
+
+    Adapted from: http://stackoverflow.com/questions/1343227/can-pythons-logging-format-be-modified-depending-on-the-message-log-level
+    """
 
     err_fmt = "ERROR: %(msg)s"
     warn_fmt = "WARNING: %(msg)s"
@@ -287,3 +292,121 @@ def scale_coefficients(intercept,
                                           columns=['feature', 'coefficient'])
 
     return df_scaled_coefficients
+
+
+def float_format_func(num, prec=3):
+    """
+    Format the given floating point number to the specified precision
+    and return as a string.
+
+    Parameters:
+    ----------
+    num : float
+        The floating point number to format.
+
+    prec: int
+        The number of decimal places to use when displaying the number.
+        Defaults to 3.
+
+    Returns:
+    -------
+    ans: str
+        The formatted string representing the given number.
+    """
+
+    formatter_string = Template('{:.${prec}f}').substitute(prec=prec)
+    ans = formatter_string.format(num)
+    return ans
+
+
+def int_or_float_format_func(num, prec=3):
+    """
+    Identify whether the number is float or integer. When displaying
+    integers, use no decimal. For a float, round to the specified
+    number of decimal places. Return as a string.
+
+    Parameters:
+    -----------
+    num : float or int
+        The number to format and display.
+    prec : int
+        The number of decimal places to display if x is a float.
+        Defaults to 3.
+
+    Returns:
+    -------
+    ans : str
+        The formatted string representing the given number.
+    """
+
+    if float.is_integer(num):
+        ans = '{}'.format(int(num))
+    else:
+        ans = float_format_func(num, prec=prec)
+    return ans
+
+
+def custom_highlighter(num,
+                       low=0,
+                       high=1,
+                       prec=3,
+                       absolute=False,
+                       span_class='bold'):
+    """
+    Return the supplied float as an HTML <span> element with the specified
+    class if its value is below ``low`` or above ``high``. If its value does
+    not meet those constraints, then return as a plain string with the
+    specified number of decimal places.
+
+    Parameters:
+    -----------
+    num : float
+        The floating point number to format.
+
+    low : float
+        The number will be displayed as an HTML span it is below this value.
+        Defaults to 0.
+
+    high : float
+        The number will be displayed as an HTML span it is above this value.
+        Defaults to 1.
+
+    prec : int
+        The number of decimal places to display for x. Defaults to 3.
+
+    absolute: bool
+        If True, use the absolute value of x for comparison.
+        Defaults to False.
+
+    span_class: str
+        One of ``bold`` or ``color``. These are the two classes
+        available for the HTML span tag.
+
+    Returns:
+    --------
+    ans : str
+        The formatted (plain or HTML) string representing the given number.
+
+    """
+    abs_num = abs(num) if absolute else num
+    val = float_format_func(num, prec=prec)
+    ans = '<span class="highlight_{}">{}</span>'.format(span_class, val) if abs_num < low or abs_num > high else val
+    return ans
+
+
+def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
+    """
+    Instantiating ``custom_highlighter()`` with the ``bold`` class as
+    the default.
+    """
+    ans = custom_highlighter(num, low, high, prec, absolute, 'bold')
+    return ans
+
+
+def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
+    """
+    Instantiating ``custom_highlighter()`` with the ``color`` class as
+    the default.
+    """
+    ans = custom_highlighter(num, low, high, prec, absolute, 'color')
+    return ans

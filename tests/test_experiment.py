@@ -1632,6 +1632,22 @@ def test_run_experiment_lr_compare():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_compare_different_experiments():
+
+    # basic rsmcompare experiment comparing two Linear regression
+    # experiments with different features and small differences in
+    # training and evaluation sets
+    source = 'lr-different-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores.report.html')
+    yield check_report, html_report
+
 def test_run_experiment_lr_compare_with_h2():
 
     # basic rsmcompare experiment comparing a LinearRegression
@@ -2103,3 +2119,31 @@ def test_run_experiment_duplicate_feature_names():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
+
+@raises(FileNotFoundError)
+def test_run_experiment_lr_compare_wrong_directory():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself
+    source = 'lr-self-compare-wrong-directory'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_lr_compare_wrong_experiment_id():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself
+    source = 'lr-self-compare-wrong-id'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
