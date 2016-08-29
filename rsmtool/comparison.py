@@ -184,7 +184,8 @@ def compute_correlations_between_versions(df_old,
         correlation_list.append(df_cor)
 
     df_correlations = pd.concat(correlation_list)
-    df_correlations.index=df_correlations['Feature']
+    df_correlations.index = df_correlations['Feature']
+    df_correlations.index.name = None
 
     return(df_correlations)
 
