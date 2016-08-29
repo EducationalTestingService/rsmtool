@@ -64,9 +64,9 @@ _df_eval_columns_renamed = ["N", "H1 mean", "H1 SD",
                             "RMSE(b)"]
 
 raw_rename_dict = dict(zip(_df_eval_columns_existing_raw,
-                           df_eval_columns_renamed))
+                           _df_eval_columns_renamed))
 scale_rename_dict = dict(zip(_df_eval_columns_existing_scale,
-                             df_eval_columns_renamed))
+                             _df_eval_columns_renamed))
 
 
 def make_summary_stat_df(df):

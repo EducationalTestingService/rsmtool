@@ -15,17 +15,10 @@ from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
 from pandas.util.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
-<<<<<<< HEAD
 from rsmtool.test_utils import do_run_experiment
 from rsmtool.comparison import (compute_correlations_between_versions,
                                 load_rsmtool_output,
                                 process_confusion_matrix)
-=======
-import warnings
-
-from rsmtool.comparison import (process_confusion_matrix,
-                                compute_correlations_between_versions)
->>>>>>> feature/RSMR-235-add-a-section-for-feature-correlations-between-the-models
 
 
 def test_process_confusion_matrix():
@@ -86,15 +79,12 @@ def test_compute_correlations_between_versions_custom_columns():
                            'feature1': [-1.3, -1.5, -2.1],
                            'feature2': [1.1, 6.2, 2.1],
                            'r1': [2, 3, 4]})
-<<<<<<< HEAD
+
     df_cors = compute_correlations_between_versions(df_old,
                                                     df_new,
                                                     human_score='r1',
                                                     id_column='id')
-=======
-    df_cors = compute_correlations_between_versions(df_old, df_new,
-                                                    human_score='r1', id_column='id')
->>>>>>> feature/RSMR-235-add-a-section-for-feature-correlations-between-the-models
+
     assert_equal(df_cors.get_value('feature1', 'old_new'), -1.0)
     assert_equal(df_cors.get_value('feature2', 'old_new'), 1.0)
     assert_equal(df_cors.get_value('feature1', 'human_old'), pearsonr(df_old['feature1'],
@@ -148,7 +138,7 @@ def test_compute_correlations_between_versions_no_matching_ids():
                            'feature1': [-1.3, -1.5, -2.1],
                            'feature2': [1.1, 6.2, 2.1],
                            'r1': [2, 3, 4]})
-<<<<<<< HEAD
+
     df_cors = compute_correlations_between_versions(df_old,
                                                     df_new,
                                                     human_score='r1',
@@ -195,10 +185,3 @@ def test_load_rsmtool_output():
 
     assert_equal(expected_csv_keys, sorted(list(csvs.keys())))
     assert_equal(expected_fig_keys, sorted(list(figs.keys())))
-=======
-    df_cors = compute_correlations_between_versions(df_old, df_new,
-                                                    human_score='r1', id_column='id')
-
-
-
->>>>>>> feature/RSMR-235-add-a-section-for-feature-correlations-between-the-models
