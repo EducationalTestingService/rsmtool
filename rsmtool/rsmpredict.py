@@ -111,7 +111,8 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
     if experiment_id not in experiment_ids:
-        raise FileNotFoundError('{} does not contain a model for the experiment "{}". '                                 'The following experiments are contained in this '
+        raise FileNotFoundError('{} does not contain a model for the experiment "{}". '
+                                'The following experiments are contained in this '
                                 'directory: {}'.format(experiment_output_dir,
                                                        experiment_id,
                                                        experiment_ids))
@@ -234,7 +235,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     df_features_preprocessed = df_features.copy()
     for feature_name in required_features:
 
-        feature_values = df_features[feature_name].values
+        feature_values = df_features_preprocessed[feature_name].values
 
         feature_transformation = df_feature_info.loc[feature_name]['transform']
         feature_weight = df_feature_info.loc[feature_name]['sign']
@@ -251,7 +252,26 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                                                     feature_transformation,
                                                                     train_feature_mean,
                                                                     train_feature_sd,
-                                                                    exclude_zero_sd=False)
+                                                                    exclude_zero_sd=False,
+                                                                    raise_transformation_error=False)
+
+        # filter the feature values once again to remove possible NaN and inf values that
+        # might have emerged when applying transformations.
+        # We do not need to do that if no transformation was applied.
+        if not feature_transformation in ['raw', 'org']:
+            # check that there are indeed inf or Nan values
+            if np.isnan(df_features_preprocessed[feature_name]).any() or \
+               np.isinf(df_features_preprocessed[feature_name]).any():
+                    newdf, newdf_excluded = filter_on_column(df_features_preprocessed, feature_name, 'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocessed
+                    df_features_preprocessed = newdf
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the preprocessed
+                    # ones
+                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
+                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
 
         # now standardize the feature values
         df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
