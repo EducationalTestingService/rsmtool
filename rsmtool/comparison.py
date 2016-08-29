@@ -15,6 +15,8 @@ from collections import defaultdict
 from scipy.stats import pearsonr
 from os.path import exists, join
 
+
+
 _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
                                  "sys_mean.raw_trim",
                                  "sys_sd.raw_trim",
@@ -62,9 +64,9 @@ _df_eval_columns_renamed = ["N", "H1 mean", "H1 SD",
                             "RMSE(b)"]
 
 raw_rename_dict = dict(zip(_df_eval_columns_existing_raw,
-                          _df_eval_columns_renamed))
+                           df_eval_columns_renamed))
 scale_rename_dict = dict(zip(_df_eval_columns_existing_scale,
-                            _df_eval_columns_renamed))
+                             df_eval_columns_renamed))
 
 
 def make_summary_stat_df(df):
