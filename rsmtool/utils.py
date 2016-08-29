@@ -294,14 +294,14 @@ def scale_coefficients(intercept,
     return df_scaled_coefficients
 
 
-def float_format_func(x, prec=3):
+def float_format_func(num, prec=3):
     """
     Format the given floating point number to the specified precision
     and return as a string.
 
     Parameters:
     ----------
-    x : float
+    num : float
         The floating point number to format.
 
     prec: int
@@ -315,7 +315,7 @@ def float_format_func(x, prec=3):
     """
 
     formatter_string = Template('{:.${prec}f}').substitute(prec=prec)
-    ans = formatter_string.format(x)
+    ans = formatter_string.format(num)
     return ans
 
 
@@ -327,7 +327,7 @@ def int_or_float_format_func(num, prec=3):
 
     Parameters:
     -----------
-    x : float or int
+    num : float or int
         The number to format and display.
     prec : int
         The number of decimal places to display if x is a float.
@@ -339,14 +339,14 @@ def int_or_float_format_func(num, prec=3):
         The formatted string representing the given number.
     """
 
-    if float.is_integer(x):
-        ans = '{}'.format(int(x))
+    if float.is_integer(num):
+        ans = '{}'.format(int(num))
     else:
-        ans = float_format_func(x, prec=prec)
+        ans = float_format_func(num, prec=prec)
     return ans
 
 
-def custom_highlighter(x,
+def custom_highlighter(num,
                        low=0,
                        high=1,
                        prec=3,
@@ -360,7 +360,7 @@ def custom_highlighter(x,
 
     Parameters:
     -----------
-    x : float
+    num : float
         The floating point number to format.
 
     low : float
@@ -388,25 +388,25 @@ def custom_highlighter(x,
         The formatted (plain or HTML) string representing the given number.
 
     """
-    abs_x = abs(x) if absolute else x
-    val = float_format_func(x, prec=prec)
-    ans = '<span class="highlight_{}">{}</span>'.format(span_class, val) if abs_x < low or abs_x > high else val
+    abs_num = abs(num) if absolute else num
+    val = float_format_func(num, prec=prec)
+    ans = '<span class="highlight_{}">{}</span>'.format(span_class, val) if abs_num < low or abs_num > high else val
     return ans
 
 
-def bold_highlighter(x, low=0, high=1, prec=3, absolute=False):
+def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiating ``custom_highlighter()`` with the ``bold`` class as
     the default.
     """
-    ans = custom_highlighter(x, low, high, prec, absolute, 'bold')
+    ans = custom_highlighter(num, low, high, prec, absolute, 'bold')
     return ans
 
 
-def color_highlighter(x, low=0, high=1, prec=3, absolute=False):
+def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiating ``custom_highlighter()`` with the ``color`` class as
     the default.
     """
-    ans = custom_highlighter(x, low, high, prec, absolute, 'color')
+    ans = custom_highlighter(num, low, high, prec, absolute, 'color')
     return ans
