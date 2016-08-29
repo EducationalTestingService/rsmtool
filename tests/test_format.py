@@ -1,5 +1,6 @@
 """
-Unit tests for testing functions in format.py
+Unit tests for testing the various float formatting
+functions in `utils.py`.
 
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
@@ -8,11 +9,11 @@ Unit tests for testing functions in format.py
 
 from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
 
-from rsmtool.format_utils import (float_format_func,
-                                  int_or_float_format_func,
-                                  custom_highlighter,
-                                  bold_highlighter,
-                                  color_highlighter)
+from rsmtool.utils import (float_format_func,
+                           int_or_float_format_func,
+                           custom_highlighter,
+                           bold_highlighter,
+                           color_highlighter)
 
 
 def test_float_format_func_default_prec():
