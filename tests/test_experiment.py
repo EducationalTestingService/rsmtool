@@ -1632,6 +1632,22 @@ def test_run_experiment_lr_compare():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_compare_different_experiments():
+
+    # basic rsmcompare experiment comparing two Linear regression
+    # experiments with different features and small differences in
+    # training and evaluation sets
+    source = 'lr-different-compare'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores.report.html')
+    yield check_report, html_report
+
 def test_run_experiment_lr_compare_with_h2():
 
     # basic rsmcompare experiment comparing a LinearRegression
