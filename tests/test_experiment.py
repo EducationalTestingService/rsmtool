@@ -2217,7 +2217,7 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
 def test_run_experiment_summary_wrong_directory():
 
     # rsmsummary experiment where the specified directory
-    # does not contain any rsmtool experiments
+    # does not exist
     source = 'summary-wrong-directory'
     config_file = join(test_dir,
                        'data',
@@ -2226,3 +2226,30 @@ def test_run_experiment_summary_wrong_directory():
                        'rsmsummary.json')
     do_run_comparison(source, config_file)
 
+
+@raises(FileNotFoundError)
+def test_run_experiment_summary_no_csv_directory():
+
+    # rsmsummary experiment where the specified directory
+    # does not contain any rsmtool experiments
+    source = 'summary-no-output-dir'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummary.json')
+    do_run_comparison(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_summary_no_json():
+
+    # rsmsummary experiment where the specified directory
+    # does not contain any json files
+    source = 'summary-no-json-file'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummary.json')
+    do_run_comparison(source, config_file)
