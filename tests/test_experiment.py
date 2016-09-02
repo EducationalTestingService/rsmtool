@@ -2233,6 +2233,20 @@ def test_run_experiment_lr_predict_missing_columns():
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
 
+
+@raises(ValueError)
+def test_run_experiment_lr_predict_no_numeric_feature_values():
+
+    # rsmpredict experiment with missing post-processing file
+    source = 'lr-predict-no-numeric-feature-values'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
 @raises(ValueError)
 def test_run_experiment_wrong_model_name():
 
