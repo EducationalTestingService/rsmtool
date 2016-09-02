@@ -9,6 +9,7 @@ Run evaluation only experiments.
 #!/usr/bin/env python
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -82,6 +83,11 @@ def run_evaluation(config_file, output_dir):
     # read in the main config file
     config_obj = read_json_file(config_file)
     config_obj = check_main_config(config_obj, context='rsmeval')
+
+    # save a copy of the normalized config into the experiment directory
+    outjson = join(output_dir, 'output', '{}_rsmeval.json'.format(config_obj['experiment_id']))
+    with open(outjson, 'w') as outfile:
+        json.dump(config_obj, outfile, indent=4, separators=(',', ': '))
 
     # get the directory where the config file lives
     # if this is the 'expm' directory, then go

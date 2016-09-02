@@ -51,6 +51,8 @@ from .rsmtool import run_experiment
 
 from .rsmpredict import compute_and_save_predictions
 
+from .rsmsummarize import run_summary
+
 from .utils import (agreement,
                     partial_correlations,
                     write_experiment_output,
@@ -80,6 +82,7 @@ __all__ = ['compute_basic_descriptives',
            'run_experiment',
            'run_evaluation',
            'run_comparison',
+           'run_summary',
            'compute_and_save_predictions',
            'agreement',
            'partial_correlations',

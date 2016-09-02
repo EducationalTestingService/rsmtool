@@ -1,0 +1,5 @@
+{
+  "summary_id": "model_comparison",
+  "description": "a comparison of the results of the rsmtool sample experiment, rsmeval sample experiment and once again the rsmtool sample experiment",
+  "experiment_dirs": ["../rsmtool", "../rsmeval", "../rsmtool"]
+}

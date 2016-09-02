@@ -55,7 +55,7 @@ This folder contains the final RSMEval report in HTML format as well as in the f
 
 output
 ~~~~~~
-This folder contains all of the :ref:`intermediate files <intermediate_files_rsmeval>` produced as part of the various analyses performed, saved as ``.csv`` files.
+This folder contains all of the :ref:`intermediate files <intermediate_files_rsmeval>` produced as part of the various analyses performed, saved as ``.csv`` files. ``rsmeval`` will also save in this folder a copy of the :ref:`configuration file <config_file_rsmeval>`. Fields not specified in the original configuration file will be pre-populated with default values. 
 
 figure
 ~~~~~~

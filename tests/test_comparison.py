@@ -145,8 +145,8 @@ def test_compute_correlations_between_versions_no_matching_ids():
                                                     id_column='id')
 
 def test_load_rsmtool_output():
-    source = 'lr'
-    experiment_id = 'lr'
+    source = 'lr-subgroups-with-h2'
+    experiment_id = 'lr_subgroups_with_h2'
     test_dir = dirname(__file__)
     config_file = join(test_dir,
                        'data',
@@ -155,33 +155,56 @@ def test_load_rsmtool_output():
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
     output_dir = join('test_outputs', source, 'output')
+    figure_dir = join('test_outputs', source, 'figure')
 
-    csvs, figs = load_rsmtool_output('test_outputs/lr/output',
-                                     'test_outputs/lr/figure',
-                                     'lr',
+    csvs, figs = load_rsmtool_output(output_dir,
+                                     figure_dir,
+                                     experiment_id,
                                      'scale',
-                                     [])
+                                     ['QUESTION', 'L1'])
 
     expected_csv_keys = ['df_coef',
                          'df_confmatrix',
+                         'df_consistency',
+                         'df_degradation',
                          'df_descriptives',
                          'df_eval',
+                         'df_eval_by_L1',
+                         'df_eval_by_L1_m_sd',
+                         'df_eval_by_L1_overview',
+                         'df_eval_by_QUESTION',
+                         'df_eval_by_QUESTION_m_sd',
+                         'df_eval_by_QUESTION_overview',
                          'df_eval_for_degradation',
                          'df_feature_cors',
                          'df_mcor_sc1',
+                         'df_mcor_sc1_L1_overview',
+                         'df_mcor_sc1_QUESTION_overview',
+                         'df_mcor_sc1_by_L1',
+                         'df_mcor_sc1_by_QUESTION',
                          'df_mcor_sc1_overview',
                          'df_model_fit',
                          'df_outliers',
                          'df_pca',
                          'df_pcavar',
                          'df_pcor_sc1',
+                         'df_pcor_sc1_L1_overview',
+                         'df_pcor_sc1_QUESTION_overview',
+                         'df_pcor_sc1_by_L1',
+                         'df_pcor_sc1_by_QUESTION',
                          'df_pcor_sc1_overview',
                          'df_percentiles',
                          'df_score_dist',
                          'df_scores',
                          'df_train_features']
 
-    expected_fig_keys = ['betas', 'feature_distplots', 'pca_scree_plot']
+    expected_fig_keys = ['betas',
+                         'eval_barplot_by_L1',
+                         'eval_barplot_by_QUESTION',
+                         'feature_boxplots_by_L1_svg',
+                         'feature_boxplots_by_QUESTION_svg',
+                         'feature_distplots',
+                         'pca_scree_plot']
 
-    assert_equal(expected_csv_keys, sorted(list(csvs.keys())))
-    assert_equal(expected_fig_keys, sorted(list(figs.keys())))
+    assert_equal(expected_csv_keys, sorted(csvs.keys()))
+    assert_equal(expected_fig_keys, sorted(figs.keys()))

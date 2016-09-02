@@ -33,7 +33,7 @@ Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The next step is to create an :ref:`experiment configuration file <config_file_rsmcompare>` in ``.json`` format.
 
-.. _asap_config_rsemcompare:
+.. _asap_config_rsmcompare:
 
 .. literalinclude:: ../examples/rsmcompare/config_rsmcompare.json
     :language: javascript

@@ -15,6 +15,7 @@ build:
     - rsmcompare = rsmtool.rsmcompare:main
     - rsmeval = rsmtool.rsmeval:main
     - rsmpredict = rsmtool.rsmpredict:main
+    - rsmsummarize = rsmtool.rsmsummarize:main
     - render_notebook = rsmtool.report:main
 
 requirements:
