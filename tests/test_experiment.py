@@ -2221,6 +2221,18 @@ def test_run_experiment_predict_no_experiment_id():
     do_run_prediction(source, config_file)
 
 
+@raises(KeyError)
+def test_run_experiment_lr_predict_missing_columns():
+
+    # rsmpredict experiment with missing post-processing file
+    source = 'lr-predict-missing-columns'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
 @raises(ValueError)
 def test_run_experiment_wrong_model_name():
 
