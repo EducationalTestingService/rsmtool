@@ -1,4 +1,5 @@
 {
+    "comparison_id": "lr_baseline_vs_lr_with_FEATURE8_and_zero_scores",
     "experiment_dir_old": "lr-baseline",
     "experiment_id_old": "lr_baseline",
     "description_old": "The baseline experiment.",

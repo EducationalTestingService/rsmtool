@@ -75,6 +75,7 @@ def select_candidates_with_N_or_more_items(df,
             df_excluded)
 
 
+
 def locate_custom_sections(custom_report_section_paths, configpath):
     """
     Get the absolute paths for custom report sections and check that
@@ -205,6 +206,36 @@ def normalize_json_fields(json_obj):
 
     return new_json_obj
 
+def check_id_fields(id_field_values):
+    """
+    Check whether the ID fields in the given dictionary
+    are properly formatted, i.e., they
+     - do not contain any spaces
+     - are shorter than 200 characters
+
+    Parameters
+    ----------
+    id_field_values : dict
+        A dictionary containing the ID fields names
+        as the keys and the value from the configuration
+        file as the value.
+
+    Raises
+    ------
+    ValueError
+        If the values for the ID fields in the given
+        dictionary are not formatted correctly.
+    """
+
+    for id_field, id_field_value in id_field_values.items():
+        if len(id_field_value) > 200:
+            raise ValueError("{} is too long (must be "
+                             "<=200 characters)".format(id_field))
+
+        if re.search(r'\s', id_field_value):
+            raise ValueError("{} cannot contain any "
+                             "spaces: {}".format(id_field))
+
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     """
@@ -257,20 +288,17 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
                            'experiment_dir',
                            'input_features_file']
     elif context == 'rsmcompare':
-        required_fields = ['experiment_id_old', 'experiment_dir_old',
-                           'experiment_id_new', 'experiment_dir_new']
+        required_fields = ['comparison_id',
+                           'experiment_id_old',
+                           'experiment_dir_old',
+                           'experiment_id_new',
+                           'experiment_dir_new']
 
     for field in required_fields:
         if field not in new_json_obj:
             raise ValueError("The config file must specify '{}'".format(field))
 
-    # 2. Check to make sure that no experiment IDs contain spaces
-    experiment_id_values = [new_json_obj[k] for k in new_json_obj
-                            if k.startswith('experiment_id')]
-    if any([re.search(r'\s', v) for v in experiment_id_values]):
-        raise ValueError("Experiment IDs cannot contain any spaces.")
-
-    # 3. Add default values for all unspecified fields
+    # 2. Add default values for all unspecified fields
     defaults = {'id_column': 'spkitemid',
                 'description': '',
                 'description_old': '',
@@ -307,13 +335,23 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         if field not in new_json_obj:
             new_json_obj[field] = defaults[field]
 
-    # 4. Check to make sure no unrecognized fields are specified
+    # 3. Check to make sure no unrecognized fields are specified
     for field in new_json_obj:
         if field not in defaults and field not in required_fields:
             raise ValueError("Unrecognized field '{}' in json file".format(field))
 
-    # 5. Check for fields that require feature_subset _file and try to use the default feature file:
+    # 4. Check to make sure that the ID fields that will be
+    # used as part of filenames formatted correctly
+    id_fields = ['comparison_id',
+                 'experiment_id']
+    id_field_values = {field: new_json_obj[field] for field in new_json_obj
+                       if field in id_fields}
+    # we do not need to validate any IDs for `rsmpredict`
+    if context in ['rsmtool', 'rsmeval', 'rsmcompare']:
+        check_id_fields(id_field_values)
 
+    # 5. Check for fields that require feature_subset _file and try
+    # to use the default feature file:
     if new_json_obj['feature_subset'] and not new_json_obj['feature_subset_file']:
 
         # Check if we have the default subset file from rsmextra
