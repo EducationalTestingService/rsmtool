@@ -2253,3 +2253,57 @@ def test_run_experiment_summary_no_json():
                        source,
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_feature_file():
+
+    # rsmpredict experiment with missing feature file
+    source = 'predict-no-feature-file'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_experiment_dir():
+
+    # rsmpredict experiment with missing experiment dir
+    source = 'predict-no-experiment-dir'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_output_dir():
+
+    # rsmpredict experiment where experiment_dir
+    # does not containt output directory
+    source = 'predict-no-output-dir'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_experiment_id():
+
+    # rsmpredict experiment ehere the experiment_dir
+    # does not contain the experiment with the stated id
+    source = 'predict-no-experiment-id'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
