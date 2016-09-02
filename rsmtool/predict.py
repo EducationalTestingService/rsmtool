@@ -13,6 +13,8 @@ import pandas as pd
 
 from skll import FeatureSet
 
+from rsmtool.preprocess import trim
+
 
 def predict_with_model(model, df):
     """

@@ -25,7 +25,7 @@ from rsmtool.input import (check_main_config,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column)
-from rsmtool.predict import predict_with_model
+from rsmtool.predict import predict_with_model, process_predictions
 from rsmtool.preprocess import (preprocess_new_feature_file,
                                 trim)
 from rsmtool.utils import LogFormatter
@@ -187,8 +187,8 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                   index_col=0)
 
     (df_features_preprocessed,
-    df_excluded) = preprocess_new_feature_file(df_input,
-                                               df_feature_info)
+                  df_excluded) = preprocess_new_feature_file(df_input,
+                                                             df_feature_info)
 
     # save the pre-processed features to disk if we were asked to
     if feats_file:
@@ -207,6 +207,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
 
     # read in the post-processing parameters from disk
     df_postproc_params = pd.read_csv(join(experiment_output_dir, '{}_postprocessing_params.csv'.format(experiment_id)))
+
     trim_min = df_postproc_params['trim_min'].values[0]
     trim_max = df_postproc_params['trim_max'].values[0]
     h1_mean = df_postproc_params['h1_mean'].values[0]
@@ -214,18 +215,12 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
     train_predictions_sd = df_postproc_params['train_predictions_sd'].values[0]
 
-    # now scale the predictions
-    logger.info('Rescaling predictions')
-    scaled_predictions = (df_predictions['raw'] - train_predictions_mean) / train_predictions_sd
-    scaled_predictions = scaled_predictions * h1_sd + h1_mean
-    df_predictions['scale'] = scaled_predictions
-
-    # trim and round the predictions
-    logger.info('Trimming and rounding predictions')
-    df_predictions['raw_trim'] = trim(df_predictions['raw'], trim_min, trim_max)
-    df_predictions['raw_trim_round'] = np.rint(df_predictions['raw_trim']).astype('int64')
-    df_predictions['scale_trim'] = trim(df_predictions['scale'], trim_min, trim_max)
-    df_predictions['scale_trim_round'] = np.rint(df_predictions['scale_trim']).astype('int64')
+    df_predictions = process_predictions(df_predictions,
+                                         train_predictions_mean,
+                                         train_predictions_sd,
+                                         h1_mean,
+                                         h1_sd,
+                                         trim_min, trim_max)
 
     # add back the columns that we were requested to copy if any
     if len(columns_to_copy) > 0:
