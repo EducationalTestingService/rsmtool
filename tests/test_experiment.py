@@ -343,6 +343,27 @@ def test_run_experiment_lr_predict():
 
         yield check_csv_output, output_file, expected_output_file
 
+def test_run_experiment_lr_predict_with_score():
+
+    # rsmpredict experiment with human score 
+
+    source = 'lr-predict-with-score'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
 
 def test_run_experiment_lr_predict_missing_values():
 
