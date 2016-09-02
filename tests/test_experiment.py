@@ -2224,7 +2224,7 @@ def test_run_experiment_summary_wrong_directory():
                        'experiments',
                        source,
                        'rsmsummarize.json')
-    do_run_comparison(source, config_file)
+    do_run_summary(source, config_file)
 
 
 @raises(FileNotFoundError)
@@ -2238,7 +2238,7 @@ def test_run_experiment_summary_no_csv_directory():
                        'experiments',
                        source,
                        'rsmsummarize.json')
-    do_run_comparison(source, config_file)
+    do_run_summary(source, config_file)
 
 
 @raises(FileNotFoundError)
@@ -2252,4 +2252,4 @@ def test_run_experiment_summary_no_json():
                        'experiments',
                        source,
                        'rsmsummarize.json')
-    do_run_comparison(source, config_file)
+    do_run_summary(source, config_file)
