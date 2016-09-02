@@ -160,9 +160,17 @@ def test_validate_experiment_id_7():
             'experiment_dir_new': 'data/new',}
     validate_and_populate_json_fields(data, context='rsmcompare')
 
+
 @raises(ValueError)
-def test_validate_summary_id():
+def test_validate_experiment_id_8():
     data = {'summary_id': 'model summary',
+            'experiment_dirs': []}
+    validate_and_populate_json_fields(data, context='rsmsummarize')
+
+
+@raises(ValueError)
+def test_validate_experiment_id_9():
+    data = {'summary_id': 'this_is_a_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_really_long_id',
             'experiment_dirs': []}
     validate_and_populate_json_fields(data, context='rsmsummarize')
 
