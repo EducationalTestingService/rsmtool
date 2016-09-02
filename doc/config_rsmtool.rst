@@ -9,7 +9,7 @@ There are four required fields and the rest are all optional.
 
 experiment_id
 """""""""""""
-An identifier for the experiment that will be used to name the report and all :ref:`intermediate CSV files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values and must *not* contain spaces.
+An identifier for the experiment that will be used to name the report and all :ref:`intermediate CSV files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
 
 model
 """""

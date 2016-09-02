@@ -975,10 +975,10 @@ def run_prediction_analyses(df_test,
 
     # compute the confusion matrix as a data frame
     score_type = 'scale' if use_scaled_predictions else 'raw'
-    system_scores = df_preds['sc1'].astype('int64')
-    human_scores = df_preds['{}_trim_round'.format(score_type)].astype('int64')
-    conf_matrix = confusion_matrix(system_scores, human_scores)
-    labels = sorted(system_scores.append(human_scores).unique())
+    human_scores = df_preds['sc1'].astype('int64')
+    system_scores = df_preds['{}_trim_round'.format(score_type)].astype('int64')
+    conf_matrix = confusion_matrix(human_scores, system_scores)
+    labels = sorted(human_scores.append(system_scores).unique())
     df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
 
     # compute the score distributions of the human and machine scores

@@ -538,10 +538,17 @@ def create_report(experiment_id, description,
                           join(reportdir, '{}.html'.format(report_name)))
 
 
-def create_comparison_report(experiment_id_old, description_old,
-                             csvdir_old, figdir_old, experiment_id_new,
-                             description_new, csvdir_new, figdir_new,
-                             output_dir, subgroups,
+def create_comparison_report(comparison_id,
+                             experiment_id_old,
+                             description_old,
+                             csvdir_old,
+                             figdir_old,
+                             experiment_id_new,
+                             description_new,
+                             csvdir_new,
+                             figdir_new,
+                             output_dir,
+                             subgroups,
                              chosen_notebook_files,
                              use_scaled_predictions_old=False,
                              use_scaled_predictions_new=False):
@@ -554,6 +561,7 @@ def create_comparison_report(experiment_id_old, description_old,
     logger = logging.getLogger(__name__)
 
     # set the environment variables we want
+    os.environ['COMPARISON_ID'] = comparison_id
     os.environ['EXPERIMENT_ID_OLD'] = experiment_id_old
     os.environ['DESCRIPTION_OLD'] = description_old
     os.environ['OUTPUT_DIR_OLD'] = csvdir_old
@@ -566,7 +574,7 @@ def create_comparison_report(experiment_id_old, description_old,
     os.environ['FIGURE_DIR_NEW'] = figdir_new
     os.environ['SCALED_NEW'] = '1' if use_scaled_predictions_new else '0'
     os.environ['JAVASCRIPT_PATH'] = javascript_path
-    
+
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
     os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
@@ -574,8 +582,7 @@ def create_comparison_report(experiment_id_old, description_old,
 
     # create the output directory
     os.makedirs(output_dir, exist_ok=True)
-    report_name = '{}_vs_{}.report'.format(experiment_id_old,
-                                           experiment_id_new)
+    report_name = '{}_report'.format(comparison_id)
     merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections
@@ -647,7 +654,7 @@ def convert_ipynb_to_html(notebook_file, html_file):
 
     # set a high timeout for datasets with a large number of features
     report_config = Config({'ExecutePreprocessor': {'enabled': True,
-                                                    'timeout': 600},
+                                                    'timeout': 3600},
                             'HTMLExporter': {'template_path': [template_path],
                                              'template_file': 'report.tpl'}})
 
