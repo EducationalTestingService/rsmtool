@@ -73,7 +73,7 @@ def check_experiment_dir(experiment_dir, configpath):
                                     "the .json configuration files for rsmtool "
                                     "experiments.".format(full_path_experiment_dir))
 
-    return jsons
+        return jsons
 
 
 def run_summary(config_file, output_dir):
