@@ -3,7 +3,7 @@
 ``rsmsummarize`` - Compare multiple scoring models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmsummarize`` command-line utility to compare multiple models and to generate a comparison report. Unlike ``rsmcompare`` which creates a detailed comparison between the two models, ``rsmsummarize`` can be used to create a more general overview of multiple models. 
+RSMTool provides the ``rsmsummarize`` command-line utility to compare multiple models and to generate a comparison report. Unlike ``rsmcompare`` which creates a detailed comparison report between the two models, ``rsmsummarize`` can be used to create a more general overview of multiple models. 
 
 ``rsmsummarize`` can be used to compare:
 

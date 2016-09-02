@@ -8,7 +8,7 @@ For this tutorial, you first need to :ref:`install RSMTool <install>` and make s
 Workflow
 ~~~~~~~~
 
-``rsmsummarize`` is designed to compare sevearl existing ``rsmtool`` or ``rsmeval`` experiments. To use ``rsmsummarize`` you need:
+``rsmsummarize`` is designed to compare several existing ``rsmtool`` or ``rsmeval`` experiments. To use ``rsmsummarize`` you need:
 
 1. Two or more experiments that were run using :ref:`rsmtool <usage_rsmtool>` or :ref:`rsmeval <usage_rsmeval>`.
 2. Create an :ref:`experiment configuration file <config_file_rsmsummarize>` describing the comparison experiment you would like to run.
@@ -41,7 +41,7 @@ The next step is to create an :ref:`experiment configuration file <config_file_r
 
 Let's take a look at the options in our configuration file.
 
-- **Line 2**: We provide the ``summary_id`` for the comparison
+- **Line 2**: We provide the ``summary_id`` for the comparison. This will be used to generate the name of the final report. 
 - **Line 3**: We give a short description of this comparison experiment. This will be shown in the report.
 - **Line 4**: We also give the list of paths to the directories containing the outputs of the experiments we want to compare.
 
