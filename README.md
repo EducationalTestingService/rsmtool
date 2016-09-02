@@ -31,8 +31,30 @@ For installation and usage, please see the official [documentation](http://rsmto
 - `setuptools`
 
 ## Contributing
-
 Contributions to RSMTool are very welcome. Please refer to the [documentation](http://rsmtool.readthedocs.io/en/latest/contributing.html) for how to get started on developing new features or functionality for RSMTool.
+
+## Citing
+If you are using RSMTool in your work, you can cite it as follows:
+
+### MLA
+Madnani, Nitin and Loukina, Anastassia. "RSMTool: A Collection of Tools for Building and Evaluating Automated Scoring Models". Journal of Open Source Software 1(3), 2016.
+
+### BibTex
+
+```bib
+@article{MadnaniLoukina2016,
+  doi = {10.21105/joss.00033},
+  url = {http://dx.doi.org/10.21105/joss.00033},
+  year  = {2016},
+  month = {jul},
+  publisher = {The Open Journal},
+  volume = {1},
+  number = {3},
+  author = {Nitin Madnani and Anastassia Loukina},
+  title = {{RSMTool}: A Collection of Tools for Building and Evaluating Automated Scoring Models},
+  journal = {{Journal of Open Source Software}}
+}
+```
 
 ## Changelog
 See [GitHub Releases](https://github.com/EducationalTestingService/rsmtool/releases).
