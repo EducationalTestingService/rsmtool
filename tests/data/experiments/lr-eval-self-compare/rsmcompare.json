@@ -1,4 +1,5 @@
 {
+    "comparison_id": "lr_eval_with_h2_vs_lr_eval_with_h2",
     "experiment_dir_old": "lr-eval-with-h2",
     "experiment_id_old": "lr_eval_with_h2",
     "description_old": "Using all features with a LinearRegression model.",

@@ -1,0 +1,4 @@
+Score/Features,all features numeric,non-numeric feature values
+numeric non-zero human score,-,1
+zero human score,3,1
+non-numeric human score,0,0
