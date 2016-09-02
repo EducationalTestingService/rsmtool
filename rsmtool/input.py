@@ -234,7 +234,7 @@ def check_id_fields(id_field_values):
 
         if re.search(r'\s', id_field_value):
             raise ValueError("{} cannot contain any "
-                             "spaces: {}".format(id_field))
+                             "spaces".format(id_field))
 
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):

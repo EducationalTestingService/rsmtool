@@ -1,5 +1,5 @@
 {
-    "comparison_id": "linearsvr_vs_linearsvr",
+    "comparison_id": "LinearSVR_vs_LinearSVR",
     "experiment_dir_old": "linearsvr",
     "experiment_id_old": "LinearSVR",
     "description_old": "Using all features with a LinearSVR model.",
