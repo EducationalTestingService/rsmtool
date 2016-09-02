@@ -1,0 +1,5 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": "linearsvr, linearsvr, linearsvr",
+    "description": "Comparison of rsmtool experiment which uses a SKLL model with itself."
+}

@@ -16,6 +16,7 @@ from rsmtool.predict import predict_with_model
 from rsmtool.rsmcompare import run_comparison
 from rsmtool.rsmeval import run_evaluation
 from rsmtool.rsmpredict import compute_and_save_predictions
+from rsmtool.rsmsummarize import run_summary
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
@@ -112,6 +113,23 @@ def do_run_comparison(source, config_file):
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
     run_comparison(config_file, experiment_dir)
+
+
+def do_run_summary(source, config_file):
+    """
+    Run rsmsummarizeary experiment using the given experiment
+    configuration file located in the given source directory.
+
+    Parameters
+    ----------
+    source : str
+        Path to where the test is located on disk.
+    config_file : str
+        Path to the experiment configuration file.
+    """
+    source_output_dir = 'test_outputs'
+    experiment_dir = join(source_output_dir, source)
+    run_summary(config_file, experiment_dir)
 
 
 def check_csv_output(csv1, csv2):

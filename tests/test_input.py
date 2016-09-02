@@ -72,10 +72,10 @@ def test_validate_and_populate_missing_fields():
 @raises(ValueError)
 def test_validate_and_populate_min_responses_but_no_candidate():
     data = {'experiment_id': 'experiment_1',
-                'train_file': 'data/rsmtool_smTrain.csv',
-                'test_file': 'data/rsmtool_smEval.csv',
-                'model': 'LinearRegression',
-                'min_responses_per_candidate': 5}
+            'train_file': 'data/rsmtool_smTrain.csv',
+            'test_file': 'data/rsmtool_smEval.csv',
+            'model': 'LinearRegression',
+            'min_responses_per_candidate': 5}
     validate_and_populate_json_fields(data)
 
 
@@ -136,6 +136,12 @@ def test_validate_experiment_id_5():
             'experiment_id_new': 'new experiment',
             'experiment_dir_new': 'data/new',}
     validate_and_populate_json_fields(data, context='rsmcompare')
+
+@raises(ValueError)
+def test_validate_summary_id():
+    data = {'summary_id': 'model summary',
+            'experiment_dirs': []}
+    validate_and_populate_json_fields(data, context='rsmsummarize')
 
 
 @raises(ValueError)
