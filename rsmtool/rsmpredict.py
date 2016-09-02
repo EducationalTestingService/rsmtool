@@ -35,6 +35,8 @@ from skll import Learner
 from rsmtool.version import __version__
 
 
+
+
 def compute_and_save_predictions(config_file, output_file, feats_file):
     """
     Run ``rsmpredict`` with given configuration file and generate
@@ -320,7 +322,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     df_predictions['scale_trim_round'] = np.rint(df_predictions['scale_trim']).astype('int64')
 
     # add back the columns that we were requested to copy if any
-    if columns_to_copy:
+    if len(columns_to_copy) > 0:
         df_predictions_with_metadata = pd.merge(df_predictions,
                                                 df_input[['spkitemid'] + columns_to_copy])
         assert(len(df_predictions) == len(df_predictions_with_metadata))
