@@ -50,7 +50,7 @@ This folder contains the final RSMTool report in HTML format as well in the form
 
 output
 ^^^^^^
-This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files.
+This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files. ``rsmtool`` will also save in this folder a copy of the :ref:`configuration file <config_file_rsmtool>`. Fields not specified in the original configuration file will be pre-populated with default values. 
 
 figure
 ^^^^^^
