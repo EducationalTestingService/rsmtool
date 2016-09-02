@@ -39,7 +39,8 @@ from .preprocess import (filter_on_column,
                          preprocess_feature,
                          remove_outliers,
                          transform_feature,
-                         trim)
+                         trim,
+                         preprocess_new_feature_file)
 
 from .report import convert_ipynb_to_html, merge_notebooks
 
@@ -75,6 +76,7 @@ __all__ = ['compute_basic_descriptives',
            'filter_on_column',
            'remove_outliers',
            'preprocess_feature',
+           'preprocess_new_feature_file'
            'transform_feature',
            'trim',
            'convert_ipynb_to_html',

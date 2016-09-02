@@ -38,7 +38,7 @@ Data preprocessing
 
 1. Truncate/clamp any outlier feature values, where outliers are defined as :math:`\mu \pm 4*\sigma`, where :math:`\mu` is the mean and :math:`\sigma` is the standard deviation.
 
-2. Apply pre-specified transformations to feature values.
+2. Apply pre-specified :ref:`transformations <json_transformation>` to feature values.
 
 3. Flip the signs for feature values if necessary.
 
@@ -50,7 +50,7 @@ Pre-processing parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Any held-out evaluation data on which the model is to be evaluated needs to be pre-processed in the same way as the training data. Therefore, the following parameters are computed on the training set, saved to disk, and re-used when pre-processing the evaluation set:
 
-- Mean and standard deviation  of raw feature values. These are used to compute truncate any outliers on the evaluation set;
+- Mean and standard deviation  of raw feature values. These are used to compute floor and ceiling for truncating any outliers in the evaluation set;
 
 - Any transformation and sign changes that were applied;
 
