@@ -70,7 +70,7 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-Once the run finishes, you will see an HTML file named ``ASAP2_vs_ASAP2.report.html``. This is the final ``rsmcompare`` comparison report.
+Once the run finishes, you will see an HTML file named ``ASAP2_vs_ASAP2_report.html``. This is the final ``rsmcompare`` comparison report.
 
 Examine the report
 ~~~~~~~~~~~~~~~~~~
