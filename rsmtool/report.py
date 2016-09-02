@@ -593,7 +593,7 @@ def convert_ipynb_to_html(notebook_file, html_file):
 
     # set a high timeout for datasets with a large number of features
     report_config = Config({'ExecutePreprocessor': {'enabled': True,
-                                                    'timeout': 600},
+                                                    'timeout': 3600},
                             'HTMLExporter': {'template_path': [template_path],
                                              'template_file': 'report.tpl'}})
 
