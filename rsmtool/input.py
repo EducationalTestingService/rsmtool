@@ -222,7 +222,7 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         Context of the tool in which we are validating.
         Possible values are {'rsmtool', 'rsmeval',
                              'rsmpredict', 'rsmcompare',
-                             'rsmsumm'}
+                             'rsmsummarize'}
         Defaults to 'rsmtool'.
 
     Returns
@@ -261,7 +261,7 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
         required_fields = ['experiment_id_old', 'experiment_dir_old',
                            'experiment_id_new', 'experiment_dir_new']
 
-    elif context == 'rsmsumm':
+    elif context == 'rsmsummarize':
         required_fields = ['summary_id', 'experiment_dirs']
 
     for field in required_fields:

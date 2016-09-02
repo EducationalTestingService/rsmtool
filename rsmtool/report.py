@@ -23,16 +23,16 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (special_section_list_rsmtool,
                                    special_section_list_rsmeval,
                                    special_section_list_rsmcompare,
-                                   special_section_list_rsmsumm,
+                                   special_section_list_rsmsummarize,
                                    ordered_section_list_with_special_sections_rsmtool,
                                    ordered_section_list_with_special_sections_rsmeval,
                                    ordered_section_list_with_special_sections_rsmcompare,
-                                   ordered_section_list_with_special_sections_rsmsumm,
+                                   ordered_section_list_with_special_sections_rsmsummarize,
                                    special_notebook_path)
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
     ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
-    ordered_section_list_rsmsumm = ordered_section_list_with_special_sections_rsmsumm
+    ordered_section_list_rsmsummarize = ordered_section_list_with_special_sections_rsmsummarize
 else:
     ordered_section_list_rsmtool = ['data_description',
                                     'data_description_by_group',
@@ -65,15 +65,15 @@ else:
                                        'notes',
                                        'sysinfo']
 
-    ordered_section_list_rsmsumm = ['preprocessed_features',
-                                    'model',
-                                    'evaluation',
-                                    'sysinfo']
+    ordered_section_list_rsmsummarize = ['preprocessed_features',
+                                         'model',
+                                         'evaluation',
+                                         'sysinfo']
 
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
-    special_section_list_rsmsumm = []
+    special_section_list_rsmsummarize = []
     special_notebook_path = ""
 
 package_path = dirname(__file__)
@@ -98,8 +98,8 @@ general_section_list_rsmeval = [section for section in ordered_section_list_rsme
 general_section_list_rsmcompare = [section for section in ordered_section_list_rsmcompare
                                    if section not in special_section_list_rsmcompare]
 
-general_section_list_rsmsumm = [section for section in ordered_section_list_rsmsumm
-                                if section not in special_section_list_rsmsumm]
+general_section_list_rsmsummarize = [section for section in ordered_section_list_rsmsummarize
+                                if section not in special_section_list_rsmsummarize]
 
 
 # define a mapping from the tool name to the master
@@ -107,21 +107,21 @@ general_section_list_rsmsumm = [section for section in ordered_section_list_rsms
 master_section_dict = {'general': {'rsmtool': general_section_list_rsmtool,
                                    'rsmeval': general_section_list_rsmeval,
                                    'rsmcompare': general_section_list_rsmcompare,
-                                   'rsmsumm': general_section_list_rsmsumm},
+                                   'rsmsummarize': general_section_list_rsmsummarize},
                        'special': {'rsmtool': special_section_list_rsmtool,
                                    'rsmeval': special_section_list_rsmeval,
                                    'rsmcompare': special_section_list_rsmcompare,
-                                   'rsmsumm': special_section_list_rsmsumm}}
+                                   'rsmsummarize': special_section_list_rsmsummarize}}
 
 # define the mapping for section paths
 notebook_path_dict = {'general': {'rsmtool': notebook_path,
                                   'rsmeval': notebook_path,
                                   'rsmcompare': comparison_notebook_path,
-                                  'rsmsumm': summary_notebook_path},
+                                  'rsmsummarize': summary_notebook_path},
                       'special': {'rsmtool': special_notebook_path,
                                   'rsmeval': special_notebook_path,
                                   'rsmcompare': special_notebook_path,
-                                  'rsmsumm': special_notebook_path}}
+                                  'rsmsummarize': special_notebook_path}}
 
 
 def merge_notebooks(notebook_files, output_file):
@@ -452,8 +452,8 @@ def get_ordered_notebook_files(general_sections,
         ordered_section_list = ordered_section_list_rsmeval
     elif context == 'rsmcompare':
         ordered_section_list = ordered_section_list_rsmcompare
-    elif context == 'rsmsumm':
-        ordered_section_list = ordered_section_list_rsmsumm
+    elif context == 'rsmsummarize':
+        ordered_section_list = ordered_section_list_rsmsummarize
 
     # add all custom sections to the end of the default ordered list
     ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])

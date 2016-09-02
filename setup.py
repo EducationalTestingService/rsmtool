@@ -27,7 +27,7 @@ setup(name='rsmtool',
                      'rsmeval = rsmtool.rsmeval:main',
                      'rsmpredict = rsmtool.rsmpredict:main',
                      'rsmcompare = rsmtool.rsmcompare:main',
-                     'rsmsumm = rsmtool.rsmsumm:main',
+                     'rsmsummarize = rsmtool.rsmsummarize:main',
                      'render_notebook = rsmtool.report:main']
                     },
       classifiers=['Intended Audience :: Science/Research',

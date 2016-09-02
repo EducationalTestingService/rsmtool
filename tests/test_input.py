@@ -141,7 +141,7 @@ def test_validate_experiment_id_5():
 def test_validate_summary_id():
     data = {'summary_id': 'model summary',
             'experiment_dirs': []}
-    validate_and_populate_json_fields(data, context='rsmsumm')
+    validate_and_populate_json_fields(data, context='rsmsummarize')
 
 
 @raises(ValueError)

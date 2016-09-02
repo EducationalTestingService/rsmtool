@@ -2,7 +2,7 @@
 
 API Documentation
 -----------------
-The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, and :ref:`rsmcompare <usage_rsmcompare>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
+The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, :ref:`rsmcompare <usage_rsmcompare>`, and :ref:`rsmsummarize <usage_rsmsummarize>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
 
 :mod:`rsmtool` Package
 ======================

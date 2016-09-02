@@ -78,7 +78,7 @@ def check_experiment_dir(experiment_dir, configpath):
 
 def run_summary(config_file, output_dir):
     """
-    Run RSMSumm experiment using the given configuration
+    Run rsmsummarize experiment using the given configuration
     file and generate all outputs in the given directory.
 
     Parameters
@@ -100,7 +100,7 @@ def run_summary(config_file, output_dir):
     # load the information from the config file
     # read in the main config file
     config_obj = read_json_file(config_file)
-    config_obj = check_main_config(config_obj, context='rsmsumm')
+    config_obj = check_main_config(config_obj, context='rsmsummarize')
 
     # get the directory where the config file lives
     configpath = dirname(config_file)
@@ -150,7 +150,7 @@ def run_summary(config_file, output_dir):
                                                        section_order,
                                                        subgroups,
                                                        model_type=None,
-                                                       context='rsmsumm')
+                                                       context='rsmsummarize')
     # now generate the comparison report
     logger.info('Starting report generation')
     create_summary_report(summary_id, description,
@@ -171,7 +171,7 @@ def main():
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmsumm')
+    parser = argparse.ArgumentParser(prog='rsmsummarize')
 
     parser.add_argument('config_file',
                         help="The JSON config file for this experiment")

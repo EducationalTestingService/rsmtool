@@ -1765,13 +1765,13 @@ def test_run_experiment_lr_eval_tool_compare():
 
 def test_run_experiment_lr_summary():
 
-    # basic rsmcumm experiment comparing several rsmtool experiments
+    # basic rsmsummarize experiment comparing several rsmtool experiments
     source = 'lr-self-summary'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsumm.json')
+                       'rsmsummarize.json')
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
@@ -1780,14 +1780,14 @@ def test_run_experiment_lr_summary():
 
 def test_run_experiment_linearsvr_summary():
 
-    # basic rsmsumm experiment comparing an experiment
+    # basic rsmsummarize experiment comparing an experiment
     # which uses a SKLL model to itself
     source = 'linearsvr-self-summary'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsumm.json')
+                       'rsmsummarize.json')
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
@@ -1796,13 +1796,13 @@ def test_run_experiment_linearsvr_summary():
 
 def test_run_experiment_lr_eval_summary():
 
-    # basic rsmsumm experiment comparing an rsmtool and rsmeval experiments
+    # basic rsmsummarize experiment comparing an rsmtool and rsmeval experiments
     source = 'lr-self-eval-summary'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsumm.json')
+                       'rsmsummarize.json')
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
@@ -1811,14 +1811,14 @@ def test_run_experiment_lr_eval_summary():
 
 def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
 
-    # basic rsmsumm experiment comparing a LinearRegression
+    # basic rsmsummarize experiment comparing a LinearRegression
     # experiment to itself with a custom list of sections
     source = 'lr-self-summary-with-custom-sections'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsumm.json')
+                       'rsmsummarize.json')
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
@@ -2216,40 +2216,40 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
 @raises(FileNotFoundError)
 def test_run_experiment_summary_wrong_directory():
 
-    # rsmsummary experiment where the specified directory
+    # rsmsummarize experiment where the specified directory
     # does not exist
     source = 'summary-wrong-directory'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsummary.json')
+                       'rsmsummarize.json')
     do_run_comparison(source, config_file)
 
 
 @raises(FileNotFoundError)
 def test_run_experiment_summary_no_csv_directory():
 
-    # rsmsummary experiment where the specified directory
+    # rsmsummarize experiment where the specified directory
     # does not contain any rsmtool experiments
     source = 'summary-no-output-dir'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsummary.json')
+                       'rsmsummarize.json')
     do_run_comparison(source, config_file)
 
 
 @raises(FileNotFoundError)
 def test_run_experiment_summary_no_json():
 
-    # rsmsummary experiment where the specified directory
+    # rsmsummarize experiment where the specified directory
     # does not contain any json files
     source = 'summary-no-json-file'
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
-                       'rsmsummary.json')
+                       'rsmsummarize.json')
     do_run_comparison(source, config_file)

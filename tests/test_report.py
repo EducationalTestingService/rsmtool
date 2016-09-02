@@ -18,7 +18,7 @@ from rsmtool.report import (check_section_names,
 # will run irrespective of whether or not rsmextra is installed
 # We also set a placeholder special_notebook path
 
-for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsumm']:
+for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
     master_section_dict['special'][context].append('placeholder_special_section')
     notebook_path_dict['special'].update({context:'special_notebook_path'})
 
@@ -27,7 +27,7 @@ for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsumm']:
 general_section_list_rsmtool = master_section_dict['general']['rsmtool']
 general_section_list_rsmeval = master_section_dict['general']['rsmeval']
 general_section_list_rsmcompare = master_section_dict['general']['rsmcompare']
-general_section_list_rsmsumm = master_section_dict['general']['rsmsumm']
+general_section_list_rsmsummarize = master_section_dict['general']['rsmsummarize']
 
 
 def check_section_lists(context):
@@ -376,7 +376,7 @@ def test_determine_chosen_sections_rsmcompare_custom_general_with_special_and_su
     eq_(sorted(chosen_sections), sorted(general_sections +
                                         special_sections))
 
-def test_determine_chosen_sections_rsmsumm_default_general():
+def test_determine_chosen_sections_rsmsummarize_default_general():
     general_sections = ['all']
     special_sections = []
     custom_sections = []
@@ -385,11 +385,11 @@ def test_determine_chosen_sections_rsmsumm_default_general():
                                                 special_sections,
                                                 custom_sections,
                                                 subgroups,
-                                                context='rsmsumm')
-    eq_(sorted(chosen_sections), sorted(general_section_list_rsmsumm))
+                                                context='rsmsummarize')
+    eq_(sorted(chosen_sections), sorted(general_section_list_rsmsummarize))
 
 
-def test_determine_chosen_sections_rsmsumm_custom_general():
+def test_determine_chosen_sections_rsmsummarize_custom_general():
     general_sections = ['evaluation']
     special_sections = []
     custom_sections = []
@@ -398,7 +398,7 @@ def test_determine_chosen_sections_rsmsumm_custom_general():
                                                 special_sections,
                                                 custom_sections,
                                                 subgroups,
-                                                context='rsmsumm')
+                                                context='rsmsummarize')
     eq_(sorted(chosen_sections), sorted(general_sections))
 
 
@@ -553,19 +553,19 @@ def test_get_ordered_notebook_files_custom_rsmcompare():
     eq_(notebook_files, expected_notebook_files)
 
 
-def test_get_ordered_notebook_files_custom_rsmsumm():
+def test_get_ordered_notebook_files_custom_rsmsummarize():
     # custom and general sections, custom order and subgroups
     general_sections = ['evaluation']
     custom_sections = ['/test_path/custom.ipynb']
     subgroups = ['prompt']
     section_order = ['custom',
                      'evaluation']
-    summary_notebook_path = notebook_path_dict['general']['rsmsumm']
+    summary_notebook_path = notebook_path_dict['general']['rsmsummarize']
     notebook_files = get_ordered_notebook_files(general_sections,
                                                 custom_sections=custom_sections,
                                                 section_order=section_order,
                                                 subgroups=subgroups,
-                                                context='rsmsumm')
+                                                context='rsmsummarize')
 
     expected_notebook_files = ([join(summary_notebook_path, 'header.ipynb')] +
                                ['/test_path/custom.ipynb'] +
@@ -607,12 +607,12 @@ def test_get_section_file_map_rsmcompare():
     eq_(section_file_map['placeholder'], normpath('special_notebook_path/placeholder.ipynb'))
 
 
-def test_get_section_file_map_rsmsumm():
+def test_get_section_file_map_rsmsummarize():
     special_sections = ['placeholder']
     custom_sections = ['/path/notebook.ipynb']
     section_file_map = get_section_file_map(special_sections,
                                             custom_sections,
-                                            context='rsmsumm')
+                                            context='rsmsummarize')
     eq_(section_file_map['evaluation'], join(summary_notebook_path, 'evaluation.ipynb'))
     eq_(section_file_map['notebook'], '/path/notebook.ipynb')
     eq_(section_file_map['placeholder'], normpath('special_notebook_path/placeholder.ipynb'))

@@ -51,7 +51,7 @@ from .rsmtool import run_experiment
 
 from .rsmpredict import compute_and_save_predictions
 
-from .rsmsumm import run_summary
+from .rsmsummarize import run_summary
 
 from .utils import (agreement,
                     partial_correlations,
