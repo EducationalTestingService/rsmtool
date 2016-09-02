@@ -1,5 +1,5 @@
 [![Circle CI](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master.svg?style=shield)](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/EducationalTestingService/rsmtool/badge.svg?branch=feature%2Fadd-test-coverage)](https://coveralls.io/github/EducationalTestingService/rsmtool?branch=feature%2Fadd-test-coverage)
+[![Coverage Status](https://coveralls.io/repos/github/EducationalTestingService/rsmtool/badge.svg?branch=master)](https://coveralls.io/github/EducationalTestingService/rsmtool?branch=master)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.58851.svg)](http://dx.doi.org/10.5281/zenodo.58851)
 [![status](http://joss.theoj.org/papers/fbc649c17d45074d92ac21084aaa6209/status.svg)](http://joss.theoj.org/papers/fbc649c17d45074d92ac21084aaa6209)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/LICENSE)
@@ -31,8 +31,30 @@ For installation and usage, please see the official [documentation](http://rsmto
 - `setuptools`
 
 ## Contributing
-
 Contributions to RSMTool are very welcome. Please refer to the [documentation](http://rsmtool.readthedocs.io/en/latest/contributing.html) for how to get started on developing new features or functionality for RSMTool.
+
+## Citing
+If you are using RSMTool in your work, you can cite it as follows:
+
+### MLA
+Madnani, Nitin and Loukina, Anastassia. "RSMTool: A Collection of Tools for Building and Evaluating Automated Scoring Models". Journal of Open Source Software 1(3), 2016.
+
+### BibTex
+
+```bib
+@article{MadnaniLoukina2016,
+  doi = {10.21105/joss.00033},
+  url = {http://dx.doi.org/10.21105/joss.00033},
+  year  = {2016},
+  month = {jul},
+  publisher = {The Open Journal},
+  volume = {1},
+  number = {3},
+  author = {Nitin Madnani and Anastassia Loukina},
+  title = {{RSMTool}: A Collection of Tools for Building and Evaluating Automated Scoring Models},
+  journal = {{Journal of Open Source Software}}
+}
+```
 
 ## Changelog
 See [GitHub Releases](https://github.com/EducationalTestingService/rsmtool/releases).

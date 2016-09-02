@@ -159,35 +159,6 @@ def skll_learner_params_to_dataframe(learner):
     return df_coef
 
 
-def create_featureset_from_dataframe(df):
-    """
-    Take the given dataframe and construct a SKLL
-    FeatureSet instance.
-
-    It is assumed that the dataframe contains the
-    `spkitemid` and `sc1` columns, along with other
-    columns containing the feature values.
-
-    Parameters
-    ----------
-    df : pandas DataFrame
-        a data frame containing feature names and values
-        as well as response IDs and human scores.
-
-    Returns
-    -------
-    fs : skll FeatureSet object
-        a FeatureSet object with IDs, labels, and
-        feature values obtained from the data frame.
-    """
-    # Separate out the features, ids and labels and create a FeatureSet
-    feature_columns = [c for c in df.columns if c not in ['sc1', 'spkitemid']]
-    features = df[feature_columns].to_dict(orient='records')
-    ids = df['spkitemid'].tolist()
-    labels = df['sc1'].tolist()
-    return FeatureSet('train', ids=ids, labels=labels, features=features)
-
-
 def create_fake_skll_learner(df_coefficients):
 
     """
@@ -365,7 +336,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -481,7 +454,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -544,7 +519,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation

@@ -5,7 +5,11 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an example configuration file for `rsmcompare <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmcompare/config_rsmcompare.json>`_.
 
-There are six required fields and the rest are all optional.
+There are seven required fields and the rest are all optional.
+
+comparison_id
+~~~~~~~~~~~~~
+An identifier for the comparison experiment that will be used to name the report. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
 
 experiment_id_old
 ~~~~~~~~~~~~~~~~~
@@ -62,7 +66,7 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
         - a table showing mean, standard deviation, skewness and kurtosis;
         - a table showing the number of truncated outliers for each feature; and
         - a table with percentiles and outliers;
-        - a table with correlations between raw feature values and human score in each model and the correlation between the values of the same feature in these two models. Note that this table only includes features and responses which occur in both training sets. 
+        - a table with correlations between raw feature values and human score in each model and the correlation between the values of the same feature in these two models. Note that this table only includes features and responses which occur in both training sets.
 
 
     - ``features_by_group``: Shows boxplots for both experiments with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
