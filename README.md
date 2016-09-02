@@ -1,5 +1,5 @@
 [![Circle CI](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master.svg?style=shield)](https://circleci.com/gh/EducationalTestingService/rsmtool/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/EducationalTestingService/rsmtool/badge.svg?branch=feature%2Fadd-test-coverage)](https://coveralls.io/github/EducationalTestingService/rsmtool?branch=feature%2Fadd-test-coverage)
+[![Coverage Status](https://coveralls.io/repos/github/EducationalTestingService/rsmtool/badge.svg?branch=master)](https://coveralls.io/github/EducationalTestingService/rsmtool?branch=master)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.58851.svg)](http://dx.doi.org/10.5281/zenodo.58851)
 [![status](http://joss.theoj.org/papers/fbc649c17d45074d92ac21084aaa6209/status.svg)](http://joss.theoj.org/papers/fbc649c17d45074d92ac21084aaa6209)
 [![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/LICENSE)
