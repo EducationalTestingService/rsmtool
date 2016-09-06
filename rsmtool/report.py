@@ -582,7 +582,7 @@ def create_comparison_report(comparison_id,
 
     # create the output directory
     os.makedirs(output_dir, exist_ok=True)
-    report_name = '{}.report'.format(comparison_id)
+    report_name = '{}_report'.format(comparison_id)
     merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections

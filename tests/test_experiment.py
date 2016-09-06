@@ -343,6 +343,27 @@ def test_run_experiment_lr_predict():
 
         yield check_csv_output, output_file, expected_output_file
 
+def test_run_experiment_lr_predict_with_score():
+
+    # rsmpredict experiment with human score 
+
+    source = 'lr-predict-with-score'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
 
 def test_run_experiment_lr_predict_missing_values():
 
@@ -1683,7 +1704,7 @@ def test_run_experiment_lr_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report
 
 
@@ -1700,7 +1721,7 @@ def test_run_experiment_lr_compare_different_experiments():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores.report.html')
+    html_report = join('test_outputs', source, 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores_report.html')
     yield check_report, html_report
 
 def test_run_experiment_lr_compare_with_h2():
@@ -1716,7 +1737,7 @@ def test_run_experiment_lr_compare_with_h2():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_with_h2.report.html')
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_with_h2_report.html')
     yield check_report, html_report
 
 
@@ -1732,7 +1753,7 @@ def test_run_experiment_lr_compare_with_custom_order():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report
 
 
@@ -1748,7 +1769,7 @@ def test_run_experiment_lr_compare_with_chosen_sections():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report
 
 
@@ -1765,7 +1786,7 @@ def test_run_experiment_lr_compare_with_custom_sections_and_custom_order():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups.report.html')
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report
 
 
@@ -1781,7 +1802,7 @@ def test_run_experiment_linearsvr_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'LinearSVR_vs_LinearSVR.report.html')
+    html_report = join('test_outputs', source, 'LinearSVR_vs_LinearSVR_report.html')
     yield check_report, html_report
 
 
@@ -1797,7 +1818,7 @@ def test_run_experiment_lr_eval_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_eval_with_h2_vs_lr_eval_with_h2.report.html')
+    html_report = join('test_outputs', source, 'lr_eval_with_h2_vs_lr_eval_with_h2_report.html')
     yield check_report, html_report
 
 
@@ -1813,7 +1834,7 @@ def test_run_experiment_lr_eval_tool_compare():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2.report.html')
+    html_report = join('test_outputs', source, 'lr_with_h2_vs_lr_eval_with_h2_report.html')
     yield check_report, html_report
 
 
