@@ -1,0 +1,7 @@
+{
+    "id_column": "ID",
+    "human_score_column": "score",
+    "input_features_file": "../../files/train_with_one_fully_non_numeric_feature.csv",
+    "experiment_dir": "existing_experiment",
+    "experiment_id": "lr"
+}

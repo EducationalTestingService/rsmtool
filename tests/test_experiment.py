@@ -343,6 +343,27 @@ def test_run_experiment_lr_predict():
 
         yield check_csv_output, output_file, expected_output_file
 
+def test_run_experiment_lr_predict_with_score():
+
+    # rsmpredict experiment with human score 
+
+    source = 'lr-predict-with-score'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
 
 def test_run_experiment_lr_predict_missing_values():
 
@@ -373,6 +394,28 @@ def test_run_experiment_lr_predict_with_subgroups():
     # basic experiment using rsmpredict with subgroups and other columns
 
     source = 'lr-predict-with-subgroups'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
+
+def test_run_experiment_lr_predict_with_candidate():
+
+    # basic experiment using rsmpredict with candidate column
+
+    source = 'lr-predict-with-candidate'
     config_file = join(test_dir,
                        'data',
                        'experiments',
@@ -2177,6 +2220,99 @@ def test_run_experiment_lr_predict_missing_postprocessing_file():
     do_run_prediction(source, config_file)
 
 
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_input_feature_file():
+
+    # rsmpredict experiment with missing feature file
+    source = 'lr-predict-no-input-feature-file'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_experiment_dir():
+
+    # rsmpredict experiment with missing experiment dir
+    source = 'lr-predict-no-experiment-dir'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_output_dir():
+
+    # rsmpredict experiment where experiment_dir
+    # does not containt output directory
+    source = 'lr-predict-no-output-dir'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_predict_no_experiment_id():
+
+    # rsmpredict experiment ehere the experiment_dir
+    # does not contain the experiment with the stated id
+    source = 'lr-predict-no-experiment-id'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(KeyError)
+def test_run_experiment_lr_predict_missing_columns():
+
+    # rsmpredict experiment with missing columns
+    # from the config file
+    source = 'lr-predict-missing-columns'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+@raises(KeyError)
+def test_run_experiment_lr_predict_missing_feature():
+
+    # rsmpredict experiment with missing features
+    source = 'lr-predict-missing-feature'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_lr_predict_no_numeric_feature_values():
+
+    # rsmpredict experiment with missing post-processing file
+    source = 'lr-predict-no-numeric-feature-values'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
 @raises(ValueError)
 def test_run_experiment_wrong_model_name():
 
@@ -2285,3 +2421,5 @@ def test_run_experiment_summary_no_json():
                        source,
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
+
+
