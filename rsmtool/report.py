@@ -70,7 +70,7 @@ package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, 'notebooks'))
 template_path = join(notebook_path, 'templates')
 javascript_path = join(notebook_path, 'javascript')
-comparison_notebook_path = join(notebook_path, 'comparison'))
+comparison_notebook_path = join(notebook_path, 'comparison')
 
 # Define the general section list
 
@@ -541,7 +541,7 @@ def create_comparison_report(experiment_id_old, description_old,
     os.environ['FIGURE_DIR_NEW'] = figdir_new
     os.environ['SCALED_NEW'] = '1' if use_scaled_predictions_new else '0'
     os.environ['JAVASCRIPT_PATH'] = javascript_path
-    
+
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
     os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
