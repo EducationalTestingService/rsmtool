@@ -69,10 +69,8 @@ else:
 package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, 'notebooks'))
 template_path = join(notebook_path, 'templates')
-javascript_path = join(package_path, 'notebooks', 'javascript')
-comparison_notebook_path = abspath(join(package_path,
-                                        'notebooks',
-                                        'comparison'))
+javascript_path = join(notebook_path, 'javascript')
+comparison_notebook_path = join(notebook_path, 'comparison'))
 
 # Define the general section list
 
