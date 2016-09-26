@@ -745,13 +745,13 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
             df_feature_info)
 
 
-def preprocess_new_feature_file(df_input,
-                                df_feature_info):
+def preprocess_new_data(df_input,
+                        df_feature_info):
 
     """
     Process a data frame with feature values by applying
     :ref:`preprocessing parameters <preprocessing_parameters>`
-    stored in `df_feature_info`
+    stored in `df_feature_info`.
 
     Parameters
     ----------

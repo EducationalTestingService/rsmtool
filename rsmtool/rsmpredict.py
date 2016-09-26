@@ -26,7 +26,7 @@ from rsmtool.input import (check_main_config,
                            rename_default_columns,
                            check_flag_column)
 from rsmtool.predict import predict_with_model, process_predictions
-from rsmtool.preprocess import (preprocess_new_feature_file,
+from rsmtool.preprocess import (preprocess_new_data,
                                 trim)
 from rsmtool.utils import LogFormatter
 
@@ -187,8 +187,8 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                   index_col=0)
 
     (df_features_preprocessed,
-                  df_excluded) = preprocess_new_feature_file(df_input,
-                                                             df_feature_info)
+                  df_excluded) = preprocess_new_data(df_input,
+                                                     df_feature_info)
 
     # save the pre-processed features to disk if we were asked to
     if feats_file:

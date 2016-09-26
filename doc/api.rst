@@ -29,7 +29,7 @@ From :py:mod:`~rsmtool.preprocess` Module
 .. autofunction:: rsmtool.filter_on_column
 .. autofunction:: rsmtool.transform_feature
 .. autofunction:: rsmtool.preprocess_feature
-.. autofunction:: rsmtool.preprocess_new_feature_file
+.. autofunction:: rsmtool.preprocess_new_data
 
 From :py:mod:`~rsmtool.create_features` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
