@@ -610,6 +610,27 @@ def create_summary_report(summary_id, description,
     os.environ['SUMMARY_ID'] = summary_id
     os.environ['DESCRIPTION'] = description
     os.environ['JSONS'] = '%%'.join(all_experiments)
+    os.environ['JAVASCRIPT_PATH'] = javascript_path
+
+    # we define separate groups to allow future flexibility in defining
+    # what groups are used for descriptives and evaluations
+    os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
+    os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+
+    # create the output directory
+    os.makedirs(output_dir, exist_ok=True)
+    report_name = '{}_report'.format(summary_id)
+    merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+
+    # merge all the given sections
+    logger.info('Merging sections')
+    merge_notebooks(chosen_notebook_files, merged_notebook_file)
+
+    # run the merged notebook and save the output as
+    # an HTML file in the report directory
+    logger.info('Exporting HTML')
+    convert_ipynb_to_html(merged_notebook_file,
+                          join(output_dir, '{}.html'.format(report_name)))
 
 
 
