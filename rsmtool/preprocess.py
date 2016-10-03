@@ -721,10 +721,7 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
         df_train_preprocessed[feature_name] = (df_train_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
         df_test_preprocessed[feature_name] = (df_test_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
 
-        # Multiply both train and test feature by weight. Within the
-        # current SR timeline, the mean of the transformed train
-        # feature used to standardize test features has to be
-        # computed before multiplying the train feature by the weight.
+        # Multiply both train and test feature by sign.
         df_train_preprocessed[feature_name] = df_train_preprocessed[feature_name] * feature_sign
         df_test_preprocessed[feature_name] = df_test_preprocessed[feature_name] * feature_sign
 
@@ -746,3 +743,151 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     return (df_train_preprocessed,
             df_test_preprocessed,
             df_feature_info)
+
+
+def preprocess_new_data(df_input,
+                        df_feature_info):
+
+    """
+    Process a data frame with feature values by applying
+    :ref:`preprocessing parameters <preprocessing_parameters>`
+    stored in `df_feature_info`.
+
+    Parameters
+    ----------
+
+    df_input : pandas DataFrame
+        Data frame with raw feature values that will be used to generate
+        the scores. Each feature is stored in a separate column. Each row
+        corresponds to one response. There should also be a column named
+        `spkitemid` containing a unique ID for each response.
+
+    df_feature_info : pandas DataFrame
+        Data frame with preprocessing parameters stored in the following columns:
+
+            - `feature` : the name of the feature. These should match the feature names in `df_input`.
+            - `sign` : `1` or `-1`.  Indicates whether the feature value needs to be multiplied by -1.
+            - `transform` : :ref:`transformation <json_transformation>` that needs to be applied to this feature
+            - `train_mean`, `train_sd` : mean and standard deviation for outlier truncation.
+            - `train_transformed_mean`,`train_transformed_sd` : mean and standard deviation for computing `z`-scores.
+
+    Returns
+    -------
+    df_features_preprocessed : pandas DataFrame
+        Data frame with processed feature values
+
+    df_excluded: pandas DataFrame
+        Data frame with responses excluded from further analysis
+        due to non-numeric feature values in the original file
+        or after applying transformations. The data frame always contains the
+        original feature values.
+
+
+    Raises
+    ------
+    KeyError :
+        if some of the features specified in `df_feature_info` are not present in `df_input`
+
+    ValueError :
+        if all responses have at least one non-numeric feature value and therefore no score can be generated for any of the responses.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    # get the list of required features
+
+    required_features = df_feature_info.index.tolist()
+
+    # ensure that all the features that are needed by the model
+    # are present in the input file
+    input_feature_columns = [c for c in df_input if c != 'spkitemid']
+    missing_features = set(required_features).difference(input_feature_columns)
+    if missing_features:
+        raise KeyError('The input feature file is missing the following features: {}'.format(missing_features))
+
+    extra_features = set(input_feature_columns).difference(required_features + ['spkitemid'])
+    if extra_features:
+        logging.warning('The following extraenous features will be ignored: {}'.format(extra_features))
+
+    # keep the required features plus the id
+    features_to_keep = ['spkitemid'] + required_features
+
+    # check if actually have the human scores for this data and add
+    # sc1 to preprocessed features for consistency with other tools
+    has_human_scores = 'sc1' in df_input
+    if has_human_scores:
+        features_to_keep.append('sc1')
+
+    df_features = df_input[features_to_keep]
+
+    # preprocess the feature values
+    logger.info('Pre-processing input features')
+
+    # first we need to filter out NaNs and any other
+    # weird features, the same way we did for rsmtool.
+    df_filtered = df_features.copy()
+    df_excluded = pd.DataFrame(columns=df_filtered.columns)
+
+    for feature_name in required_features:
+        newdf, newdf_excluded = filter_on_column(df_filtered, feature_name, 'spkitemid',
+                                                 exclude_zeros=False,
+                                                 exclude_zero_sd=False)
+        del df_filtered
+        df_filtered = newdf
+        df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+
+    # make sure that the remaining data frame is not empty
+    if len(df_filtered) == 0:
+        raise ValueError("There are no responses left after "
+                         "filtering out non-numeric feature values. No analysis "
+                         "will be run")
+
+    df_features = df_filtered.copy()
+    df_features_preprocessed = df_features.copy()
+    for feature_name in required_features:
+
+        feature_values = df_features_preprocessed[feature_name].values
+
+        feature_transformation = df_feature_info.loc[feature_name]['transform']
+        feature_sign = df_feature_info.loc[feature_name]['sign']
+
+        train_feature_mean = df_feature_info.loc[feature_name]['train_mean']
+        train_feature_sd = df_feature_info.loc[feature_name]['train_sd']
+
+        train_transformed_mean = df_feature_info.loc[feature_name]['train_transformed_mean']
+        train_transformed_sd = df_feature_info.loc[feature_name]['train_transformed_sd']
+
+        # transform the feature values and remove outliers
+        df_features_preprocessed[feature_name] = preprocess_feature(feature_values,
+                                                                    feature_name,
+                                                                    feature_transformation,
+                                                                    train_feature_mean,
+                                                                    train_feature_sd,
+                                                                    exclude_zero_sd=False,
+                                                                    raise_transformation_error=False)
+
+        # filter the feature values once again to remove possible NaN and inf values that
+        # might have emerged when applying transformations.
+        # We do not need to do that if no transformation was applied.
+        if not feature_transformation in ['raw', 'org']:
+            # check that there are indeed inf or Nan values
+            if np.isnan(df_features_preprocessed[feature_name]).any() or \
+               np.isinf(df_features_preprocessed[feature_name]).any():
+                    newdf, newdf_excluded = filter_on_column(df_features_preprocessed, feature_name, 'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocessed
+                    df_features_preprocessed = newdf
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the preprocessed
+                    # ones
+                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
+                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
+
+        # now standardize the feature values
+        df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
+
+        # Multiply features by sign.
+        df_features_preprocessed[feature_name] = df_features_preprocessed[feature_name] * feature_sign
+
+    return (df_features_preprocessed, df_excluded)

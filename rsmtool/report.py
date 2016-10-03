@@ -79,13 +79,11 @@ else:
 package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, 'notebooks'))
 template_path = join(notebook_path, 'templates')
-javascript_path = join(package_path, 'notebooks', 'javascript')
-comparison_notebook_path = abspath(join(package_path,
-                                        'notebooks',
-                                        'comparison'))
-summary_notebook_path = abspath(join(package_path,
-                                     'notebooks',
-                                     'summary'))
+
+javascript_path = join(notebook_path, 'javascript')
+comparison_notebook_path = join(notebook_path, 'comparison')
+summary_notebook_path = join(notebook_path, 'summary')
+
 
 # Define the general section list
 
@@ -612,6 +610,7 @@ def create_summary_report(summary_id, description,
     os.environ['SUMMARY_ID'] = summary_id
     os.environ['DESCRIPTION'] = description
     os.environ['JSONS'] = '%%'.join(all_experiments)
+    os.environ['JAVASCRIPT_PATH'] = javascript_path
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
@@ -632,6 +631,7 @@ def create_summary_report(summary_id, description,
     logger.info('Exporting HTML')
     convert_ipynb_to_html(merged_notebook_file,
                           join(output_dir, '{}.html'.format(report_name)))
+
 
 
 def convert_ipynb_to_html(notebook_file, html_file):
