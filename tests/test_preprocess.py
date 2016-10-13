@@ -70,6 +70,29 @@ def test_filter_on_column_std_epsilon_zero():
     ok_(output_excluded_df.empty)
 
 
+def test_filter_on_column_with_inf():
+    # Test that the function exclude columns where feature value is 'inf'
+    data = pd.DataFrame({'id': np.arange(1, 5, dtype='int64'),
+                        'feature_1': [1.5601, 0, 2.33, 11.32],
+                        'feature_ok': np.arange(1, 5)})
+    data['feature_with_inf'] = 1/data['feature_1']
+    bad_df = data[np.isinf(data['feature_with_inf'])].copy()
+    good_df = data[~np.isinf(data['feature_with_inf'])].copy()
+    bad_df.reset_index(drop=True, inplace=True)
+    good_df.reset_index(drop=True, inplace=True)
+
+    output_df, output_excluded_df = filter_on_column(data,
+                                                     'feature_with_inf',
+                                                     'id',
+                                                     exclude_zeros=False,
+                                                     exclude_zero_sd=True)
+
+    print(output_df)
+    assert_frame_equal(output_df, good_df)
+    assert_frame_equal(output_excluded_df, bad_df)
+
+
+
 def test_transform_feature():
     name = 'dpsec'
     data = np.array([1, 2, 3, 4])

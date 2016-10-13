@@ -183,10 +183,12 @@ def filter_on_column(df,
     # Save the values that have been converted to NaNs
     # as a separate data frame. We want to keep them as NaNs
     # to do more analyses later.
-    bad_rows = df_filtered[df_filtered[column].isnull()]
+    # We also filter out inf values. Since these can only be generated
+    # during transformations we convert them to NaNs for consistency. 
+    bad_rows = df_filtered[df_filtered[column].isnull() | np.isinf(df_filtered[column])]
 
     # drop the NaNs that we might have gotten
-    df_filtered = df_filtered[df_filtered[column].notnull()]
+    df_filtered = df_filtered[df_filtered[column].notnull() & ~np.isinf(df_filtered[column])]
 
     # exclude zeros if specified
     if exclude_zeros:
