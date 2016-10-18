@@ -596,7 +596,7 @@ def create_comparison_report(comparison_id,
 
 def create_summary_report(summary_id, description,
                           all_experiments,
-                          output_dir, subgroups,
+                          csvdir, subgroups,
                           chosen_notebook_files):
     """
     The main function to generate a summary
@@ -610,17 +610,18 @@ def create_summary_report(summary_id, description,
     os.environ['SUMMARY_ID'] = summary_id
     os.environ['DESCRIPTION'] = description
     os.environ['JSONS'] = '%%'.join(all_experiments)
+    os.environ['OUTPUT_DIR'] = csvdir
     os.environ['JAVASCRIPT_PATH'] = javascript_path
+
 
     # we define separate groups to allow future flexibility in defining
     # what groups are used for descriptives and evaluations
     os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
     os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
 
-    # create the output directory
-    os.makedirs(output_dir, exist_ok=True)
     report_name = '{}_report'.format(summary_id)
-    merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+    reportdir = join(csvdir, '..')
+    merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections
     logger.info('Merging sections')
@@ -630,7 +631,7 @@ def create_summary_report(summary_id, description,
     # an HTML file in the report directory
     logger.info('Exporting HTML')
     convert_ipynb_to_html(merged_notebook_file,
-                          join(output_dir, '{}.html'.format(report_name)))
+                          join(reportdir, '{}.html'.format(report_name)))
 
 
 
