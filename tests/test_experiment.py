@@ -1906,7 +1906,7 @@ def test_run_experiment_lr_tsv_input_files():
     # rsmtool experiment with input files in .tsv format
 
     source = 'lr-tsv-input-files'
-    experiment_id = 'lr'
+    experiment_id = 'lr_with_feature_subset_file'
     config_file = join(test_dir,
                        'data',
                        'experiments',
@@ -1936,7 +1936,7 @@ def test_run_experiment_lr_xlsx_input_files():
     # rsmtool experiment with input files in .xlsx format
 
     source = 'lr-xlsx-input-files'
-    experiment_id = 'lr'
+    experiment_id = 'lr_with_feature_subset_file'
     config_file = join(test_dir,
                        'data',
                        'experiments',
@@ -1967,7 +1967,7 @@ def test_run_experiment_lr_eval_tsv_input_files():
     # rsmeval experiment input file as in .tsv format
 
     source = 'lr-eval-tsv-input-files'
-    experiment_id = 'lr_evaluation'
+    experiment_id = 'lr_evaluation_with_scaling'
     config_file = join(test_dir,
                        'data',
                        'experiments',
@@ -1995,7 +1995,7 @@ def test_run_experiment_lr_eval_xlsx_input_files():
     # rsmeval experiment input file as in .xlsx format
 
     source = 'lr-eval-xlsx-input-files'
-    experiment_id = 'lr_evaluation'
+    experiment_id = 'lr_evaluation_with_scaling'
     config_file = join(test_dir,
                        'data',
                        'experiments',
