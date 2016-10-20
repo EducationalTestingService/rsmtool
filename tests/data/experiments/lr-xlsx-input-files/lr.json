@@ -1,0 +1,14 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train.xlsx",
+    "description": "Using all features with an LinearRegression model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "LinearRegression",
+    "train_label_column": "score",
+    "features": "features.json",
+    "experiment_id": "lr",
+    "trim_max": 6,
+    "test_file": "../../files/test.xlsx"
+}
