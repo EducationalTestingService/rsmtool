@@ -402,19 +402,20 @@ def test_filter_on_flag_column_with_none_value_in_int_flag_column_int_dict():
                        'sc1': [1, 2, 1, 3, 4, 5],
                        'feature': [2, 3, 4, 5, 6, 2],
                        'flag1': [1, 2, 2, 3, 4, None]}, 
-                       dtype=int)
+                       dtype=object)
     flag_dict = {'flag1': [2, 4]}
 
     df_new_expected = pd.DataFrame({'spkitemid': [2, 3, 5],
                                     'sc1': [2, 1, 4],
                                     'feature': [3, 4, 6],
-                                    'flag1': [2, 2, 4]})
+                                    'flag1': [2, 2, 4]},
+                                    dtype=object)
 
     df_excluded_expected = pd.DataFrame({'spkitemid': [1, 4, 6],
                                          'sc1': [1, 3, 5],
                                          'feature': [2, 5, 2],
                                          'flag1': [1, 3, None]}, 
-                                         dtype=int)
+                                         dtype=object)
 
     df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
     assert_frame_equal(df_new, df_new_expected)
