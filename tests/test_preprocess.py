@@ -185,19 +185,8 @@ def test_apply_add_one_log_transform():
     assert_array_equal(apply_add_one_log_transform('name', np.array([0, 4])), np.array([0, np.log(5)]))
 
 
-def test_filter_on_flag_column_nothing_to_exclude():
-    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
-                       'sc1': [1, 2, 1, 3],
-                       'feature': [2, 3, 4, 5],
-                       'flag1': [0, 0, 0, 0],
-                       'flag2': [1, 2, 2, 1]})
-    flag_dict = {'flag1': [0], 'flag2': [1, 2]}
-    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
-    assert_frame_equal(df_new, df)
-    eq_(len(df_excluded), 0)
-
-
 def test_filter_on_flag_column_empty_flag_dictionary():
+    # no flags specified, keep the data frame as is
     df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
                        'sc1': [1, 2, 1, 3],
                        'feature': [2, 3, 4, 5],
@@ -209,23 +198,254 @@ def test_filter_on_flag_column_empty_flag_dictionary():
     eq_(len(df_excluded), 0)
 
 
-def test_filter_on_flag_column_nothing_to_exclude_convert_to_float():
+
+def test_filter_on_flag_column_nothing_to_exclude_int_column_and_dict():
     df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
                        'sc1': [1, 2, 1, 3],
                        'feature': [2, 3, 4, 5],
-                       'flag1': [0.0, 0.0, 0.0, 0.0],
-                       'flag2': [1, 'TD', 'TD', 1]})
-
-    df_new = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
-                           'sc1': [1, 2, 1, 3],
-                           'feature': [2, 3, 4, 5],
-                           'flag1': [0.0, 0.0, 0.0, 0.0],
-                           'flag2': [1.0, 'TD', 'TD', 1.0]})
-    flag_dict = {'flag1': [0.0], 'flag2': [1.0, 'TD']}
-    df_filtered, df_excluded = filter_on_flag_columns(df, flag_dict)
-    print(df_filtered, df_excluded)
-    assert_frame_equal(df_filtered, df_new)
+                       'flag1': [0, 1, 2, 3]})
+    flag_dict = {'flag1': [0, 1, 2, 3, 4]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
     eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_float_column_and_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0.5, 1.1, 2.2, 3.6]})
+    flag_dict = {'flag1': [0.5, 1.1, 2.2, 3.6, 4.5]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+def test_filter_on_flag_column_nothing_to_exclude_str_column_and_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': ['a', 'b', 'c', 'd']})
+    flag_dict = {'flag1': ['a', 'b', 'c', 'd', 'e']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_float_column_int_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0.0, 1.0, 2.0, 3.0]})
+    flag_dict = {'flag1': [0, 1, 2, 3, 4]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_int_column_float_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, 1, 2, 3]})
+    flag_dict = {'flag1': [0.0, 1.0, 2.0, 3.0, 4.5]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_str_column_float_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': ['0', '1', '2', '3.5']})
+    flag_dict = {'flag1': [0.0, 1.0, 2.0, 3.5, 4.0]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_float_column_str_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0.0, 1.0, 2.0, 3.5]})
+    flag_dict = {'flag1': ['1', '2', '3.5', '4', 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_str_column_int_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': ['0.0', '1.0', '2.0', '3.0']})
+    flag_dict = {'flag1': [0, 1, 2, 3, 4]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_int_column_str_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, 1, 2, 3]})
+    flag_dict = {'flag1': ['0.0', '1.0', '2.0', '3.0', 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_str_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, '1.0', 2, 3.5]})
+    flag_dict = {'flag1': ['0.0', '1.0', '2.0', '3.5', 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    print(df_new, df)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_int_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, '1.0', 2, 3.0]})
+    flag_dict = {'flag1': [0, 1, 2, 3, 4]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_float_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, '1.5', 2, 3.5]})
+    flag_dict = {'flag1': [0.0, 1.5, 2.0, 3.5, 4.0]}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_int_column_mixed_type_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0, 1, 2, 3]})
+    flag_dict = {'flag1': [0, 1, 2, 3.0, 3.5, 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_float_column_mixed_type_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [0.0, 1.0, 2.0, 3.5]})
+    flag_dict = {'flag1': [0, 1, 2, 3.0, 3.5, 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_str_column_mixed_type_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': ['0.0', '1.0', '2.0', '3.5']})
+    flag_dict = {'flag1': [0, 1, 2, 3.0, 3.5, 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_mixed_type_dict():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd'],
+                       'sc1': [1, 2, 1, 3],
+                       'feature': [2, 3, 4, 5],
+                       'flag1': [1, 2, 3.5, 'TD']})
+    flag_dict = {'flag1': [0, 1, 2, 3.0, 3.5, 'TD']}
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df)
+    eq_(len(df_excluded), 0)
+
+
+def test_filter_on_flag_column_mixed_type_column_mixed_type_dict_filter_preserve_type():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd', 'e', 'f'],
+                       'sc1': [1, 2, 1, 3, 4, 5],
+                       'feature': [2, 3, 4, 5, 6, 2],
+                       'flag1': [1, 1.5, 2, 3.5, 'TD', 'NS']})
+    flag_dict = {'flag1': [1.5, 2, 'TD']}
+
+    df_new_expected = pd.DataFrame({'spkitemid': ['b', 'c', 'e'],
+                                    'sc1': [2, 1, 4],
+                                    'feature': [3, 4, 6],
+                                    'flag1': [1.5, 2,'TD']})
+
+    df_excluded_expected = pd.DataFrame({'spkitemid': ['a', 'd', 'f'],
+                                         'sc1': [1, 3, 5],
+                                         'feature': [2, 5, 2],
+                                         'flag1': [0, 3.5, 'NS']})
+
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df_new_expected)
+    assert_frame_equal(df_excluded, df_excluded_expected)
+
+
+def test_filter_on_flag_column_two_flags_same_responses():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd', 'e', 'f'],
+                       'sc1': [1, 2, 1, 3, 4, 5],
+                       'feature': [2, 3, 4, 5, 6, 2],
+                       'flag1': [1, 1.5, 2, 3.5, 'TD', 'NS'],
+                       'flag2': [1, 0, 0, 1, 0, 1]})
+    flag_dict = {'flag1': [1.5, 2, 'TD'], 'flag2': [0]}
+
+    df_new_expected = pd.DataFrame({'spkitemid': ['b', 'c', 'e'],
+                                    'sc1': [2, 1, 4],
+                                    'feature': [3, 4, 6],
+                                    'flag1': [1.5, 2,'TD'],
+                                    'flag2': [0, 0, 0]})
+
+    df_excluded_expected = pd.DataFrame({'spkitemid': ['a', 'd', 'f'],
+                                         'sc1': [1, 3, 5],
+                                         'feature': [2, 5, 2],
+                                         'flag1': [0, 3.5, 'NS'],
+                                         'flag2': [1, 1, 1]})
+
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df_new_expected)
+    assert_frame_equal(df_excluded, df_excluded_expected)
+
+
+
+def test_filter_on_flag_column_two_flags_different_responses():
+    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd', 'e', 'f'],
+                       'sc1': [1, 2, 1, 3, 4, 5],
+                       'feature': [2, 3, 4, 5, 6, 2],
+                       'flag1': [1, 1.5, 2, 3.5, 'TD', 'NS'],
+                       'flag2': [2, 0, 0, 1, 0, 1]})
+    flag_dict = {'flag1': [1.5, 2, 'TD', 'NS'], 'flag2': [0, 2]}
+
+    df_new_expected = pd.DataFrame({'spkitemid': ['b', 'c', 'e'],
+                                    'sc1': [2, 1, 4],
+                                    'feature': [3, 4, 6],
+                                    'flag1': [1.5, 2,'TD'],
+                                    'flag2': [0, 0, 0]})
+
+    df_excluded_expected = pd.DataFrame({'spkitemid': ['a', 'd', 'f'],
+                                         'sc1': [1, 3, 5],
+                                         'feature': [2, 5, 2],
+                                         'flag1': [0, 3.5, 'NS'],
+                                         'flag2': [2, 1, 1]})
+
+    df_new, df_excluded = filter_on_flag_columns(df, flag_dict)
+    assert_frame_equal(df_new, df_new_expected)
+    assert_frame_equal(df_excluded, df_excluded_expected)
 
 
 def test_filter_on_flag_column():

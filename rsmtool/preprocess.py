@@ -122,6 +122,10 @@ def filter_on_flag_columns(df, flag_column_dict):
                              "on flag columns. No further analysis can "
                              "be run.")
 
+        # reset the index 
+        df_responses_with_requested_flags.reset_index(drop=True, inplace=True)
+        df_responses_with_excluded_flags.reset_index(drop=True, inplace=True)
+
         return (df_responses_with_requested_flags,
                 df_responses_with_excluded_flags)
 
