@@ -633,7 +633,7 @@ def test_filter_on_flag_column_nothing_left():
                            'flag1': [1, 0, 20, 14],
                            'flag2': [1, 1.0, 'TD', '03']})
 
-    flag_dict = {'flag1': ['0'], 'flag2': ['1', '2', '3']}
+    flag_dict = {'flag1': [1, 0, 14], 'flag2': ['TD']}
 
     df_new, df_excluded = filter_on_flag_columns(bad_df, flag_dict)
     import ipdb
