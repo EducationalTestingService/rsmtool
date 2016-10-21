@@ -11,7 +11,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from skll.data import safe_float
+from skll.data import safe_float as string_to_number
 
 def trim(values, trim_min, trim_max):
     """
@@ -98,10 +98,11 @@ def filter_on_flag_columns(df, flag_column_dict):
         # since flag column may be a mix of strings and numeric values
         # we convert all strings and integers to floats such that, for
         # example, “1”, 1, and “1.0" all map to 1.0. To do this, we will
-        # first convert all the strings to numbers (using `safe_float`)
-        # and then convert all the integers to floats.
-        convert_to_float = lambda x: float(x) if type(x) == int else x
-        flag_column_dict_to_float = {key: list(map(convert_to_float(map(safe_float, value))))
+        # first convert all the strings to numbers and then convert
+        # all the integers to floats.
+        int_to_float = lambda x: float(x) if type(x) == int else x
+        convert_to_float = lambda x: int_to_float(string_to_number(x))
+        flag_column_dict_to_float = {key: list(map(convert_to_float, value))
                                      for (key, value) in flag_column_dict.items()}
 
         # and now convert the the values in the feature column in the data frame
@@ -123,7 +124,7 @@ def filter_on_flag_columns(df, flag_column_dict):
                              "on flag columns. No further analysis can "
                              "be run.")
 
-        # reset the index 
+        # reset the index
         df_responses_with_requested_flags.reset_index(drop=True, inplace=True)
         df_responses_with_excluded_flags.reset_index(drop=True, inplace=True)
 
