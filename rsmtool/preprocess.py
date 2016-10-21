@@ -322,7 +322,7 @@ def apply_inverse_transform(name, data,
                              "applied to feature {} which can have a "
                              "value of 0".format(name))
         else:
-            logging.warning("The inverse transformation was applied "
+            logging.warning("The inverse transformation was applied to "
                             "feature {} which has a value of 0 for "
                             "some responses. No system score will be "
                             "generated for such responses".format(name))
@@ -350,7 +350,8 @@ def apply_inverse_transform(name, data,
                             "have different signs. This can change "
                             "the ranking of the responses".format(name))
 
-    new_data = 1 / data
+    with np.errstate(divide='ignore'):
+        new_data = 1 / data
     return new_data
 
 
@@ -393,7 +394,8 @@ def apply_sqrt_transform(name, data, raise_error=True):
                             "negative values for some responses. No system score "
                             "will be generated for such responses".format(name))
 
-    new_data = np.sqrt(data)
+    with np.errstate(invalid='ignore'):
+        new_data = np.sqrt(data)
     return new_data
 
 
@@ -842,7 +844,8 @@ def preprocess_new_data(df_input,
                                                  exclude_zero_sd=False)
         del df_filtered
         df_filtered = newdf
-        df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+        with np.errstate(divide='ignore'):
+            df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
 
     # make sure that the remaining data frame is not empty
     if len(df_filtered) == 0:
