@@ -11,6 +11,7 @@ import logging
 import re
 import warnings
 
+import numpy as np
 import pandas as pd
 
 from collections import defaultdict
@@ -1410,7 +1411,8 @@ def load_and_filter_data(input_file,
                                                      exclude_zero_sd=exclude_zero_sd)
             del df_filtered
             df_filtered = newdf
-            df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+            with np.errstate(divide='ignore'):
+                df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
 
         # make sure that the remaining data frame is not empty
         if len(df_filtered) == 0:
