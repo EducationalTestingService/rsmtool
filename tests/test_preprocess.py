@@ -398,10 +398,11 @@ def test_filter_on_flag_column_mixed_type_column_mixed_type_dict_filter_preserve
 
 
 def test_filter_on_flag_column_with_none_value_in_int_flag_column_int_dict():
-    df = pd.DataFrame({'spkitemid': ['a', 'b', 'c', 'd', 'e', 'f'],
+    df = pd.DataFrame({'spkitemid': [1, 2, 3, 4, 5, 6],
                        'sc1': [1, 2, 1, 3, 4, 5],
                        'feature': [2, 3, 4, 5, 6, 2],
-                       'flag1': [1, 2, 2, 3, 4, None]})
+                       'flag1': [1, 2, 2, 3, 4, None]}, 
+                       dtype=int)
     flag_dict = {'flag1': [2, 4]}
 
     df_new_expected = pd.DataFrame({'spkitemid': ['b', 'c', 'e'],
