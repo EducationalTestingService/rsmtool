@@ -15,7 +15,7 @@ import pandas as pd
 
 from collections import defaultdict
 from functools import partial
-from os.path import abspath, basename, dirname, exists, join
+from os.path import abspath, basename, dirname, exists, join, splitext
 
 from numpy import nan
 from numpy.random import RandomState
@@ -54,15 +54,22 @@ def read_data_file(filename, converters=None):
 
     Raises
     ------
+    ValueError
+        If the file has an extension that we do not support
     pd.parser.CParserError
         If the file is badly formatted or corrupt.
     """
 
-    if filename.endswith('.csv') or filename.endswith('.tsv'):
-        sep='\t' if filename.endswith('.tsv') else ','
+    file_extension = splitext(filename)[1].lower()
+
+    if file_extension in ['.csv', '.tsv']:
+        sep='\t' if file_extension == '.tsv' else ','
         do_read = partial(pd.read_csv, sep=sep, converters=converters)
-    elif filename.endswith('.xls') or filename.endswith('.xlsx'):
+    elif file_extension in ['.xls', '.xlsx']:
         do_read = partial(pd.read_excel, converters=converters)
+    else:
+        raise ValueError("RSMTool only supports file in .csv, .tsv or .xls/.xlsx format. "
+                         "The file should have the extension which matches its format.")
 
     try:
         df = do_read(filename)

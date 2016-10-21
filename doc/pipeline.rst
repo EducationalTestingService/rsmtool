@@ -24,7 +24,7 @@ Input file format
 
 The input files containing feature values and scores for all responses in training and evaluation data should be in tabular format with features and scores stored in columns and each row correponding to a single response.
 
-RSMTool supports input files in ``.csv``, ``.tsv`` or ``.xlsx`` format. For Excel spreadsheets all data must be stored in the first sheet. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format. 
+RSMTool supports input files in ``.csv``, ``.tsv`` or ``xls``/``.xlsx`` format. For Excel spreadsheets all data must be stored in the first sheet. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format. 
 
 
 .. _feature_preprocessing:

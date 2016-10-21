@@ -19,6 +19,7 @@ from rsmtool.input import (check_flag_column,
                            validate_and_populate_json_fields)
 
 
+
 def check_read_data_file(extension):
     """
     Test whether the ``read_data_file()`` function works as expected.
@@ -32,11 +33,11 @@ def check_read_data_file(extension):
     tempf = tempfile.NamedTemporaryFile(mode='w',
                                         suffix='.{}'.format(extension),
                                         delete=False)
-    if extension == 'csv':
+    if extension.lower() == 'csv':
         df_expected.to_csv(tempf, index=False)
-    elif extension == 'tsv':
+    elif extension.lower() == 'tsv':
         df_expected.to_csv(tempf, sep='\t', index=False)
-    elif extension in ['xls', 'xlsx']:
+    elif extension.lower() in ['xls', 'xlsx']:
         df_expected.to_excel(tempf.name, index=False)
     tempf.close()
 
@@ -51,8 +52,14 @@ def check_read_data_file(extension):
 
 
 def test_read_data_file():
-    for extension in ['csv', 'tsv', 'xls', 'xlsx']:
+    # note that we cannot check for capital .xls and .xlsx because Excel writer 
+    # does not support these extensions
+    for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
         yield check_read_data_file, extension
+
+@raises(ValueError)
+def test_read_data_file_wrong_extension():
+    check_read_data_file('txt')
 
 
 def test_normalize_fields():
