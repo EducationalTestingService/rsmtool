@@ -198,6 +198,35 @@ def test_run_experiment_linearsvr():
     yield check_report, html_report
 
 
+def test_run_experiment_wls():
+
+    # basic experiment with weighted least squares model
+
+    source = 'wls'
+    experiment_id = 'wls'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
 def test_run_experiment_lr_subgroups():
 
     # basic experiment with LinearRegression model but also including
