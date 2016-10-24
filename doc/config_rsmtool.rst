@@ -17,11 +17,11 @@ The machine learner you want to use to build the scoring model. Possible values 
 
 train_file
 """"""""""
-The path to the training data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
+The path to the training data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
 test_file
 """""""""
-The path to the evaluation data feature file in ``.csv`` format. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
+The path to the evaluation data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
 description *(Optional)*
 """"""""""""""""""""""""
@@ -51,7 +51,7 @@ sign *(Optional)*
 """""""""""""""""
 See below.
 
-By default, ``rsmtool`` will use all of the columns present in the training and evaluation CSV files as features except for any columns explicitly identified in the configuration file (see below). These four fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). These four fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _id_column_rsmtool:
 

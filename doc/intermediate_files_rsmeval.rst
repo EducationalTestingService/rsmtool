@@ -6,7 +6,7 @@ Although the primary output of ``rsmeval`` is an HTML report, we also want the u
 
 .. note::
 
-    The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original ``.csv`` files. This is because RSMEval standardizes these column names internally for convenience. These values are:
+    The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original data files. This is because RSMEval standardizes these column names internally for convenience. These values are:
 
     - ``spkitemid`` for the column containing response IDs.
     - ``sc1`` for the column containing the human scores used as observed scores

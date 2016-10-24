@@ -7,7 +7,7 @@ Although the primary output of RSMTool is an HTML report, we also want the user 
 
 .. note::
 
-    The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original ``.csv`` files. This is because RSMTool standardizes these column names internally for convenience. These values are:
+    The names of all files begin with the ``experiment_id`` provided by the user in the experiment configuration file. In addition, the names for certain columns are set to default values in these files irrespective of what they were named in the original data files. This is because RSMTool standardizes these column names internally for convenience. These values are:
 
     - ``spkitemid`` for the column containing response IDs.
     - ``sc1`` for the column containing the human scores used as training labels.
@@ -38,7 +38,7 @@ These files contain all of the rows in the training and evaluation sets that wer
 
 .. note::
 
-    If the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+    If the training/evaluation files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
@@ -62,7 +62,7 @@ These files contain all of the the columns from the original features files that
 
 .. note::
 
-    If the training/evaluation ``.csv`` files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
+    If the training/evaluation files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
 Response length
 ^^^^^^^^^^^^^^^

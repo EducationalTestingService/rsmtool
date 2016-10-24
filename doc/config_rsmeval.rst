@@ -13,7 +13,7 @@ An identifier for the experiment that will be used to name the report and all :r
 
 predictions_file
 ~~~~~~~~~~~~~~~~
-The path to the ``.csv`` file with predictions to evaluate. Each row should correspond to a single response and contain the predicted and observed scores for this response. In addition, there should be a column with a unique identifier (ID) for each response. The path can be absolute or relative to the location of the configuration file.
+The path to the file with predictions to evaluate. The file should be in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain the predicted and observed scores for this response. In addition, there should be a column with a unique identifier (ID) for each response. The path can be absolute or relative to the location of the configuration file.
 
 system_score_column
 ~~~~~~~~~~~~~~~~~~~
@@ -71,7 +71,7 @@ scale_with *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
 In many scoring applications, system scores are :ref:`re-scaled <score_postprocessing>` so that their mean and standard deviation match those of the human scores for the training data.
 
-If you want ``rsmeval`` to re-scale the supplied predictions, you need to provide -- as the value for this field -- the path to a second ``.csv`` file containing the human scores and predictions of the same system on its training data. This file *must* have two columns: the human scores under the ``sc1`` column and the predicted score under the ``prediction``.
+If you want ``rsmeval`` to re-scale the supplied predictions, you need to provide -- as the value for this field -- the path to a second file in one of the :ref:`supported formats <input_file_format>` containing the human scores and predictions of the same system on its training data. This file *must* have two columns: the human scores under the ``sc1`` column and the predicted score under the ``prediction``.
 
 This field can also be set to ``"asis"`` if the scores are already scaled. In this case, no additional scaling will be performed by ``rsmeval`` but the report will refer to the scores as "scaled".
 
