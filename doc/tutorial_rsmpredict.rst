@@ -54,7 +54,7 @@ Let's take a look at the options in our configuration file.
 
 - **Line 2**: We give the path to the directory containing the output of the ``rsmtool`` experiment.
 - **Line 3**: We provide the ``experiment_id`` of the ``rsmtool`` experiment used to train the model. This can usually be read off the ``output/<experiment_id>.model`` file in the ``rsmtool`` experiment output directory.
-- **Line 4**: We list the path to the data file with the feature values for the new data.  For this tutorial we used `.csv` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
+- **Line 4**: We list the path to the data file with the feature values for the new data.  For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: This field indicates that the unique IDs for the responses in the ``.csv`` file are located in a column named ``ID``.
 - **Lines 6-7**: These fields indicates that there are two sets of human scores in our ``.csv`` file located in the columns named ``score`` and ``score2``. The values from these columns will be added to the output file containing the predictions which can be useful if we want to evaluate the predictions using ``rsmeval``.
 
