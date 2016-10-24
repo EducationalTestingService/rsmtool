@@ -345,7 +345,7 @@ def compute_pca(df, selected_features):
 
     df_components = pd.DataFrame(pca.components_)
     df_components.columns = selected_features
-    df_components.index = ['PC{}'.format(i) for i in range(1, len(selected_features) + 1)]
+    df_components.index = ['PC{}'.format(i) for i in range(1, len(df_components.index) + 1)]
     df_components = df_components.transpose()
 
     # compute the variance data frame
@@ -358,7 +358,7 @@ def compute_pca(df, selected_features):
     df_variance = df_variance[['Eigenvalues', 'Percentage of variance', 'Cumulative percentage of variance']]
 
     # set the row names and take the transpose
-    df_variance.index = ['PC{}'.format(i) for i in range(1, len(selected_features) + 1)]
+    df_variance.index = ['PC{}'.format(i) for i in range(1, len(df_variance.index) + 1)]
     df_variance = df_variance.transpose()
 
     return df_components, df_variance

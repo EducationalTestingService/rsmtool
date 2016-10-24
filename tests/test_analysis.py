@@ -5,7 +5,8 @@ import pandas as pd
 from nose.tools import (assert_almost_equal, assert_equal)
 from numpy.random import RandomState
 
-from rsmtool.analysis import (correlation_helper,
+from rsmtool.analysis import (compute_pca,
+                              correlation_helper,
                               metrics_helper)
 
 prng = RandomState(133)
@@ -85,3 +86,14 @@ def test_that_metrics_helper_works_for_data_with_the_same_label():
     # kappas will be 0 or 1
     evals = metrics_helper(same_human_scores, system_scores)
     assert_equal(evals.isnull().values.sum(), 1)
+
+
+def test_compute_pca_less_components_than_features():
+    # test pca when we have less components than features
+    df = pd.DataFrame({'a':range(100)})
+    for i in range(100):
+        df[i] = df['a']*i
+    (components, variance) = compute_pca(df, df.columns)
+
+
+
