@@ -39,7 +39,7 @@ Let's take a look at the options in our configuration file.
 
 - **Line 2**: We define an experiment ID.
 - **Line 3**: We also provide a description which will be included in the experiment report.
-- **Line 4**: We list the path to the file with the predicted and human scores. For this tutorial we used `.csv` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
+- **Line 4**: We list the path to the file with the predicted and human scores. For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: This field indicates that the system scores in our ``.csv`` file are located in a column named ``system``.
 - **Line 6**: This field indicates that the human (reference) scores in our ``.csv`` file are located in a column named ``human``.
 - **Line 7**: This field indicates that the unique IDs for the responses in the ``.csv`` file are located in columns named ``ID``.

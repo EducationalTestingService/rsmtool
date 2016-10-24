@@ -62,7 +62,7 @@ The next step is to create an :ref:`RSMTool experiment configuration file <confi
 Let's take a look at the options in our configuration file.
 
 - **Line 2**: We define an experiment ID
-- **Lines 3-4**: We list the paths to our training and evaluation files with the feature values.  For this tutorial we used `.csv` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
+- **Lines 3-4**: We list the paths to our training and evaluation files with the feature values.  For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: We choose to use a linear regression model to combine those features into a score.
 - **Line 6**: We also provide a description which will be included in the experiment report.
 - **Lines 7-8**: These two fields indicate that the human scores in the two ``.csv`` files are located in columns named ``score``.
