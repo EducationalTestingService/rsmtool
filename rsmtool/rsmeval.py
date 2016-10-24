@@ -299,7 +299,8 @@ def run_evaluation(config_file, output_dir):
                          "non-numeric machine scores. No further analysis "
                          "can be run. ")
 
-    df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+    with np.errstate(divide='ignore'):
+        df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
 
     # if requested, exclude the candidates with less than X responses
     # left after filtering
