@@ -11,5 +11,6 @@
     "feature_subset": "subset1",
     "experiment_id": "lr_with_feature_subset_file",
     "trim_max": 6,
-    "test_file": "../../files/test.tsv"
+    "test_file": "../../files/test.tsv",
+    "features" : "features.tsv"
 }
