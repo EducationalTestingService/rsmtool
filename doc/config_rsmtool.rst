@@ -85,6 +85,10 @@ second_human_score_column *(Optional)*
 """"""""""""""""""""""""""""""""""""""
 The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_rsmtool` option below will apply to this column too.
 
+.. note::
+
+    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. The value for responses which do not have a second human score should be left blank. 
+
 .. _flag_column_rsmtool:
 
 flag_column *(Optional)*
