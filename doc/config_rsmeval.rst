@@ -55,11 +55,16 @@ The name for an optional column in the test data containing a second human score
 
 flag_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be evaluated. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
+This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be evaluated. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmeval`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
 
 .. note::
 
     If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responses which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
+
+.. note::
+
+    When comparing the values in the supplied dictionary and the data, ``rsmeval`` does not take into account the original type of the value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are treated as the same value. 
+
 
 .. _exclude_zero_scores_eval:
 
