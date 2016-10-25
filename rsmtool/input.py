@@ -1259,7 +1259,7 @@ def load_experiment_data(main_config_file, output_dir):
     # same feature names as specified in feature json file,
     # if there was one
     elif not select_features_automatically:
-        assert feature_names == requested_features
+        assert (feature_names == requested_features).all()
 
     # Do the same for the test data except we can ignore the trim min
     # and max since we already have that from the training data and
