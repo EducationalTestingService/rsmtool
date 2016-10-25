@@ -81,19 +81,34 @@ length_column *(Optional)*
 """"""""""""""""""""""""""
 The name for the optional column in the training and evaluation data containing response length. If specified, length is included in the inter-feature and partial correlation analyses. Note that this field *should not* be specified if you want to use the length column as an actual feature in the model. In the latter scenario, the length column will automatically be included in the analyses, like any other feature. If you specify ``length_column`` *and* include the same column name as  a feature in the :ref:`feature file <feature_file_rsmtool>`, ``rsmtool`` will ignore the ``length_column`` setting. In addition, if ``length_column`` has missing values or if its standard deviation is 0 (both somewhat unlikely scenarios), ``rsmtool`` will *not* include any length-based analyses in the report.
 
+
+.. _second_human_score_column_rsmtool:
+
 second_human_score_column *(Optional)*
 """"""""""""""""""""""""""""""""""""""
 The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_rsmtool` option below will apply to this column too.
 
+.. note::
+
+    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
+
+    
 .. _flag_column_rsmtool:
 
 flag_column *(Optional)*
 """"""""""""""""""""""""
-This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
+This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. 
+When this field is used, the specified columns must be present in both training and evaluation set. 
+Defaults to ``None``.
 
 .. note::
 
     If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responses which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
+
+
+.. note::
+
+    When reading the values in the supplied dictionary, ``rsmtool`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
 
 .. _exclude_zero_scores_rsmtool:
 
@@ -178,7 +193,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
-     - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
+     - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 

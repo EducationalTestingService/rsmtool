@@ -47,19 +47,30 @@ The name for the column containing the human scores for each response. The value
 
     All responses with non-numeric values or zeros in either ``human_score_column`` or ``system_score_column`` will be automatically excluded from evaluation. You can use :ref:`exclude_zero_scores_eval` to keep responses with zero scores.
 
+.. _second_human_score_column_eval:
+
 second_human_score_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_eval` option below will apply to this column too.
+
+.. note::
+
+    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
 
 .. _flag_column_eval:
 
 flag_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be evaluated. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
+This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be evaluated. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmeval`` will *only* use responses for which the ``ADVISORY`` column has the value 0. Defaults to ``None``.
 
 .. note::
 
     If  several conditions are specified (e.g., ``{"ADVISORY": 0, "ERROR": 0}``) only those responses which satisfy *all* the conditions will be selected for further analysis (in this example, these will be the responses where the ``ADVISORY`` column has a value of 0 *and* the ``ERROR`` column has a value of 0).
+
+.. note::
+
+    When reading the values in the supplied dictionary, ``rsmeval`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
+
 
 .. _exclude_zero_scores_eval:
 
@@ -95,7 +106,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
+    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
 
     - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
 
