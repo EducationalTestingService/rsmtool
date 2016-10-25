@@ -214,17 +214,17 @@ def write_experiment_output(data_frames,
         df.to_csv(outfile, index=False)
 
 
-def write_feature_json(feature_specs,
-                       selected_features,
-                       experiment_id,
-                       featuredir):
+def write_feature_csv(df_feature_specs,
+                      selected_features,
+                      experiment_id,
+                      featuredir):
     """
-    Write out the feature ``.json`` file to disk.
+    Write out the feature ``.csv`` file to disk.
 
     Parameters
     ----------
-    feature_specs : dict
-        Dictionary containing the specifications of the features.
+    feature_specs : Pandas DataFrame
+        Data frame containing the specifications of the features.
     selected_features : list of str
         List of features that were selected for model building.
     experiment_id : str
@@ -233,13 +233,13 @@ def write_feature_json(feature_specs,
         Path to the `feature` experiment output directory where the
         feature JSON file will be saved.
     """
-    feature_specs_selected = {}
-    feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
-
+    df_features_selected = df_feature_specs[df_feature_specs['feature'].isin(selected_features)]
+  
     makedirs(featuredir, exist_ok=True)
-    outjson = join(featuredir, '{}_selected.json'.format(experiment_id))
-    with open(outjson, 'w') as outfile:
-        json.dump(feature_specs_selected, outfile, indent=4, separators=(',', ': '))
+    write_experiment_output([df_features_selected],
+                            ['selected'],
+                            experiment_id,
+                            featuredir)
 
 
 def scale_coefficients(intercept,

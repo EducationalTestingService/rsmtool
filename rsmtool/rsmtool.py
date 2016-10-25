@@ -28,7 +28,7 @@ from rsmtool.preprocess import preprocess_train_and_test_features
 from rsmtool.report import create_report
 from rsmtool.utils import (scale_coefficients,
                            write_experiment_output,
-                           write_feature_json)
+                           write_feature_csv)
 from rsmtool.utils import LogFormatter
 from rsmtool.version import __version__
 
@@ -185,7 +185,7 @@ def run_experiment(config_file, output_dir):
     # this can be used to train models using just this selection.
 
     if select_features_automatically:
-        write_feature_json(df_feature_specs, selected_features, experiment_id, featuredir)
+        write_feature_csv(df_feature_specs, selected_features, experiment_id, featuredir)
 
     df_selected_feature_info = df_feature_info[df_feature_info['feature'].isin(selected_features)]
     write_experiment_output([df_selected_feature_info],
