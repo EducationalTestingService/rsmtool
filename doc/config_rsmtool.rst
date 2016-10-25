@@ -90,8 +90,9 @@ The name for an optional column in the test data containing a second human score
 
 .. note::
 
-    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. The value for responses which do not have a second human score should be left blank. 
+    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
 
+    
 .. _flag_column_rsmtool:
 
 flag_column *(Optional)*
