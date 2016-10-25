@@ -12,11 +12,13 @@ from rsmtool.input import (check_flag_column,
                            check_subgroups,
                            check_feature_subset_file,
                            normalize_json_fields,
+                           normalize_and_validate_json_feature_file,
                            process_json_fields,
                            read_data_file,
                            rename_default_columns,
                            select_candidates_with_N_or_more_items,
-                           validate_and_populate_json_fields)
+                           validate_and_populate_json_fields,
+                           validate_feature_specs)
 
 
 
@@ -471,3 +473,104 @@ def test_select_candidates_with_N_or_more_items_custom_name():
      df_excluded) = select_candidates_with_N_or_more_items(data, 2, 'ID')
     assert_frame_equal(df_included, df_included_expected)
     assert_frame_equal(df_excluded, df_excluded_expected)
+
+
+def test_normalize_and_validate_json_feature_file():
+    feature_json = {'features': [{'feature': 'f1',
+                                  'transform': 'raw',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv',
+                                  'sign' : -1}]}
+    new_feature_json = normalize_and_validate_json_feature_file(feature_json)
+    assert_equal(new_feature_json, feature_json)
+
+
+def test_normalize_json_feature_file_old_file():
+    old_feature_json = {'feats': [{'featN': 'f1',
+                                  'trans': 'raw',
+                                  'wt': 1},
+                                 {'featN': 'f2',
+                                  'trans': 'inv',
+                                  'wt' : -1}]}
+    expected_feature_json = {'features': [{'feature': 'f1',
+                                  'transform': 'raw',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv',
+                                  'sign' : -1}]}
+    new_feature_json = normalize_and_validate_json_feature_file(old_feature_json)
+    assert_equal(new_feature_json, expected_feature_json)
+
+@raises(KeyError)
+def test_normalize_and_validate_json_feature_file_missing_fields():
+    feature_json = {'features': [{'feature': 'f1',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv'}]}
+    new_feature_json = normalize_and_validate_json_feature_file(feature_json)
+
+
+
+def test_validate_feature_specs():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_feature_specs, df_new_feature_specs)
+
+
+def test_validate_feature_specs_with_Feature_as_column():
+    df_feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': [1.0, 1.0, -1.0]})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                         'transform': ['raw', 'inv', 'sqrt'],
+                                         'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+
+def test_validate_feature_specs_sign_to_float():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['1', '1', '-1']})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                              'transform': ['raw', 'inv', 'sqrt'],
+                                              'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+def test_validate_feature_specs_add_default_values():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3']})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                              'transform': ['raw', 'raw', 'raw'],
+                                              'sign': [1, 1, 1]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+@raises(ValueError)
+def test_validate_feature_specs_wrong_sign_format():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+
+
+@raises(ValueError)
+def test_validate_feature_duplicate_feature():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f1', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+
+
+@raises(KeyError)
+def test_validate_feature_missing_feature_column():
+    df_feature_specs = pd.DataFrame({'FeatureName': ['f1', 'f1', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)

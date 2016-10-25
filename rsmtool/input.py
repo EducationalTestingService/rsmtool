@@ -69,7 +69,7 @@ def read_data_file(filename, converters=None):
     elif file_extension in ['.xls', '.xlsx']:
         do_read = partial(pd.read_excel, converters=converters)
     else:
-        raise ValueError("RSMTool only supports file in .csv, .tsv or .xls/.xlsx format. "
+        raise ValueError("RSMTool only supports files in .csv, .tsv or .xls/.xlsx format. "
                          "The file should have the extension which matches its format.")
 
     try:
@@ -254,6 +254,7 @@ def normalize_json_fields(json_obj):
 
     return new_json_obj
 
+
 def check_id_fields(id_field_values):
     """
     Check whether the ID fields in the given dictionary
@@ -283,6 +284,7 @@ def check_id_fields(id_field_values):
         if re.search(r'\s', id_field_value):
             raise ValueError("{} cannot contain any "
                              "spaces".format(id_field))
+
 
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):
@@ -557,7 +559,99 @@ def parse_json_with_comments(filename):
         return ans
 
 
-def normalize_and_validate_feature_file(feature_json):
+
+def read_and_check_feature_file(feature_file_location):
+    """
+    Read the feature file in .csv, .tsv, .xlsx or .xls or .json format,
+    check the format and normalize the values
+
+    Parameters
+    ----------
+    feature_file_location : str
+        path to the feature file
+
+    Returns
+    -------
+    df_feature_specs : pandas DataFrame
+        A data frame with features specifications
+
+    """
+    logger = logging.getLogger(__name__)
+
+    file_extension = splitext(feature_file_location)[1].lower()
+
+    if file_extension == '.json':
+        feature_dict = read_json_file(feature_file_location)
+        df_feature_specs_org = normalize_and_validate_json_feature_file(feature_dict)
+    else:
+        df_feature_specs_org = read_data_file(feature_file_location)
+
+    df_feature_specs = validate_feature_specs(df_feature_specs_org)
+    return df_feature_specs
+
+
+def validate_feature_specs(df_specs_org):
+    """
+    Check the supplied feature specs to make sure that there are no duplicate
+    feature names and that all columns are in the right format. Add the default values
+    for  `transform` and `sign` if none is supplied
+
+    Parameters
+    ----------
+    df_specs_org : pandas DataFrame
+            A data frame with feature specifications
+
+
+    Returns
+    ------
+    df_specs : pandas DataFrame
+            A data frame with normalized values
+
+    Raises
+    ------
+    KeyError :
+           If the data frame does not `feature` column
+
+    ValueEror:
+           If the values are in the wrong format.
+    """
+   
+    df_specs_new = df_specs_org.copy()
+
+    # we allow internally the use of 'Feature' since
+    # this is the column name in subset_feature_file.
+    if "Feature" in df_specs_org:
+        df_specs_new['feature'] = df_specs_new['Feature']
+
+    # check that we have a column named `feature`
+    if not 'feature' in df_specs_new:
+        raise KeyError("The feature file must contain a column named 'feature'")
+
+
+    # check to make sure that there are no duplicate feature names
+    feature_name_count = df_specs_new['feature'].value_counts()
+    duplicate_features = feature_name_count[feature_name_count > 1]
+    if len(duplicate_features)>0:
+        raise ValueError("The following feature names are duplicated "
+                         "in the feature file: {}".format(duplicate_features.index))
+
+    # if we have `sign` column, check that it can be converted to float
+    if 'sign' in df_specs_new:
+        try:
+            df_specs_new['sign'] = df_specs_new['sign'].astype(float)
+        except ValueError:
+            raise ValueError("The `sign` column in the feature file can only contain '1' or '-1'")
+    else:
+        df_specs_new['sign'] = 1
+
+    if not 'transform' in df_specs_new:
+        df_specs_new['transform'] = 'raw'
+
+    return df_specs_new[['feature', 'sign', 'transform']]
+
+
+
+def normalize_and_validate_json_feature_file(feature_json):
     """
     Normalize the field names in `feature_json` in order to maintain
     backwards compatibility with old config files. Raises exceptions
@@ -604,17 +698,8 @@ def normalize_and_validate_feature_file(feature_json):
             raise KeyError("The feature file does not "
                            "contain the following fields: {}".format(','.join(missing_fields)))
 
-        # make sure that the sign is float
-        new_feature_dict['sign'] = float(new_feature_dict['sign'])
         new_json_obj['features'].append(new_feature_dict)
 
-    # check to make sure that there are no duplicate feature names
-    feature_names = [feature_dict['feature'] for feature_dict in new_json_obj['features']]
-    duplicate_features = [name for name in set(feature_names)
-                          if feature_names.count(name) > 1]
-    if duplicate_features:
-        raise ValueError("The following feature names are duplicated "
-                         "in the feature file: {}".format(duplicate_features))
 
     return new_json_obj
 
@@ -1074,8 +1159,7 @@ def load_experiment_data(main_config_file, output_dir):
                                     'found.\n'.format(config_obj['features']))
         else:
             logger.info('Reading feature file: {}'.format(feature_file_location))
-            feature_json = read_json_file(feature_file_location)
-            feature_specs = normalize_and_validate_feature_file(feature_json)
+            df_feature_specs = read_feature_file(feature_file_location)
             requested_features = [fdict['feature'] for fdict in feature_specs['features']]
 
     # check to make sure that `length_column` or `second_human_score_column`
