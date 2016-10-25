@@ -47,6 +47,8 @@ The name for the column containing the human scores for each response. The value
 
     All responses with non-numeric values or zeros in either ``human_score_column`` or ``system_score_column`` will be automatically excluded from evaluation. You can use :ref:`exclude_zero_scores_eval` to keep responses with zero scores.
 
+.. _second_human_score_column_eval:
+
 second_human_score_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_eval` option below will apply to this column too.
@@ -104,7 +106,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
+    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config files specifies :ref:`second_human_score_column <second_human_score_column_eval>`
 
     - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
 
