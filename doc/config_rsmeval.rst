@@ -69,7 +69,7 @@ This field makes it possible to only use responses with particular values in a g
 
 .. note::
 
-    When comparing the values in the supplied dictionary and the data, ``rsmeval`` does not take into account the original type of the value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are treated as the same value. 
+    When reading the values in the supplied dictionary, ``rsmeval`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
 
 
 .. _exclude_zero_scores_eval:
@@ -106,7 +106,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config files specifies :ref:`second_human_score_column <second_human_score_column_eval>`
+    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
 
     - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
 

@@ -107,7 +107,7 @@ Defaults to ``None``.
 
 .. note::
 
-    When comparing the values in the supplied dictionary and the data, ``rsmtool`` does not take into account the original type of the value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are treated as the same value. 
+    When reading the values in the supplied dictionary, ``rsmtool`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
 
 .. _exclude_zero_scores_rsmtool:
 
@@ -192,7 +192,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
-     - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config files specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
+     - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 
