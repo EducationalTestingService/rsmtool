@@ -58,7 +58,7 @@ from .rsmsummarize import run_summary
 from .utils import (agreement,
                     partial_correlations,
                     write_experiment_output,
-                    write_feature_json)
+                    write_feature_csv)
 
 __all__ = ['compute_basic_descriptives',
            'compute_percentiles',
@@ -90,7 +90,7 @@ __all__ = ['compute_basic_descriptives',
            'agreement',
            'partial_correlations',
            'write_experiment_output',
-           'write_feature_json']
+           'write_feature_csv']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

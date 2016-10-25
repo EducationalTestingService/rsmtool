@@ -576,11 +576,14 @@ def read_and_check_feature_file(feature_file_location):
         A data frame with features specifications
 
     """
-    logger = logging.getLogger(__name__)
 
     file_extension = splitext(feature_file_location)[1].lower()
 
     if file_extension == '.json':
+        warnings.warn("The .json format for feature file is deprecated and will be "
+                      "removed in a future release. Please convert your feature file to "
+                      "a .csv/.tsv file with three columns: feature, sign and transform.",
+                      category=DeprecationWarning)
         feature_dict = read_json_file(feature_file_location)
         df_feature_specs_org = normalize_and_validate_json_feature_file(feature_dict)
     else:
