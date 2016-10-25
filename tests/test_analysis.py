@@ -100,5 +100,6 @@ def test_compute_pca_less_components_than_features():
     for i in range(100):
         df[i] = df['a']*i
     (components, variance) = compute_pca(df, df.columns)
-
+    assert_equal(len(components.columns), 100)
+    assert_equal(len(variance.columns), 100)
 
