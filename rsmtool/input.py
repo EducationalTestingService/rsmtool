@@ -1159,8 +1159,8 @@ def load_experiment_data(main_config_file, output_dir):
                                     'found.\n'.format(config_obj['features']))
         else:
             logger.info('Reading feature file: {}'.format(feature_file_location))
-            df_feature_specs = read_feature_file(feature_file_location)
-            requested_features = [fdict['feature'] for fdict in feature_specs['features']]
+            df_feature_specs = read_and_check_feature_file(feature_file_location)
+            requested_features = df_feature_specs['feature']
 
     # check to make sure that `length_column` or `second_human_score_column`
     # are not also included in the requested features, if they are specified
@@ -1248,9 +1248,9 @@ def load_experiment_data(main_config_file, output_dir):
     # know what features are selected
     if select_features_automatically:
         if select_transformations is False:
-            feature_specs = generate_default_specs(feature_names)
+            df_feature_specs = generate_default_specs(feature_names)
         else:
-            feature_specs = generate_specs_from_data(feature_names,
+            df_feature_specs = generate_specs_from_data(feature_names,
                                                      'sc1',
                                                      df_train_features,
                                                      feature_subset_specs=feature_subset_specs,
@@ -1317,7 +1317,7 @@ def load_experiment_data(main_config_file, output_dir):
             df_test_flagged_responses,
             experiment_id, description,
             train_file_location, test_file_location,
-            feature_specs, model_name, model_type,
+            df_feature_specs, model_name, model_type,
             train_label_column, test_label_column,
             id_column, length_column, second_human_score_column,
             candidate_column,

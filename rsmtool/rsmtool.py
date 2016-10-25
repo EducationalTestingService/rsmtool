@@ -76,7 +76,7 @@ def run_experiment(config_file, output_dir):
      df_test_flagged_responses,
      experiment_id, description,
      train_file_location, test_file_location,
-     feature_specs, model_name, model_type,
+     df_feature_specs, model_name, model_type,
      train_label_column, test_label_column,
      id_column, length_column, second_human_score_column,
      candidate_column, subgroups,
@@ -95,7 +95,7 @@ def run_experiment(config_file, output_dir):
      df_test_preprocessed_features,
      df_feature_info) = preprocess_train_and_test_features(df_train_features,
                                                            df_test_features,
-                                                           feature_specs)
+                                                           df_feature_specs)
 
     logger.info('Saving training and test set data to disk')
     write_experiment_output([df_train_features, df_test_features,
@@ -185,7 +185,7 @@ def run_experiment(config_file, output_dir):
     # this can be used to train models using just this selection.
 
     if select_features_automatically:
-        write_feature_json(feature_specs, selected_features, experiment_id, featuredir)
+        write_feature_json(df_feature_specs, selected_features, experiment_id, featuredir)
 
     df_selected_feature_info = df_feature_info[df_feature_info['feature'].isin(selected_features)]
     write_experiment_output([df_selected_feature_info],

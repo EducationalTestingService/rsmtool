@@ -9,6 +9,7 @@ Functions dealing with generating feature names and transformations if there is 
 import logging
 
 import numpy as np
+import pandas as pd
 
 from scipy.stats.stats import pearsonr
 
@@ -95,8 +96,8 @@ def generate_default_specs(feature_names):
 
     """
     Generate default feature "specifications" for the features
-    with the given names. The specifications are given by three fields:
-    "feature", "transform", and "sign".
+    with the given names. The specifications are stored as a data frame with 
+    three columns "feature", "transform", and "sign".
 
     Parameters
     ----------
@@ -105,28 +106,23 @@ def generate_default_specs(feature_names):
 
     Returns
     -------
-    feature_specs: dict
-        Dictionary of feature specifications that can be saved as a
-        :ref:`feature JSON file <example_feature_json>`.
+    feature_specs: pandas DataFrame
+        A dataframe with feature specifications that can be saved as a
+        :ref:`feature list file <example_feature_csv>`.
 
     Note
     ----
     Since these are default specifications, the values for the
-    `transform` field for each feature will be `"raw"` and the value
-    for the `sign` field will be `1`.
+    `transform` column for each feature will be `"raw"` and the value
+    for the `sign` column will be `1`.
 
     """
 
-    feature_specs = {'features': []}
+    df_feature_specs = pd.DataFrame({'feature': feature_names})
+    df_feature_specs['transform'] = 'raw'
+    df_feature_specs['sign'] = 1.0
 
-    for feature in feature_names:
-        feature_dict = {}
-        feature_dict['feature'] = feature
-        feature_dict['transform'] = 'raw'
-        feature_dict['sign'] = 1
-        feature_specs['features'].append(feature_dict)
-
-    return feature_specs
+    return df_feature_specs
 
 
 def find_feature_sign(feature, sign_dict):
@@ -140,10 +136,10 @@ def find_feature_sign(feature, sign_dict):
     if not feature in sign_dict.keys():
         logger.warning("No information about sign is available for feature {}. "
                        "The feature will be assigned the default positive weight.".format(feature))
-        feature_sign_numeric = 1
+        feature_sign_numeric = 1.0
     else:
         feature_sign_string = sign_dict[feature]
-        feature_sign_numeric = -1 if feature_sign_string == '-' else 1
+        feature_sign_numeric = -1.0 if feature_sign_string == '-' else 1.0
     return feature_sign_numeric
 
 
@@ -214,7 +210,7 @@ def generate_specs_from_data(feature_names,
     else:
         sign_dict = {}
 
-    feature_specs = {'features': []}
+    feature_specs = []
     feature_dict = {}
     for feature in feature_names:
         feature_dict['feature'] = feature
@@ -224,6 +220,8 @@ def generate_specs_from_data(feature_names,
         # Change the sign for inverse and addOneInv transformations
         if feature_dict['transform'] in ['inv', 'addOneInv']:
             feature_dict['sign'] = feature_dict['sign'] * -1
-        feature_specs['features'].append(feature_dict)
+        feature_specs.append(feature_dict)
         feature_dict = {}
-    return feature_specs
+
+    df_feature_specs = pd.DataFrame(feature_specs)
+    return df_feature_specs
