@@ -131,7 +131,7 @@ Note that ``inv`` is never used for features with positive values. Defaults to `
 
 .. seealso::
 
-    It is also possible to manually apply transformations to any feature as part of the :ref:`feature column selection <json_column_selection>` process.
+    It is also possible to manually apply transformations to any feature as part of the :ref:`feature column selection <feature_list_column_selection>` process.
 
 .. _use_scaled_predictions_rsmtool:
 
