@@ -58,7 +58,7 @@ This folder contains all of the figures generated as part of the various analyse
 
 feature
 ^^^^^^^
-This folder contains a ``.csv`` file that lists all features, signs and transformation as used in the `final` model, taking into account any manual or automatic feature selection.
+This folder contains a ``.csv`` file that lists all features, signs and transformation as used in the `final` model, taking into account any manual or automatic feature selection. See :ref:`feature column selection <column_selection_rsmtool>` for more details.
 
 .. include:: column_selection_rsmtool.rst
 
