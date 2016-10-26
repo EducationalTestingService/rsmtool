@@ -604,9 +604,11 @@ def read_and_check_feature_file(feature_file_location):
     file_extension = splitext(feature_file_location)[1].lower()
 
     if file_extension == '.json':
-        warnings.warn("The .json format for feature file is deprecated and will be "
-                      "removed in a future release. Please convert your feature file to "
-                      "a .csv/.tsv file with three columns: feature, sign and transform.",
+        warnings.warn("The JSON format for feature file is deprecated and "
+                      "will be removed in a future release. Please convert your "
+                      "feature file to a CSV/TSV/XLS/XLSX file with three columns: "
+                      "\"feature\", \"sign\" and \"transform.\". You can use the "
+                      "\"convert_feature_json\" utility provided by RSMTool.",
                       category=DeprecationWarning)
         feature_dict = read_json_file(feature_file_location)
         feature_specs_dict = normalize_and_validate_json_feature_file(feature_dict)
@@ -632,7 +634,7 @@ def validate_feature_specs(df_specs_org):
 
     Returns
     ------
-    df_specs : pandas DataFrame
+    df_specs_new : pandas DataFrame
             A data frame with normalized values
 
     Raises
@@ -649,7 +651,7 @@ def validate_feature_specs(df_specs_org):
     # we allow internally the use of 'Feature' since
     # this is the column name in subset_feature_file.
     if "Feature" in df_specs_org:
-        df_specs_new['feature'] = df_specs_new['Feature']
+        df_specs_new['feature'] = df_specs_org['Feature']
 
     # check that we have a column named `feature`
     if not 'feature' in df_specs_new:
@@ -1175,6 +1177,7 @@ def load_experiment_data(main_config_file, output_dir):
     select_transformations = config_obj['select_transformations']
     feature_sign = config_obj['sign']
     requested_features = []
+    generate_feature_specs_automatically = True
 
     # For backward compatibility, we check whether this field can
     # be set to all and set the select_transformations to true
@@ -1188,6 +1191,7 @@ def load_experiment_data(main_config_file, output_dir):
                           category=DeprecationWarning)
     if feature_field is not None:
         feature_file_location = locate_file(feature_field, configpath)
+        generate_feature_specs_automatically = False
         if not feature_file_location:
             raise FileNotFoundError('Feature file {} not '
                                     'found.\n'.format(config_obj['features']))
@@ -1278,14 +1282,15 @@ def load_experiment_data(main_config_file, output_dir):
                                            use_fake_labels=use_fake_train_labels)
 
     # Generate feature specifications now that we know what features to use
-    if select_transformations:
-        df_feature_specs = generate_specs_from_data(feature_names,
-                                                    'sc1',
-                                                    df_train_features,
-                                                    feature_subset_specs=feature_subset_specs,
-                                                    feature_sign=feature_sign)
-    else:
-        df_feature_specs = generate_default_specs(feature_names)
+    if generate_feature_specs_automatically:
+        if select_transformations:
+            df_feature_specs = generate_specs_from_data(feature_names,
+                                                        'sc1',
+                                                        df_train_features,
+                                                        feature_subset_specs=feature_subset_specs,
+                                                        feature_sign=feature_sign)
+        else:
+            df_feature_specs = generate_default_specs(feature_names)
 
     # Do the same for the test data except we can ignore the trim min
     # and max since we already have that from the training data and
