@@ -90,7 +90,7 @@ if __name__ == '__main__':
                         dest='delete',
                         action="store_true")
     args = parser.parse_args()
-    if convert_all:
+    if args.convert_all:
         convert_all()
     else:
         convert_json_to_csv(args.json_file, args.output_file, args.delete)

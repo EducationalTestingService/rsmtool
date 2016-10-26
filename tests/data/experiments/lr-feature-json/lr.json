@@ -6,7 +6,7 @@
     "train_label_column": "score",
     "test_file": "../../files/test.csv",
     "trim_max": 6,
-    "features": "features.csv",
+    "features": "features.json",
     "trim_min": 1,
     "model": "LinearRegression",
     "experiment_id": "lr",

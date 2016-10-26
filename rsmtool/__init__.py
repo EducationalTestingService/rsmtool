@@ -77,7 +77,7 @@ __all__ = ['compute_basic_descriptives',
            'filter_on_column',
            'remove_outliers',
            'preprocess_feature',
-           'preprocess_new_data'
+           'preprocess_new_data',
            'transform_feature',
            'trim',
            'convert_ipynb_to_html',

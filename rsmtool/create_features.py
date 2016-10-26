@@ -92,7 +92,9 @@ def generate_feature_names(df,
     return feature_names
 
 
-def generate_default_specs(feature_names):
+def generate_default_specs(feature_names,
+                           feature_subset_specs=None,
+                           feature_subset=None):
 
     """
     Generate default feature "specifications" for the features

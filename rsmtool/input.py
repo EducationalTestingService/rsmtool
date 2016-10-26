@@ -24,7 +24,9 @@ from numpy.random import RandomState
 from rsmtool import HAS_RSMEXTRA
 from rsmtool.create_features import (generate_feature_names,
                                      generate_default_specs,
-                                     generate_specs_from_data)
+                                     generate_specs_from_data,
+                                     select_by_subset)
+
 from rsmtool.model import check_model_name
 from rsmtool.preprocess import (filter_on_column,
                                 filter_on_flag_columns)
@@ -585,7 +587,8 @@ def read_and_check_feature_file(feature_file_location):
                       "a .csv/.tsv file with three columns: feature, sign and transform.",
                       category=DeprecationWarning)
         feature_dict = read_json_file(feature_file_location)
-        df_feature_specs_org = normalize_and_validate_json_feature_file(feature_dict)
+        feature_specs_dict = normalize_and_validate_json_feature_file(feature_dict)
+        df_feature_specs_org = pd.DataFrame(feature_specs_dict['features'])
     else:
         df_feature_specs_org = read_data_file(feature_file_location)
 
@@ -658,7 +661,7 @@ def normalize_and_validate_json_feature_file(feature_json):
     """
     Normalize the field names in `feature_json` in order to maintain
     backwards compatibility with old config files. Raises exceptions
-    if it finds missing fields or duplicate feature names.
+    if it finds missing fields.
 
     Parameters
     ----------
@@ -1146,24 +1149,47 @@ def load_experiment_data(main_config_file, output_dir):
     feature_sign = config_obj['sign']
 
     requested_features = []
-    feature_specs = {}
-    select_features_automatically = True
+    generate_feature_specs_automatically = True
 
     # For backward compatibility, we check whether this field can
     # be set to all and set the select_transformations to true
     # as was done in the previous version.
     if feature_field == 'all':
         select_transformations = True
+        warnings.warn(""" The use of "all" instead of path to the feature file """
+                      """ is deprecated and will be removed in a future release. """
+                      """ You can achieve the same goal by not specifying any """
+                      """ feature file and setting "select_transformations" to True.""",
+                          category=DeprecationWarning)
     elif feature_field is not None:
         feature_file_location = locate_file(feature_field, configpath)
-        select_features_automatically = False
         if not feature_file_location:
             raise FileNotFoundError('Feature file {} not '
                                     'found.\n'.format(config_obj['features']))
         else:
             logger.info('Reading feature file: {}'.format(feature_file_location))
             df_feature_specs = read_and_check_feature_file(feature_file_location)
-            requested_features = df_feature_specs['feature']
+            
+            # if the user did not specify a feature subset, we are done with feature
+            # specifications
+            if not feature_subset and not select_transformations:
+                requested_features = df_feature_specs['feature']
+                generate_feature_specs_automatically = False
+            # if the user requested feature subset we further select a subset of 
+            # features based on the specified subset
+            elif feature_subset: 
+                requested_features = select_by_subset(df_feature_specs['feature'],
+                                                      feature_subset_specs,
+                                                      feature_subset)
+                if not select_transformations:
+                    df_feature_specs = df_feature_specs[df_feature_specs['feature'].isin(requested_features)]
+                    generate_feature_specs_automatically = False
+                elif select_transformations:
+                    logger.warn("You specified a feature file but also set `select_transformations` to True. "
+                                "Any transformations or signs specified in the feature file will be "
+                                "overwritten by the automatically selected transformations and signs.")
+
+    
 
     # check to make sure that `length_column` or `second_human_score_column`
     # are not also included in the requested features, if they are specified
@@ -1249,20 +1275,22 @@ def load_experiment_data(main_config_file, output_dir):
 
     # Generate feature specifications now that we
     # know what features are selected
-    if select_features_automatically:
+    if generate_feature_specs_automatically:
         if select_transformations is False:
-            df_feature_specs = generate_default_specs(feature_names)
+            df_feature_specs = generate_default_specs(feature_names,
+                                                      feature_subset_specs=feature_subset_specs,
+                                                      feature_sign=feature_sign)
         else:
             df_feature_specs = generate_specs_from_data(feature_names,
-                                                     'sc1',
-                                                     df_train_features,
-                                                     feature_subset_specs=feature_subset_specs,
-                                                     feature_sign=feature_sign)
+                                                        'sc1',
+                                                         df_train_features,
+                                                        feature_subset_specs=feature_subset_specs,
+                                                        feature_sign=feature_sign)
+
     # Sanity check to make sure the function returned the
-    # same feature names as specified in feature json file,
-    # if there was one
-    elif not select_features_automatically:
-        assert (feature_names == requested_features).all()
+    # same feature names as we originally requested
+    elif not generate_feature_specs_automatically:
+        assert feature_names == requested_features
 
     # Do the same for the test data except we can ignore the trim min
     # and max since we already have that from the training data and
@@ -1328,7 +1356,7 @@ def load_experiment_data(main_config_file, output_dir):
             feature_subset_file,
             used_trim_min, used_trim_max,
             use_scaled_predictions, exclude_zero_scores,
-            select_features_automatically,
+            generate_feature_specs_automatically,
             exclude_listwise,
             min_items,
             chosen_notebook_files)
@@ -1430,7 +1458,7 @@ def load_and_filter_data(input_file,
                          "'{}'. Please make sure all response IDs are "
                          "unique and re-run the tool.".format(id_column))
 
-    # Generate feature names if no feature .json file was provided.
+    # Generate feature names if no specific features were requested by the user
     if len(requested_feature_names) == 0:
         feature_names = generate_feature_names(df,
                                                reserved_column_names,
