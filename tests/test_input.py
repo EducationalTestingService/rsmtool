@@ -1,3 +1,5 @@
+import os
+import tempfile
 import warnings
 
 import pandas as pd
@@ -6,14 +8,58 @@ from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.util.testing import assert_frame_equal
 
-from rsmtool.input import (normalize_json_fields,
-                           process_json_fields,
-                           rename_default_columns,
-                           validate_and_populate_json_fields,
-                           check_flag_column,
+from rsmtool.input import (check_flag_column,
                            check_subgroups,
                            check_feature_subset_file,
-                           select_candidates_with_N_or_more_items)
+                           normalize_json_fields,
+                           process_json_fields,
+                           read_data_file,
+                           rename_default_columns,
+                           select_candidates_with_N_or_more_items,
+                           validate_and_populate_json_fields)
+
+
+
+def check_read_data_file(extension):
+    """
+    Test whether the ``read_data_file()`` function works as expected.
+    """
+    df_expected = pd.DataFrame({'id': ['001', '002', '003'],
+                                'feature1': [1, 2, 3],
+                                'feature2': [4, 5, 6],
+                                'gender': ['M', 'F', 'F'],
+                                'candidate': ['123', '456', '78901']})
+
+    tempf = tempfile.NamedTemporaryFile(mode='w',
+                                        suffix='.{}'.format(extension),
+                                        delete=False)
+    if extension.lower() == 'csv':
+        df_expected.to_csv(tempf, index=False)
+    elif extension.lower() == 'tsv':
+        df_expected.to_csv(tempf, sep='\t', index=False)
+    elif extension.lower() in ['xls', 'xlsx']:
+        df_expected.to_excel(tempf.name, index=False)
+    tempf.close()
+
+    # now read in the file using `read_data_file()`
+    df_read = read_data_file(tempf.name,
+                             converters={'id': str, 'candidate': str})
+
+    # get rid of the file now that have read it into memory
+    os.unlink(tempf.name)
+
+    assert_frame_equal(df_expected, df_read)
+
+
+def test_read_data_file():
+    # note that we cannot check for capital .xls and .xlsx because Excel writer 
+    # does not support these extensions
+    for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
+        yield check_read_data_file, extension
+
+@raises(ValueError)
+def test_read_data_file_wrong_extension():
+    check_read_data_file('txt')
 
 
 def test_normalize_fields():

@@ -11,10 +11,12 @@ import logging
 import re
 import warnings
 
+import numpy as np
 import pandas as pd
 
 from collections import defaultdict
-from os.path import abspath, basename, dirname, exists, join
+from functools import partial
+from os.path import abspath, basename, dirname, exists, join, splitext
 
 from numpy import nan
 from numpy.random import RandomState
@@ -31,6 +33,52 @@ from rsmtool.report import get_ordered_notebook_files
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
                                    default_feature_sign)
+
+
+def read_data_file(filename, converters=None):
+    """
+    Read a CSV/TSV/XLS/XLSX file and return a data frame.
+
+    Parameters
+    ----------
+    filename : str
+        Name of file to read.
+    converters : None, optional
+        A dictionary specifying how the types of the columns
+        in the file should be converted. Specified in the same
+        format as for ``pandas.read_csv()``.
+
+    Returns
+    -------
+    df : pandas DataFrame
+        Data frame containing the data in the given file.
+
+    Raises
+    ------
+    ValueError
+        If the file has an extension that we do not support
+    pd.parser.CParserError
+        If the file is badly formatted or corrupt.
+    """
+
+    file_extension = splitext(filename)[1].lower()
+
+    if file_extension in ['.csv', '.tsv']:
+        sep='\t' if file_extension == '.tsv' else ','
+        do_read = partial(pd.read_csv, sep=sep, converters=converters)
+    elif file_extension in ['.xls', '.xlsx']:
+        do_read = partial(pd.read_excel, converters=converters)
+    else:
+        raise ValueError("RSMTool only supports file in .csv, .tsv or .xls/.xlsx format. "
+                         "The file should have the extension which matches its format.")
+
+    try:
+        df = do_read(filename)
+    except pd.parser.CParserError:
+        raise pd.parser.CParserError('Cannot read {}. Please check that it is '
+                                     'not corrupt or in an incompatible format. '
+                                     '(Try running dos2unix?)'.format(filename))
+    return df
 
 
 def select_candidates_with_N_or_more_items(df,
@@ -52,7 +100,7 @@ def select_candidates_with_N_or_more_items(df,
         name of the column which contains candidate ids
 
     Returns
-    --------
+    -------
     df_included: pandas DataFrame
         Data frame with responses from candidates with responses to N or more items
 
@@ -1000,7 +1048,7 @@ def load_experiment_data(main_config_file, output_dir):
     # if the user requested feature_subset file and feature subset,
     # read the file and check its format
     if feature_subset_file and feature_subset:
-        feature_subset_specs = pd.read_csv(feature_subset_file_location)
+        feature_subset_specs = read_data_file(feature_subset_file_location)
         check_feature_subset_file(feature_subset_specs, feature_subset)
     else:
         feature_subset_specs = None
@@ -1199,7 +1247,7 @@ def load_experiment_data(main_config_file, output_dir):
             chosen_notebook_files)
 
 
-def load_and_filter_data(csv_file,
+def load_and_filter_data(input_file,
                          label_column,
                          id_column,
                          length_column,
@@ -1219,7 +1267,7 @@ def load_and_filter_data(csv_file,
                          min_items_per_candidate=None,
                          use_fake_labels=False):
     """
-    Load the data from `csv_file` and filters it to remove
+    Load the data from `input_file` and filters it to remove
     rows that have zero/non-numeric values for `label_column`.
     If feature_names are specified, it checks whether any
     features that are specifically requested in `feature_names`
@@ -1245,7 +1293,7 @@ def load_and_filter_data(csv_file,
     converter_dict = dict([(column, str) for column in string_columns if column])
 
     # read in the CSV file
-    df = pd.read_csv(csv_file, converters=converter_dict)
+    df = read_data_file(input_file, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
     columns_to_check = [id_column, label_column]
@@ -1363,7 +1411,8 @@ def load_and_filter_data(csv_file,
                                                      exclude_zero_sd=exclude_zero_sd)
             del df_filtered
             df_filtered = newdf
-            df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+            with np.errstate(divide='ignore'):
+                df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
 
         # make sure that the remaining data frame is not empty
         if len(df_filtered) == 0:
@@ -1393,7 +1442,7 @@ def load_and_filter_data(csv_file,
                        "names do not contain hyphens. "
                        "The data does not have columns "
                        "for the following features: "
-                       "{}".format(csv_file,
+                       "{}".format(input_file,
                                    ', '.join(missing_features)))
 
     # check the values for length column. We do this after filtering
