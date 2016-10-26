@@ -23,6 +23,8 @@ from .analysis import (compute_basic_descriptives,
                        correlation_helper,
                        metrics_helper)
 
+from .convert_feature_json import convert_feature_json_file
+
 from .create_features import (generate_default_specs,
                               find_feature_transformation)
 
@@ -65,6 +67,7 @@ __all__ = ['compute_basic_descriptives',
            'compute_outliers',
            'compute_pca',
            'correlation_helper',
+           'convert_feature_json_file',
            'metrics_helper',
            'generate_default_specs',
            'find_feature_transformation',

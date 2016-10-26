@@ -24,7 +24,7 @@ Input file format
 
 The input files containing feature values and scores for all responses in training and evaluation data should be in tabular format with features and scores stored in columns and each row correponding to a single response.
 
-RSMTool supports input files in ``.csv``, ``.tsv`` or ``xls``/``.xlsx`` format. For Excel spreadsheets all data must be stored in the first sheet. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format. 
+RSMTool supports input files in ``.csv``, ``.tsv`` or ``xls``/``.xlsx`` format. For Excel spreadsheets all data must be stored in the first sheet. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format.
 
 
 .. _feature_preprocessing:
@@ -49,7 +49,7 @@ Data preprocessing
 
 1. Truncate/clamp any outlier feature values, where outliers are defined as :math:`\mu \pm 4*\sigma`, where :math:`\mu` is the mean and :math:`\sigma` is the standard deviation.
 
-2. Apply pre-specified :ref:`transformations <json_transformation>` to feature values.
+2. Apply pre-specified :ref:`transformations <feature_list_transformation>` to feature values.
 
 3. Flip the signs for feature values if necessary.
 

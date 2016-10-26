@@ -24,7 +24,7 @@ While fine-grained column selection is better for a single experiment, subset-ba
 
 Fine-grained column selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To manually select columns to be used as features, you can provide a data file in one of the :ref:`supported formats <input_file_format>`. The file must contain a column named ``feature`` which specifies the names the feature columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the values in these feature columns before being used in the model.
+To manually select columns to be used as features, you can provide a data file in one of the :ref:`supported formats <input_file_format>`. The file must contain a column named ``feature`` which specifies the names of the feature columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the values in these feature columns before being used in the model.
 
 .. _example_feature_csv:
 
@@ -32,10 +32,9 @@ Here's an example of what such a file might look like.
 
 .. code-block:: text
 
-    Feature,transform,sign
+    feature,transform,sign
     feature1,raw,1
     feature2,inv,-1
-
 
 There is one required column and two optional columns.
 
@@ -62,7 +61,7 @@ If the feature file contains no ``transform`` column, ``rsmtool`` will use the o
 
 sign (optional)
 """""""""""""""
-After transformation, the column values will be multiplied by this number. This field is usually set to ``1`` or ``-1`` depending on the expected sign of the correlation between transformed feature and human score to ensure that all features in the final models have positive correlation with the score.
+After transformation, the column values will be multiplied by this number, which can be either ``1`` or ``-1`` depending on the expected sign of the correlation between transformed feature and human score. This mechanism is provided to ensure that all features in the final models have a positive correlation with the score, if that is so desired by the user.
 
 If the feature file contains no ``sign`` column, ``rsmtool`` will multiply all values by ``1``.
 
@@ -72,7 +71,7 @@ To ensure that this is working as expected, you can check the sign of correlatio
 
 .. note::
 
-        You can use the fine-grained method of column selection in combination with a :ref:`model with automatic feature selection <automatic_feature_selection_models>`. In this case, if not all features are used in the final model, ``rsmtool`` will create a new ``.csv`` file in the ``feature`` folder in the experiment output directory. This file will only contain information about the features included in the final model.
+        You can use the fine-grained method of column selection in combination with a :ref:`model with automatic feature selection <automatic_feature_selection_models>`. In this case, the features that end up being used in the final model can be found in the ``.csv`` file in the ``feature`` folder in the experiment output directory.
 
 .. _subset_column_selection:
 
@@ -88,7 +87,7 @@ Here's an example of a subset definition file, say ``subset.csv``.
 
 .. code-block:: text
 
-    Feature,A,B
+    feature,A,B
     feature1,0,1
     feature2,1,1
     feature3,1,0
@@ -124,7 +123,7 @@ To understand this, let's re-examine our earlier example of a subset definition 
 
 .. code-block:: text
 
-    Feature,A,B,sign_A
+    feature,A,B,sign_A
     feature1,0,1,+
     feature2,1,1,-
     feature3,1,0,+
@@ -144,7 +143,6 @@ Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an e
 
 .. note::
 
-    1. If :ref:`select_transformations <select_transformations_rsmtool>` is set to ``true``, ``rsmtool`` is intelligent enough to take it into account when flipping the signs. For example, if the expected correlation sign for a given feature is negative, ``rsmtool`` will multiply the feature values by ``-1`` if the ``sqrt`` transform has the highest correlation with score. However, if the best transformation turns out to be ``inv`` -- which already changes the polarity of the feature -- no such multiplication will take place.
+    If :ref:`select_transformations <select_transformations_rsmtool>` is set to ``true``, ``rsmtool`` is intelligent enough to take it into account when flipping the signs. For example, if the expected correlation sign for a given feature is negative, ``rsmtool`` will multiply the feature values by ``-1`` if the ``sqrt`` transform has the highest correlation with score. However, if the best transformation turns out to be ``inv`` -- which already changes the polarity of the feature -- no such multiplication will take place.
 
-    2. If you use subset-based feature selection, ``rsmtool`` will create a new ``.csv`` file in the ``feature`` folder in the experiment output directory listing all features, signs and transformation as used in the final model. This file will only contain information about the features included in the final model.
 
