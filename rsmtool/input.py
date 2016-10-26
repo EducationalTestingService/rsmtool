@@ -1173,7 +1173,7 @@ def load_experiment_data(main_config_file, output_dir):
             # if the user did not specify a feature subset, we are done with feature
             # specifications
             if not feature_subset and not select_transformations:
-                requested_features = df_feature_specs['feature']
+                requested_features = df_feature_specs['feature'].tolist()
                 generate_feature_specs_automatically = False
             # if the user requested feature subset we further select a subset of 
             # features based on the specified subset
@@ -1277,9 +1277,7 @@ def load_experiment_data(main_config_file, output_dir):
     # know what features are selected
     if generate_feature_specs_automatically:
         if select_transformations is False:
-            df_feature_specs = generate_default_specs(feature_names,
-                                                      feature_subset_specs=feature_subset_specs,
-                                                      feature_sign=feature_sign)
+            df_feature_specs = generate_default_specs(feature_names)
         else:
             df_feature_specs = generate_specs_from_data(feature_names,
                                                         'sc1',
