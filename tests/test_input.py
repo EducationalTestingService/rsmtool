@@ -54,8 +54,8 @@ def check_read_data_file(extension):
 
 
 def test_read_data_file():
-    # note that we cannot check for capital .xls and .xlsx because Excel writer 
-    # does not support these extensions
+    # note that we cannot check for capital .xls and .xlsx
+    # because xlwt does not support these extensions
     for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
         yield check_read_data_file, extension
 
@@ -403,7 +403,7 @@ def test_check_subgroups_replace_empty():
 
 @raises(ValueError)
 def test_check_feature_subset_file_no_feature_column():
-    feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
+    feature_specs = pd.DataFrame({'feat': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
     check_feature_subset_file(feature_specs, 'subset1')
 
 
