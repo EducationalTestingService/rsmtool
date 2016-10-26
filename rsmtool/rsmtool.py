@@ -84,7 +84,6 @@ def run_experiment(config_file, output_dir):
      used_trim_min, used_trim_max,
      use_scaled_predictions,
      exclude_zero_scores,
-     generate_feature_specs_automatically,
      exclude_listwise,
      min_items,
      chosen_notebook_files) = load_experiment_data(config_file, output_dir)
@@ -169,22 +168,9 @@ def run_experiment(config_file, output_dir):
     # identify the features used by the model
     selected_features = model.feat_vectorizer.get_feature_names()
 
-    # if we had a subset of features from the user, check if the
-    # final subset of features matches that and if not  
-    # mark that we need to generate feature subset
-    if not generate_feature_specs_automatically:
-        requested_features = df_feature_info['feature'].tolist()
-        omitted_features = set(requested_features).difference(selected_features)
-        if omitted_features:
-            generate_feature_specs_automatically = True
-
-    # generate a new feature spec file if there was no original file
-    # or if the features used in the model no longer 
-    # match the original set. 
-    # This file can be used to train models using just this selection.
-
-    if generate_feature_specs_automatically:
-        write_feature_csv(df_feature_specs, selected_features, experiment_id, featuredir)
+    # generate the feature spec file which can be used to train models
+    # using just this selection
+    write_feature_csv(df_feature_specs, selected_features, experiment_id, featuredir)
 
     df_selected_feature_info = df_feature_info[df_feature_info['feature'].isin(selected_features)]
     write_experiment_output([df_selected_feature_info],
