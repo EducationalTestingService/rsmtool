@@ -1,7 +1,5 @@
 import sys
 
-from os.path import dirname, join, normpath
-
 import numpy as np
 from numpy.testing import assert_array_equal
 
@@ -13,10 +11,6 @@ from rsmtool.create_features import (select_by_prefix,
                                      select_by_subset,
                                      generate_default_specs,
                                      generate_specs_from_data)
-
-_my_dir = dirname(__file__)
-_code_dir = normpath(join(_my_dir, '..', 'code'))
-sys.path.append(_code_dir)
 
 
 def test_select_by_prefix():
@@ -160,4 +154,4 @@ def test_generate_specs_from_data_no_subset_specs():
     assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
     assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
 
-    
+

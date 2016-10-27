@@ -2,6 +2,8 @@ import os
 import tempfile
 import warnings
 
+from os.path import dirname, join
+
 import pandas as pd
 
 from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
@@ -20,6 +22,9 @@ from rsmtool.input import (check_flag_column,
                            validate_and_populate_json_fields,
                            validate_feature_specs)
 
+from rsmtool.convert_feature_json import convert_feature_json_file
+
+_MY_DIR = dirname(__file__)
 
 
 def check_read_data_file(extension):
@@ -265,7 +270,7 @@ def test_process_fields_with_non_boolean():
             'subgroups': 'native language, GPA_range',
             'exclude_zero_scores': 'Yes'}
 
-    newdata = process_json_fields(validate_and_populate_json_fields(data))
+    process_json_fields(validate_and_populate_json_fields(data))
 
 @raises(ValueError)
 def test_process_fields_with_integer():
@@ -279,7 +284,7 @@ def test_process_fields_with_integer():
             'subgroups': 'native language, GPA_range',
             'exclude_zero_scores': 1}
 
-    newdata = process_json_fields(validate_and_populate_json_fields(data))
+    process_json_fields(validate_and_populate_json_fields(data))
 
 
 def test_rename_no_columns():
@@ -502,14 +507,14 @@ def test_normalize_json_feature_file_old_file():
     new_feature_json = normalize_and_validate_json_feature_file(old_feature_json)
     assert_equal(new_feature_json, expected_feature_json)
 
+
 @raises(KeyError)
 def test_normalize_and_validate_json_feature_file_missing_fields():
     feature_json = {'features': [{'feature': 'f1',
                                   'sign': 1},
                                  {'feature': 'f2',
                                   'transform': 'inv'}]}
-    new_feature_json = normalize_and_validate_json_feature_file(feature_json)
-
+    normalize_and_validate_json_feature_file(feature_json)
 
 
 def test_validate_feature_specs():
@@ -557,7 +562,7 @@ def test_validate_feature_specs_wrong_sign_format():
     df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                      'transform': ['raw', 'inv', 'sqrt'],
                                      'sign': ['+', '+', '-']})
-    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    validate_feature_specs(df_feature_specs)
 
 
 @raises(ValueError)
@@ -565,7 +570,7 @@ def test_validate_feature_duplicate_feature():
     df_feature_specs = pd.DataFrame({'feature': ['f1', 'f1', 'f3'],
                                      'transform': ['raw', 'inv', 'sqrt'],
                                      'sign': ['+', '+', '-']})
-    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    validate_feature_specs(df_feature_specs)
 
 
 @raises(KeyError)
@@ -573,4 +578,39 @@ def test_validate_feature_missing_feature_column():
     df_feature_specs = pd.DataFrame({'FeatureName': ['f1', 'f1', 'f3'],
                                      'transform': ['raw', 'inv', 'sqrt'],
                                      'sign': ['+', '+', '-']})
-    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    validate_feature_specs(df_feature_specs)
+
+
+def test_json_feature_conversion():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'features.json')
+    expected_feature_csv = join(_MY_DIR, 'data', 'experiments', 'lr', 'features.csv')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+
+    # read the expected and converted files into data frames
+    df_expected = pd.read_csv(expected_feature_csv)
+    df_converted = pd.read_csv(tempf.name)
+
+    # get rid of the file now that have read it into memory
+    os.unlink(tempf.name)
+
+    assert_frame_equal(df_expected, df_converted)
+
+@raises(RuntimeError)
+def test_json_feature_conversion_bad_json():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'lr.json')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+
+@raises(RuntimeError)
+def test_json_feature_conversion_bad_output_file():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'features.json')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+

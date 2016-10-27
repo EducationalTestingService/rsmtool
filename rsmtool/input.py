@@ -24,8 +24,7 @@ from numpy.random import RandomState
 from rsmtool import HAS_RSMEXTRA
 from rsmtool.create_features import (generate_feature_names,
                                      generate_default_specs,
-                                     generate_specs_from_data,
-                                     select_by_subset)
+                                     generate_specs_from_data)
 
 from rsmtool.model import check_model_name
 from rsmtool.preprocess import (filter_on_column,
