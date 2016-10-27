@@ -15,13 +15,13 @@ import logging
 import os
 import sys
 
-from os.path import exists, join
+from os.path import dirname, exists, join
 
 from rsmtool.convert_feature_json import convert_feature_json_file
 from rsmtool.utils import LogFormatter
 
 
-def convert_tests(test_dir):
+def main():
 
     # set up the basic logging config
     fmt = LogFormatter()
@@ -33,7 +33,9 @@ def convert_tests(test_dir):
     logger = logging.getLogger(__name__)
 
     # get the path to th rsmtool experiment directory
-    experiments_dir = join(test_dir, 'data', 'experiments')
+    experiments_dir = join(dirname(__file__),
+                           'data',
+                           'experiments')
 
     # iterate over all the test experiments
     for experiment in os.listdir(experiments_dir):
@@ -71,3 +73,6 @@ def convert_tests(test_dir):
             config_dict['features'] = 'features.csv'
             with open(experiment_json[0], 'w') as outfile:
                 json.dump(config_dict, outfile, indent=4, separators=(',', ': '))
+
+if __name__ == '__main__':
+    main()
