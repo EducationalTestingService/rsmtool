@@ -574,7 +574,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
     elif model_name == 'WeightedLeastSquares':
 
-        # train weighted least squares regression 
+        # train weighted least squares regression
         # get the feature columns
 
         X = df_train[feature_columns]
@@ -583,10 +583,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         X = sm.add_constant(X)
 
         # define the weights as inverse proportion of total number of data points for each score
-
-        score_levels = df_train['sc1'].unique()
-        expected_proportion = 1/len(score_levels)
-        score_weights_dict = dict([(sc1, expected_proportion/len(df_train[df_train['sc1']==sc1])) for sc1 in score_levels])
+        score_level_dict = df_train['sc1'].value_counts()
+        expected_proportion = 1/len(score_level_dict)
+        score_weights_dict = {sc1: expected_proportion/count for sc1, count in score_level_dict.items()}
         weights = [score_weights_dict[sc1] for sc1 in df_train['sc1']]
 
         # fit the model
