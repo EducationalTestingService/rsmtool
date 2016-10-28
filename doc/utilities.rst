@@ -23,3 +23,29 @@ Convert a given Jupyter notebook file (``.ipynb``) to HTML (``.html``) format.
 .. option:: -h, --help
 
     Show help message and exit.
+
+
+.. _convert_feature_json:
+
+convert_feature_json
+--------------------
+
+.. program:: convert_feature_json
+
+Convert an older feature JSON file to a new file in tabular format.
+
+.. option:: --json
+
+    Path to input feature JSON file that is to be converted.
+
+.. option:: --output
+
+    Path to output CSV/TSV/XLS/XLSX file containing the features in tabular format.
+
+.. option:: --delete
+
+    Delete original feature JSON file after conversion.
+
+.. option:: -h, --help
+
+    Show help message and exit.

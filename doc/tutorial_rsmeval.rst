@@ -10,7 +10,7 @@ Workflow
 
 ``rsmeval`` is designed for evaluating existing machine scores. Once you have the scores computed for all the responses in your data, the next steps are fairly straightforward:
 
-1. Create a ``.csv`` file containing the computed system scores and the human scores you want to compare against.
+1. Create a data file in one of the :ref:`supported formats <input_file_format>` containing the computed system scores and the human scores you want to compare against.
 2. Create an :ref:`experiment configuration file <config_file_rsmeval>` describing the evaluation experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmeval <usage_rsmeval>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmeval>`.
 4. Examine the HTML report to check various aspects of model performance.
@@ -39,7 +39,7 @@ Let's take a look at the options in our configuration file.
 
 - **Line 2**: We define an experiment ID.
 - **Line 3**: We also provide a description which will be included in the experiment report.
-- **Line 4**: We list the path to the ``.csv`` with the predicted and human scores.
+- **Line 4**: We list the path to the file with the predicted and human scores. For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: This field indicates that the system scores in our ``.csv`` file are located in a column named ``system``.
 - **Line 6**: This field indicates that the human (reference) scores in our ``.csv`` file are located in a column named ``human``.
 - **Line 7**: This field indicates that the unique IDs for the responses in the ``.csv`` file are located in columns named ``ID``.
@@ -51,7 +51,7 @@ Documentation for all of the available configuration options is available :ref:`
 
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
-Now that we have our scores in ``.csv`` format and our configuration file in ``.json`` format, we can use the :ref:`rsmeval <usage_rsmeval>` command-line script to run our evaluation experiment.
+Now that we have our scores in the right format and our configuration file in ``.json`` format, we can use the :ref:`rsmeval <usage_rsmeval>` command-line script to run our evaluation experiment.
 
 .. code-block:: bash
 
