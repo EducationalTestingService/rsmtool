@@ -1,15 +1,15 @@
 {
     "train_file": "../../files/train_subgroup_edge_cases.csv",
-    "description": "Using all the features with an LinearRegression model and including subgroup analyses with edge cases.",
-    "test_file": "../../files/test_subgroup_edge_cases.csv",
-    "trim_min": 1,
-    "model": "LinearRegression",
-    "subgroups": "group_edge_cases",
-    "train_label_column": "score",
-    "experiment_id": "lr_subgroups_with_edge_cases",
-    "test_label_column": "score",
     "id_column": "ID",
-    "trim_max": 6,
     "use_scaled_predictions": true,
-    "features": "features.json"
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "subgroups": "group_edge_cases",
+    "description": "Using all the features with an LinearRegression model and including subgroup analyses with edge cases.",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "test_file": "../../files/test_subgroup_edge_cases.csv",
+    "experiment_id": "lr_subgroups_with_edge_cases",
+    "model": "LinearRegression"
 }

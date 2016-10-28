@@ -61,5 +61,9 @@ From :py:mod:`~rsmtool.utils` Module
 .. autofunction:: rsmtool.partial_correlations
 .. autofunction:: rsmtool.agreement
 .. autofunction:: rsmtool.write_experiment_output
-.. autofunction:: rsmtool.write_feature_json
+.. autofunction:: rsmtool.write_feature_csv
+
+From :py:mod:`~rsmtool.convert_feature_json` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.convert_feature_json_file
 

@@ -2,6 +2,8 @@ import os
 import tempfile
 import warnings
 
+from os.path import dirname, join
+
 import pandas as pd
 
 from nose.tools import assert_equal, assert_raises, eq_, ok_, raises
@@ -12,12 +14,17 @@ from rsmtool.input import (check_flag_column,
                            check_subgroups,
                            check_feature_subset_file,
                            normalize_json_fields,
+                           normalize_and_validate_json_feature_file,
                            process_json_fields,
                            read_data_file,
                            rename_default_columns,
                            select_candidates_with_N_or_more_items,
-                           validate_and_populate_json_fields)
+                           validate_and_populate_json_fields,
+                           validate_feature_specs)
 
+from rsmtool.convert_feature_json import convert_feature_json_file
+
+_MY_DIR = dirname(__file__)
 
 
 def check_read_data_file(extension):
@@ -52,8 +59,8 @@ def check_read_data_file(extension):
 
 
 def test_read_data_file():
-    # note that we cannot check for capital .xls and .xlsx because Excel writer 
-    # does not support these extensions
+    # note that we cannot check for capital .xls and .xlsx
+    # because xlwt does not support these extensions
     for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
         yield check_read_data_file, extension
 
@@ -263,7 +270,7 @@ def test_process_fields_with_non_boolean():
             'subgroups': 'native language, GPA_range',
             'exclude_zero_scores': 'Yes'}
 
-    newdata = process_json_fields(validate_and_populate_json_fields(data))
+    process_json_fields(validate_and_populate_json_fields(data))
 
 @raises(ValueError)
 def test_process_fields_with_integer():
@@ -277,7 +284,7 @@ def test_process_fields_with_integer():
             'subgroups': 'native language, GPA_range',
             'exclude_zero_scores': 1}
 
-    newdata = process_json_fields(validate_and_populate_json_fields(data))
+    process_json_fields(validate_and_populate_json_fields(data))
 
 
 def test_rename_no_columns():
@@ -401,7 +408,7 @@ def test_check_subgroups_replace_empty():
 
 @raises(ValueError)
 def test_check_feature_subset_file_no_feature_column():
-    feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
+    feature_specs = pd.DataFrame({'feat': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
     check_feature_subset_file(feature_specs, 'subset1')
 
 
@@ -471,3 +478,139 @@ def test_select_candidates_with_N_or_more_items_custom_name():
      df_excluded) = select_candidates_with_N_or_more_items(data, 2, 'ID')
     assert_frame_equal(df_included, df_included_expected)
     assert_frame_equal(df_excluded, df_excluded_expected)
+
+
+def test_normalize_and_validate_json_feature_file():
+    feature_json = {'features': [{'feature': 'f1',
+                                  'transform': 'raw',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv',
+                                  'sign' : -1}]}
+    new_feature_json = normalize_and_validate_json_feature_file(feature_json)
+    assert_equal(new_feature_json, feature_json)
+
+
+def test_normalize_json_feature_file_old_file():
+    old_feature_json = {'feats': [{'featN': 'f1',
+                                  'trans': 'raw',
+                                  'wt': 1},
+                                 {'featN': 'f2',
+                                  'trans': 'inv',
+                                  'wt' : -1}]}
+    expected_feature_json = {'features': [{'feature': 'f1',
+                                  'transform': 'raw',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv',
+                                  'sign' : -1}]}
+    new_feature_json = normalize_and_validate_json_feature_file(old_feature_json)
+    assert_equal(new_feature_json, expected_feature_json)
+
+
+@raises(KeyError)
+def test_normalize_and_validate_json_feature_file_missing_fields():
+    feature_json = {'features': [{'feature': 'f1',
+                                  'sign': 1},
+                                 {'feature': 'f2',
+                                  'transform': 'inv'}]}
+    normalize_and_validate_json_feature_file(feature_json)
+
+
+def test_validate_feature_specs():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_feature_specs, df_new_feature_specs)
+
+
+def test_validate_feature_specs_with_Feature_as_column():
+    df_feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': [1.0, 1.0, -1.0]})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                         'transform': ['raw', 'inv', 'sqrt'],
+                                         'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+
+def test_validate_feature_specs_sign_to_float():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['1', '1', '-1']})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                              'transform': ['raw', 'inv', 'sqrt'],
+                                              'sign': [1.0, 1.0, -1.0]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+def test_validate_feature_specs_add_default_values():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3']})
+    df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                              'transform': ['raw', 'raw', 'raw'],
+                                              'sign': [1, 1, 1]})
+    df_new_feature_specs = validate_feature_specs(df_feature_specs)
+    assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
+
+
+@raises(ValueError)
+def test_validate_feature_specs_wrong_sign_format():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    validate_feature_specs(df_feature_specs)
+
+
+@raises(ValueError)
+def test_validate_feature_duplicate_feature():
+    df_feature_specs = pd.DataFrame({'feature': ['f1', 'f1', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    validate_feature_specs(df_feature_specs)
+
+
+@raises(KeyError)
+def test_validate_feature_missing_feature_column():
+    df_feature_specs = pd.DataFrame({'FeatureName': ['f1', 'f1', 'f3'],
+                                     'transform': ['raw', 'inv', 'sqrt'],
+                                     'sign': ['+', '+', '-']})
+    validate_feature_specs(df_feature_specs)
+
+
+def test_json_feature_conversion():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'features.json')
+    expected_feature_csv = join(_MY_DIR, 'data', 'experiments', 'lr', 'features.csv')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+
+    # read the expected and converted files into data frames
+    df_expected = pd.read_csv(expected_feature_csv)
+    df_converted = pd.read_csv(tempf.name)
+
+    # get rid of the file now that have read it into memory
+    os.unlink(tempf.name)
+
+    assert_frame_equal(df_expected, df_converted)
+
+@raises(RuntimeError)
+def test_json_feature_conversion_bad_json():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'lr.json')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+
+@raises(RuntimeError)
+def test_json_feature_conversion_bad_output_file():
+    json_feature_file = join(_MY_DIR, 'data', 'experiments', 'lr-feature-json', 'features.json')
+
+    # convert the feature json file and write to a temporary location
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
+    convert_feature_json_file(json_feature_file, tempf.name, delete=False)
+

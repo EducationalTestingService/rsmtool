@@ -1,15 +1,15 @@
 {
-    "test_label_column": "sc2",
     "train_file": "../../files/train.csv",
-    "description": "Using all features with an LinearRegression model.",
-    "use_scaled_predictions": true,
-    "trim_min": 1,
     "id_column": "ID",
-    "model": "LinearRegression",
+    "use_scaled_predictions": true,
+    "test_label_column": "sc2",
     "train_label_column": "score",
+    "test_file": "../../files/test_with_h1_named_sc2.csv",
     "second_human_score_column": "sc1",
-    "features": "features.json",
-    "experiment_id": "lr_with_h2_named_sc1",
     "trim_max": 6,
-    "test_file": "../../files/test_with_h1_named_sc2.csv"
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_with_h2_named_sc1",
+    "description": "Using all features with an LinearRegression model."
 }

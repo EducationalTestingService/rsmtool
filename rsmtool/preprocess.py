@@ -668,7 +668,7 @@ def preprocess_feature(data,
     return transformed_feature
 
 
-def preprocess_train_and_test_features(df_train, df_test, feature_specs):
+def preprocess_train_and_test_features(df_train, df_test, df_feature_specs):
     """
     Pre-process those features in the given training and testing
     data frame `df` whose specifications are contained in
@@ -683,9 +683,9 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     df_test : pandas DataFrame
         Data frame containing the raw feature values
         for the test set.
-    feature_specs : dict
-        Dictionary containing the various specifications
-        from the feature JSON file.
+    df_feature_specs : pandas DataFrame
+        Data frame containing the various specifications
+        from the feature file.
     """
 
     # keep the original data frames and make copies
@@ -697,12 +697,14 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     # all relevant information about each feature
     df_feature_info = pd.DataFrame()
 
-    # now iterate over each feature
-    for fdict in feature_specs['features']:
+    # make feature the index of df_feature_specs
+    df_feature_specs.index = df_feature_specs['feature']
 
-        feature_name = fdict['feature']
-        feature_transformation = fdict['transform']
-        feature_sign = fdict['sign']
+    # now iterate over each feature
+    for feature_name in df_feature_specs['feature']:
+
+        feature_transformation = df_feature_specs.get_value(feature_name, 'transform')
+        feature_sign = df_feature_specs.get_value(feature_name, 'sign')
 
         train_feature_mean = df_train[feature_name].mean()
         train_feature_sd = df_train[feature_name].std()

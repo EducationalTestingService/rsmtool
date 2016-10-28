@@ -25,6 +25,7 @@ from rsmtool import HAS_RSMEXTRA
 from rsmtool.create_features import (generate_feature_names,
                                      generate_default_specs,
                                      generate_specs_from_data)
+
 from rsmtool.model import check_model_name
 from rsmtool.preprocess import (filter_on_column,
                                 filter_on_flag_columns)
@@ -69,7 +70,7 @@ def read_data_file(filename, converters=None):
     elif file_extension in ['.xls', '.xlsx']:
         do_read = partial(pd.read_excel, converters=converters)
     else:
-        raise ValueError("RSMTool only supports file in .csv, .tsv or .xls/.xlsx format. "
+        raise ValueError("RSMTool only supports files in .csv, .tsv or .xls/.xlsx format. "
                          "The file should have the extension which matches its format.")
 
     try:
@@ -254,6 +255,7 @@ def normalize_json_fields(json_obj):
 
     return new_json_obj
 
+
 def check_id_fields(id_field_values):
     """
     Check whether the ID fields in the given dictionary
@@ -283,6 +285,7 @@ def check_id_fields(id_field_values):
         if re.search(r'\s', id_field_value):
             raise ValueError("{} cannot contain any "
                              "spaces".format(id_field))
+
 
 
 def validate_and_populate_json_fields(json_obj, context='rsmtool'):
@@ -402,8 +405,20 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
     if context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
         check_id_fields(id_field_values)
 
-    # 5. Check for fields that require feature_subset _file and try
-    # to use the default feature file:
+    # 5. Check that the feature file and feature subset/subset file are not
+    # specified together
+    msg = ("You cannot specify BOTH \"features\" and \"{}\". "
+           "Please refer to the \"Selecting Feature Columns\" "
+           "section in the documentation for more details.")
+    if new_json_obj['features'] and new_json_obj['feature_subset_file']:
+        msg = msg.format("feature_subset_file")
+        raise ValueError(msg)
+    if new_json_obj['features'] and new_json_obj['feature_subset']:
+        msg = msg.format("feature_subset_file")
+        raise ValueError(msg)
+
+    # 6. Check for fields that require feature_subset _file and try
+    # to use the default feature file
     if new_json_obj['feature_subset'] and not new_json_obj['feature_subset_file']:
 
         # Check if we have the default subset file from rsmextra
@@ -437,17 +452,27 @@ def validate_and_populate_json_fields(json_obj, context='rsmtool'):
                 and not new_json_obj['sign']):
             new_json_obj['sign'] = default_feature_sign
 
-    # 6. Check for fields that must be specified together
+    # 7. Check for fields that must be specified together
     if new_json_obj['min_items_per_candidate'] and not new_json_obj['candidate_column']:
-        raise ValueError("If you want to filter out candidates with responses to less than X "
-                         "items, you need to specify the name of the column "
-                         "which contains candidate ids.")
+        raise ValueError("If you want to filter out candidates with "
+                         "responses to less than X items, you need "
+                         "to specify the name of the column which "
+                         "contains candidate IDs.")
 
-    # 7. Check the fields that requires rsmextra
+    # 8. Check the fields that requires rsmextra
     if not HAS_RSMEXTRA:
         if new_json_obj['special_sections']:
             raise ValueError("Special sections are only available to ETS"
                              " users by installing the rsmextra package.")
+
+    # 9. Raise a warning if we are specifiying a feature file but also
+    # telling the system to automatically select transformations
+    if new_json_obj['features'] and new_json_obj['select_transformations']:
+        logger.warning("You specified a feature file but also set "
+                       "`select_transformations` to True. Any transformations "
+                       "or signs specified in the feature file will be "
+                       "overwritten by the automatically selected transformations "
+                       "and signs.")
 
     return new_json_obj
 
@@ -557,11 +582,108 @@ def parse_json_with_comments(filename):
         return ans
 
 
-def normalize_and_validate_feature_file(feature_json):
+
+def read_and_check_feature_file(feature_file_location):
+    """
+    Read the feature file in .csv, .tsv, .xlsx or .xls or .json format,
+    check the format and normalize the values
+
+    Parameters
+    ----------
+    feature_file_location : str
+        path to the feature file
+
+    Returns
+    -------
+    df_feature_specs : pandas DataFrame
+        A data frame with features specifications
+
+    """
+
+    file_extension = splitext(feature_file_location)[1].lower()
+
+    if file_extension == '.json':
+        warnings.warn("The JSON format for feature file is deprecated and "
+                      "will be removed in a future release. Please convert your "
+                      "feature file to a CSV/TSV/XLS/XLSX file with three columns: "
+                      "\"feature\", \"sign\" and \"transform.\". You can use the "
+                      "\"convert_feature_json\" utility provided by RSMTool.",
+                      category=DeprecationWarning)
+        feature_dict = read_json_file(feature_file_location)
+        feature_specs_dict = normalize_and_validate_json_feature_file(feature_dict)
+        df_feature_specs_org = pd.DataFrame(feature_specs_dict['features'])
+    else:
+        df_feature_specs_org = read_data_file(feature_file_location)
+
+    df_feature_specs = validate_feature_specs(df_feature_specs_org)
+    return df_feature_specs
+
+
+def validate_feature_specs(df_specs_org):
+    """
+    Check the supplied feature specs to make sure that there are no duplicate
+    feature names and that all columns are in the right format. Add the default values
+    for  `transform` and `sign` if none is supplied
+
+    Parameters
+    ----------
+    df_specs_org : pandas DataFrame
+            A data frame with feature specifications
+
+
+    Returns
+    ------
+    df_specs_new : pandas DataFrame
+            A data frame with normalized values
+
+    Raises
+    ------
+    KeyError :
+           If the data frame does not have a ``feature`` column.
+    ValueError:
+           If there are duplicate values in the ``feature`` column
+           or if the ``sign`` column contains invalid values.
+    """
+
+    df_specs_new = df_specs_org.copy()
+
+    # we allow internally the use of 'Feature' since
+    # this is the column name in subset_feature_file.
+    if "Feature" in df_specs_org:
+        df_specs_new['feature'] = df_specs_org['Feature']
+
+    # check that we have a column named `feature`
+    if not 'feature' in df_specs_new:
+        raise KeyError("The feature file must contain a column named 'feature'")
+
+    # check to make sure that there are no duplicate feature names
+    feature_name_count = df_specs_new['feature'].value_counts()
+    duplicate_features = feature_name_count[feature_name_count > 1]
+    if len(duplicate_features) > 0:
+        raise ValueError("The following feature names are duplicated "
+                         "in the feature file: {}".format(duplicate_features.index))
+
+    # if we have `sign` column, check that it can be converted to float
+    if 'sign' in df_specs_new:
+        try:
+            df_specs_new['sign'] = df_specs_new['sign'].astype(float)
+            assert np.all(df_specs_new['sign'].isin([-1, 1]))
+        except (ValueError, AssertionError):
+            raise ValueError("The `sign` column in the feature file can only contain '1' or '-1'")
+    else:
+        df_specs_new['sign'] = 1
+
+    if not 'transform' in df_specs_new:
+        df_specs_new['transform'] = 'raw'
+
+    return df_specs_new[['feature', 'sign', 'transform']]
+
+
+
+def normalize_and_validate_json_feature_file(feature_json):
     """
     Normalize the field names in `feature_json` in order to maintain
-    backwards compatibility with old config files. Raises exceptions
-    if it finds missing fields or duplicate feature names.
+    backwards compatibility with old config files.
 
     Parameters
     ----------
@@ -573,14 +695,14 @@ def normalize_and_validate_feature_file(feature_json):
 
     Returns
     -------
-    new_json_obj : dict
+    new_feature_json : dict
         JSON object with all old style names normalized to
         new style names.
 
     Raises
     ------
     KeyError
-    ValueError
+        If required fields are missing in the feature JSON file.
     """
 
     field_mapping = {'wt': 'sign',
@@ -589,7 +711,7 @@ def normalize_and_validate_feature_file(feature_json):
 
     required_fields = ['feature', 'sign', 'transform']
 
-    new_json_obj = defaultdict(list)
+    new_feature_json = defaultdict(list)
 
     feature_list = feature_json['features'] if 'features' in feature_json else feature_json['feats']
 
@@ -604,19 +726,10 @@ def normalize_and_validate_feature_file(feature_json):
             raise KeyError("The feature file does not "
                            "contain the following fields: {}".format(','.join(missing_fields)))
 
-        # make sure that the sign is float
-        new_feature_dict['sign'] = float(new_feature_dict['sign'])
-        new_json_obj['features'].append(new_feature_dict)
+        new_feature_json['features'].append(new_feature_dict)
 
-    # check to make sure that there are no duplicate feature names
-    feature_names = [feature_dict['feature'] for feature_dict in new_json_obj['features']]
-    duplicate_features = [name for name in set(feature_names)
-                          if feature_names.count(name) > 1]
-    if duplicate_features:
-        raise ValueError("The following feature names are duplicated "
-                         "in the feature file: {}".format(duplicate_features))
 
-    return new_json_obj
+    return new_feature_json
 
 
 def read_json_file(json_file):
@@ -854,7 +967,7 @@ def check_flag_column(config_obj):
     return new_filtering_dict
 
 
-def check_feature_subset_file(feature_specs, subset=None, sign=None):
+def check_feature_subset_file(df_feature_specs, subset=None, sign=None):
     """
     Check that the file is in the correct format and contains all
     the requested values. Raises an exception if it finds any errors
@@ -862,7 +975,7 @@ def check_feature_subset_file(feature_specs, subset=None, sign=None):
 
     Parameters
     ----------
-    feature_specs : pandas DataFrame
+    df_feature_specs : pandas DataFrame
         Data frame containing the feature specifications.
     subset : str, optional
         Name of a pre-defined feature subset, defaults
@@ -873,24 +986,30 @@ def check_feature_subset_file(feature_specs, subset=None, sign=None):
     Raises
     ------
     ValueError
+        If any columns are missing from the subset file
+        or if any of the columns contain invalid values.
     """
 
-    if 'Feature' not in feature_specs.columns:
-        raise ValueError("The feature_subset_file must contain a column named 'Feature' "
+    # we want to allow title-cased names of columns for historical reasons
+    # e.g., `Feature` instead of `feature` etc.
+    if ('feature' not in df_feature_specs and
+        'Feature' not in df_feature_specs):
+        raise ValueError("The feature_subset_file must contain a column named 'feature' "
                          "containing the feature names.")
     if subset:
-        if subset not in feature_specs.columns:
+        if subset not in df_feature_specs:
             raise ValueError("Unknown value for feature_subset: {}".format(subset))
 
-        if not feature_specs[subset].isin([0, 1]).all():
+        if not df_feature_specs[subset].isin([0, 1]).all():
             raise ValueError("The subset columns in feature file can only contain 0 or 1")
 
     if sign:
-        if not 'Sign_{}'.format(sign) in feature_specs.columns:
-                raise ValueError("The feature_subset_file does not contain the requested "
-                                 "sign column 'Sign_{}'".format(sign))
+        if ('sign_{}'.format(sign) not in df_feature_specs and
+            'Sign_{}'.format(sign) not in df_feature_specs):
+                raise ValueError("The feature_subset_file must contain the requested "
+                                 "sign column 'sign_{}'".format(sign))
 
-        if not feature_specs[subset].isin(['-', '+']).all():
+        if not df_feature_specs[subset].isin(['-', '+']).all():
             raise ValueError("The sign columns in feature file can only contain - or +")
 
 
@@ -1056,27 +1175,29 @@ def load_experiment_data(main_config_file, output_dir):
     # Do we need to automatically find the best transformations/change sign?
     select_transformations = config_obj['select_transformations']
     feature_sign = config_obj['sign']
-
     requested_features = []
-    feature_specs = {}
-    select_features_automatically = True
+    generate_feature_specs_automatically = True
 
     # For backward compatibility, we check whether this field can
     # be set to all and set the select_transformations to true
     # as was done in the previous version.
     if feature_field == 'all':
         select_transformations = True
-    elif feature_field is not None:
+        warnings.warn("The use of \"all\" instead of path to the feature file "
+                      "is deprecated and will be removed in a future release. "
+                      "You can achieve the same goal by not specifying any "
+                      "feature file and setting \"select_transformations\" to True.",
+                          category=DeprecationWarning)
+    if feature_field is not None:
         feature_file_location = locate_file(feature_field, configpath)
-        select_features_automatically = False
+        generate_feature_specs_automatically = False
         if not feature_file_location:
             raise FileNotFoundError('Feature file {} not '
                                     'found.\n'.format(config_obj['features']))
         else:
             logger.info('Reading feature file: {}'.format(feature_file_location))
-            feature_json = read_json_file(feature_file_location)
-            feature_specs = normalize_and_validate_feature_file(feature_json)
-            requested_features = [fdict['feature'] for fdict in feature_specs['features']]
+            df_feature_specs = read_and_check_feature_file(feature_file_location)
+            requested_features = df_feature_specs['feature'].tolist()
 
     # check to make sure that `length_column` or `second_human_score_column`
     # are not also included in the requested features, if they are specified
@@ -1104,7 +1225,6 @@ def load_experiment_data(main_config_file, output_dir):
     # and `candidate_column` are specified. We add both names to
     # simplify things downstream since neither the original name nor
     # the standardized name should be used as feature names
-
     if second_human_score_column:
         reserved_column_names.append(second_human_score_column)
         reserved_column_names.append('sc2')
@@ -1160,22 +1280,16 @@ def load_experiment_data(main_config_file, output_dir):
                                            min_items_per_candidate=min_items,
                                            use_fake_labels=use_fake_train_labels)
 
-    # Generate feature specifications now that we
-    # know what features are selected
-    if select_features_automatically:
-        if select_transformations is False:
-            feature_specs = generate_default_specs(feature_names)
+    # Generate feature specifications now that we know what features to use
+    if generate_feature_specs_automatically:
+        if select_transformations:
+            df_feature_specs = generate_specs_from_data(feature_names,
+                                                        'sc1',
+                                                        df_train_features,
+                                                        feature_subset_specs=feature_subset_specs,
+                                                        feature_sign=feature_sign)
         else:
-            feature_specs = generate_specs_from_data(feature_names,
-                                                     'sc1',
-                                                     df_train_features,
-                                                     feature_subset_specs=feature_subset_specs,
-                                                     feature_sign=feature_sign)
-    # Sanity check to make sure the function returned the
-    # same feature names as specified in feature json file,
-    # if there was one
-    elif not select_features_automatically:
-        assert feature_names == requested_features
+            df_feature_specs = generate_default_specs(feature_names)
 
     # Do the same for the test data except we can ignore the trim min
     # and max since we already have that from the training data and
@@ -1233,7 +1347,7 @@ def load_experiment_data(main_config_file, output_dir):
             df_test_flagged_responses,
             experiment_id, description,
             train_file_location, test_file_location,
-            feature_specs, model_name, model_type,
+            df_feature_specs, model_name, model_type,
             train_label_column, test_label_column,
             id_column, length_column, second_human_score_column,
             candidate_column,
@@ -1241,7 +1355,6 @@ def load_experiment_data(main_config_file, output_dir):
             feature_subset_file,
             used_trim_min, used_trim_max,
             use_scaled_predictions, exclude_zero_scores,
-            select_features_automatically,
             exclude_listwise,
             min_items,
             chosen_notebook_files)
@@ -1343,7 +1456,7 @@ def load_and_filter_data(input_file,
                          "'{}'. Please make sure all response IDs are "
                          "unique and re-run the tool.".format(id_column))
 
-    # Generate feature names if no feature .json file was provided.
+    # Generate feature names if no specific features were requested by the user
     if len(requested_feature_names) == 0:
         feature_names = generate_feature_names(df,
                                                reserved_column_names,

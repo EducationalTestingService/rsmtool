@@ -1,18 +1,20 @@
 {
-    "test_label_column": "score",
     "train_file": "../../files/train_with_flags_and_zero_scores.csv",
-    "description": "Using all features with an LinearRegression model with flag-based filtering and also zero-score filtering.",
-    "use_scaled_predictions": true,
-    "trim_min": 1,
     "id_column": "ID",
-    "model": "LinearRegression",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
     "train_label_column": "score",
+    "test_file": "../../files/test_with_flags.csv",
     "second_human_score_column": "score2",
     "subgroups": "L1",
-    "features": "features.json",
-    "experiment_id": "lr_exclude_flags_and_zeros",
+    "exclude_zero_scores": true,
     "trim_max": 6,
-    "test_file": "../../files/test_with_flags.csv",
-    "flag_column": {"flag": 0},
-    "exclude_zero_scores": true
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_exclude_flags_and_zeros",
+    "description": "Using all features with an LinearRegression model with flag-based filtering and also zero-score filtering.",
+    "flag_column": {
+        "flag": 0
+    }
 }
