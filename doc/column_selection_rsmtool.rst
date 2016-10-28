@@ -81,7 +81,7 @@ For more advanced users, ``rsmtool`` offers the ability to assign columns to nam
 
 If you want to run multiple ``rsmtool`` experiments, each choosing from a large number of features, generating a separate :ref:`feature file <feature_list_column_selection>` for each experiment listing columns to use can quickly become tedious.
 
-Instead you can define feature subsets by providing a subset definition file in one of the :ref:`supported formats <input_file_format>` which lists *all* feature names under a column named ``Feature``. Each subset is an additional column with a value of either ``0`` (denoting that the feature does *not* belong to the subset named by that column) or ``1`` (denoting that the feature does belong to the subset named by that column).
+Instead you can define feature subsets by providing a subset definition file in one of the :ref:`supported formats <input_file_format>` which lists *all* feature names under a column named ``feature``. Each subset is an additional column with a value of either ``0`` (denoting that the feature does *not* belong to the subset named by that column) or ``1`` (denoting that the feature does belong to the subset named by that column).
 
 Here's an example of a subset definition file, say ``subset.csv``.
 
