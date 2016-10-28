@@ -7,7 +7,7 @@
     "id_column": "ID",
     "model": "WeightedLeastSquares",
     "train_label_column": "score",
-    "features": "features.json",
+    "features": "features.csv",
     "experiment_id": "wls",
     "trim_max": 6,
     "test_file": "../../files/test.csv"
