@@ -1,0 +1,14 @@
+{
+    "test_label_column": "score",
+    "train_file": "../../files/train.csv",
+    "description": "Using all features with a weighted least squares model.",
+    "use_scaled_predictions": false,
+    "trim_min": 1,
+    "id_column": "ID",
+    "model": "WeightedLeastSquares",
+    "train_label_column": "score",
+    "features": "features.csv",
+    "experiment_id": "wls",
+    "trim_max": 6,
+    "test_file": "../../files/test.csv"
+}

@@ -29,7 +29,8 @@ builtin_models = ['LinearRegression',
                   'LassoFixedLambdaThenLR',
                   'PositiveLassoCVThenLR',
                   'LassoFixedLambda',
-                  'PositiveLassoCV']
+                  'PositiveLassoCV',
+                  'WeightedLeastSquares']
 
 skll_models = ['AdaBoostRegressor',
                'DecisionTreeRegressor',
@@ -570,6 +571,31 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
         # we used only the non-zero features
         used_features = non_zero_features
+
+    elif model_name == 'WeightedLeastSquares':
+
+        # train weighted least squares regression
+        # get the feature columns
+
+        X = df_train[feature_columns]
+
+        # add the intercept
+        X = sm.add_constant(X)
+
+        # define the weights as inverse proportion of total number of data points for each score
+        score_level_dict = df_train['sc1'].value_counts()
+        expected_proportion = 1/len(score_level_dict)
+        score_weights_dict = {sc1: expected_proportion/count for sc1, count in score_level_dict.items()}
+        weights = [score_weights_dict[sc1] for sc1 in df_train['sc1']]
+
+        # fit the model
+        fit = sm.WLS(df_train['sc1'], X, weights=weights).fit()
+        df_coef = ols_coefficients_to_dataframe(fit.params)
+        learner = create_fake_skll_learner(df_coef)
+
+        # we used all the features
+        used_features = feature_columns
+
 
     # save the raw coefficients to a file
     df_coef.to_csv(join(csvdir, '{}_coefficients.csv'.format(experiment_id)), index=False)
