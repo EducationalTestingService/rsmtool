@@ -5,7 +5,7 @@
     "use_scaled_predictions": false,
     "trim_min": 1,
     "id_column": "ID",
-    "model": "WeightedLeastSquares",
+    "model": "ScoreWeightedLR",
     "train_label_column": "score",
     "features": "features.csv",
     "experiment_id": "wls",

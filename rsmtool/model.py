@@ -23,14 +23,14 @@ from skll import FeatureSet, Learner
 
 builtin_models = ['LinearRegression',
                   'EqualWeightsLR',
+                  'ScoreWeightedLR',
                   'RebalancedLR',
                   'NNLR',
                   'LassoFixedLambdaThenNNLR',
                   'LassoFixedLambdaThenLR',
                   'PositiveLassoCVThenLR',
                   'LassoFixedLambda',
-                  'PositiveLassoCV',
-                  'WeightedLeastSquares']
+                  'PositiveLassoCV']
 
 skll_models = ['AdaBoostRegressor',
                'DecisionTreeRegressor',
@@ -572,7 +572,7 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         # we used only the non-zero features
         used_features = non_zero_features
 
-    elif model_name == 'WeightedLeastSquares':
+    elif model_name == 'ScoreWeightedLR':
 
         # train weighted least squares regression
         # get the feature columns
