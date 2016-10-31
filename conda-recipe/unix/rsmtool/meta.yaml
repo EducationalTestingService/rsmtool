@@ -1,12 +1,12 @@
 package:
   name: rsmtool
-  version: 5.2.1
+  version: 5.5.0
 
 source:
   path: ../../../../rsmtool
 
 build:
-  number: 0
+  number: 1
   script:
     - cd $SRC_DIR
     - $PYTHON setup.py install
@@ -17,6 +17,7 @@ build:
     - rsmpredict = rsmtool.rsmpredict:main
     - rsmsummarize = rsmtool.rsmsummarize:main
     - render_notebook = rsmtool.report:main
+    - convert_feature_json = rsmtool.convert_feature_json:main
 
 requirements:
   build:
@@ -68,6 +69,7 @@ test:
     - rsmtool
     - rsmtool.analysis
     - rsmtool.comparison
+    - rsmtool.convert_feature_json
     - rsmtool.create_features
     - rsmtool.input
     - rsmtool.model
@@ -83,6 +85,7 @@ test:
     - rsmcompare --help
     - rsmpredict --help
     - render_notebook --help
+    - convert_feature_json --help
 
 about:
   home: https://github.com/EducationalTestingService/rsmtool
