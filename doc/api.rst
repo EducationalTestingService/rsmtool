@@ -2,7 +2,7 @@
 
 API Documentation
 -----------------
-The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, and :ref:`rsmcompare <usage_rsmcompare>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
+The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, :ref:`rsmcompare <usage_rsmcompare>`, and :ref:`rsmsummarize <usage_rsmsummarize>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
 
 :mod:`rsmtool` Package
 ======================
@@ -10,6 +10,7 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 .. autofunction:: rsmtool.run_experiment
 .. autofunction:: rsmtool.run_evaluation
 .. autofunction:: rsmtool.run_comparison
+.. autofunction:: rsmtool.run_summary
 .. autofunction:: rsmtool.compute_and_save_predictions
 
 From :py:mod:`~rsmtool.analysis` Module
@@ -28,6 +29,7 @@ From :py:mod:`~rsmtool.preprocess` Module
 .. autofunction:: rsmtool.filter_on_column
 .. autofunction:: rsmtool.transform_feature
 .. autofunction:: rsmtool.preprocess_feature
+.. autofunction:: rsmtool.preprocess_new_data
 
 From :py:mod:`~rsmtool.create_features` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,5 +61,9 @@ From :py:mod:`~rsmtool.utils` Module
 .. autofunction:: rsmtool.partial_correlations
 .. autofunction:: rsmtool.agreement
 .. autofunction:: rsmtool.write_experiment_output
-.. autofunction:: rsmtool.write_feature_json
+.. autofunction:: rsmtool.write_feature_csv
+
+From :py:mod:`~rsmtool.convert_feature_json` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.convert_feature_json_file
 

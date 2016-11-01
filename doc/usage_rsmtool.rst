@@ -50,15 +50,15 @@ This folder contains the final RSMTool report in HTML format as well in the form
 
 output
 ^^^^^^
-This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files.
+This folder contains all of the :ref:`intermediate files <intermediate_files_rsmtool>` produced as part of the various analyses performed, saved as ``.csv`` files. ``rsmtool`` will also save in this folder a copy of the :ref:`configuration file <config_file_rsmtool>`. Fields not specified in the original configuration file will be pre-populated with default values.
 
 figure
 ^^^^^^
 This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
 
-feature *(Optional)*
-^^^^^^^^^^^^^^^^^^^^
-This folder is only created if you use :ref:`feature column selection <column_selection_rsmtool>` or a :ref:`model with automatic feature selection <automatic_feature_selection_models>`.
+feature
+^^^^^^^
+This folder contains a ``.csv`` file that lists all features, signs and transformation as used in the `final` model, taking into account any manual or automatic feature selection. See :ref:`feature column selection <column_selection_rsmtool>` for more details.
 
 .. include:: column_selection_rsmtool.rst
 

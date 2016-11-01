@@ -23,13 +23,16 @@ if HAS_RSMEXTRA:
     from rsmextra.settings import (special_section_list_rsmtool,
                                    special_section_list_rsmeval,
                                    special_section_list_rsmcompare,
+                                   special_section_list_rsmsummarize,
                                    ordered_section_list_with_special_sections_rsmtool,
                                    ordered_section_list_with_special_sections_rsmeval,
                                    ordered_section_list_with_special_sections_rsmcompare,
+                                   ordered_section_list_with_special_sections_rsmsummarize,
                                    special_notebook_path)
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
     ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
+    ordered_section_list_rsmsummarize = ordered_section_list_with_special_sections_rsmsummarize
 else:
     ordered_section_list_rsmtool = ['data_description',
                                     'data_description_by_group',
@@ -61,16 +64,26 @@ else:
                                        'pca',
                                        'notes',
                                        'sysinfo']
+
+    ordered_section_list_rsmsummarize = ['preprocessed_features',
+                                         'model',
+                                         'evaluation',
+                                         'sysinfo']
+
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
+    special_section_list_rsmsummarize = []
     special_notebook_path = ""
 
 package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, 'notebooks'))
 template_path = join(notebook_path, 'templates')
+
 javascript_path = join(notebook_path, 'javascript')
 comparison_notebook_path = join(notebook_path, 'comparison')
+summary_notebook_path = join(notebook_path, 'summary')
+
 
 # Define the general section list
 
@@ -83,22 +96,30 @@ general_section_list_rsmeval = [section for section in ordered_section_list_rsme
 general_section_list_rsmcompare = [section for section in ordered_section_list_rsmcompare
                                    if section not in special_section_list_rsmcompare]
 
+general_section_list_rsmsummarize = [section for section in ordered_section_list_rsmsummarize
+                                if section not in special_section_list_rsmsummarize]
+
+
 # define a mapping from the tool name to the master
 # list for both general and special sections
 master_section_dict = {'general': {'rsmtool': general_section_list_rsmtool,
                                    'rsmeval': general_section_list_rsmeval,
-                                   'rsmcompare': general_section_list_rsmcompare},
+                                   'rsmcompare': general_section_list_rsmcompare,
+                                   'rsmsummarize': general_section_list_rsmsummarize},
                        'special': {'rsmtool': special_section_list_rsmtool,
                                    'rsmeval': special_section_list_rsmeval,
-                                   'rsmcompare': special_section_list_rsmcompare}}
+                                   'rsmcompare': special_section_list_rsmcompare,
+                                   'rsmsummarize': special_section_list_rsmsummarize}}
 
 # define the mapping for section paths
 notebook_path_dict = {'general': {'rsmtool': notebook_path,
                                   'rsmeval': notebook_path,
-                                  'rsmcompare': comparison_notebook_path},
+                                  'rsmcompare': comparison_notebook_path,
+                                  'rsmsummarize': summary_notebook_path},
                       'special': {'rsmtool': special_notebook_path,
                                   'rsmeval': special_notebook_path,
-                                  'rsmcompare': special_notebook_path}}
+                                  'rsmcompare': special_notebook_path,
+                                  'rsmsummarize': special_notebook_path}}
 
 
 def merge_notebooks(notebook_files, output_file):
@@ -429,6 +450,8 @@ def get_ordered_notebook_files(general_sections,
         ordered_section_list = ordered_section_list_rsmeval
     elif context == 'rsmcompare':
         ordered_section_list = ordered_section_list_rsmcompare
+    elif context == 'rsmsummarize':
+        ordered_section_list = ordered_section_list_rsmsummarize
 
     # add all custom sections to the end of the default ordered list
     ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
@@ -513,10 +536,17 @@ def create_report(experiment_id, description,
                           join(reportdir, '{}.html'.format(report_name)))
 
 
-def create_comparison_report(experiment_id_old, description_old,
-                             csvdir_old, figdir_old, experiment_id_new,
-                             description_new, csvdir_new, figdir_new,
-                             output_dir, subgroups,
+def create_comparison_report(comparison_id,
+                             experiment_id_old,
+                             description_old,
+                             csvdir_old,
+                             figdir_old,
+                             experiment_id_new,
+                             description_new,
+                             csvdir_new,
+                             figdir_new,
+                             output_dir,
+                             subgroups,
                              chosen_notebook_files,
                              use_scaled_predictions_old=False,
                              use_scaled_predictions_new=False):
@@ -529,6 +559,7 @@ def create_comparison_report(experiment_id_old, description_old,
     logger = logging.getLogger(__name__)
 
     # set the environment variables we want
+    os.environ['COMPARISON_ID'] = comparison_id
     os.environ['EXPERIMENT_ID_OLD'] = experiment_id_old
     os.environ['DESCRIPTION_OLD'] = description_old
     os.environ['OUTPUT_DIR_OLD'] = csvdir_old
@@ -549,8 +580,7 @@ def create_comparison_report(experiment_id_old, description_old,
 
     # create the output directory
     os.makedirs(output_dir, exist_ok=True)
-    report_name = '{}_vs_{}.report'.format(experiment_id_old,
-                                           experiment_id_new)
+    report_name = '{}_report'.format(comparison_id)
     merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections
@@ -562,6 +592,46 @@ def create_comparison_report(experiment_id_old, description_old,
     logger.info('Exporting HTML')
     convert_ipynb_to_html(merged_notebook_file,
                           join(output_dir, '{}.html'.format(report_name)))
+
+
+def create_summary_report(summary_id, description,
+                          all_experiments,
+                          output_dir, subgroups,
+                          chosen_notebook_files):
+    """
+    The main function to generate a summary
+    report comparing several RSMTool experiments as
+    defined by the given arguments.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    # set the environment variables we want
+    os.environ['SUMMARY_ID'] = summary_id
+    os.environ['DESCRIPTION'] = description
+    os.environ['JSONS'] = '%%'.join(all_experiments)
+    os.environ['JAVASCRIPT_PATH'] = javascript_path
+
+    # we define separate groups to allow future flexibility in defining
+    # what groups are used for descriptives and evaluations
+    os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
+    os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+
+    # create the output directory
+    os.makedirs(output_dir, exist_ok=True)
+    report_name = '{}_report'.format(summary_id)
+    merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+
+    # merge all the given sections
+    logger.info('Merging sections')
+    merge_notebooks(chosen_notebook_files, merged_notebook_file)
+
+    # run the merged notebook and save the output as
+    # an HTML file in the report directory
+    logger.info('Exporting HTML')
+    convert_ipynb_to_html(merged_notebook_file,
+                          join(output_dir, '{}.html'.format(report_name)))
+
 
 
 def convert_ipynb_to_html(notebook_file, html_file):
@@ -584,7 +654,7 @@ def convert_ipynb_to_html(notebook_file, html_file):
 
     # set a high timeout for datasets with a large number of features
     report_config = Config({'ExecutePreprocessor': {'enabled': True,
-                                                    'timeout': 600},
+                                                    'timeout': 3600},
                             'HTMLExporter': {'template_path': [template_path],
                                              'template_file': 'report.tpl'}})
 

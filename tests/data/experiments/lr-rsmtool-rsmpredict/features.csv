@@ -1,0 +1,4 @@
+feature,sign,transform
+FEATURE1,1,raw
+FEATURE2,1,raw
+FEATURE7,-1,addOneLn

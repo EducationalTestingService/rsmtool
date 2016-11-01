@@ -10,6 +10,8 @@ Models which use the full feature set
 
 - ``EqualWeightsLR``:  A model with all feature weights set to 1.0; a naive model.
 
+- ``ScoreWeightedLR``: a model that learns empirical regression weights using weighted least sqaures. The weights are determined based on the number of responses with different score levels. Score levels with lower number of responses are assigned higher weight.
+
 - ``RebalancedLR`` -  empirical regression weights are rebalanced by using a small portion of positive weights to replace negative beta values. This model has no negative coefficients.
 
 

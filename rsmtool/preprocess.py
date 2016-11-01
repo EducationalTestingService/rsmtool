@@ -11,6 +11,7 @@ import logging
 import numpy as np
 import pandas as pd
 
+from skll.data import safe_float as string_to_number
 
 def trim(values, trim_min, trim_max):
     """
@@ -77,15 +78,13 @@ def filter_on_flag_columns(df, flag_column_dict):
         on the flag column information.
     """
 
-    df_new = df.copy()
-
     flag_columns = list(flag_column_dict.keys())
 
     if not flag_columns:
-        return df_new, pd.DataFrame(columns=df.columns)
+        return df.copy(), pd.DataFrame(columns=df.columns)
     else:
         # check that all columns are present
-        missing_flag_columns = set(flag_columns).difference(df_new.columns)
+        missing_flag_columns = set(flag_columns).difference(df.columns)
         if missing_flag_columns:
             raise KeyError("The data does not contain columns "
                            "for all flag columns specified in the "
@@ -97,30 +96,37 @@ def filter_on_flag_columns(df, flag_column_dict):
                            "{}".format(', '.join(missing_flag_columns)))
 
         # since flag column may be a mix of strings and numeric values
-        # we convert all integers to floats so that 1 and 1.0
-        # are treated as the same value
+        # we convert all strings and integers to floats such that, for
+        # example, “1”, 1, and “1.0" all map to 1.0. To do this, we will
+        # first convert all the strings to numbers and then convert
+        # all the integers to floats.
+        int_to_float = lambda x: float(x) if type(x) == int else x
+        convert_to_float = lambda x: int_to_float(string_to_number(x))
+        flag_column_dict_to_float = {key: list(map(convert_to_float, value))
+                                     for (key, value) in flag_column_dict.items()}
 
-        convert_to_float = lambda x: float(x) if type(x) == int else x
-
-        # we first convert the values in the dictionary
-        flag_column_dict_to_float = dict([(key, list(map(convert_to_float, value)))
-                                         for (key, value) in flag_column_dict.items()])
-
-        # and then the values in the data
-        for column in flag_columns:
-            df_new[column] = df_new[column].map(convert_to_float)
+        # and now convert the the values in the feature column in the data frame
+        df_new = df[flag_columns].copy()
+        df_new = df_new.applymap(convert_to_float)
 
         # identify responses with values which satisfy the condition
         full_mask = df_new.isin(flag_column_dict_to_float)
         flagged_mask = full_mask[list(flag_column_dict_to_float.keys())].all(1)
-        df_responses_with_requested_flags = df_new[flagged_mask]
-        df_responses_with_excluded_flags = df_new[~flagged_mask]
+
+        # return the columns from the original frame that was passed in
+        # so that all data types remain the same and are not changed
+        df_responses_with_requested_flags = df[flagged_mask].copy()
+        df_responses_with_excluded_flags = df[~flagged_mask].copy()
 
         # make sure that the remaining data frame is not empty
         if len(df_responses_with_requested_flags) == 0:
             raise ValueError("No responses remaining after filtering "
                              "on flag columns. No further analysis can "
                              "be run.")
+
+        # reset the index
+        df_responses_with_requested_flags.reset_index(drop=True, inplace=True)
+        df_responses_with_excluded_flags.reset_index(drop=True, inplace=True)
 
         return (df_responses_with_requested_flags,
                 df_responses_with_excluded_flags)
@@ -183,10 +189,12 @@ def filter_on_column(df,
     # Save the values that have been converted to NaNs
     # as a separate data frame. We want to keep them as NaNs
     # to do more analyses later.
-    bad_rows = df_filtered[df_filtered[column].isnull()]
+    # We also filter out inf values. Since these can only be generated
+    # during transformations we convert them to NaNs for consistency.
+    bad_rows = df_filtered[df_filtered[column].isnull() | np.isinf(df_filtered[column])]
 
     # drop the NaNs that we might have gotten
-    df_filtered = df_filtered[df_filtered[column].notnull()]
+    df_filtered = df_filtered[df_filtered[column].notnull() & ~np.isinf(df_filtered[column])]
 
     # exclude zeros if specified
     if exclude_zeros:
@@ -314,7 +322,7 @@ def apply_inverse_transform(name, data,
                              "applied to feature {} which can have a "
                              "value of 0".format(name))
         else:
-            logging.warning("The inverse transformation was applied "
+            logging.warning("The inverse transformation was applied to "
                             "feature {} which has a value of 0 for "
                             "some responses. No system score will be "
                             "generated for such responses".format(name))
@@ -342,7 +350,8 @@ def apply_inverse_transform(name, data,
                             "have different signs. This can change "
                             "the ranking of the responses".format(name))
 
-    new_data = 1 / data
+    with np.errstate(divide='ignore'):
+        new_data = 1 / data
     return new_data
 
 
@@ -385,7 +394,8 @@ def apply_sqrt_transform(name, data, raise_error=True):
                             "negative values for some responses. No system score "
                             "will be generated for such responses".format(name))
 
-    new_data = np.sqrt(data)
+    with np.errstate(invalid='ignore'):
+        new_data = np.sqrt(data)
     return new_data
 
 
@@ -658,7 +668,7 @@ def preprocess_feature(data,
     return transformed_feature
 
 
-def preprocess_train_and_test_features(df_train, df_test, feature_specs):
+def preprocess_train_and_test_features(df_train, df_test, df_feature_specs):
     """
     Pre-process those features in the given training and testing
     data frame `df` whose specifications are contained in
@@ -673,9 +683,9 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     df_test : pandas DataFrame
         Data frame containing the raw feature values
         for the test set.
-    feature_specs : dict
-        Dictionary containing the various specifications
-        from the feature JSON file.
+    df_feature_specs : pandas DataFrame
+        Data frame containing the various specifications
+        from the feature file.
     """
 
     # keep the original data frames and make copies
@@ -687,12 +697,14 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     # all relevant information about each feature
     df_feature_info = pd.DataFrame()
 
-    # now iterate over each feature
-    for fdict in feature_specs['features']:
+    # make feature the index of df_feature_specs
+    df_feature_specs.index = df_feature_specs['feature']
 
-        feature_name = fdict['feature']
-        feature_transformation = fdict['transform']
-        feature_sign = fdict['sign']
+    # now iterate over each feature
+    for feature_name in df_feature_specs['feature']:
+
+        feature_transformation = df_feature_specs.get_value(feature_name, 'transform')
+        feature_sign = df_feature_specs.get_value(feature_name, 'sign')
 
         train_feature_mean = df_train[feature_name].mean()
         train_feature_sd = df_train[feature_name].std()
@@ -721,10 +733,7 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
         df_train_preprocessed[feature_name] = (df_train_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
         df_test_preprocessed[feature_name] = (df_test_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
 
-        # Multiply both train and test feature by weight. Within the
-        # current SR timeline, the mean of the transformed train
-        # feature used to standardize test features has to be
-        # computed before multiplying the train feature by the weight.
+        # Multiply both train and test feature by sign.
         df_train_preprocessed[feature_name] = df_train_preprocessed[feature_name] * feature_sign
         df_test_preprocessed[feature_name] = df_test_preprocessed[feature_name] * feature_sign
 
@@ -746,3 +755,152 @@ def preprocess_train_and_test_features(df_train, df_test, feature_specs):
     return (df_train_preprocessed,
             df_test_preprocessed,
             df_feature_info)
+
+
+def preprocess_new_data(df_input,
+                        df_feature_info):
+
+    """
+    Process a data frame with feature values by applying
+    :ref:`preprocessing parameters <preprocessing_parameters>`
+    stored in `df_feature_info`.
+
+    Parameters
+    ----------
+
+    df_input : pandas DataFrame
+        Data frame with raw feature values that will be used to generate
+        the scores. Each feature is stored in a separate column. Each row
+        corresponds to one response. There should also be a column named
+        `spkitemid` containing a unique ID for each response.
+
+    df_feature_info : pandas DataFrame
+        Data frame with preprocessing parameters stored in the following columns:
+
+            - `feature` : the name of the feature. These should match the feature names in `df_input`.
+            - `sign` : `1` or `-1`.  Indicates whether the feature value needs to be multiplied by -1.
+            - `transform` : :ref:`transformation <json_transformation>` that needs to be applied to this feature
+            - `train_mean`, `train_sd` : mean and standard deviation for outlier truncation.
+            - `train_transformed_mean`,`train_transformed_sd` : mean and standard deviation for computing `z`-scores.
+
+    Returns
+    -------
+    df_features_preprocessed : pandas DataFrame
+        Data frame with processed feature values
+
+    df_excluded: pandas DataFrame
+        Data frame with responses excluded from further analysis
+        due to non-numeric feature values in the original file
+        or after applying transformations. The data frame always contains the
+        original feature values.
+
+
+    Raises
+    ------
+    KeyError :
+        if some of the features specified in `df_feature_info` are not present in `df_input`
+
+    ValueError :
+        if all responses have at least one non-numeric feature value and therefore no score can be generated for any of the responses.
+    """
+
+    logger = logging.getLogger(__name__)
+
+    # get the list of required features
+
+    required_features = df_feature_info.index.tolist()
+
+    # ensure that all the features that are needed by the model
+    # are present in the input file
+    input_feature_columns = [c for c in df_input if c != 'spkitemid']
+    missing_features = set(required_features).difference(input_feature_columns)
+    if missing_features:
+        raise KeyError('The input feature file is missing the following features: {}'.format(missing_features))
+
+    extra_features = set(input_feature_columns).difference(required_features + ['spkitemid'])
+    if extra_features:
+        logging.warning('The following extraenous features will be ignored: {}'.format(extra_features))
+
+    # keep the required features plus the id
+    features_to_keep = ['spkitemid'] + required_features
+
+    # check if actually have the human scores for this data and add
+    # sc1 to preprocessed features for consistency with other tools
+    has_human_scores = 'sc1' in df_input
+    if has_human_scores:
+        features_to_keep.append('sc1')
+
+    df_features = df_input[features_to_keep]
+
+    # preprocess the feature values
+    logger.info('Pre-processing input features')
+
+    # first we need to filter out NaNs and any other
+    # weird features, the same way we did for rsmtool.
+    df_filtered = df_features.copy()
+    df_excluded = pd.DataFrame(columns=df_filtered.columns)
+
+    for feature_name in required_features:
+        newdf, newdf_excluded = filter_on_column(df_filtered, feature_name, 'spkitemid',
+                                                 exclude_zeros=False,
+                                                 exclude_zero_sd=False)
+        del df_filtered
+        df_filtered = newdf
+        with np.errstate(divide='ignore'):
+            df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+
+    # make sure that the remaining data frame is not empty
+    if len(df_filtered) == 0:
+        raise ValueError("There are no responses left after "
+                         "filtering out non-numeric feature values. No analysis "
+                         "will be run")
+
+    df_features = df_filtered.copy()
+    df_features_preprocessed = df_features.copy()
+    for feature_name in required_features:
+
+        feature_values = df_features_preprocessed[feature_name].values
+
+        feature_transformation = df_feature_info.loc[feature_name]['transform']
+        feature_sign = df_feature_info.loc[feature_name]['sign']
+
+        train_feature_mean = df_feature_info.loc[feature_name]['train_mean']
+        train_feature_sd = df_feature_info.loc[feature_name]['train_sd']
+
+        train_transformed_mean = df_feature_info.loc[feature_name]['train_transformed_mean']
+        train_transformed_sd = df_feature_info.loc[feature_name]['train_transformed_sd']
+
+        # transform the feature values and remove outliers
+        df_features_preprocessed[feature_name] = preprocess_feature(feature_values,
+                                                                    feature_name,
+                                                                    feature_transformation,
+                                                                    train_feature_mean,
+                                                                    train_feature_sd,
+                                                                    exclude_zero_sd=False,
+                                                                    raise_transformation_error=False)
+
+        # filter the feature values once again to remove possible NaN and inf values that
+        # might have emerged when applying transformations.
+        # We do not need to do that if no transformation was applied.
+        if not feature_transformation in ['raw', 'org']:
+            # check that there are indeed inf or Nan values
+            if np.isnan(df_features_preprocessed[feature_name]).any() or \
+               np.isinf(df_features_preprocessed[feature_name]).any():
+                    newdf, newdf_excluded = filter_on_column(df_features_preprocessed, feature_name, 'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocessed
+                    df_features_preprocessed = newdf
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the preprocessed
+                    # ones
+                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
+                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
+
+        # now standardize the feature values
+        df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
+
+        # Multiply features by sign.
+        df_features_preprocessed[feature_name] = df_features_preprocessed[feature_name] * feature_sign
+
+    return (df_features_preprocessed, df_excluded)

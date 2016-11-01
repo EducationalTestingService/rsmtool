@@ -93,6 +93,9 @@ def run_comparison(config_file, output_dir):
     # get the directory where the config file lives
     configpath = dirname(config_file)
 
+    # get the comparison ID
+    comparison_id = config_obj['comparison_id']
+
     # get the information about the "old" experiment
     description_old = config_obj['description_old']
     experiment_id_old = config_obj['experiment_id_old']
@@ -126,7 +129,7 @@ def run_comparison(config_file, output_dir):
             raise FileNotFoundError("The directory {} does not contain "
                                     "the output of an rsmtool "
                                     "experiment.".format(experiment_dir_new))
-    
+
     check_experiment_id(experiment_dir_new, experiment_id_new)
 
     use_scaled_predictions_new = config_obj['use_scaled_predictions_new']
@@ -158,10 +161,17 @@ def run_comparison(config_file, output_dir):
 
     # now generate the comparison report
     logger.info('Starting report generation')
-    create_comparison_report(experiment_id_old, description_old,
-                             csvdir_old, figdir_old, experiment_id_new,
-                             description_new, csvdir_new, figdir_new,
-                             output_dir, subgroups,
+    create_comparison_report(comparison_id,
+                             experiment_id_old,
+                             description_old,
+                             csvdir_old,
+                             figdir_old,
+                             experiment_id_new,
+                             description_new,
+                             csvdir_new,
+                             figdir_new,
+                             output_dir,
+                             subgroups,
                              chosen_notebook_files,
                              use_scaled_predictions_old=use_scaled_predictions_old,
                              use_scaled_predictions_new=use_scaled_predictions_new)

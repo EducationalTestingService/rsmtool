@@ -1,16 +1,16 @@
 {
-    "test_label_column": "h1",
     "train_file": "../../files/train_with_defaults_as_extra_columns.csv",
-    "description": "Using all features with an LinearRegression model.",
-    "use_scaled_predictions": true,
-    "trim_min": 1,
     "id_column": "uid",
-    "model": "LinearRegression",
+    "use_scaled_predictions": true,
+    "test_label_column": "h1",
     "train_label_column": "h1",
+    "test_file": "../../files/test_with_defaults_as_extra_columns.csv",
     "second_human_score_column": "h2",
-    "length_column": "WORDS",
-    "features": "features.json",
-    "experiment_id": "lr_with_defaults_as_extra_columns",
     "trim_max": 6,
-    "test_file": "../../files/test_with_defaults_as_extra_columns.csv"
+    "length_column": "WORDS",
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_with_defaults_as_extra_columns",
+    "description": "Using all features with an LinearRegression model."
 }

@@ -33,7 +33,7 @@ Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The next step is to create an :ref:`experiment configuration file <config_file_rsmcompare>` in ``.json`` format.
 
-.. _asap_config_rsemcompare:
+.. _asap_config_rsmcompare:
 
 .. literalinclude:: ../examples/rsmcompare/config_rsmcompare.json
     :language: javascript
@@ -41,14 +41,15 @@ The next step is to create an :ref:`experiment configuration file <config_file_r
 
 Let's take a look at the options in our configuration file.
 
-- **Line 2**: We provide the ``experiment_id`` for the experiment we want to use as a baseline.
-- **Line 3**: We also give the path to the directory containing the output of the original baseline experiment.
-- **Line 4**: We give a short description of this baseline experiment. This will be shown in the report.
-- **Line 5**: This field indicates that the baseline experiment used scaled scores for some evaluation analyses.
-- **Line 6**: We provide the ``experiment_id`` for the new experiment. We use the same experiment ID for both experiments since we are comparing the experiment to itself.
-- **Line 7**: We also give the path to the directory containing the output of the new experiment. As above, we use the same path because we are comparing the experiment to itself.
-- **Line 8**: We give a short description of the new experiment. This will also be shown in the report.
-- **Line 9**: This field indicates that the new experiment also used scaled scores for some evaluation analyses.
+- **Line 2**: We provide an ID for the comparison experiment.
+- **Line 3**: We provide the ``experiment_id`` for the experiment we want to use as a baseline.
+- **Line 4**: We also give the path to the directory containing the output of the original baseline experiment.
+- **Line 5**: We give a short description of this baseline experiment. This will be shown in the report.
+- **Line 6**: This field indicates that the baseline experiment used scaled scores for some evaluation analyses.
+- **Line 7**: We provide the ``experiment_id`` for the new experiment. We use the same experiment ID for both experiments since we are comparing the experiment to itself.
+- **Line 8**: We also give the path to the directory containing the output of the new experiment. As above, we use the same path because we are comparing the experiment to itself.
+- **Line 9**: We give a short description of the new experiment. This will also be shown in the report.
+- **Line 10**: This field indicates that the new experiment also used scaled scores for some evaluation analyses.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmcompare>`.
 
@@ -69,7 +70,7 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-Once the run finishes, you will see an HTML file named ``ASAP2_vs_ASAP2.report.html``. This is the final ``rsmcompare`` comparison report.
+Once the run finishes, you will see an HTML file named ``ASAP2_vs_ASAP2_report.html``. This is the final ``rsmcompare`` comparison report.
 
 Examine the report
 ~~~~~~~~~~~~~~~~~~

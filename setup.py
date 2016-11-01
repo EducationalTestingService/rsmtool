@@ -27,8 +27,10 @@ setup(name='rsmtool',
                      'rsmeval = rsmtool.rsmeval:main',
                      'rsmpredict = rsmtool.rsmpredict:main',
                      'rsmcompare = rsmtool.rsmcompare:main',
-                     'render_notebook = rsmtool.report:main']
-                   },
+                     'rsmsummarize = rsmtool.rsmsummarize:main',
+                     'render_notebook = rsmtool.report:main',
+                     'convert_feature_json = rsmtool.convert_feature_json:main']
+                    },
       classifiers=['Intended Audience :: Science/Research',
                    'Intended Audience :: Developers',
                    'Programming Language :: Python',

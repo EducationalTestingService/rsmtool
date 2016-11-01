@@ -23,6 +23,7 @@ from skll import FeatureSet, Learner
 
 builtin_models = ['LinearRegression',
                   'EqualWeightsLR',
+                  'ScoreWeightedLR',
                   'RebalancedLR',
                   'NNLR',
                   'LassoFixedLambdaThenNNLR',
@@ -157,35 +158,6 @@ def skll_learner_params_to_dataframe(learner):
     df_coef = df_coef[['feature', 'coefficient']]
 
     return df_coef
-
-
-def create_featureset_from_dataframe(df):
-    """
-    Take the given dataframe and construct a SKLL
-    FeatureSet instance.
-
-    It is assumed that the dataframe contains the
-    `spkitemid` and `sc1` columns, along with other
-    columns containing the feature values.
-
-    Parameters
-    ----------
-    df : pandas DataFrame
-        a data frame containing feature names and values
-        as well as response IDs and human scores.
-
-    Returns
-    -------
-    fs : skll FeatureSet object
-        a FeatureSet object with IDs, labels, and
-        feature values obtained from the data frame.
-    """
-    # Separate out the features, ids and labels and create a FeatureSet
-    feature_columns = [c for c in df.columns if c not in ['sc1', 'spkitemid']]
-    features = df[feature_columns].to_dict(orient='records')
-    ids = df['spkitemid'].tolist()
-    labels = df['sc1'].tolist()
-    return FeatureSet('train', ids=ids, labels=labels, features=features)
 
 
 def create_fake_skll_learner(df_coefficients):
@@ -365,7 +337,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -481,7 +455,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -544,7 +520,9 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
         p_lambda = sqrt(len(df_train) * log10(len(feature_columns)))
 
         # create a SKLL FeatureSet instance from the given data frame
-        fs_train = create_featureset_from_dataframe(df_train)
+        fs_train = FeatureSet.from_data_frame(df_train[feature_columns + ['sc1']],
+                                              'train',
+                                              labels_column='sc1')
 
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
@@ -593,6 +571,31 @@ def train_builtin_model(model_name, df_train, experiment_id, csvdir, figdir):
 
         # we used only the non-zero features
         used_features = non_zero_features
+
+    elif model_name == 'ScoreWeightedLR':
+
+        # train weighted least squares regression
+        # get the feature columns
+
+        X = df_train[feature_columns]
+
+        # add the intercept
+        X = sm.add_constant(X)
+
+        # define the weights as inverse proportion of total number of data points for each score
+        score_level_dict = df_train['sc1'].value_counts()
+        expected_proportion = 1/len(score_level_dict)
+        score_weights_dict = {sc1: expected_proportion/count for sc1, count in score_level_dict.items()}
+        weights = [score_weights_dict[sc1] for sc1 in df_train['sc1']]
+
+        # fit the model
+        fit = sm.WLS(df_train['sc1'], X, weights=weights).fit()
+        df_coef = ols_coefficients_to_dataframe(fit.params)
+        learner = create_fake_skll_learner(df_coef)
+
+        # we used all the features
+        used_features = feature_columns
+
 
     # save the raw coefficients to a file
     df_coef.to_csv(join(csvdir, '{}_coefficients.csv'.format(experiment_id)), index=False)

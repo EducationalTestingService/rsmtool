@@ -22,17 +22,18 @@ import pandas as pd
 
 from rsmtool.input import (check_main_config,
                            locate_file,
+                           read_data_file,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column)
-from rsmtool.predict import predict_with_model
-from rsmtool.preprocess import (filter_on_column,
-                                preprocess_feature,
+from rsmtool.predict import predict_with_model, process_predictions
+from rsmtool.preprocess import (preprocess_new_data,
                                 trim)
 from rsmtool.utils import LogFormatter
 
 from skll import Learner
 from rsmtool.version import __version__
+
 
 
 def compute_and_save_predictions(config_file, output_file, feats_file):
@@ -133,7 +134,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     string_columns = [id_column, candidate_column] + subgroups
     converter_dict = dict([(column, str) for column in string_columns if column])
 
-    df_input = pd.read_csv(input_features_file, converters=converter_dict)
+    df_input = read_data_file(input_features_file, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
     columns_to_check = [id_column] + subgroups + list(flag_column_dict.keys())
@@ -180,107 +181,15 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     if df_input['spkitemid'].size != df_input['spkitemid'].unique().size:
         raise ValueError("The data contains repeated response IDs in {}. Please make sure all response IDs are unique and re-run the tool.".format(id_column))
 
-    # now we need to pre-process these features using
-    # the parameters that are already stored in the
-    # _features.csv file.
+    #  Read the preprocessing parameters stored in the
+    # _features.csv file
     df_feature_info = pd.read_csv(join(experiment_output_dir,
                                        '{}_feature.csv'.format(experiment_id)),
                                   index_col=0)
-    required_features = df_feature_info.index.tolist()
 
-    # ensure that all the features that are needed by the model
-    # are present in the input file
-    input_feature_columns = [c for c in df_input if c != id_column]
-    missing_features = set(required_features).difference(input_feature_columns)
-    if missing_features:
-        raise KeyError('{} is missing the following features: {}'.format(feats_file, missing_features))
-    extra_features = set(input_feature_columns).difference(required_features + [id_column])
-    if extra_features:
-        logging.warning('The following extraenous features will be ignored: {}'.format(extra_features))
-
-    # keep the required features plus the id
-    features_to_keep = ['spkitemid'] + required_features
-
-    # check if actually have the human scores for this data and add
-    # sc1 to preprocessed features for consistency with other tools
-    has_human_scores = 'sc1' in df_input
-    if has_human_scores:
-        features_to_keep.append('sc1')
-
-    df_features = df_input[features_to_keep]
-
-    # preprocess the feature values
-    logger.info('Pre-processing input features')
-
-    # first we need to filter out NaNs and any other
-    # weird features, the same way we did for rsmtool.
-    df_filtered = df_features.copy()
-    df_excluded = pd.DataFrame(columns=df_filtered.columns)
-
-    for feature_name in required_features:
-        newdf, newdf_excluded = filter_on_column(df_filtered, feature_name, 'spkitemid',
-                                                 exclude_zeros=False,
-                                                 exclude_zero_sd=False)
-        del df_filtered
-        df_filtered = newdf
-        df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
-
-    # make sure that the remaining data frame is not empty
-    if len(df_filtered) == 0:
-        raise ValueError("There are no responses left after "
-                         "filtering out non-numeric feature values. No analysis "
-                         "will be run")
-
-    df_features = df_filtered.copy()
-    df_features_preprocessed = df_features.copy()
-    for feature_name in required_features:
-
-        feature_values = df_features_preprocessed[feature_name].values
-
-        feature_transformation = df_feature_info.loc[feature_name]['transform']
-        feature_weight = df_feature_info.loc[feature_name]['sign']
-
-        train_feature_mean = df_feature_info.loc[feature_name]['train_mean']
-        train_feature_sd = df_feature_info.loc[feature_name]['train_sd']
-
-        train_transformed_mean = df_feature_info.loc[feature_name]['train_transformed_mean']
-        train_transformed_sd = df_feature_info.loc[feature_name]['train_transformed_sd']
-
-        # transform the feature values and remove outliers
-        df_features_preprocessed[feature_name] = preprocess_feature(feature_values,
-                                                                    feature_name,
-                                                                    feature_transformation,
-                                                                    train_feature_mean,
-                                                                    train_feature_sd,
-                                                                    exclude_zero_sd=False,
-                                                                    raise_transformation_error=False)
-
-        # filter the feature values once again to remove possible NaN and inf values that
-        # might have emerged when applying transformations.
-        # We do not need to do that if no transformation was applied.
-        if not feature_transformation in ['raw', 'org']:
-            # check that there are indeed inf or Nan values
-            if np.isnan(df_features_preprocessed[feature_name]).any() or \
-               np.isinf(df_features_preprocessed[feature_name]).any():
-                    newdf, newdf_excluded = filter_on_column(df_features_preprocessed, feature_name, 'spkitemid',
-                                                             exclude_zeros=False,
-                                                             exclude_zero_sd=False)
-                    del df_features_preprocessed
-                    df_features_preprocessed = newdf
-                    # add the response(s) with missing values to the excluded responses
-                    # but make sure we are adding the original values, not the preprocessed
-                    # ones
-                    newdf_excluded_original = df_features[df_features['spkitemid'].isin(newdf_excluded['spkitemid'])].copy()
-                    df_excluded = pd.merge(df_excluded, newdf_excluded_original, how='outer')
-
-        # now standardize the feature values
-        df_features_preprocessed[feature_name] = (df_features_preprocessed[feature_name] - train_transformed_mean) / train_transformed_sd
-
-        # Multiply features by weight. Within the
-        # current SR timeline, the mean of the transformed train
-        # feature used to standardize test features has to be
-        # computed before multiplying the train feature by the weight.
-        df_features_preprocessed[feature_name] = df_features_preprocessed[feature_name] * feature_weight
+    (df_features_preprocessed,
+                  df_excluded) = preprocess_new_data(df_input,
+                                                     df_feature_info)
 
     # save the pre-processed features to disk if we were asked to
     if feats_file:
@@ -299,6 +208,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
 
     # read in the post-processing parameters from disk
     df_postproc_params = pd.read_csv(join(experiment_output_dir, '{}_postprocessing_params.csv'.format(experiment_id)))
+
     trim_min = df_postproc_params['trim_min'].values[0]
     trim_max = df_postproc_params['trim_max'].values[0]
     h1_mean = df_postproc_params['h1_mean'].values[0]
@@ -306,21 +216,15 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
     train_predictions_sd = df_postproc_params['train_predictions_sd'].values[0]
 
-    # now scale the predictions
-    logger.info('Rescaling predictions')
-    scaled_predictions = (df_predictions['raw'] - train_predictions_mean) / train_predictions_sd
-    scaled_predictions = scaled_predictions * h1_sd + h1_mean
-    df_predictions['scale'] = scaled_predictions
-
-    # trim and round the predictions
-    logger.info('Trimming and rounding predictions')
-    df_predictions['raw_trim'] = trim(df_predictions['raw'], trim_min, trim_max)
-    df_predictions['raw_trim_round'] = np.rint(df_predictions['raw_trim']).astype('int64')
-    df_predictions['scale_trim'] = trim(df_predictions['scale'], trim_min, trim_max)
-    df_predictions['scale_trim_round'] = np.rint(df_predictions['scale_trim']).astype('int64')
+    df_predictions = process_predictions(df_predictions,
+                                         train_predictions_mean,
+                                         train_predictions_sd,
+                                         h1_mean,
+                                         h1_sd,
+                                         trim_min, trim_max)
 
     # add back the columns that we were requested to copy if any
-    if columns_to_copy:
+    if len(columns_to_copy) > 0:
         df_predictions_with_metadata = pd.merge(df_predictions,
                                                 df_input[['spkitemid'] + columns_to_copy])
         assert(len(df_predictions) == len(df_predictions_with_metadata))

@@ -14,7 +14,7 @@ Workflow
 
 Once you have the features extracted from your data, using RSMTool is fairly straightforward:
 
-1. Make sure your data is split into a training set and a held-out evaluation set. You will need two ``.csv`` files containing the feature values: one for each set.
+1. Make sure your data is split into a training set and a held-out evaluation set. You will need two files containing the feature values: one for each set. The files should be in one of the :ref:`supported formats <input_file_format>`
 2. Create an :ref:`experiment configuration file <config_file_rsmtool>` describing the modeling experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmtool <usage_rsmtool>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmtool>`.
 4. Examine the HTML report to check various aspects of model performance.
@@ -62,7 +62,7 @@ The next step is to create an :ref:`RSMTool experiment configuration file <confi
 Let's take a look at the options in our configuration file.
 
 - **Line 2**: We define an experiment ID
-- **Lines 3-4**: We list the paths to our training and evaluation ``.csv`` files with the feature values.
+- **Lines 3-4**: We list the paths to our training and evaluation files with the feature values.  For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: We choose to use a linear regression model to combine those features into a score.
 - **Line 6**: We also provide a description which will be included in the experiment report.
 - **Lines 7-8**: These two fields indicate that the human scores in the two ``.csv`` files are located in columns named ``score``.
@@ -80,7 +80,7 @@ Documentation for all of the available configuration options is available :ref:`
 
 Run the experiment
 ^^^^^^^^^^^^^^^^^^
-Now that we have our features in ``.csv`` format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
+Now that we have our features in right format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
 
 .. code-block:: bash
 

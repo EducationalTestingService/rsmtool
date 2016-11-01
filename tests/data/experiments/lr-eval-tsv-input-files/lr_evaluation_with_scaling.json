@@ -1,0 +1,10 @@
+{
+    "predictions_file": "../../files/predictions_raw.tsv",
+    "scale_with": "../../files/train_predictions.tsv",
+    "description": "An evaluation of LinearRegression predictions using scaling.",
+    "human_score_column": "h1",
+    "system_score_column": "score",
+    "experiment_id": "lr_evaluation_with_scaling",
+    "trim_min": 1,
+    "trim_max": 6
+}

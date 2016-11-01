@@ -9,6 +9,7 @@ Run evaluation only experiments.
 #!/usr/bin/env python
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -26,6 +27,7 @@ from rsmtool.input import (check_main_config,
                            check_subgroups,
                            get_trim_min_max,
                            locate_file,
+                           read_data_file,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column,
@@ -82,6 +84,11 @@ def run_evaluation(config_file, output_dir):
     # read in the main config file
     config_obj = read_json_file(config_file)
     config_obj = check_main_config(config_obj, context='rsmeval')
+
+    # save a copy of the normalized config into the experiment directory
+    outjson = join(output_dir, 'output', '{}_rsmeval.json'.format(config_obj['experiment_id']))
+    with open(outjson, 'w') as outfile:
+        json.dump(config_obj, outfile, indent=4, separators=(',', ': '))
 
     # get the directory where the config file lives
     # if this is the 'expm' directory, then go
@@ -218,7 +225,7 @@ def run_evaluation(config_file, output_dir):
         string_columns = [id_column, candidate_column] + subgroups
         converter_dict = dict([(column, str) for column in string_columns if column])
 
-        df_pred = pd.read_csv(predictions_file_location, converters=converter_dict)
+        df_pred = read_data_file(predictions_file_location, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
 
@@ -292,7 +299,8 @@ def run_evaluation(config_file, output_dir):
                          "non-numeric machine scores. No further analysis "
                          "can be run. ")
 
-    df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+    with np.errstate(divide='ignore'):
+        df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
 
     # if requested, exclude the candidates with less than X responses
     # left after filtering
@@ -325,7 +333,7 @@ def run_evaluation(config_file, output_dir):
             raise FileNotFoundError('Error: scaling file {} not found.\n'.format(scale_with))
         else:
             logger.info('Reading scaling file: {}'.format(scale_file_location))
-            df_scale_with = pd.read_csv(scale_file_location)
+            df_scale_with = read_data_file(scale_file_location)
 
         if 'sc1' not in df_scale_with.columns and 'prediction' not in df_scale_with.columns:
             raise KeyError('The CSV file specified for scaling ',

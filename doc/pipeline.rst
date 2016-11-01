@@ -8,13 +8,24 @@ The following figure gives an overview of the RSMTool pipeline:
    :align: center
 
 
-As its primary input, RSMTool takes a CSV feature file with numeric, non-sparse features and a human score as input, :ref:`pre-processes <feature_preprocessing>` them and lets you train a regression-based **Scoring Model** to predict the human score from the features. Available regression models include Ridge, SVR, AdaBoost, and Random Forests, among many others.
+As its primary input, RSMTool takes a :ref:`data file <input_file_format>` containing a table with numeric, non-sparse features and a human scores for all responses, :ref:`pre-processes <feature_preprocessing>` them and lets you train a regression-based **Scoring Model** to predict the human score from the features. Available regression models include Ridge, SVR, AdaBoost, and Random Forests, among many others.
 
 This trained model can then be used to generate scores for a held-out evaluation data whose feature values are pre-processed using the same :ref:`Pre-processing Parameters <preprocessing_parameters>`. In addition to the raw scores predicted by the model, the **Prediction Analysis** component of the pipline generates several additional :ref:`post-processed scores <score_postprocessing>` that are commonly used in automated scoring.
 
 The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different evaluation measures illustrating model efficacy [#]_. More Details about these analyses can be found in a separate `technical paper <https://github.com/EducationalTestingService/rsmtool/raw/master/doc/rsmtool.pdf>`_.
 
 In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as :ref:`CSV files <intermediate_files_rsmtool>`.
+
+
+.. _input_file_format:
+
+Input file format
+"""""""""""""""""
+
+The input files containing feature values and scores for all responses in training and evaluation data should be in tabular format with features and scores stored in columns and each row correponding to a single response.
+
+RSMTool supports input files in ``.csv``, ``.tsv`` or ``xls``/``.xlsx`` format. For Excel spreadsheets all data must be stored in the first sheet. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format.
+
 
 .. _feature_preprocessing:
 
@@ -38,7 +49,7 @@ Data preprocessing
 
 1. Truncate/clamp any outlier feature values, where outliers are defined as :math:`\mu \pm 4*\sigma`, where :math:`\mu` is the mean and :math:`\sigma` is the standard deviation.
 
-2. Apply pre-specified transformations to feature values.
+2. Apply pre-specified :ref:`transformations <feature_list_transformation>` to feature values.
 
 3. Flip the signs for feature values if necessary.
 
@@ -50,7 +61,7 @@ Pre-processing parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Any held-out evaluation data on which the model is to be evaluated needs to be pre-processed in the same way as the training data. Therefore, the following parameters are computed on the training set, saved to disk, and re-used when pre-processing the evaluation set:
 
-- Mean and standard deviation  of raw feature values. These are used to compute truncate any outliers on the evaluation set;
+- Mean and standard deviation  of raw feature values. These are used to compute floor and ceiling for truncating any outliers in the evaluation set;
 
 - Any transformation and sign changes that were applied;
 

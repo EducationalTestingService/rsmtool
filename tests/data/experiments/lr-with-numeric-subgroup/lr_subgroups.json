@@ -1,0 +1,15 @@
+{
+    "train_file": "../../files/train_with_numeric_subgroup.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "subgroups": "QUESTION, ITEM",
+    "description": "Using all the features with an LinearRegression model and including subgroup analyses where one of the subgroups has numeric values.",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "test_file": "../../files/test_with_numeric_subgroup.csv",
+    "experiment_id": "lr_subgroups",
+    "model": "LinearRegression"
+}
