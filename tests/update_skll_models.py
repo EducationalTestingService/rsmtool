@@ -46,6 +46,11 @@ def main():
     model_files = glob.glob(join(TEST_DIR, 'data', 'experiments',
                                  '*predict*', 'existing_experiment',
                                  'output', "*.model"))
+    print(model_files)
     for model_file in model_files:
         print("Processing {}".format(model_file))
         update_model(model_file)
+
+
+if __name__ == "__main__":
+    main()
