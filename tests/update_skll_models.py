@@ -22,29 +22,30 @@ from skll import Learner
 TEST_DIR = dirname(__file__)
 
 def update_model(model_file):
+    ''' Read in the model file and save it again'''
 
-	model_dir = dirname(model_file)
-	# get the list of current files so that we can remove them later to ensure there are no stranded .npy
+    model_dir = dirname(model_file)
 
-	npy_files = glob.glob(join(model_dir, '*.npy'))
+    # get the list of current files so that we can
+    #remove them later to ensure there are no stranded .npy
 
-	# now load the SKLL model 
+    npy_files = glob.glob(join(model_dir, '*.npy'))
+
+    # now load the SKLL model
     model = Learner.from_file(model_file)
 
-    # delete the existing npy files. The model file will get overwritten, 
+    # delete the existing npy files. The model file will get overwritten,
     # but we do not know the exact number of current .npy files.
     for npy_file in npy_files:
-    	os.remove(npy_file)
+        remove(npy_file)
 
-    Learner.save(model_file)
-
-
+    model.save(model_file)
 
 
 def main():
-	model_files = glob.glob(join(TEST_DIR, 'data', 'experiments',
-							    '*predict*', 'existing_experiment',
-							     'output', "*.model" ))
-	for model in model_files:
-		print("Processing {}".format(model_file))
-		update_model(model_file)
+    model_files = glob.glob(join(TEST_DIR, 'data', 'experiments',
+                                 '*predict*', 'existing_experiment',
+                                 'output', "*.model"))
+    for model_file in model_files:
+        print("Processing {}".format(model_file))
+        update_model(model_file)
