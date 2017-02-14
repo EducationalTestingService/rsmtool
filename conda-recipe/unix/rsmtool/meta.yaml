@@ -1,6 +1,6 @@
 package:
   name: rsmtool
-  version: 5.5.0
+  version: 5.5.1
 
 source:
   path: ../../../../rsmtool
@@ -31,16 +31,15 @@ requirements:
     - nose 1.3.7
     - notebook 4.2.3
     - pandas 0.19.0
-    - scikit-learn 0.17.1
+    - scikit-learn 0.18.1
     - seaborn 0.7.1
-    - skll 1.2.1
+    - skll 1.3
     - statsmodels 0.6.1
     - zeromq
     - setuptools
     - openpyxl
     - xlrd
     - xlwt
-    - nomkl
 
   run:
     - python
@@ -53,9 +52,9 @@ requirements:
     - nose 1.3.7
     - notebook 4.2.3
     - pandas 0.19.0
-    - scikit-learn 0.17.1
+    - scikit-learn 0.18.1
     - seaborn 0.7.1
-    - skll 1.2.1
+    - skll 1.3
     - statsmodels 0.6.1
     - zeromq
     - openpyxl
