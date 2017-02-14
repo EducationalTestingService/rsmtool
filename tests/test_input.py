@@ -592,6 +592,7 @@ def test_json_feature_conversion():
     # read the expected and converted files into data frames
     df_expected = pd.read_csv(expected_feature_csv)
     df_converted = pd.read_csv(tempf.name)
+    tempf.close()
 
     # get rid of the file now that have read it into memory
     os.unlink(tempf.name)
