@@ -1,14 +1,14 @@
-import json
 import logging
 import os
 
 import numpy as np
 import pandas as pd
 
+from math import ceil
 from os import makedirs
 from os.path import join
 from string import Template
-
+from textwrap import wrap
 
 # get the path to this file
 package_path = os.path.dirname(__file__)
@@ -234,7 +234,7 @@ def write_feature_csv(df_feature_specs,
         feature JSON file will be saved.
     """
     df_features_selected = df_feature_specs[df_feature_specs['feature'].isin(selected_features)]
-  
+
     makedirs(featuredir, exist_ok=True)
     write_experiment_output([df_features_selected],
                             ['selected'],
@@ -410,3 +410,21 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     ans = custom_highlighter(num, low, high, prec, absolute, 'color')
     return ans
+
+
+def compute_subgroup_plot_params(group_names, num_plots):
+    wrapped_group_names = ['\n'.join(wrap(str(gn), 20)) for gn in group_names]
+    plot_height = 4 if wrapped_group_names == group_names else 6
+    num_groups = len(group_names)
+    if num_groups <= 6:
+        num_columns = 2
+        num_rows = ceil(num_plots/num_columns)
+        figure_width = num_columns * num_groups
+        figure_height = plot_height * num_rows
+    else:
+        num_columns = 1
+        num_rows = num_plots
+        figure_width = 10
+        figure_height = plot_height * num_plots
+
+    return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
