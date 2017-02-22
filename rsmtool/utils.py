@@ -413,6 +413,10 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
 
 
 def compute_subgroup_plot_params(group_names, num_plots):
+    """
+    Computing subgroup plot and figure parameters based on number of
+    subgroups and number of plots to be generated.
+    """
     wrapped_group_names = ['\n'.join(wrap(str(gn), 20)) for gn in group_names]
     plot_height = 4 if wrapped_group_names == group_names else 6
     num_groups = len(group_names)
