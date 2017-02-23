@@ -446,7 +446,7 @@ def metrics_helper(human_scores, system_scores):
     numerator = mean_system_score - mean_human_score
     denominator = np.sqrt((system_score_sd**2 + human_score_sd**2) / 2)
 
-    # if the denominator is zero, then return 0 as the SMD
+    # if the denominator is zero, then return NaN as the SMD
     SMD = np.nan if denominator == 0 else numerator/denominator
 
     # compute r2 and MSE
