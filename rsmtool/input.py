@@ -73,12 +73,15 @@ def read_data_file(filename, converters=None):
         raise ValueError("RSMTool only supports files in .csv, .tsv or .xls/.xlsx format. "
                          "The file should have the extension which matches its format.")
 
-    try:
-        df = do_read(filename)
-    except pd.parser.CParserError:
-        raise pd.parser.CParserError('Cannot read {}. Please check that it is '
-                                     'not corrupt or in an incompatible format. '
-                                     '(Try running dos2unix?)'.format(filename))
+    # ignore warnings about mixed data types for large files
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=pd.io.common.DtypeWarning)
+        try:
+            df = do_read(filename)
+        except pd.parser.CParserError:
+            raise pd.parser.CParserError('Cannot read {}. Please check that it is '
+                                         'not corrupt or in an incompatible format. '
+                                         '(Try running dos2unix?)'.format(filename))
     return df
 
 

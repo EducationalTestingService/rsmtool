@@ -19,6 +19,7 @@ from rsmtool.rsmpredict import compute_and_save_predictions
 from rsmtool.rsmsummarize import run_summary
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
+html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
 
 
@@ -188,12 +189,17 @@ def check_report(html_file):
         Path the HTML report file on disk.
     """
     report_errors = 0
+    report_warnings = 0
     with open(html_file, 'r') as htmlf:
         for line in htmlf:
-            m = html_error_regexp.search(line)
-            if m:
+            m_error = html_error_regexp.search(line)
+            if m_error:
                 report_errors += 1
+            m_warning = html_warning_regexp.search(line)
+            if m_warning:
+                report_warnings += 1
     assert_equal(report_errors, 0)
+    assert_equal(report_warnings, 0)
 
 
 def check_scaled_coefficients(source, experiment_id):
