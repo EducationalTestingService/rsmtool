@@ -422,7 +422,11 @@ def metrics_helper(human_scores, system_scores):
     # any cases where either of the scores are NaNs.
     df = pd.DataFrame({'human': human_scores,
                        'system': system_scores}).dropna(how='any')
-    correlations = pearsonr(df['human'], df['system'])[0]
+
+    if len(df['human'].unique()) == 1 or len(df['system'].unique()) == 1:
+        correlations = np.nan
+    else:
+        correlations = pearsonr(df['human'], df['system'])[0]
 
     # compute the min/max/mean/std. dev. for the system and human scores
     min_system_score = np.min(system_scores)
@@ -441,7 +445,9 @@ def metrics_helper(human_scores, system_scores):
     # by Williamson et al (2012)
     numerator = mean_system_score - mean_human_score
     denominator = np.sqrt((system_score_sd**2 + human_score_sd**2) / 2)
-    SMD = numerator/denominator
+
+    # if the denominator is zero, then return NaN as the SMD
+    SMD = np.nan if denominator == 0 else numerator/denominator
 
     # compute r2 and MSE
     r2 = r2_score(human_scores, system_scores)
