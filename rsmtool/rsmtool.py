@@ -263,14 +263,16 @@ def run_experiment(config_file, output_dir):
                        "is the expected behavior, you can ignore "
                        "the following warnings about the mismatch in the data")
 
+    columns_for_prediction = ['spkitemid', 'sc1'] + selected_features
+
     (df_train_predictions,
      df_test_predictions,
      train_predictions_mean,
      train_predictions_sd,
      h1_mean,
      h1_sd) = generate_train_and_test_predictions(model,
-                                                  df_train_preprocessed_features,
-                                                  df_test_preprocessed_features,
+                                                  df_train_preprocessed_features[columns_for_prediction],
+                                                  df_test_preprocessed_features[columns_for_prediction],
                                                   used_trim_min,
                                                   used_trim_max)
 
