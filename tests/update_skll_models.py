@@ -19,7 +19,6 @@ from os import getcwd, remove
 from os.path import join, dirname
 from skll import Learner
 
-#TEST_DIR = dirname(__file__)
 TEST_DIR = getcwd()
 
 def update_model(model_file):
