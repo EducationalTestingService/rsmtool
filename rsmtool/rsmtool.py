@@ -253,15 +253,7 @@ def run_experiment(config_file, output_dir):
     # and testing data
     logger.info('Generating training and test set predictions')
 
-    # Tell the user that they will get the mismatch warning if
-    # the model features do not match the original data
-
-    if len(selected_features) != len(df_test_preprocessed_features.columns) - 2:
-        logger.warning("You specified a model with automatic feature "
-                       "selection and therefore some of the original "
-                       "features were excluded from the final model. If this "
-                       "is the expected behavior, you can ignore "
-                       "the following warnings about the mismatch in the data")
+    columns_for_prediction = ['spkitemid', 'sc1'] + selected_features
 
     (df_train_predictions,
      df_test_predictions,
@@ -269,8 +261,8 @@ def run_experiment(config_file, output_dir):
      train_predictions_sd,
      h1_mean,
      h1_sd) = generate_train_and_test_predictions(model,
-                                                  df_train_preprocessed_features,
-                                                  df_test_preprocessed_features,
+                                                  df_train_preprocessed_features[columns_for_prediction],
+                                                  df_test_preprocessed_features[columns_for_prediction],
                                                   used_trim_min,
                                                   used_trim_max)
 
