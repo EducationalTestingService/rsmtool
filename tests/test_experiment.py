@@ -339,6 +339,38 @@ def test_run_experiment_lr_numeric_subgroup():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_with_id_with_leading_zeros():
+
+    #  basic experiment with LinearRegression model including responses with
+    #  candidate ids with leading zeros that should be kept in the outputs
+
+    source = 'lr-with-id-with-leading-zeros'
+    experiment_id = 'lr_subgroups'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_subgroup_outputs, output_dir, experiment_id, ['ITEM', 'QUESTION']
+    yield check_report, html_report
+
+
 def test_run_experiment_lr_eval():
 
     # basic evaluation experiment using rsmeval
