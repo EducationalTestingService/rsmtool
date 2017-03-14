@@ -147,8 +147,20 @@ def check_csv_output(csv1, csv2):
         Path to the second CSV files.
 
     """
-    df1 = pd.read_csv(csv1, index_col=0)
-    df2 = pd.read_csv(csv2, index_col=0)
+
+    # make sure that the main id columns are read as strings since
+    # this may affect merging in custom notebooks
+    string_columns = ['spkitemid', 'candidate']
+
+    converter_dict = {column: str for column in string_columns}
+
+    df1 = pd.read_csv(csv1, converters=converter_dict)
+    df2 = pd.read_csv(csv2, converters=converter_dict)
+
+    # set the first column to be the index. We do it this way to ensure
+    # string indices are preserved as such
+    df1.index = df1[df1.columns[0]]
+    df2.index = df2[df2.columns[0]]
 
     # sort all the indices alphabetically
     df1.sort_index(inplace=True)
@@ -160,7 +172,7 @@ def check_csv_output(csv1, csv2):
             if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
 
-    # do the same for indices
+    #do the same for indices
     for df in [df1, df2]:
         if df.index.dtype == np.int64:
             df.index = df.index.astype(np.float64)
