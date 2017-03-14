@@ -172,10 +172,10 @@ def check_csv_output(csv1, csv2):
             if not c in string_columns and df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
 
-    # do the same for indices
-    #for df in [df1, df2]:
-    #    if df.index.dtype == np.int64:
-    #        df.index = df.index.astype(np.float64)
+    #do the same for indices
+    for df in [df1, df2]:
+        if df.index.dtype == np.int64:
+            df.index = df.index.astype(np.float64)
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
