@@ -152,7 +152,7 @@ def check_csv_output(csv1, csv2):
     # this may affect merging in custom notebooks
     string_columns = ['spkitemid', 'candidate']
 
-    converter_dict = dict([(column, str) for column in string_columns if column])
+    converter_dict = {column: str for column in string_columns}
 
     df1 = pd.read_csv(csv1, converters=converter_dict)
     df2 = pd.read_csv(csv2, converters=converter_dict)
@@ -169,7 +169,7 @@ def check_csv_output(csv1, csv2):
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
-            if not c in string_columns and df[c].dtype == np.int64:
+            if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
 
     #do the same for indices
