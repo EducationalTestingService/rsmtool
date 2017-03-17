@@ -47,4 +47,19 @@ Here are all the arguments to the ``rsmsummarize`` command-line script.
 
 Output
 """"""
-``rsmsummarize`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file) in the output directory.
+
+``rsmsummarize`` produces a set of folders in the output directory.
+
+report
+~~~~~~
+This folder contains the final ``rsmsummarize`` report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
+
+output
+~~~~~~
+This folder contains all of the :ref:`intermediate files <intermediate_files_rsmsummarize>` produced as part of the various analyses performed, saved as ``.csv`` files. ``rsmsummarize`` will also save in this folder a copy of the :ref:`configuration file <config_file_rsmsummarize>`. Fields not specified in the original configuration file will be pre-populated with default values. 
+
+figure
+~~~~~~
+This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
+
+.. include:: intermediate_files_rsmsummarize.rst
