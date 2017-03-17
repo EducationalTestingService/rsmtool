@@ -1,14 +1,14 @@
-import json
 import logging
 import os
 
 import numpy as np
 import pandas as pd
 
+from math import ceil
 from os import makedirs
 from os.path import join
 from string import Template
-
+from textwrap import wrap
 
 # get the path to this file
 package_path = os.path.dirname(__file__)
@@ -214,17 +214,17 @@ def write_experiment_output(data_frames,
         df.to_csv(outfile, index=False)
 
 
-def write_feature_json(feature_specs,
-                       selected_features,
-                       experiment_id,
-                       featuredir):
+def write_feature_csv(df_feature_specs,
+                      selected_features,
+                      experiment_id,
+                      featuredir):
     """
-    Write out the feature ``.json`` file to disk.
+    Write out the feature ``.csv`` file to disk.
 
     Parameters
     ----------
-    feature_specs : dict
-        Dictionary containing the specifications of the features.
+    feature_specs : Pandas DataFrame
+        Data frame containing the specifications of the features.
     selected_features : list of str
         List of features that were selected for model building.
     experiment_id : str
@@ -233,13 +233,13 @@ def write_feature_json(feature_specs,
         Path to the `feature` experiment output directory where the
         feature JSON file will be saved.
     """
-    feature_specs_selected = {}
-    feature_specs_selected['features'] = [feature_info for feature_info in feature_specs['features'] if feature_info['feature'] in selected_features]
+    df_features_selected = df_feature_specs[df_feature_specs['feature'].isin(selected_features)]
 
     makedirs(featuredir, exist_ok=True)
-    outjson = join(featuredir, '{}_selected.json'.format(experiment_id))
-    with open(outjson, 'w') as outfile:
-        json.dump(feature_specs_selected, outfile, indent=4, separators=(',', ': '))
+    write_experiment_output([df_features_selected],
+                            ['selected'],
+                            experiment_id,
+                            featuredir)
 
 
 def scale_coefficients(intercept,
@@ -410,3 +410,25 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     ans = custom_highlighter(num, low, high, prec, absolute, 'color')
     return ans
+
+
+def compute_subgroup_plot_params(group_names, num_plots):
+    """
+    Computing subgroup plot and figure parameters based on number of
+    subgroups and number of plots to be generated.
+    """
+    wrapped_group_names = ['\n'.join(wrap(str(gn), 20)) for gn in group_names]
+    plot_height = 4 if wrapped_group_names == group_names else 6
+    num_groups = len(group_names)
+    if num_groups <= 6:
+        num_columns = 2
+        num_rows = ceil(num_plots/num_columns)
+        figure_width = num_columns * num_groups
+        figure_height = plot_height * num_rows
+    else:
+        num_columns = 1
+        num_rows = num_plots
+        figure_width = 10
+        figure_height = plot_height * num_plots
+
+    return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)

@@ -1,0 +1,90 @@
+package:
+  name: rsmtool
+  version: 5.5.2
+
+source:
+  path: ../../../rsmtool
+
+build:
+  number: 0
+  script:
+    - cd $SRC_DIR
+    - $PYTHON setup.py install
+  entry_points:
+    - rsmtool = rsmtool.rsmtool:main
+    - rsmcompare = rsmtool.rsmcompare:main
+    - rsmeval = rsmtool.rsmeval:main
+    - rsmpredict = rsmtool.rsmpredict:main
+    - rsmsummarize = rsmtool.rsmsummarize:main
+    - render_notebook = rsmtool.report:main
+    - convert_feature_json = rsmtool.convert_feature_json:main
+
+requirements:
+  build:
+    - python
+    - numpy 1.11.3
+    - scipy 0.18.1
+    - ipython 5.1.0
+    - jupyter 1.0.0
+    - joblib 0.9.4
+    - matplotlib 2.0.0
+    - nose 1.3.7
+    - notebook 4.3.1
+    - pandas 0.19.2
+    - scikit-learn 0.18.1
+    - seaborn 0.7.1
+    - skll 1.3
+    - statsmodels 0.6.1
+    - zeromq
+    - setuptools
+    - openpyxl
+    - xlrd
+    - xlwt
+
+  run:
+    - python
+    - numpy 1.11.3
+    - scipy 0.18.1
+    - ipython 5.1.0
+    - jupyter 1.0.0
+    - joblib 0.9.4
+    - matplotlib 2.0.0
+    - nose 1.3.7
+    - notebook 4.3.1
+    - pandas 0.19.2
+    - scikit-learn 0.18.1
+    - seaborn 0.7.1
+    - skll 1.3
+    - statsmodels 0.6.1
+    - zeromq
+    - openpyxl
+    - xlrd
+    - xlwt
+
+test:
+  # Python imports
+  imports:
+    - rsmtool
+    - rsmtool.analysis
+    - rsmtool.comparison
+    - rsmtool.convert_feature_json
+    - rsmtool.create_features
+    - rsmtool.input
+    - rsmtool.model
+    - rsmtool.predict
+    - rsmtool.preprocess
+    - rsmtool.report
+    - rsmtool.utils
+    - rsmtool.test_utils
+
+  commands:
+    - rsmtool --help
+    - rsmeval --help
+    - rsmcompare --help
+    - rsmpredict --help
+    - render_notebook --help
+    - convert_feature_json --help
+
+about:
+  home: https://github.com/EducationalTestingService/rsmtool
+  license: Apache 2.0

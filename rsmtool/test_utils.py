@@ -19,6 +19,7 @@ from rsmtool.rsmpredict import compute_and_save_predictions
 from rsmtool.rsmsummarize import run_summary
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
+html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
 
 
@@ -146,8 +147,20 @@ def check_csv_output(csv1, csv2):
         Path to the second CSV files.
 
     """
-    df1 = pd.read_csv(csv1, index_col=0)
-    df2 = pd.read_csv(csv2, index_col=0)
+
+    # make sure that the main id columns are read as strings since
+    # this may affect merging in custom notebooks
+    string_columns = ['spkitemid', 'candidate']
+
+    converter_dict = {column: str for column in string_columns}
+
+    df1 = pd.read_csv(csv1, converters=converter_dict)
+    df2 = pd.read_csv(csv2, converters=converter_dict)
+
+    # set the first column to be the index. We do it this way to ensure
+    # string indices are preserved as such
+    df1.index = df1[df1.columns[0]]
+    df2.index = df2[df2.columns[0]]
 
     # sort all the indices alphabetically
     df1.sort_index(inplace=True)
@@ -159,7 +172,7 @@ def check_csv_output(csv1, csv2):
             if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
 
-    # do the same for indices
+    #do the same for indices
     for df in [df1, df2]:
         if df.index.dtype == np.int64:
             df.index = df.index.astype(np.float64)
@@ -188,12 +201,17 @@ def check_report(html_file):
         Path the HTML report file on disk.
     """
     report_errors = 0
+    report_warnings = 0
     with open(html_file, 'r') as htmlf:
         for line in htmlf:
-            m = html_error_regexp.search(line)
-            if m:
+            m_error = html_error_regexp.search(line)
+            if m_error:
                 report_errors += 1
+            m_warning = html_warning_regexp.search(line)
+            if m_warning:
+                report_warnings += 1
     assert_equal(report_errors, 0)
+    assert_equal(report_warnings, 0)
 
 
 def check_scaled_coefficients(source, experiment_id):

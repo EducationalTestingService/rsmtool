@@ -16,7 +16,7 @@ Workflow
 
 Once you have the features for the new data and the RSMTool model, using ``rsmpredict`` is fairly straightforward:
 
-1. Create a ``.csv`` file containing the features for the new data.
+1. Create a file containing the features for the new data. The file should be in one of the :ref:`supported formats <input_file_format>`.
 2. Create an :ref:`experiment configuration file <config_file_rsmpredict>` describing the  experiment you would like to run.
 3.  Run that configuration file with :ref:`rsmpredict <usage_rsmpredict>` to generate the predicted scores.
 
@@ -54,7 +54,7 @@ Let's take a look at the options in our configuration file.
 
 - **Line 2**: We give the path to the directory containing the output of the ``rsmtool`` experiment.
 - **Line 3**: We provide the ``experiment_id`` of the ``rsmtool`` experiment used to train the model. This can usually be read off the ``output/<experiment_id>.model`` file in the ``rsmtool`` experiment output directory.
-- **Line 4**: We list the path to the ``.csv`` file with the feature values for the new data.
+- **Line 4**: We list the path to the data file with the feature values for the new data.  For this tutorial we used ``.csv`` format, but RSMTool also supports several other :ref:`input file formats <input_file_format>`.
 - **Line 5**: This field indicates that the unique IDs for the responses in the ``.csv`` file are located in a column named ``ID``.
 - **Lines 6-7**: These fields indicates that there are two sets of human scores in our ``.csv`` file located in the columns named ``score`` and ``score2``. The values from these columns will be added to the output file containing the predictions which can be useful if we want to evaluate the predictions using ``rsmeval``.
 
@@ -62,7 +62,7 @@ Documentation for all of the available configuration options is available :ref:`
 
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
-Now that we have the model, the features in ``.csv`` format, and our configuration file in ``.json`` format, we can use the :ref:`rsmpredict <usage_rsmpredict>` command-line script to generate the predictions and to save them in ``predictions.csv``.
+Now that we have the model, the features in the right format, and our configuration file in ``.json`` format, we can use the :ref:`rsmpredict <usage_rsmpredict>` command-line script to generate the predictions and to save them in ``predictions.csv``.
 
 .. code-block:: bash
 

@@ -7,5 +7,5 @@
     "id_column": "ID",
     "experiment_id": "lr_rsmtool_rsmpredict",
     "test_file": "../../files/test.csv",
-    "features": "features.json"
+    "features": "features.csv"
 }

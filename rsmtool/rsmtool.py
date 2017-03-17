@@ -28,7 +28,7 @@ from rsmtool.preprocess import preprocess_train_and_test_features
 from rsmtool.report import create_report
 from rsmtool.utils import (scale_coefficients,
                            write_experiment_output,
-                           write_feature_json)
+                           write_feature_csv)
 from rsmtool.utils import LogFormatter
 from rsmtool.version import __version__
 
@@ -76,7 +76,7 @@ def run_experiment(config_file, output_dir):
      df_test_flagged_responses,
      experiment_id, description,
      train_file_location, test_file_location,
-     feature_specs, model_name, model_type,
+     df_feature_specs, model_name, model_type,
      train_label_column, test_label_column,
      id_column, length_column, second_human_score_column,
      candidate_column, subgroups,
@@ -84,7 +84,6 @@ def run_experiment(config_file, output_dir):
      used_trim_min, used_trim_max,
      use_scaled_predictions,
      exclude_zero_scores,
-     select_features_automatically,
      exclude_listwise,
      min_items,
      chosen_notebook_files) = load_experiment_data(config_file, output_dir)
@@ -95,7 +94,7 @@ def run_experiment(config_file, output_dir):
      df_test_preprocessed_features,
      df_feature_info) = preprocess_train_and_test_features(df_train_features,
                                                            df_test_features,
-                                                           feature_specs)
+                                                           df_feature_specs)
 
     logger.info('Saving training and test set data to disk')
     write_experiment_output([df_train_features, df_test_features,
@@ -169,23 +168,9 @@ def run_experiment(config_file, output_dir):
     # identify the features used by the model
     selected_features = model.feat_vectorizer.get_feature_names()
 
-    # if this is not the same set as what was originally
-    # specified or no set was specified
-    # if we had a subset of features from the user, check if the
-    # final subset of features matches that and if not set the feature
-    # selection to automatic
-    if not select_features_automatically:
-        requested_features = df_feature_info['feature'].tolist()
-        omitted_features = set(requested_features).difference(selected_features)
-        if omitted_features:
-            select_features_automatically = True
-
-    # for all models with automatic feature selection
-    # generate a .json file with selected features.
-    # this can be used to train models using just this selection.
-
-    if select_features_automatically:
-        write_feature_json(feature_specs, selected_features, experiment_id, featuredir)
+    # generate the feature spec file which can be used to train models
+    # using just this selection
+    write_feature_csv(df_feature_specs, selected_features, experiment_id, featuredir)
 
     df_selected_feature_info = df_feature_info[df_feature_info['feature'].isin(selected_features)]
     write_experiment_output([df_selected_feature_info],
@@ -268,15 +253,7 @@ def run_experiment(config_file, output_dir):
     # and testing data
     logger.info('Generating training and test set predictions')
 
-    # Tell the user that they will get the mismatch warning if
-    # the model features do not match the original data
-
-    if len(selected_features) != len(df_test_preprocessed_features.columns) - 2:
-        logger.warning("You specified a model with automatic feature "
-                       "selection and therefore some of the original "
-                       "features were excluded from the final model. If this "
-                       "is the expected behavior, you can ignore "
-                       "the following warnings about the mismatch in the data")
+    columns_for_prediction = ['spkitemid', 'sc1'] + selected_features
 
     (df_train_predictions,
      df_test_predictions,
@@ -284,8 +261,8 @@ def run_experiment(config_file, output_dir):
      train_predictions_sd,
      h1_mean,
      h1_sd) = generate_train_and_test_predictions(model,
-                                                  df_train_preprocessed_features,
-                                                  df_test_preprocessed_features,
+                                                  df_train_preprocessed_features[columns_for_prediction],
+                                                  df_test_preprocessed_features[columns_for_prediction],
                                                   used_trim_min,
                                                   used_trim_max)
 

@@ -16,7 +16,7 @@ The ``experiment_id`` used to create the ``rsmtool`` model files being used for 
 
 input_feature_file
 ~~~~~~~~~~~~~~~~~~
-The path to the ``.csv`` file with the raw feature values that will be used for generating predictions. Each row should correspond to a single response and contain feature values for this response. In addition, there should be a column with a unique identifier (ID) for each response. The path can be absolute or relative to the location of config file. Note that the feature names *must* be the same as used in the original ``rsmtool`` experiment.
+The path to the file with the raw feature values that will be used for generating predictions. The file should be in one of the :ref:`supported formats <input_file_format>` Each row should correspond to a single response and contain feature values for this response. In addition, there should be a column with a unique identifier (ID) for each response. The path can be absolute or relative to the location of config file. Note that the feature names *must* be the same as used in the original ``rsmtool`` experiment.
 
 
 .. note::

@@ -5,7 +5,8 @@ import pandas as pd
 from nose.tools import (assert_almost_equal, assert_equal)
 from numpy.random import RandomState
 
-from rsmtool.analysis import (correlation_helper,
+from rsmtool.analysis import (compute_pca,
+                              correlation_helper,
                               metrics_helper)
 
 prng = RandomState(133)
@@ -68,20 +69,37 @@ def test_that_correlation_helper_works_for_data_with_four_rows():
 
 def test_that_correlation_helper_works_for_data_with_the_same_label():
     # this should return two data frames with nans
-    retval = correlation_helper(df_features_same_score, 'sc1', 'group')
-    assert_equal(retval[0].isnull().values.sum(), 3)
-    assert_equal(retval[1].isnull().values.sum(), 3)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        retval = correlation_helper(df_features_same_score, 'sc1', 'group')
+        assert_equal(retval[0].isnull().values.sum(), 3)
+        assert_equal(retval[1].isnull().values.sum(), 3)
 
 
 def test_that_metrics_helper_works_for_data_with_one_row():
     # There should be NaNs for SMD, correlations and both sds
-    evals = metrics_helper(human_scores[0:1], system_scores[0:1])
-    assert_equal(evals.isnull().values.sum(), 4)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        evals = metrics_helper(human_scores[0:1], system_scores[0:1])
+        assert_equal(evals.isnull().values.sum(), 4)
 
 
 def test_that_metrics_helper_works_for_data_with_the_same_label():
     # There should be NaNs for correlation.
     # Note that for a dataset with a single response
     # kappas will be 0 or 1
-    evals = metrics_helper(same_human_scores, system_scores)
-    assert_equal(evals.isnull().values.sum(), 1)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        evals = metrics_helper(same_human_scores, system_scores)
+        assert_equal(evals.isnull().values.sum(), 1)
+
+
+def test_compute_pca_less_components_than_features():
+    # test pca when we have less components than features
+    df = pd.DataFrame({'a':range(100)})
+    for i in range(100):
+        df[i] = df['a']*i
+    (components, variance) = compute_pca(df, df.columns)
+    assert_equal(len(components.columns), 100)
+    assert_equal(len(variance.columns), 100)
+

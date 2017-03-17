@@ -23,6 +23,8 @@ from .analysis import (compute_basic_descriptives,
                        correlation_helper,
                        metrics_helper)
 
+from .convert_feature_json import convert_feature_json_file
+
 from .create_features import (generate_default_specs,
                               find_feature_transformation)
 
@@ -58,13 +60,14 @@ from .rsmsummarize import run_summary
 from .utils import (agreement,
                     partial_correlations,
                     write_experiment_output,
-                    write_feature_json)
+                    write_feature_csv)
 
 __all__ = ['compute_basic_descriptives',
            'compute_percentiles',
            'compute_outliers',
            'compute_pca',
            'correlation_helper',
+           'convert_feature_json_file',
            'metrics_helper',
            'generate_default_specs',
            'find_feature_transformation',
@@ -77,7 +80,7 @@ __all__ = ['compute_basic_descriptives',
            'filter_on_column',
            'remove_outliers',
            'preprocess_feature',
-           'preprocess_new_data'
+           'preprocess_new_data',
            'transform_feature',
            'trim',
            'convert_ipynb_to_html',
@@ -90,7 +93,7 @@ __all__ = ['compute_basic_descriptives',
            'agreement',
            'partial_correlations',
            'write_experiment_output',
-           'write_feature_json']
+           'write_feature_csv']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

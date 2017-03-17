@@ -22,6 +22,7 @@ import pandas as pd
 
 from rsmtool.input import (check_main_config,
                            locate_file,
+                           read_data_file,
                            read_json_file,
                            rename_default_columns,
                            check_flag_column)
@@ -133,7 +134,7 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     string_columns = [id_column, candidate_column] + subgroups
     converter_dict = dict([(column, str) for column in string_columns if column])
 
-    df_input = pd.read_csv(input_features_file, converters=converter_dict)
+    df_input = read_data_file(input_features_file, converters=converter_dict)
 
     # make sure that the columns specified in the config file actually exist
     columns_to_check = [id_column] + subgroups + list(flag_column_dict.keys())
