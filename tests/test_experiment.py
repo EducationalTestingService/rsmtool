@@ -1994,6 +1994,18 @@ def test_run_experiment_lr_summary():
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
     yield check_report, html_report
 
 
@@ -2010,6 +2022,18 @@ def test_run_experiment_linearsvr_summary():
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
     yield check_report, html_report
 
 
@@ -2025,6 +2049,18 @@ def test_run_experiment_lr_eval_summary():
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
     yield check_report, html_report
 
 
@@ -2041,6 +2077,18 @@ def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
     do_run_summary(source, config_file)
 
     html_report = join('test_outputs', source, 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
     yield check_report, html_report
 
 def test_run_experiment_lr_tsv_input_files():
