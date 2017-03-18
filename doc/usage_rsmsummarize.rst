@@ -33,7 +33,7 @@ Here are all the arguments to the ``rsmsummarize`` command-line script.
 
 .. option:: output_dir (optional)
 
-    The output directory where the report files for this comparison will be stored.
+    The output directory where the report and intermediate ``.csv`` files for this comparison will be stored.
 
 .. option:: -h, --help
 

@@ -1,7 +1,7 @@
 .. _intermediate_files_rsmsummarize:
 
 Intermediate CSV files
-----------------------
+""""""""""""""""""""""
 
 Although the primary output of RSMSummarize is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMSummarize experiment report are saved as ``.csv`` files in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
@@ -28,7 +28,7 @@ This file contains the main information about the models included into the repor
     - The learner
     - The label used to train the model
 
-..note::
+.. note::
     If the report includes a combination of ``rsmtool`` and ``rsmeval`` experiments, this summary table will only include ``rsmtool`` experiments since no model information is available for ``rsmeval`` experiments.
 
 
