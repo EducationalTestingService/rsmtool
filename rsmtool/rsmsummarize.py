@@ -98,11 +98,15 @@ def run_summary(config_file, output_dir):
 
     logger = logging.getLogger(__name__)
 
-    # create the 'output' sub-directories
+    # create the 'output' and the 'figure' sub-directories
     # where all the experiment output such as the CSV files
-    # be saved
+    # and the box plots will be saved
     csvdir = abspath(join(output_dir, 'output'))
+    figdir = abspath(join(output_dir, 'figure'))
+    reportdir = abspath(join(output_dir, 'report'))
     os.makedirs(csvdir, exist_ok=True)
+    os.makedirs(figdir, exist_ok=True)
+    os.makedirs(reportdir, exist_ok=True)
 
     # load the information from the config file
     # read in the main config file

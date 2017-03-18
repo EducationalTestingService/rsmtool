@@ -620,7 +620,7 @@ def create_summary_report(summary_id, description,
     os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
 
     report_name = '{}_report'.format(summary_id)
-    reportdir = join(csvdir, '..')
+    reportdir = abspath(join(csvdir, '..', 'report'))
     merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
 
     # merge all the given sections

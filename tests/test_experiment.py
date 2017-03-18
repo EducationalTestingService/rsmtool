@@ -1993,7 +1993,7 @@ def test_run_experiment_lr_summary():
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
 
-    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -2021,7 +2021,7 @@ def test_run_experiment_linearsvr_summary():
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
 
-    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -2048,7 +2048,7 @@ def test_run_experiment_lr_eval_summary():
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
 
-    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -2076,7 +2076,7 @@ def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
                        'rsmsummarize.json')
     do_run_summary(source, config_file)
 
-    html_report = join('test_outputs', source, 'model_comparison_report.html')
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
