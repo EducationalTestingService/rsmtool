@@ -17,9 +17,10 @@ filenames: ``margcor_score_all_data.csv``, ``pcor_score_all_data.csv``, ```pcor_
 
 The first file contains the marginal correlations between each pre-processed feature and human score. The second file contains the partial correlation between each pre-processed feature and human score after controlling for all other features. The third file contains the partial correlations between each pre-processed feature and human score after controlling for response length, if ``length_column`` was specified in the configuration file.
 
-Model summary
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-filenames: ``model_summary.csv``
+Model information
+^^^^^^^^^^^^^^^^^
+
+- ``model_summary.csv``
 
 This file contains the main information about the models included into the report including: 
 
@@ -28,8 +29,13 @@ This file contains the main information about the models included into the repor
     - The learner
     - The label used to train the model
 
+- ``betas.csv``: standardized coefficients (for built-in models only).
+
+- ``model_fit.csv``: R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding.
+
+
 .. note::
-    If the report includes a combination of ``rsmtool`` and ``rsmeval`` experiments, this summary table will only include ``rsmtool`` experiments since no model information is available for ``rsmeval`` experiments.
+    If the report includes a combination of ``rsmtool`` and ``rsmeval`` experiments, the summary tables with model information will only include ``rsmtool`` experiments since no model information is available for ``rsmeval`` experiments.
 
 
 Evaluation metrics
