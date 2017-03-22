@@ -39,6 +39,7 @@ else:
                                     'feature_descriptives',
                                     'features_by_group',
                                     'preprocessed_features',
+                                    'dff',
                                     'consistency',
                                     'model',
                                     'evaluation',
