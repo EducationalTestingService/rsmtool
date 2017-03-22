@@ -130,6 +130,12 @@ def do_run_summary(source, config_file):
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
+
+    # remove all previously created files
+    for output_subdir in ['output', 'figure', 'report']:
+        files = glob(join(source_output_dir, source, output_subdir, '*'))
+        for f in files:
+            remove(f)
     run_summary(config_file, experiment_dir)
 
 
