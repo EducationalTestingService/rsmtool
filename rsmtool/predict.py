@@ -104,11 +104,11 @@ def generate_train_and_test_predictions(model, df_train, df_test, trim_min, trim
     logger.info('Processing train set predictions')
 
     df_train_predictions = process_predictions(df_train_predictions,
-                                              train_predictions_mean,
-                                              train_predictions_sd,
-                                              human_labels_mean,
-                                              human_labels_sd,
-                                              trim_min, trim_max)
+                                               train_predictions_mean,
+                                               train_predictions_sd,
+                                               human_labels_mean,
+                                               human_labels_sd,
+                                               trim_min, trim_max)
     
     logger.info('Processing test set predictions')
 
