@@ -365,7 +365,10 @@ def compute_pca(df, selected_features):
     return df_components, df_variance
 
 
-def metrics_helper(human_scores, system_scores):
+def metrics_helper(human_scores,
+                   system_scores, 
+                   population_human_score_sd = None,
+                   population_system_score_sd = None):
     """
     This is a helper function that computes some basic agreement
     and association metrics between the system scores and the
@@ -378,6 +381,18 @@ def metrics_helper(human_scores, system_scores):
 
     system_scores: pandas Series
         Series containing numeric scores predicted by the model.
+
+    population_human_sd : float
+        Reference standard deviation for human scores. This is used to compute SMD and
+        should be the standard deviation for the whole population when SMD are computed
+        for individual subgroups.  
+        When None, this will be computed as the standard deviation of `human_scores`
+
+    population_system_sd : float
+        Reference standard deviation for system scores.  This is used to compute SMD and
+        should be the standard deviation for the whole population when SMD are computed
+        for individual subgroups. 
+        When None, this will be computed as the standard devaiation of `system_scores`.
 
     Returns
     -------
@@ -441,10 +456,16 @@ def metrics_helper(human_scores, system_scores):
     system_score_sd = np.std(system_scores, ddof=1)
     human_score_sd = np.std(human_scores, ddof=1)
 
+    if not population_system_score_sd:
+        population_system_score_sd = system_score_sd
+
+    if not population_human_score_sd:
+        population_human_score_sd = human_score_sd
     # compute standardized mean difference as recommended
-    # by Williamson et al (2012)
+    # by Williamson et al (2012). Note this metrics is only
+    # applicable when both sets of scores are on the same scale. 
     numerator = mean_system_score - mean_human_score
-    denominator = np.sqrt((system_score_sd**2 + human_score_sd**2) / 2)
+    denominator = np.sqrt((population_system_score_sd**2 + population_human_score_sd**2) / 2)
 
     # if the denominator is zero, then return NaN as the SMD
     SMD = np.nan if denominator == 0 else numerator/denominator
@@ -547,7 +568,8 @@ def filter_metrics(df_metrics,
 def compute_metrics(df,
                     compute_shortened=False,
                     use_scaled_predictions=False,
-                    include_second_score=False):
+                    include_second_score=False,
+                    population_sd_dict=None):
     """
     Compute the evaluation metrics for the scores in the given data frame.
 
@@ -574,6 +596,9 @@ def compute_metrics(df,
         the shortened version of the metrics data frame.
     include_second_score : bool, optional
         Second human score available, defaults to False.
+    population_sd_dict : dictionary, optional
+        Dictionary containing population standard deviation for each column containing
+        human or system scores. This is used to compute SMD for subgroups.
 
     Returns
     -------
@@ -588,6 +613,10 @@ def compute_metrics(df,
         is empty if `compute_shortened` is False.
     """
 
+    # get the population standard deviations for SMD if none were supplied
+    if not population_sd_dict:
+        population_sd_dict = {df[col].std(ddof=1) for col in df.columns if not col=='spkitemid'}
+
     # if the second human score column is available, the values are
     # probably not available for all of the responses in the test
     # set and so we want to exclude 'sc2' from human-machine metrics
@@ -596,7 +625,12 @@ def compute_metrics(df,
     df_human_human_eval = pd.DataFrame()
     if include_second_score:
         df_single_scored = df.drop('sc2', axis=1)
-        df_human_machine_eval = df_single_scored.apply(lambda s: metrics_helper(df_single_scored['sc1'], s))
+        # TODO: we need to pass the column name to the dictionary, not the values
+        # TODO add passing this dictionary to all calls to metrics_helper in this function
+        df_human_machine_eval = df_single_scored.apply(lambda s: metrics_helper(df_single_scored['sc1'],
+                                                                                s,
+                                                                                population_sd_dict['sc1'],
+                                                                                population_sd_dict[s]))
         df_double_scored = df[df['sc2'].notnull()][['sc1', 'sc2']]
         df_human_human_eval = df_double_scored.apply(lambda s: metrics_helper(df_double_scored['sc1'], s))
         # drop the sc1 column from the human-human agreement frame
@@ -683,6 +717,7 @@ def compute_metrics_by_group(df_test,
         Include human-human association statistics,
         defaults to False.
 
+
     Returns
     -------
     df_human_machine_eval_by_group : pandas DataFrame
@@ -693,6 +728,11 @@ def compute_metrics_by_group(df_test,
         statistics or is an empty data frame, depending
         on whether `include_second_score` is True.
     """
+
+    # get the population standard deviation that we will need to compute SMD for all columns
+    # other than id and subgroup
+    population_sd_dict = {df[col].std(ddof=1) for col in df_test.columns if not col in ['spkitemid',
+                                                                                        'grouping_variable']}
 
     # create a duplicate data frame to compute evaluations
     # over the whole data, i.e., across groups
@@ -716,7 +756,8 @@ def compute_metrics_by_group(df_test,
          df_group_human_human_metrics) = compute_metrics(df_group,
                                                          compute_shortened=True,
                                                          use_scaled_predictions=use_scaled_predictions,
-                                                         include_second_score=include_second_score)
+                                                         include_second_score=include_second_score,
+                                                         population_sd_dict=population_sd_dict)
 
         # we need to convert the shortened data frame to a series here
         df_human_machine_eval_by_group[group] = df_group_human_machine_metrics_short.iloc[0]
