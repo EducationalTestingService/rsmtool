@@ -615,7 +615,7 @@ def compute_metrics(df,
 
     # get the population standard deviations for SMD if none were supplied
     if not population_sd_dict:
-        population_sd_dict = {df[col].std(ddof=1) for col in df.columns if not col=='spkitemid'}
+        population_sd_dict = {col:df[col].std(ddof=1) for col in df.columns if not col=='spkitemid'}
 
     # if the second human score column is available, the values are
     # probably not available for all of the responses in the test
@@ -625,14 +625,14 @@ def compute_metrics(df,
     df_human_human_eval = pd.DataFrame()
     if include_second_score:
         df_single_scored = df.drop('sc2', axis=1)
-        # TODO: we need to pass the column name to the dictionary, not the values
-        # TODO add passing this dictionary to all calls to metrics_helper in this function
         df_human_machine_eval = df_single_scored.apply(lambda s: metrics_helper(df_single_scored['sc1'],
                                                                                 s,
                                                                                 population_sd_dict['sc1'],
-                                                                                population_sd_dict[s]))
+                                                                                population_sd_dict[s.name]))
         df_double_scored = df[df['sc2'].notnull()][['sc1', 'sc2']]
-        df_human_human_eval = df_double_scored.apply(lambda s: metrics_helper(df_double_scored['sc1'], s))
+        df_human_human_eval = df_double_scored.apply(lambda s: metrics_helper(df_double_scored['sc1'], s,
+                                                                              population_sd_dict['sc1'],
+                                                                              population_sd_dict[s.name]))
         # drop the sc1 column from the human-human agreement frame
         df_human_human_eval = df_human_human_eval.drop('sc1', 1)
         # sort the rows in the correct order
@@ -655,7 +655,9 @@ def compute_metrics(df,
             df_human_human_eval['N'] = 0
         df_human_human_eval.index = ['']
     else:
-        df_human_machine_eval = df.apply(lambda s: metrics_helper(df['sc1'], s))
+        df_human_machine_eval = df.apply(lambda s: metrics_helper(df['sc1'], s,
+                                                                  population_sd_dict['sc1'],
+                                                                  population_sd_dict[s.name]))
 
     # drop 'sc1' column from the human-machine frame and transpose
     df_human_machine_eval = df_human_machine_eval.drop('sc1', 1)
@@ -731,8 +733,8 @@ def compute_metrics_by_group(df_test,
 
     # get the population standard deviation that we will need to compute SMD for all columns
     # other than id and subgroup
-    population_sd_dict = {df[col].std(ddof=1) for col in df_test.columns if not col in ['spkitemid',
-                                                                                        'grouping_variable']}
+    population_sd_dict = {col: df_test[col].std(ddof=1) for col in df_test.columns if not col in ['spkitemid',
+                                                                                                  grouping_variable]}
 
     # create a duplicate data frame to compute evaluations
     # over the whole data, i.e., across groups
