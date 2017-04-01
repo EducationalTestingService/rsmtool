@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 
+from os import listdir
 from os.path import abspath, dirname, exists, join, normpath
 
 
@@ -97,6 +98,16 @@ def run_summary(config_file, output_dir):
 
     logger = logging.getLogger(__name__)
 
+    # create the 'output' and the 'figure' sub-directories
+    # where all the experiment output such as the CSV files
+    # and the box plots will be saved
+    csvdir = abspath(join(output_dir, 'output'))
+    figdir = abspath(join(output_dir, 'figure'))
+    reportdir = abspath(join(output_dir, 'report'))
+    os.makedirs(csvdir, exist_ok=True)
+    os.makedirs(figdir, exist_ok=True)
+    os.makedirs(reportdir, exist_ok=True)
+
     # load the information from the config file
     # read in the main config file
     config_obj = read_json_file(config_file)
@@ -155,7 +166,7 @@ def run_summary(config_file, output_dir):
     logger.info('Starting report generation')
     create_summary_report(summary_id, description,
                           all_experiments,
-                          output_dir, subgroups,
+                          csvdir, subgroups,
                           chosen_notebook_files)
 
 
@@ -173,6 +184,12 @@ def main():
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='rsmsummarize')
 
+    parser.add_argument('-f', '--force', dest='force_write',
+                        action='store_true', default=False,
+                        help="If true, rsmsummarize will not check if the"
+                             " output directory already contains the "
+                             "output of another rsmsummarize experiment. ")
+
     parser.add_argument('config_file',
                         help="The JSON config file for this experiment")
 
@@ -186,6 +203,24 @@ def main():
     # parse given command line arguments
     args = parser.parse_args()
     logger.info('Output directory: {}'.format(args.output_dir))
+
+    # Raise an error if the specified output directory
+    # already contains a non-empty `output` directory, unless
+    # `--force` was specified, in which case we assume
+    # that the user knows what she is doing and simply
+    # output a warning saying that the report might
+    # not be correct.
+    csvdir = join(args.output_dir, 'output')
+    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
+    if non_empty_csvdir:
+        if not args.force_write:
+            raise IOError("'{}' already contains a non-empty 'output' "
+                          "directory.".format(args.output_dir))
+        else:
+            logger.warning("{} already contains a non-empty 'output' directory. "
+                           "The generated report might contain "
+                           "unexpected information from a previous "
+                           "experiment.".format(args.output_dir))
 
     # convert all paths to absolute to make sure
     # all files can be found later

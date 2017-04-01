@@ -191,7 +191,7 @@ Predictions
 ^^^^^^^^^^^
 filenames: ``pred_processed.csv``, ``pred_train.csv``
 
-The first file contains the predicted scores for the evaluation set: the raw scores as well as different types of post-processed scores. The second file contains the predicted scores for the responses in the training set.
+The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores. 
 
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
