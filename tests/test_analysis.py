@@ -55,7 +55,6 @@ def test_that_correlation_helper_works_for_data_with_two_rows():
     assert_equal(retval[1].isnull().values.sum(), 3)
 
 
-
 def test_that_correlation_helper_works_for_data_with_three_rows():
     # this should compute marginal correlations but return Nans for
     # partial correlations

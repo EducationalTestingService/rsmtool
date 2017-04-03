@@ -597,7 +597,7 @@ def compute_metrics(df,
         the shortened version of the metrics data frame.
     include_second_score : bool, optional
         Second human score available, defaults to False.
-    population_sd_dict : dictionary, optional
+    population_sd_dict : dict, optional
         Dictionary containing population standard deviation for each column containing
         human or system scores. This is used to compute SMD for subgroups.
 
