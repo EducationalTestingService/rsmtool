@@ -12,12 +12,12 @@ Before running this script, make sure that the outputs work as expected
 """
 
 import argparse
-import ast
 import inspect
 import re
 import shutil
 
 
+from ast import literal_eval as eval
 from importlib.machinery import SourceFileLoader
 from os import getcwd
 from os.path import exists, join
@@ -25,7 +25,7 @@ from os.path import exists, join
 
 def main():
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='update_test_data.py')
+    parser = argparse.ArgumentParser(prog='update_test_files.py')
     parser.add_argument('suffix', help="The suffix of the output file")
     parser.add_argument('outputs_dir', help="The path to test_outputs")
 
@@ -47,7 +47,7 @@ def main():
         if inspect.isfunction(member[1]) and member[0].startswith('test_run_experiment'):
             function = member[1]
             # get the experiment id and the source for each test function
-            function_code_lines = inspect.getsourcelines(member[1])
+            function_code_lines = inspect.getsourcelines(function)
             experiment_id_line = [line for line in function_code_lines[0]
                                   if re.search(r'experiment_id = ', line)]
 
@@ -56,12 +56,12 @@ def main():
             # directory anyway) or it was a compare or prediction test function
             # which are not a problem for various reasons.
             if experiment_id_line:
-                experiment_id_in_test = ast.literal_eval(experiment_id_line[0].strip().split(' = ')[1])
+                experiment_id_in_test = eval(experiment_id_line[0].strip().split(' = ')[1])
 
                 # get the name of the source directory
                 source_line = [line for line in function_code_lines[0]
                                       if re.search(r'source = ', line)]
-                source = ast.literal_eval(source_line[0].strip().split(' = ')[1])
+                source = eval(source_line[0].strip().split(' = ')[1])
                 print(source)
 
                 # check if the specified output file already exists in test data
