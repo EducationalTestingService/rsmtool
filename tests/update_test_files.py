@@ -19,8 +19,9 @@ import shutil
 
 from ast import literal_eval as eval
 from importlib.machinery import SourceFileLoader
-from os import getcwd
-from os.path import exists, join
+from os.path import dirname, exists, join
+
+_MY_PATH = dirname(__file__)
 
 
 def main():
@@ -40,7 +41,7 @@ def main():
     # they folllow the same structure.
     # see http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # for Python 3.5 solution
-    test_experiment = SourceFileLoader('test_experiment', join(getcwd(), 'test_experiment.py')).load_module()
+    test_experiment = SourceFileLoader('test_experiment', join(_MY_PATH, 'test_experiment.py')).load_module()
 
     # iterate over all the members and focus on only the experiment functions
     for member in inspect.getmembers(test_experiment):
@@ -66,8 +67,8 @@ def main():
 
                 # check if the specified output file already exists in test data
 
-                test_file = join('data/experiments/{}/output/{}_{}'.format(source, experiment_id_in_test, suffix))
-                output_file = join('{}/{}/output/{}_{}'.format(out_dir, source, experiment_id_in_test, suffix))
+                test_file = '{}/data/experiments/{}/output/{}_{}'.format(_MY_PATH, source, experiment_id_in_test, suffix)
+                output_file = '{}/{}/output/{}_{}'.format(out_dir, source, experiment_id_in_test, suffix)
 
                 if exists(output_file):
                     print('Copying {} to {}'.format(output_file, test_file))
