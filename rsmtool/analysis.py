@@ -366,7 +366,7 @@ def compute_pca(df, selected_features):
 
 
 def metrics_helper(human_scores,
-                   system_scores, 
+                   system_scores,
                    population_human_score_sd = None,
                    population_system_score_sd = None):
     """
@@ -382,16 +382,16 @@ def metrics_helper(human_scores,
     system_scores: pandas Series
         Series containing numeric scores predicted by the model.
 
-    population_human_sd : float
+    population_human_score_sd : float
         Reference standard deviation for human scores. This is used to compute SMD and
         should be the standard deviation for the whole population when SMD are computed
-        for individual subgroups.  
+        for individual subgroups.
         When None, this will be computed as the standard deviation of `human_scores`
 
-    population_system_sd : float
+    population_system_score_sd : float
         Reference standard deviation for system scores.  This is used to compute SMD and
         should be the standard deviation for the whole population when SMD are computed
-        for individual subgroups. 
+        for individual subgroups.
         When None, this will be computed as the standard devaiation of `system_scores`.
 
     Returns
@@ -461,9 +461,10 @@ def metrics_helper(human_scores,
 
     if not population_human_score_sd:
         population_human_score_sd = human_score_sd
+
     # compute standardized mean difference as recommended
     # by Williamson et al (2012). Note this metrics is only
-    # applicable when both sets of scores are on the same scale. 
+    # applicable when both sets of scores are on the same scale.
     numerator = mean_system_score - mean_human_score
     denominator = np.sqrt((population_system_score_sd**2 + population_human_score_sd**2) / 2)
 
