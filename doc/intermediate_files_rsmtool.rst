@@ -191,7 +191,7 @@ Predictions
 ^^^^^^^^^^^
 filenames: ``pred_processed.csv``, ``pred_train.csv``
 
-The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores. 
+The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores.
 
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
@@ -204,22 +204,26 @@ Evaluation metrics
     - h_mean
     - h_sd
     - corr
-    - sys_mean [raw/scale trim]
-    - sys_sd [raw/scale trim]
-    - SMD [raw/scale trim]
-    - adj_agr [raw/scale trim_round]
-    - exact_agr [raw/scale trim_round]
-    - kappa [raw/scale trim_round]
-    - wtkappa [raw/scale trim_round]
-    - sys_mean [raw/scale trim_round]
-    - sys_sd [raw/scale trim_round]
-    - SMD [raw/scale trim_round]
-    - R2 [raw/scale trim]
-    - RMSE [raw/scale trim]
+    - sys_mean [raw/scale_trim]
+    - sys_sd [raw/scale_trim]
+    - SMD [raw/scale_trim]
+    - adj_agr [raw/scale_trim_round]
+    - exact_agr [raw/scale_trim_round]
+    - kappa [raw/scale_trim_round]
+    - wtkappa [raw/scale_trim_round]
+    - sys_mean [raw/scale_trim_round]
+    - sys_sd [raw/scale_trim_round]
+    - SMD [raw/scale_trim_round]
+    - R2 [raw/scale_trim]
+    - RMSE [raw/scale_trim]
 
 - ``score_dist.csv``: the distributions of the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
 - ``confMatrix.csv``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+
+.. note::
+
+    Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
 
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^

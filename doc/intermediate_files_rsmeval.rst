@@ -109,6 +109,11 @@ Evaluation metrics
 
 - ``confMatrix.csv``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
+.. note::
+
+    Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
+
+
 Human-human Consistency
 ~~~~~~~~~~~~~~~~~~~~~~~
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
