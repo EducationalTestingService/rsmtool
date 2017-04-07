@@ -7,7 +7,7 @@ Although the primary output of RSMSummarize is an HTML report, we also want the 
 
 .. note::
 
-    The names of all files begin with the ``summary_id`` provided by the user in the experiment configuration file. 
+    The names of all files begin with the ``summary_id`` provided by the user in the experiment configuration file.
 
 
 Marginal and partial correlations with score
@@ -22,7 +22,7 @@ Model information
 
 - ``model_summary.csv``
 
-This file contains the main information about the models included into the report including: 
+This file contains the main information about the models included into the report including:
 
     - Total number of features
     - Total number of features with non-negative coefficients
@@ -58,3 +58,7 @@ Evaluation metrics
     - SMD [raw/scale trim_round]
     - R2 [raw/scale trim]
     - RMSE [raw/scale trim]
+
+.. note::
+
+    Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.

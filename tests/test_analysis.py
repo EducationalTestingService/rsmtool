@@ -1,9 +1,12 @@
 import warnings
 
+from os.path import dirname, join
+
 import pandas as pd
 
 from nose.tools import (assert_almost_equal, assert_equal)
 from numpy.random import RandomState
+from pandas.util.testing import assert_series_equal
 
 from rsmtool.analysis import (compute_pca,
                               correlation_helper,
@@ -24,6 +27,8 @@ human_scores = pd.Series(prng.randint(1, 5, size=10))
 system_scores = pd.Series(prng.random_sample(10)*5)
 same_human_scores = pd.Series([3]*10)
 
+# get the directory containing the tests
+test_dir = dirname(__file__)
 
 def test_correlation_helper():
     # test that there are no nans for data frame with 10 values
@@ -48,7 +53,6 @@ def test_that_correlation_helper_works_for_data_with_two_rows():
     retval = correlation_helper(df_features[:2], 'sc1', 'group')
     assert_equal(abs(retval[0].values).sum(), 3)
     assert_equal(retval[1].isnull().values.sum(), 3)
-
 
 
 def test_that_correlation_helper_works_for_data_with_three_rows():
@@ -92,6 +96,40 @@ def test_that_metrics_helper_works_for_data_with_the_same_label():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
         evals = metrics_helper(same_human_scores, system_scores)
         assert_equal(evals.isnull().values.sum(), 1)
+
+
+def test_metrics_helper_population_sds():
+    df_features = pd.read_csv(join(test_dir, 'data', 'files', 'train.csv'))
+    # compute the metrics when not specifying the population SDs
+    computed_metrics1 = metrics_helper(df_features['score'], df_features['score2'])
+    expected_metrics1 = pd.Series({'N': 500.0,
+                                  'R2': 0.65340566606389394,
+                                  'RMSE': 0.47958315233127197,
+                                  'SMD': 0.036736365006090885,
+                                  'adj_agr': 100.0,
+                                  'corr': 0.82789026370069529,
+                                  'exact_agr': 77.0,
+                                  'h_max': 6.0,
+                                  'h_mean': 3.4199999999999999,
+                                  'h_min': 1.0,
+                                  'h_sd': 0.81543231461565147,
+                                  'kappa': 0.6273493195074531,
+                                  'sys_max': 6.0,
+                                  'sys_mean': 3.4500000000000002,
+                                  'sys_min': 1.0,
+                                  'sys_sd': 0.81782496620652367,
+                                  'wtkappa': 0.82732732732732728})
+    # and now compute them specifying the population SDs
+    computed_metrics2 = metrics_helper(df_features['score'],
+                                       df_features['score2'],
+                                       population_human_score_sd=0.5,
+                                       population_system_score_sd=0.4)
+    # the only number that should change is the SMD
+    expected_metrics2 = expected_metrics1.copy()
+    expected_metrics2['SMD'] = 0.066259
+
+    assert_series_equal(computed_metrics1, expected_metrics1)
+    assert_series_equal(computed_metrics2, expected_metrics2)
 
 
 def test_compute_pca_less_components_than_features():
