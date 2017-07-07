@@ -219,7 +219,7 @@ def filter_on_column(df,
     # computed by std is not 0
     if exclude_zero_sd is True:
         feature_sd = df_filtered[column].std()
-        if np.isclose(feature_sd, 0, atol=1e-06):
+        if np.isclose(feature_sd, 0, atol=1e-07):
             logger.info("Feature {} was excluded from the model"
                         " because its standard deviation in the "
                         "training set is equal to 0.".format(column))
@@ -660,7 +660,7 @@ def preprocess_feature(data,
     # We only do this for the training set.
     if exclude_zero_sd:
         feature_sd = np.std(transformed_feature, ddof=1)
-        if np.isclose(feature_sd, 0, atol=1e-06):
+        if np.isclose(feature_sd, 0, atol=1e-07):
             raise ValueError("The standard deviation for feature {} "
                              "is 0 after pre-processing. Please exclude "
                              "this feature and re-run the experiment.".format(feature_name))
