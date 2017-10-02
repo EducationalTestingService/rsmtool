@@ -9,17 +9,18 @@ dependencies:
     - "~/miniconda3/pkgs"
   override:
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    - pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd
     - chmod +x miniconda.sh
     - ./miniconda.sh -b -f
     - ${HOME}/miniconda3/bin/conda config --add channels desilinguist
     - ${HOME}/miniconda3/bin/conda update --yes conda
-    - ${HOME}/miniconda3/bin/conda install --file conda_requirements.txt --yes
-    - ${HOME}/miniconda3/bin/pip install nose-cov python-coveralls
-    - ${HOME}/miniconda3/bin/pip install -e .
+    - ${HOME}/miniconda3/bin/conda create --name rsmenv --file conda_requirements.txt --yes
+    - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
+    - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
   post:
-    - cd ${HOME}/rsmtool && ${HOME}/miniconda3/bin/coveralls
+    - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
