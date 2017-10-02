@@ -23,3 +23,4 @@ test:
     - ${HOME}/miniconda3/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/bin/coveralls
+    - pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd
