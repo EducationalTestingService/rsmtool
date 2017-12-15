@@ -9,7 +9,7 @@ dependencies:
     - "~/miniconda3/pkgs"
   override:
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-    - pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd
+    - [[ -x ${HOME}/miniconda3/pkgs ]] && pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd
     - chmod +x miniconda.sh
     - ./miniconda.sh -b -f
     - ${HOME}/miniconda3/bin/conda config --add channels desilinguist
