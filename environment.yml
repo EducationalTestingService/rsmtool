@@ -1,4 +1,4 @@
-tichannels:
+channels:
   - defaults
   - conda-forge
   - desilinguist
