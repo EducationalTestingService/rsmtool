@@ -33,6 +33,7 @@ def update_model(model_file):
 
     # now load the SKLL model
     model = Learner.from_file(model_file)
+    model.logger = ''
 
     # delete the existing npy files. The model file will get overwritten,
     # but we do not know the exact number of current .npy files.
