@@ -33,6 +33,9 @@ def update_model(model_file):
 
     # now load the SKLL model
     model = Learner.from_file(model_file)
+
+    # This change is necessary for compatibility with SKLL 1.5. 
+    # It can be removed after the release of SKLL 1.5.1.
     model.logger = ''
 
     # delete the existing npy files. The model file will get overwritten,
