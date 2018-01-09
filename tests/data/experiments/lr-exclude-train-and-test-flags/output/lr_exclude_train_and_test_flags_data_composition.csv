@@ -1,0 +1,5 @@
+partition,responses,L1
+Training,350,4
+Evaluation,50,4
+Overlapping,50,4
+Total,350,4

@@ -1,8 +1,11 @@
 """
 The script to create a comparison report for multiple models
 
+:author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
+
+:date: 10/25/2017
 :organization: ETS
 """
 
@@ -15,17 +18,15 @@ import os
 import sys
 
 from os import listdir
-from os.path import abspath, dirname, exists, join, normpath
+from os.path import (abspath,
+                     dirname,
+                     exists,
+                     join,
+                     normpath)
 
-
-from rsmtool.input import (check_main_config,
-                           locate_file,
-                           read_json_file,
-                           locate_custom_sections)
-
-from rsmtool.report import (create_summary_report,
-                            get_ordered_notebook_files)
-
+from rsmtool.configuration_parser import ConfigurationParser, Configuration
+from rsmtool.reader import DataReader
+from rsmtool.reporter import Reporter
 
 from rsmtool.utils import LogFormatter
 
@@ -38,10 +39,11 @@ def check_experiment_dir(experiment_dir, configpath):
     the output of the rsmtool experiment.
 
     Parameters
+    ----------
     experiment_dir : str
-        Supplied path to the experiment_dir
-    configpath: str
-        Path to the directory containing the configuration file
+        Supplied path to the experiment_dir.
+    configpath : str
+        Path to the directory containing the configuration file.
 
     Returns
     -------
@@ -52,10 +54,9 @@ def check_experiment_dir(experiment_dir, configpath):
     ------
     FileNotFoundError
         If the directory does not exist or does not contain and output
-        of an RSMTool experiment
+        of an RSMTool experiment.
     """
-
-    full_path_experiment_dir = locate_file(experiment_dir, configpath)
+    full_path_experiment_dir = DataReader.locate_files(experiment_dir, configpath)
     if not full_path_experiment_dir:
         raise FileNotFoundError("The directory {} "
                                 "does not exist.".format(experiment_dir))
@@ -67,8 +68,8 @@ def check_experiment_dir(experiment_dir, configpath):
                                     "the output of an rsmtool "
                                     "experiment.".format(full_path_experiment_dir))
 
-        # find the json config files  for all experiments stored in this directory
-        jsons = glob.glob(join(csvdir,  '*.json'))
+        # find the json configuration files for all experiments stored in this directory
+        jsons = glob.glob(join(csvdir, '*.json'))
         if len(jsons) == 0:
             raise FileNotFoundError("The directory {} does not contain "
                                     "the .json configuration files for rsmtool "
@@ -77,15 +78,16 @@ def check_experiment_dir(experiment_dir, configpath):
         return jsons
 
 
-def run_summary(config_file, output_dir):
+def run_summary(config_file_or_obj, output_dir):
     """
     Run rsmsummarize experiment using the given configuration
     file and generate all outputs in the given directory.
 
     Parameters
     ----------
-    config_file : str
+    config_file_or_obj : str or configuration_parser.Configuration
         Path to the experiment configuration file.
+        Users can also pass a `Configuration` object that is in memory.
     output_dir : str
         Path to the experiment output directory.
 
@@ -93,9 +95,7 @@ def run_summary(config_file, output_dir):
     ------
     ValueError
         If any of the required fields are missing or ill-specified.
-
     """
-
     logger = logging.getLogger(__name__)
 
     # create the 'output' and the 'figure' sub-directories
@@ -104,26 +104,35 @@ def run_summary(config_file, output_dir):
     csvdir = abspath(join(output_dir, 'output'))
     figdir = abspath(join(output_dir, 'figure'))
     reportdir = abspath(join(output_dir, 'report'))
+
     os.makedirs(csvdir, exist_ok=True)
     os.makedirs(figdir, exist_ok=True)
     os.makedirs(reportdir, exist_ok=True)
 
-    # load the information from the config file
-    # read in the main config file
-    config_obj = read_json_file(config_file)
-    config_obj = check_main_config(config_obj, context='rsmsummarize')
+    # Allow users to pass Configuration object to the
+    # `config_file_or_obj` argument, rather than read file
+    if not isinstance(config_file_or_obj, Configuration):
 
-    # get the directory where the config file lives
-    configpath = dirname(config_file)
+        # Instantiate configuration parser object
+        parser = ConfigurationParser.get_configparser(config_file_or_obj)
 
-    # get the summary ID
-    summary_id = config_obj['summary_id']
+        logger.info('Reading, normalizing, validating, and processing configuration.')
+        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj,
+                                                                          context='rsmsummarize')
 
-    # get the description
-    description = config_obj['description']
+        # get the directory where the configuration file lives
+        configpath = dirname(config_file_or_obj)
+
+    else:
+
+        configuration = config_file_or_obj
+        if configuration.filepath is not None:
+            configpath = dirname(configuration.filepath)
+        else:
+            configpath = os.getcwd()
 
     # get the list of the experiment dirs
-    experiment_dirs = config_obj['experiment_dirs']
+    experiment_dirs = configuration['experiment_dirs']
 
     # check the experiment dirs and assemble the list of csvdir and jsons
     all_experiments = []
@@ -135,47 +144,56 @@ def run_summary(config_file, output_dir):
     # Note: at the moment no comparison are reported for subgroups.
     # this option is added to the code to make it easier to add
     # subgroup comparisons in future versions
-    subgroups = config_obj.get('subgroups')
+    subgroups = configuration.get('subgroups')
 
-    general_report_sections = config_obj['general_sections']
+    general_report_sections = configuration['general_sections']
 
     # get any special sections that the user might have specified
-    special_report_sections = config_obj['special_sections']
+    special_report_sections = configuration['special_sections']
 
     # get any custom sections and locate them to make sure
     # that they exist, otherwise raise an exception
-    custom_report_section_paths = config_obj['custom_sections']
+    custom_report_section_paths = configuration['custom_sections']
     if custom_report_section_paths:
         logger.info('Locating custom report sections')
-        custom_report_sections = locate_custom_sections(custom_report_section_paths, configpath)
+        custom_report_sections = Reporter.locate_custom_sections(custom_report_section_paths,
+                                                                 configpath)
     else:
         custom_report_sections = []
 
-    section_order = config_obj['section_order']
+    section_order = configuration['section_order']
+
+    # Initialize reporter
+    reporter = Reporter()
 
     # check all sections values and order and get the
     # ordered list of notebook files
-    chosen_notebook_files = get_ordered_notebook_files(general_report_sections,
-                                                       special_report_sections,
-                                                       custom_report_sections,
-                                                       section_order,
-                                                       subgroups,
-                                                       model_type=None,
-                                                       context='rsmsummarize')
+    chosen_notebook_files = reporter.get_ordered_notebook_files(general_report_sections,
+                                                                special_report_sections,
+                                                                custom_report_sections,
+                                                                section_order,
+                                                                subgroups,
+                                                                model_type=None,
+                                                                context='rsmsummarize')
+
+    # add chosen notebook files to configuration
+    configuration['chosen_notebook_files'] = chosen_notebook_files
+
     # now generate the comparison report
     logger.info('Starting report generation')
-    create_summary_report(summary_id, description,
-                          all_experiments,
-                          csvdir, subgroups,
-                          chosen_notebook_files)
+    reporter.create_summary_report(configuration,
+                                   all_experiments,
+                                   csvdir)
 
 
 def main():
-    # set up the basic logging config
-    fmt = LogFormatter()
-    hdlr = logging.StreamHandler(sys.stdout)
-    hdlr.setFormatter(fmt)
-    logging.root.addHandler(hdlr)
+    # set up the basic logging configuration
+    formatter = LogFormatter()
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+
+    logging.root.addHandler(handler)
     logging.root.setLevel(logging.INFO)
 
     # get the logger
@@ -191,7 +209,7 @@ def main():
                              "output of another rsmsummarize experiment. ")
 
     parser.add_argument('config_file',
-                        help="The JSON config file for this experiment")
+                        help="The JSON configuration file for this experiment")
 
     parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
                         help="The output directory where all the files "
@@ -227,9 +245,9 @@ def main():
     config_file = abspath(args.config_file)
     output_dir = abspath(args.output_dir)
 
-    # make sure that the given config file exists
+    # make sure that the given configuration file exists
     if not exists(config_file):
-        raise FileNotFoundError('Main config file {} '
+        raise FileNotFoundError('Main configuration file {} '
                                 'not found.'.format(config_file))
 
     # run the experiment
@@ -237,4 +255,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()

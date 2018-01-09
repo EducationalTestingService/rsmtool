@@ -1,0 +1,14 @@
+*.pyc
+*.pyo
+*.egg
+*.egg-info/
+
+.DS_Store
+.coverage
+
+*dist/
+*build/
+*static/
+*test_outputs/
+
+__pycache__

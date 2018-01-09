@@ -1,47 +1,44 @@
 """
 The main RSMTool script.
 
-:author: Nitin Madnani (nmadnani@ets.org)
+:author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
+:author: Nitin Madnani (nmadnani@ets.org)
+
+:date: 10/25/2017
 :organization: ETS
 """
 
-#!/usr/bin/env python
-
 import argparse
 import logging
-import os
 import sys
 
-from os import listdir
-from os.path import abspath, exists, join
+from os import listdir, getcwd, makedirs
+from os.path import abspath, exists, join, dirname
 
-import pandas as pd
-
-from rsmtool.analysis import (run_training_analyses,
-                              run_prediction_analyses,
-                              run_data_composition_analyses_for_rsmtool)
-from rsmtool.input import load_experiment_data
-from rsmtool.model import train_model
-from rsmtool.predict import generate_train_and_test_predictions
-from rsmtool.preprocess import preprocess_train_and_test_features
-from rsmtool.report import create_report
-from rsmtool.utils import (scale_coefficients,
-                           write_experiment_output,
-                           write_feature_csv)
+from rsmtool.analyzer import Analyzer
+from rsmtool.configuration_parser import ConfigurationParser, Configuration
+from rsmtool.modeler import Modeler
+from rsmtool.preprocessor import FeaturePreprocessor
+from rsmtool.reader import DataReader
+from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
+from rsmtool.writer import DataWriter
+
 from rsmtool.version import __version__
 
 
-def run_experiment(config_file, output_dir):
+def run_experiment(config_file_or_obj,
+                   output_dir):
     """
     Run RSMTool experiment using the given configuration
     file and generate all outputs in the given directory.
 
     Parameters
     ----------
-    config_file : str
+    config_file_or_obj : str or Configuration
         Path to the experiment configuration file.
+        Users can also pass a `Configuration` object that is in memory.
     output_dir : str
         Path to the experiment output directory.
 
@@ -49,7 +46,6 @@ def run_experiment(config_file, output_dir):
     ------
     ValueError
         If any of the required fields are missing or ill-specified.
-
     """
 
     logger = logging.getLogger(__name__)
@@ -57,327 +53,232 @@ def run_experiment(config_file, output_dir):
     # create the 'output' and the 'figure' sub-directories
     # where all the experiment output such as the CSV files
     # and the box plots will be saved
+
+    # Get absolute paths to output directories
     csvdir = abspath(join(output_dir, 'output'))
     figdir = abspath(join(output_dir, 'figure'))
     reportdir = abspath(join(output_dir, 'report'))
     featuredir = abspath(join(output_dir, 'feature'))
-    os.makedirs(csvdir, exist_ok=True)
-    os.makedirs(figdir, exist_ok=True)
-    os.makedirs(reportdir, exist_ok=True)
 
-    # load the experiment data
-    logger.info('Loading experiment data')
-    (df_train_features, df_test_features,
-     df_train_metadata, df_test_metadata,
-     df_train_other_columns, df_test_other_columns,
-     df_train_excluded, df_test_excluded,
-     df_train_length, df_test_human_scores,
-     df_train_flagged_responses,
-     df_test_flagged_responses,
-     experiment_id, description,
-     train_file_location, test_file_location,
-     df_feature_specs, model_name, model_type,
-     train_label_column, test_label_column,
-     id_column, length_column, second_human_score_column,
-     candidate_column, subgroups,
-     feature_subset_file,
-     used_trim_min, used_trim_max,
-     use_scaled_predictions,
-     exclude_zero_scores,
-     exclude_listwise,
-     min_items,
-     chosen_notebook_files) = load_experiment_data(config_file, output_dir)
+    # Make directories, if necessary
+    makedirs(csvdir, exist_ok=True)
+    makedirs(figdir, exist_ok=True)
+    makedirs(reportdir, exist_ok=True)
 
-    # preprocess each feature for the training and testing data
-    logger.info('Pre-processing training and test set features')
-    (df_train_preprocessed_features,
-     df_test_preprocessed_features,
-     df_feature_info) = preprocess_train_and_test_features(df_train_features,
-                                                           df_test_features,
-                                                           df_feature_specs)
+    # Allow users to pass Configuration object to the
+    # `config_file_or_obj` argument, rather than read from file
+    if not isinstance(config_file_or_obj, Configuration):
 
-    logger.info('Saving training and test set data to disk')
-    write_experiment_output([df_train_features, df_test_features,
-                             df_train_metadata,
-                             df_test_metadata,
-                             df_train_other_columns,
-                             df_test_other_columns,
-                             df_train_preprocessed_features,
-                             df_test_preprocessed_features,
-                             df_train_excluded,
-                             df_test_excluded,
-                             df_train_length,
-                             df_test_human_scores,
-                             df_train_flagged_responses,
-                             df_test_flagged_responses],
-                            ['train_features',
-                             'test_features',
-                             'train_metadata',
-                             'test_metadata',
-                             'train_other_columns',
-                             'test_other_columns',
-                             'train_preprocessed_features',
-                             'test_preprocessed_features',
-                             'train_excluded_responses',
-                             'test_excluded_responses',
-                             'train_response_lengths',
-                             'test_human_scores',
-                             'train_responses_with_excluded_flags',
-                             'test_responses_with_excluded_flags'],
-                            experiment_id,
-                            csvdir)
+        # Instantiate configuration parser object
+        configparser = ConfigurationParser.get_configparser(config_file_or_obj)
 
-    # do the data composition stats
-    features = [column for column in df_train_features.columns if column not in ['spkitemid', 'sc1']]
-    (df_train_excluded_analysis,
-     df_test_excluded_analysis,
-     df_data_composition,
-     data_composition_by_group_dict) = run_data_composition_analyses_for_rsmtool(df_train_metadata,
-                                                                                 df_test_metadata,
-                                                                                 df_train_excluded,
-                                                                                 df_test_excluded,
-                                                                                 features,
-                                                                                 subgroups,
-                                                                                 candidate_column,
-                                                                                 exclude_zero_scores=exclude_zero_scores,
-                                                                                 exclude_listwise=exclude_listwise)
-    write_experiment_output([df_train_excluded_analysis,
-                             df_test_excluded_analysis,
-                             df_data_composition],
-                            ['train_excluded_composition',
-                             'test_excluded_composition',
-                             'data_composition'],
-                            experiment_id,
-                            csvdir)
+        logger.info('Reading, normalizing, validating, and processing configuration.')
+        configuration = configparser.read_normalize_validate_and_process_config(config_file_or_obj)
 
-    # write the results of data composition analysis by group
-    for group in subgroups:
-        write_experiment_output([data_composition_by_group_dict[group]], ['data_composition_by_{}'.format(group)], experiment_id, csvdir)
+        # get the directory where the configuration file lives
+        configpath = dirname(config_file_or_obj)
 
-    # train the appropriate model. This is done before the
-    # descriptive analyses since for models with feature
-    # selection we only do the analysis for the
-    # features selected for the final model
-    logger.info('Training {} model'.format(model_name))
-    model = train_model(model_name,
-                        df_train_preprocessed_features,
-                        experiment_id,
-                        csvdir,
-                        figdir)
+    else:
 
-    # identify the features used by the model
-    selected_features = model.feat_vectorizer.get_feature_names()
+        configuration = config_file_or_obj
 
-    # generate the feature spec file which can be used to train models
-    # using just this selection
-    write_feature_csv(df_feature_specs, selected_features, experiment_id, featuredir)
+        if configuration.filepath is not None:
+            configpath = dirname(configuration.filepath)
+        else:
+            configpath = getcwd()
 
+    logger.info('Saving configuration file.')
+    configuration.save(output_dir)
+
+    # Get DataWriter object
+    writer = DataWriter(configuration['experiment_id'])
+
+    # Get the paths and names for the DataReader
+    (file_names,
+     file_paths) = configuration.get_names_and_paths(['train_file', 'test_file',
+                                                      'features', 'feature_subset_file'],
+                                                     ['train', 'test', 'feature_specs',
+                                                      'feature_subset_specs'])
+
+    file_paths = DataReader.locate_files(file_paths, configpath)
+
+    # Use the default converter for both train and test
+    converters = {'train': configuration.get_default_converter(),
+                  'test': configuration.get_default_converter()}
+
+    logger.info('Reading in all data from files.')
+
+    # Initialize the reader
+    reader = DataReader(file_paths, file_names, converters)
+    data_container = reader.read()
+
+    logger.info('Preprocessing all features.')
+
+    # Initialize the processor
+    processor = FeaturePreprocessor()
+
+    (processed_config,
+     processed_container) = processor.process_data(configuration,
+                                                   data_container)
+
+    # Rename certain frames with more descriptive names
+    # for writing out experiment files
+    rename_dict = {'train_excluded': 'train_excluded_responses',
+                   'test_excluded': 'test_excluded_responses',
+                   'train_length': 'train_response_lengths',
+                   'train_flagged': 'train_responses_with_excluded_flags',
+                   'test_flagged': 'test_responses_with_excluded_flags'}
+
+    logger.info('Saving training and test set data to disk.')
+
+    # Write out files
+    writer.write_experiment_output(csvdir,
+                                   processed_container,
+                                   ['train_features',
+                                    'test_features',
+                                    'train_metadata',
+                                    'test_metadata',
+                                    'train_other_columns',
+                                    'test_other_columns',
+                                    'train_preprocessed_features',
+                                    'test_preprocessed_features',
+                                    'train_excluded',
+                                    'test_excluded',
+                                    'train_length',
+                                    'test_human_scores',
+                                    'train_flagged',
+                                    'test_flagged'],
+                                   rename_dict)
+
+    # Initialize the analyzer
+    analyzer = Analyzer()
+
+    (analyzed_config,
+     analyzed_container) = analyzer.run_data_composition_analyses_for_rsmtool(processed_container,
+                                                                              processed_config)
+
+    # Write out files
+    writer.write_experiment_output(csvdir,
+                                   analyzed_container)
+
+    logger.info('Training {} model.'.format(processed_config['model_name']))
+
+    # Initialize modeler
+    modeler = Modeler()
+
+    modeler.train(processed_config,
+                  processed_container,
+                  csvdir,
+                  figdir)
+
+    # Identify the features used by the model
+    selected_features = modeler.get_feature_names()
+
+    # Add selected features to processed configuration
+    processed_config['selected_features'] = selected_features
+
+    # Write out files
+    writer.write_feature_csv(featuredir,
+                             processed_container,
+                             selected_features)
+
+    features_data_container = processed_container.copy()
+
+    # Get selected feature info, and write out to file
+    df_feature_info = features_data_container.feature_info.copy()
     df_selected_feature_info = df_feature_info[df_feature_info['feature'].isin(selected_features)]
-    write_experiment_output([df_selected_feature_info],
-                            ['feature'],
-                            experiment_id,
-                            csvdir)
+    selected_feature_dataset_dict = {'name': 'selected_feature_info',
+                                     'frame': df_selected_feature_info}
 
-    # run the training set analyses
-    logger.info('Running analyses on training set')
+    features_data_container.add_dataset(selected_feature_dataset_dict,
+                                        update=True)
 
-    (df_descriptives,
-     df_percentiles,
-     df_outliers,
-     df_all_pairwise_cors_orig,
-     df_all_pairwise_cors,
-     df_margcor_sc1,
-     df_pcor_sc1,
-     df_pcor_sc1_no_length,
-     df_margcor_length,
-     df_pcor_length,
-     score_correlation_by_group_dict,
-     length_correlation_by_group_dict,
-     df_pca_components,
-     df_pca_variance) = run_training_analyses(df_train_features,
-                                              df_train_metadata,
-                                              df_train_preprocessed_features,
-                                              df_train_length,
-                                              length_column,
-                                              selected_features,
-                                              subgroups)
+    writer.write_experiment_output(csvdir,
+                                   features_data_container,
+                                   dataframe_names=['selected_feature_info'],
+                                   new_names_dict={'selected_feature_info': 'feature'})
 
-    write_experiment_output([df_descriptives,
-                             df_percentiles,
-                             df_outliers,
-                             df_all_pairwise_cors_orig,
-                             df_all_pairwise_cors,
-                             df_margcor_sc1, df_pcor_sc1,
-                             df_pcor_sc1_no_length,
-                             df_margcor_length, df_pcor_length,
-                             df_pca_components,
-                             df_pca_variance],
-                            ['feature_descriptives',
-                             'feature_descriptivesExtra',
-                             'feature_outliers',
-                             'cors_orig',
-                             'cors_processed',
-                             'margcor_score_all_data',
-                             'pcor_score_all_data',
-                             'pcor_score_no_length_all_data',
-                             'margcor_length_all_data',
-                             'pcor_length_all_data',
-                             'pca', 'pcavar'],
-                            experiment_id,
-                            csvdir,
-                            reset_index=True)
+    logger.info('Running analyses on training set.')
 
-    # write the results of score and length correlation analyses by group
-    for group in subgroups:
-        sc1_marg_cors, sc1_part_cors, sc1_part_cors_no_length = score_correlation_by_group_dict[group]
-        write_experiment_output([sc1_marg_cors, sc1_part_cors, sc1_part_cors_no_length],
-                                ['margcor_score_by_{}'.format(group),
-                                 'pcor_score_by_{}'.format(group),
-                                 'pcor_score_no_length_by_{}'.format(group)],
-                                experiment_id,
-                                csvdir,
-                                reset_index=True)
+    (train_analyzed_config,
+     train_analyzed_container) = analyzer.run_training_analyses(processed_container,
+                                                                processed_config)
 
-        length_marg_cors, length_part_cors, _ = length_correlation_by_group_dict.get(group,
-                                                                                     (pd.DataFrame(),
-                                                                                      pd.DataFrame(),
-                                                                                      pd.DataFrame()))
-        write_experiment_output([length_marg_cors, length_part_cors],
-                                ['margcor_length_by_{}'.format(group),
-                                 'pcor_length_by_{}'.format(group)],
-                                experiment_id,
-                                csvdir,
-                                reset_index=True)
+    # Write out files
+    writer.write_experiment_output(csvdir,
+                                   train_analyzed_container,
+                                   reset_index=True)
 
-    # now generate the predictions using this model on the training
-    # and testing data
-    logger.info('Generating training and test set predictions')
-
+    # Use only selected features for predictions
     columns_for_prediction = ['spkitemid', 'sc1'] + selected_features
+    train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
+    test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
 
-    (df_train_predictions,
-     df_test_predictions,
-     train_predictions_mean,
-     train_predictions_sd,
-     h1_mean,
-     h1_sd) = generate_train_and_test_predictions(model,
-                                                  df_train_preprocessed_features[columns_for_prediction],
-                                                  df_test_preprocessed_features[columns_for_prediction],
-                                                  used_trim_min,
-                                                  used_trim_max)
+    logger.info('Generating training and test set predictions.')
+    (pred_config,
+     pred_data_container) = modeler.predict_train_and_test(train_for_prediction,
+                                                           test_for_prediction,
+                                                           processed_config)
 
-    # create a data frame with the post-processing parameters
-    # we want to save to disk
-    df_postproc_params = pd.DataFrame([{'trim_min': used_trim_min,
-                                        'trim_max': used_trim_max,
-                                        'h1_mean': h1_mean,
-                                        'h1_sd': h1_sd,
-                                        'train_predictions_mean': train_predictions_mean,
-                                        'train_predictions_sd': train_predictions_sd}])
+    # Write out files
+    writer.write_experiment_output(csvdir,
+                                   pred_data_container,
+                                   new_names_dict={'pred_test': 'pred_processed'})
 
-    logger.info('Saving training and test set predictions to disk')
-    write_experiment_output([df_train_predictions,
-                             df_test_predictions,
-                             df_postproc_params],
-                            ['pred_train',
-                             'pred_processed',
-                             'postprocessing_params'],
-                            experiment_id,
-                            csvdir)
+    original_coef_file = join(csvdir, '{}_coefficients.csv'.format(pred_config['experiment_id']))
 
-    # scale coefficients using the predictions and save them
-    # into a separate file -
-    # we only do this for models which generate _coefficients file.
-
-    original_coef_file = join(csvdir, "{}_coefficients.csv".format(experiment_id))
-
+    # If coefficients file exists, then generate
+    # scaled coefficients and save to file
     if exists(original_coef_file):
         logger.info('Scaling the coefficients and saving them to disk')
         try:
-            df_scaled_coefficients = scale_coefficients(model.model.intercept_,
-                                                        model.model.coef_,
-                                                        model.feat_vectorizer.get_feature_names(),
-                                                        train_predictions_mean,
-                                                        train_predictions_sd,
-                                                        h1_sd)
+
+            # Scale coefficients, and return DataContainer w/ scaled coefficients
+            scaled_data_container = modeler.scale_coefficients(pred_config)
+
+            # Write out files to disk
+            writer.write_experiment_output(csvdir,
+                                           scaled_data_container)
+
         except AttributeError:
             raise ValueError("It appears you are trying to save two different "
                              "experiments to the same directory using the same "
                              "ID. Please clear the content of the directory and "
                              "rerun both experiments using different "
                              "experiment IDs.")
-        write_experiment_output([df_scaled_coefficients],
-                                ['coefficients_scaled'],
-                                experiment_id,
-                                csvdir)
 
-    # run the analyses on the predictions of the models
+    # Add processed data_container frames to pred_data_container
+    new_pred_data_container = pred_data_container + processed_container
 
-    logger.info('Running analyses on test set predictions')
-    (df_human_machine_eval,
-     df_human_machine_eval_short,
-     df_human_human_eval,
-     eval_by_group_dict,
-     df_degradation,
-     df_confmatrix,
-     df_score_dist) = run_prediction_analyses(df_test_predictions,
-                                              df_test_metadata,
-                                              df_test_human_scores,
-                                              subgroups,
-                                              second_human_score_column,
-                                              use_scaled_predictions=use_scaled_predictions)
+    logger.info('Running prediction analyses.')
+    (pred_analysis_config,
+     pred_analysis_data_container) = analyzer.run_prediction_analyses(new_pred_data_container,
+                                                                      pred_config)
 
-    write_experiment_output([df_human_machine_eval,
-                             df_human_machine_eval_short,
-                             df_human_human_eval,
-                             df_degradation,
-                             df_confmatrix,
-                             df_score_dist],
-                            ['eval',
-                             'eval_short',
-                             'consistency',
-                             'degradation',
-                             'confMatrix',
-                             'score_dist'],
-                            experiment_id,
-                            csvdir,
-                            reset_index=True)
-
-    # write the results of evaluations by group
-    for group in subgroups:
-        eval_by_group, consistency_by_group = eval_by_group_dict[group]
-        write_experiment_output([eval_by_group, consistency_by_group],
-                                ['eval_by_{}'.format(group),
-                                 'consistency_by_{}'.format(group)],
-                                experiment_id, csvdir, reset_index=True)
+    # Write out files
+    writer.write_experiment_output(csvdir,
+                                   pred_analysis_data_container,
+                                   reset_index=True)
+    # Initialize reporter
+    reporter = Reporter()
 
     # generate the report
-    logger.info('Starting report generation')
-    create_report(experiment_id, description,
-                  model_type, model_name,
-                  train_file_location,
-                  test_file_location,
-                  csvdir, figdir,
-                  subgroups,
-                  length_column,
-                  second_human_score_column,
-                  min_items,
-                  feature_subset_file=feature_subset_file,
-                  chosen_notebook_files=chosen_notebook_files,
-                  exclude_zero_scores=exclude_zero_scores,
-                  use_scaled_predictions=use_scaled_predictions)
+    logger.info('Starting report generation.')
+    reporter.create_report(processed_config,
+                           csvdir,
+                           figdir)
 
 
 def main():
 
-    # set up the basic logging config
-    fmt = LogFormatter()
-    hdlr = logging.StreamHandler(sys.stdout)
-    hdlr.setFormatter(fmt)
-    logging.root.addHandler(hdlr)
+    formatter = LogFormatter()
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+
+    logging.root.addHandler(handler)
     logging.root.setLevel(logging.INFO)
 
-    # get the logger
     logger = logging.getLogger(__name__)
 
     # set up an argument parser
@@ -385,21 +286,20 @@ def main():
 
     parser.add_argument('-f', '--force', dest='force_write',
                         action='store_true', default=False,
-                        help="If true, rsmtool will not check if the"
-                             " output directory already contains the "
+                        help="If true, rsmtool will not check if the "
+                             "output directory already contains the "
                              "output of another rsmtool experiment. ")
 
-    parser.add_argument('config_file', help="The JSON config file for "
+    parser.add_argument('config_file', help="The JSON configuration file for "
                                             "this experiment")
 
-    parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
+    parser.add_argument('output_dir', nargs='?', default=getcwd(),
                         help="The output directory where all the files "
                              "for this experiment will be stored")
 
     parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s {0}'.format(__version__))
 
-    # parse given command line arguments
     args = parser.parse_args()
     logger.info('Output directory: {}'.format(args.output_dir))
 
@@ -426,9 +326,9 @@ def main():
     config_file = abspath(args.config_file)
     output_dir = abspath(args.output_dir)
 
-    # make sure that the given config file exists
+    # make sure that the given configuration file exists
     if not exists(config_file):
-        raise FileNotFoundError('Main config file {} '
+        raise FileNotFoundError('Main configuration file {} '
                                 'not found.'.format(config_file))
 
     # run the experiment
@@ -436,4 +336,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()

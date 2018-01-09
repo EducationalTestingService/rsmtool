@@ -1,13 +1,17 @@
 """
+:author: Jeremy Biggs {jbiggs@ets.org)}
+:author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
+
+:date: 01/25/2017
 :organization: ETS
 """
 
-import re
-import warnings
-
 # do we have rsmextra installed? we try to import rsmextra here
 # to avoid doing this in each module.
+
+import re
+import warnings
 
 try:
     import rsmextra
@@ -16,36 +20,26 @@ except ImportError:
 else:
     HAS_RSMEXTRA = True
 
-from .analysis import (compute_basic_descriptives,
-                       compute_percentiles,
-                       compute_outliers,
-                       compute_pca,
-                       correlation_helper,
-                       metrics_helper)
+from .analyzer import Analyzer
 
 from .convert_feature_json import convert_feature_json_file
 
-from .create_features import (generate_default_specs,
-                              find_feature_transformation)
+from .comparer import Comparer
 
-from .input import parse_json_with_comments
+from .container import DataContainer
 
-from .model import (model_fit_to_dataframe,
-                    ols_coefficients_to_dataframe,
-                    skll_learner_params_to_dataframe,
-                    train_builtin_model)
+from .modeler import Modeler
 
-from .predict import predict_with_model
+from .preprocessor import FeaturePreprocessor
 
-from .preprocess import (filter_on_column,
-                         preprocess_feature,
-                         preprocess_new_data,
-                         remove_outliers,
-                         transform_feature,
-                         trim)
+from .reader import DataReader
 
+from .reporter import Reporter
 
-from .report import convert_ipynb_to_html, merge_notebooks
+from .writer import DataWriter
+
+from .utils import (agreement,
+                    partial_correlations)
 
 from .rsmcompare import run_comparison
 
@@ -56,44 +50,6 @@ from .rsmtool import run_experiment
 from .rsmpredict import compute_and_save_predictions
 
 from .rsmsummarize import run_summary
-
-from .utils import (agreement,
-                    partial_correlations,
-                    write_experiment_output,
-                    write_feature_csv)
-
-__all__ = ['compute_basic_descriptives',
-           'compute_percentiles',
-           'compute_outliers',
-           'compute_pca',
-           'correlation_helper',
-           'convert_feature_json_file',
-           'metrics_helper',
-           'generate_default_specs',
-           'find_feature_transformation',
-           'parse_json_with_comments',
-           'model_fit_to_dataframe',
-           'ols_coefficients_to_dataframe',
-           'skll_learner_params_to_dataframe',
-           'train_builtin_model',
-           'predict_with_model',
-           'filter_on_column',
-           'remove_outliers',
-           'preprocess_feature',
-           'preprocess_new_data',
-           'transform_feature',
-           'trim',
-           'convert_ipynb_to_html',
-           'merge_notebooks',
-           'run_experiment',
-           'run_evaluation',
-           'run_comparison',
-           'run_summary',
-           'compute_and_save_predictions',
-           'agreement',
-           'partial_correlations',
-           'write_experiment_output',
-           'write_feature_csv']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

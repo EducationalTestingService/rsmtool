@@ -2,8 +2,11 @@
 Utility to generate predictions on new data
 from existing RSMTool models.
 
-:author: Nitin Madnani (nmadnani@ets.org)
+:author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
+:author: Nitin Madnani (nmadnani@ets.org)
+
+:date: 10/25/2017
 :organization: ETS
 """
 
@@ -15,38 +18,36 @@ import logging
 import os
 import sys
 
-from os.path import basename, dirname, exists, join, normpath, splitext
+from os.path import (basename,
+                     dirname,
+                     exists,
+                     join,
+                     normpath,
+                     splitext,
+                     split)
 
-import numpy as np
-import pandas as pd
-
-from rsmtool.input import (check_main_config,
-                           locate_file,
-                           read_data_file,
-                           read_json_file,
-                           rename_default_columns,
-                           check_flag_column)
-from rsmtool.predict import predict_with_model, process_predictions
-from rsmtool.preprocess import (preprocess_new_data,
-                                trim)
+from rsmtool.configuration_parser import ConfigurationParser, Configuration
+from rsmtool.modeler import Modeler
+from rsmtool.preprocessor import FeaturePreprocessor
+from rsmtool.reader import DataReader
 from rsmtool.utils import LogFormatter
+from rsmtool.writer import DataWriter
 
-from skll import Learner
 from rsmtool.version import __version__
 
 
-
-def compute_and_save_predictions(config_file, output_file, feats_file):
+def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=None):
     """
     Run ``rsmpredict`` with given configuration file and generate
     predictions (and, optionally, pre-processed feature values).
 
     Parameters
     ----------
-    config_file : str
+    config_file_or_obj : str or configuration_parser.Configuration
         Path to the experiment configuration file.
-    output_file : str
-        Path to the output file for saving predictions.
+        Users can also pass a `Configuration` object that is in memory.
+    output_dir : str
+        Path to the output directory for saving files.
     feats_file (optional): str
         Path to the output file for saving preprocessed feature values.
 
@@ -54,51 +55,49 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     ------
     ValueError
         If any of the required fields are missing or ill-specified.
-
     """
 
     logger = logging.getLogger(__name__)
 
-    # read in the main config file
-    config_obj = read_json_file(config_file)
-    config_obj = check_main_config(config_obj, context='rsmpredict')
+    # Allow users to pass Configuration object to the
+    # `config_file_or_obj` argument, rather than read file
+    if not isinstance(config_file_or_obj, Configuration):
 
-    # get the directory where the config file lives
-    # if this is the 'expm' directory, then go
-    # up one level.
-    configpath = dirname(config_file)
+        # Instantiate configuration parser object
+        configparser = ConfigurationParser.get_configparser(config_file_or_obj)
+
+        logger.info('Reading, normalizing, validating, and processing config.')
+        config = configparser.read_normalize_validate_and_process_config(config_file_or_obj,
+                                                                         context='rsmpredict')
+
+        # get the directory where the config file lives
+        configpath = dirname(config_file_or_obj)
+
+    else:
+
+        config = config_file_or_obj
+        if config.filepath is not None:
+            configpath = dirname(config.filepath)
+        else:
+            configpath = os.getcwd()
+
+    # get the experiment ID
+    experiment_id = config['experiment_id']
+
+    # Get DataWriter object
+    writer = DataWriter(experiment_id)
 
     # get the input file containing the feature values
     # for which we want to generate the predictions
-    input_features_file = locate_file(config_obj['input_features_file'], configpath)
+    input_features_file = DataReader.locate_files(config['input_features_file'], configpath)
     if not input_features_file:
-        raise FileNotFoundError('Input file {} does not exist'.format(config_obj['input_features_file']))
+        raise FileNotFoundError('Input file {} does not exist'
+                                ''.format(config['input_features_file']))
 
-    # get the experiment ID
-    experiment_id = config_obj['experiment_id']
-
-    # get the column name that will hold the ID
-    id_column = config_obj['id_column']
-
-    # get the column name for human score (if any)
-    human_score_column = config_obj['human_score_column']
-
-    # get the column name for second human score (if any)
-    second_human_score_column = config_obj['second_human_score_column']
-
-    # get the column name for subgroups (if any)
-    subgroups = config_obj['subgroups']
-
-    # get the column names for flag columns (if any)
-    flag_column_dict = check_flag_column(config_obj)
-
-    # get the name for the candidate_column (if any)
-    candidate_column = config_obj['candidate_column']
-
-    # get the directory of the experiment
-    experiment_dir = locate_file(config_obj['experiment_dir'], configpath)
+    experiment_dir = DataReader.locate_files(config['experiment_dir'], configpath)
     if not experiment_dir:
-        raise FileNotFoundError('The directory {} does not exist.'.format(config_obj['experiment_dir']))
+        raise FileNotFoundError('The directory {} does not exist.'
+                                ''.format(config['experiment_dir']))
     else:
         experiment_output_dir = normpath(join(experiment_dir, 'output'))
         if not exists(experiment_output_dir):
@@ -108,7 +107,8 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
     # find all the .model files in the experiment output directory
     model_files = glob.glob(join(experiment_output_dir, '*.model'))
     if not model_files:
-        raise FileNotFoundError('The directory {} does not contain any rsmtool models.'.format(experiment_output_dir))
+        raise FileNotFoundError('The directory {} does not contain any rsmtool models.'
+                                ''.format(experiment_output_dir))
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
     if experiment_id not in experiment_ids:
@@ -128,130 +128,117 @@ def compute_and_save_predictions(config_file, output_file, feats_file):
                                     'original model training'.format(experiment_output_dir,
                                                                      expected_file_name))
 
-    # read in the given features but make sure that the
-    # `id_column`, `candidate_column` and subgroups are read in as a string
-    logger.info('Reading features from {}'.format(input_features_file))
-    string_columns = [id_column, candidate_column] + subgroups
-    converter_dict = dict([(column, str) for column in string_columns if column])
+    # model_files = glob.glob(join(experiment_output_dir, '*.model'))
+    # if not model_files:
+    #     raise FileNotFoundError('The directory {} does not contain any rsmtool models. '
+    #                             ''.format(experiment_output_dir))
 
-    df_input = read_data_file(input_features_file, converters=converter_dict)
+    logger.info('Reading input files.')
 
-    # make sure that the columns specified in the config file actually exist
-    columns_to_check = [id_column] + subgroups + list(flag_column_dict.keys())
+    feature_info = join(experiment_output_dir,
+                        '{}_feature.csv'.format(experiment_id))
 
-    # add subgroups and the flag columns to the list of columns
-    # that will be added to the final file
-    columns_to_copy = subgroups + list(flag_column_dict.keys())
+    post_processing = join(experiment_output_dir,
+                           '{}_postprocessing_params.csv'.format(experiment_id))
 
-    # human_score_column will be set to sc1 by default
-    # we only raise an error if it's set to something else.
-    # However, since we cannot distinguish whether the column was set
-    # to sc1 by default or specified as such in the config file
-    # we append it to output anyway as long as
-    # it is in the input file
+    file_paths = [input_features_file, feature_info, post_processing]
+    file_names = ['input_features',
+                  'feature_info',
+                  'postprocessing_params']
 
-    if human_score_column != 'sc1' or 'sc1' in df_input.columns:
-        columns_to_check.append(human_score_column)
-        columns_to_copy.append('sc1')
+    converters = {'input_features': config.get_default_converter()}
 
-    if candidate_column:
-        columns_to_check.append(candidate_column)
-        columns_to_copy.append('candidate')
+    # Initialize the reader
+    reader = DataReader(file_paths, file_names, converters)
+    data_container = reader.read(kwargs_dict={'feature_info': {'index_col': 0}})
 
-    if second_human_score_column:
-        columns_to_check.append(second_human_score_column)
-        columns_to_copy.append('sc2')
+    # load the Modeler to generate the predictions
+    model = Modeler.load_from_file(join(experiment_output_dir,
+                                        '{}.model'.format(experiment_id)))
 
-    missing_columns = set(columns_to_check).difference(df_input.columns)
-    if missing_columns:
-        raise KeyError("Columns {} from the config file "
-                       "do not exist in the data.".format(missing_columns))
+    # Add the model to the configuration object
+    config['model'] = model
 
-    # rename all columns
-    df_input = rename_default_columns(df_input,
-                                      [],
-                                      id_column,
-                                      human_score_column,
-                                      second_human_score_column,
-                                      None,
-                                      None,
-                                      candidate_column=candidate_column)
+    # Initialize the processor
+    processor = FeaturePreprocessor()
 
-    # check that the id_column contains unique values
-    if df_input['spkitemid'].size != df_input['spkitemid'].unique().size:
-        raise ValueError("The data contains repeated response IDs in {}. Please make sure all response IDs are unique and re-run the tool.".format(id_column))
-
-    #  Read the preprocessing parameters stored in the
-    # _features.csv file
-    df_feature_info = pd.read_csv(join(experiment_output_dir,
-                                       '{}_feature.csv'.format(experiment_id)),
-                                  index_col=0)
-
-    (df_features_preprocessed,
-                  df_excluded) = preprocess_new_data(df_input,
-                                                     df_feature_info)
+    (processed_config,
+     processed_container) = processor.process_data(config,
+                                                   data_container,
+                                                   context='rsmpredict')
 
     # save the pre-processed features to disk if we were asked to
-    if feats_file:
+    if feats_file is not None:
         logger.info('Saving pre-processed feature values to {}'.format(feats_file))
 
+        feats_dir = dirname(feats_file)
+
         # create any directories needed for the output file
-        os.makedirs(dirname(feats_file), exist_ok=True)
-        df_features_preprocessed.to_csv(feats_file, index=False)
+        os.makedirs(feats_dir, exist_ok=True)
 
-    # now load the SKLL model to generate the predictions
-    model = Learner.from_file(join(experiment_output_dir, '{}.model'.format(experiment_id)))
+        _, feats_filename = split(feats_file)
+        feats_filename, _ = splitext(feats_filename)
 
-    # now generate the predictions for the features using this model
-    logger.info('Generating predictions')
-    df_predictions = predict_with_model(model, df_features_preprocessed)
+        # Write out files
+        writer.write_experiment_output(feats_dir,
+                                       processed_container,
+                                       include_experiment_id=False,
+                                       dataframe_names=['features_processed'],
+                                       new_names_dict={'features_processed':
+                                                       feats_filename})
 
-    # read in the post-processing parameters from disk
-    df_postproc_params = pd.read_csv(join(experiment_output_dir, '{}_postprocessing_params.csv'.format(experiment_id)))
+    if (output_file.lower().endswith('.csv') or
+        output_file.lower().endswith('.xlsx')):
 
-    trim_min = df_postproc_params['trim_min'].values[0]
-    trim_max = df_postproc_params['trim_max'].values[0]
-    h1_mean = df_postproc_params['h1_mean'].values[0]
-    h1_sd = df_postproc_params['h1_sd'].values[0]
-    train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
-    train_predictions_sd = df_postproc_params['train_predictions_sd'].values[0]
+        output_dir = dirname(output_file)
+        _, filename = split(output_file)
+        filename, _ = splitext(filename)
 
-    df_predictions = process_predictions(df_predictions,
-                                         train_predictions_mean,
-                                         train_predictions_sd,
-                                         h1_mean,
-                                         h1_sd,
-                                         trim_min, trim_max)
-
-    # add back the columns that we were requested to copy if any
-    if len(columns_to_copy) > 0:
-        df_predictions_with_metadata = pd.merge(df_predictions,
-                                                df_input[['spkitemid'] + columns_to_copy])
-        assert(len(df_predictions) == len(df_predictions_with_metadata))
     else:
-        df_predictions_with_metadata = df_predictions.copy()
+        output_dir = output_file
+        filename = 'predictions_with_metadata'
 
     # create any directories needed for the output file
-    os.makedirs(dirname(output_file), exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     # save the predictions to disk
-    logger.info('Saving predictions to {}'.format(output_file))
-    df_predictions_with_metadata.to_csv(output_file, index=False)
+    logger.info('Saving predictions.')
+
+    # Write out files
+    writer.write_experiment_output(output_dir,
+                                   processed_container,
+                                   include_experiment_id=False,
+                                   dataframe_names=['predictions_with_metadata'],
+                                   new_names_dict={'predictions_with_metadata':
+                                                   filename})
 
     # save excluded responses to disk
-    if not df_excluded.empty:
-        excluded_output_file = '{}_excluded_responses{}'.format(*splitext(output_file))
-        logger.info('Saving excluded responses to {}'.format(excluded_output_file))
-        df_excluded.to_csv(excluded_output_file, index=False)
+    if not processed_container.excluded.empty:
+
+        # save the predictions to disk
+        logger.info('Saving excluded responses to {}'.format(join(output_dir,
+                                                                  '{}_excluded_responses.csv'
+                                                                  ''.format(filename))))
+
+        # Write out files
+        writer.write_experiment_output(output_dir,
+                                       processed_container,
+                                       include_experiment_id=False,
+                                       dataframe_names=['excluded'],
+                                       new_names_dict={'excluded':
+                                                       '{}_excluded_responses'
+                                                       ''.format(filename)})
 
 
 def main():
 
     # set up the basic logging config
-    fmt = LogFormatter()
-    hdlr = logging.StreamHandler(sys.stdout)
-    hdlr.setFormatter(fmt)
-    logging.root.addHandler(hdlr)
+    formatter = LogFormatter()
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+
+    logging.root.addHandler(handler)
     logging.root.setLevel(logging.INFO)
 
     # set up an argument parser
@@ -288,5 +275,7 @@ def main():
                                  output_file,
                                  preproc_feats_file)
 
+
 if __name__ == '__main__':
+
     main()

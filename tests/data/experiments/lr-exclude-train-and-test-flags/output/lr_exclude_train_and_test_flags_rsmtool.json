@@ -1,0 +1,39 @@
+{
+    "general_sections": [
+        "all"
+    ],
+    "use_scaled_predictions": true,
+    "flag_column_test": {
+        "flag": 2
+    },
+    "second_human_score_column": "score2",
+    "min_items_per_candidate": null,
+    "subgroups": [
+        "L1"
+    ],
+    "candidate_column": null,
+    "test_file": "../../files/test_with_different_flags.csv",
+    "exclude_zero_scores": true,
+    "id_column": "ID",
+    "test_label_column": "score",
+    "select_transformations": false,
+    "length_column": null,
+    "experiment_id": "lr_exclude_train_and_test_flags",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "special_sections": null,
+    "feature_subset": null,
+    "trim_max": 6,
+    "flag_column": {
+        "flag": 0
+    },
+    "standardize_features": true,
+    "train_label_column": "score",
+    "description": "Using different training and test flags.",
+    "feature_subset_file": null,
+    "section_order": null,
+    "custom_sections": null,
+    "features": "features.csv",
+    "train_file": "../../files/train_with_flags.csv",
+    "sign": null
+}

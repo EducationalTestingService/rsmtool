@@ -92,6 +92,8 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``evaluation``: Compares the standard set of evaluations recommended for scoring models on the evaluation data.
 
+    - ``evaluation by group``: tables and barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
+
     - ``pca``: Shows the results of principal components analysis on the processed feature values for the new model only:
 
         - the principal components themselves;

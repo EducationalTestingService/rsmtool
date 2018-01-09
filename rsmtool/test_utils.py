@@ -10,9 +10,8 @@ from os.path import basename, join
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
 
-from rsmtool import run_experiment
-from rsmtool.model import create_fake_skll_learner
-from rsmtool.predict import predict_with_model
+from rsmtool.modeler import Modeler
+from rsmtool.rsmtool import run_experiment
 from rsmtool.rsmcompare import run_comparison
 from rsmtool.rsmeval import run_evaluation
 from rsmtool.rsmpredict import compute_and_save_predictions
@@ -151,7 +150,6 @@ def check_csv_output(csv1, csv2):
         Path to the first CSV file.
     csv2 : str
         Path to the second CSV files.
-
     """
 
     # make sure that the main id columns are read as strings since
@@ -178,7 +176,7 @@ def check_csv_output(csv1, csv2):
             if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
 
-    #do the same for indices
+    # do the same for indices
     for df in [df1, df2]:
         if df.index.dtype == np.int64:
             df.index = df.index.astype(np.float64)
@@ -252,10 +250,11 @@ def check_scaled_coefficients(source, experiment_id):
 
     # create fake skll objects with new coefficients
     df_coef = pd.read_csv(scaled_coefficients_file)
-    new_model = create_fake_skll_learner(df_coef)
+    learner = Modeler.create_fake_skll_learner(df_coef)
+    model = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'
-    df_new_predictions = predict_with_model(new_model, df_preprocessed_test_data)
+    df_new_predictions = model.predict(df_preprocessed_test_data)
     df_new_predictions.rename(columns={'raw': 'scale'}, inplace=True)
 
     # check that new predictions match the scaled old predictions
@@ -292,7 +291,6 @@ def check_all_csv_exist(csv_files, experiment_id, model_source):
                           "_pca.csv",
                           "_pcavar.csv",
                           "_pcor_score_all_data.csv",
-                          #"_pred.csv", check again
                           "_pred_processed.csv",
                           "_pred_train.csv",
                           "_score_dist.csv",
@@ -370,11 +368,17 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups):
                                                '{}_data_composition.csv'.format(experiment_id)))
     for group in subgroups:
         composition_by_group = pd.read_csv(join(output_dir,
-                                                '{}_data_composition_by_{}.csv'.format(experiment_id,
-                                                                                       group)))
+                                                '{}_data_composition_by_{}'
+                                                '.csv'.format(experiment_id,
+                                                              group)))
         for partition in ['Training', 'Evaluation']:
-            partition_info = df_data_composition_all[df_data_composition_all['partition'] == partition].copy()
-            total_responses_across_groups = sum(composition_by_group['{} set'.format(partition)])
-            ok_(total_responses_across_groups == partition_info.iloc[0]['responses'])
-            group_info = composition_by_group[composition_by_group['{} set'.format(partition)] != 0].copy()
-            ok_(len(group_info) == partition_info.iloc[0][group])
+            partition_info = df_data_composition_all.ix[df_data_composition_all['partition'] ==
+                                                        partition]
+
+            summation = sum(composition_by_group['{} set'
+                                                 ''.format(partition)])
+            ok_(summation == partition_info.iloc[0]['responses'])
+
+            length = len(composition_by_group.ix[composition_by_group['{} set'
+                                                                      ''.format(partition)] != 0])
+            ok_(length == partition_info.iloc[0][group])

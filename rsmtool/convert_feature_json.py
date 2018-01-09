@@ -4,16 +4,16 @@ newer feature files in tabular formats (csv/tsv/xls/xlsx).
 
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
+
 :organization: ETS
 """
-
 import argparse
 import json
 import os
-
 import pandas as pd
 
-from os.path import dirname, exists, splitext
+from os.path import splitext
+
 
 def convert_feature_json_file(json_file, output_file, delete=False):
     """
@@ -28,6 +28,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
         Path to CSV/TSV/XLS/XLSX output file.
     delete : bool, optional
         Whether to delete the original file after conversion.
+        Defaults to False.
 
     Raises
     ------
@@ -39,7 +40,8 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     # make sure the input file is a valid feature JSON file
     json_dict = json.load(open(json_file, 'r'))
     if not list(json_dict.keys()) == ['features']:
-        raise RuntimeError("{} is not a valid feature JSON file".format(json_file))
+        raise RuntimeError("{} is not a valid feature JSON "
+                           "file".format(json_file))
 
     # convert to tabular format
     df_feature = pd.DataFrame(json_dict['features'])
@@ -47,8 +49,9 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     # make sure the output file is in a supported format
     output_extension = splitext(output_file)[1].lower()
     if output_extension not in ['.csv', '.tsv', '.xls', '.xlsx']:
-        raise RuntimeError("The output file {} has an unsupported extension. "
-                           "It must be a CSV/TSV/XLS/XLSX file.".format(output_file))
+        raise RuntimeError("The output file {} has an unsupported "
+                           "extension. It must be a CSV/TSV/XLS/XLSX "
+                           "file.".format(output_file))
 
     if output_extension == '.csv':
         df_feature.to_csv(output_file, index=False)
@@ -64,9 +67,11 @@ def convert_feature_json_file(json_file, output_file, delete=False):
 def main():
     parser = argparse.ArgumentParser(prog='convert_feature_json')
     parser.add_argument('json_file',
-                        help="The feature JSON file to convert to tabular format.")
+                        help="The feature JSON file to convert "
+                             "to tabular format.")
     parser.add_argument('output_file',
-                        help="The output file containing the features in tabular format.")
+                        help="The output file containing the features "
+                             "in tabular format.")
     parser.add_argument('--delete',
                         help="Delete original JSON file after conversion.",
                         default=False,
@@ -74,7 +79,11 @@ def main():
                         action="store_true")
 
     args = parser.parse_args()
-    convert_feature_json_file(args.json_file, args.output_file, delete=args.delete)
+    convert_feature_json_file(args.json_file,
+                              args.output_file,
+                              delete=args.delete)
+
 
 if __name__ == '__main__':
+
     main()

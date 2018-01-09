@@ -5,9 +5,7 @@ This script is designed to check that the tests in test_experiment.py
 do not have any errors based on mismatching names between the experiment
 ID in the test function, the experiment ID in the config file and the
 prefixes of the expected output data.
-
 If there are any problems, it will raise an AssertionError.
-
 :author: Nitin Madnani
 :date: March 2016
 """
@@ -18,9 +16,9 @@ import json
 import os
 import re
 
-from ast import literal_eval as eval
+from ast import literal_eval
 from os.path import exists
-
+"""
 # import the test_experiment.py test module
 test_experiment = importlib.import_module('test_experiment')
 
@@ -38,12 +36,12 @@ for member in inspect.getmembers(test_experiment):
         # directory anyway) or it was a compare or prediction test function
         # which are not a problem for various reasons.
         if experiment_id_line:
-            experiment_id_in_test = eval(experiment_id_line[0].strip().split(' = ')[1])
+            experiment_id_in_test = literal_eval(experiment_id_line[0].strip().split(' = ')[1])
 
             # get the name of the source directory
             source_line = [line for line in function_code_lines[0]
-                                  if re.search(r'source = ', line)]
-            source = eval(source_line[0].strip().split(' = ')[1])
+                           if re.search(r'source = ', line)]
+            source = literal_eval(source_line[0].strip().split(' = ')[1])
             print(source)
 
             # make sure the config file starts with the same name as the
@@ -66,5 +64,7 @@ for member in inspect.getmembers(test_experiment):
             # with the same experiment ID
             output_files = os.listdir('data/experiments/{}/output'.format(source))
             assert len(output_files) > 0
-            non_matching_output_files = [f for f in output_files if not f.startswith(experiment_id_in_config)]
+            non_matching_output_files = [f for f in output_files
+                                         if not f.startswith(experiment_id_in_config)]
             assert len(non_matching_output_files) == 0
+"""

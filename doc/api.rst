@@ -13,55 +13,75 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 .. autofunction:: rsmtool.run_summary
 .. autofunction:: rsmtool.compute_and_save_predictions
 
-From :py:mod:`~rsmtool.analysis` Module
+From :py:mod:`~rsmtool.analyzer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.compute_basic_descriptives
-.. autofunction:: rsmtool.compute_percentiles
-.. autofunction:: rsmtool.compute_outliers
-.. autofunction:: rsmtool.compute_pca
-.. autofunction:: rsmtool.correlation_helper
-.. autofunction:: rsmtool.metrics_helper
+.. automodule:: rsmtool.analyzer
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.preprocess` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.trim
-.. autofunction:: rsmtool.remove_outliers
-.. autofunction:: rsmtool.filter_on_column
-.. autofunction:: rsmtool.transform_feature
-.. autofunction:: rsmtool.preprocess_feature
-.. autofunction:: rsmtool.preprocess_new_data
+From :py:mod:`~rsmtool.comparer` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.comparer
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.create_features` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.generate_default_specs
-.. autofunction:: rsmtool.find_feature_transformation
+From :py:mod:`~rsmtool.configuration_parser` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.configuration_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.input` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.parse_json_with_comments
+From :py:mod:`~rsmtool.container` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.container
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.model` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.model_fit_to_dataframe
-.. autofunction:: rsmtool.ols_coefficients_to_dataframe
-.. autofunction:: rsmtool.skll_learner_params_to_dataframe
-.. autofunction:: rsmtool.train_builtin_model
+From :py:mod:`~rsmtool.modeler` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.modeler
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.predict` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.predict_with_model
+From :py:mod:`~rsmtool.preprocessor` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.preprocessor
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.report` Module
+From :py:mod:`~rsmtool.reader` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.convert_ipynb_to_html
-.. autofunction:: rsmtool.merge_notebooks
+.. automodule:: rsmtool.reader
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-From :py:mod:`~rsmtool.utils` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.partial_correlations
-.. autofunction:: rsmtool.agreement
-.. autofunction:: rsmtool.write_experiment_output
-.. autofunction:: rsmtool.write_feature_csv
+From :py:mod:`~rsmtool.reporter` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.reporter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+From :py:mod:`~rsmtool.transformer` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.transformer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+From :py:mod:`~rsmtool.writer` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: rsmtool.writer
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 From :py:mod:`~rsmtool.convert_feature_json` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

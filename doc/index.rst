@@ -1,5 +1,5 @@
 .. RSMTool documentation master file, created by
-   sphinx-quickstart on Wed Jul 20 09:24:36 2016.
+   sphinx-quickstart on Mon Dec 11 10:52:16 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 

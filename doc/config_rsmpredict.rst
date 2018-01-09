@@ -48,6 +48,10 @@ second_human_score_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The name for the column containing the second human score. This column will be renamed to ``sc2``.
 
+standardize_features *(Optional)*
+"""""""""""""""""""""""""""""""""
+If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
+
 subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. All these columns will be included into the predictions file with the original names.

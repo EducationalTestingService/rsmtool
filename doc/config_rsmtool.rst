@@ -98,7 +98,7 @@ The name for an optional column in the test data containing a second human score
 flag_column *(Optional)*
 """"""""""""""""""""""""
 This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. 
-When this field is used, the specified columns must be present in both training and evaluation set. 
+When this field is used, the specified columns must be present in the training set and, if ``flag_column_tes`` is not passed, the evaluation set, as well. 
 Defaults to ``None``.
 
 .. note::
@@ -109,6 +109,16 @@ Defaults to ``None``.
 .. note::
 
     When reading the values in the supplied dictionary, ``rsmtool`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
+
+
+.. _flag_column_test_rsmtool:
+
+flag_column_test *(Optional)*
+"""""""""""""""""""""""""""""
+This field makes it possible to only use a separate Python flag dictionary for the evaluation set. If this field is not passed, and ``flag_column`` is passed, then the same advisories will be used for both training and evaluation sets. 
+
+When this field is used, the specified columns must be present in the evaluation set. 
+Defaults to ``None`` or `flag_column``, if ``flag_column`` is present. Use ``flag_column_test`` only if you want filtering of the test set.
 
 .. _exclude_zero_scores_rsmtool:
 
@@ -147,6 +157,14 @@ Note that ``inv`` is never used for features with positive values. Defaults to `
 .. seealso::
 
     It is also possible to manually apply transformations to any feature as part of the :ref:`feature column selection <feature_list_column_selection>` process.
+
+
+.. _standardize_features:
+
+standardize_features *(Optional)*
+"""""""""""""""""""""""""""""""""
+If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
+
 
 .. _use_scaled_predictions_rsmtool:
 

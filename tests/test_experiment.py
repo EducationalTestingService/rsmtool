@@ -4,6 +4,7 @@ from glob import glob
 from os.path import basename, dirname, exists, join
 
 from nose.tools import raises
+from rsmtool.configuration_parser import ConfigurationParser
 
 from rsmtool.test_utils import (check_csv_output,
                                 check_report,
@@ -47,72 +48,6 @@ def test_run_experiment_lr():
     yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
-
-
-def test_run_experiment_lr_old_config():
-    # basic experiment with a LinearRegression model but using an
-    # old style configuration file
-
-    source = 'lr-old-config'
-    experiment_id = 'empWt'
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
-
-    # run this experiment but suppress the expected deprecation warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
-        do_run_experiment(source, experiment_id, config_file)
-        output_dir = join('test_outputs', source, 'output')
-        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-        csv_files = glob(join(output_dir, '*.csv'))
-        for csv_file in csv_files:
-            csv_filename = basename(csv_file)
-            expected_csv_file = join(expected_output_dir, csv_filename)
-
-            if exists(expected_csv_file):
-                yield check_csv_output, csv_file, expected_csv_file
-
-        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-        yield check_scaled_coefficients, source, experiment_id
-        yield check_report, html_report
-
-
-def test_run_experiment_lr_feature_json():
-    # basic experiment with a LinearRegression model but using
-    # feature json file
-
-    source = 'lr-feature-json'
-    experiment_id = 'lr'
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
-
-    # run this experiment but suppress the expected deprecation warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
-        do_run_experiment(source, experiment_id, config_file)
-        output_dir = join('test_outputs', source, 'output')
-        expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-        csv_files = glob(join(output_dir, '*.csv'))
-        for csv_file in csv_files:
-            csv_filename = basename(csv_file)
-            expected_csv_file = join(expected_output_dir, csv_filename)
-
-            if exists(expected_csv_file):
-                yield check_csv_output, csv_file, expected_csv_file
-
-        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
-        yield check_scaled_coefficients, source, experiment_id
-        yield check_report, html_report
 
 
 def test_run_experiment_lr_subset_features():
@@ -216,6 +151,7 @@ def test_run_experiment_ridge():
 
     yield check_all_csv_exist, csv_files, experiment_id, 'skll'
     yield check_report, html_report
+
 
 def test_run_experiment_linearsvr():
 
@@ -447,7 +383,8 @@ def test_run_experiment_lr_subgroups_with_edge_cases():
         do_run_experiment(source, experiment_id, config_file)
         output_dir = join('test_outputs', source, 'output')
         expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-        html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+        html_report = join('test_outputs', source, 'report',
+                           '{}_report.html'.format(experiment_id))
 
         csv_files = glob(join(output_dir, '*.csv'))
         for csv_file in csv_files:
@@ -483,6 +420,7 @@ def test_run_experiment_lr_predict():
         expected_output_file = join(expected_output_dir, csv_file)
 
         yield check_csv_output, output_file, expected_output_file
+
 
 def test_run_experiment_lr_predict_with_score():
 
@@ -528,7 +466,6 @@ def test_run_experiment_lr_predict_missing_values():
         expected_output_file = join(expected_output_dir, csv_file)
 
         yield check_csv_output, output_file, expected_output_file
-
 
 
 def test_run_experiment_lr_predict_with_subgroups():
@@ -707,6 +644,7 @@ def test_run_experiment_lr_include_zeros():
     yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
+
 
 def test_run_experiment_lr_with_length():
 
@@ -1041,6 +979,7 @@ def test_run_experiment_lr_eval_with_scaling_and_h2_keep_zeros():
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_report, html_report
 
+
 def test_run_experiment_lr_with_h2_named_sc1():
 
     # basic experiment with second rater analyses
@@ -1161,8 +1100,6 @@ def test_run_experiment_lr_eval_exclude_listwise():
             yield check_csv_output, csv_file, expected_csv_file
 
     yield check_report, html_report
-
-
 
 
 def test_run_experiment_lr_eval_with_missing_scores():
@@ -1397,8 +1334,6 @@ def test_run_experiment_lr_with_custom_sections_and_order():
     yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
-
-
 
 
 def test_run_experiment_lr_eval_with_custom_sections_and_order():
@@ -1865,8 +1800,10 @@ def test_run_experiment_lr_compare_different_experiments():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores_report.html')
+    html_report = join('test_outputs', source,
+                       'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores_report.html')
     yield check_report, html_report
+
 
 def test_run_experiment_lr_compare_with_h2():
 
@@ -2090,6 +2027,7 @@ def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
             yield check_csv_output, csv_file, expected_csv_file
 
     yield check_report, html_report
+
 
 def test_run_experiment_lr_tsv_input_files():
 
@@ -2494,6 +2432,7 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
                        '{}.json'.format(experiment_id))
     do_run_evaluation(source, experiment_id, config_file)
 
+
 @raises(ValueError)
 def test_run_experiment_lr_eval_same_system_human_score():
 
@@ -2699,6 +2638,7 @@ def test_run_experiment_lr_predict_missing_columns():
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
 
+
 @raises(KeyError)
 def test_run_experiment_lr_predict_missing_feature():
 
@@ -2765,6 +2705,7 @@ def test_run_experiment_duplicate_feature_names():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
+
 
 @raises(FileNotFoundError)
 def test_run_experiment_lr_compare_wrong_directory():
@@ -2835,3 +2776,294 @@ def test_run_experiment_summary_no_json():
     do_run_summary(source, config_file)
 
 
+@raises(ValueError)
+def test_run_experiment_lr_old_config():
+    # basic experiment with a LinearRegression model but using an
+    # old style configuration file
+
+    source = 'lr-old-config'
+    experiment_id = 'empWt'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    # run this experiment but suppress the expected deprecation warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        do_run_experiment(source, experiment_id, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_lr_feature_json():
+    # basic experiment with a LinearRegression model but using
+    # feature json file
+
+    source = 'lr-feature-json'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    # run this experiment but suppress the expected deprecation warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        do_run_experiment(source, experiment_id, config_file)
+
+
+# Repeated tests with CFG-style config
+# and config objects
+
+
+def test_run_experiment_lr_with_cfg():
+    # basic experiment with a LinearRegression model
+
+    source = 'lr-cfg'
+    experiment_id = 'lr_cfg'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.cfg'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_with_object():
+    # basic experiment with a LinearRegression model
+
+    source = 'lr-object'
+    experiment_id = 'lr_object'
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    config_dict = {"train_file": "../../files/train.csv",
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": "../../files/test.csv",
+                   "trim_max": 6,
+                   "features": "features.csv",
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_object",
+                   "description": "Using all features with an LinearRegression model."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config()
+    config_obj = config_file
+
+    do_run_experiment(source, experiment_id, config_obj)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_cfg():
+
+    # basic evaluation experiment using rsmeval
+
+    source = 'lr-eval-cfg'
+    experiment_id = 'lr_eval_cfg'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.cfg'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_summary_with_object():
+
+    # basic rsmsummarize experiment comparing several rsmtool experiments
+    source = 'lr-self-summary-object'
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+
+    config_dict = {"summary_id": "model_comparison",
+                   "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
+                   "description": "Comparison of rsmtool experiment with itself."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
+    config_obj = config_file
+
+    do_run_summary(source, config_obj)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_no_standardization():
+    # basic experiment with a LinearRegression model,
+    # with no standardization of features
+
+    source = 'lr-no-standardization'
+    experiment_id = 'lr_no_standardization'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_predict_no_standardization():
+
+    # rsmpredict experiment with no standardization of features
+
+    source = 'lr-predict-no-standardization'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file
+
+
+def test_run_experiment_lr_exclude_test_flags():
+    # basic experiment with a LinearRegression model,
+    # with only test flags removed
+
+    source = 'lr-exclude-test-flags'
+    experiment_id = 'lr_exclude_test_flags'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_exclude_train_and_test_flags():
+    # basic experiment with a LinearRegression model,
+    # with different train and test flags
+
+    source = 'lr-exclude-train-and-test-flags'
+    experiment_id = 'lr_exclude_train_and_test_flags'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report

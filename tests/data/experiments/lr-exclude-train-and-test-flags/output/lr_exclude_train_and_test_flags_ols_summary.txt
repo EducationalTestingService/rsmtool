@@ -1,0 +1,32 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    sc1   R-squared:                       0.486
+Model:                            OLS   Adj. R-squared:                  0.474
+Method:                 Least Squares   F-statistic:                     40.37
+Date:                Fri, 15 Dec 2017   Prob (F-statistic):           4.55e-45
+Time:                        11:59:01   Log-Likelihood:                -302.50
+No. Observations:                 350   AIC:                             623.0
+Df Residuals:                     341   BIC:                             657.7
+Df Model:                           8                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [95.0% Conf. Int.]
+------------------------------------------------------------------------------
+const          3.4114      0.031    109.697      0.000         3.350     3.473
+FEATURE1       0.3296      0.040      8.261      0.000         0.251     0.408
+FEATURE2       0.0340      0.035      0.961      0.337        -0.036     0.104
+FEATURE3       0.1864      0.039      4.787      0.000         0.110     0.263
+FEATURE4       0.1107      0.038      2.877      0.004         0.035     0.186
+FEATURE5       0.0318      0.036      0.891      0.373        -0.038     0.102
+FEATURE6       0.1229      0.035      3.465      0.001         0.053     0.193
+FEATURE7      -0.0297      0.031     -0.944      0.346        -0.091     0.032
+FEATURE8      -0.0396      0.031     -1.261      0.208        -0.101     0.022
+==============================================================================
+Omnibus:                        5.945   Durbin-Watson:                   2.306
+Prob(Omnibus):                  0.051   Jarque-Bera (JB):                7.358
+Skew:                          -0.148   Prob(JB):                       0.0253
+Kurtosis:                       3.646   Cond. No.                         2.66
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

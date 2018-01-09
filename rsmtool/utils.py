@@ -1,64 +1,280 @@
-import logging
-import os
+"""
+Utility classes and functions.
 
+:author: Jeremy Biggs (jbiggs@ets.org)
+:author: Anastassia Loukina (aloukina@ets.org)
+:author: Nitin Madnani (nmadnani@ets.org)
+
+:date: 10/25/2017
+:organization: ETS
+"""
+
+import re
+import json
+import logging
 import numpy as np
 import pandas as pd
 
 from math import ceil
-from os import makedirs
-from os.path import join
 from string import Template
 from textwrap import wrap
 
-# get the path to this file
-package_path = os.path.dirname(__file__)
+from skll.data import safe_float as string_to_number
 
 
-class LogFormatter(logging.Formatter):
+BUILTIN_MODELS = ['LinearRegression',
+                  'EqualWeightsLR',
+                  'ScoreWeightedLR',
+                  'RebalancedLR',
+                  'NNLR',
+                  'LassoFixedLambdaThenNNLR',
+                  'LassoFixedLambdaThenLR',
+                  'PositiveLassoCVThenLR',
+                  'LassoFixedLambda',
+                  'PositiveLassoCV']
+
+SKLL_MODELS = ['AdaBoostRegressor',
+               'DecisionTreeRegressor',
+               'ElasticNet',
+               'GradientBoostingRegressor',
+               'KNeighborsRegressor',
+               'Lasso',
+               'LinearSVR',
+               'RandomForestRegressor',
+               'Ridge',
+               'SGDRegressor',
+               'SVR']
+
+DEFAULTS = {'id_column': 'spkitemid',
+            'description': '',
+            'description_old': '',
+            'description_new': '',
+            'train_label_column': 'sc1',
+            'test_label_column': 'sc1',
+            'human_score_column': 'sc1',
+            'exclude_zero_scores': True,
+            'use_scaled_predictions': False,
+            'use_scaled_predictions_old': False,
+            'use_scaled_predictions_new': False,
+            'select_transformations': False,
+            'standardize_features': True,
+            'scale_with': None,
+            'sign': None,
+            'features': None,
+            'length_column': None,
+            'second_human_score_column': None,
+            'form_level_scores': None,
+            'candidate_column': None,
+            'general_sections': 'all',
+            'special_sections': None,
+            'custom_sections': None,
+            'feature_subset_file': None,
+            'feature_subset': None,
+            'feature_prefix': None,
+            'trim_min': None,
+            'trim_max': None,
+            'subgroups': [],
+            'section_order': None,
+            'flag_column': None,
+            'flag_column_test': None,
+            'min_items_per_candidate': None}
+
+LIST_FIELDS = ['feature_prefix',
+               'general_sections',
+               'special_sections',
+               'custom_sections',
+               'subgroups',
+               'section_order',
+               'experiment_dirs']
+
+BOOLEAN_FIELDS = ['exclude_zero_scores',
+                  'use_scaled_predictions',
+                  'use_scaled_predictions_old',
+                  'use_scaled_predictions_new',
+                  'select_transformations']
+
+FIELD_NAME_MAPPING = {'expID': 'experiment_id',
+                      'LRmodel': 'model',
+                      'train': 'train_file',
+                      'test': 'test_file',
+                      'predictions': 'predictions_file',
+                      'feature': 'features',
+                      'train.lab': 'train_label_column',
+                      'test.lab': 'test_label_column',
+                      'trim.min': 'trim_min',
+                      'trim.max': 'trim_max',
+                      'scale': 'use_scaled_predictions',
+                      'feature.subset': 'feature_subset'}
+
+MODEL_NAME_MAPPING = {'empWt': 'LinearRegression',
+                      'eqWt': 'EqualWeightsLR',
+                      'empWtBalanced': 'RebalancedLR',
+                      'empWtDropNeg': '',
+                      'empWtNNLS': 'NNLR',
+                      'empWtDropNegLasso': 'LassoFixedLambdaThenNNLR',
+                      'empWtLasso': 'LassoFixedLambdaThenLR',
+                      'empWtLassoBest': 'PositiveLassoCVThenLR',
+                      'lassoWtLasso': 'LassoFixedLambda',
+                      'lassoWtLassoBest': 'PositiveLassoCV'}
+
+CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
+                                         'model',
+                                         'train_file',
+                                         'test_file'],
+                            'optional': ['description',
+                                         'features',
+                                         'feature_subset_file',
+                                         'feature_subset',
+                                         'sign',
+                                         'id_column',
+                                         'train_label_column',
+                                         'test_label_column',
+                                         'length_column',
+                                         'second_human_score_column',
+                                         'flag_column',
+                                         'flag_column_test',
+                                         'exclude_zero_scores',
+                                         'trim_min',
+                                         'trim_max',
+                                         'select_transformations',
+                                         'use_scaled_predictions',
+                                         'subgroups',
+                                         'general_sections',
+                                         'custom_sections',
+                                         'special_sections',
+                                         'section_order',
+                                         'candidate_column',
+                                         'standardize_features',
+                                         'min_items_per_candidate']},
+                'rsmeval': {'required': ['experiment_id',
+                                         'predictions_file',
+                                         'system_score_column',
+                                         'trim_min',
+                                         'trim_max'],
+                            'optional': ['description',
+                                         'id_column',
+                                         'human_score_column',
+                                         'second_human_score_column',
+                                         'flag_column',
+                                         'exclude_zero_scores',
+                                         'scale_with',
+                                         'subgroups',
+                                         'general_sections',
+                                         'custom_sections',
+                                         'special_sections',
+                                         'section_order',
+                                         'candidate_column',
+                                         'min_items_per_candidate']},
+                'rsmpredict': {'required': ['experiment_id',
+                                            'experiment_dir',
+                                            'input_features_file'],
+                               'optional': ['id_column',
+                                            'candidate_column',
+                                            'human_score_column',
+                                            'second_human_score_column',
+                                            'standardize_features',
+                                            'subgroups',
+                                            'flag_column']},
+                'rsmcompare': {'required': ['comparison_id',
+                                            'experiment_id_old',
+                                            'experiment_dir_old',
+                                            'experiment_id_new',
+                                            'experiment_dir_new',
+                                            'description_old',
+                                            'description_new'],
+                               'optional': ['use_scaled_predictions_old',
+                                            'use_scaled_predictions_new',
+                                            'subgroups',
+                                            'general_sections',
+                                            'custom_sections',
+                                            'special_sections',
+                                            'section_order']},
+                'rsmsummarize': {'required': ['summary_id',
+                                              'experiment_dirs'],
+                                 'optional': ['description',
+                                              'general_sections',
+                                              'custom_sections',
+                                              'special_sections',
+                                              'subgroups',
+                                              'section_order']}}
+
+
+def int_to_float(value):
     """
-    Custom logging formatter.
+    Convert integer to float, if possible.
 
-    Adapted from: http://stackoverflow.com/questions/1343227/can-pythons-logging-format-be-modified-depending-on-the-message-log-level
+    Parameters
+    ----------
+    value
+        Name of the experiment file we want to locate.
+
+    Returns
+    -------
+    value
+        Value converted to float, if possible
+    """
+    return float(value) if type(value) == int else value
+
+
+def convert_to_float(value):
+    """
+    Convert value to float, if possible.
+
+    Parameters
+    ----------
+    value
+        Name of the experiment file we want to locate.
+
+    Returns
+    -------
+    value
+        Value converted to float, if possible
+    """
+    return int_to_float(string_to_number(value))
+
+
+def parse_json_with_comments(filename):
+    """
+    Parse a JSON file after removing any comments.
+    Comments can use either ``//`` for single-line
+    comments or or ``/* ... */`` for multi-line comments.
+
+    Parameters
+    ----------
+    filename : str
+        Path to the input JSON file.
+
+    Returns
+    -------
+    obj : dict
+        JSON object representing the input file.
+
+    Note
+    ----
+    This code was adapted from:
+    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html.
     """
 
-    err_fmt = "ERROR: %(msg)s"
-    warn_fmt = "WARNING: %(msg)s"
-    dbg_fmt = "DBG: %(module)s: %(lineno)d: %(msg)s"
-    info_fmt = "%(msg)s"
+    # Regular expression to identify comments
+    comment_re = re.compile(
+        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+        re.DOTALL | re.MULTILINE
+    )
 
-    def __init__(self, fmt="%(levelno)s: %(msg)s"):
-        logging.Formatter.__init__(self, fmt)
+    with open(filename) as file_buff:
+        content = ''.join(file_buff.readlines())
 
-    def format(self, record):
+        # Looking for comments
+        match = comment_re.search(content)
+        while match:
 
-        # Save the original format configured by the user
-        # when the logger formatter was instantiated
-        format_orig = self._fmt
+            # single line comment
+            content = content[:match.start()] + content[match.end():]
+            match = comment_re.search(content)
 
-        # Replace the original format with one customized by logging level
-        if record.levelno == logging.DEBUG:
-            self._fmt = LogFormatter.dbg_fmt
-            self._style = logging.PercentStyle(self._fmt)
-
-        elif record.levelno == logging.WARNING:
-            self._fmt = LogFormatter.warn_fmt
-            self._style = logging.PercentStyle(self._fmt)
-
-        elif record.levelno == logging.INFO:
-            self._fmt = LogFormatter.info_fmt
-            self._style = logging.PercentStyle(self._fmt)
-
-        elif record.levelno == logging.ERROR:
-            self._fmt = LogFormatter.err_fmt
-            self._style = logging.PercentStyle(self._fmt)
-
-        # Call the original formatter class to do the grunt work
-        result = logging.Formatter.format(self, record)
-
-        # Restore the original format configured by the user
-        self._fmt = format_orig
-
-        return result
+        # Return JSON object
+        config = json.loads(content)
+        return config
 
 
 def covariance_to_correlation(m):
@@ -101,12 +317,12 @@ def partial_correlations(df):
 
     Parameters
     ----------
-    df : pandas DataFrame
+    df : pd.DataFrame
         Data frame containing the feature values.
 
     Returns
     -------
-    df_pcor : pandas DataFrame
+    df_pcor : pd.DataFrame
         Data frame containing the partial correlations of of each
         pair of variables in the given data frame `df`,
         excluding all other variables.
@@ -127,7 +343,8 @@ def partial_correlations(df):
     if numcols > numrows:
         icvx = empty_array
     else:
-        # we also return nans if there is singularity in the data (e.g. all human scores are the same)
+        # we also return nans if there is singularity in the data
+        # (e.g. all human scores are the same)
         try:
             icvx = np.linalg.inv(df_cov)
         except np.linalg.LinAlgError:
@@ -152,6 +369,7 @@ def agreement(score1, score2, tolerance=0):
         List of rater 2 scores
     tolerance : int, optional
         Difference in scores that is acceptable.
+        Defaults to 0.
 
     Returns
     -------
@@ -170,130 +388,6 @@ def agreement(score1, score2, tolerance=0):
     return agreement_value
 
 
-def write_experiment_output(data_frames,
-                            suffixes,
-                            experiment_id,
-                            csvdir,
-                            reset_index=False):
-    """
-    Write out each of the given list of data frames as a ``.csv`` file
-    in the given directory. Each data frame was generated as part of
-    running an RSMTool exepriment. All ``.csv`` files are prefixed with
-    the given experiment ID and suffixed with the corresponding value in
-    the list of suffixes. Additionally, the indexes in the data frames
-    are reset if so specified.
-
-    Parameters
-    ----------
-    data_frames : list of pandas DataFrame
-        List of data frames to write out.
-    suffixes : list of str
-        List of suffixes, one for each of the data frames.
-    experiment_id : str
-        The experiment ID.
-    csvdir : str
-        Path to the `output` experiment sub-directory that will
-        contain the CSV files corresponding to each of the data frames.
-    reset_index : bool, optional
-        Whether to reset the index of each data frame
-        before writing to disk. Defaults to `False`.
-    """
-    for df, suffix in zip(data_frames, suffixes):
-
-        # if the data frame is empty, skip it
-        if df.empty:
-            continue
-
-        # reset the index if we are asked to
-        if reset_index:
-            df.index.name = ''
-            df.reset_index(inplace=True)
-
-        # write data frame to CSV file
-        outfile = join(csvdir, '{}_{}.csv'.format(experiment_id, suffix))
-        df.to_csv(outfile, index=False)
-
-
-def write_feature_csv(df_feature_specs,
-                      selected_features,
-                      experiment_id,
-                      featuredir):
-    """
-    Write out the feature ``.csv`` file to disk.
-
-    Parameters
-    ----------
-    feature_specs : Pandas DataFrame
-        Data frame containing the specifications of the features.
-    selected_features : list of str
-        List of features that were selected for model building.
-    experiment_id : str
-        The experiment ID.
-    featuredir : str
-        Path to the `feature` experiment output directory where the
-        feature JSON file will be saved.
-    """
-    df_features_selected = df_feature_specs[df_feature_specs['feature'].isin(selected_features)]
-
-    makedirs(featuredir, exist_ok=True)
-    write_experiment_output([df_features_selected],
-                            ['selected'],
-                            experiment_id,
-                            featuredir)
-
-
-def scale_coefficients(intercept,
-                       coefficients,
-                       feature_names,
-                       train_predictions_mean,
-                       train_predictions_sd,
-                       h1_sd):
-    """
-    Scale coefficients and intercept using human scores and model
-    prediction on the training set. This procedure approximates
-    what is done in operational setting but does not apply
-    trimming to predictions.
-
-    Parameters
-    ----------
-    intercept : float
-        The model intercept value.
-    coefficients : numpy array
-        Numpy array containing the model coefficients.
-    feature_names : list of str
-        List of feature names corresponding to the coefficients.
-    train_predictions_mean : float
-        The mean of the predictions on the training set.
-    train_predictions_sd : float
-        The std. dev. of the predictions on the training set.
-    h1_sd : float
-        The std. dev. of the H1 scores.
-
-    Returns
-    -------
-    df_scaled_coefficients : pandas DataFrame
-        Data frame containing the scaled coefficients
-        and the feature names, along with the intercept.
-    """
-
-    # scale the coefficients and the intercept
-    scaled_coefficients = coefficients * h1_sd/train_predictions_sd
-
-    # adjust the intercept to set the mean predicted score
-    # to the mean of the training variable
-    new_intercept = intercept * (h1_sd/train_predictions_sd) + train_predictions_mean * (1 - h1_sd/train_predictions_sd)
-
-    intercept_and_feature_names = ['Intercept'] + feature_names
-    intercept_and_feature_values = [new_intercept] + list(scaled_coefficients)
-
-    # create a data frame with new values
-    df_scaled_coefficients = pd.DataFrame({'feature': intercept_and_feature_names,
-                                           'coefficient': intercept_and_feature_values},
-                                          columns=['feature', 'coefficient'])
-
-    return df_scaled_coefficients
-
-
 def float_format_func(num, prec=3):
     """
     Format the given floating point number to the specified precision
@@ -303,8 +397,7 @@ def float_format_func(num, prec=3):
     ----------
     num : float
         The floating point number to format.
-
-    prec: int
+    prec: int, optional
         The number of decimal places to use when displaying the number.
         Defaults to 3.
 
@@ -329,7 +422,7 @@ def int_or_float_format_func(num, prec=3):
     -----------
     num : float or int
         The number to format and display.
-    prec : int
+    prec : int, optional
         The number of decimal places to display if x is a float.
         Defaults to 3.
 
@@ -362,22 +455,17 @@ def custom_highlighter(num,
     -----------
     num : float
         The floating point number to format.
-
     low : float
         The number will be displayed as an HTML span it is below this value.
         Defaults to 0.
-
     high : float
         The number will be displayed as an HTML span it is above this value.
         Defaults to 1.
-
     prec : int
         The number of decimal places to display for x. Defaults to 3.
-
     absolute: bool
         If True, use the absolute value of x for comparison.
         Defaults to False.
-
     span_class: str
         One of ``bold`` or ``color``. These are the two classes
         available for the HTML span tag.
@@ -386,11 +474,11 @@ def custom_highlighter(num,
     --------
     ans : str
         The formatted (plain or HTML) string representing the given number.
-
     """
     abs_num = abs(num) if absolute else num
     val = float_format_func(num, prec=prec)
-    ans = '<span class="highlight_{}">{}</span>'.format(span_class, val) if abs_num < low or abs_num > high else val
+    ans = ('<span class="highlight_{}">{}</span>'.format(span_class, val)
+           if abs_num < low or abs_num > high else val)
     return ans
 
 
@@ -398,6 +486,28 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiating ``custom_highlighter()`` with the ``bold`` class as
     the default.
+
+    Parameters:
+    -----------
+    num : float
+        The floating point number to format.
+    low : float
+        The number will be displayed as an HTML span it is below this value.
+        Defaults to 0.
+    high : float
+        The number will be displayed as an HTML span it is above this value.
+        Defaults to 1.
+    prec : int
+        The number of decimal places to display for x.
+        Defaults to 3.
+    absolute: bool
+        If True, use the absolute value of x for comparison.
+        Defaults to False.
+
+    Returns:
+    --------
+    ans : str
+        The formatted highlighter with bold class as default.
     """
     ans = custom_highlighter(num, low, high, prec, absolute, 'bold')
     return ans
@@ -407,6 +517,28 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiating ``custom_highlighter()`` with the ``color`` class as
     the default.
+
+    Parameters:
+    -----------
+    num : float
+        The floating point number to format.
+    low : float
+        The number will be displayed as an HTML span it is below this value.
+        Defaults to 0.
+    high : float
+        The number will be displayed as an HTML span it is above this value.
+        Defaults to 1.
+    prec : int
+        The number of decimal places to display for x.
+        Defaults to 3.
+    absolute: bool
+        If True, use the absolute value of x for comparison.
+        Defaults to False.
+
+    Returns:
+    --------
+    ans : str
+        The formatted highlighter with color class as default.
     """
     ans = custom_highlighter(num, low, high, prec, absolute, 'color')
     return ans
@@ -416,13 +548,33 @@ def compute_subgroup_plot_params(group_names, num_plots):
     """
     Computing subgroup plot and figure parameters based on number of
     subgroups and number of plots to be generated.
+
+    Parameters
+    ----------
+    group_names : list
+        A list of subgroup names for plots.
+    num_plots : int
+        The number of plots to compute.
+
+    Returns
+    -------
+    figure_width : int
+        The width of the figure.
+    figure_height : int
+        The height of the figure.
+    num_rows : int
+        The number of rows for the plots.
+    num_columns : int
+        The number of columns for the plots.
+    wrapped_group_names : list of str
+        A list of group names for plots.
     """
     wrapped_group_names = ['\n'.join(wrap(str(gn), 20)) for gn in group_names]
     plot_height = 4 if wrapped_group_names == group_names else 6
     num_groups = len(group_names)
     if num_groups <= 6:
         num_columns = 2
-        num_rows = ceil(num_plots/num_columns)
+        num_rows = ceil(num_plots / num_columns)
         figure_width = num_columns * num_groups
         figure_height = plot_height * num_rows
     else:
@@ -432,3 +584,63 @@ def compute_subgroup_plot_params(group_names, num_plots):
         figure_height = plot_height * num_plots
 
     return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
+
+
+class LogFormatter(logging.Formatter):
+    """
+    Custom logging formatter.
+
+    Adapted from:
+        http://stackoverflow.com/questions/1343227/
+        can-pythons-logging-format-be-modified-depending-
+        on-the-message-log-level
+    """
+
+    info_fmt = "%(msg)s"
+    warn_fmt = "WARNING: %(msg)s"
+
+    err_fmt = "ERROR: %(msg)s"
+    dbg_fmt = "DEBUG: %(module)s: %(lineno)d: %(msg)s"
+
+    def __init__(self, fmt="%(levelno)s: %(msg)s"):
+
+        logging.Formatter.__init__(self, fmt)
+
+    def format(self, record):
+        """
+        format the logger
+
+        Parameters
+        ----------
+        record
+            The record to format
+        """
+
+        # Save the original format configured by the user
+        # when the logger formatter was instantiated
+        format_orig = self._fmt
+
+        # Replace the original format with one customized by logging level
+        if record.levelno == logging.DEBUG:
+            self._fmt = LogFormatter.dbg_fmt
+            self._style = logging.PercentStyle(self._fmt)
+
+        elif record.levelno == logging.WARNING:
+            self._fmt = LogFormatter.warn_fmt
+            self._style = logging.PercentStyle(self._fmt)
+
+        elif record.levelno == logging.INFO:
+            self._fmt = LogFormatter.info_fmt
+            self._style = logging.PercentStyle(self._fmt)
+
+        elif record.levelno == logging.ERROR:
+            self._fmt = LogFormatter.err_fmt
+            self._style = logging.PercentStyle(self._fmt)
+
+        # Call the original formatter class to do the grunt work
+        result = logging.Formatter.format(self, record)
+
+        # Restore the original format configured by the user
+        self._fmt = format_orig
+
+        return result
