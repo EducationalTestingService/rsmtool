@@ -61,13 +61,13 @@ def test_compute_correlations_between_versions_default_columns():
                            'feature2': [1.1, 6.2, 2.1],
                            'sc1': [2, 3, 4]})
     df_cors = compute_correlations_between_versions(df_old, df_new)
-    assert_equal(df_cors.get_value('feature1', 'old_new'), -1.0)
-    assert_equal(df_cors.get_value('feature2', 'old_new'), 1.0)
-    assert_equal(df_cors.get_value('feature1', 'human_old'), pearsonr(df_old['feature1'],
-                                                                      df_old['sc1'])[0])
-    assert_equal(df_cors.get_value('feature1', 'human_new'), pearsonr(df_new['feature1'],
-                                                                      df_new['sc1'])[0])
-    assert_equal(df_cors.get_value('feature1', "N"), 3)
+    assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
+    assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+    assert_equal(df_cors.at['feature1', 'human_old'], pearsonr(df_old['feature1'],
+                                                               df_old['sc1'])[0])
+    assert_equal(df_cors.at['feature1', 'human_new'], pearsonr(df_new['feature1'],
+                                                               df_new['sc1'])[0])
+    assert_equal(df_cors.at['feature1', 'N'], 3)
 
 
 def test_compute_correlations_between_versions_custom_columns():
@@ -85,13 +85,13 @@ def test_compute_correlations_between_versions_custom_columns():
                                                     human_score='r1',
                                                     id_column='id')
 
-    assert_equal(df_cors.get_value('feature1', 'old_new'), -1.0)
-    assert_equal(df_cors.get_value('feature2', 'old_new'), 1.0)
-    assert_equal(df_cors.get_value('feature1', 'human_old'), pearsonr(df_old['feature1'],
-                                                                      df_old['r1'])[0])
-    assert_equal(df_cors.get_value('feature1', 'human_new'), pearsonr(df_new['feature1'],
-                                                                      df_new['r1'])[0])
-    assert_equal(df_cors.get_value('feature1', "N"), 3)
+    assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
+    assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+    assert_equal(df_cors.at['feature1', 'human_old'], pearsonr(df_old['feature1'],
+                                                               df_old['r1'])[0])
+    assert_equal(df_cors.at['feature1', 'human_new'], pearsonr(df_new['feature1'],
+                                                               df_new['r1'])[0])
+    assert_equal(df_cors.at['feature1', 'N'], 3)
 
 
 @raises(ValueError)
@@ -122,9 +122,9 @@ def test_compute_correlations_between_versions_extra_data():
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore')
         df_cors = compute_correlations_between_versions(df_old, df_new)
-    assert_equal(df_cors.get_value('feature1', 'old_new'), -1.0)
-    assert_equal(df_cors.get_value('feature2', 'old_new'), 1.0)
-    assert_equal(df_cors.get_value('feature1', "N"), 3)
+    assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
+    assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+    assert_equal(df_cors.at['feature1', 'N'], 3)
     assert_equal(len(df_cors), 2)
 
 

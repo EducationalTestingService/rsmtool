@@ -373,6 +373,8 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups):
                                                 '{}_data_composition_by_{}.csv'.format(experiment_id,
                                                                                        group)))
         for partition in ['Training', 'Evaluation']:
-            partition_info = df_data_composition_all.ix[df_data_composition_all['partition'] == partition]
-            ok_(sum(composition_by_group['{} set'.format(partition)]) == partition_info.iloc[0]['responses'])
-            ok_(len(composition_by_group.ix[composition_by_group['{} set'.format(partition)] != 0]) == partition_info.iloc[0][group])
+            partition_info = df_data_composition_all[df_data_composition_all['partition'] == partition].copy()
+            total_responses_across_groups = sum(composition_by_group['{} set'.format(partition)])
+            ok_(total_responses_across_groups == partition_info.iloc[0]['responses'])
+            group_info = composition_by_group[composition_by_group['{} set'.format(partition)] != 0].copy()
+            ok_(len(group_info) == partition_info.iloc[0][group])

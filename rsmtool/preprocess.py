@@ -703,8 +703,8 @@ def preprocess_train_and_test_features(df_train, df_test, df_feature_specs):
     # now iterate over each feature
     for feature_name in df_feature_specs['feature']:
 
-        feature_transformation = df_feature_specs.get_value(feature_name, 'transform')
-        feature_sign = df_feature_specs.get_value(feature_name, 'sign')
+        feature_transformation = df_feature_specs.at[feature_name, 'transform']
+        feature_sign = df_feature_specs.at[feature_name, 'sign']
 
         train_feature_mean = df_train[feature_name].mean()
         train_feature_sd = df_train[feature_name].std()

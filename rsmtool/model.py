@@ -8,13 +8,21 @@ Functions dealing with training built-in or SKLL models
 
 import logging
 import pickle
+import warnings
 
 from math import log10, sqrt
 from os.path import join
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+
+# import statsmodels while suppressing FutureWarning messages since
+# the latest statsmodels uses some pandas code that is scheduled to
+# be deprecated. However, we do not want to see this warning when we
+# use rsmtool
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=FutureWarning)
+    import statsmodels.api as sm
 
 from numpy.random import RandomState
 from scipy.optimize import nnls
