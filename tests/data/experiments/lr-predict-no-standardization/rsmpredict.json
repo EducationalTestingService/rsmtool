@@ -1,8 +1,0 @@
-{
-    "id_column": "ID",
-    "human_score_column": "score",
-    "input_features_file": "../../files/test.csv",
-    "experiment_dir": "existing_experiment",
-    "experiment_id": "lr_no_standardization",
-    "standardize_features": false
-}

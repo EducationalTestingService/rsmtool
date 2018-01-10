@@ -372,13 +372,13 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups):
                                                 '.csv'.format(experiment_id,
                                                               group)))
         for partition in ['Training', 'Evaluation']:
-            partition_info = df_data_composition_all.ix[df_data_composition_all['partition'] ==
-                                                        partition]
+            partition_info = df_data_composition_all.loc[df_data_composition_all['partition'] ==
+                                                         partition]
 
             summation = sum(composition_by_group['{} set'
                                                  ''.format(partition)])
             ok_(summation == partition_info.iloc[0]['responses'])
 
-            length = len(composition_by_group.ix[composition_by_group['{} set'
-                                                                      ''.format(partition)] != 0])
+            length = len(composition_by_group.loc[composition_by_group['{} set'
+                                                                       ''.format(partition)] != 0])
             ok_(length == partition_info.iloc[0][group])
