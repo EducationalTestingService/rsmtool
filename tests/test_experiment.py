@@ -2971,7 +2971,9 @@ def test_run_experiment_lr_no_standardization():
                        'experiments',
                        source,
                        '{}.json'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=UserWarning)
+        do_run_experiment(source, experiment_id, config_file)
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))

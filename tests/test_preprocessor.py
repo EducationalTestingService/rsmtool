@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -1150,7 +1152,9 @@ class TestFeatureSpecsProcessor:
                                      {'feature': 'f2',
                                       'transform': 'inv',
                                       'sign': -1}]}
-        new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=DeprecationWarning)
+            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
         assert_equal(new_feature_json, feature_json)
 
     def test_normalize_json_feature_file_old_file(self):
@@ -1158,7 +1162,10 @@ class TestFeatureSpecsProcessor:
                                       {'featN': 'f2', 'trans': 'inv', 'wt': -1}]}
         expected_feature_json = {'features': [{'feature': 'f1', 'transform': 'raw', 'sign': 1},
                                               {'feature': 'f2', 'transform': 'inv', 'sign': -1}]}
-        new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(old_feature_json)
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=DeprecationWarning)
+            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(old_feature_json)
         assert_equal(new_feature_json, expected_feature_json)
 
     @raises(KeyError)
@@ -1167,7 +1174,9 @@ class TestFeatureSpecsProcessor:
                                       'sign': 1},
                                      {'feature': 'f2',
                                       'transform': 'inv'}]}
-        FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=DeprecationWarning)
+            FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
 
     def test_validate_feature_specs(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
