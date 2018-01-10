@@ -1,0 +1,33 @@
+{
+    "test_label_column": "score",
+    "trim_min": 1,
+    "standardize_features": false,
+    "select_transformations": false,
+    "experiment_id": "lr_no_standardization",
+    "special_sections": null,
+    "test_file": "../../files/test.csv",
+    "section_order": null,
+    "candidate_column": null,
+    "flag_column": null,
+    "subgroups": [],
+    "model": "LinearRegression",
+    "feature_subset": null,
+    "description": "A LinearRegression model with no standardization of features.",
+    "min_items_per_candidate": null,
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "features": "features.csv",
+    "second_human_score_column": null,
+    "length_column": null,
+    "custom_sections": null,
+    "exclude_zero_scores": true,
+    "sign": null,
+    "feature_subset_file": null,
+    "general_sections": [
+        "all"
+    ],
+    "train_label_column": "score",
+    "flag_column_test": null,
+    "use_scaled_predictions": true,
+    "trim_max": 6
+}
