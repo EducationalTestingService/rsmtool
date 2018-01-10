@@ -17,7 +17,7 @@ For installation and usage, please see the official [documentation](http://rsmto
 
 ## Requirements
 
-- Python 3.4 or higher
+- Python 3.6
 - `numpy`
 - `scipy`
 - `scikit-learn`
@@ -58,6 +58,4 @@ Madnani, Nitin and Loukina, Anastassia. "RSMTool: A Collection of Tools for Buil
 
 ## Changelog
 See [GitHub Releases](https://github.com/EducationalTestingService/rsmtool/releases).
-
-
 
