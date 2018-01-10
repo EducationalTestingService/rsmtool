@@ -127,8 +127,8 @@ class Analyzer:
         if not df.empty:
             # re-code human scores into numeric, missing or zero
             df['score_category'] = 'numeric non-zero human score'
-            df.ix[df['sc1'].isnull(), 'score_category'] = 'non-numeric human score'
-            df.ix[df['sc1'].astype(float) == 0, 'score_category'] = 'zero human score'
+            df.loc[df['sc1'].isnull(), 'score_category'] = 'non-numeric human score'
+            df.loc[df['sc1'].astype(float) == 0, 'score_category'] = 'zero human score'
 
             # recode feature values: a response with at least one
             # missing feature is assigned 'non-numeric feature values'
@@ -136,8 +136,8 @@ class Analyzer:
             null_feature_rows = df_features_only.isnull().any(axis=1)
             df_null_features = df_features_only[null_feature_rows]
             df['feat_category'] = 'all features numeric'
-            df.ix[df['spkitemid'].isin(df_null_features['spkitemid']),
-                  'feat_category'] = 'non-numeric feature values'
+            df.loc[df['spkitemid'].isin(df_null_features['spkitemid']),
+                   'feat_category'] = 'non-numeric feature values'
 
             # crosstabulate
             df_crosstab = pd.crosstab(df['score_category'],
