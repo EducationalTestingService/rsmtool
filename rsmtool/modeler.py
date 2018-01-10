@@ -12,13 +12,13 @@ as well as making predictions for new data.
 
 import logging
 import pickle
+import warnings
 
 from math import log10, sqrt
 from os.path import join
 
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
 
 from numpy.random import RandomState
 from scipy.optimize import nnls
@@ -32,6 +32,10 @@ from rsmtool.preprocessor import FeaturePreprocessor
 
 from rsmtool.configuration_parser import Configuration
 from rsmtool.container import DataContainer
+
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore', category=FutureWarning)
+    import statsmodels.api as sm
 
 
 class Modeler:
