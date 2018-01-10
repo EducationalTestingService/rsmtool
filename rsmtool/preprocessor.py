@@ -418,10 +418,12 @@ class FeaturePreprocessor:
     @staticmethod
     def trim(values,
              trim_min,
-             trim_max):
+             trim_max,
+             tolerance=0.49998):
         """
-        Trim the values contained in the given numpy array to `trim_min`
-        - 0.49998 as the floor and `trim_max` + 0.49998 as the ceiling.
+        Trim the values contained in the given numpy array to
+        `trim_min` - `tolerance` as the floor and
+        `trim_max` + `tolerance` as the ceiling.
 
         Parameters
         ----------
@@ -433,14 +435,17 @@ class FeaturePreprocessor:
         trim_max : float
             The highest score on the score point, used for
             trimming the raw regression predictions.
+        tolerance : float, optional
+            The tolerance that will be used to compute the
+            trim interval. Defaults to 0.49998.
 
         Returns
         -------
         trimmed_values : list of float
             List of trimmed values.
         """
-        new_max = trim_max + 0.49998
-        new_min = trim_min - 0.49998
+        new_max = trim_max + tolerance
+        new_min = trim_min - tolerance
         trimmed_values = values.copy()
         trimmed_values[trimmed_values > new_max] = new_max
         trimmed_values[trimmed_values < new_min] = new_min
