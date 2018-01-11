@@ -2,7 +2,7 @@
 
 Installation
 ============
-Note that RSMTool only currently works with Python 3.4 and higher.
+Note that RSMTool has been tested with Python 3.6 or higher.
 
 Currently, the best way to install RSMTool is by using the ``conda`` package manager. If you have already installed ``conda``, you can skip straight to Step 2.
 
@@ -10,7 +10,7 @@ Currently, the best way to install RSMTool is by using the ``conda`` package man
 
 2. Create a new conda environment (say, ``rsmtool``) and install the RSMTool conda package by running::
 
-    conda create -n rsmtool -c desilinguist python=3.4 rsmtool
+    conda create -n rsmtool -c defaults -c conda-forge -c desilinguist python=3.6 rsmtool
 
 3. Activate this conda environment by running ``source activate rsmtool`` (``activate rsmtool`` on windows). You should now have all of the RSMTool command-line utilities in your path.
 

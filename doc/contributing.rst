@@ -9,9 +9,7 @@ Contributions to RSMTool are very welcome. You can use the instructions below to
 
 3. Create a new conda environment (say, ``rsmtool``) and install the packages specified in the ``conda_requirements.txt`` file by running::
 
-    conda create -n rsmtool -c desilinguist --file conda_requirements.txt.
-
- Use ``conda_requirements_windows.txt`` if you are on Windows. There are two versions because RSMTool currently does not use MKL on non-Windows platforms.
+    conda create -n rsmtool -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt
 
 4. Activate the environment using ``source activate rsmtool`` (use ``activate rsmtool`` if you are on Windows).
 
