@@ -29,6 +29,8 @@ This process is only meant for the project administrators, not users and develop
 
 11. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
 
-12. Update the RSMTool conda environment on the ETS linux servers with the latest package.
+12. Do an accompanying release of RSMExtra (only needed for ETS users).
 
-13. Send an email around at ETS announcing the release and the changes.
+13. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+
+14. Send an email around at ETS announcing the release and the changes.
