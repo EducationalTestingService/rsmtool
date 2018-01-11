@@ -21,9 +21,9 @@ This process is only meant for the project administrators, not users and develop
 
 7. Draft a release on GitHub while the Linux and Windows builds are running.
 
-8. Once both builds have passed, make a pull request with the release branch to merge into ``master``.
+8. Once both builds have passed, make a pull request with the release branch to be merged into ``master`` and request code review.
 
-9. Once the build for the PR passes, merge the branch into ``master``.
+9. Once the build for the PR passes and the reviewers approve, merge the release branch into ``master``.
 
 10. Make sure that the RTFD build for ``master`` passes.
 
