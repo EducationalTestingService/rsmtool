@@ -90,6 +90,9 @@ def run_experiment(config_file_or_obj,
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
 
+    # Get output format
+    file_format = configuration.get('file_format', 'csv')
+
     # Get DataWriter object
     writer = DataWriter(configuration['experiment_id'])
 
@@ -148,7 +151,8 @@ def run_experiment(config_file_or_obj,
                                     'test_human_scores',
                                     'train_flagged',
                                     'test_flagged'],
-                                   rename_dict)
+                                   rename_dict,
+                                   file_format=file_format)
 
     # Initialize the analyzer
     analyzer = Analyzer()
@@ -159,7 +163,8 @@ def run_experiment(config_file_or_obj,
 
     # Write out files
     writer.write_experiment_output(csvdir,
-                                   analyzed_container)
+                                   analyzed_container,
+                                   file_format=file_format)
 
     logger.info('Training {} model.'.format(processed_config['model_name']))
 
@@ -196,7 +201,8 @@ def run_experiment(config_file_or_obj,
     writer.write_experiment_output(csvdir,
                                    features_data_container,
                                    dataframe_names=['selected_feature_info'],
-                                   new_names_dict={'selected_feature_info': 'feature'})
+                                   new_names_dict={'selected_feature_info': 'feature'},
+                                   file_format=file_format)
 
     logger.info('Running analyses on training set.')
 
@@ -207,7 +213,8 @@ def run_experiment(config_file_or_obj,
     # Write out files
     writer.write_experiment_output(csvdir,
                                    train_analyzed_container,
-                                   reset_index=True)
+                                   reset_index=True,
+                                   file_format=file_format)
 
     # Use only selected features for predictions
     columns_for_prediction = ['spkitemid', 'sc1'] + selected_features
@@ -223,7 +230,8 @@ def run_experiment(config_file_or_obj,
     # Write out files
     writer.write_experiment_output(csvdir,
                                    pred_data_container,
-                                   new_names_dict={'pred_test': 'pred_processed'})
+                                   new_names_dict={'pred_test': 'pred_processed'},
+                                   file_format=file_format)
 
     original_coef_file = join(csvdir, '{}_coefficients.csv'.format(pred_config['experiment_id']))
 
@@ -238,7 +246,8 @@ def run_experiment(config_file_or_obj,
 
             # Write out files to disk
             writer.write_experiment_output(csvdir,
-                                           scaled_data_container)
+                                           scaled_data_container,
+                                           file_format=file_format)
 
         except AttributeError:
             raise ValueError("It appears you are trying to save two different "
@@ -258,7 +267,8 @@ def run_experiment(config_file_or_obj,
     # Write out files
     writer.write_experiment_output(csvdir,
                                    pred_analysis_data_container,
-                                   reset_index=True)
+                                   reset_index=True,
+                                   file_format=file_format)
     # Initialize reporter
     reporter = Reporter()
 
