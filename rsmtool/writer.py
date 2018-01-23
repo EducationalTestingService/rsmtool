@@ -129,25 +129,28 @@ class DataWriter:
                 outfile += '.csv'
                 df.to_csv(outfile, index=index, **kwargs)
 
+            elif file_format == 'tsv':
+                outfile += '.tsv'
+                df.to_csv(outfile, index=index, sep='\t', **kwargs)
+
             elif file_format == 'json':
                 outfile += '.json'
                 df.to_json(outfile, orient='records', **kwargs)
 
-            elif (file_format == 'excel' or
-                  file_format == 'xlsx'):
+            elif file_format == 'xlsx':
                 outfile += '.xlsx'
                 df.to_excel(outfile, index=index, **kwargs)
 
             else:
                 raise KeyError('Please make sure that the `file_format` specified '
-                               'is one of the following:\n{`json`, `csv`, `excel`}\n.'
+                               'is one of the following:\n{`json`, `csv`, `tsv`, `xlsx`}\n.'
                                'You specified {}.'.format(file_format))
 
     def write_feature_csv(self,
                           featuredir,
                           data_container,
                           selected_features,
-                          include_experiment_id=True,):
+                          include_experiment_id=True):
         """
         Write out the feature file to disk.
 

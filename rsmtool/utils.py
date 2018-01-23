@@ -12,6 +12,8 @@ Utility classes and functions.
 import re
 import json
 import logging
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -201,6 +203,9 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                               'special_sections',
                                               'subgroups',
                                               'section_order']}}
+
+
+POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
 
 
 def int_to_float(value):
@@ -588,6 +593,53 @@ def compute_subgroup_plot_params(group_names, num_plots):
         figure_height = plot_height * num_plots
 
     return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
+
+
+def get_output_directory_extension(directory, experiment_id):
+    """
+    Check the output directory to determine what file extensions
+    exist. If more than one extension (in the possible list of
+    extensions) exists, then raise a value error. Otherwise,
+    return the one file extension. If no extensions can be found, then
+    `csv` will be returned.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory where output is located.
+    experiment_id : str
+        The ID of the experiment.
+
+    Returns
+    -------
+    extension : str
+        The extension that files in this directory end with.
+
+    Raises
+    ------
+    ValueError
+        If any files in the directory have different extensions,
+        while also being in the list of files with possible output
+        extensions.
+    """
+    extension = 'csv'
+    extensions_identified = [os.path.splitext(name)[-1].replace('.', '')
+                             for name in os.listdir(directory)
+                             if any(name.endswith(ext) for ext in POSSIBLE_EXTENSIONS)]
+
+    extensions = set(extensions_identified)
+    if len(extensions) > 1:
+        raise ValueError('Some of the files in the experiment output directory (`{}`) '
+                         'for `{}` have different extensions. All files in this directory '
+                         'must have the same extension. The following extensions were '
+                         'identified : {}'.format(directory,
+                                                  experiment_id,
+                                                  ', '.join(extensions)))
+
+    elif len(extensions) == 1:
+        extension = list(extensions)[0]
+
+    return extension
 
 
 class LogFormatter(logging.Formatter):

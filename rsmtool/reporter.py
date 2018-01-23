@@ -313,7 +313,7 @@ class Reporter:
 
         # set a high timeout for datasets with a large number of features
         report_config = Config({'ExecutePreprocessor': {'enabled': True,
-                                                        'timeout': 3600},
+                                                        'timeout': 4800},
                                 'HTMLExporter': {'template_path': [template_path],
                                                  'template_file': 'report.tpl'}})
 
@@ -616,6 +616,7 @@ class Reporter:
         exclude_zero_scores = configuration.get('exclude_zero_scores', True)
         use_scaled_predictions = configuration.get('use_scaled_predictions', False)
         standardize_features = configuration.get('standardize_features', True)
+        file_format = configuration.get('file_format', 'csv')
 
         # get either test or predictions file location
         test_file_location = configuration.get('test_file_location')
@@ -654,6 +655,7 @@ class Reporter:
         # what groups are used for descriptives and evaluations
         os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
         os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+        os.environ['FILE_FORMAT'] = file_format
 
         # get the report directory which is at the same level
         # as the output and the figure directory
