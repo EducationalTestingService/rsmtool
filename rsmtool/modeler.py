@@ -890,7 +890,7 @@ class Modeler:
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx}, optional
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
             The format in which to save files.
             Defaults to 'csv'.
 
@@ -1020,7 +1020,7 @@ class Modeler:
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx}, optional
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
             The format in which to save files. For SKLL models,
             this argument does not actually change the format of
             the output files at this time, as no betas are computed.
@@ -1084,7 +1084,7 @@ class Modeler:
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx}, optional
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
             The format in which to save files.
             Defaults to 'csv'.
 

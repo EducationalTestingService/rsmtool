@@ -133,6 +133,8 @@ class DataWriter:
                 outfile += '.tsv'
                 df.to_csv(outfile, index=index, sep='\t', **kwargs)
 
+            # Added JSON for experimental purposes, but leaving
+            # this out of the documentation at this stage
             elif file_format == 'json':
                 outfile += '.json'
                 df.to_json(outfile, orient='records', **kwargs)
@@ -143,7 +145,7 @@ class DataWriter:
 
             else:
                 raise KeyError('Please make sure that the `file_format` specified '
-                               'is one of the following:\n{`json`, `csv`, `tsv`, `xlsx`}\n.'
+                               'is one of the following:\n{`csv`, `tsv`, `xlsx`}\n.'
                                'You specified {}.'.format(file_format))
 
     def write_feature_csv(self,
