@@ -62,7 +62,7 @@ class DataWriter:
         reset_index : bool, optional
             Whether to reset the index of each data frame
             before writing to disk. Defaults to `False`.
-        file_format : {'csv', 'excel', 'json'}, optional
+        file_format : {'csv', 'xlsx', 'tsv'}, optional
             The file format in which to output the data.
             Defaults to 'csv'.
         index : bool
@@ -150,7 +150,8 @@ class DataWriter:
                           featuredir,
                           data_container,
                           selected_features,
-                          include_experiment_id=True):
+                          include_experiment_id=True,
+                          file_format='csv'):
         """
         Write out the feature file to disk.
 
@@ -166,6 +167,9 @@ class DataWriter:
         include_experiment_id : str, optional
             Whether to include the experiment ID in the file name.
             Defaults to True.
+        file_format : {'csv', 'xlsx', 'tsv'}, optional
+            The file format in which to output the data.
+            Defaults to 'csv'.
         """
 
         df_feature_specs = data_container['feature_specs']
@@ -182,4 +186,5 @@ class DataWriter:
                                      data_container,
                                      ['feature_specs'],
                                      {'feature_specs': 'selected'},
-                                     include_experiment_id=include_experiment_id)
+                                     include_experiment_id=include_experiment_id,
+                                     file_format=file_format)

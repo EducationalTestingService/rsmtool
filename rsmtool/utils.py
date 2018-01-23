@@ -599,9 +599,12 @@ def get_output_directory_extension(directory, experiment_id):
     """
     Check the output directory to determine what file extensions
     exist. If more than one extension (in the possible list of
-    extensions) exists, then raise a value error. Otherwise,
+    extensions) exists, then raise a ValueError. Otherwise,
     return the one file extension. If no extensions can be found, then
-    `csv` will be returned.
+    `csv` will be returned by default.
+
+    Possible extensions include: `csv`, `tsv`, `xlsx`. Files in the
+    directory with none of these extensions will be ignored.
 
     Parameters
     ----------
@@ -612,15 +615,15 @@ def get_output_directory_extension(directory, experiment_id):
 
     Returns
     -------
-    extension : str
-        The extension that files in this directory end with.
+    extension : {'csv', 'tsv', 'xlsx'}
+        The extension that output files in this directory
+        end with.
 
     Raises
     ------
     ValueError
         If any files in the directory have different extensions,
-        while also being in the list of files with possible output
-        extensions.
+        and are in the list of possible output extensions.
     """
     extension = 'csv'
     extensions_identified = [os.path.splitext(name)[-1].replace('.', '')

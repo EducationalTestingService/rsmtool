@@ -174,7 +174,8 @@ def run_experiment(config_file_or_obj,
     modeler.train(processed_config,
                   processed_container,
                   csvdir,
-                  figdir)
+                  figdir,
+                  file_format)
 
     # Identify the features used by the model
     selected_features = modeler.get_feature_names()
@@ -185,7 +186,8 @@ def run_experiment(config_file_or_obj,
     # Write out files
     writer.write_feature_csv(featuredir,
                              processed_container,
-                             selected_features)
+                             selected_features,
+                             file_format=file_format)
 
     features_data_container = processed_container.copy()
 
@@ -233,7 +235,8 @@ def run_experiment(config_file_or_obj,
                                    new_names_dict={'pred_test': 'pred_processed'},
                                    file_format=file_format)
 
-    original_coef_file = join(csvdir, '{}_coefficients.csv'.format(pred_config['experiment_id']))
+    original_coef_file = join(csvdir, '{}_coefficients.{}'.format(pred_config['experiment_id'],
+                                                                  file_format))
 
     # If coefficients file exists, then generate
     # scaled coefficients and save to file

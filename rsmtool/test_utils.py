@@ -10,6 +10,7 @@ from os.path import basename, join
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
 
+from rsmtool.reader import DataReader
 from rsmtool.modeler import Modeler
 from rsmtool.rsmtool import run_experiment
 from rsmtool.rsmcompare import run_comparison
@@ -138,7 +139,7 @@ def do_run_summary(source, config_file):
     run_summary(config_file, experiment_dir)
 
 
-def check_csv_output(csv1, csv2):
+def check_csv_output(csv1, csv2, file_format='csv'):
     """
     Check if two experiment CSV files have values that are
     the same to within three decimal places. Raises an
@@ -158,13 +159,17 @@ def check_csv_output(csv1, csv2):
 
     converter_dict = {column: str for column in string_columns}
 
-    df1 = pd.read_csv(csv1, converters=converter_dict)
-    df2 = pd.read_csv(csv2, converters=converter_dict)
+    df1 = DataReader.read_from_file(csv1, converters=converter_dict)
+    df2 = DataReader.read_from_file(csv2, converters=converter_dict)
 
     # set the first column to be the index. We do it this way to ensure
     # string indices are preserved as such
     df1.index = df1[df1.columns[0]]
     df2.index = df2[df2.columns[0]]
+
+    # make sure indexes are string, so they can be sorted
+    df1.index = df1.index.map(str)
+    df2.index = df2.index.map(str)
 
     # sort all the indices alphabetically
     df1.sort_index(inplace=True)
@@ -183,7 +188,8 @@ def check_csv_output(csv1, csv2):
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
-    if csv1.endswith('pca.csv') or csv1.endswith('factor_correlations.csv'):
+    if (csv1.endswith('pca.{}'.format(file_format)) or
+        csv1.endswith('factor_correlations.{}'.format(file_format))):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
@@ -218,7 +224,7 @@ def check_report(html_file):
     assert_equal(report_warnings, 0)
 
 
-def check_scaled_coefficients(source, experiment_id):
+def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     """
     Check that the predictions generated using scaled
     coefficients match the scaled scores. Raises an
@@ -234,22 +240,25 @@ def check_scaled_coefficients(source, experiment_id):
     preprocessed_test_file = join('test_outputs',
                                   source,
                                   'output',
-                                  '{}_test_preprocessed_features.csv'.format(experiment_id))
+                                  '{}_test_preprocessed_features.{}'.format(experiment_id,
+                                                                            file_format))
     scaled_coefficients_file = join('test_outputs',
                                     source,
                                     'output',
-                                    '{}_coefficients_scaled.csv'.format(experiment_id))
+                                    '{}_coefficients_scaled.{}'.format(experiment_id,
+                                                                       file_format))
     predictions_file = join('test_outputs',
                             source,
                             'output',
-                            '{}_pred_processed.csv'.format(experiment_id))
+                            '{}_pred_processed.{}'.format(experiment_id,
+                                                          file_format))
 
-    df_preprocessed_test_data = pd.read_csv(preprocessed_test_file)
-    df_old_predictions = pd.read_csv(predictions_file)
+    df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
+    df_old_predictions = DataReader.read_from_file(predictions_file)
     df_old_predictions = df_old_predictions[['spkitemid', 'sc1', 'scale']]
 
     # create fake skll objects with new coefficients
-    df_coef = pd.read_csv(scaled_coefficients_file)
+    df_coef = DataReader.read_from_file(scaled_coefficients_file)
     learner = Modeler.create_fake_skll_learner(df_coef)
     model = Modeler.load_from_learner(learner)
 
@@ -264,7 +273,7 @@ def check_scaled_coefficients(source, experiment_id):
                        check_less_precise=True)
 
 
-def check_all_csv_exist(csv_files, experiment_id, model_source):
+def check_all_csv_exist(csv_files, experiment_id, model_source, file_format='csv'):
     """
     Check that all crucial output files have been generated.
     Raises an AssertionError if they have not.
@@ -278,29 +287,29 @@ def check_all_csv_exist(csv_files, experiment_id, model_source):
     model_source : str
         'rsmtool' or 'skll'
     """
-    csv_must_have_both = ["_confMatrix.csv",
-                          "_cors_orig.csv",
-                          "_cors_processed.csv",
-                          "_eval.csv",
-                          "_eval_short.csv",
-                          "_feature.csv",
-                          "_feature_descriptives.csv",
-                          "_feature_descriptivesExtra.csv",
-                          "_feature_outliers.csv",
-                          "_margcor_score_all_data.csv",
-                          "_pca.csv",
-                          "_pcavar.csv",
-                          "_pcor_score_all_data.csv",
-                          "_pred_processed.csv",
-                          "_pred_train.csv",
-                          "_score_dist.csv",
-                          "_train_preprocessed_features.csv",
-                          "_test_preprocessed_features.csv",
-                          "_postprocessing_params.csv"
+    csv_must_have_both = ["_confMatrix.{}".format(file_format),
+                          "_cors_orig.{}".format(file_format),
+                          "_cors_processed.{}".format(file_format),
+                          "_eval.{}".format(file_format),
+                          "_eval_short.{}".format(file_format),
+                          "_feature.{}".format(file_format),
+                          "_feature_descriptives.{}".format(file_format),
+                          "_feature_descriptivesExtra.{}".format(file_format),
+                          "_feature_outliers.{}".format(file_format),
+                          "_margcor_score_all_data.{}".format(file_format),
+                          "_pca.{}".format(file_format),
+                          "_pcavar.{}".format(file_format),
+                          "_pcor_score_all_data.{}".format(file_format),
+                          "_pred_processed.{}".format(file_format),
+                          "_pred_train.{}".format(file_format),
+                          "_score_dist.{}".format(file_format),
+                          "_train_preprocessed_features.{}".format(file_format),
+                          "_test_preprocessed_features.{}".format(file_format),
+                          "_postprocessing_params.{}".format(file_format)
                           ]
 
-    csv_must_have_rsmtool = ["_betas.csv",
-                             "_coefficients.csv"]
+    csv_must_have_rsmtool = ["_betas.{}".format(file_format),
+                             "_coefficients.{}".format(file_format)]
     if model_source == 'rsmtool':
         csv_must_have = csv_must_have_both + csv_must_have_rsmtool
     else:
@@ -312,7 +321,7 @@ def check_all_csv_exist(csv_files, experiment_id, model_source):
     assert_equal(len(missing_csv), 0, "Missing csv files: {}".format(','.join(missing_csv)))
 
 
-def check_consistency_files_exist(csv_files, experiment_id):
+def check_consistency_files_exist(csv_files, experiment_id, file_format='csv'):
     """
     Check to make sure that the consistency files
     were generated. Raises an AssertionError if
@@ -325,8 +334,8 @@ def check_consistency_files_exist(csv_files, experiment_id):
     experiment_id : str
         The experiment ID.
     """
-    csv_must_have = ["_consistency.csv",
-                     "_degradation.csv"]
+    csv_must_have = ["_consistency.{}".format(file_format),
+                     "_degradation.{}".format(file_format)]
 
     csv_must_with_id = [experiment_id + file_name for file_name in csv_must_have]
     csv_exist = [basename(file_name) for file_name in csv_files]

@@ -3069,3 +3069,211 @@ def test_run_experiment_lr_exclude_train_and_test_flags():
     yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
+
+
+def test_run_experiment_lr_with_xlsx_output():
+    # basic experiment with a LinearRegression model
+    # with XLSX files as outputs
+
+    source = 'lr-with-xlsx-output'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.xlsx'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file, 'xlsx'
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool', 'xlsx'
+    yield check_scaled_coefficients, source, experiment_id, 'xlsx'
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_with_tsv_output():
+    # basic experiment with a LinearRegression model
+    # with TSV files as outputs
+
+    source = 'lr-with-tsv-output'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.tsv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file, 'tsv'
+
+    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool', 'tsv'
+    yield check_scaled_coefficients, source, experiment_id, 'tsv'
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_tsv_output():
+
+    # basic evaluation experiment using rsmeval
+    # output in TSV format
+
+    source = 'lr-eval-with-tsv-output'
+    experiment_id = 'lr_evaluation'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.tsv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file, 'tsv'
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_xlsx_output():
+
+    # basic evaluation experiment using rsmeval
+    # output in XLSX format
+
+    source = 'lr-eval-with-xlsx-output'
+    experiment_id = 'lr_evaluation'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.xlsx'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file, 'xlsx'
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_predict_with_tsv_output():
+
+    # basic experiment using rsmpredict
+    # output in TSV format
+
+    source = 'lr-predict-with-tsv-output'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.tsv', 'preprocessed_features.tsv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file, 'tsv'
+
+
+def test_run_experiment_lr_predict_with_xlsx_output():
+
+    # basic experiment using rsmpredict
+    # output in TSV format
+
+    source = 'lr-predict-with-xlsx-output'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.xlsx', 'preprocessed_features.xlsx']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_csv_output, output_file, expected_output_file, 'xlsx'
+
+
+def test_run_experiment_lr_summary_with_tsv_inputs():
+
+    # basic rsmsummarize experiment comparing several rsmtool experiments
+    # inputs are TSVs rather than CSVs (outputs are still CSVs)
+
+    source = 'lr-self-summary-with-tsv-inputs'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_csv_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_compare_different_format():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself, with TSVs in output directory
+
+    source = 'lr-self-compare-different-format'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
+    yield check_report, html_report
