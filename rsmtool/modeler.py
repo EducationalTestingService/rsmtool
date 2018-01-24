@@ -950,11 +950,7 @@ class Modeler:
         # unpack all results
         learner, fit, df_coef, used_features = result
 
-        # save the raw coefficients to a file
-        # df_coef.to_csv(join(csvdir, '{}_coefficients.{}'.format(experiment_id,
-        #                                                         file_format)),
-        #                index=False)
-
+        # add raw coefficients to frame list
         frames.append({'name': 'coefficients', 'frame': df_coef})
 
         # compute the standardized and relative coefficients (betas) for the
@@ -966,10 +962,8 @@ class Modeler:
         df_betas['relative'] = df_betas / sum(abs(df_betas['standardized']))
         df_betas.reset_index(inplace=True)
 
+        # add betas to frame list
         frames.append({'name': 'betas', 'frame': df_betas})
-
-        # df_betas.to_csv(join(csvdir, '{}_betas.{}'.format(experiment_id,
-        #                                                   file_format)), index=False)
 
         # save the OLS fit object and its summary to files
         if fit:
@@ -981,9 +975,8 @@ class Modeler:
 
             # create a data frame with main model fit metrics and save to the file
             df_model_fit = self.model_fit_to_dataframe(fit)
-            # model_fit_file = join(csvdir, '{}_model_fit.{}'.format(experiment_id,
-            #                                                        file_format))
-            # df_model_fit.to_csv(model_fit_file, index=False)
+
+            # add model_fit to frame list
             frames.append({'name': 'model_fit', 'frame': df_model_fit})
 
         # save the SKLL model to a file
