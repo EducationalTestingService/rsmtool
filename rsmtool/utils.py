@@ -20,6 +20,8 @@ import pandas as pd
 from math import ceil
 from string import Template
 from textwrap import wrap
+from IPython.display import (display,
+                             HTML)
 
 from skll.data import safe_float as string_to_number
 
@@ -643,6 +645,86 @@ def get_output_directory_extension(directory, experiment_id):
         extension = list(extensions)[0]
 
     return extension
+
+
+class Thumbnail:
+    """
+    Convert an image file to a click-able thumbnail.
+    """
+
+    def __init__(self):
+        self.current_id = 0
+
+    def convert(self, path_to_image):
+        """
+        Given an path to an image file, display
+        a click-able thumbnail version of the image.
+        On click, open the full-sized version of the
+        image in a new window.
+
+        Parameters
+        ----------
+        path_to_image : str
+            The absolute or relative path to the image.
+            If an absolute path is provided, it will be
+            converted to a relative path.
+
+        Returns
+        -------
+        display : IPython.display.display
+            The HTML display of the thumbnail image.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the image file cannot be located.
+        """
+        if not os.path.exists(path_to_image):
+            raise FileNotFoundError('The file `{}` could not be '
+                                    'located.'.format(path_to_image))
+
+        # check if the path is relative or absolute
+        if os.path.isabs(path_to_image):
+            relative_path = os.path.relpath(path_to_image)
+        else:
+            relative_path = path_to_image
+
+        # get the current ID of the image
+        self.current_id += 1
+        current_id = 'id{}'.format(self.current_id)
+        current_id_with_pound = '"#{}"'.format(current_id)
+
+        # specify the thumbnail style
+        style = """
+        <style>
+        img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 150px;
+        }
+        </style>
+        """
+
+        # on click, open larger image in new window
+        script = """
+        <script>
+        function getPicture(picid) {{
+            var src = $(picid).attr('src');
+            window.open(src, 'Image', resizable=1);
+        }};
+        </script>""".format(current_id)
+
+        # generate image tags
+        image = ("""<img id='{}' src='{}' onclick='getPicture({})'>"""
+                 """</img>""").format(current_id,
+                                      relative_path,
+                                      current_id_with_pound)
+
+        # display the image
+        image += style
+        image += script
+        return display(HTML(image))
 
 
 class LogFormatter(logging.Formatter):
