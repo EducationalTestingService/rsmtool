@@ -257,7 +257,6 @@ class Comparer:
         """
 
         extension = get_output_directory_extension(csvdir, experiment_id)
-        print(extension)
 
         csvs = defaultdict(pd.DataFrame)
         figs = {}
