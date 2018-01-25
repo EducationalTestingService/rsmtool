@@ -40,6 +40,7 @@ Documentation
    api
    utilities
    contributing
+   release_process
 
 Indices and tables
 ==================

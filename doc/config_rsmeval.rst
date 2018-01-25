@@ -35,6 +35,12 @@ description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
+file_format *(Optional)*
+"""""""""""""""""""""""""""
+The format of the output files. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
+
+.. _file_format_eval:
+
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmeval`` will look for a column called ``spkitemid`` in the prediction file.

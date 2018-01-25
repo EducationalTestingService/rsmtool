@@ -28,6 +28,11 @@ The path to the file with the raw feature values that will be used for generatin
 
     ``rsmpredict`` does not require human scores for the new data since it does not evaluate the generated predictions. If you do have the human scores and want to evaluate the new predictions, you can use the :ref:`rsmeval <usage_rsmeval>` command-line utility.
 
+file_format *(Optional)*
+"""""""""""""""""""""""""""
+The format of the output files. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
+
+.. _file_format_predict:
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
