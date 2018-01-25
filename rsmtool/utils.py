@@ -660,7 +660,7 @@ class Thumbnail:
     def __init__(self):
         self.current_id = 0
 
-    def convert(self, path_to_image):
+    def convert_to_html(self, path_to_image):
         """
         Given an path to an image file, display
         a click-able thumbnail version of the image.
@@ -676,13 +676,21 @@ class Thumbnail:
 
         Returns
         -------
-        display : IPython.display.display
-            The HTML display of the thumbnail image.
+        image : str
+            The HTML string generated for the image.
 
         Raises
         ------
         FileNotFoundError
             If the image file cannot be located.
+
+        Note
+        ----
+        This function returns an HTML string
+        (1) in case you want to do something
+        with this string other than display in
+        a Jupyter notebook, and (2) to make the
+        unit testing easier.
         """
         if not os.path.exists(path_to_image):
             raise FileNotFoundError('The file `{}` could not be '
@@ -729,7 +737,33 @@ class Thumbnail:
         # display the image
         image += style
         image += script
-        return display(HTML(image))
+        return image
+
+    def convert(self, path_to_image):
+        """
+        Given an path to an image file, display
+        a click-able thumbnail version of the image.
+        On click, open the full-sized version of the
+        image in a new window.
+
+        Parameters
+        ----------
+        path_to_image : str
+            The absolute or relative path to the image.
+            If an absolute path is provided, it will be
+            converted to a relative path.
+
+        Returns
+        -------
+        display : IPython.core.display.HTML
+            The HTML display of the thumbnail image.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the image file cannot be located.
+        """
+        return display(HTML(self.convert_to_html(path_to_image)))
 
 
 class LogFormatter(logging.Formatter):

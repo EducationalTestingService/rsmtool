@@ -2,7 +2,7 @@
 import tempfile
 import os
 
-from nose.tools import assert_equal, eq_
+from nose.tools import assert_equal, eq_, raises
 
 from rsmtool.utils import (float_format_func,
                            int_or_float_format_func,
@@ -13,6 +13,8 @@ from rsmtool.utils import (float_format_func,
                            convert_to_float,
                            compute_subgroup_plot_params,
                            parse_json_with_comments)
+
+from rsmtool.utils import Thumbnail
 
 
 def test_int_to_float():
@@ -224,3 +226,100 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
 
     subgroup_plot_params = compute_subgroup_plot_params(group_names, 5)
     eq_(expected_subgroup_plot_params, subgroup_plot_params)
+
+
+class TestThumbnail:
+
+    def get_result(self, path, id_num='1'):
+
+        # get the expected HTML output
+
+        result = """
+        <img id='id{}' src='{}' onclick='getPicture("#id{}")'></img>
+        <style>
+        img {{
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 150px;
+        }}
+        </style>
+
+        <script>
+        function getPicture(picid) {{
+            var src = $(picid).attr('src');
+            window.open(src, 'Image', resizable=1);
+        }};
+        </script>""".format(id_num, path, id_num)
+        return "".join(result.strip().split())
+
+    def test_convert_to_html(self):
+
+        # simple test of HTML thumbnail conversion
+
+        path = 'tests/data/figures/figure1.svg'
+
+        thumb = Thumbnail()
+        image = thumb.convert_to_html(path)
+
+        clean_image = "".join(image.strip().split())
+        clean_thumb = self.get_result(path)
+
+        eq_(clean_image, clean_thumb)
+
+    def test_convert_to_html_with_png(self):
+
+        # simple test of HTML thumbnail conversion
+        # with a PNG file instead of SVG
+
+        path = 'tests/data/figures/figure3.png'
+
+        thumb = Thumbnail()
+        image = thumb.convert_to_html(path)
+
+        clean_image = "".join(image.strip().split())
+        clean_thumb = self.get_result(path)
+
+        eq_(clean_image, clean_thumb)
+
+    def test_convert_to_html_with_two_images(self):
+
+        # test converting two images to HTML thumbnails
+
+        path1 = 'tests/data/figures/figure1.svg'
+        path2 = 'tests/data/figures/figure2.svg'
+
+        thumb = Thumbnail()
+        thumb.convert_to_html(path1)
+        image = thumb.convert_to_html(path2)
+
+        clean_image = "".join(image.strip().split())
+        clean_thumb = self.get_result(path2, '2')
+
+        eq_(thumb.current_id, 2)
+        eq_(clean_image, clean_thumb)
+
+    def test_convert_to_html_with_absolute_path(self):
+
+        # test converting image to HTML with absolute path
+
+        path = 'tests/data/figures/figure1.svg'
+        path_absolute = os.path.abspath(path)
+
+        thumb = Thumbnail()
+        image = thumb.convert_to_html(path_absolute)
+
+        clean_image = "".join(image.strip().split())
+        clean_thumb = self.get_result(path)
+
+        eq_(clean_image, clean_thumb)
+
+    @raises(FileNotFoundError)
+    def test_convert_to_html_file_not_found_error(self):
+
+        # test FileNotFound error properly raised
+
+        path = 'random/path/to/figure1.svg'
+
+        thumb = Thumbnail()
+        thumb.convert_to_html(path)
