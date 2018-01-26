@@ -1628,8 +1628,7 @@ class FeaturePreprocessor:
         flag_column_dict = config_obj.check_flag_column()
         flag_column_test_dict = config_obj.check_flag_column('flag_column_test')
 
-        if (flag_column_dict is not None and
-            flag_column_test_dict is None):
+        if (flag_column_dict and not flag_column_test_dict):
             flag_column_test_dict = flag_column_dict
 
         # are we generating fake labels?
