@@ -234,7 +234,7 @@ def test_has_files_with_extension_true():
     eq_(result, True)
 
 
-def test_has_files_with_extension_flase():
+def test_has_files_with_extension_false():
     directory = 'tests/data/files'
     result = has_files_with_extension(directory, 'ppt')
     eq_(result, False)
