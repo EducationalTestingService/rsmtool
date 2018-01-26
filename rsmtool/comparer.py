@@ -226,7 +226,7 @@ class Comparer:
         conf_matrix_renamed.columns = ['human {}'.format(x) for x in conf_matrix.columns]
         return conf_matrix_renamed
 
-    def load_rsmtool_output(self, csvdir, figdir, experiment_id, prefix, groups_eval):
+    def load_rsmtool_output(self, filedir, figdir, experiment_id, prefix, groups_eval):
         """
         Function to load all of the outputs of an rsmtool experiment.
         For each type of output, we first check whether the file exists
@@ -234,8 +234,8 @@ class Comparer:
 
         Parameters
         ----------
-        csvdir : str
-            Path to the directory containing output ``.csv`` files.
+        filedir : str
+            Path to the directory containing output files.
         figdir : str
             Path to the directory containing output figures.
         experiment_id : str
@@ -248,72 +248,72 @@ class Comparer:
 
         Returns
         -------
-        csvs : dict
-            A dictionary with ``.csv`` outputs converted to pandas data
+        files : dict
+            A dictionary with outputs converted to pandas data
             frames. If a particular type of output did not exist for the
             experiment, its value will be an empty data frame.
         figs: dict
             A dictionary with experiment figures.
         """
 
-        extension = get_output_directory_extension(csvdir, experiment_id)
+        extension = get_output_directory_extension(filedir, experiment_id)
 
-        csvs = defaultdict(pd.DataFrame)
+        files = defaultdict(pd.DataFrame)
         figs = {}
 
         # feature distributions and the inter-feature correlations
-        feature_train_file = join(csvdir, '{}_train_features.{}'.format(experiment_id,
-                                                                        extension))
+        feature_train_file = join(filedir, '{}_train_features.{}'.format(experiment_id,
+                                                                         extension))
         if exists(feature_train_file):
-            csvs['df_train_features'] = DataReader.read_from_file(feature_train_file)
+            files['df_train_features'] = DataReader.read_from_file(feature_train_file)
 
         feature_distplots_file = join(figdir, '{}_distrib.svg'.format(experiment_id))
         if exists(feature_distplots_file):
             with open(feature_distplots_file, 'rb') as f:
                 figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
 
-        feature_cors_file = join(csvdir, '{}_cors_processed.{}'.format(experiment_id,
-                                                                       extension))
+        feature_cors_file = join(filedir, '{}_cors_processed.{}'.format(experiment_id,
+                                                                        extension))
         if exists(feature_cors_file):
-            csvs['df_feature_cors'] = DataReader.read_from_file(feature_cors_file, index_col=0)
+            files['df_feature_cors'] = DataReader.read_from_file(feature_cors_file, index_col=0)
 
         # df_scores
-        scores_file = join(csvdir, '{}_pred_processed.{}'.format(experiment_id,
-                                                                 extension))
+        scores_file = join(filedir, '{}_pred_processed.{}'.format(experiment_id,
+                                                                  extension))
         if exists(scores_file):
             df_scores = DataReader.read_from_file(scores_file, converters={'spkitemid': str})
-            csvs['df_scores'] = df_scores[['spkitemid', 'sc1', prefix]]
+            files['df_scores'] = df_scores[['spkitemid', 'sc1', prefix]]
 
         # model coefficients if present
-        betas_file = join(csvdir, '{}_betas.{}'.format(experiment_id,
-                                                       extension))
+        betas_file = join(filedir, '{}_betas.{}'.format(experiment_id,
+                                                        extension))
         if exists(betas_file):
-            csvs['df_coef'] = DataReader.read_from_file(betas_file, index_col=0)
-            csvs['df_coef'].index.name = None
+            files['df_coef'] = DataReader.read_from_file(betas_file, index_col=0)
+            files['df_coef'].index.name = None
 
         # read in the model fit files if present
-        model_fit_file = join(csvdir, '{}_model_fit.{}'.format(experiment_id,
-                                                               extension))
+        model_fit_file = join(filedir, '{}_model_fit.{}'.format(experiment_id,
+                                                                extension))
         if exists(model_fit_file):
-            csvs['df_model_fit'] = DataReader.read_from_file(model_fit_file)
+            files['df_model_fit'] = DataReader.read_from_file(model_fit_file)
 
         # human human agreement
-        consistency_file = join(csvdir, '{}_consistency.{}'.format(experiment_id,
-                                                                   extension))
+        consistency_file = join(filedir, '{}_consistency.{}'.format(experiment_id,
+                                                                    extension))
 
         # load if consistency file is present
         if exists(consistency_file):
             df_consistency = DataReader.read_from_file(consistency_file, index_col=0)
-            csvs['df_consistency'] = df_consistency
+            files['df_consistency'] = df_consistency
 
         # degradation
-        degradation_file = join(csvdir, "{}_degradation.{}".format(experiment_id,
-                                                                   extension))
+        degradation_file = join(filedir, "{}_degradation.{}".format(experiment_id,
+                                                                    extension))
 
         # load if degradation file is present
         if exists(degradation_file):
             df_degradation = DataReader.read_from_file(degradation_file, index_col=0)
-            csvs['df_degradation'] = df_degradation
+            files['df_degradation'] = df_degradation
 
         # use the raw columns or the scale columns depending on the prefix
         existing_eval_cols = (_df_eval_columns_existing_raw if prefix == 'raw'
@@ -323,105 +323,108 @@ class Comparer:
         # read in the short version of the evaluation metrics for all data
         short_metrics_list = ["N", "Adj. Agmt.(br)", "Agmt.(br)", "K(br)",
                               "Pearson(b)", "QWK(br)", "R2(b)", "RMSE(b)"]
-        eval_file_short = join(csvdir, '{}_eval_short.{}'.format(experiment_id, extension))
+        eval_file_short = join(filedir, '{}_eval_short.{}'.format(experiment_id, extension))
 
         if exists(eval_file_short):
             df_eval = DataReader.read_from_file(eval_file_short, index_col=0)
             df_eval = df_eval[existing_eval_cols]
             df_eval = df_eval.rename(columns=rename_dict)
-            csvs['df_eval'] = df_eval[short_metrics_list]
-            csvs['df_eval'].index.name = None
+            files['df_eval'] = df_eval[short_metrics_list]
+            files['df_eval'].index.name = None
 
-        eval_file = join(csvdir, '{}_eval.{}'.format(experiment_id, extension))
+        eval_file = join(filedir, '{}_eval.{}'.format(experiment_id, extension))
         if exists(eval_file):
-            csvs['df_eval_for_degradation'] = DataReader.read_from_file(eval_file, index_col=0)
+            files['df_eval_for_degradation'] = DataReader.read_from_file(eval_file, index_col=0)
 
         # read in the evaluation metrics by subgroup, if we are asked to
         for group in groups_eval:
-            group_eval_file = join(csvdir, '{}_eval_by_{}.{}'.format(experiment_id,
-                                                                     group,
-                                                                     extension))
+            group_eval_file = join(filedir, '{}_eval_by_{}.{}'.format(experiment_id,
+                                                                      group,
+                                                                      extension))
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
                 df_eval = df_eval[existing_eval_cols]
                 df_eval = df_eval.rename(columns=rename_dict)
-                csvs['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
-                csvs['df_eval_by_{}'.format(group)].index.name = None
+                files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
+                files['df_eval_by_{}'.format(group)].index.name = None
 
-                series = csvs['df_eval_by_{}'.format(group)]
-                csvs['df_eval_by_{}_overview'.format(group)] = self.make_summary_stat_df(series)
+                series = files['df_eval_by_{}'.format(group)]
+                files['df_eval_by_{}_overview'.format(group)] = self.make_summary_stat_df(series)
 
                 # set the ordering of mean/SD/SMD statistics
-                csvs['df_eval_by_{}_m_sd'.format(group)] = df_eval[['N', 'H1 mean',
-                                                                    'H1 SD', 'score mean(br)',
-                                                                    'score SD(br)',
-                                                                    'score mean(b)',
-                                                                    'score SD(b)',
-                                                                    'SMD(br)', 'SMD(b)']]
-                csvs['df_eval_by_{}_m_sd'.format(group)].index.name = None
+                files['df_eval_by_{}_m_sd'.format(group)] = df_eval[['N', 'H1 mean',
+                                                                     'H1 SD', 'score mean(br)',
+                                                                     'score SD(br)',
+                                                                     'score mean(b)',
+                                                                     'score SD(b)',
+                                                                     'SMD(br)', 'SMD(b)']]
+                files['df_eval_by_{}_m_sd'.format(group)].index.name = None
 
         # read in the partial correlations vs. score for all data
-        pcor_score_file = join(csvdir, '{}_pcor_score_all_data.{}'.format(experiment_id, extension))
+        pcor_score_file = join(filedir, '{}_pcor_score_all_data.{}'.format(experiment_id,
+                                                                           extension))
         if exists(pcor_score_file):
-            csvs['df_pcor_sc1'] = DataReader.read_from_file(pcor_score_file, index_col=0)
-            csvs['df_pcor_sc1_overview'] = self.make_summary_stat_df(csvs['df_pcor_sc1'])
+            files['df_pcor_sc1'] = DataReader.read_from_file(pcor_score_file, index_col=0)
+            files['df_pcor_sc1_overview'] = self.make_summary_stat_df(files['df_pcor_sc1'])
 
         # read in the partial correlations by subgroups, if we are asked to
         for group in groups_eval:
-            group_pcor_file = join(csvdir, '{}_pcor_score_by_{}.{}'.format(experiment_id,
-                                                                           group,
-                                                                           extension))
+            group_pcor_file = join(filedir, '{}_pcor_score_by_{}.{}'.format(experiment_id,
+                                                                            group,
+                                                                            extension))
             if exists(group_pcor_file):
-                csvs['df_pcor_sc1_by_{}'.format(group)] = DataReader.read_from_file(group_pcor_file,
-                                                                                    index_col=0)
+                files['df_pcor_sc1_by_{}'
+                      ''.format(group)] = DataReader.read_from_file(group_pcor_file,
+                                                                    index_col=0)
 
-                series = csvs['df_pcor_sc1_by_{}'.format(group)]
-                csvs['df_pcor_sc1_{}_overview'.format(group)] = self.make_summary_stat_df(series)
+                series = files['df_pcor_sc1_by_{}'.format(group)]
+                files['df_pcor_sc1_{}_overview'.format(group)] = self.make_summary_stat_df(series)
 
         # read in the marginal correlations vs. score for all data
-        mcor_score_file = join(csvdir, '{}_margcor_score_all_data.{}'.format(experiment_id,
-                                                                             extension))
+        mcor_score_file = join(filedir, '{}_margcor_score_all_data.{}'.format(experiment_id,
+                                                                              extension))
         if exists(mcor_score_file):
-            csvs['df_mcor_sc1'] = DataReader.read_from_file(mcor_score_file, index_col=0)
-            csvs['df_mcor_sc1_overview'] = self.make_summary_stat_df(csvs['df_mcor_sc1'])
+            files['df_mcor_sc1'] = DataReader.read_from_file(mcor_score_file, index_col=0)
+            files['df_mcor_sc1_overview'] = self.make_summary_stat_df(files['df_mcor_sc1'])
 
         # read in the partial correlations by subgroups, if we are asked to
         for group in groups_eval:
-            group_mcor_file = join(csvdir,
+            group_mcor_file = join(filedir,
                                    '{}_margcor_score_by_{}.{}'.format(experiment_id,
                                                                       group,
                                                                       extension))
             if exists(group_mcor_file):
-                csvs['df_mcor_sc1_by_{}'.format(group)] = DataReader.read_from_file(group_mcor_file,
-                                                                                    index_col=0)
+                files['df_mcor_sc1_by_{}'
+                      ''.format(group)] = DataReader.read_from_file(group_mcor_file,
+                                                                    index_col=0)
 
-                series = csvs['df_mcor_sc1_by_{}'.format(group)]
-                csvs['df_mcor_sc1_{}_overview'.format(group)] = self.make_summary_stat_df(series)
+                series = files['df_mcor_sc1_by_{}'.format(group)]
+                files['df_mcor_sc1_{}_overview'.format(group)] = self.make_summary_stat_df(series)
 
-        pca_file = join(csvdir, '{}_pca.{}'.format(experiment_id, extension))
+        pca_file = join(filedir, '{}_pca.{}'.format(experiment_id, extension))
         if exists(pca_file):
-            csvs['df_pca'] = DataReader.read_from_file(pca_file, index_col=0)
-            csvs['df_pcavar'] = DataReader.read_from_file(join(csvdir,
-                                                               '{}_pcavar.{}'.format(experiment_id,
-                                                                                     extension)),
-                                                          index_col=0)
+            files['df_pca'] = DataReader.read_from_file(pca_file, index_col=0)
+            files['df_pcavar'] = DataReader.read_from_file(join(filedir,
+                                                                '{}_pcavar.{}'.format(experiment_id,
+                                                                                      extension)),
+                                                           index_col=0)
 
-        descriptives_file = join(csvdir, '{}_feature_descriptives.{}'.format(experiment_id,
-                                                                             extension))
+        descriptives_file = join(filedir, '{}_feature_descriptives.{}'.format(experiment_id,
+                                                                              extension))
         if exists(descriptives_file):
             # we read all files pertaining to the descriptive analysis together
             # since we merge the outputs
-            csvs['df_descriptives'] = DataReader.read_from_file(descriptives_file, index_col=0)
+            files['df_descriptives'] = DataReader.read_from_file(descriptives_file, index_col=0)
 
             # this df contains only the number of features. this is used later
             # for another two tables to show the number of features
-            df_features_n_values = csvs['df_descriptives'][['N', 'min', 'max']]
+            df_features_n_values = files['df_descriptives'][['N', 'min', 'max']]
 
-            csvs['df_descriptives'] = csvs['df_descriptives'][['N', 'mean', 'std. dev.',
-                                                               'skewness', 'kurtosis']]
+            files['df_descriptives'] = files['df_descriptives'][['N', 'mean', 'std. dev.',
+                                                                 'skewness', 'kurtosis']]
 
-            outliers_file = join(csvdir, '{}_feature_outliers.{}'.format(experiment_id,
-                                                                         extension))
+            outliers_file = join(filedir, '{}_feature_outliers.{}'.format(experiment_id,
+                                                                          extension))
             df_outliers = DataReader.read_from_file(outliers_file, index_col=0)
             df_outliers = df_outliers.rename(columns={'upper': 'Upper',
                                                       'lower': 'Lower',
@@ -430,53 +433,53 @@ class Comparer:
                                                       'lowerperc': 'Lower %',
                                                       'bothperc': 'Both %'})
             df_outliers_columns = df_outliers.columns.tolist()
-            csvs['df_outliers'] = df_outliers
+            files['df_outliers'] = df_outliers
 
             # join with df_features_n_values to get the value of N
-            csvs['df_outliers'] = pd.merge(csvs['df_outliers'], df_features_n_values,
-                                           left_index=True,
-                                           right_index=True)[['N'] + df_outliers_columns]
+            files['df_outliers'] = pd.merge(files['df_outliers'], df_features_n_values,
+                                            left_index=True,
+                                            right_index=True)[['N'] + df_outliers_columns]
 
             # join with df_features_n_values to get the value of N
-            percentiles_file = join(csvdir, '{}_feature_descriptives'
-                                            'Extra.{}'.format(experiment_id,
-                                                              extension))
+            percentiles_file = join(filedir, '{}_feature_descriptives'
+                                             'Extra.{}'.format(experiment_id,
+                                                               extension))
 
-            csvs['df_percentiles'] = DataReader.read_from_file(percentiles_file,
-                                                               index_col=0)
-            csvs['df_percentiles'] = pd.merge(csvs['df_percentiles'],
-                                              df_features_n_values,
-                                              left_index=True,
-                                              right_index=True)
+            files['df_percentiles'] = DataReader.read_from_file(percentiles_file,
+                                                                index_col=0)
+            files['df_percentiles'] = pd.merge(files['df_percentiles'],
+                                               df_features_n_values,
+                                               left_index=True,
+                                               right_index=True)
 
-            mild_outliers = (csvs['df_percentiles']["Mild outliers"] /
-                             csvs['df_percentiles']["N"].astype(float) * 100)
+            mild_outliers = (files['df_percentiles']["Mild outliers"] /
+                             files['df_percentiles']["N"].astype(float) * 100)
 
-            csvs['df_percentiles']["Mild outliers (%)"] = mild_outliers
+            files['df_percentiles']["Mild outliers (%)"] = mild_outliers
 
-            extreme_outliers = (csvs['df_percentiles']["Extreme outliers"] /
-                                csvs['df_percentiles']["N"].astype(float) * 100)
+            extreme_outliers = (files['df_percentiles']["Extreme outliers"] /
+                                files['df_percentiles']["N"].astype(float) * 100)
 
-            csvs['df_percentiles']["Extreme outliers (%)"] = extreme_outliers
+            files['df_percentiles']["Extreme outliers (%)"] = extreme_outliers
 
-            csvs['df_percentiles'] = csvs['df_percentiles'][['N', 'min', 'max',
-                                                             '1%', '5%', '25%',
-                                                             '50%', '75%', '95%',
-                                                             '99%', 'IQR', 'Mild outliers',
-                                                             'Mild outliers (%)',
-                                                             'Extreme outliers',
-                                                             'Extreme outliers (%)']]
+            files['df_percentiles'] = files['df_percentiles'][['N', 'min', 'max',
+                                                               '1%', '5%', '25%',
+                                                               '50%', '75%', '95%',
+                                                               '99%', 'IQR', 'Mild outliers',
+                                                               'Mild outliers (%)',
+                                                               'Extreme outliers',
+                                                               'Extreme outliers (%)']]
 
-        confmatrix_file = join(csvdir, '{}_confMatrix.{}'.format(experiment_id, extension))
+        confmatrix_file = join(filedir, '{}_confMatrix.{}'.format(experiment_id, extension))
         if exists(confmatrix_file):
             conf_matrix = DataReader.read_from_file(confmatrix_file, index_col=0)
-            csvs['df_confmatrix'] = self.process_confusion_matrix(conf_matrix)
+            files['df_confmatrix'] = self.process_confusion_matrix(conf_matrix)
 
-        score_dist_file = join(csvdir, '{}_score_dist.{}'.format(experiment_id, extension))
+        score_dist_file = join(filedir, '{}_score_dist.{}'.format(experiment_id, extension))
         if exists(score_dist_file):
             df_score_dist = DataReader.read_from_file(score_dist_file, index_col=1)
             df_score_dist.rename(columns={'sys_{}'.format(prefix): 'sys'}, inplace=True)
-            csvs['df_score_dist'] = df_score_dist[['human', 'sys', 'difference']]
+            files['df_score_dist'] = df_score_dist[['human', 'sys', 'difference']]
 
         # read in the feature boxplots by subgroup, if we were asked to
         for group in groups_eval:
@@ -512,4 +515,4 @@ class Comparer:
             with open(pca_svg_file, 'rb') as f:
                 figs['pca_scree_plot'] = base64.b64encode(f.read()).decode('utf-8')
 
-        return (csvs, figs)
+        return (files, figs)
