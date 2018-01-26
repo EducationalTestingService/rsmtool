@@ -9,15 +9,16 @@ Utility classes and functions.
 :organization: ETS
 """
 
-import re
 import json
 import logging
+import re
 import os
 
 import numpy as np
 import pandas as pd
 
 from math import ceil
+from glob import glob
 from string import Template
 from textwrap import wrap
 
@@ -595,6 +596,27 @@ def compute_subgroup_plot_params(group_names, num_plots):
     return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
 
 
+def has_files_with_extension(directory, ext):
+    """
+    Check if the directory has any files with the given extension.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory where output is located.
+    ext : str
+        The the given extension.
+
+    Returns
+    -------
+    bool
+        True if directory contains files with given extension,
+        else False.
+    """
+    files_with_extension = glob(os.path.join(directory, '*.{}'.format(ext)))
+    return len(files_with_extension) > 0
+
+
 def get_output_directory_extension(directory, experiment_id):
     """
     Check the output directory to determine what file extensions
@@ -626,9 +648,8 @@ def get_output_directory_extension(directory, experiment_id):
         and are in the list of possible output extensions.
     """
     extension = 'csv'
-    extensions_identified = [os.path.splitext(name)[-1].replace('.', '')
-                             for name in os.listdir(directory)
-                             if any(name.endswith(ext) for ext in POSSIBLE_EXTENSIONS)]
+    extensions_identified = [ext for ext in POSSIBLE_EXTENSIONS
+                             if has_files_with_extension(directory, ext)]
 
     extensions = set(extensions_identified)
     if len(extensions) > 1:
