@@ -870,7 +870,7 @@ class Modeler:
                             model_name,
                             df_train,
                             experiment_id,
-                            csvdir,
+                            filedir,
                             figdir,
                             file_format='csv'):
         """
@@ -886,7 +886,7 @@ class Modeler:
             `spkitemid` and the numeric label column named `sc1`.
         experiment_id : str
             The experiment ID.
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
@@ -967,8 +967,8 @@ class Modeler:
 
         # save the OLS fit object and its summary to files
         if fit:
-            ols_file = join(csvdir, '{}.ols'.format(experiment_id))
-            summary_file = join(csvdir, '{}_ols_summary.txt'.format(experiment_id))
+            ols_file = join(filedir, '{}.ols'.format(experiment_id))
+            summary_file = join(filedir, '{}_ols_summary.txt'.format(experiment_id))
             with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
                 pickle.dump(fit, olsf)
                 summf.write(str(fit.summary()))
@@ -980,11 +980,11 @@ class Modeler:
             frames.append({'name': 'model_fit', 'frame': df_model_fit})
 
         # save the SKLL model to a file
-        model_file = join(csvdir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, '{}.model'.format(experiment_id))
         learner.save(model_file)
 
         container = DataContainer(frames)
-        writer.write_experiment_output(csvdir, container, file_format=file_format)
+        writer.write_experiment_output(filedir, container, file_format=file_format)
 
         self.learner = learner
 
@@ -994,7 +994,7 @@ class Modeler:
                          model_name,
                          df_train,
                          experiment_id,
-                         csvdir,
+                         filedir,
                          figdir,
                          file_format='csv'):
         """
@@ -1009,7 +1009,7 @@ class Modeler:
             to train the model.
         experiment_id : str
             The experiment ID.
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
@@ -1048,7 +1048,7 @@ class Modeler:
         # TODO: compute betas for linear SKLL models?
 
         # save the SKLL model to disk with the given model name prefix
-        model_file = join(csvdir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, '{}.model'.format(experiment_id))
         learner.save(model_file)
 
         self.learner = learner
@@ -1059,7 +1059,7 @@ class Modeler:
     def train(self,
               configuration,
               data_container,
-              csvdir,
+              filedir,
               figdir,
               file_format='csv'):
         """
@@ -1073,7 +1073,7 @@ class Modeler:
             A configuration object containing `experiment_id` and `model_name`
         data_container : container.DataContainer
             A data_container object containing `train_preprocessed_features`
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
@@ -1094,7 +1094,7 @@ class Modeler:
 
         df_train = data_container['train_preprocessed_features']
 
-        args = [model_name, df_train, experiment_id, csvdir, figdir, file_format]
+        args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
         model = self.train_builtin_model(*args) if model_name in builtin_models \
             else self.train_skll_model(*args)
         return model
