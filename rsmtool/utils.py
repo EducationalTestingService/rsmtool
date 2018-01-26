@@ -648,20 +648,19 @@ def get_output_directory_extension(directory, experiment_id):
         and are in the list of possible output extensions.
     """
     extension = 'csv'
-    extensions_identified = [ext for ext in POSSIBLE_EXTENSIONS
-                             if has_files_with_extension(directory, ext)]
+    extensions_identified = set(ext for ext in POSSIBLE_EXTENSIONS
+                                if has_files_with_extension(directory, ext))
 
-    extensions = set(extensions_identified)
-    if len(extensions) > 1:
+    if len(extensions_identified) > 1:
         raise ValueError('Some of the files in the experiment output directory (`{}`) '
                          'for `{}` have different extensions. All files in this directory '
                          'must have the same extension. The following extensions were '
                          'identified : {}'.format(directory,
                                                   experiment_id,
-                                                  ', '.join(extensions)))
+                                                  ', '.join(extensions_identified)))
 
-    elif len(extensions) == 1:
-        extension = list(extensions)[0]
+    elif len(extensions_identified) == 1:
+        extension = list(extensions_identified)[0]
 
     return extension
 
