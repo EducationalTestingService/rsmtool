@@ -32,6 +32,7 @@ from rsmtool.preprocessor import FeaturePreprocessor
 
 from rsmtool.configuration_parser import Configuration
 from rsmtool.container import DataContainer
+from rsmtool.writer import DataWriter
 
 with warnings.catch_warnings():
     warnings.filterwarnings('ignore', category=FutureWarning)
@@ -865,7 +866,13 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_builtin_model(self, model_name, df_train, experiment_id, csvdir, figdir):
+    def train_builtin_model(self,
+                            model_name,
+                            df_train,
+                            experiment_id,
+                            filedir,
+                            figdir,
+                            file_format='csv'):
         """
         Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
@@ -879,10 +886,13 @@ class Modeler:
             `spkitemid` and the numeric label column named `sc1`.
         experiment_id : str
             The experiment ID.
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
+            The format in which to save files.
+            Defaults to 'csv'.
 
         Returns
         -------
@@ -934,12 +944,14 @@ class Modeler:
         elif model_name == 'ScoreWeightedLR':
             result = self.train_score_weighted_lr(df_train, feature_columns)
 
+        writer = DataWriter(experiment_id)
+        frames = []
+
         # unpack all results
         learner, fit, df_coef, used_features = result
 
-        # save the raw coefficients to a file
-        df_coef.to_csv(join(csvdir, '{}_coefficients.csv'.format(experiment_id)),
-                       index=False)
+        # add raw coefficients to frame list
+        frames.append({'name': 'coefficients', 'frame': df_coef})
 
         # compute the standardized and relative coefficients (betas) for the
         # non-intercept features and save to a file
@@ -949,30 +961,42 @@ class Modeler:
         df_betas.columns = ['standardized']
         df_betas['relative'] = df_betas / sum(abs(df_betas['standardized']))
         df_betas.reset_index(inplace=True)
-        df_betas.to_csv(join(csvdir, '{}_betas.csv'.format(experiment_id)), index=False)
+
+        # add betas to frame list
+        frames.append({'name': 'betas', 'frame': df_betas})
 
         # save the OLS fit object and its summary to files
         if fit:
-            ols_file = join(csvdir, '{}.ols'.format(experiment_id))
-            summary_file = join(csvdir, '{}_ols_summary.txt'.format(experiment_id))
+            ols_file = join(filedir, '{}.ols'.format(experiment_id))
+            summary_file = join(filedir, '{}_ols_summary.txt'.format(experiment_id))
             with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
                 pickle.dump(fit, olsf)
                 summf.write(str(fit.summary()))
 
             # create a data frame with main model fit metrics and save to the file
             df_model_fit = self.model_fit_to_dataframe(fit)
-            model_fit_file = join(csvdir, '{}_model_fit.csv'.format(experiment_id))
-            df_model_fit.to_csv(model_fit_file, index=False)
+
+            # add model_fit to frame list
+            frames.append({'name': 'model_fit', 'frame': df_model_fit})
 
         # save the SKLL model to a file
-        model_file = join(csvdir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, '{}.model'.format(experiment_id))
         learner.save(model_file)
+
+        container = DataContainer(frames)
+        writer.write_experiment_output(filedir, container, file_format=file_format)
 
         self.learner = learner
 
         return learner
 
-    def train_skll_model(self, model_name, df_train, experiment_id, csvdir, figdir):
+    def train_skll_model(self,
+                         model_name,
+                         df_train,
+                         experiment_id,
+                         filedir,
+                         figdir,
+                         file_format='csv'):
         """
         Train a SKLL regression model.
 
@@ -985,10 +1009,15 @@ class Modeler:
             to train the model.
         experiment_id : str
             The experiment ID.
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
+            The format in which to save files. For SKLL models,
+            this argument does not actually change the format of
+            the output files at this time, as no betas are computed.
+            Defaults to 'csv'.
 
         Returns
         -------
@@ -1019,7 +1048,7 @@ class Modeler:
         # TODO: compute betas for linear SKLL models?
 
         # save the SKLL model to disk with the given model name prefix
-        model_file = join(csvdir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, '{}.model'.format(experiment_id))
         learner.save(model_file)
 
         self.learner = learner
@@ -1027,7 +1056,12 @@ class Modeler:
         # return the SKLL learner object
         return learner
 
-    def train(self, configuration, data_container, csvdir, figdir):
+    def train(self,
+              configuration,
+              data_container,
+              filedir,
+              figdir,
+              file_format='csv'):
         """
         The main driver function to train the given model on the given
         data and save the results in the given directories using the
@@ -1039,10 +1073,13 @@ class Modeler:
             A configuration object containing `experiment_id` and `model_name`
         data_container : container.DataContainer
             A data_container object containing `train_preprocessed_features`
-        csvdir : str
+        filedir : str
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
+        file_format : {'csv', 'tsv', 'xlsx'}, optional
+            The format in which to save files.
+            Defaults to 'csv'.
 
         Returns
         -------
@@ -1057,7 +1094,7 @@ class Modeler:
 
         df_train = data_container['train_preprocessed_features']
 
-        args = [model_name, df_train, experiment_id, csvdir, figdir]
+        args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
         model = self.train_builtin_model(*args) if model_name in builtin_models \
             else self.train_skll_model(*args)
         return model

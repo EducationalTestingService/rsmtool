@@ -85,6 +85,9 @@ def run_evaluation(config_file_or_obj, output_dir):
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
 
+    # Get output format
+    file_format = configuration.get('file_format', 'csv')
+
     # Get DataWriter object
     writer = DataWriter(configuration['experiment_id'])
 
@@ -158,7 +161,8 @@ def run_evaluation(config_file_or_obj, output_dir):
                                    new_names_dict={'pred_test':
                                                    'pred_processed',
                                                    'test_excluded':
-                                                   'test_excluded_responses'})
+                                                   'test_excluded_responses'},
+                                   file_format=file_format)
 
     # Initialize the analyzer
     analyzer = Analyzer()
@@ -169,7 +173,8 @@ def run_evaluation(config_file_or_obj, output_dir):
                                                                               processed_config)
     # Write out files
     writer.write_experiment_output(csvdir,
-                                   analyzed_container)
+                                   analyzed_container,
+                                   file_format=file_format)
 
     for_pred_data_container = analyzed_container + processed_container
 
@@ -181,7 +186,8 @@ def run_evaluation(config_file_or_obj, output_dir):
 
     writer.write_experiment_output(csvdir,
                                    pred_analysis_data_container,
-                                   reset_index=True)
+                                   reset_index=True,
+                                   file_format=file_format)
 
     # Initialize reporter
     reporter = Reporter()

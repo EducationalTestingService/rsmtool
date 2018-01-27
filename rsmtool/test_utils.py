@@ -10,6 +10,7 @@ from os.path import basename, join
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
 
+from rsmtool.reader import DataReader
 from rsmtool.modeler import Modeler
 from rsmtool.rsmtool import run_experiment
 from rsmtool.rsmcompare import run_comparison
@@ -87,6 +88,9 @@ def do_run_prediction(source, config_file):
         Path to the experiment configuration file.
     """
     source_output_dir = 'test_outputs'
+
+    # The `csv` file extension is ultimately dropped by the `rsmpredict.py`
+    # script, so these arguments can be used for CSV, TSV, or XLSX output
     output_file = join(source_output_dir, source, 'output', 'predictions.csv')
     feats_file = join(source_output_dir, source, 'output', 'preprocessed_features.csv')
 
@@ -138,18 +142,21 @@ def do_run_summary(source, config_file):
     run_summary(config_file, experiment_dir)
 
 
-def check_csv_output(csv1, csv2):
+def check_file_output(file1, file2, file_format='csv'):
     """
-    Check if two experiment CSV files have values that are
+    Check if two experiment files have values that are
     the same to within three decimal places. Raises an
     AssertionError if they are not.
 
     Parameters
     ----------
-    csv1 : str
-        Path to the first CSV file.
-    csv2 : str
-        Path to the second CSV files.
+    file1 : str
+        Path to the first file.
+    file2 : str
+        Path to the second files.
+    file_format : str, optional
+        The format of the output files.
+        Defaults to 'csv'.
     """
 
     # make sure that the main id columns are read as strings since
@@ -158,13 +165,19 @@ def check_csv_output(csv1, csv2):
 
     converter_dict = {column: str for column in string_columns}
 
-    df1 = pd.read_csv(csv1, converters=converter_dict)
-    df2 = pd.read_csv(csv2, converters=converter_dict)
+    df1 = DataReader.read_from_file(file1, converters=converter_dict)
+    df2 = DataReader.read_from_file(file2, converters=converter_dict)
 
-    # set the first column to be the index. We do it this way to ensure
-    # string indices are preserved as such
-    df1.index = df1[df1.columns[0]]
-    df2.index = df2[df2.columns[0]]
+    # if the first column is numeric, just force the index to string;
+    # however, if it is non-numeric, set it as the index and then
+    # force it to string. We do this to ensure string indices are
+    # preserved as such
+    for df in [df1, df2]:
+        if np.issubdtype(df[df.columns[0]].dtype, np.number):
+            df.index = df.index.map(str)
+        else:
+            df.index = df[df.columns[0]]
+            df.index = df.index.map(str)
 
     # sort all the indices alphabetically
     df1.sort_index(inplace=True)
@@ -183,7 +196,8 @@ def check_csv_output(csv1, csv2):
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
-    if csv1.endswith('pca.csv') or csv1.endswith('factor_correlations.csv'):
+    if (file1.endswith('pca.{}'.format(file_format)) or
+        file1.endswith('factor_correlations.{}'.format(file_format))):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
@@ -218,7 +232,7 @@ def check_report(html_file):
     assert_equal(report_warnings, 0)
 
 
-def check_scaled_coefficients(source, experiment_id):
+def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     """
     Check that the predictions generated using scaled
     coefficients match the scaled scores. Raises an
@@ -230,26 +244,32 @@ def check_scaled_coefficients(source, experiment_id):
         Path to the source directory on disk.
     experiment_id : str
         The experiment ID.
+    file_format : str, optional
+        The format of the output files.
+        Defaults to 'csv'.
     """
     preprocessed_test_file = join('test_outputs',
                                   source,
                                   'output',
-                                  '{}_test_preprocessed_features.csv'.format(experiment_id))
+                                  '{}_test_preprocessed_features.{}'.format(experiment_id,
+                                                                            file_format))
     scaled_coefficients_file = join('test_outputs',
                                     source,
                                     'output',
-                                    '{}_coefficients_scaled.csv'.format(experiment_id))
+                                    '{}_coefficients_scaled.{}'.format(experiment_id,
+                                                                       file_format))
     predictions_file = join('test_outputs',
                             source,
                             'output',
-                            '{}_pred_processed.csv'.format(experiment_id))
+                            '{}_pred_processed.{}'.format(experiment_id,
+                                                          file_format))
 
-    df_preprocessed_test_data = pd.read_csv(preprocessed_test_file)
-    df_old_predictions = pd.read_csv(predictions_file)
+    df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
+    df_old_predictions = DataReader.read_from_file(predictions_file)
     df_old_predictions = df_old_predictions[['spkitemid', 'sc1', 'scale']]
 
     # create fake skll objects with new coefficients
-    df_coef = pd.read_csv(scaled_coefficients_file)
+    df_coef = DataReader.read_from_file(scaled_coefficients_file)
     learner = Modeler.create_fake_skll_learner(df_coef)
     model = Modeler.load_from_learner(learner)
 
@@ -264,55 +284,58 @@ def check_scaled_coefficients(source, experiment_id):
                        check_less_precise=True)
 
 
-def check_all_csv_exist(csv_files, experiment_id, model_source):
+def check_generated_output(generated_files, experiment_id, model_source, file_format='csv'):
     """
     Check that all crucial output files have been generated.
     Raises an AssertionError if they have not.
 
     Parameters
     ----------
-    csv_files : list of str
-        List of CSV files generated by a test.
+    generated_files : list of str
+        List of files generated by a test.
     experiment_id : str
         The experiment ID.
     model_source : str
         'rsmtool' or 'skll'
+    file_format : str, optional
+        The format of the output files.
+        Defaults to 'csv'.
     """
-    csv_must_have_both = ["_confMatrix.csv",
-                          "_cors_orig.csv",
-                          "_cors_processed.csv",
-                          "_eval.csv",
-                          "_eval_short.csv",
-                          "_feature.csv",
-                          "_feature_descriptives.csv",
-                          "_feature_descriptivesExtra.csv",
-                          "_feature_outliers.csv",
-                          "_margcor_score_all_data.csv",
-                          "_pca.csv",
-                          "_pcavar.csv",
-                          "_pcor_score_all_data.csv",
-                          "_pred_processed.csv",
-                          "_pred_train.csv",
-                          "_score_dist.csv",
-                          "_train_preprocessed_features.csv",
-                          "_test_preprocessed_features.csv",
-                          "_postprocessing_params.csv"
-                          ]
+    file_must_have_both = ["_confMatrix.{}".format(file_format),
+                           "_cors_orig.{}".format(file_format),
+                           "_cors_processed.{}".format(file_format),
+                           "_eval.{}".format(file_format),
+                           "_eval_short.{}".format(file_format),
+                           "_feature.{}".format(file_format),
+                           "_feature_descriptives.{}".format(file_format),
+                           "_feature_descriptivesExtra.{}".format(file_format),
+                           "_feature_outliers.{}".format(file_format),
+                           "_margcor_score_all_data.{}".format(file_format),
+                           "_pca.{}".format(file_format),
+                           "_pcavar.{}".format(file_format),
+                           "_pcor_score_all_data.{}".format(file_format),
+                           "_pred_processed.{}".format(file_format),
+                           "_pred_train.{}".format(file_format),
+                           "_score_dist.{}".format(file_format),
+                           "_train_preprocessed_features.{}".format(file_format),
+                           "_test_preprocessed_features.{}".format(file_format),
+                           "_postprocessing_params.{}".format(file_format)
+                           ]
 
-    csv_must_have_rsmtool = ["_betas.csv",
-                             "_coefficients.csv"]
+    file_must_have_rsmtool = ["_betas.{}".format(file_format),
+                              "_coefficients.{}".format(file_format)]
     if model_source == 'rsmtool':
-        csv_must_have = csv_must_have_both + csv_must_have_rsmtool
+        file_must_have = file_must_have_both + file_must_have_rsmtool
     else:
-        csv_must_have = csv_must_have_both
+        file_must_have = file_must_have_both
 
-    csv_must_with_id = [experiment_id + file_name for file_name in csv_must_have]
-    csv_exist = [basename(file_name) for file_name in csv_files]
-    missing_csv = set(csv_must_with_id).difference(set(csv_exist))
-    assert_equal(len(missing_csv), 0, "Missing csv files: {}".format(','.join(missing_csv)))
+    file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
+    file_exist = [basename(file_name) for file_name in generated_files]
+    missing_file = set(file_must_with_id).difference(set(file_exist))
+    assert_equal(len(missing_file), 0, "Missing files: {}".format(','.join(missing_file)))
 
 
-def check_consistency_files_exist(csv_files, experiment_id):
+def check_consistency_files_exist(generated_files, experiment_id, file_format='csv'):
     """
     Check to make sure that the consistency files
     were generated. Raises an AssertionError if
@@ -320,21 +343,24 @@ def check_consistency_files_exist(csv_files, experiment_id):
 
     Parameters
     ----------
-    csv_files : list of str
-        List of CSV files generated by a test.
+    generated_files : list of str
+        List of files generated by a test.
     experiment_id : str
         The experiment ID.
+    file_format : str, optional
+        The format of the output files.
+        Defaults to 'csv'.
     """
-    csv_must_have = ["_consistency.csv",
-                     "_degradation.csv"]
+    file_must_have = ["_consistency.{}".format(file_format),
+                      "_degradation.{}".format(file_format)]
 
-    csv_must_with_id = [experiment_id + file_name for file_name in csv_must_have]
-    csv_exist = [basename(file_name) for file_name in csv_files]
-    missing_csv = set(csv_must_with_id).difference(set(csv_exist))
-    assert_equal(len(missing_csv), 0, "Missing csv files: {}".format(','.join(missing_csv)))
+    file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
+    file_exist = [basename(file_name) for file_name in generated_files]
+    missing_file = set(file_must_with_id).difference(set(file_exist))
+    assert_equal(len(missing_file), 0, "Missing files: {}".format(','.join(missing_file)))
 
 
-def check_subgroup_outputs(output_dir, experiment_id, subgroups):
+def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='csv'):
     """
     Check to make sure that the subgroup outputs
     look okay. Raise an AssertionError if they do not.
@@ -348,15 +374,20 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups):
     subgroups : list of str
         List of column names that contain grouping
         information.
+    file_format : str, optional
+        The format of the output files.
+        Defaults to 'csv'.
     """
-    train_preprocessed = pd.read_csv(join(output_dir,
-                                          '{}_{}'.format(experiment_id,
-                                                         'train_metadata.csv')),
-                                     index_col=0)
-    test_preprocessed = pd.read_csv(join(output_dir,
-                                         '{}_{}'.format(experiment_id,
-                                                        'test_metadata.csv')),
-                                    index_col=0)
+    train_preprocessed_file = join(output_dir,
+                                   '{}_train_metadata.{}'.format(experiment_id,
+                                                                 file_format))
+    train_preprocessed = DataReader.read_from_file(train_preprocessed_file, index_col=0)
+
+    test_preprocessed_file = join(output_dir,
+                                  '{}_test_metadata.{}'.format(experiment_id,
+                                                               file_format))
+    test_preprocessed = DataReader.read_from_file(test_preprocessed_file,
+                                                  index_col=0)
     for group in subgroups:
         ok_(group in train_preprocessed.columns)
         ok_(group in test_preprocessed.columns)
@@ -364,13 +395,16 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups):
     # check that the total sum of N per category matches the total N
     # in data composition and the total N categories matches what is
     # in overall data composition
-    df_data_composition_all = pd.read_csv(join(output_dir,
-                                               '{}_data_composition.csv'.format(experiment_id)))
+    file_data_composition_all = join(output_dir,
+                                     '{}_data_composition.{}'.format(experiment_id,
+                                                                     file_format))
+    df_data_composition_all = DataReader.read_from_file(file_data_composition_all)
     for group in subgroups:
-        composition_by_group = pd.read_csv(join(output_dir,
-                                                '{}_data_composition_by_{}'
-                                                '.csv'.format(experiment_id,
-                                                              group)))
+        file_composition_by_group = join(output_dir,
+                                         '{}_data_composition_by_{}.{}'.format(experiment_id,
+                                                                               group,
+                                                                               file_format))
+        composition_by_group = DataReader.read_from_file(file_composition_by_group)
         for partition in ['Training', 'Evaluation']:
             partition_info = df_data_composition_all.loc[df_data_composition_all['partition'] ==
                                                          partition]

@@ -6,11 +6,11 @@ from os.path import basename, dirname, exists, join
 from nose.tools import raises
 from rsmtool.configuration_parser import ConfigurationParser
 
-from rsmtool.test_utils import (check_csv_output,
+from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_scaled_coefficients,
                                 check_subgroup_outputs,
-                                check_all_csv_exist,
+                                check_generated_output,
                                 check_consistency_files_exist,
                                 do_run_experiment,
                                 do_run_evaluation,
@@ -43,9 +43,9 @@ def test_run_experiment_lr():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -72,9 +72,9 @@ def test_run_experiment_lr_subset_features():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -102,9 +102,9 @@ def test_run_experiment_lr_subset_feature_file():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -147,9 +147,9 @@ def test_run_experiment_ridge():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'skll'
+    yield check_generated_output, csv_files, experiment_id, 'skll'
     yield check_report, html_report
 
 
@@ -176,9 +176,9 @@ def test_run_experiment_linearsvr():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'skll'
+    yield check_generated_output, csv_files, experiment_id, 'skll'
     yield check_report, html_report
 
 
@@ -205,9 +205,9 @@ def test_run_experiment_wls():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'skll'
+    yield check_generated_output, csv_files, experiment_id, 'skll'
     yield check_report, html_report
 
 
@@ -235,9 +235,9 @@ def test_run_experiment_lr_subgroups():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_subgroup_outputs, output_dir, experiment_id, ['L1']
     yield check_report, html_report
@@ -267,9 +267,9 @@ def test_run_experiment_lr_numeric_subgroup():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_subgroup_outputs, output_dir, experiment_id, ['ITEM', 'QUESTION']
     yield check_report, html_report
@@ -299,9 +299,9 @@ def test_run_experiment_lr_with_id_with_leading_zeros():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_subgroup_outputs, output_dir, experiment_id, ['ITEM', 'QUESTION']
     yield check_report, html_report
@@ -330,7 +330,7 @@ def test_run_experiment_lr_eval():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -358,7 +358,7 @@ def test_run_experiment_lr_eval_with_scaling():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -392,9 +392,9 @@ def test_run_experiment_lr_subgroups_with_edge_cases():
             expected_csv_file = join(expected_output_dir, csv_filename)
 
             if exists(expected_csv_file):
-                yield check_csv_output, csv_file, expected_csv_file
+                yield check_file_output, csv_file, expected_csv_file
 
-        yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+        yield check_generated_output, csv_files, experiment_id, 'rsmtool'
         yield check_scaled_coefficients, source, experiment_id
         yield check_subgroup_outputs, output_dir, experiment_id, ['group_edge_cases']
         yield check_report, html_report
@@ -419,7 +419,7 @@ def test_run_experiment_lr_predict():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_with_score():
@@ -441,7 +441,7 @@ def test_run_experiment_lr_predict_with_score():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_missing_values():
@@ -465,7 +465,7 @@ def test_run_experiment_lr_predict_missing_values():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_with_subgroups():
@@ -487,7 +487,7 @@ def test_run_experiment_lr_predict_with_subgroups():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_with_candidate():
@@ -509,7 +509,7 @@ def test_run_experiment_lr_predict_with_candidate():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_illegal_transformations():
@@ -534,7 +534,7 @@ def test_run_experiment_lr_predict_illegal_transformations():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_rsmtool_and_rsmpredict():
@@ -567,10 +567,10 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_scaled_coefficients, source, experiment_id
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_report, html_report
 
     # check that the rsmpredict generated the same results
@@ -581,7 +581,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
         output_file = join(output_dir, csv_pair[0])
         expected_output_file = join(expected_output_dir, csv_pair[1])
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_missing_values():
@@ -608,9 +608,9 @@ def test_run_experiment_lr_missing_values():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -639,9 +639,9 @@ def test_run_experiment_lr_include_zeros():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -669,9 +669,9 @@ def test_run_experiment_lr_with_length():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -699,9 +699,9 @@ def test_run_experiment_lr_subgroups_with_length():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -729,9 +729,9 @@ def test_run_experiment_lr_with_large_integer_value():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -760,9 +760,9 @@ def test_run_experiment_lr_missing_length_values():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -791,9 +791,9 @@ def test_run_experiment_length_zero_sd():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -821,9 +821,9 @@ def test_run_experiment_lr_with_h2():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -852,9 +852,9 @@ def test_run_experiment_lr_subgroups_with_h2():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
@@ -884,9 +884,9 @@ def test_run_experiment_lr_with_h2_include_zeros():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
@@ -915,9 +915,9 @@ def test_run_experiment_lr_with_h2_and_length():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -945,7 +945,7 @@ def test_run_experiment_lr_eval_with_h2():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -974,7 +974,7 @@ def test_run_experiment_lr_eval_with_scaling_and_h2_keep_zeros():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_report, html_report
@@ -1005,9 +1005,9 @@ def test_run_experiment_lr_with_h2_named_sc1():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
@@ -1038,9 +1038,9 @@ def test_run_experiment_lr_with_defaults_as_extra_columns():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
@@ -1069,7 +1069,7 @@ def test_run_experiment_lr_exclude_listwise():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1097,7 +1097,7 @@ def test_run_experiment_lr_eval_exclude_listwise():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1125,7 +1125,7 @@ def test_run_experiment_lr_eval_with_missing_scores():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1155,7 +1155,7 @@ def test_run_experiment_lr_eval_with_h2_named_sc1():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_consistency_files_exist, csv_files, experiment_id
     yield check_report, html_report
@@ -1184,7 +1184,7 @@ def test_run_experiment_lr_eval_with_missing_data():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1212,9 +1212,9 @@ def test_run_experiment_lr_with_custom_order():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1242,7 +1242,7 @@ def test_run_experiment_lr_eval_with_custom_order():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1270,9 +1270,9 @@ def test_run_experiment_lr_with_custom_sections():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1300,7 +1300,7 @@ def test_run_experiment_lr_eval_with_custom_sections():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1329,9 +1329,9 @@ def test_run_experiment_lr_with_custom_sections_and_order():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1360,7 +1360,7 @@ def test_run_experiment_lr_eval_with_custom_sections_and_order():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1389,9 +1389,9 @@ def test_run_experiment_lr_exclude_flags():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1421,9 +1421,9 @@ def test_run_experiment_lr_exclude_flags_and_zeros():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1452,7 +1452,7 @@ def test_run_experiment_lr_eval_exclude_flags():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1482,9 +1482,9 @@ def test_run_experiment_lr_use_all_features():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1510,9 +1510,9 @@ def test_run_experiment_equalweightslr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1538,9 +1538,9 @@ def test_run_experiment_rebalancedlr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1566,9 +1566,9 @@ def test_run_experiment_lassofixedlambdathenlr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1594,9 +1594,9 @@ def test_run_experiment_positivelassocvthenlr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1622,9 +1622,9 @@ def test_run_experiment_nnlr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1650,9 +1650,9 @@ def test_run_experiment_lassofixedlambdathennnlr_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1678,9 +1678,9 @@ def test_run_experiment_lassofixedlambda_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1706,9 +1706,9 @@ def test_run_experiment_positivelassocv_model():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1735,9 +1735,9 @@ def test_run_experiment_lr_candidate_same_as_id():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1764,9 +1764,9 @@ def test_run_experiment_lr_candidate_same_as_id_candidate():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -1941,7 +1941,7 @@ def test_run_experiment_lr_summary():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1969,7 +1969,7 @@ def test_run_experiment_linearsvr_summary():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -1996,7 +1996,7 @@ def test_run_experiment_lr_eval_summary():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2024,7 +2024,7 @@ def test_run_experiment_lr_summary_with_custom_sections_and_custom_order():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2052,9 +2052,9 @@ def test_run_experiment_lr_tsv_input_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2083,9 +2083,9 @@ def test_run_experiment_lr_tsv_input_and_subset_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2113,9 +2113,9 @@ def test_run_experiment_lr_xlsx_input_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2144,9 +2144,9 @@ def test_run_experiment_lr_xlsx_input_and_subset_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2174,7 +2174,7 @@ def test_run_experiment_lr_eval_tsv_input_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2202,7 +2202,7 @@ def test_run_experiment_lr_eval_xlsx_input_files():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2226,7 +2226,7 @@ def test_run_experiment_lr_predict_tsv_input_files():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_predict_xlsx_input_files():
@@ -2248,7 +2248,7 @@ def test_run_experiment_lr_predict_xlsx_input_files():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 @raises(ValueError)
@@ -2839,9 +2839,9 @@ def test_run_experiment_lr_with_cfg():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2887,9 +2887,9 @@ def test_run_experiment_lr_with_object():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -2917,7 +2917,7 @@ def test_run_experiment_lr_eval_with_cfg():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2955,7 +2955,7 @@ def test_run_experiment_lr_summary_with_object():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
 
@@ -2983,9 +2983,9 @@ def test_run_experiment_lr_no_standardization():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -3010,7 +3010,7 @@ def test_run_experiment_lr_predict_no_standardization():
         output_file = join(output_dir, csv_file)
         expected_output_file = join(expected_output_dir, csv_file)
 
-        yield check_csv_output, output_file, expected_output_file
+        yield check_file_output, output_file, expected_output_file
 
 
 def test_run_experiment_lr_exclude_test_flags():
@@ -3035,9 +3035,9 @@ def test_run_experiment_lr_exclude_test_flags():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -3064,8 +3064,216 @@ def test_run_experiment_lr_exclude_train_and_test_flags():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_with_xlsx_output():
+    # basic experiment with a LinearRegression model
+    # with XLSX files as outputs
+
+    source = 'lr-with-xlsx-output'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    xlsx_files = glob(join(output_dir, '*.xlsx'))
+    for xlsx_file in xlsx_files:
+        xlsx_filename = basename(xlsx_file)
+        expected_xlsx_file = join(expected_output_dir, xlsx_filename)
+
+        if exists(expected_xlsx_file):
+            yield check_file_output, xlsx_file, expected_xlsx_file, 'xlsx'
+
+    yield check_generated_output, xlsx_files, experiment_id, 'rsmtool', 'xlsx'
+    yield check_scaled_coefficients, source, experiment_id, 'xlsx'
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_with_tsv_output():
+    # basic experiment with a LinearRegression model
+    # with TSV files as outputs
+
+    source = 'lr-with-tsv-output'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    tsv_files = glob(join(output_dir, '*.tsv'))
+    for tsv_file in tsv_files:
+        tsv_filename = basename(tsv_file)
+        expected_tsv_file = join(expected_output_dir, tsv_filename)
+
+        if exists(expected_tsv_file):
+            yield check_file_output, tsv_file, expected_tsv_file, 'tsv'
+
+    yield check_generated_output, tsv_files, experiment_id, 'rsmtool', 'tsv'
+    yield check_scaled_coefficients, source, experiment_id, 'tsv'
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_tsv_output():
+
+    # basic evaluation experiment using rsmeval
+    # output in TSV format
+
+    source = 'lr-eval-with-tsv-output'
+    experiment_id = 'lr_evaluation'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    tsv_files = glob(join(output_dir, '*.tsv'))
+    for tsv_file in tsv_files:
+        tsv_filename = basename(tsv_file)
+        expected_tsv_file = join(expected_output_dir, tsv_filename)
+
+        if exists(expected_tsv_file):
+            yield check_file_output, tsv_file, expected_tsv_file, 'tsv'
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_xlsx_output():
+
+    # basic evaluation experiment using rsmeval
+    # output in XLSX format
+
+    source = 'lr-eval-with-xlsx-output'
+    experiment_id = 'lr_evaluation'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    xlsx_files = glob(join(output_dir, '*.xlsx'))
+    for xlsx_file in xlsx_files:
+        xlsx_filename = basename(xlsx_file)
+        expected_xlsx_file = join(expected_output_dir, xlsx_filename)
+
+        if exists(expected_xlsx_file):
+            yield check_file_output, xlsx_file, expected_xlsx_file, 'xlsx'
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_predict_with_tsv_output():
+
+    # basic experiment using rsmpredict
+    # output in TSV format
+
+    source = 'lr-predict-with-tsv-output'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for tsv_file in ['predictions.tsv', 'preprocessed_features.tsv']:
+        output_file = join(output_dir, tsv_file)
+        expected_output_file = join(expected_output_dir, tsv_file)
+
+        yield check_file_output, output_file, expected_output_file, 'tsv'
+
+
+def test_run_experiment_lr_predict_with_xlsx_output():
+
+    # basic experiment using rsmpredict
+    # output in TSV format
+
+    source = 'lr-predict-with-xlsx-output'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for xlsx_file in ['predictions.xlsx', 'preprocessed_features.xlsx']:
+        output_file = join(output_dir, xlsx_file)
+        expected_output_file = join(expected_output_dir, xlsx_file)
+
+        yield check_file_output, output_file, expected_output_file, 'xlsx'
+
+
+def test_run_experiment_lr_summary_with_tsv_inputs():
+
+    # basic rsmsummarize experiment comparing several rsmtool experiments
+    # inputs are TSVs rather than CSVs (outputs are still CSVs)
+
+    source = 'lr-self-summary-with-tsv-inputs'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    tsv_files = glob(join(output_dir, '*.tsv'))
+    for tsv_file in tsv_files:
+        tsv_filename = basename(tsv_file)
+        expected_tsv_file = join(expected_output_dir, tsv_filename)
+
+        if exists(expected_tsv_file):
+            yield check_file_output, tsv_file, expected_tsv_file
+
+    yield check_report, html_report
+
+
+def test_run_experiment_lr_compare_different_format():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself, with TSVs in output directory
+
+    source = 'lr-self-compare-different-format'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report

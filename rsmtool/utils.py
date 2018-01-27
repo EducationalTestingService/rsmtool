@@ -9,13 +9,16 @@ Utility classes and functions.
 :organization: ETS
 """
 
-import re
 import json
 import logging
+import re
+import os
+
 import numpy as np
 import pandas as pd
 
 from math import ceil
+from glob import glob
 from string import Template
 from textwrap import wrap
 
@@ -63,6 +66,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'features': None,
             'length_column': None,
             'second_human_score_column': None,
+            'file_format': 'csv',
             'form_level_scores': None,
             'candidate_column': None,
             'general_sections': 'all',
@@ -125,6 +129,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'features',
                                          'feature_subset_file',
                                          'feature_subset',
+                                         'file_format',
                                          'sign',
                                          'id_column',
                                          'train_label_column',
@@ -155,6 +160,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'id_column',
                                          'human_score_column',
                                          'second_human_score_column',
+                                         'file_format',
                                          'flag_column',
                                          'exclude_zero_scores',
                                          'scale_with',
@@ -170,6 +176,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                             'input_features_file'],
                                'optional': ['id_column',
                                             'candidate_column',
+                                            'file_format',
                                             'human_score_column',
                                             'second_human_score_column',
                                             'standardize_features',
@@ -197,6 +204,9 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                               'special_sections',
                                               'subgroups',
                                               'section_order']}}
+
+
+POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
 
 
 def int_to_float(value):
@@ -584,6 +594,75 @@ def compute_subgroup_plot_params(group_names, num_plots):
         figure_height = plot_height * num_plots
 
     return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
+
+
+def has_files_with_extension(directory, ext):
+    """
+    Check if the directory has any files with the given extension.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory where output is located.
+    ext : str
+        The the given extension.
+
+    Returns
+    -------
+    bool
+        True if directory contains files with given extension,
+        else False.
+    """
+    files_with_extension = glob(os.path.join(directory, '*.{}'.format(ext)))
+    return len(files_with_extension) > 0
+
+
+def get_output_directory_extension(directory, experiment_id):
+    """
+    Check the output directory to determine what file extensions
+    exist. If more than one extension (in the possible list of
+    extensions) exists, then raise a ValueError. Otherwise,
+    return the one file extension. If no extensions can be found, then
+    `csv` will be returned by default.
+
+    Possible extensions include: `csv`, `tsv`, `xlsx`. Files in the
+    directory with none of these extensions will be ignored.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the directory where output is located.
+    experiment_id : str
+        The ID of the experiment.
+
+    Returns
+    -------
+    extension : {'csv', 'tsv', 'xlsx'}
+        The extension that output files in this directory
+        end with.
+
+    Raises
+    ------
+    ValueError
+        If any files in the directory have different extensions,
+        and are in the list of possible output extensions.
+    """
+    extension = 'csv'
+    extensions_identified = {ext for ext in POSSIBLE_EXTENSIONS
+                             if has_files_with_extension(directory, ext)}
+
+    if len(extensions_identified) > 1:
+        raise ValueError('Some of the files in the experiment output directory (`{}`) '
+                         'for `{}` have different extensions. All files in this directory '
+                         'must have the same extension. The following extensions were '
+                         'identified : {}'.format(directory,
+                                                  experiment_id,
+                                                  ', '.join(extensions_identified)))
+
+    elif len(extensions_identified) == 1:
+        extension = list(extensions_identified)[0]
+
+    return extension
 
 
 class LogFormatter(logging.Formatter):

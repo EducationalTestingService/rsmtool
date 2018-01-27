@@ -84,6 +84,9 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
     # get the experiment ID
     experiment_id = config['experiment_id']
 
+    # Get output format
+    file_format = config.get('file_format', 'csv')
+
     # Get DataWriter object
     writer = DataWriter(experiment_id)
 
@@ -185,7 +188,8 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                                        include_experiment_id=False,
                                        dataframe_names=['features_processed'],
                                        new_names_dict={'features_processed':
-                                                       feats_filename})
+                                                       feats_filename},
+                                       file_format=file_format)
 
     if (output_file.lower().endswith('.csv') or
         output_file.lower().endswith('.xlsx')):
@@ -210,7 +214,8 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                                    include_experiment_id=False,
                                    dataframe_names=['predictions_with_metadata'],
                                    new_names_dict={'predictions_with_metadata':
-                                                   filename})
+                                                   filename},
+                                   file_format=file_format)
 
     # save excluded responses to disk
     if not processed_container.excluded.empty:
@@ -227,7 +232,8 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                                        dataframe_names=['excluded'],
                                        new_names_dict={'excluded':
                                                        '{}_excluded_responses'
-                                                       ''.format(filename)})
+                                                       ''.format(filename)},
+                                       file_format=file_format)
 
 
 def main():

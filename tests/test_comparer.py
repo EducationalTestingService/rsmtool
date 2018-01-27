@@ -221,5 +221,7 @@ class TestComparer:
                              'feature_distplots',
                              'pca_scree_plot']
 
+        print(expected_csv_keys, sorted(csvs.keys()))
+
         assert_equal(expected_csv_keys, sorted(csvs.keys()))
         assert_equal(expected_fig_keys, sorted(figs.keys()))

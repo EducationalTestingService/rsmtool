@@ -62,7 +62,7 @@ class DataWriter:
         reset_index : bool, optional
             Whether to reset the index of each data frame
             before writing to disk. Defaults to `False`.
-        file_format : {'csv', 'excel', 'json'}, optional
+        file_format : {'csv', 'xlsx', 'tsv'}, optional
             The file format in which to output the data.
             Defaults to 'csv'.
         index : bool
@@ -129,25 +129,31 @@ class DataWriter:
                 outfile += '.csv'
                 df.to_csv(outfile, index=index, **kwargs)
 
+            elif file_format == 'tsv':
+                outfile += '.tsv'
+                df.to_csv(outfile, index=index, sep='\t', **kwargs)
+
+            # Added JSON for experimental purposes, but leaving
+            # this out of the documentation at this stage
             elif file_format == 'json':
                 outfile += '.json'
                 df.to_json(outfile, orient='records', **kwargs)
 
-            elif (file_format == 'excel' or
-                  file_format == 'xlsx'):
+            elif file_format == 'xlsx':
                 outfile += '.xlsx'
                 df.to_excel(outfile, index=index, **kwargs)
 
             else:
                 raise KeyError('Please make sure that the `file_format` specified '
-                               'is one of the following:\n{`json`, `csv`, `excel`}\n.'
+                               'is one of the following:\n{`csv`, `tsv`, `xlsx`}\n.'
                                'You specified {}.'.format(file_format))
 
     def write_feature_csv(self,
                           featuredir,
                           data_container,
                           selected_features,
-                          include_experiment_id=True,):
+                          include_experiment_id=True,
+                          file_format='csv'):
         """
         Write out the feature file to disk.
 
@@ -163,6 +169,9 @@ class DataWriter:
         include_experiment_id : str, optional
             Whether to include the experiment ID in the file name.
             Defaults to True.
+        file_format : {'csv', 'xlsx', 'tsv'}, optional
+            The file format in which to output the data.
+            Defaults to 'csv'.
         """
 
         df_feature_specs = data_container['feature_specs']
@@ -179,4 +188,5 @@ class DataWriter:
                                      data_container,
                                      ['feature_specs'],
                                      {'feature_specs': 'selected'},
-                                     include_experiment_id=include_experiment_id)
+                                     include_experiment_id=include_experiment_id,
+                                     file_format=file_format)

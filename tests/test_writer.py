@@ -25,7 +25,7 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['json', 'csv', 'excel']:
+        for file_type in ['json', 'csv', 'xlsx']:
 
             if file_type != 'json':
 
@@ -84,7 +84,7 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter('test')
-        for file_type in ['json', 'csv', 'excel']:
+        for file_type in ['json', 'csv', 'xlsx']:
 
             if file_type != 'json':
 
