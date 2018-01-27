@@ -648,8 +648,8 @@ def get_output_directory_extension(directory, experiment_id):
         and are in the list of possible output extensions.
     """
     extension = 'csv'
-    extensions_identified = set(ext for ext in POSSIBLE_EXTENSIONS
-                                if has_files_with_extension(directory, ext))
+    extensions_identified = {ext for ext in POSSIBLE_EXTENSIONS
+                             if has_files_with_extension(directory, ext)}
 
     if len(extensions_identified) > 1:
         raise ValueError('Some of the files in the experiment output directory (`{}`) '
