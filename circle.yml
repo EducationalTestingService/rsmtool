@@ -2,6 +2,10 @@
 machine:
     environment:
         COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
+        TESTFILES1: "tests/test_experiment_rsmtool.py"
+        TESTFILES2: "tests/test_experiment_rsmeval.py tests/test_analyzer.py tests/test_comparer.py tests/test_utils.py"
+        TESTFILES3: "tests/test_experiment_rsmpredict.py tests/test_preprocess.py tests/test_transformer.py tests/test_writer.py"
+        TESTFILES4: "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_configuration_parser.py tests/test_reader.py tests/test_modeler.py tests/test_reporter.py"
 
 # Install stuff
 dependencies:
@@ -21,7 +25,7 @@ dependencies:
 # Run test
 test:
   override:
-    - case $CIRCLE_NODE_INDEX in 0) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml tests/test_comparer.py tests/configuration_parser.py tests/test_experiment_rsmtool.py ;; 1) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml tests/test_analyzer.py tests/test_experiment_rsmeval.py ;; 2) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py ;; 3)${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py ;; esac:
-        parallel: true
+    - case $CIRCLE_NODE_INDEX in 0) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES1 ;; 1) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES2 ;; 2) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES3 ;; 3) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES4 ;; esac:
+      parallel: true
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
