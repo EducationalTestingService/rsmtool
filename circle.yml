@@ -21,6 +21,23 @@ dependencies:
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
+      parallel: true
+      files:
+        - tests/test_analyzer.py
+        - tests/test_comparer.py
+        - tests/test_configuration_parser.py
+        - tests/test_experiment_rsmtool.py
+        - tests/test_experiment_rsmcompare.py
+        - tests/test_experiment_rsmeval.py
+        - tests/test_experiment_rsmpredict.py
+        - tests/test_experiment_rsmsummarize.py
+        - tests/test_modeler.py
+        - tests/test_preprocessor.py
+        - tests/test_reader.py
+        - tests/test_reporter.py
+        - tests/test_transformer.py
+        - tests/test_utils.py
+        - tests/test_writer.py
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
