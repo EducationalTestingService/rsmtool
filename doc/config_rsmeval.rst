@@ -9,7 +9,7 @@ There are four required fields and the rest are all optional.
 
 experiment_id
 ~~~~~~~~~~~~~
-An identifier for the experiment that will be used to name the report and all :ref:`intermediate CSV files <intermediate_files_rsmeval>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
+An identifier for the experiment that will be used to name the report and all :ref:`intermediate files <intermediate_files_rsmeval>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
 
 predictions_file
 ~~~~~~~~~~~~~~~~
@@ -37,7 +37,7 @@ A brief description of the experiment. This will be included in the report. The 
 
 file_format *(Optional)*
 """""""""""""""""""""""""""
-The format of the output files. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
+The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 .. _file_format_eval:
 

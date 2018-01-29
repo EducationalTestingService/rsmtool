@@ -30,7 +30,7 @@ The path to the file with the raw feature values that will be used for generatin
 
 file_format *(Optional)*
 """""""""""""""""""""""""""
-The format of the output files. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
+The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 .. _file_format_predict:
 
