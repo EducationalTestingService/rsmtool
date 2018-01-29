@@ -12,7 +12,9 @@ from rsmtool.utils import (float_format_func,
                            int_to_float,
                            convert_to_float,
                            compute_subgroup_plot_params,
-                           parse_json_with_comments)
+                           parse_json_with_comments,
+                           has_files_with_extension,
+                           get_output_directory_extension)
 
 from rsmtool.utils import Thumbnail
 
@@ -226,6 +228,30 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
 
     subgroup_plot_params = compute_subgroup_plot_params(group_names, 5)
     eq_(expected_subgroup_plot_params, subgroup_plot_params)
+
+
+def test_has_files_with_extension_true():
+    directory = 'tests/data/files'
+    result = has_files_with_extension(directory, 'csv')
+    eq_(result, True)
+
+
+def test_has_files_with_extension_false():
+    directory = 'tests/data/files'
+    result = has_files_with_extension(directory, 'ppt')
+    eq_(result, False)
+
+
+def test_get_output_directory_extension():
+    directory = 'tests/data/experiments/lr/output'
+    result = get_output_directory_extension(directory, 'id_1')
+    eq_(result, 'csv')
+
+
+@raises(ValueError)
+def test_get_output_directory_extension_error():
+    directory = 'tests/data/files'
+    get_output_directory_extension(directory, 'id_1')
 
 
 class TestThumbnail:

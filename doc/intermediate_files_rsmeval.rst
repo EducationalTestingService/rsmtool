@@ -1,8 +1,8 @@
 .. _intermediate_files_rsmeval:
 
-Intermediate CSV files
-""""""""""""""""""""""
-Although the primary output of ``rsmeval`` is an HTML report, we also want the user to be able to conduct additional analyses outside of ``rsmeval``. To this end, all of the tables produced in an the experiment report are saved as ``.csv`` files in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
+Intermediate files
+""""""""""""""""""
+Although the primary output of ``rsmeval`` is an HTML report, we also want the user to be able to conduct additional analyses outside of ``rsmeval``. To this end, all of the tables produced in an the experiment report are saved as ``.csv`` files  (or other file format specified with ``file_format`` parameter) in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
 .. note::
 
