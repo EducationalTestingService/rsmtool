@@ -19,6 +19,6 @@ dependencies:
 # Run test
 test:
   override:
-    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml 
+    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml 
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
