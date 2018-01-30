@@ -1,4 +1,4 @@
-ec# Set up the machine
+# Set up the machine
 machine:
     environment:
         COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
