@@ -22,7 +22,7 @@ dependencies:
 # Run test
 test:
   override:
-    - case $CIRCLE_NODE_INDEX in 0) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES1 ;; 1) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES2 ;; 2) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES3 ;; 3) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES4 ;; esac:
+    - case $CIRCLE_NODE_INDEX in 0) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES1 ;; 1) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES2 ;; 2) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES3 ;; 3) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES4 ;; esac:
       parallel: true
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
