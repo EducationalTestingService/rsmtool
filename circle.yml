@@ -1,12 +1,9 @@
-# Set up the machine
+ec# Set up the machine
 machine:
     environment:
         COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
-        TESTFILES1: "tests/test_experiment_rsmtool.py"
-        TESTFILES2: "tests/test_experiment_rsmeval.py tests/test_analyzer.py tests/test_comparer.py tests/test_utils.py"
-        TESTFILES3: "tests/test_experiment_rsmpredict.py tests/test_preprocess.py tests/test_transformer.py tests/test_writer.py"
-        TESTFILES4: "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_configuration_parser.py tests/test_reader.py tests/test_modeler.py tests/test_reporter.py"
-
+        CONDA_OFFLINE_MODE: 1
+        
 # Install stuff
 dependencies:
   cache_directories:
@@ -18,14 +15,13 @@ dependencies:
     - ./miniconda.sh -b -f
     - ${HOME}/miniconda3/bin/conda config --add channels desilinguist
     - ${HOME}/miniconda3/bin/conda update --yes conda
-    - ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes
+    - if [[ $CONDA_OFFLINE_MODE -eq 1 ]]; then ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes --offline; else ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes; fi 
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
 # Run test
 test:
   override:
-    - case $CIRCLE_NODE_INDEX in 0) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES1 ;; 1) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES2 ;; 2) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES3 ;; 3) ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml $TESTFILES4 ;; esac:
-      parallel: true
+    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml 
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
