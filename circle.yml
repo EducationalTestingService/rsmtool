@@ -15,6 +15,7 @@ dependencies:
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
+
 # Run tests
 test:
   override:
