@@ -3302,9 +3302,9 @@ def test_run_experiment_lr_with_thumbnails():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
@@ -3333,9 +3333,9 @@ def test_run_experiment_lr_with_thumbnails_subgroups():
         expected_csv_file = join(expected_output_dir, csv_filename)
 
         if exists(expected_csv_file):
-            yield check_csv_output, csv_file, expected_csv_file
+            yield check_file_output, csv_file, expected_csv_file
 
-    yield check_all_csv_exist, csv_files, experiment_id, 'rsmtool'
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_subgroup_outputs, output_dir, experiment_id, ['L1']
     yield check_report, html_report
