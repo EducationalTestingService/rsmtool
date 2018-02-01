@@ -617,7 +617,7 @@ class Reporter:
         use_scaled_predictions = configuration.get('use_scaled_predictions', False)
         standardize_features = configuration.get('standardize_features', True)
         file_format = configuration.get('file_format', 'csv')
-        skll_objective = configuration['skll_objective']
+        skll_objective = configuration.get('skll_objective', '')
 
         # get either test or predictions file location
         test_file_location = configuration.get('test_file_location')
