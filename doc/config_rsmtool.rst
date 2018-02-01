@@ -31,6 +31,11 @@ skll_objective *(Optional)*
 """""""""""""""""""""""""""
 The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
+.. _file_format:
+
+file_format *(Optional)*
+"""""""""""""""""""""""""""
+The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 .. _feature_file_rsmtool:
 
@@ -52,12 +57,6 @@ feature_subset *(Optional)*
 See below.
 
 .. _sign:
-
-file_format *(Optional)*
-"""""""""""""""""""""""""""
-The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
-
-.. _file_format:
 
 sign *(Optional)*
 """""""""""""""""
