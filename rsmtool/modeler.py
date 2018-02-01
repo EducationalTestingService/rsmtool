@@ -1050,8 +1050,6 @@ class Modeler:
         else:
             objective = 'f1_score_micro'
 
-        import ipdb
-        ipdb.set_trace()
         learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
 
         # TODO: compute betas for linear SKLL models?
