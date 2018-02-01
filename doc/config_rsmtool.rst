@@ -27,6 +27,11 @@ description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
+skll_objective *(Optional)*
+"""""""""""""""""""""""""""
+The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+
+
 .. _feature_file_rsmtool:
 
 features *(Optional)*
