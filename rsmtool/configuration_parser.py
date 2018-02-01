@@ -32,7 +32,10 @@ from rsmtool.utils import (DEFAULTS,
                            LIST_FIELDS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
-                           FIELD_NAME_MAPPING)
+                           FIELD_NAME_MAPPING,
+                           SKLL_MODELS)
+
+from skll.metrics import SCORERS
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file,
@@ -813,13 +816,25 @@ class ConfigurationParser:
                              "to specify the name of the column which "
                              "contains candidate IDs.")
 
-        # 8. Check the fields that requires rsmextra
+        # 8. Check that if "skll_objective" is specified, it's one of the metrics that SKLL
+        # allows for AND that it is specified for a SKLL model and _not_ a built-in
+        # linear regression model
+        if new_config['skll_objective']:
+            if new_config['model'] not in SKLL_MODELS:
+                logging.warning("You specified a custom SKLL objective but also chose a "
+                                "non-SKLL model. The objective will be ignored.")
+            else:
+                if new_config['skll_objective'] not in SCORERS:
+                    raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
+                                     "documentation and choose a valid tuning objective.")
+
+        # 9. Check the fields that requires rsmextra
         if not HAS_RSMEXTRA:
             if new_config['special_sections']:
                 raise ValueError("Special sections are only available to ETS"
                                  " users by installing the rsmextra package.")
 
-        # 9. Raise a warning if we are specifiying a feature file but also
+        # 10. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
             logging.warning("You specified a feature file but also set "
@@ -829,7 +844,7 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 10. Clean up config dict to keep only context-specific fields
+        # 11. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
