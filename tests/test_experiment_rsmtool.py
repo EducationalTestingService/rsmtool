@@ -149,12 +149,70 @@ def test_run_experiment_ridge():
     yield check_report, html_report
 
 
+def test_run_experiment_ridge_custom_objective():
+
+    # experiment with ridge model and a custom tuning objective
+
+    source = 'ridge-custom-objective'
+    experiment_id = 'Ridge_custom_objective'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
 def test_run_experiment_linearsvr():
 
     # basic experiment with LinearSVR model
 
     source = 'linearsvr'
     experiment_id = 'LinearSVR'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_linearsvr_custom_objective():
+
+    # experiment with LinearSVR model and a custom tuning objective
+
+    source = 'linearsvr-custom-objective'
+    experiment_id = 'LinearSVR_custom_objective'
     config_file = join(test_dir,
                        'data',
                        'experiments',
