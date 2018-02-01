@@ -1,26 +1,24 @@
 # Set up the machine
 machine:
-    environment:
-        COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
+  environment:
+    COVERALLS_REPO_TOKEN: 26O5nwca92Yp0383fqlTwPQKAz4652pEo
 
 # Install stuff
 dependencies:
-  cache_directories:
-    - "~/miniconda3/pkgs"
   override:
     - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
     - chmod +x miniconda.sh
     - ./miniconda.sh -b -f
-    - ${HOME}/miniconda3/bin/conda config --add channels desilinguist
     - ${HOME}/miniconda3/bin/conda update --yes conda
-    - ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes
+    - ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes --quiet
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
     - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
-# Run test
+
+# Run tests
 test:
   override:
-    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests -v tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+    - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc --with-xunit --xunit-file=$CIRCLE_TEST_REPORTS/nosetests.xml
   post:
     - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls

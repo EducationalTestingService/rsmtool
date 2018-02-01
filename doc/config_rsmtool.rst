@@ -9,7 +9,7 @@ There are four required fields and the rest are all optional.
 
 experiment_id
 """""""""""""
-An identifier for the experiment that will be used to name the report and all :ref:`intermediate CSV files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
+An identifier for the experiment that will be used to name the report and all :ref:`intermediate files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
 
 model
 """""
@@ -41,11 +41,18 @@ See below.
 
 .. _feature_subset:
 
+
 feature_subset *(Optional)*
 """""""""""""""""""""""""""
 See below.
 
 .. _sign:
+
+file_format *(Optional)*
+"""""""""""""""""""""""""""
+The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
+
+.. _file_format:
 
 sign *(Optional)*
 """""""""""""""""
@@ -205,13 +212,13 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``features_by_group``: Shows boxplots with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
-    - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score. 
-
     - ``preprocessed_features``: Shows analyses of preprocessed features:
 
         - histograms showing the distributions of preprocessed features values;
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
+
+    - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score. 
 
      - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
 
