@@ -1,25 +1,16 @@
-import warnings
-
 from glob import glob
 from os.path import basename, dirname, exists, join
 
 from nose.tools import raises
-from rsmtool.configuration_parser import ConfigurationParser
 
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
-                                check_scaled_coefficients,
-                                check_subgroup_outputs,
-                                check_generated_output,
                                 check_consistency_files_exist,
-                                do_run_experiment,
-                                do_run_evaluation,
-                                do_run_prediction,
-                                do_run_comparison,
-                                do_run_summary)
+                                do_run_evaluation)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
+
 
 def test_run_experiment_lr_eval():
 
@@ -600,4 +591,3 @@ def test_run_experiment_lr_eval_with_xlsx_output():
             yield check_file_output, xlsx_file, expected_xlsx_file, 'xlsx'
 
     yield check_report, html_report
-

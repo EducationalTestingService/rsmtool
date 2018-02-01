@@ -12,14 +12,11 @@ from rsmtool.test_utils import (check_file_output,
                                 check_subgroup_outputs,
                                 check_generated_output,
                                 check_consistency_files_exist,
-                                do_run_experiment,
-                                do_run_evaluation,
-                                do_run_prediction,
-                                do_run_comparison,
-                                do_run_summary)
+                                do_run_experiment)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
+
 
 def test_run_experiment_lr():
     # basic experiment with a LinearRegression model
@@ -1837,5 +1834,3 @@ def test_run_experiment_lr_with_tsv_output():
     yield check_generated_output, tsv_files, experiment_id, 'rsmtool', 'tsv'
     yield check_scaled_coefficients, source, experiment_id, 'tsv'
     yield check_report, html_report
-
-
