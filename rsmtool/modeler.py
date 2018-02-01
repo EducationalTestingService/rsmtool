@@ -996,7 +996,8 @@ class Modeler:
                          experiment_id,
                          filedir,
                          figdir,
-                         file_format='csv'):
+                         file_format='csv',
+                         custom_objective=None):
         """
         Train a SKLL regression model.
 
@@ -1018,6 +1019,10 @@ class Modeler:
             this argument does not actually change the format of
             the output files at this time, as no betas are computed.
             Defaults to 'csv'.
+        custom_objective : str, optional
+            Name of custom user-specified objective. If not specified
+            or `None`, `neg_mean_squared_error` is used as the objective.
+            Defaults to `None`.
 
         Returns
         -------
@@ -1036,13 +1041,17 @@ class Modeler:
         # create a FeatureSet and train the model
         fs = FeatureSet('train', ids=ids, labels=labels, features=features)
 
-        # if it's a regression model, then our grid objective should be
-        # pearson and otherwise it should be accuracy
+        # if it's one of the RSMTool-known SKLL models, they are all regressors so
+        # we want to use either the user-specified objective or `neg_mean_squared_error`.
+        # otherwise we want to use `f1_score_macro` since if the user specified a custom
+        # model, it's probably a classifier.
         if model_name in skll_models:
-            objective = 'pearson'
+            objective = 'neg_mean_squared_error' if not custom_objective else custom_objective
         else:
             objective = 'f1_score_micro'
 
+        import ipdb
+        ipdb.set_trace()
         learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
 
         # TODO: compute betas for linear SKLL models?
@@ -1095,6 +1104,13 @@ class Modeler:
         df_train = data_container['train_preprocessed_features']
 
         args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
+
+        # add user-specified SKLL objective to the arguments if we are 
+        # training a SKLL model
+        if model_name not in builtin_models:
+            skll_objective = configuration['skll_objective']
+            args.append(skll_objective)
+
         model = self.train_builtin_model(*args) if model_name in builtin_models \
             else self.train_skll_model(*args)
         return model
