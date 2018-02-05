@@ -15,6 +15,12 @@ model
 """""
 The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
 
+
+skll_objective *(Optional)*
+"""""""""""""""""""""""""""
+The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+
+
 train_file
 """"""""""
 The path to the training data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
@@ -27,9 +33,6 @@ description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
-skll_objective *(Optional)*
-"""""""""""""""""""""""""""
-The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _file_format:
 
