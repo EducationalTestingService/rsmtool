@@ -1,5 +1,3 @@
-import warnings
-
 from glob import glob
 from os.path import basename, dirname, exists, join
 
@@ -8,18 +6,11 @@ from rsmtool.configuration_parser import ConfigurationParser
 
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
-                                check_scaled_coefficients,
-                                check_subgroup_outputs,
-                                check_generated_output,
-                                check_consistency_files_exist,
-                                do_run_experiment,
-                                do_run_evaluation,
-                                do_run_prediction,
-                                do_run_comparison,
                                 do_run_summary)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
+
 
 def test_run_experiment_lr_summary():
 
@@ -238,4 +229,3 @@ def test_run_experiment_lr_summary_with_tsv_inputs():
             yield check_file_output, tsv_file, expected_tsv_file
 
     yield check_report, html_report
-

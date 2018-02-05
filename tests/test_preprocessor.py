@@ -644,8 +644,6 @@ class TestFeaturePreprocessor:
         flag_dict = {'flag1': [1, 0, 14], 'flag2': ['TD']}
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(bad_df, flag_dict)
-        import ipdb
-        ipdb.set_trace()
 
     def test_remove_outliers(self):
         # we want to test that even if we pass in a list of

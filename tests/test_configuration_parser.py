@@ -315,6 +315,19 @@ class TestConfigurationParser:
         self.parser._config = newdata
         newdata = self.parser.process_config()
 
+    @raises(ValueError)
+    def test_invalid_skll_objective(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'LinearSVR',
+                'skll_objective': 'squared_error'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
     def test_get_correct_configparser_cfg(self):
         config_parser = ConfigurationParser.get_configparser('config.cfg')
         assert isinstance(config_parser, CFGConfigurationParser)
