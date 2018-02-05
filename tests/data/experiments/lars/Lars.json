@@ -1,0 +1,12 @@
+{
+    "train_file": "../../files/train_spkitemid.csv",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "model": "Lars",
+    "experiment_id": "Lars",
+    "test_file": "../../files/test_spkitemid.csv",
+    "description": "Using all features with a Lars model."
+}
