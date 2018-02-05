@@ -762,7 +762,7 @@ class ConfigurationParser:
             msg = msg.format("feature_subset_file")
             raise ValueError(msg)
         if new_config['features'] and new_config['feature_subset']:
-            msg = msg.format("feature_subset_file")
+            msg = msg.format("feature_subset")
             raise ValueError(msg)
 
         # 6. Check for fields that require feature_subset_file and try
