@@ -37,32 +37,37 @@ file_format *(Optional)*
 """""""""""""""""""""""""""
 The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
+.. _feature_fields_note:
+
+.. note ::
+
+    By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). The following four fields (``features``, ``feature_subset_file``, ``feature_subset``, and ``sign``) are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+
+
 .. _feature_file_rsmtool:
 
 features *(Optional)*
 """""""""""""""""""""
-See below.
+Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. 
 
 .. _feature_subset_file:
 
 feature_subset_file *(Optional)*
 """"""""""""""""""""""""""""""""
-See below.
+Path to the feature subset file if using :ref:`subset-based column selection <subset_column_selection>`.
 
 .. _feature_subset:
 
-
 feature_subset *(Optional)*
 """""""""""""""""""""""""""
-See below.
+Name of the pre-defined feature subset to be used if using :ref:`subset-based column selection <subset_column_selection>`.
 
 .. _sign:
 
 sign *(Optional)*
 """""""""""""""""
-See below.
+Name of the column containing expected correlation sign between each feature and human score if using :ref:`subset-based column selection <subset_column_selection>`.
 
-By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). These four fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _id_column_rsmtool:
 
