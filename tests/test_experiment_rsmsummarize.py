@@ -229,3 +229,32 @@ def test_run_experiment_lr_summary_with_tsv_inputs():
             yield check_file_output, tsv_file, expected_tsv_file
 
     yield check_report, html_report
+
+
+def test_run_experiment_lr_summary_no_scaling():
+
+    # basic rsmsummarize experiment comparing several rsmtool experiments
+    # which use raw score for evaluations
+    source = 'lr-self-summary-no-scaling'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
+
