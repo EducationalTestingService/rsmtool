@@ -207,7 +207,7 @@ def test_run_experiment_lr_compare_with_subgroups_and_edge_cases():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself with in case where subgroups have
     # edge cases (such 1 or 2 cases per subgroup or the same score)
-    
+
     source = 'lr-self-compare-with-subgroups-and-edge-cases'
     config_file = join(test_dir,
                        'data',
@@ -216,6 +216,6 @@ def test_run_experiment_lr_compare_with_subgroups_and_edge_cases():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases.html')
+    html_report = join('test_outputs', source, 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report.html')
     yield check_report, html_report
 
