@@ -1,0 +1,6 @@
+group_edge_cases,Training set,Evaluation set
+NormalGroup,444,144
+SameHumanScore,50,50
+SingleResponse,1,1
+ThreeResponses,3,3
+TwoResponses,2,2
