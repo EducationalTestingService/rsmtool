@@ -1,25 +1,18 @@
-import warnings
-
 from glob import glob
 from os.path import basename, dirname, exists, join
 
 from nose.tools import raises
-from rsmtool.configuration_parser import ConfigurationParser
 
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_scaled_coefficients,
-                                check_subgroup_outputs,
                                 check_generated_output,
-                                check_consistency_files_exist,
                                 do_run_experiment,
-                                do_run_evaluation,
-                                do_run_prediction,
-                                do_run_comparison,
-                                do_run_summary)
+                                do_run_prediction)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
+
 
 def test_run_experiment_lr_predict():
 
@@ -249,7 +242,6 @@ def test_run_experiment_lr_predict_xlsx_input_files():
         yield check_file_output, output_file, expected_output_file
 
 
-
 @raises(ValueError)
 def test_run_experiment_lr_predict_with_repeated_ids():
 
@@ -261,7 +253,6 @@ def test_run_experiment_lr_predict_with_repeated_ids():
                        source,
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
-
 
 
 @raises(FileNotFoundError)
@@ -464,4 +455,3 @@ def test_run_experiment_lr_predict_with_xlsx_output():
         expected_output_file = join(expected_output_dir, xlsx_file)
 
         yield check_file_output, output_file, expected_output_file, 'xlsx'
-

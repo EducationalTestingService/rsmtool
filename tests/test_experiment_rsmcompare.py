@@ -1,25 +1,13 @@
-import warnings
-
-from glob import glob
-from os.path import basename, dirname, exists, join
+from os.path import dirname, join
 
 from nose.tools import raises
-from rsmtool.configuration_parser import ConfigurationParser
 
-from rsmtool.test_utils import (check_file_output,
-                                check_report,
-                                check_scaled_coefficients,
-                                check_subgroup_outputs,
-                                check_generated_output,
-                                check_consistency_files_exist,
-                                do_run_experiment,
-                                do_run_evaluation,
-                                do_run_prediction,
-                                do_run_comparison,
-                                do_run_summary)
+from rsmtool.test_utils import (check_report,
+                                do_run_comparison)
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
+
 
 def test_run_experiment_lr_compare():
 
@@ -213,3 +201,18 @@ def test_run_experiment_lr_compare_different_format():
     html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
     yield check_report, html_report
 
+
+def test_run_experiment_lr_compare_with_thumbnail():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself, with thumbnail conversion
+    source = 'lr-self-compare-with-thumbnails'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
+    yield check_report, html_report
