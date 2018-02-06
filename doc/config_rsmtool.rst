@@ -185,6 +185,17 @@ standardize_features *(Optional)*
 If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
 
 
+.. _use_thumbnails_rsmtool:
+
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
+
+.. note::
+
+    All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
+
+
 .. _use_scaled_predictions_rsmtool:
 
 use_scaled_predictions *(Optional)*
