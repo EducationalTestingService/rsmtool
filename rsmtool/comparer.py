@@ -9,7 +9,6 @@ Classes for comparing outputs of two RSMTool experiments.
 :organization: ETS
 """
 
-import base64
 import numpy as np
 import pandas as pd
 import warnings
