@@ -9,7 +9,7 @@
     "trim_max": 6,
     "features": "features.csv",
     "trim_min": 1,
-    "images_to_thumbnails": true,
+    "use_thumbnails": true,
     "test_file": "../../files/test.csv",
     "experiment_id": "lr_subgroups",
     "model": "LinearRegression"
