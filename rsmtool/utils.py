@@ -674,7 +674,7 @@ def get_output_directory_extension(directory, experiment_id):
     return extension
 
 
-class Thumbnail:
+class ThumbnailConverter:
     """
     Convert an image file to a click-able thumbnail.
     """
@@ -682,7 +682,7 @@ class Thumbnail:
     def __init__(self):
         self.current_id = 0
 
-    def convert_to_html(self, path_to_image):
+    def to_html(self, path_to_image):
         """
         Given an path to an image file, display
         a click-able thumbnail version of the image.
@@ -737,6 +737,7 @@ class Thumbnail:
             border-radius: 4px;
             padding: 5px;
             width: 150px;
+            cursor: pointer;
         }
         </style>
         """
@@ -751,7 +752,8 @@ class Thumbnail:
         </script>""".format(current_id)
 
         # generate image tags
-        image = ("""<img id='{}' src='{}' onclick='getPicture({})'>"""
+        image = ("""<img id='{}' src='{}' onclick='getPicture({})' """
+                 """onmouseover='Click to enlarge image'>"""
                  """</img>""").format(current_id,
                                       relative_path,
                                       current_id_with_pound)
@@ -761,7 +763,7 @@ class Thumbnail:
         image += script
         return image
 
-    def convert(self, path_to_image):
+    def show(self, path_to_image):
         """
         Given an path to an image file, display
         a click-able thumbnail version of the image.
