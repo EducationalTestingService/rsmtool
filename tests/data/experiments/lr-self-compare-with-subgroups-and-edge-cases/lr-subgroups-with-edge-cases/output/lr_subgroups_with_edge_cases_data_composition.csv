@@ -1,0 +1,5 @@
+partition,responses,group_edge_cases
+Training,500,5
+Evaluation,200,5
+Overlapping,200,5
+Total,500,5
