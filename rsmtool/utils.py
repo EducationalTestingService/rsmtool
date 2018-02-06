@@ -787,7 +787,7 @@ class ThumbnailConverter:
         FileNotFoundError
             If the image file cannot be located.
         """
-        return display(HTML(self.convert_to_html(path_to_image)))
+        return display(HTML(self.to_html(path_to_image)))
 
 
 class LogFormatter(logging.Formatter):

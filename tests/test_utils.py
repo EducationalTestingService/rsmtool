@@ -16,7 +16,7 @@ from rsmtool.utils import (float_format_func,
                            has_files_with_extension,
                            get_output_directory_extension)
 
-from rsmtool.utils import Thumbnail
+from rsmtool.utils import ThumbnailConverter
 
 
 def test_int_to_float():
@@ -261,13 +261,17 @@ class TestThumbnail:
         # get the expected HTML output
 
         result = """
-        <img id='id{}' src='{}' onclick='getPicture("#id{}")'></img>
+        <img id='id{}' src='{}'
+        onclick='getPicture("#id{}")'
+        onmouseover='Click to enlarge image'>
+        </img>
         <style>
         img {{
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 5px;
             width: 150px;
+            cursor: pointer;
         }}
         </style>
 
@@ -285,8 +289,8 @@ class TestThumbnail:
 
         path = 'tests/data/figures/figure1.svg'
 
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path)
+        thumb = ThumbnailConverter()
+        image = thumb.to_html(path)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -300,8 +304,8 @@ class TestThumbnail:
 
         path = 'tests/data/figures/figure3.png'
 
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path)
+        thumb = ThumbnailConverter()
+        image = thumb.to_html(path)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -315,9 +319,9 @@ class TestThumbnail:
         path1 = 'tests/data/figures/figure1.svg'
         path2 = 'tests/data/figures/figure2.svg'
 
-        thumb = Thumbnail()
-        thumb.convert_to_html(path1)
-        image = thumb.convert_to_html(path2)
+        thumb = ThumbnailConverter()
+        thumb.to_html(path1)
+        image = thumb.to_html(path2)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path2, '2')
@@ -332,8 +336,8 @@ class TestThumbnail:
         path = 'tests/data/figures/figure1.svg'
         path_absolute = os.path.abspath(path)
 
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path_absolute)
+        thumb = ThumbnailConverter()
+        image = thumb.to_html(path_absolute)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -347,5 +351,5 @@ class TestThumbnail:
 
         path = 'random/path/to/figure1.svg'
 
-        thumb = Thumbnail()
-        thumb.convert_to_html(path)
+        thumb = ThumbnailConverter()
+        thumb.to_html(path)
