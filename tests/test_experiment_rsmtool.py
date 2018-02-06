@@ -1983,3 +1983,18 @@ def test_run_experiment_lr_with_feature_list():
     yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
+
+
+@raises(ValueError)
+def test_run_experiment_lr_length_column_and_feature_list():
+    # experiment with feature as list instead of file name
+    # and length included in feature list and as length column
+
+    source = 'lr-with-length-and-feature-list'
+    experiment_id = 'lr_with_length_and_feature'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
