@@ -9,7 +9,7 @@
     "features": "features.csv",
     "trim_min": 1,
     "model": "LinearRegression",
-    "images_to_thumbnails": true,
+    "use_thumbnails": true,
     "experiment_id": "lr",
     "description": "Using all features with an LinearRegression model."
 }

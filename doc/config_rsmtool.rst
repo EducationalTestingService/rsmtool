@@ -15,6 +15,12 @@ model
 """""
 The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
 
+
+skll_objective *(Optional)*
+"""""""""""""""""""""""""""
+The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+
+
 train_file
 """"""""""
 The path to the training data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
@@ -27,9 +33,6 @@ description *(Optional)*
 """"""""""""""""""""""""
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
-skll_objective *(Optional)*
-"""""""""""""""""""""""""""
-The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _file_format:
 
@@ -37,32 +40,37 @@ file_format *(Optional)*
 """""""""""""""""""""""""""
 The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
+.. _feature_fields_note:
+
+.. note ::
+
+    By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). The following four fields (``features``, ``feature_subset_file``, ``feature_subset``, and ``sign``) are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+
+
 .. _feature_file_rsmtool:
 
 features *(Optional)*
 """""""""""""""""""""
-See below.
+Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. 
 
 .. _feature_subset_file:
 
 feature_subset_file *(Optional)*
 """"""""""""""""""""""""""""""""
-See below.
+Path to the feature subset file if using :ref:`subset-based column selection <subset_column_selection>`.
 
 .. _feature_subset:
 
-
 feature_subset *(Optional)*
 """""""""""""""""""""""""""
-See below.
+Name of the pre-defined feature subset to be used if using :ref:`subset-based column selection <subset_column_selection>`.
 
 .. _sign:
 
 sign *(Optional)*
 """""""""""""""""
-See below.
+Name of the column containing expected correlation sign between each feature and human score if using :ref:`subset-based column selection <subset_column_selection>`.
 
-By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). These four fields are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _id_column_rsmtool:
 
@@ -175,6 +183,17 @@ Note that ``inv`` is never used for features with positive values. Defaults to `
 standardize_features *(Optional)*
 """""""""""""""""""""""""""""""""
 If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
+
+
+.. _use_thumbnails_rsmtool:
+
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
+
+.. note::
+
+    All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
 
 
 .. _use_scaled_predictions_rsmtool:

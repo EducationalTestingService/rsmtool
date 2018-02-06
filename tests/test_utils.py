@@ -2,6 +2,8 @@
 import tempfile
 import os
 
+
+from itertools import count
 from nose.tools import assert_equal, eq_, raises
 
 from rsmtool.utils import (float_format_func,
@@ -14,9 +16,8 @@ from rsmtool.utils import (float_format_func,
                            compute_subgroup_plot_params,
                            parse_json_with_comments,
                            has_files_with_extension,
-                           get_output_directory_extension)
-
-from rsmtool.utils import Thumbnail
+                           get_output_directory_extension,
+                           get_thumbnail_as_html)
 
 
 def test_int_to_float():
@@ -261,13 +262,17 @@ class TestThumbnail:
         # get the expected HTML output
 
         result = """
-        <img id='id{}' src='{}' onclick='getPicture("#id{}")'></img>
+        <img id='{}' src='{}'
+        onclick='getPicture("#{}")'
+        title="Click to enlarge">
+        </img>
         <style>
         img {{
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 5px;
             width: 150px;
+            cursor: pointer;
         }}
         </style>
 
@@ -284,9 +289,7 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
 
         path = 'tests/data/figures/figure1.svg'
-
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path)
+        image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -299,9 +302,7 @@ class TestThumbnail:
         # with a PNG file instead of SVG
 
         path = 'tests/data/figures/figure3.png'
-
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path)
+        image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -315,14 +316,13 @@ class TestThumbnail:
         path1 = 'tests/data/figures/figure1.svg'
         path2 = 'tests/data/figures/figure2.svg'
 
-        thumb = Thumbnail()
-        thumb.convert_to_html(path1)
-        image = thumb.convert_to_html(path2)
+        counter = count(1)
+        image = get_thumbnail_as_html(path1, next(counter))
+        image = get_thumbnail_as_html(path2, next(counter))
 
         clean_image = "".join(image.strip().split())
-        clean_thumb = self.get_result(path2, '2')
+        clean_thumb = self.get_result(path2, 2)
 
-        eq_(thumb.current_id, 2)
         eq_(clean_image, clean_thumb)
 
     def test_convert_to_html_with_absolute_path(self):
@@ -332,8 +332,7 @@ class TestThumbnail:
         path = 'tests/data/figures/figure1.svg'
         path_absolute = os.path.abspath(path)
 
-        thumb = Thumbnail()
-        image = thumb.convert_to_html(path_absolute)
+        image = get_thumbnail_as_html(path_absolute, 1)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path)
@@ -346,6 +345,4 @@ class TestThumbnail:
         # test FileNotFound error properly raised
 
         path = 'random/path/to/figure1.svg'
-
-        thumb = Thumbnail()
-        thumb.convert_to_html(path)
+        get_thumbnail_as_html(path, 1)

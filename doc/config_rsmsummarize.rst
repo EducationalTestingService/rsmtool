@@ -36,7 +36,6 @@ RSMTool provides pre-defined sections for ``rsmsummarize`` (listed below) and, b
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
 
-
 .. _custom_sections_rsmsummarize:
 
 custom_sections *(Optional)*
@@ -58,3 +57,9 @@ A list containing the order in which the sections in the report should be genera
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmsummarize>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmsummarize>`.
+
+.. _use_thumbnails_rsmsummarize:
+
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.

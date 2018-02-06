@@ -8,6 +8,6 @@
     "experiment_id_new": "lr_subgroups",
     "description_new": "Using all features with a LinearRegression model.",
     "use_scaled_predictions_new": true,
-    "images_to_thumbnails": true,
+    "use_thumbnails": true,
     "subgroups": ["QUESTION"]
 }
