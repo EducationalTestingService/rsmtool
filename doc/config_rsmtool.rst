@@ -84,9 +84,7 @@ The name for the column containing the human scores in the training data. If set
 
 .. note::
 
-    1. All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation. By default, zero scores in either ``train_label_column`` or ``test_label_column`` will also be excluded. See :ref:`exclude_zero_scores_rsmtool` if you want to keep responses with zero scores.
-
-    2. If ``train_label_column`` and ``test_label_column`` contain floating point scores, they may be rounded for some of the evaluation methods, e.g. when computing kappa and the confusion matrices. 
+    All responses with non-numeric values in either ``train_label_column`` or ``test_label_column`` and/or those with non-numeric values for relevant features will be automatically excluded from model training and evaluation. By default, zero scores in either ``train_label_column`` or ``test_label_column`` will also be excluded. See :ref:`exclude_zero_scores_rsmtool` if you want to keep responses with zero scores.
 
 .. _length_column_rsmtool:
 
