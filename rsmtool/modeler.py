@@ -1103,7 +1103,7 @@ class Modeler:
 
         args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
 
-        # add user-specified SKLL objective to the arguments if we are 
+        # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if model_name not in builtin_models:
             skll_objective = configuration['skll_objective']
@@ -1113,7 +1113,7 @@ class Modeler:
             else self.train_skll_model(*args)
         return model
 
-    def predict(self, df):
+    def predict(self, df, predict_expected=False):
         """
         Get the raw predictions of the given SKLL model on the data
         contained in the given data frame.
@@ -1124,10 +1124,15 @@ class Modeler:
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named `spkitemid`, and a label column named `sc1`.
+        predict_expected : bool, optional
+            Predict expected scores for classifiers that return probability
+            distributions over score. This will be ignored with a warning
+            if the specified model does not support probability distributions.
+            Defaults to `False`.
 
         Returns
         -------
-        df_predictions: pandas DataFrame
+        df_predictions : pandas DataFrame
             Data frame containing the raw predictions, the IDs, and the
             human scores.
         """
@@ -1143,7 +1148,21 @@ class Modeler:
             labels = df['sc1'].tolist()
 
         fs = FeatureSet('data', ids=ids, labels=labels, features=features)
-        predictions = model.predict(fs)
+
+        # Check whether we can predict expected values. If we cannnot, then raise a warning
+        # and ignore the flag
+        if predict_expected:
+            if not hasattr(model.model, "predict_proba"):
+                logging.warning("Expected scores cannot be computed since {} does not support "
+                                "probability distributions over scores.".format(model.model_type.__name__))
+            else:
+                model.probability = True
+                import ipdb
+                ipdb.set_trace()
+                probability_distributions = model.predict(fs)
+                predictions = 
+        else:
+            predictions = model.predict(fs)
 
         df_predictions = pd.DataFrame()
         df_predictions['spkitemid'] = ids
@@ -1184,9 +1203,10 @@ class Modeler:
 
         trim_max = configuration['trim_max']
         trim_min = configuration['trim_min']
+        predict_expected_scores = configuration['predict_expected_scores']
 
-        df_train_predictions = self.predict(df_train)
-        df_test_predictions = self.predict(df_test)
+        df_train_predictions = self.predict(df_train, predict_expected=predict_expected_scores)
+        df_test_predictions = self.predict(df_test, predict_expected=predict_expected_scores)
 
         # get the mean and SD of the training set predictions
         train_predictions_mean = df_train_predictions['raw'].mean()
