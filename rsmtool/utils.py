@@ -358,7 +358,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         if num_score_points_specified != num_score_points_in_learner:
             raise ValueError('The specified number of score points ({}) '
                              'does not match that from the the learner '
-                             '({}).'.format(num_score_points_specified, 
+                             '({}).'.format(num_score_points_specified,
                                             num_score_points_in_learner))
         expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
