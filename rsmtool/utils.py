@@ -353,12 +353,13 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         probability_distributions = model.predict(featureset)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have
-        if probability_distributions.shape[1] != (max_score - min_score + 1):
-            raise ValueError('The number of score points in the data or '
-                             'directly specified via `trim_min`({}) '
-                             'and `trim_max`({}) does not match the number '
-                             'of labels in the learner.'.format(min_score,
-                                                                max_score))
+        num_score_points_specified = max_score - min_score + 1
+        num_score_points_in_learner = probability_distributions.shape[1]
+        if num_score_points_specified != num_score_points_in_learner:
+            raise ValueError('The specified number of score points ({}) '
+                             'does not match that from the the learner '
+                             '({}).'.format(num_score_points_specified, 
+                                            num_score_points_in_learner))
         expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
         raise ValueError("Expected scores cannot be computed since {} does not support "
