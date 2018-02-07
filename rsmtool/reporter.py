@@ -54,6 +54,7 @@ else:
                                     'evaluation',
                                     'evaluation_by_group',
                                     'pca',
+                                    'intermediate_file_paths',
                                     'sysinfo']
 
     ordered_section_list_rsmeval = ['data_description',
