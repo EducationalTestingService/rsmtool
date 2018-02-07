@@ -106,6 +106,7 @@ BOOLEAN_FIELDS = ['exclude_zero_scores',
                   'use_scaled_predictions',
                   'use_scaled_predictions_old',
                   'use_scaled_predictions_new',
+                  'use_thumbnails',
                   'select_transformations']
 
 FIELD_NAME_MAPPING = {'expID': 'experiment_id',
