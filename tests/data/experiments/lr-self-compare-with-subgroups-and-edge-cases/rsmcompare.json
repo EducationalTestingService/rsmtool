@@ -1,0 +1,12 @@
+{
+    "comparison_id": "lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases",
+    "experiment_dir_old": "lr-subgroups-with-edge-cases",
+    "experiment_id_old": "lr_subgroups_with_edge_cases",
+    "description_old": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr-subgroups-with-edge-cases",
+    "experiment_id_new": "lr_subgroups_with_edge_cases",
+    "description_new": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_new": true,
+    "subgroups": ["group_edge_cases"]
+}

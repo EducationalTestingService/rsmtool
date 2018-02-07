@@ -617,6 +617,7 @@ class Reporter:
         use_scaled_predictions = configuration.get('use_scaled_predictions', False)
         standardize_features = configuration.get('standardize_features', True)
         file_format = configuration.get('file_format', 'csv')
+        use_thumbnails = configuration.get('use_thumbnails', False)
         skll_objective = configuration.get('skll_objective', '')
         predict_expected_scores = configuration['predict_expected_scores']
 
@@ -660,6 +661,7 @@ class Reporter:
 
         # pass in other useful information to the report
         os.environ['FILE_FORMAT'] = file_format
+        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
         os.environ['SKLL_OBJECTIVE'] = '' if skll_objective is None else skll_objective
         os.environ['PREDICT_EXPECTED_SCORES'] = predict_expected_scores
 
@@ -725,6 +727,7 @@ class Reporter:
         chosen_notebook_files = configuration['chosen_notebook_files']
         use_scaled_predictions_old = configuration.get('use_scaled_predictions_old', False)
         use_scaled_predictions_new = configuration.get('use_scaled_predictions_new', False)
+        use_thumbnails = configuration.get('use_thumbnails', False)
 
         # set the environment variables we want
         os.environ['COMPARISON_ID'] = comparison_id
@@ -745,6 +748,7 @@ class Reporter:
         # what groups are used for descriptives and evaluations
         os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
         os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
@@ -793,6 +797,7 @@ class Reporter:
         description = configuration['description']
         subgroups = configuration.get('subgroups')
         chosen_notebook_files = configuration['chosen_notebook_files']
+        use_thumbnails = configuration.get('use_thumbnails', False)
 
         # set the environment variables we want
         os.environ['SUMMARY_ID'] = summary_id
@@ -805,6 +810,7 @@ class Reporter:
         # what groups are used for descriptives and evaluations
         os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
         os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
 
         report_name = '{}_report'.format(summary_id)
         reportdir = abspath(join(csvdir, '..', 'report'))
