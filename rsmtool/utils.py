@@ -19,6 +19,7 @@ import pandas as pd
 
 from math import ceil
 from glob import glob
+from importlib import import_module
 from string import Template
 from textwrap import wrap
 
@@ -35,26 +36,6 @@ BUILTIN_MODELS = ['LinearRegression',
                   'PositiveLassoCVThenLR',
                   'LassoFixedLambda',
                   'PositiveLassoCV']
-
-SKLL_MODELS = ['AdaBoostRegressor',
-               'BayesianRidge',
-               'DecisionTreeRegressor',
-               'DummyRegressor',
-               'ElasticNet',
-               'GradientBoostingRegressor',
-               'HuberRegressor',
-               'KNeighborsRegressor',
-               'Lars',
-               'Lasso',
-               'LinearSVR',
-               'MLPRegressor',
-               'RandomForestRegressor',
-               'RANSACRegressor',
-               'Ridge',
-               'SGDRegressor',
-               'SVR',
-               'TheilSenRegressor',
-               'LogisticRegression']
 
 DEFAULTS = {'id_column': 'spkitemid',
             'description': '',
@@ -221,6 +202,26 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
 
 
 POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
+
+_skll_module = import_module('skll.learner')
+
+
+def is_skll_model(model_name):
+    """
+    Check whether the given model is a valid learner name in SKLL.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model to check
+
+    Returns
+    -------
+    valid: bool
+        `True` if the given model name is a valid SKLL learner,
+        `False` otherwise
+    """
+    return hasattr(_skll_module, model_name)
 
 
 def int_to_float(value):
