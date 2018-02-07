@@ -2350,7 +2350,9 @@ class FeaturePreprocessor:
         h1_sd = df_postproc_params['h1_sd'].values[0]
 
         # now generate the predictions for the features using this model
-        logging.info('Generating predictions')
+        logged_str = 'Generating predictions'
+        logged_str += ' (expected scores).' if predict_expected_scores else '.'
+        logging.info(logged_str)
         df_predictions = model.predict(df_features_preprocessed,
                                        int(trim_min),
                                        int(trim_max),
