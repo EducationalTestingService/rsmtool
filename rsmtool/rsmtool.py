@@ -223,7 +223,9 @@ def run_experiment(config_file_or_obj,
     train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
     test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
 
-    logger.info('Generating training and test set predictions.')
+    logged_str = 'Generating training and test set predictions'
+    logged_str += ' (expected scores).' if configuration['predict_expected_scores'] else '.'
+    logger.info(logged_str)
     (pred_config,
      pred_data_container) = modeler.predict_train_and_test(train_for_prediction,
                                                            test_for_prediction,
