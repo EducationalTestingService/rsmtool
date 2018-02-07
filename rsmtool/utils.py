@@ -224,6 +224,24 @@ def is_skll_model(model_name):
     return hasattr(_skll_module, model_name)
 
 
+def is_built_in_model(model_name):
+    """
+    Check whether the given model is a valid built-in model.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model to check
+
+    Returns
+    -------
+    valid: bool
+        `True` if the given model name is a valid built-in model,
+        `False` otherwise
+    """
+    return model_name in BUILTIN_MODELS
+
+
 def int_to_float(value):
     """
     Convert integer to float, if possible.
