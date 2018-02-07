@@ -663,7 +663,7 @@ class Reporter:
         os.environ['FILE_FORMAT'] = file_format
         os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
         os.environ['SKLL_OBJECTIVE'] = '' if skll_objective is None else skll_objective
-        os.environ['PREDICT_EXPECTED_SCORES'] = predict_expected_scores
+        os.environ['PREDICT_EXPECTED_SCORES'] = '1' if predict_expected_scores else '0'
 
         # get the report directory which is at the same level
         # as the output and the figure directory
