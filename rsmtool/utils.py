@@ -320,6 +320,53 @@ def parse_json_with_comments(filename):
         return config
 
 
+def compute_expected_scores_from_model(model, featureset, min_score, max_score):
+    """
+    Compute expected scores using probability distributions over the labels.
+
+    Parameters
+    ----------
+    model : skll.Learner
+        The SKLL Learner object to use for computing the expected scores.
+    featureset : skll.data.FeatureSet
+        The SKLL FeatureSet object for which predictions are to be made.
+    min_score : int
+        Minimum score level to be used for computing expected scores.
+    max_score : int
+        Maximum score level to be used for computing expected scores.
+
+    Returns
+    -------
+    expected_scores: np.array
+        A numpy array containing the expected scores.
+
+    Raises
+    ------
+    ValueError
+        If the given model cannot predict probability distributions and
+        or if the score range specified by `min_score` and `max_score`
+        does not match what the model predicts in its probability
+        distribution.
+    """
+    if hasattr(model.model, "predict_proba"):
+        model.probability = True
+        probability_distributions = model.predict(featureset)
+        # check to make sure that the number of labels in the probability
+        # distributions matches the number of score points we have
+        if probability_distributions.shape[1] != (max_score - min_score + 1):
+            raise ValueError('The number of score points in the data or '
+                             'directly specified via `trim_min`({}) '
+                             'and `trim_max`({}) does not match the number '
+                             'of labels in the learner.'.format(min_score,
+                                                                max_score))
+        expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
+    else:
+        raise ValueError("Expected scores cannot be computed since {} does not support "
+                         "probability distributions over scores.".format(model.model_type.__name__))
+
+    return expected_scores
+
+
 def covariance_to_correlation(m):
     """
     This is a port of the R `cov2cor` function.

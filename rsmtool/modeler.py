@@ -26,7 +26,7 @@ from sklearn.linear_model import LassoCV
 from skll import FeatureSet, Learner
 
 from rsmtool.analyzer import Analyzer
-from rsmtool.utils import is_skll_model
+from rsmtool.utils import compute_expected_scores_from_model, is_skll_model
 from rsmtool.preprocessor import FeaturePreprocessor
 
 from rsmtool.configuration_parser import Configuration
@@ -1167,28 +1167,10 @@ class Modeler:
         # Check whether we can predict expected values. If it's the wrong model,
         # then raise a warning and ignore the flag. Raise an exception if the
         # score points do not match the number of labels in the learner output
-        predictions = None
-        if predict_expected:
-            if hasattr(model.model, "predict_proba"):
-                model.probability = True
-                probability_distributions = model.predict(fs)
-                # check to make sure that the number of labels in the probability
-                # distributions matches the number of score points we have
-                if probability_distributions.shape[1] != (max_score - min_score + 1):
-                    raise ValueError('The number of score points in the data or '
-                                     'directly specified via `trim_min`({}) '
-                                     'and `trim_max`({}) does not match the number '
-                                     'of labels in the learner.'.format(min_score,
-                                                                        max_score))
-                predictions = probability_distributions.dot(range(min_score, max_score + 1))
-            else:
-                raise ValueError("Expected scores cannot be computed since {} does not support "
-                                 "probability distributions over scores.".format(model.model_type.__name__))
-
-        # compute the usual predictions if that's what we wanted or
-        # if the model didn't support probability distributions
-        if predictions is None:
-            predictions = model.predict(fs)
+        predictions = compute_expected_scores_from_model(model,
+                                                         fs,
+                                                         min_score,
+                                                         max_score) if predict_expected else model.predict(fs)
 
         df_predictions = pd.DataFrame()
         df_predictions['spkitemid'] = ids
