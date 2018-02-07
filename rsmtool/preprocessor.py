@@ -2284,6 +2284,9 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get('standardize_features', True)
 
+        # should we predict expected scores
+        predict_expected_scores = config_obj['predict_expected_scores']
+
         # get the column names for flag columns (if any)
         flag_column_dict = config_obj.check_flag_column()
 
@@ -2341,14 +2344,17 @@ class FeaturePreprocessor:
                                                  df_feature_info,
                                                  standardize_features)
 
-        # now generate the predictions for the features using this model
-        logging.info('Generating predictions')
-        df_predictions = model.predict(df_features_preprocessed)
-
         trim_min = df_postproc_params['trim_min'].values[0]
         trim_max = df_postproc_params['trim_max'].values[0]
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
+
+        # now generate the predictions for the features using this model
+        logging.info('Generating predictions')
+        df_predictions = model.predict(df_features_preprocessed,
+                                       int(trim_min),
+                                       int(trim_max),
+                                       predict_expected=predict_expected_scores)
 
         train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
         train_predictions_sd = df_postproc_params['train_predictions_sd'].values[0]
