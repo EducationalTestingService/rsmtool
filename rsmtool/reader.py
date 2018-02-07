@@ -54,6 +54,8 @@ class DataReader:
             If any elements in file_converters are not dict.
         NameError
             If file converter name does not exist in the dataset.
+        ValueError
+            If filepath for a given file is None
         """
 
         # Default datasets list
@@ -61,6 +63,11 @@ class DataReader:
 
         # Make sure filepaths length matches frame names length
         assert len(filepaths) == len(framenames)
+
+        # Make sure that there are no Nones in the filepaths
+        frames_with_no_path = [framenames[i] for i in range(len(framenames)) if filepaths[i] is None]
+        if len(frames_with_no_path) > 0:
+            raise ValueError("No path specified for {}".format(' ,'.join(frames_with_no_path)))
 
         # Assign names and paths lists
         self.dataset_names = framenames
