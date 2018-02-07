@@ -18,7 +18,7 @@ The machine learner you want to use to build the scoring model. Possible values 
 
 skll_objective *(Optional)*
 """""""""""""""""""""""""""
-The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 
 train_file
