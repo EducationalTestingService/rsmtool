@@ -13,7 +13,7 @@ An identifier for the experiment that will be used to name the report and all :r
 
 model
 """""
-The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
+The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
 
 train_file
 """"""""""
@@ -23,9 +23,17 @@ test_file
 """""""""
 The path to the evaluation data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
+.. _skll_objective:
+
 skll_objective *(Optional)*
 """""""""""""""""""""""""""
 The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+
+.. _predict_expected_scores:
+
+predict_expected_scores *(Optional)*
+""""""""""""""""""""""""""""""""""""
+If a probablistic SKLL classifier is chosen to build the scoring model, then *expected scores* --- probability-weighted averages over all score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default for a classifier. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
 
 description *(Optional)*
 """"""""""""""""""""""""
