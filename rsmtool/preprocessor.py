@@ -27,7 +27,7 @@ from rsmtool.container import DataContainer
 from rsmtool.reporter import Reporter
 from rsmtool.transformer import FeatureTransformer
 from rsmtool.utils import convert_to_float
-from rsmtool.utils import BUILTIN_MODELS, SKLL_MODELS
+from rsmtool.utils import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
@@ -404,9 +404,9 @@ class FeaturePreprocessor:
             If the model is not supported.
         """
 
-        if model_name in BUILTIN_MODELS:
+        if is_built_in_model(model_name):
             model_type = 'BUILTIN'
-        elif model_name in SKLL_MODELS:
+        elif is_skll_model(model_name):
                 model_type = 'SKLL'
         else:
             raise ValueError("The specified model {} "

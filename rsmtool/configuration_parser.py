@@ -33,7 +33,7 @@ from rsmtool.utils import (DEFAULTS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
                            FIELD_NAME_MAPPING,
-                           SKLL_MODELS)
+                           is_skll_model)
 
 from skll.metrics import SCORERS
 
@@ -820,7 +820,7 @@ class ConfigurationParser:
         # allows for AND that it is specified for a SKLL model and _not_ a built-in
         # linear regression model
         if new_config['skll_objective']:
-            if new_config['model'] not in SKLL_MODELS:
+            if is_skll_model(new_config['model']):
                 logging.warning("You specified a custom SKLL objective but also chose a "
                                 "non-SKLL model. The objective will be ignored.")
             else:
