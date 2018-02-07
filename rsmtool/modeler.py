@@ -26,8 +26,7 @@ from sklearn.linear_model import LassoCV
 from skll import FeatureSet, Learner
 
 from rsmtool.analyzer import Analyzer
-from rsmtool.utils import BUILTIN_MODELS as builtin_models
-from rsmtool.utils import SKLL_MODELS as skll_models
+from rsmtool.utils import is_skll_model
 from rsmtool.preprocessor import FeaturePreprocessor
 
 from rsmtool.configuration_parser import Configuration
@@ -1026,8 +1025,8 @@ class Modeler:
 
         Returns
         -------
-        learner : skll Learner object
-            SKLL Learner object of the appropriate type.
+        Tuple containing a SKLL Learner object of the appropriate type
+        and the chosen tuning objective.
         """
         # instantiate the given SKLL learner
         learner = Learner(model_name)
@@ -1041,14 +1040,14 @@ class Modeler:
         # create a FeatureSet and train the model
         fs = FeatureSet('train', ids=ids, labels=labels, features=features)
 
-        # if it's one of the RSMTool-known SKLL models, they are all regressors so
-        # we want to use either the user-specified objective or `neg_mean_squared_error`.
-        # otherwise we want to use `f1_score_macro` since if the user specified a custom
-        # model, it's probably a classifier.
-        if model_name in skll_models:
+        # If we are training a SKLL regressor, then we want to use either the
+        # user-specified objective or `neg_mean_squared_error`. If it's SKLL
+        # classifier, then the choice is between the user-specified objective
+        # and `f1_score_micro`.
+        if learner.model_type._estimator_type == 'regressor':
             objective = 'neg_mean_squared_error' if not custom_objective else custom_objective
         else:
-            objective = 'f1_score_micro'
+            objective = 'f1_score_micro' if not custom_objective else custom_objective
 
         learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
 
@@ -1060,8 +1059,8 @@ class Modeler:
 
         self.learner = learner
 
-        # return the SKLL learner object
-        return learner
+        # return the SKLL learner object and the chosen objective
+        return learner, objective
 
     def train(self,
               configuration,
@@ -1105,15 +1104,17 @@ class Modeler:
 
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
-        if model_name not in builtin_models:
+        if is_skll_model(model_name):
             skll_objective = configuration['skll_objective']
             args.append(skll_objective)
+            model, chosen_objective = self.train_skll_model(*args)
+            configuration['skll_objective'] = chosen_objective
+        else:
+            model = self.train_builtin_model(args)
 
-        model = self.train_builtin_model(*args) if model_name in builtin_models \
-            else self.train_skll_model(*args)
         return model
 
-    def predict(self, df, predict_expected=False):
+    def predict(self, df, min_score, max_score, predict_expected=False):
         """
         Get the raw predictions of the given SKLL model on the data
         contained in the given data frame.
@@ -1124,17 +1125,31 @@ class Modeler:
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named `spkitemid`, and a label column named `sc1`.
+        min_score : int
+            Minimum score level to be used if computing expected scores.
+        max_score : int
+            Maximum score level to be used if computing expected scores.
         predict_expected : bool, optional
             Predict expected scores for classifiers that return probability
             distributions over score. This will be ignored with a warning
             if the specified model does not support probability distributions.
-            Defaults to `False`.
+            Note also that this assumes that the score range consists of
+            contiguous integers - starting at `min_score` and ending at
+            `max_score`. Defaults to `False`.
 
         Returns
         -------
         df_predictions : pandas DataFrame
             Data frame containing the raw predictions, the IDs, and the
             human scores.
+
+        Raises
+        ------
+        ValueError
+            If the model cannot predict probability distributions and
+            `predict_expected` is set to `True` or if the score range
+            specified by `min_score` and `max_score` does not match
+            what the model predicts in its probability distribution.
         """
         model = self.learner
 
@@ -1149,19 +1164,30 @@ class Modeler:
 
         fs = FeatureSet('data', ids=ids, labels=labels, features=features)
 
-        # Check whether we can predict expected values. If we cannnot, then raise a warning
-        # and ignore the flag
+        # Check whether we can predict expected values. If it's the wrong model,
+        # then raise a warning and ignore the flag. Raise an exception if the
+        # score points do not match the number of labels in the learner output
+        predictions = None
         if predict_expected:
-            if not hasattr(model.model, "predict_proba"):
-                logging.warning("Expected scores cannot be computed since {} does not support "
-                                "probability distributions over scores.".format(model.model_type.__name__))
-            else:
+            if hasattr(model.model, "predict_proba"):
                 model.probability = True
-                import ipdb
-                ipdb.set_trace()
                 probability_distributions = model.predict(fs)
-                predictions = 
-        else:
+                # check to make sure that the number of labels in the probability
+                # distributions matches the number of score points we have
+                if probability_distributions.shape[1] != (max_score - min_score + 1):
+                    raise ValueError('The number of score points in the data or '
+                                     'directly specified via `trim_min`({}) '
+                                     'and `trim_max`({}) does not match the number '
+                                     'of labels in the learner.'.format(min_score,
+                                                                        max_score))
+                predictions = probability_distributions.dot(range(min_score, max_score + 1))
+            else:
+                raise ValueError("Expected scores cannot be computed since {} does not support "
+                                 "probability distributions over scores.".format(model.model_type.__name__))
+
+        # compute the usual predictions if that's what we wanted or
+        # if the model didn't support probability distributions
+        if predictions is None:
             predictions = model.predict(fs)
 
         df_predictions = pd.DataFrame()
@@ -1205,8 +1231,14 @@ class Modeler:
         trim_min = configuration['trim_min']
         predict_expected_scores = configuration['predict_expected_scores']
 
-        df_train_predictions = self.predict(df_train, predict_expected=predict_expected_scores)
-        df_test_predictions = self.predict(df_test, predict_expected=predict_expected_scores)
+        df_train_predictions = self.predict(df_train,
+                                            int(trim_min),
+                                            int(trim_max),
+                                            predict_expected=predict_expected_scores)
+        df_test_predictions = self.predict(df_test,
+                                           int(trim_min),
+                                           int(trim_max),
+                                           predict_expected=predict_expected_scores)
 
         # get the mean and SD of the training set predictions
         train_predictions_mean = df_train_predictions['raw'].mean()
