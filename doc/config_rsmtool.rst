@@ -51,7 +51,7 @@ The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Option
 
 features *(Optional)*
 """""""""""""""""""""
-Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include. If a list is passed, 
+Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include in the experiment.
 
 .. _feature_subset_file:
 
