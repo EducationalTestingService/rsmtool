@@ -216,6 +216,22 @@ def test_run_experiment_lr_compare_with_subgroups_and_edge_cases():
                        'rsmcompare.json')
     do_run_comparison(source, config_file)
 
-    html_report = join('test_outputs', source, 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report.html')
+    html_report = join('test_outputs', source,
+                       'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report.html')
     yield check_report, html_report
 
+
+def test_run_experiment_lr_compare_with_thumbnail():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself, with thumbnail conversion
+    source = 'lr-self-compare-with-thumbnails'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr_subgroups_vs_lr_subgroups_report.html')
+    yield check_report, html_report
