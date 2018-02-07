@@ -39,16 +39,23 @@ BUILTIN_MODELS = ['LinearRegression',
                   'PositiveLassoCV']
 
 SKLL_MODELS = ['AdaBoostRegressor',
+               'BayesianRidge',
                'DecisionTreeRegressor',
+               'DummyRegressor',
                'ElasticNet',
                'GradientBoostingRegressor',
+               'HuberRegressor',
                'KNeighborsRegressor',
+               'Lars',
                'Lasso',
                'LinearSVR',
+               'MLPRegressor',
                'RandomForestRegressor',
+               'RANSACRegressor',
                'Ridge',
                'SGDRegressor',
-               'SVR']
+               'SVR',
+               'TheilSenRegressor']
 
 DEFAULTS = {'id_column': 'spkitemid',
             'description': '',

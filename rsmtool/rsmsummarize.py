@@ -1,5 +1,5 @@
 """
-The script to create a comparison report for multiple models
+The script to create a summary report for experiment
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
