@@ -1115,14 +1115,14 @@ class Modeler:
 
         df_train = data_container['train_preprocessed_features']
 
-        args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
+        args = [model_name, df_train, experiment_id, filedir, figdir]
         kwargs = {'file_format': file_format}
 
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if is_skll_model(model_name):
             kwargs.update({'custom_objective': configuration['skll_objective'],
-                           'predict_expected': configuration['predict_expected_scores']})
+                           'predict_expected_scores': configuration['predict_expected_scores']})
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration['skll_objective'] = chosen_objective
         else:
