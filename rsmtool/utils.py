@@ -357,7 +357,6 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         distribution.
     """
     if hasattr(model.model, "predict_proba"):
-        model.probability = True
         probability_distributions = model.predict(featureset)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have

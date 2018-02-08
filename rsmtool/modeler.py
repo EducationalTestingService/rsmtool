@@ -996,7 +996,8 @@ class Modeler:
                          filedir,
                          figdir,
                          file_format='csv',
-                         custom_objective=None):
+                         custom_objective=None,
+                         predict_expected_scores=False):
         """
         Train a SKLL regression model.
 
@@ -1022,14 +1023,28 @@ class Modeler:
             Name of custom user-specified objective. If not specified
             or `None`, `neg_mean_squared_error` is used as the objective.
             Defaults to `None`.
+        predict_expected_scores : bool, optional
+            Whether we want the trained classifiers to predict expected scores.
 
         Returns
         -------
         Tuple containing a SKLL Learner object of the appropriate type
         and the chosen tuning objective.
         """
-        # instantiate the given SKLL learner
-        learner = Learner(model_name)
+        # Instantiate the given SKLL learner and set its probability value
+        # appropriately. There are two complications here:
+        #  (a) It is possible to just set `probability` for all learners
+        #       but for non-probabilistic learners, that would print out a warning
+        #       that could potentially confuse users.
+        #  (b) We need to handle SVC learners in a special way beacuse they
+        #      their `predict_proba` method is not even exposed until their
+        #      `probability` property is set to True.
+        if model_name == 'SVC':
+            learner = Learner(model_name, probability=predict_expected_scores)
+        else:
+            learner = Learner(model_name)
+            if hasattr(learner.model, 'predict_proba'):
+                learner.probability = True
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -1101,16 +1116,17 @@ class Modeler:
         df_train = data_container['train_preprocessed_features']
 
         args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
+        kwargs = {'file_format': file_format}
 
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if is_skll_model(model_name):
-            skll_objective = configuration['skll_objective']
-            args.append(skll_objective)
-            model, chosen_objective = self.train_skll_model(*args)
+            kwargs.update({'custom_objective': configuration['skll_objective'],
+                           'predict_expected': configuration['predict_expected_scores']})
+            model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration['skll_objective'] = chosen_objective
         else:
-            model = self.train_builtin_model(args)
+            model = self.train_builtin_model(*args, **kwargs)
 
         return model
 
