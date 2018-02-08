@@ -5,6 +5,7 @@ import os
 
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
+from numpy.testing import assert_array_almost_equal
 
 from rsmtool.utils import (float_format_func,
                            int_or_float_format_func,
@@ -17,7 +18,11 @@ from rsmtool.utils import (float_format_func,
                            parse_json_with_comments,
                            has_files_with_extension,
                            get_output_directory_extension,
-                           get_thumbnail_as_html)
+                           get_thumbnail_as_html,
+                           compute_expected_scores_from_model)
+
+from sklearn.datasets import make_classification
+from skll import FeatureSet, Learner
 
 
 def test_int_to_float():
@@ -346,3 +351,45 @@ class TestThumbnail:
 
         path = 'random/path/to/figure1.svg'
         get_thumbnail_as_html(path, 1)
+
+
+class TestExpectedScores():
+
+    @classmethod
+    def setUpClass(cls):
+        X, y = make_classification(n_samples=525, n_features=10, n_classes=5, n_informative=8, random_state=123)
+        X_train, y_train = X[:500], y[:500]
+        X_test = X[500:]
+
+        train_ids = list(range(1, len(X_train) + 1))
+        train_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_train.shape[1])], x)) for x in X_train]
+        train_labels = list(y_train)
+
+        test_ids = list(range(1, len(X_test) + 1))
+        test_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_test.shape[1])], x)) for x in X_test]
+
+        cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
+        cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
+
+        cls.linearsvc = Learner('LinearSVC')
+        _ = cls.linearsvc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+
+        cls.svc = Learner('SVC', probability=True)
+        _ = cls.svc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+
+    @raises(ValueError)
+    def test_wrong_model(self):
+        compute_expected_scores_from_model(self.linearsvc, self.test_fs, 0, 4)
+
+    @raises(ValueError)
+    def test_wrong_score_range(self):
+        compute_expected_scores_from_model(self.svc, self.test_fs, 0, 3)
+
+    def test_expected_scores(self):
+        computed_predictions = compute_expected_scores_from_model(self.svc, self.test_fs, 0, 4)
+        expected_predictions = [1.83279452, 2.97289086, 2.74849281, 1.99571651, 2.76838765,
+                                2.04660524, 1.15405697, 2.32511763, 3.88577987, 3.27419026,
+                                2.91685271, 1.67666158, 3.15582854, 3.75776759, 2.00056874,
+                                2.36653171, 2.72716145, 1.08826546, 1.03194046, 3.18858882,
+                                1.06785037, 2.64412275, 1.69135228, 1.4056247, 1.95607289]
+        assert_array_almost_equal(computed_predictions, expected_predictions, decimal=6)
