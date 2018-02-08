@@ -107,17 +107,14 @@ def run_experiment(config_file_or_obj,
     file_paths = DataReader.locate_files(file_paths_org, configpath)
 
     # check that we were able to locate all files
+
     if None in file_paths:
         indices_with_no_paths = [i for i in range(len(file_paths))
                                  if file_paths[i] is None]
 
-        error_message_list = ["{} file {} not found.".format(file_names[i],
-                                                             file_paths_org[i])
-                              for i in indices_with_no_paths]
-
-        raise FileNotFoundError('\n'.join(error_message_list))
-
-
+        missing_file_paths = [file_paths_org[i] for i in indices_with_no_paths]
+    
+        raise FileNotFoundError('The following files were not found: {}'.format(repr(missing_file_paths)))
 
     # Use the default converter for both train and test
     converters = {'train': configuration.get_default_converter(),
