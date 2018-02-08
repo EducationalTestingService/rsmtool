@@ -97,13 +97,24 @@ def run_experiment(config_file_or_obj,
     writer = DataWriter(configuration['experiment_id'])
 
     # Get the paths and names for the DataReader
-    (file_names,
-     file_paths) = configuration.get_names_and_paths(['train_file', 'test_file',
-                                                      'features', 'feature_subset_file'],
-                                                     ['train', 'test', 'feature_specs',
-                                                      'feature_subset_specs'])
 
-    file_paths = DataReader.locate_files(file_paths, configpath)
+    (file_names,
+     file_paths_org) = configuration.get_names_and_paths(['train_file', 'test_file',
+                                                          'features', 'feature_subset_file'],
+                                                         ['train', 'test', 'feature_specs',
+                                                          'feature_subset_specs'])
+
+    file_paths = DataReader.locate_files(file_paths_org, configpath)
+
+    # check that we were able to locate all files
+
+    if None in file_paths:
+        indices_with_no_paths = [i for i in range(len(file_paths))
+                                 if file_paths[i] is None]
+
+        missing_file_paths = [file_paths_org[i] for i in indices_with_no_paths]
+    
+        raise FileNotFoundError('The following files were not found: {}'.format(repr(missing_file_paths)))
 
     # Use the default converter for both train and test
     converters = {'train': configuration.get_default_converter(),
