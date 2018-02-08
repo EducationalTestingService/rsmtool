@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train_spkitemid.csv",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "model": "LogisticRegression",
+    "skll_objective": "accuracy",
+    "predict_expected_scores": true,
+    "experiment_id": "LogisticRegression_expected_scores",
+    "test_file": "../../files/test_spkitemid.csv",
+    "description": "Using all features with a LogisticRegression model."
+}
