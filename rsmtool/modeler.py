@@ -1043,8 +1043,8 @@ class Modeler:
             learner = Learner(model_name, probability=predict_expected_scores)
         else:
             learner = Learner(model_name)
-            if hasattr(learner.model, 'predict_proba'):
-                learner.probability = True
+            if hasattr(learner.model_type, 'predict_proba'):
+                learner.probability = predict_expected_scores
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
