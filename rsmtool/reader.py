@@ -65,8 +65,9 @@ class DataReader:
         assert len(filepaths) == len(framenames)
 
         # Make sure that there are no Nones in the filepaths
-        frames_with_no_path = [framenames[i] for i in range(len(framenames)) if filepaths[i] is None]
-        if len(frames_with_no_path) > 0:
+        
+        if None in filepaths:
+            frames_with_no_path = [framenames[i] for i in range(len(framenames)) if filepaths[i] is None]
             raise ValueError("No path specified for {}".format(' ,'.join(frames_with_no_path)))
 
         # Assign names and paths lists
