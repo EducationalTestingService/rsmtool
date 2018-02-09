@@ -1032,19 +1032,8 @@ class Modeler:
         and the chosen tuning objective.
         """
         # Instantiate the given SKLL learner and set its probability value
-        # appropriately. There are two complications here:
-        #  (a) It is possible to just set `probability` for all learners
-        #       but for non-probabilistic learners, that would print out a warning
-        #       that could potentially confuse users.
-        #  (b) We need to handle SVC learners in a special way beacuse they
-        #      their `predict_proba` method is not even exposed until their
-        #      `probability` property is set to True.
-        if model_name == 'SVC':
-            learner = Learner(model_name, probability=predict_expected_scores)
-        else:
-            learner = Learner(model_name)
-            if hasattr(learner.model_type, 'predict_proba'):
-                learner.probability = predict_expected_scores
+        # appropriately.
+        learner = Learner(model_name, probability=predict_expected_scores)
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -1179,10 +1168,7 @@ class Modeler:
             labels = df['sc1'].tolist()
 
         fs = FeatureSet('data', ids=ids, labels=labels, features=features)
-
-        # Check whether we can predict expected values. If it's the wrong model,
-        # then raise a warning and ignore the flag. Raise an exception if the
-        # score points do not match the number of labels in the learner output
+        # if we are predicting expected scores, then call a different function
         predictions = compute_expected_scores_from_model(model,
                                                          fs,
                                                          min_score,
