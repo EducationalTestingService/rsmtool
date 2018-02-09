@@ -28,11 +28,20 @@ The path to the file with the raw feature values that will be used for generatin
 
     ``rsmpredict`` does not require human scores for the new data since it does not evaluate the generated predictions. If you do have the human scores and want to evaluate the new predictions, you can use the :ref:`rsmeval <usage_rsmeval>` command-line utility.
 
+.. _file_format_predict:
+
 file_format *(Optional)*
 """""""""""""""""""""""""""
 The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
-.. _file_format_predict:
+predict_expected_scores *(Optional)*
+""""""""""""""""""""""""""""""""""""
+If the original model was a probablistic SKLL classifier, then *expected scores* --- probability-weighted averages over a contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
+
+.. note::
+
+    If the model in the original ``rsmtool`` experiment is an SVC, that original experiment *must* have been run with ``predict_expected_scores`` set to ``true``. This is because SVC classifiers are fit differently if probabilistic output is desired, in contrast to other probabilistic SKLL classifiers.
+
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
