@@ -507,6 +507,22 @@ def test_run_experiment_eval_lr_with_missing_candidate_column():
     do_run_evaluation(source, experiment_id, config_file)
 
 
+@raises(FileNotFoundError)
+def test_run_experiment_lr_eval_wrong_path():
+
+    # basic rsmeval experiment with wrong path to the 
+    # predictions file
+
+    source = 'lr-eval-with-wrong-path'
+    experiment_id = 'lr_eval_with_h2'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_evaluation(source, experiment_id, config_file)
+
+
 def test_run_experiment_lr_eval_with_cfg():
 
     # basic evaluation experiment using rsmeval

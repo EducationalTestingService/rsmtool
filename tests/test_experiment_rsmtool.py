@@ -1962,6 +1962,35 @@ def test_run_experiment_lr_feature_json():
         do_run_experiment(source, experiment_id, config_file)
 
 
+@raises(FileNotFoundError)
+def test_run_experiment_wrong_train_file_path():
+    # basic experiment with the path in train_file field pointing to 
+    # a non-existing file
+    source = 'lr-wrong-path'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                        source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+
+@raises(FileNotFoundError)
+def test_run_experiment_wrong_feature_file_path():
+    # basic experiment with the path in features field pointing to 
+    # a non-existing file
+    source = 'lr-wrong-path-features'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                        source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+
+
 def test_run_experiment_lr_with_cfg():
     # basic experiment with a LinearRegression model
 
