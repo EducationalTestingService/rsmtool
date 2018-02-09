@@ -619,7 +619,7 @@ class Reporter:
         file_format = configuration.get('file_format', 'csv')
         use_thumbnails = configuration.get('use_thumbnails', False)
         skll_objective = configuration.get('skll_objective', '')
-        predict_expected_scores = configuration['predict_expected_scores']
+        predict_expected_scores = configuration.get('predict_expected_scores', False)
 
         # get either test or predictions file location
         test_file_location = configuration.get('test_file_location')
