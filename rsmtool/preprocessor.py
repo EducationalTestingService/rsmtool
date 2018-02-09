@@ -1682,18 +1682,12 @@ class FeaturePreprocessor:
         requested_features = []
         generate_feature_specs_automatically = True
 
-        # For backward compatibility, we check whether this field can
-        # be set to all and set the select_transformations to true
-        # as was done in the previous version.
-        if feature_field == 'all':
-            select_transformations = True
-            warnings.warn("The use of \"all\" instead of path to the feature file "
-                          "is deprecated and will be removed in a future release. "
-                          "You can achieve the same goal by not specifying any "
-                          "feature file and setting \"select_transformations\" to True.",
-                          category=DeprecationWarning)
+        # if the feature field is a list, then simply
+        # assign it to `requested_features`
+        if isinstance(feature_field, list):
+            requested_features = feature_field
 
-        if feature_field is not None:
+        elif feature_field is not None:
             generate_feature_specs_automatically = False
             feature_specs = FeatureSpecsProcessor.validate_feature_specs(feature_specs)
             requested_features = feature_specs['feature'].tolist()

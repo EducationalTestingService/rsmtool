@@ -51,7 +51,7 @@ The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Option
 
 features *(Optional)*
 """""""""""""""""""""
-Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. 
+Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include in the experiment.
 
 .. _feature_subset_file:
 
@@ -185,17 +185,6 @@ standardize_features *(Optional)*
 If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
 
 
-.. _use_thumbnails_rsmtool:
-
-use_thumbnails *(Optional)*
-"""""""""""""""""""""""""""""""""""
-If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
-
-.. note::
-
-    All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
-
-
 .. _use_scaled_predictions_rsmtool:
 
 use_scaled_predictions *(Optional)*
@@ -284,6 +273,13 @@ A list containing the order in which the sections in the report should be genera
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmtool>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmtool>`.
+
+
+.. _use_thumbnails_rsmtool:
+
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
 
 
 candidate_column *(Optional)*
