@@ -25,7 +25,6 @@ from textwrap import wrap
 from IPython.display import (display,
                              HTML)
 
-from skll import Learner
 from skll.data import safe_float as string_to_number
 
 
@@ -218,6 +217,8 @@ _skll_module = import_module('skll.learner')
 def is_skll_model(model_name):
     """
     Check whether the given model is a valid learner name in SKLL.
+    Note that the `LinearRegression` model is also available in
+    SKLL but we always want to use the built-in model with that name.
 
     Parameters
     ----------
@@ -230,7 +231,7 @@ def is_skll_model(model_name):
         `True` if the given model name is a valid SKLL learner,
         `False` otherwise
     """
-    return hasattr(_skll_module, model_name)
+    return hasattr(_skll_module, model_name) and model_name != 'LinearRegression'
 
 
 def is_built_in_model(model_name):
