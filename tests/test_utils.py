@@ -402,4 +402,4 @@ class TestExpectedScores():
                                 2.92610019, 1.50800606, 3.06142746, 3.76927309, 2.00217987,
                                 2.2993259, 2.91747598, 1.00907901, 1.02490296, 3.69485081,
                                 2.04568922, 2.60198602, 1.8403947, 1.35505209, 1.99068596]
-        assert_array_almost_equal(computed_predictions, expected_predictions, decimal=6)
+        assert_array_almost_equal(computed_predictions, expected_predictions, decimal=2)
