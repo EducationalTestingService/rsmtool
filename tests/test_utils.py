@@ -375,13 +375,13 @@ class TestExpectedScores():
 
         # train some test SKLL learners that we will use in our tests
         cls.linearsvc = Learner('LinearSVC')
-        _ = cls.linearsvc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+        _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
 
         cls.svc = Learner('SVC')
-        _ = cls.svc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+        _ = cls.svc.train(cls.train_fs, grid_search=False)
 
         cls.svc_with_probs = Learner('SVC', probability=True)
-        _ = cls.svc_with_probs.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+        _ = cls.svc_with_probs.train(cls.train_fs, grid_search=False)
 
     @raises(ValueError)
     def test_wrong_model(self):
@@ -397,9 +397,9 @@ class TestExpectedScores():
 
     def test_expected_scores(self):
         computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
-        expected_predictions = [1.83279452, 2.97289086, 2.74849281, 1.99571651, 2.76838765,
-                                2.04660524, 1.15405697, 2.32511763, 3.88577987, 3.27419026,
-                                2.91685271, 1.67666158, 3.15582854, 3.75776759, 2.00056874,
-                                2.36653171, 2.72716145, 1.08826546, 1.03194046, 3.18858882,
-                                1.06785037, 2.64412275, 1.69135228, 1.4056247, 1.95607289]
+        expected_predictions = [1.99309843, 3.0150261, 2.81954592, 2.05229557, 2.53435775,
+                                2.02165905, 0.99727808, 2.12953073, 3.89610915, 3.55630337,
+                                2.92610019, 1.50800606, 3.06142746, 3.76927309, 2.00217987,
+                                2.2993259, 2.91747598, 1.00907901, 1.02490296, 3.69485081,
+                                2.04568922, 2.60198602, 1.8403947, 1.35505209, 1.99068596]
         assert_array_almost_equal(computed_predictions, expected_predictions, decimal=6)
