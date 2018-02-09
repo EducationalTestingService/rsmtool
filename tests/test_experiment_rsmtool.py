@@ -1790,7 +1790,7 @@ def test_run_experiment_lr_feature_json():
 
 @raises(FileNotFoundError)
 def test_run_experiment_wrong_train_file_path():
-    # basic experiment with the path in train_file field pointing to 
+    # basic experiment with the path in train_file field pointing to
     # a non-existing file
     source = 'lr-wrong-path'
     experiment_id = 'lr'
@@ -1804,7 +1804,7 @@ def test_run_experiment_wrong_train_file_path():
 
 @raises(FileNotFoundError)
 def test_run_experiment_wrong_feature_file_path():
-    # basic experiment with the path in features field pointing to 
+    # basic experiment with the path in features field pointing to
     # a non-existing file
     source = 'lr-wrong-path-features'
     experiment_id = 'lr'
@@ -2143,3 +2143,32 @@ def test_run_experiment_lr_length_column_and_feature_list():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
+
+
+def test_run_experiment_lr_with_feature_list_and_transformation():
+    # basic experiment with a LinearRegression model
+    # with feature as list instead of file name
+
+    source = 'lr-with-feature-list-and-transformation'
+    experiment_id = 'lr'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
