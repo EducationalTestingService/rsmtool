@@ -270,7 +270,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
                                       '{}_postprocessing_params.{}'.format(experiment_id,
                                                                            file_format))
 
-    postproc_params = DataReader.read_from_file(postprocessing_params_file).loc[0] 
+    postproc_params = DataReader.read_from_file(postprocessing_params_file).loc[0]
     df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
     df_old_predictions = DataReader.read_from_file(predictions_file)
     df_old_predictions = df_old_predictions[['spkitemid', 'sc1', 'scale']]
