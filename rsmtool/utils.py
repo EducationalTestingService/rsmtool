@@ -25,6 +25,7 @@ from textwrap import wrap
 from IPython.display import (display,
                              HTML)
 
+from skll import Learner
 from skll.data import safe_float as string_to_number
 
 
@@ -330,7 +331,8 @@ def parse_json_with_comments(filename):
 
 def compute_expected_scores_from_model(model, featureset, min_score, max_score):
     """
-    Compute expected scores using probability distributions over the labels.
+    Compute expected scores using probability distributions over the labels
+    from the given SKLL model.
 
     Parameters
     ----------
@@ -357,6 +359,9 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         distribution.
     """
     if hasattr(model.model, "predict_proba"):
+        # Tell the model we want probabiltiies as output. This is likely already set
+        # to True but it might not be, e.g., when using rsmpredict.
+        model.probability = True
         probability_distributions = model.predict(featureset)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have
@@ -369,8 +374,12 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
                                             num_score_points_in_learner))
         expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
-        raise ValueError("Expected scores cannot be computed since {} does not support "
-                         "probability distributions over scores.".format(model.model_type.__name__))
+        if model.model_type.__name__ == 'SVC':
+            raise ValueError("Expected scores cannot be computed since the SVC model was "
+                             "not originally trained to predict probabilities.")
+        else:
+            raise ValueError("Expected scores cannot be computed since {} is not a "
+                             "probabilistic classifier.".format(model.model_type.__name__))
 
     return expected_scores
 
