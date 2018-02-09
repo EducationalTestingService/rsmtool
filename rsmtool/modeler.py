@@ -81,7 +81,7 @@ class Modeler:
     @classmethod
     def load_from_learner(cls, learner):
         """
-        Load a Model object from file.
+        Load a Modeler object from file.
 
         Parameters
         ----------
@@ -90,7 +90,7 @@ class Modeler:
 
         Returns
         -------
-        model : Modeler
+        modeler : Modeler
             A Modeler instance
 
         Raises
