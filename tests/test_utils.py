@@ -357,6 +357,8 @@ class TestExpectedScores():
 
     @classmethod
     def setUpClass(cls):
+
+        # create a dummy train and test feature set
         X, y = make_classification(n_samples=525, n_features=10, n_classes=5, n_informative=8, random_state=123)
         X_train, y_train = X[:500], y[:500]
         X_test = X[500:]
@@ -371,22 +373,30 @@ class TestExpectedScores():
         cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
         cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
 
+        # train some test SKLL learners that we will use in our tests
         cls.linearsvc = Learner('LinearSVC')
         _ = cls.linearsvc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
 
-        cls.svc = Learner('SVC', probability=True)
+        cls.svc = Learner('SVC')
         _ = cls.svc.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
+
+        cls.svc_with_probs = Learner('SVC', probability=True)
+        _ = cls.svc_with_probs.train(cls.train_fs, grid_search=True, grid_objective='f1_score_micro')
 
     @raises(ValueError)
     def test_wrong_model(self):
         compute_expected_scores_from_model(self.linearsvc, self.test_fs, 0, 4)
 
     @raises(ValueError)
+    def test_svc_model_trained_with_no_probs(self):
+        compute_expected_scores_from_model(self.svc, self.test_fs, 0, 4)
+
+    @raises(ValueError)
     def test_wrong_score_range(self):
-        compute_expected_scores_from_model(self.svc, self.test_fs, 0, 3)
+        compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 3)
 
     def test_expected_scores(self):
-        computed_predictions = compute_expected_scores_from_model(self.svc, self.test_fs, 0, 4)
+        computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
         expected_predictions = [1.83279452, 2.97289086, 2.74849281, 1.99571651, 2.76838765,
                                 2.04660524, 1.15405697, 2.32511763, 3.88577987, 3.27419026,
                                 2.91685271, 1.67666158, 3.15582854, 3.75776759, 2.00056874,

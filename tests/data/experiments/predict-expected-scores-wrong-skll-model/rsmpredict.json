@@ -1,0 +1,7 @@
+{
+    "id_column": "ID",
+    "input_features_file": "../../files/test.csv",
+    "experiment_dir": "existing_experiment",
+    "experiment_id": "LinearSVR",
+    "predict_expected_scores": true
+}
