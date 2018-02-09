@@ -12,8 +12,7 @@ env:
 - TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py"
 sudo: false
 before_install:
-- wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-  -O miniconda.sh; fi
+- wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
 - chmod +x miniconda.sh
 - ./miniconda.sh -b -f
@@ -25,7 +24,7 @@ install:
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
 script:
-- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests tests --with-coverage --cover-package=rsmtool --cov-config .coveragerc
+- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
 
 after_success:
 - cd ${HOME}/rsmtool && ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
