@@ -113,7 +113,6 @@ def run_experiment(config_file_or_obj,
                                  if file_paths[i] is None]
 
         missing_file_paths = [file_paths_org[i] for i in indices_with_no_paths]
-    
         raise FileNotFoundError('The following files were not found: {}'.format(repr(missing_file_paths)))
 
     # Use the default converter for both train and test
