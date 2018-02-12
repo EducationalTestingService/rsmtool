@@ -36,13 +36,13 @@ The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Option
 
 predict_expected_scores *(Optional)*
 """"""""""""""""""""""""""""""""""""
-If the original model was a probablistic SKLL classifier, then *expected scores* --- probability-weighted averages over a contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
+If the original model was a probabilistic SKLL classifier, then *expected scores* --- probability-weighted averages over a contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
 
 .. note::
 
     1. If the model in the original ``rsmtool`` experiment is an SVC, that original experiment *must* have been run with ``predict_expected_scores`` set to ``true``. This is because SVC classifiers are fit differently if probabilistic output is desired, in contrast to other probabilistic SKLL classifiers.
 
-    2. You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
+    2. You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probability values for certain score points which can affect floating point computations.
 
 
 id_column *(Optional)*

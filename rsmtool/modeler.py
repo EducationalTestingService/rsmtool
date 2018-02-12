@@ -1025,6 +1025,7 @@ class Modeler:
             Defaults to `None`.
         predict_expected_scores : bool, optional
             Whether we want the trained classifiers to predict expected scores.
+            Defaults to `False`.
 
         Returns
         -------
