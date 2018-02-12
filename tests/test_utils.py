@@ -6,7 +6,6 @@ import numpy as np
 
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
-from numpy.testing import assert_array_almost_equal
 
 from rsmtool.utils import (float_format_func,
                            int_or_float_format_func,
@@ -400,9 +399,3 @@ class TestExpectedScores():
         computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
         assert len(computed_predictions) == len(self.test_fs)
         assert np.all([((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions])
-        expected_predictions = [1.9931, 3.015029, 2.819548, 2.052295, 2.534358, 2.02166,
-                                0.99728, 2.129533, 3.896108, 3.556303, 2.926101, 1.508007,
-                                3.061425, 3.769271, 2.002181, 2.299324, 2.917477, 1.00908,
-                                1.024906, 3.694849, 2.045688, 2.601988, 1.840396, 1.355052,
-                                1.990685]
-        assert_array_almost_equal(computed_predictions, expected_predictions, decimal=6)

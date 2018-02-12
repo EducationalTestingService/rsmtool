@@ -366,18 +366,14 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         probability_distributions = model.predict(featureset)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have
-
-        # round the probability distributions to 3 decimal places
-        rounded_probability_distributions = np.round(probability_distributions, 6)
-
         num_score_points_specified = max_score - min_score + 1
-        num_score_points_in_learner = rounded_probability_distributions.shape[1]
+        num_score_points_in_learner = probability_distributions.shape[1]
         if num_score_points_specified != num_score_points_in_learner:
             raise ValueError('The specified number of score points ({}) '
                              'does not match that from the the learner '
                              '({}).'.format(num_score_points_specified,
                                             num_score_points_in_learner))
-        expected_scores = rounded_probability_distributions.dot(range(min_score, max_score + 1))
+        expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
         if model.model_type.__name__ == 'SVC':
             raise ValueError("Expected scores cannot be computed since the SVC model was "
