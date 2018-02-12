@@ -2,6 +2,7 @@
 import tempfile
 import os
 
+import numpy as np
 
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
@@ -17,7 +18,11 @@ from rsmtool.utils import (float_format_func,
                            parse_json_with_comments,
                            has_files_with_extension,
                            get_output_directory_extension,
-                           get_thumbnail_as_html)
+                           get_thumbnail_as_html,
+                           compute_expected_scores_from_model)
+
+from sklearn.datasets import make_classification
+from skll import FeatureSet, Learner
 
 
 def test_int_to_float():
@@ -346,3 +351,51 @@ class TestThumbnail:
 
         path = 'random/path/to/figure1.svg'
         get_thumbnail_as_html(path, 1)
+
+
+class TestExpectedScores():
+
+    @classmethod
+    def setUpClass(cls):
+
+        # create a dummy train and test feature set
+        X, y = make_classification(n_samples=525, n_features=10, n_classes=5, n_informative=8, random_state=123)
+        X_train, y_train = X[:500], y[:500]
+        X_test = X[500:]
+
+        train_ids = list(range(1, len(X_train) + 1))
+        train_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_train.shape[1])], x)) for x in X_train]
+        train_labels = list(y_train)
+
+        test_ids = list(range(1, len(X_test) + 1))
+        test_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_test.shape[1])], x)) for x in X_test]
+
+        cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
+        cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
+
+        # train some test SKLL learners that we will use in our tests
+        cls.linearsvc = Learner('LinearSVC')
+        _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
+
+        cls.svc = Learner('SVC')
+        _ = cls.svc.train(cls.train_fs, grid_search=False)
+
+        cls.svc_with_probs = Learner('SVC', probability=True)
+        _ = cls.svc_with_probs.train(cls.train_fs, grid_search=False)
+
+    @raises(ValueError)
+    def test_wrong_model(self):
+        compute_expected_scores_from_model(self.linearsvc, self.test_fs, 0, 4)
+
+    @raises(ValueError)
+    def test_svc_model_trained_with_no_probs(self):
+        compute_expected_scores_from_model(self.svc, self.test_fs, 0, 4)
+
+    @raises(ValueError)
+    def test_wrong_score_range(self):
+        compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 3)
+
+    def test_expected_scores(self):
+        computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
+        assert len(computed_predictions) == len(self.test_fs)
+        assert np.all([((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions])

@@ -26,8 +26,7 @@ from sklearn.linear_model import LassoCV
 from skll import FeatureSet, Learner
 
 from rsmtool.analyzer import Analyzer
-from rsmtool.utils import BUILTIN_MODELS as builtin_models
-from rsmtool.utils import SKLL_MODELS as skll_models
+from rsmtool.utils import compute_expected_scores_from_model, is_skll_model
 from rsmtool.preprocessor import FeaturePreprocessor
 
 from rsmtool.configuration_parser import Configuration
@@ -82,7 +81,7 @@ class Modeler:
     @classmethod
     def load_from_learner(cls, learner):
         """
-        Load a Model object from file.
+        Load a Modeler object from file.
 
         Parameters
         ----------
@@ -91,7 +90,7 @@ class Modeler:
 
         Returns
         -------
-        model : Modeler
+        modeler : Modeler
             A Modeler instance
 
         Raises
@@ -997,7 +996,8 @@ class Modeler:
                          filedir,
                          figdir,
                          file_format='csv',
-                         custom_objective=None):
+                         custom_objective=None,
+                         predict_expected_scores=False):
         """
         Train a SKLL regression model.
 
@@ -1023,14 +1023,18 @@ class Modeler:
             Name of custom user-specified objective. If not specified
             or `None`, `neg_mean_squared_error` is used as the objective.
             Defaults to `None`.
+        predict_expected_scores : bool, optional
+            Whether we want the trained classifiers to predict expected scores.
+            Defaults to `False`.
 
         Returns
         -------
-        learner : skll Learner object
-            SKLL Learner object of the appropriate type.
+        Tuple containing a SKLL Learner object of the appropriate type
+        and the chosen tuning objective.
         """
-        # instantiate the given SKLL learner
-        learner = Learner(model_name)
+        # Instantiate the given SKLL learner and set its probability value
+        # appropriately.
+        learner = Learner(model_name, probability=predict_expected_scores)
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -1041,14 +1045,14 @@ class Modeler:
         # create a FeatureSet and train the model
         fs = FeatureSet('train', ids=ids, labels=labels, features=features)
 
-        # if it's one of the RSMTool-known SKLL models, they are all regressors so
-        # we want to use either the user-specified objective or `neg_mean_squared_error`.
-        # otherwise we want to use `f1_score_macro` since if the user specified a custom
-        # model, it's probably a classifier.
-        if model_name in skll_models:
+        # If we are training a SKLL regressor, then we want to use either the
+        # user-specified objective or `neg_mean_squared_error`. If it's SKLL
+        # classifier, then the choice is between the user-specified objective
+        # and `f1_score_micro`.
+        if learner.model_type._estimator_type == 'regressor':
             objective = 'neg_mean_squared_error' if not custom_objective else custom_objective
         else:
-            objective = 'f1_score_micro'
+            objective = 'f1_score_micro' if not custom_objective else custom_objective
 
         learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
 
@@ -1060,8 +1064,8 @@ class Modeler:
 
         self.learner = learner
 
-        # return the SKLL learner object
-        return learner
+        # return the SKLL learner object and the chosen objective
+        return learner, objective
 
     def train(self,
               configuration,
@@ -1101,19 +1105,22 @@ class Modeler:
 
         df_train = data_container['train_preprocessed_features']
 
-        args = [model_name, df_train, experiment_id, filedir, figdir, file_format]
+        args = [model_name, df_train, experiment_id, filedir, figdir]
+        kwargs = {'file_format': file_format}
 
-        # add user-specified SKLL objective to the arguments if we are 
+        # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
-        if model_name not in builtin_models:
-            skll_objective = configuration['skll_objective']
-            args.append(skll_objective)
+        if is_skll_model(model_name):
+            kwargs.update({'custom_objective': configuration['skll_objective'],
+                           'predict_expected_scores': configuration['predict_expected_scores']})
+            model, chosen_objective = self.train_skll_model(*args, **kwargs)
+            configuration['skll_objective'] = chosen_objective
+        else:
+            model = self.train_builtin_model(*args, **kwargs)
 
-        model = self.train_builtin_model(*args) if model_name in builtin_models \
-            else self.train_skll_model(*args)
         return model
 
-    def predict(self, df):
+    def predict(self, df, min_score, max_score, predict_expected=False):
         """
         Get the raw predictions of the given SKLL model on the data
         contained in the given data frame.
@@ -1124,12 +1131,31 @@ class Modeler:
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named `spkitemid`, and a label column named `sc1`.
+        min_score : int
+            Minimum score level to be used if computing expected scores.
+        max_score : int
+            Maximum score level to be used if computing expected scores.
+        predict_expected : bool, optional
+            Predict expected scores for classifiers that return probability
+            distributions over score. This will be ignored with a warning
+            if the specified model does not support probability distributions.
+            Note also that this assumes that the score range consists of
+            contiguous integers - starting at `min_score` and ending at
+            `max_score`. Defaults to `False`.
 
         Returns
         -------
-        df_predictions: pandas DataFrame
+        df_predictions : pandas DataFrame
             Data frame containing the raw predictions, the IDs, and the
             human scores.
+
+        Raises
+        ------
+        ValueError
+            If the model cannot predict probability distributions and
+            `predict_expected` is set to `True` or if the score range
+            specified by `min_score` and `max_score` does not match
+            what the model predicts in its probability distribution.
         """
         model = self.learner
 
@@ -1143,7 +1169,11 @@ class Modeler:
             labels = df['sc1'].tolist()
 
         fs = FeatureSet('data', ids=ids, labels=labels, features=features)
-        predictions = model.predict(fs)
+        # if we are predicting expected scores, then call a different function
+        predictions = compute_expected_scores_from_model(model,
+                                                         fs,
+                                                         min_score,
+                                                         max_score) if predict_expected else model.predict(fs)
 
         df_predictions = pd.DataFrame()
         df_predictions['spkitemid'] = ids
@@ -1184,9 +1214,16 @@ class Modeler:
 
         trim_max = configuration['trim_max']
         trim_min = configuration['trim_min']
+        predict_expected_scores = configuration['predict_expected_scores']
 
-        df_train_predictions = self.predict(df_train)
-        df_test_predictions = self.predict(df_test)
+        df_train_predictions = self.predict(df_train,
+                                            int(trim_min),
+                                            int(trim_max),
+                                            predict_expected=predict_expected_scores)
+        df_test_predictions = self.predict(df_test,
+                                           int(trim_min),
+                                           int(trim_max),
+                                           predict_expected=predict_expected_scores)
 
         # get the mean and SD of the training set predictions
         train_predictions_mean = df_train_predictions['raw'].mean()
