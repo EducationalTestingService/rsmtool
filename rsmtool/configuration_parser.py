@@ -443,6 +443,12 @@ class Configuration:
 
             path = self._config.get(key)
 
+            # if the `features` field is a list,
+            # do not include it in the container
+            if key == 'features':
+                if isinstance(path, list):
+                    continue
+
             if path is not None:
                 existing_paths.append(path)
                 existing_names.append(names[idx])
@@ -763,7 +769,7 @@ class ConfigurationParser:
             msg = msg.format("feature_subset_file")
             raise ValueError(msg)
         if new_config['features'] and new_config['feature_subset']:
-            msg = msg.format("feature_subset_file")
+            msg = msg.format("feature_subset")
             raise ValueError(msg)
 
         # 6. Check for fields that require feature_subset_file and try

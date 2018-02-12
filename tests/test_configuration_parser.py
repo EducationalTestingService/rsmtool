@@ -553,6 +553,27 @@ class TestConfiguration:
                                                         'feature_subset_specs'])
         eq_(values_for_reader, expected)
 
+    def test_get_names_and_paths_with_feature_list(self):
+
+        filepaths = ['path/to/train.tsv',
+                     'path/to/test.tsv']
+        filenames = ['train', 'test']
+
+        expected = (filenames, filepaths)
+
+        dictionary = {'id_column': 'A',
+                      'candidate_column': 'B',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      'features': ['FEATURE1', 'FEATURE2'],
+                      'subgroups': ['C']}
+        config = Configuration(dictionary)
+        values_for_reader = config.get_names_and_paths(['train_file', 'test_file',
+                                                        'features'],
+                                                       ['train', 'test',
+                                                        'feature_specs'])
+        eq_(values_for_reader, expected)
+
 
 class TestJSONFeatureConversion:
 
