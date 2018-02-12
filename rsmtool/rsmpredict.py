@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Utility to generate predictions on new data
 from existing RSMTool models.
@@ -9,8 +11,6 @@ from existing RSMTool models.
 :date: 10/25/2017
 :organization: ETS
 """
-
-#!/usr/bin/env python
 
 import argparse
 import glob

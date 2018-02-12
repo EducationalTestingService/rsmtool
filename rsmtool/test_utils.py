@@ -264,6 +264,13 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
                             '{}_pred_processed.{}'.format(experiment_id,
                                                           file_format))
 
+    postprocessing_params_file = join('test_outputs',
+                                      source,
+                                      'output',
+                                      '{}_postprocessing_params.{}'.format(experiment_id,
+                                                                           file_format))
+
+    postproc_params = DataReader.read_from_file(postprocessing_params_file).loc[0]
     df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
     df_old_predictions = DataReader.read_from_file(predictions_file)
     df_old_predictions = df_old_predictions[['spkitemid', 'sc1', 'scale']]
@@ -271,10 +278,12 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     # create fake skll objects with new coefficients
     df_coef = DataReader.read_from_file(scaled_coefficients_file)
     learner = Modeler.create_fake_skll_learner(df_coef)
-    model = Modeler.load_from_learner(learner)
+    modeler = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'
-    df_new_predictions = model.predict(df_preprocessed_test_data)
+    df_new_predictions = modeler.predict(df_preprocessed_test_data,
+                                         postproc_params['trim_min'],
+                                         postproc_params['trim_max'])
     df_new_predictions.rename(columns={'raw': 'scale'}, inplace=True)
 
     # check that new predictions match the scaled old predictions

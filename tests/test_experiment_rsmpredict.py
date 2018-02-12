@@ -455,3 +455,111 @@ def test_run_experiment_lr_predict_with_xlsx_output():
         expected_output_file = join(expected_output_dir, xlsx_file)
 
         yield check_file_output, output_file, expected_output_file, 'xlsx'
+
+
+def test_run_experiment_logistic_regression_predict():
+
+    # basic experiment using rsmpredict with logistic regression model
+
+    source = 'logistic-regression-predict'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_file_output, output_file, expected_output_file
+
+
+def test_run_experiment_logistic_regression_predict_expected_scores():
+
+    # basic experiment using rsmpredict with logistic regression and expected scores
+
+    source = 'logistic-regression-predict-expected-scores'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_file_output, output_file, expected_output_file
+
+
+def test_run_experiment_svc_predict_expected_scores():
+
+    # basic experiment using rsmpredict with svc and expected scores
+
+    source = 'svc-predict-expected-scores'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    for csv_file in ['predictions.csv', 'preprocessed_features.csv']:
+        output_file = join(output_dir, csv_file)
+        expected_output_file = join(expected_output_dir, csv_file)
+
+        yield check_file_output, output_file, expected_output_file
+
+
+@raises(ValueError)
+def test_run_experiment_predict_expected_scores_builtin_model():
+
+    # rsmpredict experiment for expected scores but with
+    # a built-in model which is not supporte
+    source = 'lr-predict-expected-scores-builtin-model'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_predict_expected_scores_wrong_skll_model():
+
+    # rsmpredict experiment for expected scores but with
+    # a non-probabilistic SKLL learner
+    source = 'predict-expected-scores-wrong-skll-model'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_predict_expected_scores_non_probablistic_svc():
+
+    # rsmpredict experiment for expected scores but with
+    # a non-probabilistic SKLL learner
+    source = 'predict-expected-scores-non-probabilistic-svc'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+    do_run_prediction(source, config_file)

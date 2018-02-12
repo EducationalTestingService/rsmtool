@@ -178,6 +178,180 @@ def test_run_experiment_lars_custom_objective():
     yield check_report, html_report
 
 
+def test_run_experiment_logistic_regression():
+
+    # experiment with Logistic Regression model
+
+    source = 'logistic-regression'
+    experiment_id = 'LogisticRegression'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_logistic_regression_custom_objective():
+
+    # experiment with Logistic Regression model and a custom tuning objective
+
+    source = 'logistic-regression-custom-objective'
+    experiment_id = 'LogisticRegression_custom_objective'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_logistic_regression_expected_scores():
+
+    # experiment with Logistic Regression model and expected scores
+
+    source = 'logistic-regression-expected-scores'
+    experiment_id = 'LogisticRegression_expected_scores'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_svc():
+
+    # experiment with SVC model
+
+    source = 'svc'
+    experiment_id = 'SVC'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_svc_custom_objective():
+
+    # experiment with SVC model and a custom tuning objective
+
+    source = 'svc-custom-objective'
+    experiment_id = 'SVC_custom_objective'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
+def test_run_experiment_svc_expected_scores():
+
+    # experiment with SVC model and expected scores
+
+    source = 'svc-expected-scores'
+    experiment_id = 'SVC_expected_scores'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'skll'
+    yield check_report, html_report
+
+
 def test_run_experiment_dummyregressor():
 
     # basic experiment with DummyRegressor model
