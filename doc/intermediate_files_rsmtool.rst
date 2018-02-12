@@ -3,7 +3,7 @@
 Intermediate files
 ------------------
 
-Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as ``.csv`` files (or other file format specified with ``file_format`` parameter) in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
+Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as the file format specified with ``file_format`` parameter in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
 .. note::
 
@@ -20,7 +20,7 @@ Although the primary output of RSMTool is an HTML report, we also want the user 
 
 Feature values
 ^^^^^^^^^^^^^^
-filenames: ``train_features.csv``, ``test_features.csv``, ``train_preprocessed_features.csv``, ``test_preprocessed_features.csv``
+filenames: ``train_features``, ``test_features``, ``train_preprocessed_features``, ``test_preprocessed_features``
 
 These files contain the raw and pre-processed feature values for the training and evaluation sets. They include *only* includes the rows that were used for training/evaluating the models after filtering. For models with feature selection, these files *only* include the features that ended up being included in the model.
 
@@ -32,7 +32,7 @@ These files contain the raw and pre-processed feature values for the training an
 
 Flagged responses
 ^^^^^^^^^^^^^^^^^
-filenames: ``train_responses_with_excluded_flags.csv``, ``test_responses_with_excluded_flags.csv``
+filenames: ``train_responses_with_excluded_flags``, ``test_responses_with_excluded_flags``
 
 These files contain all of the rows in the training and evaluation sets that were filtered out based on conditions specified in :ref:`flag_column <flag_column_rsmtool>`.
 
@@ -42,7 +42,7 @@ These files contain all of the rows in the training and evaluation sets that wer
 
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
-filenames: ``train_excluded_responses.csv``, ``test_excluded_responses.csv``
+filenames: ``train_excluded_responses``, ``test_excluded_responses``
 
 These files contain all of the rows in the training and evaluation sets that were filtered out because of feature values or scores. For models with feature selection, these files *only* include the features that ended up being included in the model.
 
@@ -232,3 +232,5 @@ These files are created only if a second human score has been made available via
 - ``consistency.csv``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
 
 - ``degradation.csv``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+
+- ``disattenuated_correlations.``
