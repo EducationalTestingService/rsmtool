@@ -9,7 +9,6 @@ Classes for comparing outputs of two RSMTool experiments.
 :organization: ETS
 """
 
-import base64
 import numpy as np
 import pandas as pd
 import warnings
@@ -269,8 +268,9 @@ class Comparer:
 
         feature_distplots_file = join(figdir, '{}_distrib.svg'.format(experiment_id))
         if exists(feature_distplots_file):
-            with open(feature_distplots_file, 'rb') as f:
-                figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
+            figs['feature_distplots'] = feature_distplots_file
+            # with open(feature_distplots_file, 'rb') as f:
+            #     figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
 
         feature_cors_file = join(filedir, '{}_cors_processed.{}'.format(experiment_id,
                                                                         extension))
@@ -488,31 +488,37 @@ class Comparer:
             svg_file = join(feature_boxplot_prefix + '.svg')
             png_file = join(feature_boxplot_prefix + '.png')
             if exists(svg_file):
-                with open(svg_file, 'rb') as f:
-                    figs['feature_boxplots_by_{}_'
-                         'svg'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
+                figs['feature_boxplots_by_{}_svg'.format(group)] = svg_file
+
+                # with open(svg_file, 'rb') as f:
+                #     figs['feature_boxplots_by_{}_'
+                #          'svg'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
             elif exists(png_file):
-                with open(png_file, 'rb') as f:
-                    figs['feature_boxplots_by_{}_'
-                         'png'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
+                figs['feature_boxplots_by_{}_png'.format(group)] = png_file
+                # with open(png_file, 'rb') as f:
+                #     figs['feature_boxplots_by_{}_'
+                #          'png'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
 
         # read in the betas image if exists
         betas_svg = join(figdir, '{}_betas.svg'.format(experiment_id))
         if exists(betas_svg):
-            with open(betas_svg, 'rb') as f:
-                figs['betas'] = base64.b64encode(f.read()).decode('utf-8')
+            figs['betas'] = betas_svg
+            # with open(betas_svg, 'rb') as f:
+            #     figs['betas'] = base64.b64encode(f.read()).decode('utf-8')
 
         # read in the evaluation barplots by subgroup, if we were asked to
         for group in groups_eval:
             eval_barplot_svg_file = join(figdir, '{}_eval_by_{}.svg'.format(experiment_id, group))
             if exists(eval_barplot_svg_file):
-                with open(eval_barplot_svg_file, 'rb') as f:
-                        figs['eval_barplot_by_'
-                             '{}'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
+                figs['eval_barplot_by_{}'.format(group)] = eval_barplot_svg_file
+                # with open(eval_barplot_svg_file, 'rb') as f:
+                #         figs['eval_barplot_by_'
+                #              '{}'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
 
         pca_svg_file = join(figdir, '{}_pca.svg'.format(experiment_id))
         if exists(pca_svg_file):
-            with open(pca_svg_file, 'rb') as f:
-                figs['pca_scree_plot'] = base64.b64encode(f.read()).decode('utf-8')
+            figs['pca_scree_plot'] = pca_svg_file
+            # with open(pca_svg_file, 'rb') as f:
+            #     figs['pca_scree_plot'] = base64.b64encode(f.read()).decode('utf-8')
 
         return (files, figs)

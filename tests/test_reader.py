@@ -236,3 +236,12 @@ class TestDataReader:
         paths = {'file1.csv', 'file2.xlsx'}
         config_dir = 'output'
         DataReader.locate_files(paths, config_dir)
+
+
+    @raises(ValueError)
+    def test_setup_none_in_path(self):
+        paths = ['path1.csv', None, 'path2.csv']
+        framenames = ['train', 'test', 'features']
+        reader = DataReader(paths, framenames)
+
+

@@ -21,6 +21,8 @@ from math import ceil
 from glob import glob
 from string import Template
 from textwrap import wrap
+from IPython.display import (display,
+                             HTML)
 
 from skll.data import safe_float as string_to_number
 
@@ -37,16 +39,23 @@ BUILTIN_MODELS = ['LinearRegression',
                   'PositiveLassoCV']
 
 SKLL_MODELS = ['AdaBoostRegressor',
+               'BayesianRidge',
                'DecisionTreeRegressor',
+               'DummyRegressor',
                'ElasticNet',
                'GradientBoostingRegressor',
+               'HuberRegressor',
                'KNeighborsRegressor',
+               'Lars',
                'Lasso',
                'LinearSVR',
+               'MLPRegressor',
                'RandomForestRegressor',
+               'RANSACRegressor',
                'Ridge',
                'SGDRegressor',
-               'SVR']
+               'SVR',
+               'TheilSenRegressor']
 
 DEFAULTS = {'id_column': 'spkitemid',
             'description': '',
@@ -61,6 +70,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'use_scaled_predictions_new': False,
             'select_transformations': False,
             'standardize_features': True,
+            'use_thumbnails': False,
             'scale_with': None,
             'sign': None,
             'features': None,
@@ -96,6 +106,7 @@ BOOLEAN_FIELDS = ['exclude_zero_scores',
                   'use_scaled_predictions',
                   'use_scaled_predictions_old',
                   'use_scaled_predictions_new',
+                  'use_thumbnails',
                   'select_transformations']
 
 FIELD_NAME_MAPPING = {'expID': 'experiment_id',
@@ -133,6 +144,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'file_format',
                                          'sign',
                                          'id_column',
+                                         'use_thumbnails',
                                          'train_label_column',
                                          'test_label_column',
                                          'length_column',
@@ -165,6 +177,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'file_format',
                                          'flag_column',
                                          'exclude_zero_scores',
+                                         'use_thumbnails',
                                          'scale_with',
                                          'subgroups',
                                          'general_sections',
@@ -194,6 +207,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                'optional': ['use_scaled_predictions_old',
                                             'use_scaled_predictions_new',
                                             'subgroups',
+                                            'use_thumbnails',
                                             'general_sections',
                                             'custom_sections',
                                             'special_sections',
@@ -203,6 +217,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                  'optional': ['description',
                                               'general_sections',
                                               'custom_sections',
+                                              'use_thumbnails',
                                               'special_sections',
                                               'subgroups',
                                               'section_order']}}
@@ -665,6 +680,106 @@ def get_output_directory_extension(directory, experiment_id):
         extension = list(extensions_identified)[0]
 
     return extension
+
+
+def get_thumbnail_as_html(path_to_image, image_id):
+    """
+    Given an path to an image file, generate the HTML for
+    a click-able thumbnail version of the image.
+    On click, this HTML will open the full-sized version
+    of the image in a new window.
+
+    Parameters
+    ----------
+    path_to_image : str
+        The absolute or relative path to the image.
+        If an absolute path is provided, it will be
+        converted to a relative path.
+    image_id : int
+        The id of the <img> tag in the HTML. This must
+        be unique for each <img> tag.
+
+    Returns
+    -------
+    image : str
+        The HTML string generated for the image.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the image file cannot be located.
+    """
+    if not os.path.exists(path_to_image):
+        raise FileNotFoundError('The file `{}` could not be '
+                                'located.'.format(path_to_image))
+
+    # check if the path is relative or absolute
+    if os.path.isabs(path_to_image):
+        relative_path = os.path.relpath(path_to_image)
+    else:
+        relative_path = path_to_image
+
+    # get the current ID of the image
+    image_id_with_pound = '"#{}"'.format(image_id)
+
+    # specify the thumbnail style
+    style = """
+    <style>
+    img {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        width: 150px;
+        cursor: pointer;
+    }
+    </style>
+    """
+
+    # on click, open larger image in new window
+    script = """
+    <script>
+    function getPicture(picid) {{
+        var src = $(picid).attr('src');
+        window.open(src, 'Image', resizable=1);
+    }};
+    </script>""".format(image_id)
+
+    # generate image tags
+    image = ("""<img id='{}' src='{}' onclick='getPicture({})' """
+             """title="Click to enlarge">"""
+             """</img>""").format(image_id,
+                                  relative_path,
+                                  image_id_with_pound)
+
+    # create the image HTML
+    image += style
+    image += script
+    return image
+
+
+def show_thumbnail(path_to_image, image_id):
+    """
+    Given an path to an image file, display
+    a click-able thumbnail version of the image.
+    On click, open the full-sized version of the
+    image in a new window.
+
+    Parameters
+    ----------
+    path_to_image : str
+        The absolute or relative path to the image.
+        If an absolute path is provided, it will be
+        converted to a relative path.
+    image_id : int
+        The id of the <img> tag in the HTML. This must
+        be unique for each <img> tag.
+
+    Returns
+    -------
+    display : IPython.core.display.HTML
+        The HTML display of the thumbnail image.
+    """
+    return display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
 
 
 class LogFormatter(logging.Formatter):

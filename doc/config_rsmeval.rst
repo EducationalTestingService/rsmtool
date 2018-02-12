@@ -147,6 +147,10 @@ A list containing the order in which the sections in the report should be genera
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmeval>`.
 
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
+
 candidate_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The name for an optional column in prediction file containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
@@ -154,3 +158,5 @@ The name for an optional column in prediction file containing unique candidate I
 min_items_per_candidate *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
+
+.. _use_thumbnails_rsmeval:

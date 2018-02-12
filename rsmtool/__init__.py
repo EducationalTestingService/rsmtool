@@ -39,7 +39,9 @@ from .reporter import Reporter
 from .writer import DataWriter
 
 from .utils import (agreement,
-                    partial_correlations)
+                    get_thumbnail_as_html,
+                    partial_correlations,
+                    show_thumbnail)
 
 from .rsmcompare import run_comparison
 
