@@ -42,7 +42,7 @@ If the original model was a probablistic SKLL classifier, then *expected scores*
 
     1. If the model in the original ``rsmtool`` experiment is an SVC, that original experiment *must* have been run with ``predict_expected_scores`` set to ``true``. This is because SVC classifiers are fit differently if probabilistic output is desired, in contrast to other probabilistic SKLL classifiers.
 
-    2. You may see slight differences in expected score predictions if you run the experiment on different machines on operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
+    2. You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
 
 
 id_column *(Optional)*

@@ -37,7 +37,7 @@ If a probablistic SKLL classifier is chosen to build the scoring model, then *ex
 
 .. note ::
 
-    You may see slight differences in expected score predictions if you run the experiment on different machines on operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
+    You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
 
 
 description *(Optional)*
