@@ -701,6 +701,49 @@ class Analyzer:
 
         return metrics
 
+    
+    @staticmethod
+    def compute_disattenuated_correlations(human_machine_corr,
+                                           human_human_corr):
+        """
+        Compute the disattenuated correlations between human and machine scores. 
+        These are computed as the Pearson's correlation between the human score
+        and the machine score divided by the square root of correlation between
+        two human raters. 
+
+        Parameters
+        ----------
+        human_machine_corr : pandas DataFrame
+            Series containing of pearson's correlation coefficients human-machine correlations
+        human_human_corr : pandas DataFrame
+            Series containing of pearson's correlation coefficients for human-human correlations.
+            This can contain a single value or have the index matching that of human-machine correlations
+
+        Returns
+        -------
+        df_dis_corr: pandas DataFrame
+            Data frame containing the HM correlation, HH correlation
+            and disattenuated correlation
+        """
+
+        # if we only have a single value for human correlation and the index
+        # is not in human-machine values, we use the same HH value in all cases
+        if len(human_human_corr) == 1 and not human_human_corr.index[0] in human_machine_corr.index:
+            human_human_corr = pd.Series(human_human_corr.values.repeat(len(human_machine_corr)),
+                                         index=human_machine_corr.index)
+
+       
+        # we now concatenate the two series on index
+        df_dis_corr = pd.concat([human_machine_corr, human_human_corr],
+                                axis=1,
+                                keys=['corr_HM', 'corr_HH' ])
+        df_dis_corr['sqrt_HH'] = np.sqrt(df_dis_corr['corr_HH']) 
+        df_dis_corr['disattenuated_corr'] = df_dis_corr['corr_HM']/df_dis_corr['sqrt_HH']
+        
+        return df_dis_corr
+
+
+
     def compute_correlations_by_group(self,
                                       df,
                                       selected_features,
@@ -994,6 +1037,7 @@ class Analyzer:
                 df_human_machine_filtered,
                 df_human_human)
 
+
     def compute_metrics_by_group(self,
                                  df_test,
                                  grouping_variable,
@@ -1077,10 +1121,17 @@ class Analyzer:
 
         return (df_human_machine_by_group, df_human_human_by_group)
 
-    def compute_degradation(self, df, use_all_responses=True):
+
+    def compute_degradation_and_disattenuated_correlations(self, df,
+                                                          use_all_responses=True):
         """
         Compute the degradation in performance when using the machine
-        to predict the score instead of a second human.
+        to predict the score instead of a second human and the
+        the disattenuated correlations between human and machine scores. 
+        These are computed as the Pearson's correlation between the human score
+        and the machine score divided by the square root of correlation between
+        two human raters. 
+
         For this, we can compute the machine performance either only on the
         double scored data or on the full dataset. Both options have their
         pros and cons. The default is to use the full dataset. This function
@@ -1099,6 +1150,10 @@ class Analyzer:
         -------
         df_degradation : pandas DataFrame
             Data frame containing the degradation statistics.
+
+        df_dis_corr : pandas DataFrame
+            Data frame containing the HM correlation, HH correlation
+            and disattenuated correlation
         """
 
         if use_all_responses:
@@ -1113,7 +1168,11 @@ class Analyzer:
          df_human_human_eval) = self.compute_metrics(df_responses,
                                                      include_second_score=True)
 
-        # we only care about the degradation in these metrics
+        # compute disattenuated correlations
+        df_dis_corr = self.compute_disattenuated_correlations(df_human_machine_eval['corr'],
+                                                              df_human_human_eval['corr'])
+
+        # Compute degradation. we only care about the degradation in these metrics
         degradation_metrics = ['corr', 'kappa', 'wtkappa',
                                'exact_agr', 'adj_agr', 'SMD']
         df_human_machine_eval = df_human_machine_eval[degradation_metrics]
@@ -1121,7 +1180,10 @@ class Analyzer:
         df_degradation = df_human_machine_eval.apply(lambda row:
                                                      row - df_human_human_eval.loc[''], axis=1)
 
-        return df_degradation
+
+        return (df_degradation, df_dis_corr)
+
+
 
     def run_training_analyses(self,
                               data_container,
@@ -1358,10 +1420,12 @@ class Analyzer:
             - eval_short
             - consistency
             - degradation
+            - disattenudated_correlations
             - confMatrix
             - score_dist
             - eval_by_*
             - consistency_by_*
+            - disattenduated_correlations_by*
 
         configuration : configuration_parser.Configuration
             A new Configuration object.
@@ -1423,12 +1487,15 @@ class Analyzer:
                                                     include_second_score=include_second_score)
             eval_by_group_dict[group] = metrics
 
-        # compute the degradation statistics if we have the
-        # second human score available
+        # compute the degradation statistics and disattenuated correlations
+        # if we have the second human score available
         df_degradation = pd.DataFrame()
+        df_dis_corr = pd.DataFrame()
         if include_second_score:
-            df_degradation = self.compute_degradation(df_preds_second_score[prediction_columns])
+            (df_degradation,
+            df_dis_corr) = self.compute_degradation_and_disattenuated_correlations(df_preds_second_score[prediction_columns])
 
+        
         # compute the confusion matrix as a data frame
         score_type = 'scale' if use_scaled_predictions else 'raw'
         human_scores = df_preds['sc1'].astype('int64')
@@ -1462,6 +1529,7 @@ class Analyzer:
                     {'name': 'eval_short', 'frame': df_human_machine_short},
                     {'name': 'consistency', 'frame': df_human_human},
                     {'name': 'degradation', 'frame': df_degradation},
+                    {'name': 'disattenuated_correlations', 'frame': df_dis_corr},
                     {'name': 'confMatrix', 'frame': df_confmatrix},
                     {'name': 'score_dist', 'frame': df_score_dist}]
 
@@ -1469,10 +1537,15 @@ class Analyzer:
 
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
 
+            dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group['corr.{}_trim'.format(score_type)],
+                                                                        consistency_by_group['corr'])
+
             datasets.extend([{'name': 'eval_by_{}'.format(group),
                               'frame': eval_by_group},
                              {'name': 'consistency_by_{}'.format(group),
-                              'frame': consistency_by_group}])
+                              'frame': consistency_by_group},
+                             {'name': 'disattenuated_correlations_by_{}'.format(group),
+                              'frame': dis_corr_by_group}])
 
         return configuration, DataContainer(datasets=datasets)
 
