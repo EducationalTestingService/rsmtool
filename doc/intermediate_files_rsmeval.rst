@@ -120,4 +120,10 @@ These files are created only if a second human score has been made available via
 
 - ``consistency``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
 
+- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group
+
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+
+- ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
+
+- ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
