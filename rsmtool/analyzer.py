@@ -1537,8 +1537,11 @@ class Analyzer:
 
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
 
-            dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group['corr.{}_trim'.format(score_type)],
-                                                                        consistency_by_group['corr'])
+            
+            # compute disattenuated correlations by group if we have 
+            # second score
+            if include_second_score:
+                dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group['corr.{}_trim'.format(score_type)],
 
             datasets.extend([{'name': 'eval_by_{}'.format(group),
                               'frame': eval_by_group},
