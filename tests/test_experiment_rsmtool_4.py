@@ -23,7 +23,7 @@ from rsmtool.test_utils import (check_run_experiment,
     param('ridge-custom-objective', 'Ridge_custom_objective', skll=True),
     param('linearsvr', 'LinearSVR', skll=True),
     param('linearsvr-custom-objective', 'LinearSVR_custom_objective', skll=True),
-    param('wls', 'wls'),
+    param('wls', 'wls', skll=True),  # treat this as SKLL since we don't want to test coefficients
     param('rebalancedlr', 'rebalancedlr'),
     param('lassofixedlambdathenlr', 'lassofixedlambdathenlr'),
     param('positivelassocvthenlr', 'positivelassocvthenlr'),
@@ -33,7 +33,7 @@ from rsmtool.test_utils import (check_run_experiment,
     param('positivelassocv', 'positivelassocv'),
     param('equalweightslr', 'equalweightslr')
 ])
-def test_experiment_runner(*args, **kwargs):
+def test_run_experiment(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 

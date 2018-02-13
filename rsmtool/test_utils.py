@@ -40,7 +40,7 @@ def check_run_experiment(source,
                        source,
                        '{}.json'.format(experiment_id))
 
-    model_type = 'skll' if skll or source == 'wls' else 'rsmtool'
+    model_type = 'skll' if skll else 'rsmtool'
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
