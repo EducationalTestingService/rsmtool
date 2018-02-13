@@ -60,6 +60,24 @@ def test_run_experiment_lr_compare_with_h2():
     yield check_report, html_report
 
 
+def test_run_experiment_lr_compare_subgroups_with_h2():
+
+    # basic rsmcompare experiment comparing a LinearRegression
+    # experiment to itself where the rsmtool report contains
+    # h2 information and subgroups
+    source = 'lr-self-compare-with-subgroups-and-h2'
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2_report.html')
+    yield check_report, html_report
+
+
+
 def test_run_experiment_lr_compare_with_custom_order():
 
     # basic rsmcompare experiment comparing a LinearRegression
