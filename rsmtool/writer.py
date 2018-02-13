@@ -27,7 +27,7 @@ class DataWriter:
 
     def write_experiment_output(self,
                                 csvdir,
-                                data_container,
+                                container_or_dict,
                                 dataframe_names=None,
                                 new_names_dict=None,
                                 include_experiment_id=True,
@@ -36,21 +36,22 @@ class DataWriter:
                                 index=False,
                                 **kwargs):
         """
-        Write out each of the given list of data frames as a ``.csv``, ``.json`` or
-        ``.xlsx`` file in the given directory. Each data frame was generated
-        as part of running an RSMTool experiment. All files are prefixed with
-        the given experiment ID and suffixed with either the name of the data
-        frame in the DataContainer object, or a new name if ``new_names_dict`` is
-        specified. Additionally, the indexes in the data frames are reset if
-        so specified.
+        Write out each of the given list of data frames as a ``.csv``, ''.tsv``,
+        or ``.xlsx`` file in the given directory. Each data frame was generated
+        as part of running an RSMTool experiment. All files are prefixed with the
+        given experiment ID and suffixed with either the name of the data frame in
+        the DataContainer (or dict) object, or a new name if ``new_names_dict``
+        is specified. Additionally, the indexes in the  data frames are reset if so
+        specified.
 
         Parameters
         ----------
         csvdir : str
             Path to the `output` experiment sub-directory that will
             contain the CSV files corresponding to each of the data frames.
-        data_container : container.DataContainer
-            A DataContainer object.
+        container_or_dict : container.DataContainer or dict
+            A DataContainer object or dict, where keys are data frame
+            names and vales are ``pd.DataFrame`` objects.
         dataframe_names : list of str, optional
             List of data frame names, one for each of the data frames.
         new_names_dict : dict, optional
@@ -72,30 +73,29 @@ class DataWriter:
         Raises
         ------
         KeyError
-            If file_format is not correct.
+            If file_format is not correct, or data frame
+            is not in the container or dictionary
         """
 
-        # If no frames specified, get all frames in data container
-
-        data_container = data_container.copy()
+        container_or_dict = container_or_dict.copy()
 
         # If no `dataframe_names` specified, use all names
         if dataframe_names is None:
-            dataframe_names = data_container.keys()
+            dataframe_names = container_or_dict.keys()
 
         # Otherwise, check to make sure all specified names
         # are actually in the DataContainer
         else:
             for name in dataframe_names:
-                if name not in data_container:
-                    raise KeyError('The name `{}` is not in the container.'
-                                   ''.format(name))
+                if name not in container_or_dict:
+                    raise KeyError('The name `{}` is not in the container '
+                                   'or dictionary.'.format(name))
 
         # Loop through DataFrames, and save
         # output in specified format
         for dataframe_name in dataframe_names:
 
-            df = data_container.get_frame(dataframe_name)
+            df = container_or_dict[dataframe_name]
             if df is None:
                 raise KeyError('The DataFrame `{}` does not exist.'.format(dataframe_name))
 
@@ -103,7 +103,7 @@ class DataWriter:
             if df.empty:
                 continue
 
-            # If there is a desire to rename some DataFrames,
+            # If there is a desire to rename the DataFrame,
             # get the new name
             if new_names_dict is not None:
                 if dataframe_name in new_names_dict:
