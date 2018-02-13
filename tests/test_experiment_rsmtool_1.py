@@ -3,7 +3,9 @@ from os.path import join
 from nose.tools import raises
 from parameterized import param, parameterized
 
-from rsmtool.test_utils import check_run_experiment, do_run_experiment, test_dir
+from rsmtool.test_utils import (check_run_experiment,
+                                do_run_experiment,
+                                test_dir)
 
 
 @parameterized([
