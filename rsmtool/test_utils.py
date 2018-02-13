@@ -251,10 +251,16 @@ def check_file_output(file1, file2, file_format='csv'):
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
 
-    assert_frame_equal(df1.sort_index(axis=1),
-                       df2.sort_index(axis=1),
-                       check_exact=False,
-                       check_less_precise=True)
+    try:
+        assert_frame_equal(df1.sort_index(axis=1),
+                           df2.sort_index(axis=1),
+                           check_exact=False,
+                           check_less_precise=True)
+    except AssertionError as e:
+        message = e.args[0]
+        new_message = 'File {} - {}'.format(basename(file1), message)
+        e.args = (new_message, )
+        raise
 
 
 def check_report(html_file):
