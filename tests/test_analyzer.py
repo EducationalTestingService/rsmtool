@@ -187,6 +187,17 @@ class TestAnalyzer:
         assert_array_equal(df_dis_corr['disattenuated_corr'], [1.0, np.nan, np.nan])
 
 
+    def test_compute_disattenuated_correlations_negative_human(self):
+        hm_corr = pd.Series([0.9, 0.8],
+                            index=['All data', 'GROUP1'])
+        hh_corr = pd.Series([-0.03, 0.64], 
+                            index=['All data', 'GROUP1'])
+        df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
+                                                                  hh_corr)
+        assert_equal(len(df_dis_corr), 2)
+        assert_array_equal(df_dis_corr['disattenuated_corr'], [np.nan, 1.0])
+
+
 
 
 

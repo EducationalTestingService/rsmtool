@@ -737,7 +737,13 @@ class Analyzer:
         df_dis_corr = pd.concat([human_machine_corr, human_human_corr],
                                 axis=1,
                                 keys=['corr_HM', 'corr_HH' ])
-        df_dis_corr['sqrt_HH'] = np.sqrt(df_dis_corr['corr_HH']) 
+
+
+        # if any of the HH correlations are negative, we will ignore these 
+        # and treat them as Nones
+        with np.errstate(invalid='ignore'):
+            df_dis_corr['sqrt_HH'] = np.sqrt(df_dis_corr['corr_HH']) 
+
         df_dis_corr['disattenuated_corr'] = df_dis_corr['corr_HM']/df_dis_corr['sqrt_HH']
         
         return df_dis_corr
