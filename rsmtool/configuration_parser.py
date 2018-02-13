@@ -33,8 +33,9 @@ from rsmtool.utils import (DEFAULTS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
                            FIELD_NAME_MAPPING,
-                           SKLL_MODELS)
+                           is_skll_model)
 
+from skll import Learner
 from skll.metrics import SCORERS
 
 if HAS_RSMEXTRA:
@@ -442,6 +443,12 @@ class Configuration:
 
             path = self._config.get(key)
 
+            # if the `features` field is a list,
+            # do not include it in the container
+            if key == 'features':
+                if isinstance(path, list):
+                    continue
+
             if path is not None:
                 existing_paths.append(path)
                 existing_names.append(names[idx])
@@ -762,7 +769,7 @@ class ConfigurationParser:
             msg = msg.format("feature_subset_file")
             raise ValueError(msg)
         if new_config['features'] and new_config['feature_subset']:
-            msg = msg.format("feature_subset_file")
+            msg = msg.format("feature_subset")
             raise ValueError(msg)
 
         # 6. Check for fields that require feature_subset_file and try
@@ -816,11 +823,12 @@ class ConfigurationParser:
                              "to specify the name of the column which "
                              "contains candidate IDs.")
 
-        # 8. Check that if "skll_objective" is specified, it's one of the metrics that SKLL
-        # allows for AND that it is specified for a SKLL model and _not_ a built-in
+        # 8. Check that if "skll_objective" is specified, it's
+        # one of the metrics that SKLL allows for AND that it is
+        # specified for a SKLL model and _not_ a built-in
         # linear regression model
         if new_config['skll_objective']:
-            if new_config['model'] not in SKLL_MODELS:
+            if not is_skll_model(new_config['model']):
                 logging.warning("You specified a custom SKLL objective but also chose a "
                                 "non-SKLL model. The objective will be ignored.")
             else:
@@ -828,13 +836,26 @@ class ConfigurationParser:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
                                      "documentation and choose a valid tuning objective.")
 
-        # 9. Check the fields that requires rsmextra
+        # 9. Check that if we are running rsmtool to ask for
+        # expected scores then the SKLL model type must actually
+        # support probabilistic classification. If it's not a SKLL
+        # model at all, we just treat it as a LinearRegression model
+        # which is basically what they all are in the end.
+        if context == 'rsmtool' and new_config['predict_expected_scores']:
+            model_name = new_config['model']
+            dummy_learner = Learner(model_name) if is_skll_model(model_name) else Learner('LinearRegression')
+            if not hasattr(dummy_learner.model_type, 'predict_proba'):
+                raise ValueError("{} does not support expected scores "
+                                 "since it is not a probablistic classifier.".format(model_name))
+            del dummy_learner
+
+        # 10. Check the fields that requires rsmextra
         if not HAS_RSMEXTRA:
             if new_config['special_sections']:
                 raise ValueError("Special sections are only available to ETS"
                                  " users by installing the rsmextra package.")
 
-        # 10. Raise a warning if we are specifiying a feature file but also
+        # 11. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
             logging.warning("You specified a feature file but also set "
@@ -844,7 +865,7 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 11. Clean up config dict to keep only context-specific fields
+        # 12. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 

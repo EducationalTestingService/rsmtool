@@ -24,7 +24,7 @@ While fine-grained column selection is better for a single experiment, subset-ba
 
 Fine-grained column selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To manually select columns to be used as features, you can provide a data file in one of the :ref:`supported formats <input_file_format>`. The file must contain a column named ``feature`` which specifies the names of the feature columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the values in these feature columns before being used in the model.
+To manually select columns to be used as features, you can provide a data file in one of the :ref:`supported formats <input_file_format>`. The file must contain a column named ``feature`` which specifies the names of the feature columns that should be used for scoring model building. For additional flexibility, the same file also allows you to describe transformations to be applied to the values in these feature columns before being used in the model. The path to this file should be set as an argument to ``features`` in the experiment configuration file. (Note: If you do not wish to perform any feature transformations, but would simply like to select certain feature columns to include, you can also pass a ``list`` of feature names as an arguement to ``features``.)
 
 .. _example_feature_csv:
 

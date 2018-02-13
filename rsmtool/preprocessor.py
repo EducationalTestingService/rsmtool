@@ -27,7 +27,7 @@ from rsmtool.container import DataContainer
 from rsmtool.reporter import Reporter
 from rsmtool.transformer import FeatureTransformer
 from rsmtool.utils import convert_to_float
-from rsmtool.utils import BUILTIN_MODELS, SKLL_MODELS
+from rsmtool.utils import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
@@ -404,9 +404,9 @@ class FeaturePreprocessor:
             If the model is not supported.
         """
 
-        if model_name in BUILTIN_MODELS:
+        if is_built_in_model(model_name):
             model_type = 'BUILTIN'
-        elif model_name in SKLL_MODELS:
+        elif is_skll_model(model_name):
                 model_type = 'SKLL'
         else:
             raise ValueError("The specified model {} "
@@ -1682,18 +1682,12 @@ class FeaturePreprocessor:
         requested_features = []
         generate_feature_specs_automatically = True
 
-        # For backward compatibility, we check whether this field can
-        # be set to all and set the select_transformations to true
-        # as was done in the previous version.
-        if feature_field == 'all':
-            select_transformations = True
-            warnings.warn("The use of \"all\" instead of path to the feature file "
-                          "is deprecated and will be removed in a future release. "
-                          "You can achieve the same goal by not specifying any "
-                          "feature file and setting \"select_transformations\" to True.",
-                          category=DeprecationWarning)
+        # if the feature field is a list, then simply
+        # assign it to `requested_features`
+        if isinstance(feature_field, list):
+            requested_features = feature_field
 
-        if feature_field is not None:
+        elif feature_field is not None:
             generate_feature_specs_automatically = False
             feature_specs = FeatureSpecsProcessor.validate_feature_specs(feature_specs)
             requested_features = feature_specs['feature'].tolist()
@@ -2284,6 +2278,9 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get('standardize_features', True)
 
+        # should we predict expected scores
+        predict_expected_scores = config_obj['predict_expected_scores']
+
         # get the column names for flag columns (if any)
         flag_column_dict = config_obj.check_flag_column()
 
@@ -2341,14 +2338,19 @@ class FeaturePreprocessor:
                                                  df_feature_info,
                                                  standardize_features)
 
-        # now generate the predictions for the features using this model
-        logging.info('Generating predictions')
-        df_predictions = model.predict(df_features_preprocessed)
-
         trim_min = df_postproc_params['trim_min'].values[0]
         trim_max = df_postproc_params['trim_max'].values[0]
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
+
+        # now generate the predictions for the features using this model
+        logged_str = 'Generating predictions'
+        logged_str += ' (expected scores).' if predict_expected_scores else '.'
+        logging.info(logged_str)
+        df_predictions = model.predict(df_features_preprocessed,
+                                       int(trim_min),
+                                       int(trim_max),
+                                       predict_expected=predict_expected_scores)
 
         train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
         train_predictions_sd = df_postproc_params['train_predictions_sd'].values[0]

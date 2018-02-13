@@ -39,6 +39,7 @@ from .reporter import Reporter
 from .writer import DataWriter
 
 from .utils import (agreement,
+                    compute_expected_scores_from_model,
                     get_thumbnail_as_html,
                     partial_correlations,
                     show_thumbnail)

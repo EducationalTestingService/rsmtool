@@ -13,13 +13,7 @@ An identifier for the experiment that will be used to name the report and all :r
 
 model
 """""
-The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the regressors available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_.
-
-
-skll_objective *(Optional)*
-"""""""""""""""""""""""""""
-The tuning objective to use if a SKLL regressor is chosen to build the scoring model. Possible values are the regression tuning objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error``. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
-
+The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
 
 train_file
 """"""""""
@@ -28,6 +22,23 @@ The path to the training data feature file in one of the :ref:`supported formats
 test_file
 """""""""
 The path to the evaluation data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
+
+.. _skll_objective:
+
+skll_objective *(Optional)*
+"""""""""""""""""""""""""""
+The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+
+.. _predict_expected_scores:
+
+predict_expected_scores *(Optional)*
+""""""""""""""""""""""""""""""""""""
+If a probabilistic SKLL classifier is chosen to build the scoring model, then *expected scores* --- probability-weighted averages over contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default for a classifier. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
+
+.. note ::
+
+    You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
+
 
 description *(Optional)*
 """"""""""""""""""""""""
@@ -51,7 +62,7 @@ The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Option
 
 features *(Optional)*
 """""""""""""""""""""
-Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. 
+Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include in the experiment.
 
 .. _feature_subset_file:
 
@@ -185,17 +196,6 @@ standardize_features *(Optional)*
 If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
 
 
-.. _use_thumbnails_rsmtool:
-
-use_thumbnails *(Optional)*
-"""""""""""""""""""""""""""""""""""
-If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
-
-.. note::
-
-    All evaluation metrics (e.g., kappa and pearson correlation) are automatically computed for *both* scaled and raw scores.
-
-
 .. _use_scaled_predictions_rsmtool:
 
 use_scaled_predictions *(Optional)*
@@ -284,6 +284,13 @@ A list containing the order in which the sections in the report should be genera
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmtool>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmtool>`.
+
+
+.. _use_thumbnails_rsmtool:
+
+use_thumbnails *(Optional)*
+"""""""""""""""""""""""""""""""""""
+If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
 
 
 candidate_column *(Optional)*

@@ -328,6 +328,32 @@ class TestConfigurationParser:
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
 
+    @raises(ValueError)
+    def test_wrong_skll_model_for_expected_scores(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'LinearSVR',
+                'predict_expected_scores': 'true'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+    @raises(ValueError)    
+    def test_builtin_model_for_expected_scores(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'NNLR',
+                'predict_expected_scores': 'true'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
     def test_get_correct_configparser_cfg(self):
         config_parser = ConfigurationParser.get_configparser('config.cfg')
         assert isinstance(config_parser, CFGConfigurationParser)
@@ -525,6 +551,27 @@ class TestConfiguration:
                                                         'feature_subset_file'],
                                                        ['train', 'test',
                                                         'feature_subset_specs'])
+        eq_(values_for_reader, expected)
+
+    def test_get_names_and_paths_with_feature_list(self):
+
+        filepaths = ['path/to/train.tsv',
+                     'path/to/test.tsv']
+        filenames = ['train', 'test']
+
+        expected = (filenames, filepaths)
+
+        dictionary = {'id_column': 'A',
+                      'candidate_column': 'B',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      'features': ['FEATURE1', 'FEATURE2'],
+                      'subgroups': ['C']}
+        config = Configuration(dictionary)
+        values_for_reader = config.get_names_and_paths(['train_file', 'test_file',
+                                                        'features'],
+                                                       ['train', 'test',
+                                                        'feature_specs'])
         eq_(values_for_reader, expected)
 
 

@@ -619,6 +619,7 @@ class Reporter:
         file_format = configuration.get('file_format', 'csv')
         use_thumbnails = configuration.get('use_thumbnails', False)
         skll_objective = configuration.get('skll_objective', '')
+        predict_expected_scores = configuration.get('predict_expected_scores', False)
 
         # get either test or predictions file location
         test_file_location = configuration.get('test_file_location')
@@ -657,9 +658,12 @@ class Reporter:
         # what groups are used for descriptives and evaluations
         os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
         os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+
+        # pass in other useful information to the report
         os.environ['FILE_FORMAT'] = file_format
         os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
         os.environ['SKLL_OBJECTIVE'] = '' if skll_objective is None else skll_objective
+        os.environ['PREDICT_EXPECTED_SCORES'] = '1' if predict_expected_scores else '0'
 
         # get the report directory which is at the same level
         # as the output and the figure directory
