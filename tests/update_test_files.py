@@ -41,40 +41,41 @@ def main():
     # they folllow the same structure.
     # see http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # for Python 3.5 solution
-    test_experiment = SourceFileLoader('test_experiment', join(_MY_PATH, 'test_experiment.py')).load_module()
+    for context in ['rsmtool', 'rsmeval', 'rsmpredict', 'rsmsummarize', 'rsmcompare']:
+        test_experiment = SourceFileLoader('test_experiment', join(_MY_PATH, 'test_experiment_{}.py'.format(context))).load_module()
 
-    # iterate over all the members and focus on only the experiment functions
-    for member in inspect.getmembers(test_experiment):
-        if inspect.isfunction(member[1]) and member[0].startswith('test_run_experiment'):
-            function = member[1]
-            # get the experiment id and the source for each test function
-            function_code_lines = inspect.getsourcelines(function)
-            experiment_id_line = [line for line in function_code_lines[0]
-                                  if re.search(r'experiment_id = ', line)]
+        # iterate over all the members and focus on only the experiment functions
+        for member in inspect.getmembers(test_experiment):
+            if inspect.isfunction(member[1]) and member[0].startswith('test_run_experiment'):
+                function = member[1]
+                # get the experiment id and the source for each test function
+                function_code_lines = inspect.getsourcelines(function)
+                experiment_id_line = [line for line in function_code_lines[0]
+                                      if re.search(r'experiment_id = ', line)]
 
-            # if there was no experiment ID specified, it was either a
-            # a decorated test function (which means it wouldn't have an 'output'
-            # directory anyway) or it was a compare or prediction test function
-            # which are not a problem for various reasons.
-            if experiment_id_line:
-                experiment_id_in_test = eval(experiment_id_line[0].strip().split(' = ')[1])
+                # if there was no experiment ID specified, it was either a
+                # a decorated test function (which means it wouldn't have an 'output'
+                # directory anyway) or it was a compare or prediction test function
+                # which are not a problem for various reasons.
+                if experiment_id_line:
+                    experiment_id_in_test = eval(experiment_id_line[0].strip().split(' = ')[1])
 
-                # get the name of the source directory
-                source_line = [line for line in function_code_lines[0]
-                                      if re.search(r'source = ', line)]
-                source = eval(source_line[0].strip().split(' = ')[1])
-                print(source)
+                    # get the name of the source directory
+                    source_line = [line for line in function_code_lines[0]
+                                          if re.search(r'source = ', line)]
+                    source = eval(source_line[0].strip().split(' = ')[1])
+                    print(source)
 
-                # check if the specified output file already exists in test data
+                    # check if the specified output file already exists in test data
 
-                test_file = '{}/data/experiments/{}/output/{}_{}'.format(_MY_PATH, source, experiment_id_in_test, suffix)
-                output_file = '{}/{}/output/{}_{}'.format(out_dir, source, experiment_id_in_test, suffix)
+                    test_file = '{}/data/experiments/{}/output/{}_{}'.format(_MY_PATH, source, experiment_id_in_test, suffix)
+                    output_file = '{}/{}/output/{}_{}'.format(out_dir, source, experiment_id_in_test, suffix)
 
-                if exists(output_file):
-                    print('Copying {} to {}'.format(output_file, test_file))
-                    shutil.copy(output_file, test_file)
-                else:
-                    print('{} does not exist'.format(output_file))
+                    if exists(output_file):
+                        print('Copying {} to {}'.format(output_file, test_file))
+                        shutil.copy(output_file, test_file)
+                    else:
+                        print('{} does not exist'.format(output_file))
 
 if __name__ == '__main__':
     main()
