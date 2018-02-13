@@ -52,6 +52,44 @@ class TestDataWriter:
         assert_frame_equal(container.dataset1, ds_1_csv)
         assert_frame_equal(container.dataset1, ds_1_xls)
 
+    def test_dictionary_save_files(self):
+
+        data_sets = {'dataset1': pd.DataFrame(np.random.normal(size=(100, 2)),
+                                              columns=['A', 'B']),
+                     'dataset2': pd.DataFrame(np.random.normal(size=(120, 3)),
+                                              columns=['A', 'B', 'C'])}
+
+        directory = 'temp_directory'
+        os.makedirs(directory, exist_ok=True)
+
+        writer = DataWriter()
+        for file_type in ['json', 'csv', 'xlsx']:
+
+            if file_type != 'json':
+
+                writer.write_experiment_output(directory,
+                                               data_sets,
+                                               dataframe_names=['dataset1'],
+                                               file_format=file_type)
+            else:
+                writer.write_experiment_output(directory,
+                                               data_sets,
+                                               new_names_dict={'dataset1': 'aaa'},
+                                               dataframe_names=['dataset1'],
+                                               file_format=file_type)
+
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
+        ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
+        ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
+
+        output_dir = os.listdir(directory)
+        rmtree(directory)
+        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
+
+        assert_frame_equal(data_sets['dataset1'], aaa_json)
+        assert_frame_equal(data_sets['dataset1'], ds_1_csv)
+        assert_frame_equal(data_sets['dataset1'], ds_1_xls)
+
     @raises(KeyError)
     def test_data_container_save_wrong_format(self):
 
@@ -111,41 +149,3 @@ class TestDataWriter:
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
         assert_frame_equal(container.dataset1, ds_1_xls)
-
-    def test_dictionary_save_files(self):
-
-        data_sets = {'dataset1': pd.DataFrame(np.random.normal(size=(100, 2)),
-                                              columns=['A', 'B']),
-                     'dataset2': pd.DataFrame(np.random.normal(size=(120, 3)),
-                                              columns=['A', 'B', 'C'])}
-
-        directory = 'temp_directory'
-        os.makedirs(directory, exist_ok=True)
-
-        writer = DataWriter()
-        for file_type in ['json', 'csv', 'xlsx']:
-
-            if file_type != 'json':
-
-                writer.write_experiment_output(directory,
-                                               data_sets,
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
-            else:
-                writer.write_experiment_output(directory,
-                                               data_sets,
-                                               new_names_dict={'dataset1': 'aaa'},
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
-
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
-        ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
-        ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
-
-        output_dir = os.listdir(directory)
-        rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
-
-        assert_frame_equal(data_sets['dataset1'], aaa_json)
-        assert_frame_equal(data_sets['dataset1'], ds_1_csv)
-        assert_frame_equal(data_sets['dataset1'], ds_1_xls)
