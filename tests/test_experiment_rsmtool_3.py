@@ -17,15 +17,15 @@ from rsmtool.test_utils import (check_file_output,
 
 
 @parameterized([
-    # param('lr-no-standardization', 'lr_no_standardization'),
-    # param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
-    # param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
+    param('lr-no-standardization', 'lr_no_standardization'),
+    param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
+    param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
     param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
-    # param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
-    # param('lr-with-thumbnails', 'lr_with_thumbnails'),
-    # param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
-    # param('lr-with-feature-list', 'lr_with_feature_list'),
-    # param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
+    param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
+    param('lr-with-thumbnails', 'lr_with_thumbnails'),
+    param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
+    param('lr-with-feature-list', 'lr_with_feature_list'),
+    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
 ])
 def test_run_experiment(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
