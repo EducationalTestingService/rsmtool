@@ -1,0 +1,5 @@
+partition,responses,QUESTION,ITEM
+Training,500,5,5
+Evaluation,200,5,5
+Overlapping,200,5,5
+Total,500,5,5

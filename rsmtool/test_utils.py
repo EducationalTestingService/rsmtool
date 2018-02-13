@@ -1,11 +1,12 @@
 import re
+import warnings
 
 import numpy as np
-import pandas as pd
 
 from glob import glob
 from os import remove
-from os.path import basename, join
+from os.path import basename, exists, join
+from pathlib import Path
 
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
@@ -21,6 +22,54 @@ from rsmtool.rsmsummarize import run_summary
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
 html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
+
+# get the directory containing the tests
+test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
+
+
+def check_run_experiment(source,
+                         experiment_id,
+                         subgroups=None,
+                         consistency=False,
+                         skll=False,
+                         file_format='csv'):
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    model_type = 'skll' if skll or source == 'wls' else 'rsmtool'
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            check_file_output(csv_file, expected_csv_file, file_format=file_format)
+
+    check_generated_output(csv_files, experiment_id, model_type, file_format=file_format)
+
+    if not skll:
+        check_scaled_coefficients(source, experiment_id, file_format=file_format)
+
+    if subgroups:
+        check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
+
+    if consistency:
+        check_consistency_files_exist(csv_files, experiment_id, file_format=file_format)
+
+    check_report(html_report)
 
 
 def do_run_experiment(source, experiment_id, config_file):
