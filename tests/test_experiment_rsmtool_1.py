@@ -29,7 +29,7 @@ from rsmtool.test_utils import (check_run_experiment,
     param('lr-with-h2-and-length', 'lr_with_h2_and_length', consistency=True),
     param('lr-with-h2-named-sc1', 'lr_with_h2_named_sc1', consistency=True)
 ])
-def test_run_experiment(*args, **kwargs):
+def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 

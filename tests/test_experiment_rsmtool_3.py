@@ -27,7 +27,7 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-with-feature-list', 'lr_with_feature_list'),
     param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
 ])
-def test_run_experiment(*args, **kwargs):
+def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 

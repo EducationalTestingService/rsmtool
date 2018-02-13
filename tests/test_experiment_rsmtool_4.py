@@ -33,7 +33,7 @@ from rsmtool.test_utils import (check_run_experiment,
     param('positivelassocv', 'positivelassocv'),
     param('equalweightslr', 'equalweightslr')
 ])
-def test_run_experiment(*args, **kwargs):
+def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 
