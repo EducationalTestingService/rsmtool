@@ -298,12 +298,11 @@ class TestThumbnail:
 
         # simple test of HTML thumbnail conversion
 
-        path = join(test_dir, 'data', 'figures', 'figure1.svg')
-        relative_path = relpath(path)
+        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
-        clean_thumb = self.get_result(relative_path)
+        clean_thumb = self.get_result(path)
 
         eq_(clean_image, clean_thumb)
 
@@ -312,12 +311,11 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
-        path = join(test_dir, 'data', 'figures', 'figure3.png')
-        relative_path = relpath(path)
+        path = relpath(join(test_dir, 'data', 'figures', 'figure3.png'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
-        clean_thumb = self.get_result(relative_path)
+        clean_thumb = self.get_result(path)
 
         eq_(clean_image, clean_thumb)
 
@@ -325,15 +323,15 @@ class TestThumbnail:
 
         # test converting two images to HTML thumbnails
 
-        path1 = join(test_dir, 'data', 'figures', 'figure1.svg')
-        path2 = join(test_dir, 'data', 'figures', 'figure2.svg')
+        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
 
         counter = count(1)
         image = get_thumbnail_as_html(path1, next(counter))
         image = get_thumbnail_as_html(path2, next(counter))
 
         clean_image = "".join(image.strip().split())
-        clean_thumb = self.get_result(relpath(path2), 2)
+        clean_thumb = self.get_result(path2, 2)
 
         eq_(clean_image, clean_thumb)
 
@@ -341,14 +339,13 @@ class TestThumbnail:
 
         # test converting image to HTML with absolute path
 
-        path = join(test_dir, 'data', 'figures', 'figure1.svg')
+        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         path_absolute = abspath(path)
-        path_relative = relpath(path)
 
         image = get_thumbnail_as_html(path_absolute, 1)
 
         clean_image = "".join(image.strip().split())
-        clean_thumb = self.get_result(path_relative)
+        clean_thumb = self.get_result(path)
 
         eq_(clean_image, clean_thumb)
 
