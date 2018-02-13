@@ -50,7 +50,7 @@ def check_run_experiment(source,
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.csv'))
+    csv_files = glob(join(output_dir, '*.{}'.format(file_format)))
     for csv_file in csv_files:
         csv_filename = basename(csv_file)
         expected_csv_file = join(expected_output_dir, csv_filename)
