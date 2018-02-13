@@ -21,7 +21,7 @@ class TestDataWriter:
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_data_container_save_files'
+        directory = 'temp_directory_data_container_save_files_xyz'
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
@@ -59,7 +59,7 @@ class TestDataWriter:
                      'dataset2': pd.DataFrame(np.random.normal(size=(120, 3)),
                                               columns=['A', 'B', 'C'])}
 
-        directory = 'temp_directory_dictionary_save_files'
+        directory = 'temp_directory_dictionary_save_files_xyz'
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
@@ -100,7 +100,7 @@ class TestDataWriter:
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_container_save_wrong_format'
+        directory = 'temp_directory_container_save_wrong_format_xyz'
 
         writer = DataWriter()
         writer.write_experiment_output(directory,
@@ -117,7 +117,7 @@ class TestDataWriter:
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_save_files_with_id'
+        directory = 'temp_directory_save_files_with_id_xyz'
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter('test')
