@@ -50,15 +50,15 @@ def check_run_experiment(source,
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
-    csv_files = glob(join(output_dir, '*.{}'.format(file_format)))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
 
-        if exists(expected_csv_file):
-            check_file_output(csv_file, expected_csv_file, file_format=file_format)
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
-    check_generated_output(csv_files, experiment_id, model_type, file_format=file_format)
+    check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
 
     if not skll:
         check_scaled_coefficients(source, experiment_id, file_format=file_format)
@@ -67,7 +67,7 @@ def check_run_experiment(source,
         check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
 
     if consistency:
-        check_consistency_files_exist(csv_files, experiment_id, file_format=file_format)
+        check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
     check_report(html_report)
 
