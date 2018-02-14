@@ -147,6 +147,31 @@ def check_run_prediction(source, excluded=False, file_format='csv'):
         check_file_output(generated_output_file, expected_output_file)
 
 
+def check_run_summary(source, file_format='csv'):
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file)
+
+    check_report(html_report)
+
+
 def do_run_experiment(source, experiment_id, config_file):
     """
     Run RSMTool experiment using the given experiment
