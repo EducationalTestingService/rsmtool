@@ -106,6 +106,20 @@ def check_run_evaluation(source,
     check_report(html_report)
 
 
+def check_run_comparison(source,
+                         experiment_id):
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
+    check_report(html_report)
+
+
 def do_run_experiment(source, experiment_id, config_file):
     """
     Run RSMTool experiment using the given experiment
