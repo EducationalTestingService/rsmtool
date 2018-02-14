@@ -4,9 +4,9 @@
     "description": "An evaluation of LinearRegression predictions.",
     "human_score_column": "h1",
     "id_column": "id",
-    "experiment_id": "lr_evaluation",
+    "experiment_id": "lr_eval_with_xlsx_output",
     "subgroups": "QUESTION",
-    "file_format": "tsv",
+    "file_format": "xlsx",
     "scale_with": "asis",
     "trim_min": 1,
     "trim_max": 6
