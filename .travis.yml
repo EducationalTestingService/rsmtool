@@ -25,7 +25,7 @@ install:
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
 script:
-- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
+- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
 
 after_success:
 - ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
