@@ -93,15 +93,13 @@ def check_run_evaluation(source,
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
     output_files = glob(join(output_dir, '*.{}'.format(file_format)))
-    i = 0
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
 
         if exists(expected_output_file):
             check_file_output(output_file, expected_output_file, file_format=file_format)
-            i += 1
-    foo
+
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
 
