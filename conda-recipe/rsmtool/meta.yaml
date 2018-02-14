@@ -36,6 +36,7 @@ requirements:
     - skll>=1.5,<1.6
     - statsmodels>=0.8.0,<0.8.1
     - zeromq
+    - parameterized
     - setuptools
     - openpyxl
     - xlrd
@@ -57,6 +58,7 @@ requirements:
     - skll>=1.5,<1.6
     - statsmodels>=0.8.0,<0.8.1
     - zeromq
+    - parameterized
     - openpyxl
     - xlrd
     - xlwt
