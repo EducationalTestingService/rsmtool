@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 
 """
-This script is designed to update the test files.
-It takes the suffix of the output file and updates
-the test data using the files generated under `test_outputs`.
-Note that this will overwrite the original test data so make sure that
-the outputs work as expected before running the script.
+This script is designed to update the expected test output.
+It assumes that you have already run nosetests and ran the entire test suite.
+By doing so, the output has been generated under the given outputs directory.
+and that is what will be used to generate the new expected output under `tests/data/experiments`.
+
+#############################################################################################
+# IMPORTANT: DO NOT RUN THIS SCRIPT BEFORE RUNNING THE TEST SUITE OR IT WILL BE DISASTROUS. #
+#############################################################################################
+
+The scripts works as as follows. For each experiment test:
+- The script locates the output under the given outputs directory.
+- New and changed files under `test_outputs` are copied over to the expected test output location.
+- Old files in the expected test output that DO NOT exist under `test_outputs` are deleted.
+- Files that are already in the expected test output and have not changed are left alone.
+
+The script prints a log detailing the changes made for each experiment test.
 
 :author: Anastassia Loukina
 :author: Nitin Madnani
@@ -14,44 +25,70 @@ the outputs work as expected before running the script.
 
 import argparse
 import re
-import shutil
-
 
 from ast import literal_eval as eval
+from filecmp import dircmp
 from importlib.machinery import SourceFileLoader
 from inspect import getmembers, getsourcelines, isfunction
-from os.path import dirname, exists, join
+from os import remove
+from os.path import dirname, join
+from pathlib import Path
+from shutil import copyfile
 
 _MY_PATH = dirname(__file__)
 
 
-def update_test_output(source, experiment_id, filename, output_dir):
+def is_skll_excluded_file(filename):
 
-    # get the file we want to copy over
-    output_file = '{}/{}/output/{}_{}'.format(output_dir,
-                                              source,
-                                              experiment_id,
-                                              filename)
+    stem = Path(filename).stem
+    suffix = Path(filename).suffix
+    return suffix == '.model' or \
+        suffix == '.npy'or \
+        stem.endswith('_postprocessing_params') or \
+        stem.endswith('_eval') or \
+        stem.endswith('_eval_short') or \
+        stem.endswith('_confMatrix') or \
+        stem.endswith('_pred_train') or \
+        stem.endswith('_pred_processed') or \
+        stem.endswith('_score_dist')
 
-    # get the test file we want to overwrite
-    test_file = '{}/data/experiments/{}/output/{}_{}'.format(_MY_PATH,
-                                                             source,
-                                                             experiment_id,
-                                                             filename)
 
-    # check if the specified output file already exists in test data
-    if exists(output_file):
-        print('copying {} to {}'.format(output_file, test_file))
-        shutil.copy(output_file, test_file)
-    else:
-        print('{} does not exist'.format(output_file))
+def update_reference_output(source, outputs_dir, skll=False):
+
+    # locate the outputs for the experiment under the outputs directory
+    # and also locate the existing experiment outputs
+    reference_output_path = outputs_dir / source / "output"
+    existing_output_path = Path(_MY_PATH) / "data" / "experiments" / source / "output"
+
+    #  update the report files
+
+    # get a comparison betwen the two directories
+    dir_comparison = dircmp(reference_output_path, existing_output_path)
+
+    # first delete the files that only exist in the existing output directory
+    # since those are likely old files from old versions that we do not need
+    existing_output_only_files = dir_comparison.right_only
+    for file in existing_output_only_files:
+        remove(existing_output_path / file)
+
+    # Next find all the files from the reference path that are either new
+    # or changed compared to the existing path. From these we want to exclude
+    # config JSON files as well as evaluation/prediction/model files for SKLL
+    new_or_changed_files = set(dir_comparison.left_only) - set(dir_comparison.same_files)
+    new_or_changed_files = [f for f in new_or_changed_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json')]
+    if skll:
+        new_or_changed_files = [f for f in new_or_changed_files if not is_skll_excluded_file(f)]
+
+    for file in new_or_changed_files:
+        copyfile(reference_output_path / file, existing_output_path / file)
+
+    return list(existing_output_only_files), list(new_or_changed_files)
 
 
 def main():
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='update_test_files.py')
-    parser.add_argument('filename', help="The test output filename to update")
-    parser.add_argument('outputs_dir', help="The path to test_outputs")
+    parser.add_argument('outputs_dir', help="The path to the directory containing reference test outputs")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -61,11 +98,8 @@ def main():
     # they folllow the same structure.
     # see http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
     # for Python 3.5 solution
-
-    # we need to keep track of updated functions since the importing method below
-    # might lead to the same functions being part of the same module
     for test_suffix in ['rsmtool_1', 'rsmtool_2', 'rsmtool_3', 'rsmtool_4',
-                        'rsmeval', 'rsmpredict', 'rsmsummarize', 'rsmcompare']:
+                        'rsmeval', 'rsmpredict', 'rsmsummarize']:
         test_module = SourceFileLoader('test_experiment', join(_MY_PATH, 'test_experiment_{}.py'.format(test_suffix))).load_module()
 
         # iterate over all the members and focus on only the experiment functions
@@ -80,11 +114,17 @@ def main():
                 # the parameter list
                 if member_name.endswith('parameterized'):
                     for param in function.parameterized_input:
-                        source, experiment_id = param.args
-                        update_test_output(source,
-                                           experiment_id,
-                                           args.filename,
-                                           args.outputs_dir)
+                        source = param.args[0]
+                        skll = param.kwargs.get('skll', False)
+
+                        deleted, updated = update_reference_output(source,
+                                                                   Path(args.outputs_dir),
+                                                                   skll=skll)
+                        if len(deleted) > 0 or len(updated) > 0:
+                            print('{}: '.format(source))
+                            print('  - {} deleted: {}'.format(len(deleted), deleted))
+                            print('  - {} added/updated: {}'.format(len(updated), updated))
+
                 # if it's another function, then we actually inspect the source
                 # to get the source and experiment_id
                 else:
@@ -97,17 +137,17 @@ def main():
                     # directory anyway) or it was a compare or prediction test function
                     # which are not a problem for various reasons.
                     if experiment_id_line:
-                        experiment_id = eval(experiment_id_line[0].strip().split(' = ')[1])
 
                         # get the name of the source directory
                         source_line = [line for line in function_code_lines[0]
                                        if re.search(r'source = ', line)]
                         source = eval(source_line[0].strip().split(' = ')[1])
-                        update_test_output(source,
-                                           experiment_id,
-                                           args.filename,
-                                           args.outputs_dir)
-
+                        deleted, updated = update_reference_output(source,
+                                                                   Path(args.outputs_dir))
+                        if len(deleted) > 0 or len(updated) > 0:
+                            print('{}: '.format(source))
+                            print('  - {} deleted: {}'.format(len(deleted), deleted))
+                            print('  - {} added/updated: {}'.format(len(updated), updated))
 
 if __name__ == '__main__':
     main()
