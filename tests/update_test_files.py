@@ -25,6 +25,7 @@ The script prints a log detailing the changes made for each experiment test.
 
 import argparse
 import re
+import sys
 
 from ast import literal_eval as eval
 from filecmp import dircmp
@@ -93,6 +94,14 @@ def main():
     # parse given command line arguments
     args = parser.parse_args()
 
+    # print out a reminder that the user should have run the test suite
+    run_test_suite = input('Have you already run the whole test suite? (y/n): ')
+    if run_test_suite == 'n':
+        sys.exit(0)
+    elif run_test_suite != 'y':
+        print('Invalid answer. Exiting.')
+        sys.exit(1)
+
     # import the test_experiment.py test module using SourceFileLoader
     # so that it could also be used with tests in RSMExtra provided
     # they folllow the same structure.
@@ -148,6 +157,7 @@ def main():
                             print('{}: '.format(source))
                             print('  - {} deleted: {}'.format(len(deleted), deleted))
                             print('  - {} added/updated: {}'.format(len(updated), updated))
+
 
 if __name__ == '__main__':
     main()
