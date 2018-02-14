@@ -24,7 +24,7 @@ from rsmtool.test_utils import (check_run_experiment,
     param('lr-with-missing-length-values', 'lr_with_missing_length_values'),
     param('lr-with-length-zero-sd', 'lr_with_length_zero_sd'),
     param('lr-with-h2', 'lr_with_h2', consistency=True),
-    param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', ['L1', 'QUESTION'], consistency=True),
+    param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True),
     param('lr-with-h2-include-zeros', 'lr_with_h2_include_zeros', consistency=True),
     param('lr-with-h2-and-length', 'lr_with_h2_and_length', consistency=True),
     param('lr-with-h2-named-sc1', 'lr_with_h2_named_sc1', consistency=True)
