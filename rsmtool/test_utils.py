@@ -106,18 +106,45 @@ def check_run_evaluation(source,
     check_report(html_report)
 
 
-def check_run_comparison(source,
-                         experiment_id):
+def check_run_comparison(source, experiment_id):
 
     config_file = join(test_dir,
                        'data',
                        'experiments',
                        source,
                        'rsmcompare.json')
-    do_run_comparison(source, config_file)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_comparison(source, config_file)
 
     html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
     check_report(html_report)
+
+
+def check_run_prediction(source, excluded=False, file_format='csv'):
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    output_files = ['predictions.{}'.format(file_format),
+                    'preprocessed_features.{}'.format(file_format)]
+    if excluded:
+        output_files.append('predictions_excluded_responses.{}'.format(file_format))
+    for output_file in output_files:
+        generated_output_file = join(output_dir, output_file)
+        expected_output_file = join(expected_output_dir, output_file)
+
+        check_file_output(generated_output_file, expected_output_file)
 
 
 def do_run_experiment(source, experiment_id, config_file):
