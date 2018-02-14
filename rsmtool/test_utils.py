@@ -72,6 +72,42 @@ def check_run_experiment(source,
     check_report(html_report)
 
 
+def check_run_evaluation(source,
+                         experiment_id,
+                         subgroups=None,
+                         consistency=False,
+                         file_format='csv'):
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    i = 0
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
+            i += 1
+    foo
+    if consistency:
+        check_consistency_files_exist(output_files, experiment_id)
+
+    check_report(html_report)
+
+
 def do_run_experiment(source, experiment_id, config_file):
     """
     Run RSMTool experiment using the given experiment
