@@ -20,6 +20,7 @@ The script prints a log detailing the changes made for each experiment test.
 
 :author: Anastassia Loukina
 :author: Nitin Madnani
+:author: Jeremy Biggs
 :date: Feburary 2018
 """
 
@@ -54,17 +55,15 @@ def is_skll_excluded_file(filename):
         stem.endswith('_score_dist')
 
 
-def update_reference_output(source, outputs_dir, skll=False):
+def update_output(source, outputs_dir, skll=False):
 
-    # locate the outputs for the experiment under the outputs directory
-    # and also locate the existing experiment outputs
-    reference_output_path = outputs_dir / source / "output"
+    # locate the updated outputs for the experiment under the given 
+    # outputs directory and also locate the existing experiment outputs
+    updated_output_path = outputs_dir / source / "output"
     existing_output_path = Path(_MY_PATH) / "data" / "experiments" / source / "output"
 
-    #  update the report files
-
     # get a comparison betwen the two directories
-    dir_comparison = dircmp(reference_output_path, existing_output_path)
+    dir_comparison = dircmp(updated_output_path, existing_output_path)
 
     # first delete the files that only exist in the existing output directory
     # since those are likely old files from old versions that we do not need
@@ -72,7 +71,7 @@ def update_reference_output(source, outputs_dir, skll=False):
     for file in existing_output_only_files:
         remove(existing_output_path / file)
 
-    # Next find all the files from the reference path that are either new
+    # Next find all the files from the updated output path that are either new
     # or changed compared to the existing path. From these we want to exclude
     # config JSON files as well as evaluation/prediction/model files for SKLL
     new_or_changed_files = set(dir_comparison.left_only) - set(dir_comparison.same_files)
@@ -81,7 +80,7 @@ def update_reference_output(source, outputs_dir, skll=False):
         new_or_changed_files = [f for f in new_or_changed_files if not is_skll_excluded_file(f)]
 
     for file in new_or_changed_files:
-        copyfile(reference_output_path / file, existing_output_path / file)
+        copyfile(updated_output_path / file, existing_output_path / file)
 
     return list(existing_output_only_files), list(new_or_changed_files)
 
@@ -89,7 +88,7 @@ def update_reference_output(source, outputs_dir, skll=False):
 def main():
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='update_test_files.py')
-    parser.add_argument('outputs_dir', help="The path to the directory containing reference test outputs")
+    parser.add_argument('outputs_dir', help="The path to the directory containing the updated test outputs")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -97,6 +96,8 @@ def main():
     # print out a reminder that the user should have run the test suite
     run_test_suite = input('Have you already run the whole test suite? (y/n): ')
     if run_test_suite == 'n':
+        print('Please run the whole test suite using '
+              '`nosetests --nologcapture` before running this script.')
         sys.exit(0)
     elif run_test_suite != 'y':
         print('Invalid answer. Exiting.')
@@ -126,9 +127,9 @@ def main():
                         source = param.args[0]
                         skll = param.kwargs.get('skll', False)
 
-                        deleted, updated = update_reference_output(source,
-                                                                   Path(args.outputs_dir),
-                                                                   skll=skll)
+                        deleted, updated = update_output(source,
+                                                         Path(args.outputs_dir),
+                                                         skll=skll)
                         if len(deleted) > 0 or len(updated) > 0:
                             print('{}: '.format(source))
                             print('  - {} deleted: {}'.format(len(deleted), deleted))
@@ -151,8 +152,7 @@ def main():
                         source_line = [line for line in function_code_lines[0]
                                        if re.search(r'source = ', line)]
                         source = eval(source_line[0].strip().split(' = ')[1])
-                        deleted, updated = update_reference_output(source,
-                                                                   Path(args.outputs_dir))
+                        deleted, updated = update_output(source, Path(args.outputs_dir))
                         if len(deleted) > 0 or len(updated) > 0:
                             print('{}: '.format(source))
                             print('  - {} deleted: {}'.format(len(deleted), deleted))
