@@ -10,7 +10,7 @@ def readme():
         return f.read()
 
 def requirements():
-    req_path = 'conda_requirements.txt'
+    req_path = 'requirements.txt'
     with open(req_path) as f:
         reqs = f.read().splitlines()
     return reqs
@@ -31,6 +31,7 @@ setup(name='rsmtool',
                      'render_notebook = rsmtool.report:main',
                      'convert_feature_json = rsmtool.convert_feature_json:main']
                     },
+      install_requires=requirements(),
       classifiers=['Intended Audience :: Science/Research',
                    'Intended Audience :: Developers',
                    'Programming Language :: Python',
