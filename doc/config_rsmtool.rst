@@ -33,11 +33,11 @@ The tuning objective to use if a SKLL model is chosen to build the scoring model
 
 predict_expected_scores *(Optional)*
 """"""""""""""""""""""""""""""""""""
-If a probablistic SKLL classifier is chosen to build the scoring model, then *expected scores* --- probability-weighted averages over a contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default for a classifier. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
+If a probabilistic SKLL classifier is chosen to build the scoring model, then *expected scores* --- probability-weighted averages over contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default for a classifier. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
 
 .. note ::
 
-    You may see slight differences in expected score predictions if you run the experiment on different machines on operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
+    You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
 
 
 description *(Optional)*

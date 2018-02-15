@@ -843,7 +843,7 @@ class ConfigurationParser:
         # which is basically what they all are in the end.
         if context == 'rsmtool' and new_config['predict_expected_scores']:
             model_name = new_config['model']
-            dummy_learner = Learner(new_config['model']) if is_skll_model(model_name) else Learner('LinearRegression')
+            dummy_learner = Learner(model_name) if is_skll_model(model_name) else Learner('LinearRegression')
             if not hasattr(dummy_learner.model_type, 'predict_proba'):
                 raise ValueError("{} does not support expected scores "
                                  "since it is not a probablistic classifier.".format(model_name))
