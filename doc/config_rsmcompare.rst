@@ -80,7 +80,7 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``preprocessed_features_by_group``: Compares analyses of preprocessed features by subgroups: marginal and partial correlations between each feature and human score for each subgroup.
 
-    - ``consistency``: Compares metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement.
+    - ``consistency``: Compares metrics for human-human agreement, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated correlations for the whole dataset and by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
     - ``score_distributions``:
 
