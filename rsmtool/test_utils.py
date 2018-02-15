@@ -40,7 +40,7 @@ def check_run_experiment(source,
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment 
+        The name of the source directory containing the experiment
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
@@ -118,7 +118,7 @@ def check_run_evaluation(source,
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment 
+        The name of the source directory containing the experiment
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
@@ -176,7 +176,7 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment 
+        The name of the source directory containing the experiment
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
@@ -208,7 +208,7 @@ def check_run_prediction(source, excluded=False, file_format='csv', given_test_d
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment 
+        The name of the source directory containing the experiment
         configuration.
     excluded : bool, optional
         Whether to check the excluded responses file as part of the test.
@@ -255,7 +255,7 @@ def check_run_summary(source, file_format='csv', given_test_dir=None):
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment 
+        The name of the source directory containing the experiment
         configuration.
     file_format : str, optional
         Which file format is being used for the output files of the experiment.
