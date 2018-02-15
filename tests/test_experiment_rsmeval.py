@@ -8,7 +8,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
                                 do_run_evaluation,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -39,7 +39,7 @@ def test_run_experiment_lr_eval_with_cfg():
 
     source = 'lr-eval-cfg'
     experiment_id = 'lr_eval_cfg'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -47,7 +47,7 @@ def test_run_experiment_lr_eval_with_cfg():
     do_run_evaluation(source, experiment_id, config_file)
 
     output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
     csv_files = glob(join(output_dir, '*.csv'))
@@ -67,7 +67,7 @@ def test_run_experiment_lr_eval_with_repeated_ids():
     # rsmeval experiment with non-unique ids
     source = 'lr-eval-with-repeated-ids'
     experiment_id = 'lr_eval_with_repeated_ids'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -84,7 +84,7 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
 
     source = 'lr-eval-with-all-non-numeric-scores'
     experiment_id = 'lr_eval_all_non_numeric_scores'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -100,7 +100,7 @@ def test_run_experiment_lr_eval_same_system_human_score():
 
     source = 'lr-eval-same-system-human-score'
     experiment_id = 'lr_eval_same_system_human_score'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -117,7 +117,7 @@ def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
 
     source = 'lr-eval-with-all-non-numeric-machine-scores'
     experiment_id = 'lr_eval_all_non_numeric_machine_scores'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -133,7 +133,7 @@ def test_run_experiment_eval_lr_with_missing_h2_column():
     # predictions file
     source = 'lr-eval-with-missing-h2-column'
     experiment_id = 'lr_eval_with_missing_h2_column'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -149,7 +149,7 @@ def test_run_experiment_eval_lr_with_missing_candidate_column():
     # predictions file
     source = 'lr-eval-with-missing-candidate-column'
     experiment_id = 'lr_eval_with_missing_candidate_column'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -165,7 +165,7 @@ def test_run_experiment_lr_eval_wrong_path():
 
     source = 'lr-eval-with-wrong-path'
     experiment_id = 'lr_eval_with_h2'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

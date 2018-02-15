@@ -5,7 +5,7 @@ from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_comparison,
                                 do_run_comparison,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -32,7 +32,7 @@ def test_run_experiment_lr_compare_wrong_directory():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = 'lr-self-compare-wrong-directory'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -46,7 +46,7 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = 'lr-self-compare-wrong-id'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

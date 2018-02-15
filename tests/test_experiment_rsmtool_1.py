@@ -5,7 +5,7 @@ from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
                                 do_run_experiment,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -37,7 +37,7 @@ def test_run_experiment_lr_subset_feature_file_and_feature_file():
 
     source = 'lr-with-feature-subset-file-and-feature-file'
     experiment_id = 'lr_with_feature_subset_file'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -53,7 +53,7 @@ def test_run_experiment_lr_with_sc2_as_feature_name():
     # column
     source = 'lr-with-sc2-as-feature-name'
     experiment_id = 'lr_with_sc2_as_feature_name'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -69,7 +69,7 @@ def test_run_experiment_lr_with_subgroup_as_feature_name():
 
     source = 'lr-with-subgroup-as-feature-name'
     experiment_id = 'lr_with_subgroup_as_feature_name'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -86,7 +86,7 @@ def test_run_experiment_lr_all_non_numeric_scores():
 
     source = 'lr-with-all-non-numeric-scores'
     experiment_id = 'lr_with_all_non_numeric_scores'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -103,7 +103,7 @@ def test_run_experiment_lr_one_fully_non_numeric_feature():
 
     source = 'lr-with-one-fully-non-numeric-feature'
     experiment_id = 'lr_with_one_fully_non_numeric_feature'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -120,7 +120,7 @@ def test_run_experiment_lr_none_flagged():
 
     source = 'lr-with-none-flagged'
     experiment_id = 'lr_with_none_flagged'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -134,7 +134,7 @@ def test_run_experiment_wrong_model_name():
     # rsmtool experiment with incorrect model name
     source = 'wrong-model-name'
     experiment_id = 'wrong_model_name'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

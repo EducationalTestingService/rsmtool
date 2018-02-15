@@ -24,7 +24,7 @@ html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
 
 # get the directory containing the tests
-test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
+rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
 
 
 def check_run_experiment(source,
@@ -32,7 +32,11 @@ def check_run_experiment(source,
                          subgroups=None,
                          consistency=False,
                          skll=False,
-                         file_format='csv'):
+                         file_format='csv',
+                         given_test_dir=None):
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     config_file = join(test_dir,
                        'data',
@@ -76,7 +80,11 @@ def check_run_evaluation(source,
                          experiment_id,
                          subgroups=None,
                          consistency=False,
-                         file_format='csv'):
+                         file_format='csv',
+                         given_test_dir=None):
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     config_file = join(test_dir,
                        'data',
@@ -106,7 +114,10 @@ def check_run_evaluation(source,
     check_report(html_report)
 
 
-def check_run_comparison(source, experiment_id):
+def check_run_comparison(source, experiment_id, given_test_dir=None):
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     config_file = join(test_dir,
                        'data',
@@ -121,7 +132,10 @@ def check_run_comparison(source, experiment_id):
     check_report(html_report)
 
 
-def check_run_prediction(source, excluded=False, file_format='csv'):
+def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     config_file = join(test_dir,
                        'data',
@@ -147,7 +161,10 @@ def check_run_prediction(source, excluded=False, file_format='csv'):
         check_file_output(generated_output_file, expected_output_file)
 
 
-def check_run_summary(source, file_format='csv'):
+def check_run_summary(source, file_format='csv', given_test_dir=None):
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     config_file = join(test_dir,
                        'data',

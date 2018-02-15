@@ -13,7 +13,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_generated_output,
                                 check_run_experiment,
                                 do_run_experiment,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -36,14 +36,14 @@ def test_run_experiment_lr_with_cfg():
 
     source = 'lr-cfg'
     experiment_id = 'lr_cfg'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
                        '{}.cfg'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
     output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
     csv_files = glob(join(output_dir, '*.csv'))
@@ -65,7 +65,7 @@ def test_run_experiment_lr_with_object():
     source = 'lr-object'
     experiment_id = 'lr_object'
 
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -91,7 +91,7 @@ def test_run_experiment_lr_with_object():
 
     do_run_experiment(source, experiment_id, config_obj)
     output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
     csv_files = glob(join(output_dir, '*.csv'))
@@ -113,7 +113,7 @@ def test_run_experiment_duplicate_feature_names():
     # rsmtool experiment with duplicate feature names
     source = 'lr-with-duplicate-feature-names'
     experiment_id = 'lr_with_duplicate_feature_names'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -128,7 +128,7 @@ def test_run_experiment_lr_old_config():
 
     source = 'lr-old-config'
     experiment_id = 'empWt'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -147,7 +147,7 @@ def test_run_experiment_lr_feature_json():
 
     source = 'lr-feature-json'
     experiment_id = 'lr'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -165,7 +165,7 @@ def test_run_experiment_wrong_train_file_path():
     # a non-existing file
     source = 'lr-wrong-path'
     experiment_id = 'lr'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -179,7 +179,7 @@ def test_run_experiment_wrong_feature_file_path():
     # a non-existing file
     source = 'lr-wrong-path-features'
     experiment_id = 'lr'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -194,7 +194,7 @@ def test_run_experiment_lr_length_column_and_feature_list():
 
     source = 'lr-with-length-and-feature-list'
     experiment_id = 'lr_with_length_and_feature'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
