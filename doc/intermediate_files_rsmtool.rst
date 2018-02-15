@@ -3,7 +3,7 @@
 Intermediate files
 ------------------
 
-Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMTool experiment report are saved as the file format specified with ``file_format`` parameter in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
+Although the primary output of RSMTool is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool.To this end, all of the tables produced in the experiment report are saved as files in the format as specified by ``file_format`` parameter in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
 .. note::
 
@@ -236,6 +236,6 @@ These files are created only if a second human score has been made available via
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
 
-- ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
+- ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores, and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
 
 - ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 

@@ -151,7 +151,7 @@ class TestAnalyzer:
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
-        assert_equal(df_dis_corr.loc['raw', 'disattenuated_corr'], 1.0)
+        assert_equal(df_dis_corr.loc['raw', 'corr_disattenuated'], 1.0)
 
 
     def test_compute_disattenuated_correlations_matching_human(self):
@@ -162,7 +162,7 @@ class TestAnalyzer:
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
-        assert_array_equal(df_dis_corr['disattenuated_corr'], [1.0, 0.5, 1.0])
+        assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, 0.5, 1.0])
 
 
     def test_compute_disattenuated_correlations_single_matching_human(self):
@@ -173,7 +173,7 @@ class TestAnalyzer:
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
-        assert_array_equal(df_dis_corr['disattenuated_corr'], [1.0, np.nan, np.nan])
+        assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, np.nan, np.nan])
 
 
     def test_compute_disattenuated_correlations_mismatched_indices(self):
@@ -184,7 +184,7 @@ class TestAnalyzer:
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
-        assert_array_equal(df_dis_corr['disattenuated_corr'], [1.0, np.nan, np.nan])
+        assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, np.nan, np.nan])
 
 
     def test_compute_disattenuated_correlations_negative_human(self):
@@ -195,7 +195,7 @@ class TestAnalyzer:
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 2)
-        assert_array_equal(df_dis_corr['disattenuated_corr'], [np.nan, 1.0])
+        assert_array_equal(df_dis_corr['corr_disattenuated'], [np.nan, 1.0])
 
 
 
