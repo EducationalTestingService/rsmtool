@@ -9,6 +9,9 @@ from rsmtool.test_utils import (check_run_experiment,
 
 
 @parameterized([
+    param('lr-with-h2-include-zeros', 'lr_with_h2_include_zeros', consistency=True),
+    param('lr-with-h2-and-length', 'lr_with_h2_and_length', consistency=True),
+    param('lr-with-h2-named-sc1', 'lr_with_h2_named_sc1', consistency=True),
     param('lars', 'Lars', skll=True),
     param('lars-custom-objective', 'Lars_custom_objective', skll=True),
     param('logistic-regression', 'LogisticRegression', skll=True),
