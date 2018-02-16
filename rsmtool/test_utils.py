@@ -465,7 +465,7 @@ def check_file_output(file1, file2, file_format='csv'):
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
     if (file1.endswith('pca.{}'.format(file_format)) or
-        file1.endswith('factor_correlations.{}'.format(file_format))):
+            file1.endswith('factor_correlations.{}'.format(file_format))):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
