@@ -96,9 +96,10 @@ def update_output(source, outputs_dir, skll=False):
         remove(existing_output_path / file)
 
     # Next find all the NEW files in the updated outputs but do not include
-    # the config JSON files or the evaluation/prediction/model files for SKLL
+    # the config JSON files or the OLS summary files or
+    # the evaluation/prediction/model files for SKLL models
     new_files = dir_comparison.left_only
-    new_files = [f for f in new_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json')]
+    new_files = [f for f in new_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json') and not f.endswith('_ols_summary.txt')]
     if skll:
         new_files = [f for f in new_files if not is_skll_excluded_file(f)]
 
