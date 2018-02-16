@@ -83,7 +83,7 @@ def update_output(source, outputs_dir, skll=False):
     # get a comparison betwen the two directories
     dir_comparison = dircmp(updated_output_path, existing_output_path)
 
-    # if no output was found in the updated outputs directory, that's a
+    # if no output was found in the updated outputs directory, that's
     # likely to be a problem
     if not dir_comparison.left_list:
         sys.stderr.write("\nError: no updated outputs found for \"{}\".\n".format(source))
@@ -107,7 +107,7 @@ def update_output(source, outputs_dir, skll=False):
     # have actually changed beyond a tolerance level that we care about for
     # tests. To do this, we run the same function that we use when comparing
     # the files in the actual test. However, for non-tabular files, we just
-    # assume that they have really changed since we have no easy wa to compare.
+    # assume that they have really changed since we have no easy way to compare.
     changed_files = dir_comparison.diff_files
     really_changed_files = []
     for changed_file in changed_files:
