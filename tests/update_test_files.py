@@ -33,11 +33,13 @@ from filecmp import clear_cache, dircmp
 from importlib.machinery import SourceFileLoader
 from inspect import getmembers, getsourcelines, isfunction
 from os import remove
-from os.path import dirname, join
+from os.path import join
 from pathlib import Path
 from shutil import copyfile
 
-_MY_PATH = dirname(__file__)
+from rsmtool.test_utils import check_file_output
+
+_MY_PATH = Path(__file__).parent
 
 
 def is_skll_excluded_file(filename):
@@ -60,7 +62,7 @@ def update_output(source, outputs_dir, skll=False):
     # locate the updated outputs for the experiment under the given
     # outputs directory and also locate the existing experiment outputs
     updated_output_path = outputs_dir / source / "output"
-    existing_output_path = Path(_MY_PATH) / "data" / "experiments" / source / "output"
+    existing_output_path = _MY_PATH / "data" / "experiments" / source / "output"
 
     # make sure both the directories exist
     try:
@@ -74,12 +76,18 @@ def update_output(source, outputs_dir, skll=False):
     try:
         assert existing_output_path.exists()
     except AssertionError:
-        sys.stderr.write("\nError: the test directory for \"{}\" does not contain "
-                         "an output directory. Please create one.\n".format(source))
-        sys.exit(1)
+        sys.stderr.write("\nNo existing output for \"{}\". "
+                         "Creating directory ...\n".format(source))
+        existing_output_path.mkdir(parents=True)
 
     # get a comparison betwen the two directories
     dir_comparison = dircmp(updated_output_path, existing_output_path)
+
+    # if no output was found in the updated outputs directory, that's a
+    # likely to be a problem
+    if not dir_comparison.left_list:
+        sys.stderr.write("\nError: no updated outputs found for \"{}\".\n".format(source))
+        sys.exit(1)
 
     # first delete the files that only exist in the existing output directory
     # since those are likely old files from old versions that we do not need
@@ -87,17 +95,44 @@ def update_output(source, outputs_dir, skll=False):
     for file in existing_output_only_files:
         remove(existing_output_path / file)
 
-    # Next find all the files from the updated output path that are either new
-    # or changed compared to the existing path. From these we want to exclude
-    # config JSON files as well as evaluation/prediction/model files for SKLL
-    new_or_changed_files = set(dir_comparison.left_only) | set(dir_comparison.diff_files)
-    new_or_changed_files = [f for f in new_or_changed_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json')]
+    # Next find all the NEW files in the updated outputs but do not include
+    # the config JSON files or the evaluation/prediction/model files for SKLL
+    new_files = dir_comparison.left_only
+    new_files = [f for f in new_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json')]
     if skll:
-        new_or_changed_files = [f for f in new_or_changed_files if not is_skll_excluded_file(f)]
+        new_files = [f for f in new_files if not is_skll_excluded_file(f)]
 
+    # next we get the files that have changed and try to figure out if they
+    # have actually changed beyond a tolerance level that we care about for
+    # tests. To do this, we run the same function that we use when comparing
+    # the files in the actual test. However, for non-tabular files, we just
+    # assume that they have really changed since we have no easy wa to compare.
+    changed_files = dir_comparison.diff_files
+    really_changed_files = []
+    for changed_file in changed_files:
+        include_file = True
+        updated_output_filepath = updated_output_path / changed_file
+        existing_output_filepath = existing_output_path / changed_file
+        file_format = updated_output_filepath.suffix.lstrip('.')
+        if file_format in ['csv', 'tsv', 'xlsx']:
+            try:
+                check_file_output(str(updated_output_filepath),
+                                  str(existing_output_filepath),
+                                  file_format=file_format)
+            except AssertionError:
+                pass
+            else:
+                include_file = False
+
+        if include_file:
+            really_changed_files.append(changed_file)
+
+    # Copy over the new files as well as the really changed files
+    new_or_changed_files = new_files + really_changed_files
     for file in new_or_changed_files:
         copyfile(updated_output_path / file, existing_output_path / file)
 
+    # return lists of files we deleted and updated
     return sorted(existing_output_only_files), sorted(new_or_changed_files)
 
 
@@ -129,7 +164,8 @@ def main():
     # for Python 3.5 solution
     for test_suffix in ['rsmtool_1', 'rsmtool_2', 'rsmtool_3', 'rsmtool_4',
                         'rsmeval', 'rsmpredict', 'rsmsummarize']:
-        test_module = SourceFileLoader('test_experiment', join(_MY_PATH, 'test_experiment_{}.py'.format(test_suffix))).load_module()
+        test_module_path = join(_MY_PATH, 'test_experiment_{}.py'.format(test_suffix))
+        test_module = SourceFileLoader('test_experiment', test_module_path).load_module()
 
         # iterate over all the members and focus on only the experiment functions
         # and try to get the source and the experiment ID since that's what we
