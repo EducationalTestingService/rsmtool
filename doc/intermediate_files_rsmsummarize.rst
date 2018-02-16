@@ -1,9 +1,9 @@
 .. _intermediate_files_rsmsummarize:
 
-Intermediate CSV files
-""""""""""""""""""""""
+Intermediate files
+""""""""""""""""""
 
-Although the primary output of RSMSummarize is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in an RSMSummarize experiment report are saved as ``.csv`` files in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
+Although the primary output of RSMSummarize is an HTML report, we also want the user to be able to conduct additional analyses outside of RSMTool. To this end, all of the tables produced in the experiment report are saved as files in the format as specified by ``file_format`` parameter in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
 .. note::
 
@@ -13,14 +13,14 @@ Although the primary output of RSMSummarize is an HTML report, we also want the 
 Marginal and partial correlations with score
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-filenames: ``margcor_score_all_data.csv``, ``pcor_score_all_data.csv``, ```pcor_score_no_length_all_data.csv``
+filenames: ``margcor_score_all_data``, ``pcor_score_all_data``, ```pcor_score_no_length_all_data``
 
 The first file contains the marginal correlations between each pre-processed feature and human score. The second file contains the partial correlation between each pre-processed feature and human score after controlling for all other features. The third file contains the partial correlations between each pre-processed feature and human score after controlling for response length, if ``length_column`` was specified in the configuration file.
 
 Model information
 ^^^^^^^^^^^^^^^^^
 
-- ``model_summary.csv``
+- ``model_summary``
 
 This file contains the main information about the models included into the report including:
 
@@ -29,9 +29,9 @@ This file contains the main information about the models included into the repor
     - The learner
     - The label used to train the model
 
-- ``betas.csv``: standardized coefficients (for built-in models only).
+- ``betas``: standardized coefficients (for built-in models only).
 
-- ``model_fit.csv``: R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding.
+- ``model_fit``: R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding.
 
 
 .. note::
@@ -41,7 +41,7 @@ This file contains the main information about the models included into the repor
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
 
-- ``eval_short.csv`` - descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
+- ``eval_short`` - descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
     - h_mean
     - h_sd

@@ -34,7 +34,37 @@ def check_run_experiment(source,
                          skll=False,
                          file_format='csv',
                          given_test_dir=None):
+    """
+    Function to run for a parameterized rsmtool experiment test.
 
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    subgroups : list of str, optional
+        List of subgroup names used in the experiment. If specified,
+        outputs pertaining to subgroups are also checked as part of the
+        test.
+    consistency : bool, optional
+        Whether to check consistency files as part of the experiment test.
+        Generally, this should be true if the second human score column is
+        specified. Defaults to `False`.
+    skll : bool, optional
+        Whether the model being used in the experiment is a SKLL model
+        in which case the coefficients, predictions, etc. will not be
+        checked since they can vary across machines, due to parameter tuning.
+        Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
@@ -82,7 +112,32 @@ def check_run_evaluation(source,
                          consistency=False,
                          file_format='csv',
                          given_test_dir=None):
+    """
+    Function to run for a parameterized rsmeval experiment test.
 
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    subgroups : list of str, optional
+        List of subgroup names used in the experiment. If specified,
+        outputs pertaining to subgroups are also checked as part of the
+        test.
+    consistency : bool, optional
+        Whether to check consistency files as part of the experiment test.
+        Generally, this should be true if the second human score column is
+        specified. Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
@@ -115,7 +170,21 @@ def check_run_evaluation(source,
 
 
 def check_run_comparison(source, experiment_id, given_test_dir=None):
+    """
+    Function to run for a parameterized rsmcompare experiment test.
 
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
@@ -133,7 +202,25 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
 
 
 def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
+    """
+    Function to run for a parameterized rsmpredict experiment test.
 
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    excluded : bool, optional
+        Whether to check the excluded responses file as part of the test.
+        Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
@@ -162,7 +249,22 @@ def check_run_prediction(source, excluded=False, file_format='csv', given_test_d
 
 
 def check_run_summary(source, file_format='csv', given_test_dir=None):
+    """
+    Function to run for a parameterized rsmsummarize experiment test.
 
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
@@ -363,7 +465,7 @@ def check_file_output(file1, file2, file_format='csv'):
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
     if (file1.endswith('pca.{}'.format(file_format)) or
-        file1.endswith('factor_correlations.{}'.format(file_format))):
+            file1.endswith('factor_correlations.{}'.format(file_format))):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
@@ -533,7 +635,8 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format='c
         Defaults to 'csv'.
     """
     file_must_have = ["_consistency.{}".format(file_format),
-                      "_degradation.{}".format(file_format)]
+                      "_degradation.{}".format(file_format),
+                      "_disattenuated_correlations.{}".format(file_format)]
 
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
