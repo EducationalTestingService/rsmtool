@@ -1,25 +1,27 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    sc1   R-squared:                       0.371
+Model:                            OLS   Adj. R-squared:                  0.367
+Method:                 Least Squares   F-statistic:                     97.31
+Date:                Thu, 15 Feb 2018   Prob (F-statistic):           1.53e-49
+Time:                        19:55:12   Log-Likelihood:                -491.24
+No. Observations:                 500   AIC:                             990.5
+Df Residuals:                     496   BIC:                             1007.
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          3.4200      0.029    117.847      0.000       3.363       3.477
+FEATURE1       0.4305      0.030     14.386      0.000       0.372       0.489
+FEATURE2       0.1599      0.030      5.349      0.000       0.101       0.219
+FEATURE7       0.0379      0.029      1.305      0.193      -0.019       0.095
+==============================================================================
+Omnibus:                       21.205   Durbin-Watson:                   2.174
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               26.993
+Skew:                          -0.397   Prob(JB):                     1.38e-06
+Kurtosis:                       3.815   Cond. No.                         1.28
+==============================================================================
 
--------------------------Summary of Regression Analysis-------------------------
-
-Formula: Y ~ <FEATURE1> + <FEATURE2> + <FEATURE7> + <intercept>
-
-Number of Observations:         500
-Number of Degrees of Freedom:   4
-
-R-squared:         0.3705
-Adj R-squared:     0.3667
-
-Rmse:              0.6489
-
-F-stat (3, 496):    97.3126, p-value:     0.0000
-
-Degrees of Freedom: model 3, resid 496
-
------------------------Summary of Estimated Coefficients------------------------
-      Variable       Coef    Std Err     t-stat    p-value    CI 2.5%   CI 97.5%
---------------------------------------------------------------------------------
-      FEATURE1     0.4305     0.0299      14.39     0.0000     0.3719     0.4892
-      FEATURE2     0.1599     0.0299       5.35     0.0000     0.1013     0.2185
-      FEATURE7     0.0379     0.0291       1.30     0.1926    -0.0191     0.0949
-     intercept     3.4200     0.0290     117.85     0.0000     3.3631     3.4769
----------------------------------End of Summary---------------------------------
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

@@ -1,32 +1,32 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    sc1   R-squared:                       0.486
+Model:                            OLS   Adj. R-squared:                  0.474
+Method:                 Least Squares   F-statistic:                     40.37
+Date:                Thu, 15 Feb 2018   Prob (F-statistic):           4.55e-45
+Time:                        20:01:53   Log-Likelihood:                -302.50
+No. Observations:                 350   AIC:                             623.0
+Df Residuals:                     341   BIC:                             657.7
+Df Model:                           8                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          3.4114      0.031    109.697      0.000       3.350       3.473
+FEATURE1       0.3296      0.040      8.261      0.000       0.251       0.408
+FEATURE2       0.0340      0.035      0.961      0.337      -0.036       0.104
+FEATURE3       0.1864      0.039      4.787      0.000       0.110       0.263
+FEATURE4       0.1107      0.038      2.877      0.004       0.035       0.186
+FEATURE5       0.0318      0.036      0.891      0.373      -0.038       0.102
+FEATURE6       0.1229      0.035      3.465      0.001       0.053       0.193
+FEATURE7      -0.0297      0.031     -0.944      0.346      -0.091       0.032
+FEATURE8      -0.0396      0.031     -1.261      0.208      -0.101       0.022
+==============================================================================
+Omnibus:                        5.945   Durbin-Watson:                   2.306
+Prob(Omnibus):                  0.051   Jarque-Bera (JB):                7.358
+Skew:                          -0.148   Prob(JB):                       0.0253
+Kurtosis:                       3.646   Cond. No.                         2.66
+==============================================================================
 
--------------------------Summary of Regression Analysis-------------------------
-
-Formula: Y ~ <FEATURE1> + <FEATURE2> + <FEATURE3> + <FEATURE4> + <FEATURE5>
-             + <FEATURE6> + <FEATURE7> + <FEATURE8> + <intercept>
-
-Number of Observations:         350
-Number of Degrees of Freedom:   9
-
-R-squared:         0.4864
-Adj R-squared:     0.4744
-
-Rmse:              0.5818
-
-F-stat (8, 341):    40.3731, p-value:     0.0000
-
-Degrees of Freedom: model 8, resid 341
-
------------------------Summary of Estimated Coefficients------------------------
-      Variable       Coef    Std Err     t-stat    p-value    CI 2.5%   CI 97.5%
---------------------------------------------------------------------------------
-      FEATURE1     0.3296     0.0399       8.26     0.0000     0.2514     0.4077
-      FEATURE2     0.0340     0.0354       0.96     0.3371    -0.0354     0.1034
-      FEATURE3     0.1864     0.0389       4.79     0.0000     0.1101     0.2627
-      FEATURE4     0.1107     0.0385       2.88     0.0043     0.0353     0.1861
-      FEATURE5     0.0318     0.0357       0.89     0.3735    -0.0382     0.1018
---------------------------------------------------------------------------------
-      FEATURE6     0.1229     0.0355       3.46     0.0006     0.0534     0.1924
-      FEATURE7    -0.0297     0.0314      -0.94     0.3459    -0.0913     0.0319
-      FEATURE8    -0.0396     0.0314      -1.26     0.2082    -0.1010     0.0219
-     intercept     3.4114     0.0311     109.70     0.0000     3.3505     3.4724
----------------------------------End of Summary---------------------------------
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

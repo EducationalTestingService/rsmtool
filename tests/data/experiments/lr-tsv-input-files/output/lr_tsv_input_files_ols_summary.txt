@@ -3,8 +3,8 @@
 Dep. Variable:                    sc1   R-squared:                       0.497
 Model:                            OLS   Adj. R-squared:                  0.489
 Method:                 Least Squares   F-statistic:                     60.66
-Date:                Wed, 14 Feb 2018   Prob (F-statistic):           1.66e-68
-Time:                        17:32:59   Log-Likelihood:                -435.13
+Date:                Thu, 15 Feb 2018   Prob (F-statistic):           1.66e-68
+Time:                        20:03:22   Log-Likelihood:                -435.13
 No. Observations:                 500   AIC:                             888.3
 Df Residuals:                     491   BIC:                             926.2
 Df Model:                           8                                         
