@@ -1,0 +1,42 @@
+{
+    "special_sections": null,
+    "features": "features.csv",
+    "general_sections": [
+        "all"
+    ],
+    "exclude_zero_scores": true,
+    "human_score_column": "sc1",
+    "test_label_column": "score",
+    "scale_with": null,
+    "section_order": null,
+    "description_new": "",
+    "trim_min": 1,
+    "trim_max": 6,
+    "use_scaled_predictions": true,
+    "candidate_column": "CANDIDATE_ID",
+    "min_items_per_candidate": null,
+    "use_scaled_predictions_old": false,
+    "feature_subset_file": null,
+    "use_scaled_predictions_new": false,
+    "length_column": null,
+    "feature_subset": null,
+    "subgroups": [
+        "QUESTION",
+        "ITEM"
+    ],
+    "form_level_scores": null,
+    "model": "LinearRegression",
+    "experiment_id": "lr_subgroups",
+    "id_column": "ID",
+    "test_file": "../../files/test_with_candidate_id_with_leading_zeros.csv",
+    "flag_column": null,
+    "description": "Using all the features with an LinearRegression model and including subgroup analyses where one of the subgroups has numeric values.",
+    "sign": null,
+    "train_label_column": "score",
+    "description_old": "",
+    "select_transformations": false,
+    "feature_prefix": null,
+    "second_human_score_column": null,
+    "train_file": "../../files/train_with_candidate_id_with_leading_zeros.csv",
+    "custom_sections": null
+}
