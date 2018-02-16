@@ -158,6 +158,10 @@ def main():
         print('Invalid answer. Exiting.')
         sys.exit(1)
 
+    # initialize overall lists of deleted/updated files
+    overall_deleted = []
+    overall_updated = []
+
     # import the test_experiment.py test module using SourceFileLoader
     # so that it could also be used with tests in RSMExtra provided
     # they folllow the same structure.
@@ -186,10 +190,11 @@ def main():
                         deleted, updated = update_output(source,
                                                          Path(args.outputs_dir),
                                                          skll=skll)
-                        if len(deleted) > 0 or len(updated) > 0:
-                            print('{}: '.format(source))
-                            print('  - {} deleted: {}'.format(len(deleted), deleted))
-                            print('  - {} added/updated: {}'.format(len(updated), updated))
+                        if len(deleted) > 0:
+                            overall_deleted.extend([(source, deleted_file) for deleted_file in deleted])
+
+                        if len(updated) > 0:
+                            overall_updated.extend([(source, updated_file) for updated_file in updated])
 
                 # if it's another function, then we actually inspect the source
                 # to get the source and experiment_id
@@ -209,10 +214,33 @@ def main():
                                        if re.search(r'source = ', line)]
                         source = eval(source_line[0].strip().split(' = ')[1])
                         deleted, updated = update_output(source, Path(args.outputs_dir))
-                        if len(deleted) > 0 or len(updated) > 0:
-                            print('{}: '.format(source))
-                            print('  - {} deleted: {}'.format(len(deleted), deleted))
-                            print('  - {} added/updated: {}'.format(len(updated), updated))
+                        if len(deleted) > 0:
+                            overall_deleted.extend([(source, deleted_file) for deleted_file in deleted])
+
+                        if len(updated) > 0:
+                            overall_updated.extend([(source, updated_file) for updated_file in updated])
+
+    # print out the number and list of overall deleted files
+    print('{} deleted:'.format(len(overall_deleted)))
+    for source, deleted_file in overall_deleted:
+        print('{} {}'.format(source, deleted_file))
+    print()
+
+    # find the added/updated files that are not model files
+    overall_updated_non_model = [(source, updated_file) for (source, updated_file)
+                                 in overall_updated if not updated_file.endswith('.model') and
+                                 not updated_file.endswith('ols') and
+                                 not updated_file.endswith('.npy')]
+
+    # print out the number and list of overall added/updated non-model files
+    print('{} added/updated:'.format(len(overall_updated_non_model)))
+    for source, updated_file in overall_updated_non_model:
+        print('{} {}'.format(source, updated_file))
+    print()
+
+    # print out a summary statement for added/updated model files
+    num_updated_model_files = len(overall_updated) - len(overall_updated_non_model)
+    print('{} model files (*.ols/*.model/*.npy) added/updated.'.format(num_updated_model_files))
 
 
 if __name__ == '__main__':
