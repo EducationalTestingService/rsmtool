@@ -1,11 +1,12 @@
 import re
+import warnings
 
 import numpy as np
-import pandas as pd
 
 from glob import glob
 from os import remove
-from os.path import basename, join
+from os.path import basename, exists, join
+from pathlib import Path
 
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
@@ -21,6 +22,273 @@ from rsmtool.rsmsummarize import run_summary
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
 html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
+
+# get the directory containing the tests
+rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
+
+
+def check_run_experiment(source,
+                         experiment_id,
+                         subgroups=None,
+                         consistency=False,
+                         skll=False,
+                         file_format='csv',
+                         given_test_dir=None):
+    """
+    Function to run for a parameterized rsmtool experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    subgroups : list of str, optional
+        List of subgroup names used in the experiment. If specified,
+        outputs pertaining to subgroups are also checked as part of the
+        test.
+    consistency : bool, optional
+        Whether to check consistency files as part of the experiment test.
+        Generally, this should be true if the second human score column is
+        specified. Defaults to `False`.
+    skll : bool, optional
+        Whether the model being used in the experiment is a SKLL model
+        in which case the coefficients, predictions, etc. will not be
+        checked since they can vary across machines, due to parameter tuning.
+        Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    model_type = 'skll' if skll else 'rsmtool'
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_experiment(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
+
+    check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
+
+    if not skll:
+        check_scaled_coefficients(source, experiment_id, file_format=file_format)
+
+    if subgroups:
+        check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
+
+    if consistency:
+        check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
+
+    check_report(html_report)
+
+
+def check_run_evaluation(source,
+                         experiment_id,
+                         subgroups=None,
+                         consistency=False,
+                         file_format='csv',
+                         given_test_dir=None):
+    """
+    Function to run for a parameterized rsmeval experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    subgroups : list of str, optional
+        List of subgroup names used in the experiment. If specified,
+        outputs pertaining to subgroups are also checked as part of the
+        test.
+    consistency : bool, optional
+        Whether to check consistency files as part of the experiment test.
+        Generally, this should be true if the second human score column is
+        specified. Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_evaluation(source, experiment_id, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
+
+    if consistency:
+        check_consistency_files_exist(output_files, experiment_id)
+
+    check_report(html_report)
+
+
+def check_run_comparison(source, experiment_id, given_test_dir=None):
+    """
+    Function to run for a parameterized rsmcompare experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmcompare.json')
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_comparison(source, config_file)
+
+    html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
+    check_report(html_report)
+
+
+def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
+    """
+    Function to run for a parameterized rsmpredict experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    excluded : bool, optional
+        Whether to check the excluded responses file as part of the test.
+        Defaults to `False`.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmpredict.json')
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        do_run_prediction(source, config_file)
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    output_files = ['predictions.{}'.format(file_format),
+                    'preprocessed_features.{}'.format(file_format)]
+    if excluded:
+        output_files.append('predictions_excluded_responses.{}'.format(file_format))
+    for output_file in output_files:
+        generated_output_file = join(output_dir, output_file)
+        expected_output_file = join(expected_output_dir, output_file)
+
+        check_file_output(generated_output_file, expected_output_file)
+
+
+def check_run_summary(source, file_format='csv', given_test_dir=None):
+    """
+    Function to run for a parameterized rsmsummarize experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to 'csv'.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    config_file = join(test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+
+    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file)
+
+    check_report(html_report)
 
 
 def do_run_experiment(source, experiment_id, config_file):
@@ -197,15 +465,21 @@ def check_file_output(file1, file2, file_format='csv'):
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
     if (file1.endswith('pca.{}'.format(file_format)) or
-        file1.endswith('factor_correlations.{}'.format(file_format))):
+            file1.endswith('factor_correlations.{}'.format(file_format))):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
 
-    assert_frame_equal(df1.sort_index(axis=1),
-                       df2.sort_index(axis=1),
-                       check_exact=False,
-                       check_less_precise=True)
+    try:
+        assert_frame_equal(df1.sort_index(axis=1),
+                           df2.sort_index(axis=1),
+                           check_exact=False,
+                           check_less_precise=True)
+    except AssertionError as e:
+        message = e.args[0]
+        new_message = 'File {} - {}'.format(basename(file1), message)
+        e.args = (new_message, )
+        raise
 
 
 def check_report(html_file):

@@ -1,0 +1,31 @@
+language: python
+python:
+- 3.6
+notifications:
+  email: false
+  slack:
+    secure: QshUa/5NpsPSu8DlOS3VtpxcV2ijiXsRGKTR7AFn53vIaZaZ/0hTLJLpf+cz3E73kpMbj75jFGu54habUm3+SlHHQm60iJ+A8QHg625R9yp7x8A3Yv2KrrYsVrOHFoEmQQ60aDrS/MtxLd6yCr5sSyZdEedhhetkSlr6t+Mz8pxeWL8S/iuA3nkVUWzLyXtf59PpaVg3FkcrWNOsjXz6m1QlyvX1ZeDeLSm3Ag3hW2aJDcJWXj7mlSX4wwwgYkj8FJLTmzAMjN7BOQA2txe+G5TjS/bl6UEo5hNPUVJ6fa4IpU/saafsqVy5kOvDHxPXKJsFGBS4vTQAQzPrAG4tFZL+LO/X4cCyQtsXiUsIMP8oQ0yg2qdBgbQsmBpDVj/sp+5kuCJVd9W6OPupiQ53INllp019nMzqiqjGtylHhxFHi8X5V89LBdN9ajMCVkxbfUTcM/jUqJoCfPntD+3nZHu3VTgDka0vVY+gQDFHJnAew/n4hbYx4qoleAiOxh6eXJ8fRQwNO7R0L6gdFxqVvZ69fKDUlMnzCqGMwI0s4mjDQ8duNSUPf6t1k+u0U9HzV9BKBiGnBIUw2s1YcALILggUQT4B+5rRmeoTx5+mOXGI3IPbUpcNuAMstO/vAG+Ub4mY+w0dhabNtTb2oPD6PBe4SRcEggB3EU8Qd/3xpkA=
+env:
+- TESTFILES="tests/test_experiment_rsmtool_1.py"
+- TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
+- TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py"
+- TESTFILES="tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
+- TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
+sudo: false
+before_install:
+- wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+- if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
+- chmod +x miniconda.sh
+- ./miniconda.sh -b -f
+- ${HOME}/miniconda3/bin/conda update --yes conda
+
+install:
+- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes --quiet
+- ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
+- ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
+
+script:
+- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
+
+after_success:
+- ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
