@@ -29,7 +29,7 @@ import re
 import sys
 
 from ast import literal_eval as eval
-from filecmp import dircmp
+from filecmp import clear_cache, dircmp
 from importlib.machinery import SourceFileLoader
 from inspect import getmembers, getsourcelines, isfunction
 from os import remove
@@ -57,10 +57,26 @@ def is_skll_excluded_file(filename):
 
 def update_output(source, outputs_dir, skll=False):
 
-    # locate the updated outputs for the experiment under the given 
+    # locate the updated outputs for the experiment under the given
     # outputs directory and also locate the existing experiment outputs
     updated_output_path = outputs_dir / source / "output"
     existing_output_path = Path(_MY_PATH) / "data" / "experiments" / source / "output"
+
+    # make sure both the directories exist
+    try:
+        assert updated_output_path.exists()
+    except AssertionError:
+        sys.stderr.write("\nError: the given directory with updated "
+                         "test outputs does not contain the outputs for "
+                         "the \"{}\" experiment.\n".format(source))
+        sys.exit(1)
+
+    try:
+        assert existing_output_path.exists()
+    except AssertionError:
+        sys.stderr.write("\nError: the test directory for \"{}\" does not contain "
+                         "an output directory. Please create one.\n".format(source))
+        sys.exit(1)
 
     # get a comparison betwen the two directories
     dir_comparison = dircmp(updated_output_path, existing_output_path)
@@ -74,7 +90,7 @@ def update_output(source, outputs_dir, skll=False):
     # Next find all the files from the updated output path that are either new
     # or changed compared to the existing path. From these we want to exclude
     # config JSON files as well as evaluation/prediction/model files for SKLL
-    new_or_changed_files = set(dir_comparison.left_only) - set(dir_comparison.same_files)
+    new_or_changed_files = set(dir_comparison.left_only) | set(dir_comparison.diff_files)
     new_or_changed_files = [f for f in new_or_changed_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json')]
     if skll:
         new_or_changed_files = [f for f in new_or_changed_files if not is_skll_excluded_file(f)]
@@ -82,7 +98,7 @@ def update_output(source, outputs_dir, skll=False):
     for file in new_or_changed_files:
         copyfile(updated_output_path / file, existing_output_path / file)
 
-    return list(existing_output_only_files), list(new_or_changed_files)
+    return sorted(existing_output_only_files), sorted(new_or_changed_files)
 
 
 def main():
@@ -92,6 +108,9 @@ def main():
 
     # parse given command line arguments
     args = parser.parse_args()
+
+    # invalidate the filecmp cache so that it starts fresh
+    clear_cache()
 
     # print out a reminder that the user should have run the test suite
     run_test_suite = input('Have you already run the whole test suite? (y/n): ')
