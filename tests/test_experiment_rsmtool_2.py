@@ -7,6 +7,10 @@ from rsmtool.test_utils import (check_run_experiment,
                                 do_run_experiment,
                                 rsmtool_test_dir)
 
+# set this to False to disable auto-updating of all experiment
+# tests contained in this file via `update_files.py`.
+_AUTO_UPDATE = True
+
 
 @parameterized([
     param('lr-with-defaults-as-extra-columns', 'lr_with_defaults_as_extra_columns', consistency=True),
