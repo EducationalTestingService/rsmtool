@@ -872,7 +872,7 @@ class FileUpdater(object):
         # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:
             test_module_path = join(self.tests_directory, 'test_experiment_{}.py'.format(test_suffix))
-            test_module = SourceFileLoader('test_experiment', test_module_path).load_module()
+            test_module = SourceFileLoader('loaded_{}'.format(test_suffix), test_module_path).load_module()
 
             # make sure that the module tells us that it wants to be updated
             if not test_module._AUTO_UPDATE:
