@@ -7,7 +7,7 @@ import numpy as np
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink
-from os.path import abspath,dirname, join, relpath
+from os.path import abspath, dirname, join, relpath
 
 from rsmtool.utils import (float_format_func,
                            int_or_float_format_func,
