@@ -74,7 +74,7 @@ def main():
     # run the file updates
     updater.run()
 
-    # now print the report from the report
+    # now print the report from the updated object
     updater.print_report()
 
 
