@@ -9,6 +9,7 @@ from rsmtool.test_utils import (check_run_comparison,
 
 # set this to False to disable auto-updating of all experiment
 # tests contained in this file via `update_files.py`.
+# TODO: re-enable this once we start saving rsmcompare outputs
 _AUTO_UPDATE = False
 
 
