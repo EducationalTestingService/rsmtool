@@ -879,40 +879,39 @@ class FileUpdater(object):
                 continue
 
             # iterate over all the members and focus on only the experiment functions
-            # and try to get the source and the experiment ID since that's what we
-            # need to update the test files
+            # but skip over the functions that are decorated with '@raises' since those
+            # functions do not need any test data to be updated. For the rest, try to get
+            # the source since that's what we need to update the test files
             for member_name, member_object in getmembers(test_module):
                 if isfunction(member_object) and member_name.startswith('test_run_experiment'):
                     function = member_object
 
-                    # first we check if it's the parameterized function and if so
-                    # we can easily get the source and the experiment ID from
-                    # the parameter list
+                    # get the qualified name of the member function
+                    member_qualified_name = member_object.__qualname__
+
+                    # check if it has 'raises' in the qualified name and skip it, if it does
+                    if 'raises' in member_qualified_name:
+                        continue
+
+                    print(member_name)
+
+                    # otherwise first we check if it's the parameterized function and if so
+                    # we can easily get the source from the parameter list
                     if member_name.endswith('parameterized'):
                         for param in function.parameterized_input:
                             source_name = param.args[0]
                             skll = param.kwargs.get('skll', False)
                             self.update_source(source_name, skll=skll)
 
-                    # if it's another function, then we actually inspect the source
-                    # to get the source and experiment_id and this can never be a
-                    # SKLL experiment since those should always be run parameterized
+                    # if it's another function, then we actually inspect the code
+                    # to get the source. Note that this should never be a SKLL experiment
+                    # since those should always be run parameterized
                     else:
                         function_code_lines = getsourcelines(function)
-                        experiment_id_line = [line for line in function_code_lines[0]
-                                              if re.search(r'experiment_id = ', line)]
-
-                        # if there was no experiment ID specified, it was either a
-                        # a decorated test function (which means it wouldn't have an 'output'
-                        # directory anyway) or it was a compare or prediction test function
-                        # which are not a problem for various reasons.
-                        if experiment_id_line:
-
-                            # get the name of the source directory
-                            source_line = [line for line in function_code_lines[0]
-                                           if re.search(r'source = ', line)]
-                            source_name = eval(source_line[0].strip().split(' = ')[1])
-                            self.update_source(source_name)
+                        source_line = [line for line in function_code_lines[0]
+                                       if re.search(r'source = ', line)]
+                        source_name = eval(source_line[0].strip().split(' = ')[1])
+                        self.update_source(source_name)
 
     def print_report(self):
         """
