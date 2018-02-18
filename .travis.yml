@@ -28,4 +28,4 @@ script:
 - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
 
 after_success:
-- ${HOME}/miniconda3/envs/rsmenv/bin/coveralls
+- ${HOME}/miniconda3/envs/rsmenv/bin/coveralls -c .coveragerc
