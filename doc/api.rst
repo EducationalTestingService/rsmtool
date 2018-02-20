@@ -4,6 +4,34 @@ API Documentation
 -----------------
 The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, :ref:`rsmcompare <usage_rsmcompare>`, and :ref:`rsmsummarize <usage_rsmsummarize>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
 
+.. note::
+    
+    Previous versions of the RSMTool API provided the functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. If you are using these functions in your code and want to migrate to the new API, you should replace the follwing statements in your code:
+
+    .. code-block:: python
+
+        from rsmtool.analysis import metrics_helper
+        metrics_helper(...)
+
+        from rsmtool.report import convert_ipynb_to_html
+        convert_ipynb_to_html(...)
+        
+        from rsmtool.preprocess import remove_outliers
+        remove_outliers(...)
+
+    with the following, respectively:
+
+    .. code-block:: python
+
+        from rsmtool.analyzer import Analyzer
+        Analyzer.metrics_helper(...)
+
+        from rsmtool.reporter import Reporter
+        Reporter.convert_ipynb_to_htmlfr(...)
+        
+        from rsmtool.preprocessor import FeaturePreprocessor
+        FeaturePreprocessor.remove_outliers(...)
+
 :mod:`rsmtool` Package
 ======================
 
@@ -41,6 +69,10 @@ From :py:mod:`~rsmtool.container` Module
     :undoc-members:
     :show-inheritance:
 
+From :py:mod:`~rsmtool.convert_feature_json` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.convert_feature_json_file
+
 From :py:mod:`~rsmtool.modeler` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.modeler
@@ -76,14 +108,19 @@ From :py:mod:`~rsmtool.transformer` Module
     :undoc-members:
     :show-inheritance:
 
+From :py:mod:`~rsmtool.utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.utils.agreement
+.. autofunction:: rsmtool.utils.partial_correlations
+.. autofunction:: rsmtool.utils.get_thumbnail_as_html
+.. autofunction:: rsmtool.utils.show_thumbnail
+.. autofunction:: rsmtool.utils.compute_expected_scores_from_model
+.. autofunction:: rsmtool.utils.parse_json_with_comments
+
 From :py:mod:`~rsmtool.writer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.writer
     :members:
     :undoc-members:
     :show-inheritance:
-
-From :py:mod:`~rsmtool.convert_feature_json` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.convert_feature_json_file
 
