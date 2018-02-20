@@ -767,17 +767,15 @@ class FileUpdater(object):
             `True` if the file should be excluded.
             `False` otherwise.
         """
-        stem = Path(filename).stem
-        suffix = Path(filename).suffix
-        return suffix == '.model' or \
-            suffix == '.npy'or \
-            stem.endswith('_postprocessing_params') or \
-            stem.endswith('_eval') or \
-            stem.endswith('_eval_short') or \
-            stem.endswith('_confMatrix') or \
-            stem.endswith('_pred_train') or \
-            stem.endswith('_pred_processed') or \
-            stem.endswith('_score_dist')
+        possible_suffixes = ['.model', '.npy']
+        possible_stems = ['_postprocessing_params', '_eval', '_eval_short',
+                          '_confMatrix', '_pred_train', '_pred_processed',
+                          '_score_dist']
+
+        file_stem = Path(filename).stem
+        file_suffix = Path(filename).suffix
+        return any(file_suffix == suffix for suffix in possible_suffixes) or \
+            any(file_stem.endswith(stem) for stem in possible_stems)
 
     def update_source(self, source, skll=False):
         """
@@ -836,7 +834,8 @@ class FileUpdater(object):
         # the config JSON files or the OLS summary files or
         # the evaluation/prediction/model files for SKLL models
         new_files = dir_comparison.left_only
-        new_files = [f for f in new_files if not f.endswith('_rsmtool.json') and not f.endswith('_rsmeval.json') and not f.endswith('_ols_summary.txt')]
+        excluded_suffixes = ['_rsmtool.json', '_rsmeval.json', '_ols_summary.txt']
+        new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
         if skll:
             new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
 
