@@ -717,19 +717,24 @@ class FileUpdater(object):
     It does this for all of the experiment tests contained
     in the test files given by each of the `test_suffixes`.
 
-    Attributes:
-        tests_directory (str): Path to the directory containing the tests whose
-            outputs are to be updated.
-        test_suffixes (list): List of suffixes that will be added to the string
-            "test_experiment_" and located in the `tests_directory` to find
-            the tests that are to be updated.
-        updated_outputs_directory (TYPE): Description
-        deleted_files (list): List of files deleted from `tests directory`.
-        updated_files (list): List of files added or updated for the tests
-            under `tests_directory`.
-        missing_or_empty_sources (list): List of source names whose corresponding
-            directories are either missing under `updated_outputs_directory` or
-            do exist but are empty.
+    Attributes
+    ----------
+    test_suffixes : list
+        List of suffixes that will be added to the string
+        "test_experiment_" and located in the `tests_directory` to find
+        the tests that are to be updated.
+    tests_directory : str
+        Path to the directory containing the tests whose outputs are
+        to be updated.
+    updated_outputs_directory : str
+        Path to the directory containing the updated outputs for the
+        experiment tests.
+    deleted_files : list
+        List of files deleted from `tests directory`.
+    missing_or_empty_sources : list
+        List of source names whose corresponding directories are either
+        missing under `updated_outputs_directory` or do exist but are
+        empty.
     """
 
     def __init__(self,
@@ -751,12 +756,16 @@ class FileUpdater(object):
         Checks whether the given filename is one that should
         be excluded for SKLL-based experiment tests.
 
-        Args:
-            filename (str): Name of the file to be checked.
+        Parameters
+        ----------
+        filename : str
+            Name of the file to be checked.
 
-        Returns:
-            exclude: `True` if the file should be excluded.
-                `False` otherwise.
+        Returns
+        -------
+        exclude
+            `True` if the file should be excluded.
+            `False` otherwise.
         """
         stem = Path(filename).stem
         suffix = Path(filename).suffix
@@ -779,11 +788,13 @@ class FileUpdater(object):
         It does not return anything but updates the `deleted_files`, `updated_files`,
         and `missing_or_empty_sources`  class attributes appropriately.
 
-        Args:
-            source (str): Name of source directory.
-            skll (bool, optional): Whether the given source
-                is for a SKLL-based experiment test.
-
+        Parameters
+        ----------
+        source : str
+            Name of source directory.
+        skll : bool, optional
+            Whether the given source
+            is for a SKLL-based experiment test.
         """
         # locate the updated outputs for the experiment under the given
         # outputs directory and also locate the existing experiment outputs
@@ -892,8 +903,6 @@ class FileUpdater(object):
                     # check if it has 'raises' in the qualified name and skip it, if it does
                     if 'raises' in member_qualified_name:
                         continue
-
-                    print(member_name)
 
                     # otherwise first we check if it's the parameterized function and if so
                     # we can easily get the source from the parameter list
