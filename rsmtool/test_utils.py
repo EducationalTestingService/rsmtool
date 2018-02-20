@@ -884,9 +884,10 @@ class FileUpdater(object):
             test_module_path = join(self.tests_directory, 'test_experiment_{}.py'.format(test_suffix))
             test_module = SourceFileLoader('loaded_{}'.format(test_suffix), test_module_path).load_module()
 
-            # make sure that the module tells us that it wants to be updated
-            if not test_module._AUTO_UPDATE:
-                continue
+            # skip the module if it tells us that it doesn't want the data for its tests updated
+            if hasattr(test_module, '_AUTO_UPDATE'):
+                if not test_module._AUTO_UPDATE:
+                    continue
 
             # iterate over all the members and focus on only the experiment functions
             # but skip over the functions that are decorated with '@raises' since those
