@@ -91,8 +91,6 @@ def run_comparison(config_file_or_obj, output_dir):
 
         # Instantiate configuration parser object
         parser = ConfigurationParser.get_configparser(config_file_or_obj)
-
-        logger.info('Reading, normalizing, validating, and processing configuration.')
         configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj,
                                                                           context='rsmcompare')
 
