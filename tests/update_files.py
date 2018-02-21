@@ -39,11 +39,13 @@ def main():
     parser = argparse.ArgumentParser(prog='update_test_files.py')
     parser.add_argument('--tests',
                         dest='tests_dir',
-                        help="The path to the RSMTool tests directory")
+                        required=True,
+                        help="The path to the existing RSMTool tests directory")
     parser.add_argument('--outputs',
                         dest='outputs_dir',
-                        help="The path to the directory containing the test "
-                             "outputs (usually test_outputs)")
+                        required=True,
+                        help="The path to the directory containing the updated test "
+                             "outputs (usually `test_outputs`)")
 
     # parse given command line arguments
     args = parser.parse_args()
