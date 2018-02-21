@@ -20,9 +20,11 @@ To set up a local development environment, follow the steps below:
 
 5. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
 
-6. Make your changes and add tests. See the next section for more on writing new tests. 
+6. Create a new git branch with a useful and descriptive name.
 
-7. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+7. Make your changes and add tests. See the next section for more on writing new tests. 
+
+8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
 RSMTool tests
 -------------
