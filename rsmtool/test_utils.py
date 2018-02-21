@@ -731,6 +731,9 @@ class FileUpdater(object):
         experiment tests.
     deleted_files : list
         List of files deleted from `tests directory`.
+    updated_files : list
+        List of files that have either (really) changed in the updated outputs
+        or been added in those outputs.
     missing_or_empty_sources : list
         List of source names whose corresponding directories are either
         missing under `updated_outputs_directory` or do exist but are
@@ -807,7 +810,7 @@ class FileUpdater(object):
             self.missing_or_empty_sources.append(source)
             return
 
-        # if the updated output path does not exist, then create it
+        # if the existing output path does not exist, then create it
         try:
             assert existing_output_path.exists()
         except AssertionError:
