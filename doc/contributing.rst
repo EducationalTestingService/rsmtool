@@ -120,7 +120,7 @@ Once you have added all new functional tests, you should run ``nosetests --noglo
 
 This will copy over the generated outputs for the newly added tests and show you a report of the files that it added. If you run ``nosetests`` again, your newly added tests should now pass. 
 
-At this point, you should commit all of your changes included the expected test outputs that you will should see under ``tests/data/experiments/<test>/output`` where ``<test>`` refers to the test(s) that you added. 
+At this point, you should commit all of your changes included the expected test outputs that you should see under ``tests/data/experiments/<test>/output`` where ``<test>`` refers to the test(s) that you added. 
 
 Advanced tips and tricks
 ------------------------
