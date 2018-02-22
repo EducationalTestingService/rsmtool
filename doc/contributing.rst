@@ -88,7 +88,8 @@ To write a new experiment test for RSMTool (or any of the other tools):
         +----------------------------------------------------------------------------+
         | Writing test(s) for RSMPredict                                             |
         |                                                                            |
-        | * Only positional argument is the name of the test directory you created.  |
+        | * The only positional argument is the name of the test directory you       |
+        |   created.                                                                 |
         |                                                                            |
         | * Use ``excluded=True`` if you want to check the excluded responses file   |
         |   as part of the test.                                                     |
@@ -105,22 +106,25 @@ To write a new experiment test for RSMTool (or any of the other tools):
         +----------------------------------------------------------------------------+
         | Writing test(s) for RSMSummarize                                           |
         |                                                                            |
-        | * Only positional argument is the name of the test directory you created.  |
+        | * The only positional argument is the name of the test directory you       |
+        |   created.                                                                 |
         |                                                                            |
         | * Set ``file_format="tsv"`` (or ``"xlsx"``) if you specified the same      |
         |   field in the configuration file.                                         |
         +----------------------------------------------------------------------------+
 
-Once you have added all new functional tests, you should run ``nosetests --noglogcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. To do this, you should now run the following:
+Once you have added all new functional tests, commit all of your changes. Next, you should run ``nosetests --noglogcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. 
+
+To do this, you should now run the following:
 
 .. _update_files:
 .. code-block:: text
     
     python tests/update_files.py --tests tests --outputs test_outputs
 
-This will copy over the generated outputs for the newly added tests and show you a report of the files that it added. If you run ``nosetests`` again, your newly added tests should now pass. 
+This will copy over the generated outputs for the newly added tests and show you a report of the files that it added. If run correctly, the report should *only* refer to model files (``*.model``/``*.ols``) and the files affected by the functionality you implemented. If you run ``nosetests`` again, your newly added tests should now pass. 
 
-At this point, you should commit all of your changes included the expected test outputs that you should see under ``tests/data/experiments/<test>/output`` where ``<test>`` refers to the test(s) that you added. 
+At this point, you should inspect all of the new test files added by the above command using to make sure that the outputs are as expected. You can find these files under ``tests/data/experiments/<test>/output`` where ``<test>`` refers to the test(s) that you added. Once you are satisified that the outputs are as expected, you can commit all the them.
 
 Advanced tips and tricks
 ------------------------
@@ -129,7 +133,7 @@ Here are some advanced tips and tricks when working with RSMTool tests.
 
 1. To run a specific test function in a specific test file, simply use ``nosetests --nologcapture tests/test_X.py:Y`` where ``test_X.py`` is the name of the test file, and ``Y`` is the test functions. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other ``param()`` calls and run the ``test_run_experiment_parameterized()`` function as above.
 
-2. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and the update the expected test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
+2. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and then update the *expected* test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
 
-3. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests do not need updating.
+3. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
 
