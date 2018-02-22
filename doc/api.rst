@@ -6,7 +6,7 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 
 .. note::
     
-    Previous versions of the RSMTool API provided the functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. If you are using these functions in your code and want to migrate to the new API, you should replace the follwing statements in your code:
+     RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. If you are using these functions in your code and want to migrate to the new API, you should replace the follwing statements in your code:
 
     .. code-block:: python
 
