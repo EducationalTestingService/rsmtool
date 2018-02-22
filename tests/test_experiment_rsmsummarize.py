@@ -19,6 +19,8 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-self-eval-summary'),
     param('lr-self-summary-with-custom-sections'),
     param('lr-self-summary-with-tsv-inputs'),
+    param('lr-self-summary-with-tsv-output', file_format='tsv'),
+    param('lr-self-summary-with-xlsx-output', file_format='xlsx'),
     param('lr-self-summary-no-scaling')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):

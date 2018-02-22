@@ -70,10 +70,8 @@ def run_experiment(config_file_or_obj,
     if not isinstance(config_file_or_obj, Configuration):
 
         # Instantiate configuration parser object
-        configparser = ConfigurationParser.get_configparser(config_file_or_obj)
-
-        logger.info('Reading, normalizing, validating, and processing configuration.')
-        configuration = configparser.read_normalize_validate_and_process_config(config_file_or_obj)
+        parser = ConfigurationParser.get_configparser(config_file_or_obj)
+        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj)
 
         # get the directory where the configuration file lives
         configpath = dirname(config_file_or_obj)
@@ -81,7 +79,6 @@ def run_experiment(config_file_or_obj,
     else:
 
         configuration = config_file_or_obj
-
         if configuration.filepath is not None:
             configpath = dirname(configuration.filepath)
         else:
