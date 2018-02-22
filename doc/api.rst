@@ -27,7 +27,7 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
         Analyzer.metrics_helper(...)
 
         from rsmtool.reporter import Reporter
-        Reporter.convert_ipynb_to_htmlfr(...)
+        Reporter.convert_ipynb_to_html(...)
         
         from rsmtool.preprocessor import FeaturePreprocessor
         FeaturePreprocessor.remove_outliers(...)
