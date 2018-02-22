@@ -856,12 +856,86 @@ def show_thumbnail(path_to_image, image_id):
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
 
-    Returns
-    -------
+    Displays
+    --------
     display : IPython.core.display.HTML
         The HTML display of the thumbnail image.
     """
-    return display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
+    display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
+
+
+def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
+    """
+    Generate HTML list items for each file name,
+    given output directory. Optionally pass a
+    replacement dictionary to use more descriptive
+    titles for the file names.
+
+    Parameters
+    ----------
+    output_dir : str
+        The output directory.
+    experiment_id : str
+        The experiment ID.
+    file_format : str
+        The format of the output files.
+    replace_dict : dict, optional
+        A dictionary which makes file names to descriptions.
+        Defaults to empty dictionary.
+
+    Yields
+    ------
+    html_string : str
+        HTML list item with file description and link.
+    """
+    html_string = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
+    files = [f for f in os.listdir(output_dir) if f.endswith(file_format)]
+
+    for file in sorted(files):
+        relative_file = os.path.relpath(os.path.join(output_dir, file))
+        relative_name = os.path.basename(file)
+
+        # check if relative name is in the replacement dictionary and,
+        # if it is, use the more descriptive name in the replacement
+        # dictionary. Otherwise, normalize the file name and use that
+        # as the description instead.
+        if relative_name in replace_dict:
+            relative_name = replace_dict[relative_name]
+        else:
+            relative_name = relative_name.replace(experiment_id, '').replace('.' + file_format, '')
+            relative_name = ' '.join(relative_name.split('_')).strip().title()
+
+        yield html_string.format(relative_name,
+                                 relative_file,
+                                 file_format)
+
+
+def show_files(output_dir, experiment_id, file_format, replace_dict={}):
+    """
+    Show files for a given output directory.
+
+    Parameters
+    ----------
+    output_dir : str
+        The output directory.
+    experiment_id : str
+        The experiment ID.
+    file_format : str
+        The format of the output files.
+    replace_dict : dict, optional
+        A dictionary which makes file names to descriptions.
+        Defaults to empty dictionary.
+
+    Displays
+    --------
+    display : IPython.core.display.HTML
+        The HTML display of the list item.
+    """
+    for html_item in get_files_as_html(output_dir,
+                                       experiment_id,
+                                       file_format,
+                                       replace_dict):
+        display(HTML(html_item))
 
 
 class LogFormatter(logging.Formatter):

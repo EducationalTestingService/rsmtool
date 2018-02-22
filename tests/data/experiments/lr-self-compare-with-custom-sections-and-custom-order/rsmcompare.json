@@ -22,5 +22,6 @@
                       "model",
                       "consistency",
                       "custom2",
+                      "intermediate_file_paths_compare",
                       "sysinfo"]
 }

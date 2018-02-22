@@ -18,5 +18,6 @@
                       "data_description",
                       "data_description_by_group",
                       "custom2",
+                      "intermediate_file_paths",
                       "sysinfo"]
 }

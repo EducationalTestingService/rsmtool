@@ -100,6 +100,8 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``notes``: Notes explaining the terminology used in comparison reports.
 
+    - ``intermediate_file_paths_compare``: Shows links to all of the intermediate files that were generated while running the comparison.
+
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
 

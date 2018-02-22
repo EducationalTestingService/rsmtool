@@ -261,6 +261,8 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the variances; and
         - a Scree plot.
 
+    - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the experiment.
+
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
 .. _custom_sections_rsmtool:

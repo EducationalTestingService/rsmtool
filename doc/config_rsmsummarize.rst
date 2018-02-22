@@ -43,6 +43,8 @@ RSMTool provides pre-defined sections for ``rsmsummarize`` (listed below) and, b
 
     - ``evaluation``: Compares the standard set of evaluations recommended for scoring models on the evaluation data.
 
+    - ``intermediate_file_paths_summarize``: Shows links to all of the intermediate files that were generated while running the summary.
+
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
 

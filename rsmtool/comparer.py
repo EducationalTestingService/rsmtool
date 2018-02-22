@@ -315,7 +315,6 @@ class Comparer:
             df_degradation = DataReader.read_from_file(degradation_file, index_col=0)
             files['df_degradation'] = df_degradation
 
-        
         # disattenuated correlations
         dis_corr_file = join(filedir, "{}_disattenuated_correlations.{}".format(experiment_id,
                                                                                 extension))
@@ -329,9 +328,9 @@ class Comparer:
         # read in disattenuated correlations by group
         for group in groups_eval:
             group_dis_corr_file = join(filedir,
-                                     '{}_disattenuated_correlations_by_{}.{}'.format(experiment_id,
-                                                                                     group,
-                                                                                     extension))
+                                       '{}_disattenuated_correlations_by_{}.{}'.format(experiment_id,
+                                                                                       group,
+                                                                                       extension))
             if exists(group_dis_corr_file):
                 df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
                 files['df_disattenuated_correlations_by_{}'.format(group)] = df_dis_cor_group
@@ -512,35 +511,22 @@ class Comparer:
             if exists(svg_file):
                 figs['feature_boxplots_by_{}_svg'.format(group)] = svg_file
 
-                # with open(svg_file, 'rb') as f:
-                #     figs['feature_boxplots_by_{}_'
-                #          'svg'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
             elif exists(png_file):
                 figs['feature_boxplots_by_{}_png'.format(group)] = png_file
-                # with open(png_file, 'rb') as f:
-                #     figs['feature_boxplots_by_{}_'
-                #          'png'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
 
         # read in the betas image if exists
         betas_svg = join(figdir, '{}_betas.svg'.format(experiment_id))
         if exists(betas_svg):
             figs['betas'] = betas_svg
-            # with open(betas_svg, 'rb') as f:
-            #     figs['betas'] = base64.b64encode(f.read()).decode('utf-8')
 
         # read in the evaluation barplots by subgroup, if we were asked to
         for group in groups_eval:
             eval_barplot_svg_file = join(figdir, '{}_eval_by_{}.svg'.format(experiment_id, group))
             if exists(eval_barplot_svg_file):
                 figs['eval_barplot_by_{}'.format(group)] = eval_barplot_svg_file
-                # with open(eval_barplot_svg_file, 'rb') as f:
-                #         figs['eval_barplot_by_'
-                #              '{}'.format(group)] = base64.b64encode(f.read()).decode('utf-8')
 
         pca_svg_file = join(figdir, '{}_pca.svg'.format(experiment_id))
         if exists(pca_svg_file):
             figs['pca_scree_plot'] = pca_svg_file
-            # with open(pca_svg_file, 'rb') as f:
-            #     figs['pca_scree_plot'] = base64.b64encode(f.read()).decode('utf-8')
 
-        return (files, figs)
+        return (files, figs, extension)
