@@ -19,6 +19,7 @@ import pandas as pd
 
 from math import ceil
 from glob import glob
+from importlib import import_module
 from string import Template
 from textwrap import wrap
 from IPython.display import (display,
@@ -38,25 +39,6 @@ BUILTIN_MODELS = ['LinearRegression',
                   'LassoFixedLambda',
                   'PositiveLassoCV']
 
-SKLL_MODELS = ['AdaBoostRegressor',
-               'BayesianRidge',
-               'DecisionTreeRegressor',
-               'DummyRegressor',
-               'ElasticNet',
-               'GradientBoostingRegressor',
-               'HuberRegressor',
-               'KNeighborsRegressor',
-               'Lars',
-               'Lasso',
-               'LinearSVR',
-               'MLPRegressor',
-               'RandomForestRegressor',
-               'RANSACRegressor',
-               'Ridge',
-               'SGDRegressor',
-               'SVR',
-               'TheilSenRegressor']
-
 DEFAULTS = {'id_column': 'spkitemid',
             'description': '',
             'description_old': '',
@@ -72,6 +54,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'standardize_features': True,
             'use_thumbnails': False,
             'scale_with': None,
+            'predict_expected_scores': False,
             'sign': None,
             'features': None,
             'length_column': None,
@@ -103,9 +86,11 @@ LIST_FIELDS = ['feature_prefix',
                'experiment_dirs']
 
 BOOLEAN_FIELDS = ['exclude_zero_scores',
+                  'predict_expected_scores',
                   'use_scaled_predictions',
                   'use_scaled_predictions_old',
                   'use_scaled_predictions_new',
+                  'use_thumbnails',
                   'select_transformations']
 
 FIELD_NAME_MAPPING = {'expID': 'experiment_id',
@@ -153,6 +138,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'exclude_zero_scores',
                                          'trim_min',
                                          'trim_max',
+                                         'predict_expected_scores',
                                          'select_transformations',
                                          'use_scaled_predictions',
                                          'subgroups',
@@ -191,6 +177,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                'optional': ['id_column',
                                             'candidate_column',
                                             'file_format',
+                                            'predict_expected_scores',
                                             'human_score_column',
                                             'second_human_score_column',
                                             'standardize_features',
@@ -214,6 +201,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                 'rsmsummarize': {'required': ['summary_id',
                                               'experiment_dirs'],
                                  'optional': ['description',
+                                              'file_format',
                                               'general_sections',
                                               'custom_sections',
                                               'use_thumbnails',
@@ -223,6 +211,46 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
 
 
 POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
+
+_skll_module = import_module('skll.learner')
+
+
+def is_skll_model(model_name):
+    """
+    Check whether the given model is a valid learner name in SKLL.
+    Note that the `LinearRegression` model is also available in
+    SKLL but we always want to use the built-in model with that name.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model to check
+
+    Returns
+    -------
+    valid: bool
+        `True` if the given model name is a valid SKLL learner,
+        `False` otherwise
+    """
+    return hasattr(_skll_module, model_name) and model_name != 'LinearRegression'
+
+
+def is_built_in_model(model_name):
+    """
+    Check whether the given model is a valid built-in model.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model to check
+
+    Returns
+    -------
+    valid: bool
+        `True` if the given model name is a valid built-in model,
+        `False` otherwise
+    """
+    return model_name in BUILTIN_MODELS
 
 
 def int_to_float(value):
@@ -301,6 +329,61 @@ def parse_json_with_comments(filename):
         # Return JSON object
         config = json.loads(content)
         return config
+
+
+def compute_expected_scores_from_model(model, featureset, min_score, max_score):
+    """
+    Compute expected scores using probability distributions over the labels
+    from the given SKLL model.
+
+    Parameters
+    ----------
+    model : skll.Learner
+        The SKLL Learner object to use for computing the expected scores.
+    featureset : skll.data.FeatureSet
+        The SKLL FeatureSet object for which predictions are to be made.
+    min_score : int
+        Minimum score level to be used for computing expected scores.
+    max_score : int
+        Maximum score level to be used for computing expected scores.
+
+    Returns
+    -------
+    expected_scores: np.array
+        A numpy array containing the expected scores.
+
+    Raises
+    ------
+    ValueError
+        If the given model cannot predict probability distributions and
+        or if the score range specified by `min_score` and `max_score`
+        does not match what the model predicts in its probability
+        distribution.
+    """
+    if hasattr(model.model, "predict_proba"):
+        # Tell the model we want probabiltiies as output. This is likely already set
+        # to True but it might not be, e.g., when using rsmpredict.
+        model.probability = True
+        probability_distributions = model.predict(featureset)
+        # check to make sure that the number of labels in the probability
+        # distributions matches the number of score points we have
+        num_score_points_specified = max_score - min_score + 1
+        num_score_points_in_learner = probability_distributions.shape[1]
+        if num_score_points_specified != num_score_points_in_learner:
+            raise ValueError('The specified number of score points ({}) '
+                             'does not match that from the the learner '
+                             '({}).'.format(num_score_points_specified,
+                                            num_score_points_in_learner))
+        expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
+    else:
+        if model.model_type.__name__ == 'SVC':
+            raise ValueError("Expected scores cannot be computed since the SVC model was "
+                             "not originally trained to predict probabilities.")
+        else:
+            raise ValueError("Expected scores cannot be computed since {} is not a "
+                             "probabilistic classifier.".format(model.model_type.__name__))
+
+    return expected_scores
 
 
 def covariance_to_correlation(m):

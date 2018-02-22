@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Utility to generate predictions on new data
 from existing RSMTool models.
@@ -9,8 +11,6 @@ from existing RSMTool models.
 :date: 10/25/2017
 :organization: ETS
 """
-
-#!/usr/bin/env python
 
 import argparse
 import glob
@@ -64,11 +64,9 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
     if not isinstance(config_file_or_obj, Configuration):
 
         # Instantiate configuration parser object
-        configparser = ConfigurationParser.get_configparser(config_file_or_obj)
-
-        logger.info('Reading, normalizing, validating, and processing config.')
-        config = configparser.read_normalize_validate_and_process_config(config_file_or_obj,
-                                                                         context='rsmpredict')
+        parser = ConfigurationParser.get_configparser(config_file_or_obj)
+        config = parser.read_normalize_validate_and_process_config(config_file_or_obj,
+                                                                   context='rsmpredict')
 
         # get the directory where the config file lives
         configpath = dirname(config_file_or_obj)

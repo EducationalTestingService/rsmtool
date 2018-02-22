@@ -70,10 +70,8 @@ def run_experiment(config_file_or_obj,
     if not isinstance(config_file_or_obj, Configuration):
 
         # Instantiate configuration parser object
-        configparser = ConfigurationParser.get_configparser(config_file_or_obj)
-
-        logger.info('Reading, normalizing, validating, and processing configuration.')
-        configuration = configparser.read_normalize_validate_and_process_config(config_file_or_obj)
+        parser = ConfigurationParser.get_configparser(config_file_or_obj)
+        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj)
 
         # get the directory where the configuration file lives
         configpath = dirname(config_file_or_obj)
@@ -81,7 +79,6 @@ def run_experiment(config_file_or_obj,
     else:
 
         configuration = config_file_or_obj
-
         if configuration.filepath is not None:
             configpath = dirname(configuration.filepath)
         else:
@@ -97,13 +94,23 @@ def run_experiment(config_file_or_obj,
     writer = DataWriter(configuration['experiment_id'])
 
     # Get the paths and names for the DataReader
-    (file_names,
-     file_paths) = configuration.get_names_and_paths(['train_file', 'test_file',
-                                                      'features', 'feature_subset_file'],
-                                                     ['train', 'test', 'feature_specs',
-                                                      'feature_subset_specs'])
 
-    file_paths = DataReader.locate_files(file_paths, configpath)
+    (file_names,
+     file_paths_org) = configuration.get_names_and_paths(['train_file', 'test_file',
+                                                          'features', 'feature_subset_file'],
+                                                         ['train', 'test', 'feature_specs',
+                                                          'feature_subset_specs'])
+
+    file_paths = DataReader.locate_files(file_paths_org, configpath)
+
+    # check that we were able to locate all files
+
+    if None in file_paths:
+        indices_with_no_paths = [i for i in range(len(file_paths))
+                                 if file_paths[i] is None]
+
+        missing_file_paths = [file_paths_org[i] for i in indices_with_no_paths]
+        raise FileNotFoundError('The following files were not found: {}'.format(repr(missing_file_paths)))
 
     # Use the default converter for both train and test
     converters = {'train': configuration.get_default_converter(),
@@ -223,7 +230,9 @@ def run_experiment(config_file_or_obj,
     train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
     test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
 
-    logger.info('Generating training and test set predictions.')
+    logged_str = 'Generating training and test set predictions'
+    logged_str += ' (expected scores).' if configuration['predict_expected_scores'] else '.'
+    logger.info(logged_str)
     (pred_config,
      pred_data_container) = modeler.predict_train_and_test(train_for_prediction,
                                                            test_for_prediction,

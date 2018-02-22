@@ -328,6 +328,32 @@ class TestConfigurationParser:
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
 
+    @raises(ValueError)
+    def test_wrong_skll_model_for_expected_scores(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'LinearSVR',
+                'predict_expected_scores': 'true'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+    @raises(ValueError)    
+    def test_builtin_model_for_expected_scores(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'NNLR',
+                'predict_expected_scores': 'true'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
     def test_get_correct_configparser_cfg(self):
         config_parser = ConfigurationParser.get_configparser('config.cfg')
         assert isinstance(config_parser, CFGConfigurationParser)

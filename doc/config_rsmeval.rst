@@ -35,11 +35,11 @@ description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
+.. _file_format_eval:
+
 file_format *(Optional)*
 """""""""""""""""""""""""""
 The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
-
-.. _file_format_eval:
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -112,7 +112,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: Shows metrics for human-human agreement and the difference ('degradation') between the human-human and human-system agreement. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
+    - ``consistency``: Shows metrics for human-human agreement, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations.. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
 
     - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
 

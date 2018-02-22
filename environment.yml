@@ -17,6 +17,7 @@ dependencies:
 - seaborn=0.8.1
 - skll=1.5
 - statsmodels=0.8.0
+- parameterized
 - zeromq
 - sphinx
 - sphinx_rtd_theme

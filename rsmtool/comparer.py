@@ -315,6 +315,28 @@ class Comparer:
             df_degradation = DataReader.read_from_file(degradation_file, index_col=0)
             files['df_degradation'] = df_degradation
 
+        
+        # disattenuated correlations
+        dis_corr_file = join(filedir, "{}_disattenuated_correlations.{}".format(experiment_id,
+                                                                                extension))
+
+        # load if disattenuated correlations is present
+        if exists(dis_corr_file):
+            df_dis_corr = DataReader.read_from_file(dis_corr_file, index_col=0)
+            # we only use the row for raw_trim or scale_trim score
+            files['df_disattenuated_correlations'] = df_dis_corr.loc[['{}_trim'.format(prefix)]]
+
+        # read in disattenuated correlations by group
+        for group in groups_eval:
+            group_dis_corr_file = join(filedir,
+                                     '{}_disattenuated_correlations_by_{}.{}'.format(experiment_id,
+                                                                                     group,
+                                                                                     extension))
+            if exists(group_dis_corr_file):
+                df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
+                files['df_disattenuated_correlations_by_{}'.format(group)] = df_dis_cor_group
+                files['df_disattenuated_correlations_by_{}_overview'.format(group)] = self.make_summary_stat_df(df_dis_cor_group)
+
         # use the raw columns or the scale columns depending on the prefix
         existing_eval_cols = (_df_eval_columns_existing_raw if prefix == 'raw'
                               else _df_eval_columns_existing_scale)

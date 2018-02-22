@@ -2,7 +2,7 @@
 
 Intermediate files
 """"""""""""""""""
-Although the primary output of ``rsmeval`` is an HTML report, we also want the user to be able to conduct additional analyses outside of ``rsmeval``. To this end, all of the tables produced in an the experiment report are saved as ``.csv`` files  (or other file format specified with ``file_format`` parameter) in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
+Although the primary output of ``rsmeval`` is an HTML report, we also want the user to be able to conduct additional analyses outside of ``rsmeval``. To this end, all of the tables produced in the experiment report are saved as files in the format as specified by ``file_format`` parameter in the ``output`` directory. The following sections describe all of the intermediate files that are produced.
 
 .. note::
 
@@ -15,13 +15,13 @@ Although the primary output of ``rsmeval`` is an HTML report, we also want the u
 
 Predictions
 ~~~~~~~~~~~
-filename: ``pred_processed.csv``
+filename: ``pred_processed``
 
 This file contains the post-processed predicted scores: the predictions from the model are truncated, rounded, and re-scaled (if requested).
 
 Flagged responses
 ~~~~~~~~~~~~~~~~~
-filename: ``test_responses_with_excluded_flags.csv``
+filename: ``test_responses_with_excluded_flags``
 
 This file contains all of the rows in input predictions file that were filtered out based on conditions specified in :ref:`flag_column <flag_column_eval>`.
 
@@ -31,21 +31,21 @@ This file contains all of the rows in input predictions file that were filtered 
 
 Excluded responses
 ~~~~~~~~~~~~~~~~~~
-filename: ``test_excluded_responses.csv``
+filename: ``test_excluded_responses``
 
 This file contains all of the rows in the predictions file that were filtered out because of non-numeric or zero scores.
 
 Response metadata
 ~~~~~~~~~~~~~~~~~
-filename:  ``test_metadata.csv``
+filename:  ``test_metadata``
 
 This file contains the metadata columns (``id_column``,  ``subgroups`` if provided) for all rows in the predictions file that used in the evaluation.
 
 Unused columns
 ~~~~~~~~~~~~~~
-filename: ``test_other_columns.csv``
+filename: ``test_other_columns``
 
-This file contains all of the the columns from the input predictions file that are not present in the ``*_pred_processed.csv`` and ``*_metadata.csv`` files. They only include the rows that were not filtered out.
+This file contains all of the the columns from the input predictions file that are not present in the ``*_pred_processed`` and ``*_metadata`` files. They only include the rows that were not filtered out.
 
 .. note::
 
@@ -53,7 +53,7 @@ This file contains all of the the columns from the input predictions file that a
 
 Human scores
 ~~~~~~~~~~~~
-filename: ``test_human_scores.csv``
+filename: ``test_human_scores``
 
 This file contains the human scores, if available in the input predictions file, under a column called ``sc1`` with the response IDs under the ``spkitemid`` column.
 
@@ -65,29 +65,29 @@ If ``second_human_score_column`` was specfied, then it also contains the values 
 
 Data composition
 ~~~~~~~~~~~~~~~~
-filename: ``data_composition.csv``
+filename: ``data_composition``
 
 This file contains the total number of responses in the input predictions file. If applicable, the table will also include the number of different subgroups.
 
 Excluded data composition
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-filenames: ``test_excluded_composition.csv``
+filenames: ``test_excluded_composition``
 
 This file contains the composition of the set of excluded responses, e.g., why were they excluded and how many for each such exclusion.
 
 Subgroup composition
 ~~~~~~~~~~~~~~~~~~~~
-filename: ``data_composition_by_<SUBGROUP>.csv``
+filename: ``data_composition_by_<SUBGROUP>``
 
 There will be one such file for each of the specified subgroups and it contains the total number of responses in that subgroup.
 
 Evaluation metrics
 ~~~~~~~~~~~~~~~~~~
-- ``eval.csv``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
+- ``eval``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
 
-- ``eval_by_<SUBGROUP>.csv``: the same information as in `*_eval.csv` computed separately for each subgroup.
+- ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup.
 
-- ``eval_short.csv`` -  a shortened version of ``eval.csv`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
+- ``eval_short`` -  a shortened version of ``eval`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
     - h_mean
     - h_sd
@@ -105,9 +105,9 @@ Evaluation metrics
     - R2 [raw/scale trim]
     - RMSE [raw/scale trim]
 
-- ``score_dist.csv``: the distributions of the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+- ``score_dist``: the distributions of the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
-- ``confMatrix.csv``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+- ``confMatrix``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
 .. note::
 
@@ -118,6 +118,12 @@ Human-human Consistency
 ~~~~~~~~~~~~~~~~~~~~~~~
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
 
-- ``consistency.csv``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
+- ``consistency``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
 
-- ``degradation.csv``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group
+
+- ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+
+- ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores, and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
+
+- ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
