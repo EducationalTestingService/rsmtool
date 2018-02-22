@@ -35,11 +35,11 @@ description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
 
+.. _file_format_eval:
+
 file_format *(Optional)*
 """""""""""""""""""""""""""
 The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
-
-.. _file_format_eval:
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~

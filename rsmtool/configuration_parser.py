@@ -997,7 +997,7 @@ class ConfigurationParser:
             A configuration object
         """
 
-        logging.info('Configuration file: {}'.format(filepath))
+        logging.info('Reading and preprocessing configuration file: {}'.format(filepath))
         self.read_config_from_file(filepath)
         return self.normalize_validate_and_process_config(context=context)
 
