@@ -6,7 +6,7 @@ exec(compile(open('rsmtool/version.py').read(), 'rsmtool/version.py', 'exec'))
 # (we use the above instead of execfile for Python 3.x compatibility)
 
 def readme():
-    with open('README.md') as f:
+    with open('README.rst') as f:
         return f.read()
 
 def requirements():
