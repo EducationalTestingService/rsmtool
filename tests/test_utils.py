@@ -270,7 +270,7 @@ class TestIntermediateFiles:
 
     def get_files(self, file_format='csv'):
         directory = join(test_dir, 'data', 'output')
-        files = sorted([join(directory, f) for f in listdir(directory)
+        files = sorted([f for f in listdir(directory)
                         if f.endswith(file_format)])
         return files, directory
 
@@ -280,10 +280,11 @@ class TestIntermediateFiles:
         html_string = ("""<li><b>Betas</b>: <a href="{}" download>csv</a></li>"""
                        """<li><b>Eval</b>: <a href="{}" download>csv</a></li>""")
 
-        html_expected = html_string.format(relpath(files[0]), relpath(files[1]))
+        html_expected = html_string.format(join('../output', files[0]),
+                                           join('../output', files[1]))
         html_expected = "".join(html_expected.strip().split())
+        html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
         html_result = get_files_as_html(directory, 'lr', 'csv')
-        html_result = "".join(item for item in html_result)
         html_result = "".join(html_result.strip().split())
         eq_(html_expected, html_result)
 
@@ -293,13 +294,12 @@ class TestIntermediateFiles:
         html_string = ("""<li><b>THESE BETAS</b>: <a href="{}" download>csv</a></li>"""
                        """<li><b>THESE EVALS</b>: <a href="{}" download>csv</a></li>""")
 
-        replace_dict = {'lr_betas.csv': 'THESE BETAS',
-                        'lr_eval.csv': 'THESE EVALS'}
-
-        html_expected = html_string.format(files[0], files[1])
-
-        html_expected = html_string.format(relpath(files[0]), relpath(files[1]))
+        replace_dict = {'betas': 'THESE BETAS',
+                        'eval': 'THESE EVALS'}
+        html_expected = html_string.format(join('../output', files[0]),
+                                           join('../output', files[1]))
         html_expected = "".join(html_expected.strip().split())
+        html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
         html_result = get_files_as_html(directory, 'lr', 'csv', replace_dict)
         html_result = "".join(item for item in html_result)
         html_result = "".join(html_result.strip().split())
