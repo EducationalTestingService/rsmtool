@@ -13,10 +13,6 @@ Rater Scoring Modeling Tool
    :target: https://anaconda.org/desilinguist/rsmtool
    :alt: Conda package for SKLL
 
-.. image:: https://img.shields.io/pypi/pyversions/rsmtool.svg
-   :target: https://pypi.org/project/rsmtool/
-   :alt: Supported python versions for RSMTool
-
 .. image:: https://img.shields.io/readthedocs/rsmtool.svg
    :target: https://rsmtool.readthedocs.io
    :alt: Docs
@@ -24,6 +20,10 @@ Rater Scoring Modeling Tool
 .. image:: https://img.shields.io/badge/DOI-10.21105%2Fjoss.00033-blue.svg
    :target: http://joss.theoj.org/papers/10.21105/joss.00033
    :alt: DOI for citing RSMTool
+
+.. image:: https://img.shields.io/pypi/pyversions/rsmtool.svg
+   :target: https://pypi.org/project/rsmtool/
+   :alt: Supported python versions for RSMTool
 
 .. image:: https://img.shields.io/pypi/v/rsmtool.svg
    :target: https://pypi.org/project/rsmtool/
@@ -47,7 +47,7 @@ Requirements
 ------------
 
 - Python 3.6
-- ``numpy`
+- ``numpy``
 - ``scipy``
 - ``scikit-learn``
 - ``statsmodels``
