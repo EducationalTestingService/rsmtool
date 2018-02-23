@@ -1509,7 +1509,6 @@ class Analyzer:
 
         # compute the confusion matrix as a data frame
         score_type = 'scale' if use_scaled_predictions else 'raw'
-        # we round human scores for this evaluation
         human_scores = df_preds['sc1_round'].astype('int64')
         system_scores = df_preds['{}_trim_round'.format(score_type)].astype('int64')
         conf_matrix = confusion_matrix(human_scores, system_scores)
