@@ -11,7 +11,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_run_prediction,
                                 do_run_experiment,
                                 do_run_prediction,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -41,20 +41,20 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
 
     source = 'lr-rsmtool-rsmpredict'
     experiment_id = 'lr_rsmtool_rsmpredict'
-    rsmtool_config_file = join(test_dir,
+    rsmtool_config_file = join(rsmtool_test_dir,
                                'data',
                                'experiments',
                                source,
                                '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, rsmtool_config_file)
-    rsmpredict_config_file = join(test_dir,
+    rsmpredict_config_file = join(rsmtool_test_dir,
                                   'data',
                                   'experiments',
                                   source,
                                   'rsmpredict.json')
     do_run_prediction(source, rsmpredict_config_file)
     output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     csv_files = glob(join(output_dir, '*.csv'))
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 
@@ -86,7 +86,7 @@ def test_run_experiment_lr_predict_with_repeated_ids():
 
     # rsmpredict experiment with non-unique ids
     source = 'lr-predict-with-repeated-ids'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -99,7 +99,7 @@ def test_run_experiment_lr_predict_missing_model_file():
 
     # rsmpredict experiment with missing model file
     source = 'lr-predict-missing-model-file'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -112,7 +112,7 @@ def test_run_experiment_lr_predict_missing_feature_file():
 
     # rsmpredict experiment with missing feature file
     source = 'lr-predict-missing-feature-file'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -125,7 +125,7 @@ def test_run_experiment_lr_predict_missing_postprocessing_file():
 
     # rsmpredict experiment with missing post-processing file
     source = 'lr-predict-missing-postprocessing-file'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -138,7 +138,7 @@ def test_run_experiment_predict_no_input_feature_file():
 
     # rsmpredict experiment with missing feature file
     source = 'lr-predict-no-input-feature-file'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -151,7 +151,7 @@ def test_run_experiment_predict_no_experiment_dir():
 
     # rsmpredict experiment with missing experiment dir
     source = 'lr-predict-no-experiment-dir'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -165,7 +165,7 @@ def test_run_experiment_predict_no_output_dir():
     # rsmpredict experiment where experiment_dir
     # does not containt output directory
     source = 'lr-predict-no-output-dir'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -179,7 +179,7 @@ def test_run_experiment_predict_no_experiment_id():
     # rsmpredict experiment ehere the experiment_dir
     # does not contain the experiment with the stated id
     source = 'lr-predict-no-experiment-id'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -193,7 +193,7 @@ def test_run_experiment_lr_predict_missing_columns():
     # rsmpredict experiment with missing columns
     # from the config file
     source = 'lr-predict-missing-columns'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -206,7 +206,7 @@ def test_run_experiment_lr_predict_missing_feature():
 
     # rsmpredict experiment with missing features
     source = 'lr-predict-missing-feature'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -219,7 +219,7 @@ def test_run_experiment_lr_predict_no_numeric_feature_values():
 
     # rsmpredict experiment with missing post-processing file
     source = 'lr-predict-no-numeric-feature-values'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -233,7 +233,7 @@ def test_run_experiment_predict_expected_scores_builtin_model():
     # rsmpredict experiment for expected scores but with
     # a built-in model which is not supporte
     source = 'lr-predict-expected-scores-builtin-model'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -247,7 +247,7 @@ def test_run_experiment_predict_expected_scores_wrong_skll_model():
     # rsmpredict experiment for expected scores but with
     # a non-probabilistic SKLL learner
     source = 'predict-expected-scores-wrong-skll-model'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -261,7 +261,7 @@ def test_run_experiment_predict_expected_scores_non_probablistic_svc():
     # rsmpredict experiment for expected scores but with
     # a non-probabilistic SKLL learner
     source = 'predict-expected-scores-non-probabilistic-svc'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

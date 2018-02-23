@@ -798,6 +798,7 @@ class Reporter:
         subgroups = configuration.get('subgroups')
         chosen_notebook_files = configuration['chosen_notebook_files']
         use_thumbnails = configuration.get('use_thumbnails', False)
+        file_format = configuration.get('file_format', 'csv')
 
         # set the environment variables we want
         os.environ['SUMMARY_ID'] = summary_id
@@ -811,6 +812,7 @@ class Reporter:
         os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
         os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
         os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
+        os.environ['FILE_FORMAT'] = file_format
 
         report_name = '{}_report'.format(summary_id)
         reportdir = abspath(join(csvdir, '..', 'report'))

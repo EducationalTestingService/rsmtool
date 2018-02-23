@@ -1,0 +1,12 @@
+{
+    "comparison_id": "lr-subgroups-with-h2_vs_lr-subgroups-with-h2",
+    "experiment_dir_old": "lr-subgroups-with-h2",
+    "experiment_id_old": "lr_subgroups_with_h2",
+    "description_old": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr-subgroups-with-h2",
+    "experiment_id_new": "lr_subgroups_with_h2",
+    "description_new": "Using all features with a LinearRegression model.",
+    "use_scaled_predictions_new": true,
+    "subgroups": ["QUESTION", "L1"]
+}

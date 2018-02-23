@@ -5,7 +5,12 @@ from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_comparison,
                                 do_run_comparison,
-                                test_dir)
+                                rsmtool_test_dir)
+
+# set this to False to disable auto-updating of all experiment
+# tests contained in this file via `update_files.py`.
+# TODO: re-enable this once we start saving rsmcompare outputs
+_AUTO_UPDATE = False
 
 
 @parameterized([
@@ -20,6 +25,7 @@ from rsmtool.test_utils import (check_run_comparison,
     param('lr-eval-self-compare', 'lr_eval_with_h2_vs_lr_eval_with_h2_report'),
     param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2_report'),
     param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups_report'),
+    param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2_report'),
     param('lr-self-compare-with-subgroups-and-edge-cases', 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
@@ -32,7 +38,7 @@ def test_run_experiment_lr_compare_wrong_directory():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = 'lr-self-compare-wrong-directory'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -46,7 +52,7 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = 'lr-self-compare-wrong-id'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

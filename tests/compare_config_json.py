@@ -8,6 +8,7 @@ jsons in the test output directory and compare the content of the two files.
 
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
+:author: Jeremy Biggs (jbiggs@ets.org)
 :organization: ETS
 """
 

@@ -8,3 +8,4 @@ omit =
     */site-packages/nose/*
     */unittest2/*
     *rsmtool/notebooks/templates/report.tpl
+    *rsmtool/test_utils.py

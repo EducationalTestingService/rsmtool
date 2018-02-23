@@ -5,7 +5,7 @@ from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
                                 do_run_experiment,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -35,7 +35,7 @@ def test_run_experiment_lr_length_column_and_feature():
     # the same column as a model feature
     source = 'lr-with-length-and-feature'
     experiment_id = 'lr_with_length_and_feature'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -50,7 +50,7 @@ def test_run_experiment_lr_h2_column_and_feature():
     # the same column as a model feature
     source = 'lr-with-h2-and-feature'
     experiment_id = 'lr_with_h2_and_feature'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -66,7 +66,7 @@ def test_run_experiment_lr_same_h1_and_h2():
 
     source = 'lr-same-h1-and-h2'
     experiment_id = 'lr_same_h1_and_h2'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -80,7 +80,7 @@ def test_run_experiment_lr_with_repeated_ids():
     # rsmtool experiment with non-unique ids
     source = 'lr-with-repeated-ids'
     experiment_id = 'lr_with_repeated_ids'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -94,7 +94,7 @@ def test_run_experiment_lr_with_sc1_as_feature_name():
     # rsmtool experiment with sc1 used as the name of a feature
     source = 'lr-with-sc1-as-feature-name'
     experiment_id = 'lr_with_sc1_as_feature_name'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,
@@ -109,7 +109,7 @@ def test_run_experiment_lr_with_length_as_feature_name():
     # when a length analysis is requested using a different feature
     source = 'lr-with-length-as-feature-name'
     experiment_id = 'lr_with_length_as_feature_name'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

@@ -5,7 +5,7 @@ from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
                                 do_run_experiment,
-                                test_dir)
+                                rsmtool_test_dir)
 
 
 @parameterized([
@@ -46,7 +46,7 @@ def test_run_experiment_empwtdropneg():
     # rsmtool experiment with no longer supported empWtDropNeg model
     source = 'empwtdropneg'
     experiment_id = 'empWtDropNeg'
-    config_file = join(test_dir,
+    config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source,

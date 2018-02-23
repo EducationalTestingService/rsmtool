@@ -1,11 +1,13 @@
 
 import tempfile
-import os
+
 
 import numpy as np
 
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
+from os import unlink
+from os.path import abspath, dirname, join, relpath
 
 from rsmtool.utils import (float_format_func,
                            int_or_float_format_func,
@@ -23,6 +25,9 @@ from rsmtool.utils import (float_format_func,
 
 from sklearn.datasets import make_classification
 from skll import FeatureSet, Learner
+
+# get the directory containing the tests
+test_dir = dirname(__file__)
 
 
 def test_int_to_float():
@@ -56,7 +61,7 @@ def test_parse_json_with_comments():
     result = parse_json_with_comments(filename)
 
     # get rid of the file now that have read it into memory
-    os.unlink(filename)
+    unlink(filename)
 
     eq_(result, {'key1': 'value1', 'key2': 'value2', 'key3': 5})
 
@@ -237,26 +242,26 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
 
 
 def test_has_files_with_extension_true():
-    directory = 'tests/data/files'
+    directory = join(test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'csv')
     eq_(result, True)
 
 
 def test_has_files_with_extension_false():
-    directory = 'tests/data/files'
+    directory = join(test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'ppt')
     eq_(result, False)
 
 
 def test_get_output_directory_extension():
-    directory = 'tests/data/experiments/lr/output'
+    directory = join(test_dir, 'data', 'experiments', 'lr', 'output')
     result = get_output_directory_extension(directory, 'id_1')
     eq_(result, 'csv')
 
 
 @raises(ValueError)
 def test_get_output_directory_extension_error():
-    directory = 'tests/data/files'
+    directory = join(test_dir, 'data', 'files')
     get_output_directory_extension(directory, 'id_1')
 
 
@@ -293,7 +298,7 @@ class TestThumbnail:
 
         # simple test of HTML thumbnail conversion
 
-        path = 'tests/data/figures/figure1.svg'
+        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -306,7 +311,7 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
-        path = 'tests/data/figures/figure3.png'
+        path = relpath(join(test_dir, 'data', 'figures', 'figure3.png'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -318,8 +323,8 @@ class TestThumbnail:
 
         # test converting two images to HTML thumbnails
 
-        path1 = 'tests/data/figures/figure1.svg'
-        path2 = 'tests/data/figures/figure2.svg'
+        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
 
         counter = count(1)
         image = get_thumbnail_as_html(path1, next(counter))
@@ -334,8 +339,8 @@ class TestThumbnail:
 
         # test converting image to HTML with absolute path
 
-        path = 'tests/data/figures/figure1.svg'
-        path_absolute = os.path.abspath(path)
+        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path_absolute = abspath(path)
 
         image = get_thumbnail_as_html(path_absolute, 1)
 

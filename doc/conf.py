@@ -51,8 +51,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Rater Scoring Modeling Tool'
-copyright = '2016, Educational Testing Service'
-author = 'Nitin Madnani and Anastassia Loukina'
+copyright = '2018, Educational Testing Service'
+author = 'Nitin Madnani, Jeremy Biggs, and Anastassia Loukina'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
