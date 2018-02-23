@@ -1,0 +1,11 @@
+{
+    "predictions_file": "../../files/predictions_raw_with_continuous_human_scores.csv",
+    "system_score_column": "score",
+    "description": "An evaluation of LinearRegression predictions with continuous human scores.",
+    "human_score_column": "h1",
+    "second_human_score_column": "h2",
+    "experiment_id": "lr_eval_with_continuous_human_scores",
+    "trim_min": 1,
+    "trim_max": 6,
+    "scale_with": "../../files/train_predictions.csv"
+}
