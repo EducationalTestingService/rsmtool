@@ -1,5 +1,5 @@
 """
-Script to compare two RSMTool experiments
+Script to compare two RSMTool experiments.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
