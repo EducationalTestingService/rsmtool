@@ -26,7 +26,6 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
     param('lr-with-feature-list', 'lr_with_feature_list'),
     param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
-    param('lr-with-length-string', 'lr_with_length_string'),
     param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):

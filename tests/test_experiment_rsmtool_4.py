@@ -34,7 +34,8 @@ from rsmtool.test_utils import (check_run_experiment,
     param('lassofixedlambdathennnlr', 'lassofixedlambdathennnlr'),
     param('lassofixedlambda', 'lassofixedlambda'),
     param('positivelassocv', 'positivelassocv'),
-    param('equalweightslr', 'equalweightslr')
+    param('equalweightslr', 'equalweightslr'),
+    param('lr-with-length-string', 'lr_with_length_string')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
