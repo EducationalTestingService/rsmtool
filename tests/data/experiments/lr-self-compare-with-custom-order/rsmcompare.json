@@ -19,6 +19,5 @@
                       "features_by_group",
 		                  "preprocessed_features_by_group",
 		                  "notes",
-                      "intermediate_file_paths",
                       "sysinfo"]
 }

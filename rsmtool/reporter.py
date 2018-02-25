@@ -75,7 +75,6 @@ else:
                                        'evaluation',
                                        'pca',
                                        'notes',
-                                       'intermediate_file_paths',
                                        'sysinfo']
 
     ordered_section_list_rsmsummarize = ['preprocessed_features',

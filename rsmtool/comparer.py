@@ -255,14 +255,14 @@ class Comparer:
             A dictionary with experiment figures.
         """
 
-        extension = get_output_directory_extension(filedir, experiment_id)
+        file_format = get_output_directory_extension(filedir, experiment_id)
 
         files = defaultdict(pd.DataFrame)
         figs = {}
 
         # feature distributions and the inter-feature correlations
         feature_train_file = join(filedir, '{}_train_features.{}'.format(experiment_id,
-                                                                         extension))
+                                                                         file_format))
         if exists(feature_train_file):
             files['df_train_features'] = DataReader.read_from_file(feature_train_file)
 
@@ -273,33 +273,33 @@ class Comparer:
             #     figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
 
         feature_cors_file = join(filedir, '{}_cors_processed.{}'.format(experiment_id,
-                                                                        extension))
+                                                                        file_format))
         if exists(feature_cors_file):
             files['df_feature_cors'] = DataReader.read_from_file(feature_cors_file, index_col=0)
 
         # df_scores
         scores_file = join(filedir, '{}_pred_processed.{}'.format(experiment_id,
-                                                                  extension))
+                                                                  file_format))
         if exists(scores_file):
             df_scores = DataReader.read_from_file(scores_file, converters={'spkitemid': str})
             files['df_scores'] = df_scores[['spkitemid', 'sc1', prefix]]
 
         # model coefficients if present
         betas_file = join(filedir, '{}_betas.{}'.format(experiment_id,
-                                                        extension))
+                                                        file_format))
         if exists(betas_file):
             files['df_coef'] = DataReader.read_from_file(betas_file, index_col=0)
             files['df_coef'].index.name = None
 
         # read in the model fit files if present
         model_fit_file = join(filedir, '{}_model_fit.{}'.format(experiment_id,
-                                                                extension))
+                                                                file_format))
         if exists(model_fit_file):
             files['df_model_fit'] = DataReader.read_from_file(model_fit_file)
 
         # human human agreement
         consistency_file = join(filedir, '{}_consistency.{}'.format(experiment_id,
-                                                                    extension))
+                                                                    file_format))
 
         # load if consistency file is present
         if exists(consistency_file):
@@ -308,7 +308,7 @@ class Comparer:
 
         # degradation
         degradation_file = join(filedir, "{}_degradation.{}".format(experiment_id,
-                                                                    extension))
+                                                                    file_format))
 
         # load if degradation file is present
         if exists(degradation_file):
@@ -317,7 +317,7 @@ class Comparer:
 
         # disattenuated correlations
         dis_corr_file = join(filedir, "{}_disattenuated_correlations.{}".format(experiment_id,
-                                                                                extension))
+                                                                                file_format))
 
         # load if disattenuated correlations is present
         if exists(dis_corr_file):
@@ -330,7 +330,7 @@ class Comparer:
             group_dis_corr_file = join(filedir,
                                        '{}_disattenuated_correlations_by_{}.{}'.format(experiment_id,
                                                                                        group,
-                                                                                       extension))
+                                                                                       file_format))
             if exists(group_dis_corr_file):
                 df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
                 files['df_disattenuated_correlations_by_{}'.format(group)] = df_dis_cor_group
@@ -344,7 +344,7 @@ class Comparer:
         # read in the short version of the evaluation metrics for all data
         short_metrics_list = ["N", "Adj. Agmt.(br)", "Agmt.(br)", "K(br)",
                               "Pearson(b)", "QWK(br)", "R2(b)", "RMSE(b)"]
-        eval_file_short = join(filedir, '{}_eval_short.{}'.format(experiment_id, extension))
+        eval_file_short = join(filedir, '{}_eval_short.{}'.format(experiment_id, file_format))
 
         if exists(eval_file_short):
             df_eval = DataReader.read_from_file(eval_file_short, index_col=0)
@@ -353,7 +353,7 @@ class Comparer:
             files['df_eval'] = df_eval[short_metrics_list]
             files['df_eval'].index.name = None
 
-        eval_file = join(filedir, '{}_eval.{}'.format(experiment_id, extension))
+        eval_file = join(filedir, '{}_eval.{}'.format(experiment_id, file_format))
         if exists(eval_file):
             files['df_eval_for_degradation'] = DataReader.read_from_file(eval_file, index_col=0)
 
@@ -361,7 +361,7 @@ class Comparer:
         for group in groups_eval:
             group_eval_file = join(filedir, '{}_eval_by_{}.{}'.format(experiment_id,
                                                                       group,
-                                                                      extension))
+                                                                      file_format))
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
                 df_eval = df_eval[existing_eval_cols]
@@ -383,7 +383,7 @@ class Comparer:
 
         # read in the partial correlations vs. score for all data
         pcor_score_file = join(filedir, '{}_pcor_score_all_data.{}'.format(experiment_id,
-                                                                           extension))
+                                                                           file_format))
         if exists(pcor_score_file):
             files['df_pcor_sc1'] = DataReader.read_from_file(pcor_score_file, index_col=0)
             files['df_pcor_sc1_overview'] = self.make_summary_stat_df(files['df_pcor_sc1'])
@@ -392,7 +392,7 @@ class Comparer:
         for group in groups_eval:
             group_pcor_file = join(filedir, '{}_pcor_score_by_{}.{}'.format(experiment_id,
                                                                             group,
-                                                                            extension))
+                                                                            file_format))
             if exists(group_pcor_file):
                 files['df_pcor_sc1_by_{}'
                       ''.format(group)] = DataReader.read_from_file(group_pcor_file,
@@ -403,7 +403,7 @@ class Comparer:
 
         # read in the marginal correlations vs. score for all data
         mcor_score_file = join(filedir, '{}_margcor_score_all_data.{}'.format(experiment_id,
-                                                                              extension))
+                                                                              file_format))
         if exists(mcor_score_file):
             files['df_mcor_sc1'] = DataReader.read_from_file(mcor_score_file, index_col=0)
             files['df_mcor_sc1_overview'] = self.make_summary_stat_df(files['df_mcor_sc1'])
@@ -413,7 +413,7 @@ class Comparer:
             group_mcor_file = join(filedir,
                                    '{}_margcor_score_by_{}.{}'.format(experiment_id,
                                                                       group,
-                                                                      extension))
+                                                                      file_format))
             if exists(group_mcor_file):
                 files['df_mcor_sc1_by_{}'
                       ''.format(group)] = DataReader.read_from_file(group_mcor_file,
@@ -422,16 +422,16 @@ class Comparer:
                 series = files['df_mcor_sc1_by_{}'.format(group)]
                 files['df_mcor_sc1_{}_overview'.format(group)] = self.make_summary_stat_df(series)
 
-        pca_file = join(filedir, '{}_pca.{}'.format(experiment_id, extension))
+        pca_file = join(filedir, '{}_pca.{}'.format(experiment_id, file_format))
         if exists(pca_file):
             files['df_pca'] = DataReader.read_from_file(pca_file, index_col=0)
             files['df_pcavar'] = DataReader.read_from_file(join(filedir,
                                                                 '{}_pcavar.{}'.format(experiment_id,
-                                                                                      extension)),
+                                                                                      file_format)),
                                                            index_col=0)
 
         descriptives_file = join(filedir, '{}_feature_descriptives.{}'.format(experiment_id,
-                                                                              extension))
+                                                                              file_format))
         if exists(descriptives_file):
             # we read all files pertaining to the descriptive analysis together
             # since we merge the outputs
@@ -445,7 +445,7 @@ class Comparer:
                                                                  'skewness', 'kurtosis']]
 
             outliers_file = join(filedir, '{}_feature_outliers.{}'.format(experiment_id,
-                                                                          extension))
+                                                                          file_format))
             df_outliers = DataReader.read_from_file(outliers_file, index_col=0)
             df_outliers = df_outliers.rename(columns={'upper': 'Upper',
                                                       'lower': 'Lower',
@@ -464,7 +464,7 @@ class Comparer:
             # join with df_features_n_values to get the value of N
             percentiles_file = join(filedir, '{}_feature_descriptives'
                                              'Extra.{}'.format(experiment_id,
-                                                               extension))
+                                                               file_format))
 
             files['df_percentiles'] = DataReader.read_from_file(percentiles_file,
                                                                 index_col=0)
@@ -491,12 +491,12 @@ class Comparer:
                                                                'Extreme outliers',
                                                                'Extreme outliers (%)']]
 
-        confmatrix_file = join(filedir, '{}_confMatrix.{}'.format(experiment_id, extension))
+        confmatrix_file = join(filedir, '{}_confMatrix.{}'.format(experiment_id, file_format))
         if exists(confmatrix_file):
             conf_matrix = DataReader.read_from_file(confmatrix_file, index_col=0)
             files['df_confmatrix'] = self.process_confusion_matrix(conf_matrix)
 
-        score_dist_file = join(filedir, '{}_score_dist.{}'.format(experiment_id, extension))
+        score_dist_file = join(filedir, '{}_score_dist.{}'.format(experiment_id, file_format))
         if exists(score_dist_file):
             df_score_dist = DataReader.read_from_file(score_dist_file, index_col=1)
             df_score_dist.rename(columns={'sys_{}'.format(prefix): 'sys'}, inplace=True)
@@ -529,4 +529,4 @@ class Comparer:
         if exists(pca_svg_file):
             figs['pca_scree_plot'] = pca_svg_file
 
-        return (files, figs, extension)
+        return (files, figs, file_format)
