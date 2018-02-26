@@ -19,20 +19,22 @@ This process is only meant for the project administrators, not users and develop
 
 6. Upload all packages to anaconda.org using ``anaconda upload``.
 
-7. Create a pull request on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ repository to test the Linux and Windows packages.
+7. Upload source package to PyPI using ``python setup.py sdist upload``.
 
-8. Draft a release on GitHub while the Linux and Windows builds are running.
+8. Create a pull request on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ repository to test the Linux and Windows packages.
 
-9. Once both builds have passed, make a pull request with the release branch to be merged into ``master`` and request code review.
+9. Draft a release on GitHub while the Linux and Windows builds are running.
 
-10. Once the build for the PR passes and the reviewers approve, merge the release branch into ``master``.
+10. Once both builds have passed, make a pull request with the release branch to be merged into ``master`` and request code review.
 
-11. Make sure that the RTFD build for ``master`` passes.
+11. Once the build for the PR passes and the reviewers approve, merge the release branch into ``master``.
 
-12. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
+12. Make sure that the RTFD build for ``master`` passes.
 
-13. Do an accompanying release of RSMExtra (only needed for ETS users).
+13. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
 
-14. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+14. Do an accompanying release of RSMExtra (only needed for ETS users).
 
-15. Send an email around at ETS announcing the release and the changes.
+15. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+
+16. Send an email around at ETS announcing the release and the changes.

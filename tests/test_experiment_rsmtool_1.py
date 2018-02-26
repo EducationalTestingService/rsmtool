@@ -24,7 +24,9 @@ from rsmtool.test_utils import (check_run_experiment,
     param('lr-with-missing-length-values', 'lr_with_missing_length_values'),
     param('lr-with-length-zero-sd', 'lr_with_length_zero_sd'),
     param('lr-with-h2', 'lr_with_h2', consistency=True),
-    param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True)
+    param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True),
+    param('lr-with-continuous-human-scores', 'lr_with_continuous_human_scores', consistency=True),
+    param('lr-with-continuous-human-scores-in-test', 'lr_with_continuous_human_scores_in_test', consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
