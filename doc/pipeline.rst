@@ -82,7 +82,7 @@ raw_trim
 ~~~~~~~~
 The raw predictions "trimmed" to be in the score range acceptable for the item. The scores are trimmed to be within the following range: :math:`score_{min} - 0.49998` and :math:`score_{max} + 0.49998`, where :math:`score_{min}` and :math:`score_{max}` are the lowest and highest points on the scoring scale respectively.
 
-This approach represents a compromise: it provides scores that are real-valued and, therefore, provide more information than integer-valued human scores. However, it also ensures that the scores fall within the expected scale.
+This approach represents a compromise: it provides scores that are real-valued and, therefore, provide more information than human scores that are likely to be integer-valued. However, it also ensures that the scores fall within the expected scale.
 
 raw_trim_round
 ~~~~~~~~~~~~~~

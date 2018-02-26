@@ -25,10 +25,9 @@ RSMTool can also be downloaded directly from
 Installing with pip
 -------------------
 
-You can also ``pip`` to install RSMTool instead of ``conda``. To do so, simply run::
+You can also use ``pip`` to install RSMTool instead of ``conda``. To do so, simply run::
 
     pip install rsmtool
-
 
 Note that if you are on macOS, you will need to have the following line in your ``.bashrc`` for RSMTool to work properly::
 
