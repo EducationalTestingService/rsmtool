@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 The script to create a summary report for experiment
 
@@ -9,7 +11,6 @@ The script to create a summary report for experiment
 :organization: ETS
 """
 
-#!/usr/bin/env python
 
 import argparse
 import glob
