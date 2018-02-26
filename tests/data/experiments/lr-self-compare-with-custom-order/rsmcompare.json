@@ -17,7 +17,7 @@
                       "model",
                       "consistency",
                       "features_by_group",
-		              "preprocessed_features_by_group",
-		              "notes",
+		                  "preprocessed_features_by_group",
+		                  "notes",
                       "sysinfo"]
 }

@@ -20,12 +20,16 @@ import pandas as pd
 from math import ceil
 from glob import glob
 from importlib import import_module
+from pathlib import Path
 from string import Template
 from textwrap import wrap
 from IPython.display import (display,
                              HTML)
 
 from skll.data import safe_float as string_to_number
+
+
+HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
 
 
 BUILTIN_MODELS = ['LinearRegression',
@@ -856,12 +860,89 @@ def show_thumbnail(path_to_image, image_id):
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
 
-    Returns
-    -------
+    Displays
+    --------
     display : IPython.core.display.HTML
         The HTML display of the thumbnail image.
     """
-    return display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
+    display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
+
+
+def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
+    """
+    Generate HTML list items for each file name,
+    given output directory. Optionally pass a
+    replacement dictionary to use more descriptive
+    titles for the file names.
+
+    Parameters
+    ----------
+    output_dir : str
+        The output directory.
+    experiment_id : str
+        The experiment ID.
+    file_format : str
+        The format of the output files.
+    replace_dict : dict, optional
+        A dictionary which makes file names to descriptions.
+        Defaults to empty dictionary.
+
+    Returns
+    ------
+    html_string : str
+        HTML string with file descriptions and links.
+    """
+    output_dir = Path(output_dir)
+    parent_dir = output_dir.parent
+    files = output_dir.glob('*.{}'.format(file_format))
+    html_string = ''
+    for file in sorted(files):
+        relative_file = ".." / file.relative_to(parent_dir)
+        relative_name = relative_file.stem.replace('{}_'.format(experiment_id), '')
+
+        # check if relative name is in the replacement dictionary and,
+        # if it is, use the more descriptive name in the replacement
+        # dictionary. Otherwise, normalize the file name and use that
+        # as the description instead.
+        if relative_name in replace_dict:
+            descriptive_name = replace_dict[relative_name]
+        else:
+            descriptive_name_components = relative_name.split('_')
+            descriptive_name = ' '.join(descriptive_name_components).title()
+
+        html_string += HTML_STRING.format(descriptive_name,
+                                          relative_file,
+                                          file_format)
+
+    return """<ul><html>""" + html_string + """</ul></html>"""
+
+
+def show_files(output_dir, experiment_id, file_format, replace_dict={}):
+    """
+    Show files for a given output directory.
+
+    Parameters
+    ----------
+    output_dir : str
+        The output directory.
+    experiment_id : str
+        The experiment ID.
+    file_format : str
+        The format of the output files.
+    replace_dict : dict, optional
+        A dictionary which makes file names to descriptions.
+        Defaults to empty dictionary.
+
+    Displays
+    --------
+    display : IPython.core.display.HTML
+        The HTML file descriptions and links.
+    """
+    html_string = get_files_as_html(output_dir,
+                                    experiment_id,
+                                    file_format,
+                                    replace_dict)
+    display(HTML(html_string))
 
 
 class LogFormatter(logging.Formatter):

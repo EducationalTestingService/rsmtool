@@ -14,6 +14,7 @@
         "pca",
         "evaluation",
         "evaluation_by_group",
+        "intermediate_file_paths",
         "sysinfo"
     ],
     "test_label_column": "score",

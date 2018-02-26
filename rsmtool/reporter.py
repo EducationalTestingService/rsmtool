@@ -54,6 +54,7 @@ else:
                                     'evaluation',
                                     'evaluation_by_group',
                                     'pca',
+                                    'intermediate_file_paths',
                                     'sysinfo']
 
     ordered_section_list_rsmeval = ['data_description',
@@ -61,6 +62,7 @@ else:
                                     'consistency',
                                     'evaluation',
                                     'evaluation_by_group',
+                                    'intermediate_file_paths',
                                     'sysinfo']
 
     ordered_section_list_rsmcompare = ['feature_descriptives',
@@ -78,6 +80,7 @@ else:
     ordered_section_list_rsmsummarize = ['preprocessed_features',
                                          'model',
                                          'evaluation',
+                                         'intermediate_file_paths',
                                          'sysinfo']
 
     special_section_list_rsmtool = []
