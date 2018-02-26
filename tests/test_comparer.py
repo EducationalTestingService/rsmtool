@@ -172,11 +172,11 @@ class TestComparer:
         figure_dir = join('test_outputs', source, 'figure')
 
         comparer = Comparer()
-        csvs, figs = comparer.load_rsmtool_output(output_dir,
-                                                  figure_dir,
-                                                  experiment_id,
-                                                  'scale',
-                                                  ['QUESTION', 'L1'])
+        csvs, figs, file_format = comparer.load_rsmtool_output(output_dir,
+                                                               figure_dir,
+                                                               experiment_id,
+                                                               'scale',
+                                                               ['QUESTION', 'L1'])
 
         expected_csv_keys = ['df_coef',
                              'df_confmatrix',
@@ -226,7 +226,6 @@ class TestComparer:
                              'feature_distplots',
                              'pca_scree_plot']
 
-        print(expected_csv_keys, sorted(csvs.keys()))
-
+        assert_equal(file_format, 'csv')
         assert_equal(expected_csv_keys, sorted(csvs.keys()))
         assert_equal(expected_fig_keys, sorted(figs.keys()))
