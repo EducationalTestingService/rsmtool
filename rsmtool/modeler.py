@@ -999,7 +999,7 @@ class Modeler:
                          custom_objective=None,
                          predict_expected_scores=False):
         """
-        Train a SKLL regression model.
+        Train a SKLL classification or regression model.
 
         Parameters
         ----------
