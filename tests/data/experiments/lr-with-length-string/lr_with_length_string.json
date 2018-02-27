@@ -1,0 +1,15 @@
+{
+    "train_file": "../../files/train_with_length_string.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test.csv",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "length_column": "LENGTH",
+    "experiment_id": "lr_with_length_string",
+    "description": "Using all features with an LinearRegression model, with string length column."
+}

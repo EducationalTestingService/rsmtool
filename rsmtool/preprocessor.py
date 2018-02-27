@@ -1440,6 +1440,11 @@ class FeaturePreprocessor:
                            "for the following features: "
                            "{}".format(', '.join(missing_features)))
 
+        # if ``length_column`` exists, make sure it's converted to numeric;
+        # values that cannot be coerced to numeric will be set to ``np.nan``
+        if length_column:
+            df_filtered['length'] = pd.to_numeric(df_filtered['length'], errors='coerce')
+
         # check the values for length column. We do this after filtering
         # to make sure we have removed responses that have not been
         # processed correctly. Else rename length column to
