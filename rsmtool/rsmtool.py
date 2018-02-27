@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 The main RSMTool script.
 

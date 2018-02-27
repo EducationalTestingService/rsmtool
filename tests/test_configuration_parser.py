@@ -341,7 +341,7 @@ class TestConfigurationParser:
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
 
-    @raises(ValueError)    
+    @raises(ValueError)
     def test_builtin_model_for_expected_scores(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',

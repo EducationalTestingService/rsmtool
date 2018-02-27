@@ -1,4 +1,4 @@
-# python
+#!/usr/bin/env python
 
 """
 Utility script for comparing .json files.
@@ -120,7 +120,7 @@ def compare_jsons(ref_dir, test_dir):
             for field in PATH_FIELDS:
                 if (field in ref_json_norm and
                     ref_json_norm[field] is not None and
-                    not ref_json_norm[field] == 'asis'):
+                        not ref_json_norm[field] == 'asis'):
                     new_ref_path = abspath(join(ref_dir, ref_json_norm[field]))
                     new_ref_path = re.sub("My Documents", "Documents", new_ref_path)
                     ref_json_norm[field] = new_ref_path

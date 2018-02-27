@@ -1,4 +1,4 @@
-# python
+#!/usr/bin/env python
 
 """
 This is a utility script to copy over json files from rsmextra/rsmtool tests and
@@ -129,8 +129,8 @@ def copy_jsons(source_dir, target_dir):
         # My Documents with Documents
         for field in PATH_FIELDS:
             if (field in json_obj and
-                not json_obj[field] is not None and
-                not json_obj[field] == 'asis'):
+                    not json_obj[field] is not None and
+                    not json_obj[field] == 'asis'):
                 new_ref_path = abspath(join(source_dir,
                                             experiment_dir,
                                             json_obj[field]))

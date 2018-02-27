@@ -190,7 +190,7 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                                        file_format=file_format)
 
     if (output_file.lower().endswith('.csv') or
-        output_file.lower().endswith('.xlsx')):
+            output_file.lower().endswith('.xlsx')):
 
         output_dir = dirname(output_file)
         _, filename = split(output_file)

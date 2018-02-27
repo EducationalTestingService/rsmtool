@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Script to compare two RSMTool experiments.
 
@@ -9,7 +11,6 @@ Script to compare two RSMTool experiments.
 :organization: ETS
 """
 
-#!/usr/bin/env python
 
 import argparse
 import glob

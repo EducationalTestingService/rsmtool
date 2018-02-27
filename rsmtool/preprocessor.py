@@ -108,7 +108,7 @@ class FeatureSubsetProcessor:
         df_feature_specs = df.copy()
 
         if ('feature' not in df_feature_specs and
-            'Feature' not in df_feature_specs):
+                'Feature' not in df_feature_specs):
             raise ValueError("The feature_subset_file must contain "
                              "a column named 'feature' "
                              "containing the feature names.")
@@ -122,7 +122,7 @@ class FeatureSubsetProcessor:
 
         if sign:
             if ('sign_{}'.format(sign) not in df_feature_specs and
-                'Sign_{}'.format(sign) not in df_feature_specs):
+                    'Sign_{}'.format(sign) not in df_feature_specs):
                     raise ValueError("The feature_subset_file must "
                                      "contain the requested "
                                      "sign column 'sign_{}'".format(sign))
@@ -1700,12 +1700,12 @@ class FeaturePreprocessor:
         # check to make sure that `length_column` or `second_human_score_column`
         # are not also included in the requested features, if they are specified
         if (length_column and
-            length_column in requested_features):
+                length_column in requested_features):
             raise ValueError("The value of 'length_column' ('{}') cannot be "
                              "used as a model feature.".format(length_column))
 
         if (second_human_score_column and
-            second_human_score_column in requested_features):
+                second_human_score_column in requested_features):
             raise ValueError("The value of 'second_human_score_column' ('{}') cannot be "
                              "used as a model feature.".format(second_human_score_column))
 
@@ -1787,7 +1787,7 @@ class FeaturePreprocessor:
         # we have the feature_names when no feature file was specified.
         # We also allow features with 0 standard deviation in the test file.
         if (test_file_location == train_file_location and
-            train_label_column == test_label_column):
+                train_label_column == test_label_column):
             logging.warning('The same data file and label '
                             'column are used for both training '
                             'and evaluating the model. No second '
@@ -2133,7 +2133,7 @@ class FeaturePreprocessor:
 
         if data_container_obj.get_frame('scale') is not None:
             if ('sc1' not in data_container_obj.scale.columns and
-                'prediction' not in data_container_obj.scale.columns):
+                    'prediction' not in data_container_obj.scale.columns):
                 raise KeyError('The CSV file specified for scaling ',
                                'must have the "prediction" and the "sc1" '
                                'columns.')

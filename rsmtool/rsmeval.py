@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Run evaluation only experiments.
 
@@ -9,7 +11,6 @@ Run evaluation only experiments.
 :organization: ETS
 """
 
-#!/usr/bin/env python
 
 import argparse
 import logging

@@ -143,7 +143,6 @@ class TestAnalyzer:
         assert_equal(len(components.columns), 100)
         assert_equal(len(variance.columns), 100)
 
-
     def test_compute_disattenuated_correlations_single_human(self):
         hm_corr = pd.Series([0.9, 0.8, 0.6],
                             index=['raw', 'raw_trim', 'raw_trim_round'])
@@ -153,51 +152,42 @@ class TestAnalyzer:
         assert_equal(len(df_dis_corr), 3)
         assert_equal(df_dis_corr.loc['raw', 'corr_disattenuated'], 1.0)
 
-
     def test_compute_disattenuated_correlations_matching_human(self):
         hm_corr = pd.Series([0.9, 0.4, 0.6],
                             index=['All data', 'GROUP1', 'GROUP2'])
-        hh_corr = pd.Series([0.81, 0.64, 0.36], 
+        hh_corr = pd.Series([0.81, 0.64, 0.36],
                             index=['All data', 'GROUP1', 'GROUP2'])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, 0.5, 1.0])
 
-
     def test_compute_disattenuated_correlations_single_matching_human(self):
         hm_corr = pd.Series([0.9, 0.4, 0.6],
                             index=['All data', 'GROUP1', 'GROUP2'])
-        hh_corr = pd.Series([0.81], 
+        hh_corr = pd.Series([0.81],
                             index=['All data'])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, np.nan, np.nan])
 
-
     def test_compute_disattenuated_correlations_mismatched_indices(self):
         hm_corr = pd.Series([0.9, 0.6],
                             index=['All data', 'GROUP2'])
-        hh_corr = pd.Series([0.81, 0.64], 
+        hh_corr = pd.Series([0.81, 0.64],
                             index=['All data', 'GROUP1'])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr['corr_disattenuated'], [1.0, np.nan, np.nan])
 
-
     def test_compute_disattenuated_correlations_negative_human(self):
         hm_corr = pd.Series([0.9, 0.8],
                             index=['All data', 'GROUP1'])
-        hh_corr = pd.Series([-0.03, 0.64], 
+        hh_corr = pd.Series([-0.03, 0.64],
                             index=['All data', 'GROUP1'])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr,
                                                                   hh_corr)
         assert_equal(len(df_dis_corr), 2)
         assert_array_equal(df_dis_corr['corr_disattenuated'], [np.nan, 1.0])
-
-
-
-
-

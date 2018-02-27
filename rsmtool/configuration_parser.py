@@ -775,7 +775,7 @@ class ConfigurationParser:
         # 6. Check for fields that require feature_subset_file and try
         # to use the default feature file
         if (new_config['feature_subset'] and
-            not new_config['feature_subset_file']):
+                not new_config['feature_subset_file']):
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
@@ -812,12 +812,12 @@ class ConfigurationParser:
         if HAS_RSMEXTRA:
             default_feature = default_feature_subset_file
             if (new_config['feature_subset_file'] == default_feature and
-                not new_config['sign']):
+                    not new_config['sign']):
                 new_config['sign'] = default_feature_sign
 
         # 7. Check for fields that must be specified together
         if (new_config['min_items_per_candidate'] and
-            not new_config['candidate_column']):
+                not new_config['candidate_column']):
             raise ValueError("If you want to filter out candidates with "
                              "responses to less than X items, you need "
                              "to specify the name of the column which "
