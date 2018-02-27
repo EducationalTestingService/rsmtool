@@ -1440,13 +1440,10 @@ class FeaturePreprocessor:
                            "for the following features: "
                            "{}".format(', '.join(missing_features)))
 
-        # if ``length_column`` exists and is non-numeric, convert it to numeric;
+        # if ``length_column`` exists, make sure it's converted to numeric;
         # values that cannot be coerced to numeric will be set to ``np.nan``
-        if length_column and not np.issubdtype(df_filtered['length'], np.number):
+        if length_column:
             df_filtered['length'] = pd.to_numeric(df_filtered['length'], errors='coerce')
-            logging.warning("The {} column is non-numeric, and is being converted "
-                            "to numeric. Any values that cannot be coerced to numeric "
-                            "will be set to null.".format(length_column))
 
         # check the values for length column. We do this after filtering
         # to make sure we have removed responses that have not been
