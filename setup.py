@@ -5,15 +5,18 @@ from setuptools import find_packages, setup
 exec(compile(open('rsmtool/version.py').read(), 'rsmtool/version.py', 'exec'))
 # (we use the above instead of execfile for Python 3.x compatibility)
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
+
 
 def requirements():
     req_path = 'requirements.txt'
     with open(req_path) as f:
         reqs = f.read().splitlines()
     return reqs
+
 
 setup(name='rsmtool',
       version=__version__,
@@ -28,7 +31,7 @@ setup(name='rsmtool',
                      'rsmpredict = rsmtool.rsmpredict:main',
                      'rsmcompare = rsmtool.rsmcompare:main',
                      'rsmsummarize = rsmtool.rsmsummarize:main',
-                     'render_notebook = rsmtool.report:main',
+                     'render_notebook = rsmtool.reporter:main',
                      'convert_feature_json = rsmtool.convert_feature_json:main']
                     },
       install_requires=requirements(),
