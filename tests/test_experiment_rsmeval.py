@@ -1,3 +1,5 @@
+import os
+
 from glob import glob
 from os.path import basename, exists, join
 
@@ -9,6 +11,8 @@ from rsmtool.test_utils import (check_file_output,
                                 check_run_evaluation,
                                 do_run_evaluation,
                                 rsmtool_test_dir)
+
+TEST_DIR = os.environ.get('TESTDIR', None)
 
 
 @parameterized([
@@ -31,6 +35,8 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-eval-with-continuous-human-scores', 'lr_eval_with_continuous_human_scores', consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
+    if TEST_DIR:
+        kwargs['given_test_dir'] = TEST_DIR
     check_run_evaluation(*args, **kwargs)
 
 

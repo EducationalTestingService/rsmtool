@@ -1,3 +1,4 @@
+import os
 import warnings
 
 from glob import glob
@@ -15,6 +16,8 @@ from rsmtool.test_utils import (check_file_output,
                                 do_run_experiment,
                                 rsmtool_test_dir)
 
+TEST_DIR = os.environ.get('TESTDIR', None)
+
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
@@ -29,6 +32,8 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
+    if TEST_DIR:
+        kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
 
 
