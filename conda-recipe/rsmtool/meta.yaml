@@ -82,11 +82,10 @@ test:
     - rsmtool.preprocessor
     - rsmtool.reader
     - rsmtool.reporter
-    - rsmtool.report
     - rsmtool.test_utils
     - rsmtool.transformer
-    - rsmtool.writer
     - rsmtool.utils
+    - rsmtool.writer
 
   commands:
     - rsmtool --help
