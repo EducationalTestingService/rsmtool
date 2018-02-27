@@ -1,3 +1,5 @@
+import os
+
 from os.path import join
 
 from nose.tools import raises
@@ -6,6 +8,9 @@ from parameterized import param, parameterized
 from rsmtool.test_utils import (check_run_comparison,
                                 do_run_comparison,
                                 rsmtool_test_dir)
+
+TEST_DIR = os.environ.get('TESTDIR', None)
+
 
 # set this to False to disable auto-updating of all experiment
 # tests contained in this file via `update_files.py`.
@@ -29,6 +34,8 @@ _AUTO_UPDATE = False
     param('lr-self-compare-with-subgroups-and-edge-cases', 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
+    if TEST_DIR:
+        kwargs['given_test_dir'] = TEST_DIR
     check_run_comparison(*args, **kwargs)
 
 
