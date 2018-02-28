@@ -1,11 +1,20 @@
+import os
+
 from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
-                                do_run_experiment,
-                                rsmtool_test_dir)
+                                do_run_experiment)
+
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 @parameterized([
@@ -25,6 +34,8 @@ from rsmtool.test_utils import (check_run_experiment,
     param('lr-xlsx-input-and-subset-files', 'lr_xlsx_input_and_subset_files')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
+    if TEST_DIR:
+        kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
 
 

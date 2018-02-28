@@ -1,3 +1,4 @@
+import os
 import warnings
 
 from glob import glob
@@ -12,8 +13,15 @@ from rsmtool.test_utils import (check_file_output,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_experiment,
-                                do_run_experiment,
-                                rsmtool_test_dir)
+                                do_run_experiment)
+
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 @parameterized([
@@ -29,6 +37,8 @@ from rsmtool.test_utils import (check_file_output,
     param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
+    if TEST_DIR:
+        kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
 
 
