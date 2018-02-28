@@ -349,7 +349,6 @@ class TestFeaturePreprocessor:
         flag_dict = {'flag1': ['0.0', '1.0', '2.0', '3.5', 'TD']}
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
-        print(df_new, df)
         assert_frame_equal(df_new, df)
         eq_(len(df_excluded), 0)
 
@@ -711,7 +710,6 @@ class TestFeaturePreprocessor:
         values = np.array([1.4, 8.5, 7.4])
         expected = np.array([1.4, 8.49998, 7.4])
         actual = FeaturePreprocessor.trim(values, 1, 8)
-        print(actual, expected)
         assert_array_equal(actual, expected)
 
     def test_trim_with_list(self):
@@ -719,7 +717,6 @@ class TestFeaturePreprocessor:
         values = [1.4, 8.5, 7.4]
         expected = np.array([1.4, 8.49998, 7.4])
         actual = FeaturePreprocessor.trim(values, 1, 8)
-        print(actual, expected)
         assert_array_equal(actual, expected)
 
     def test_preprocess_feature_fail(self):
@@ -836,7 +833,7 @@ class TestFeaturePreprocessor:
                                    6,
                                    {},
                                    [])
-        print(df_filtered_features)
+
         assert_frame_equal(df_filtered_features,
                            df_filtered_features_expected)
 
