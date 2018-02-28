@@ -442,7 +442,7 @@ class FeaturePreprocessor:
         Returns
         -------
         trimmed_values : np.array
-            List of trimmed values.
+            Trimmed values.
         """
         if isinstance(values, list):
             values = np.array(values)
