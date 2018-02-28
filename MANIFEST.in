@@ -1,3 +1,6 @@
+include LICENSE
+include *.rst
+include requirements.txt
 recursive-include rsmtool/notebooks *
 recursive-include doc *
 prune test_outputs

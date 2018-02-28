@@ -32,3 +32,7 @@ You can also use ``pip`` to install RSMTool instead of ``conda``. To do so, simp
 Note that if you are on macOS, you will need to have the following line in your ``.bashrc`` for RSMTool to work properly::
 
     export MPLBACKEND=Agg
+
+.. note::
+    
+    Currently the `statsmodels` PyPI package seems to be broken on Windows, so `pip` installation on Windows may not work. If you are using Windows, use `conda` to install RSMTool by following the instructions above.

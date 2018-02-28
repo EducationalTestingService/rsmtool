@@ -3,7 +3,7 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Run `tests/update_files.py` to make sure that all test data in the new release have correct experiment ids and filenames. If any files need to be changed this should be investigated before the branch is released. 
+1. Run `tests/update_files.py` to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
 
 2. Create a release branch on GitHub.
 
@@ -21,7 +21,7 @@ This process is only meant for the project administrators, not users and develop
 
 7. Upload source package to PyPI using ``python setup.py sdist upload``.
 
-8. Create a pull request on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ repository to test the Linux and Windows packages.
+8. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and PyPI packages on Linux and Windows.
 
 9. Draft a release on GitHub while the Linux and Windows builds are running.
 

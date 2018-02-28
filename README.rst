@@ -57,7 +57,6 @@ Requirements
 - ``jupyter``
 - ``notebook``
 - ``seaborn``
-- ``setuptools``
 
 Contributing
 ------------

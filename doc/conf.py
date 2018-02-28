@@ -250,7 +250,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'rsmtool.tex', 'rsmtool Documentation',
-     'Nitin Madnani and Anastassia Loukina', 'manual'),
+     'Nitin Madnani, Jeremy Biggs, and Anastassia Loukina', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

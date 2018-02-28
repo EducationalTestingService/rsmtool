@@ -5,9 +5,11 @@ from setuptools import find_packages, setup
 exec(compile(open('rsmtool/version.py').read(), 'rsmtool/version.py', 'exec'))
 # (we use the above instead of execfile for Python 3.x compatibility)
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
+
 
 def requirements():
     req_path = 'requirements.txt'
@@ -15,11 +17,16 @@ def requirements():
         reqs = f.read().splitlines()
     return reqs
 
+
 setup(name='rsmtool',
       version=__version__,
       description='Rater scoring modeling tool',
       long_description=readme(),
       keywords='scoring modeling',
+      url='http://github.com/EducationalTestingService/rsmtool',
+      maintainer='Nitin Madnani',
+      maintainer_email='nmadnani@ets.org',
+      license='Apache 2',
       packages=find_packages(),
       include_package_data=True,
       entry_points={'console_scripts':
@@ -28,7 +35,7 @@ setup(name='rsmtool',
                      'rsmpredict = rsmtool.rsmpredict:main',
                      'rsmcompare = rsmtool.rsmcompare:main',
                      'rsmsummarize = rsmtool.rsmsummarize:main',
-                     'render_notebook = rsmtool.report:main',
+                     'render_notebook = rsmtool.reporter:main',
                      'convert_feature_json = rsmtool.convert_feature_json:main']
                     },
       install_requires=requirements(),
@@ -36,6 +43,7 @@ setup(name='rsmtool',
                    'Intended Audience :: Developers',
                    'Programming Language :: Python',
                    'Topic :: Scientific/Engineering',
+                   'Operating System :: Microsoft :: Windows',
                    'Operating System :: POSIX',
                    'Operating System :: Unix',
                    'Operating System :: MacOS',
