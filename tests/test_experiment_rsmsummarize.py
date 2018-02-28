@@ -11,10 +11,15 @@ from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_summary,
-                                do_run_summary,
-                                rsmtool_test_dir)
+                                do_run_summary)
 
+# allow test directory to be set via an environment variable
+# which is needed for package testing
 TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 @parameterized([

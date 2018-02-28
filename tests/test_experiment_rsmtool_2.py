@@ -6,10 +6,15 @@ from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
-                                do_run_experiment,
-                                rsmtool_test_dir)
+                                do_run_experiment)
 
+# allow test directory to be set via an environment variable
+# which is needed for package testing
 TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 @parameterized([
