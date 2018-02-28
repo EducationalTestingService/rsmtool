@@ -20,6 +20,7 @@ import sys
 from os import listdir
 from os.path import abspath, exists, join, dirname
 
+from rsmtool import VERSION_STRING
 from rsmtool.analyzer import Analyzer
 from rsmtool.configuration_parser import ConfigurationParser, Configuration
 from rsmtool.preprocessor import FeaturePreprocessor
@@ -27,8 +28,6 @@ from rsmtool.reader import DataReader
 from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
 from rsmtool.writer import DataWriter
-
-from rsmtool.version import __version__
 
 
 def run_evaluation(config_file_or_obj, output_dir):
@@ -230,7 +229,7 @@ def main():
                              "for this experiment will be stored")
 
     parser.add_argument('-V', '--version', action='version',
-                        version='%(prog)s {0}'.format(__version__))
+                        version=VERSION_STRING)
 
     # parse given command line arguments
     args = parser.parse_args()
