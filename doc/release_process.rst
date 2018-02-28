@@ -21,7 +21,7 @@ This process is only meant for the project administrators, not users and develop
 
 7. Upload source package to PyPI using ``python setup.py sdist upload``.
 
-8. Create a pull request on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ repository to test the Linux and Windows packages.
+8. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and PyPI packages on Linux and Windows.
 
 9. Draft a release on GitHub while the Linux and Windows builds are running.
 
