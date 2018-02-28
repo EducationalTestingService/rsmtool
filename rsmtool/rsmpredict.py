@@ -26,14 +26,13 @@ from os.path import (basename,
                      splitext,
                      split)
 
+from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import ConfigurationParser, Configuration
 from rsmtool.modeler import Modeler
 from rsmtool.preprocessor import FeaturePreprocessor
 from rsmtool.reader import DataReader
 from rsmtool.utils import LogFormatter
 from rsmtool.writer import DataWriter
-
-from rsmtool.version import __version__
 
 
 def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=None):
@@ -261,7 +260,7 @@ def main():
                         default=None)
 
     parser.add_argument('-V', '--version', action='version',
-                        version='%(prog)s {0}'.format(__version__))
+                        version=VERSION_STRING)
 
     # parse given command line arguments
     args = parser.parse_args()

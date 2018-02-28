@@ -20,6 +20,15 @@ except ImportError:
 else:
     HAS_RSMEXTRA = True
 
+from .version import __version__
+
+if HAS_RSMEXTRA:
+    from rsmextra.version import __version__ as rsmextra_version
+    VERSION_STRING = '%(prog)s {}; rsmextra {}'.format(__version__,
+                                                       rsmextra_version)
+else:
+    VERSION_STRING = '%(prog)s {}'.format(__version__)
+
 from .analyzer import Analyzer
 
 from .convert_feature_json import convert_feature_json_file
@@ -53,6 +62,7 @@ from .rsmtool import run_experiment
 from .rsmpredict import compute_and_save_predictions
 
 from .rsmsummarize import run_summary
+
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in
