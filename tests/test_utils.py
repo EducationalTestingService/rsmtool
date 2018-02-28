@@ -296,8 +296,8 @@ class TestIntermediateFiles:
 
         replace_dict = {'betas': 'THESE BETAS',
                         'eval': 'THESE EVALS'}
-        html_expected = html_string.format(join(join('..', 'output'), files[0]),
-                                           join(join('..', 'output'), files[1]))
+        html_expected = html_string.format(join('..', 'output', files[0]),
+                                           join('..', 'output', files[1]))
         html_expected = "".join(html_expected.strip().split())
         html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
         html_result = get_files_as_html(directory, 'lr', 'csv', replace_dict)
