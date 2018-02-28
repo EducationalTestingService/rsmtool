@@ -18,6 +18,7 @@ import sys
 from os import listdir, getcwd, makedirs
 from os.path import abspath, exists, join, dirname
 
+from rsmtool import VERSION_STRING
 from rsmtool.analyzer import Analyzer
 from rsmtool.configuration_parser import ConfigurationParser, Configuration
 from rsmtool.modeler import Modeler
@@ -26,8 +27,6 @@ from rsmtool.reader import DataReader
 from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
 from rsmtool.writer import DataWriter
-
-from rsmtool.version import __version__
 
 
 def run_experiment(config_file_or_obj,
@@ -322,7 +321,7 @@ def main():
                              "for this experiment will be stored")
 
     parser.add_argument('-V', '--version', action='version',
-                        version='%(prog)s {0}'.format(__version__))
+                        version=VERSION_STRING)
 
     args = parser.parse_args()
     logger.info('Output directory: {}'.format(args.output_dir))

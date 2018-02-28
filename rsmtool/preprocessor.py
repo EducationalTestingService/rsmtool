@@ -427,7 +427,7 @@ class FeaturePreprocessor:
 
         Parameters
         ----------
-        values : np.array
+        values : list or np.array
             The values to trim.
         trim_min : float
             The lowest score on the score point, used for
@@ -441,9 +441,12 @@ class FeaturePreprocessor:
 
         Returns
         -------
-        trimmed_values : list of float
-            List of trimmed values.
+        trimmed_values : np.array
+            Trimmed values.
         """
+        if isinstance(values, list):
+            values = np.array(values)
+
         new_max = trim_max + tolerance
         new_min = trim_min - tolerance
         trimmed_values = values.copy()
