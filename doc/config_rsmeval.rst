@@ -38,7 +38,7 @@ A brief description of the experiment. This will be included in the report. The 
 .. _file_format_eval:
 
 file_format *(Optional)*
-"""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~
 The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 id_column *(Optional)*

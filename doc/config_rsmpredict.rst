@@ -31,11 +31,11 @@ The path to the file with the raw feature values that will be used for generatin
 .. _file_format_predict:
 
 file_format *(Optional)*
-"""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~
 The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 predict_expected_scores *(Optional)*
-""""""""""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If the original model was a probabilistic SKLL classifier, then *expected scores* --- probability-weighted averages over a contiguous, numeric score points --- can be generated as the machine predictions instead of the most likely score point, which would be the default. Set this field to ``true`` to compute expected scores as predictions. Defaults to ``false``.
 
 .. note::
@@ -65,7 +65,7 @@ second_human_score_column *(Optional)*
 The name for the column containing the second human score. This column will be renamed to ``sc2``.
 
 standardize_features *(Optional)*
-"""""""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
 
 subgroups *(Optional)*
