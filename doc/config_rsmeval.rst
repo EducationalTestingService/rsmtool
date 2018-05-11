@@ -38,7 +38,7 @@ A brief description of the experiment. This will be included in the report. The 
 .. _file_format_eval:
 
 file_format *(Optional)*
-"""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~
 The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
 
 id_column *(Optional)*
@@ -150,7 +150,7 @@ A list containing the order in which the sections in the report should be genera
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmeval>`.
 
 use_thumbnails *(Optional)*
-"""""""""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
 
 candidate_column *(Optional)*
