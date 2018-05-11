@@ -1,6 +1,6 @@
 package:
   name: rsmtool
-  version: 6.0
+  version: 6.0.1
 
 source:
   path: ../../../rsmtool
