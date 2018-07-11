@@ -12,7 +12,6 @@ Utility classes and functions.
 import json
 import logging
 import re
-import os
 
 import numpy as np
 import pandas as pd
@@ -20,6 +19,7 @@ import pandas as pd
 from math import ceil
 from glob import glob
 from importlib import import_module
+from os.path import exists, isabs, join, relpath
 from pathlib import Path
 from string import Template
 from textwrap import wrap
@@ -716,7 +716,7 @@ def has_files_with_extension(directory, ext):
         True if directory contains files with given extension,
         else False.
     """
-    files_with_extension = glob(os.path.join(directory, '*.{}'.format(ext)))
+    files_with_extension = glob(join(directory, '*.{}'.format(ext)))
     return len(files_with_extension) > 0
 
 
@@ -768,7 +768,7 @@ def get_output_directory_extension(directory, experiment_id):
     return extension
 
 
-def get_thumbnail_as_html(path_to_image, image_id):
+def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     """
     Given an path to an image file, generate the HTML for
     a click-able thumbnail version of the image.
@@ -784,6 +784,10 @@ def get_thumbnail_as_html(path_to_image, image_id):
     image_id : int
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
+    path_to_thumbnail : str or None, optional
+        If you would like to use a different thumbnail
+        image, specify the path to the thumbnail.
+        Defaults to None.
 
     Returns
     -------
@@ -795,18 +799,22 @@ def get_thumbnail_as_html(path_to_image, image_id):
     FileNotFoundError
         If the image file cannot be located.
     """
-    if not os.path.exists(path_to_image):
+    if not exists(path_to_image):
         raise FileNotFoundError('The file `{}` could not be '
                                 'located.'.format(path_to_image))
 
     # check if the path is relative or absolute
-    if os.path.isabs(path_to_image):
-        relative_path = os.path.relpath(path_to_image)
+    if isabs(path_to_image):
+        relative_path = relpath(path_to_image)
     else:
         relative_path = path_to_image
 
-    # get the current ID of the image
-    image_id_with_pound = '"#{}"'.format(image_id)
+    # if `path_to_thumbnail` is None, use `path_to_image`;
+    # otherwise, get the relative path to the thumbnail
+    if path_to_thumbnail is None:
+        path_to_thumbnail = '{}'.format(relative_path)
+    else:
+        path_to_thumbnail = relpath(path_to_thumbnail)
 
     # specify the thumbnail style
     style = """
@@ -831,11 +839,11 @@ def get_thumbnail_as_html(path_to_image, image_id):
     </script>""".format(image_id)
 
     # generate image tags
-    image = ("""<img id='{}' src='{}' onclick='getPicture({})' """
+    image = ("""<img id='{}' src='{}' onclick='getPicture("{}")' """
              """title="Click to enlarge">"""
              """</img>""").format(image_id,
                                   relative_path,
-                                  image_id_with_pound)
+                                  path_to_thumbnail)
 
     # create the image HTML
     image += style
@@ -843,7 +851,7 @@ def get_thumbnail_as_html(path_to_image, image_id):
     return image
 
 
-def show_thumbnail(path_to_image, image_id):
+def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     """
     Given an path to an image file, display
     a click-able thumbnail version of the image.
@@ -859,13 +867,19 @@ def show_thumbnail(path_to_image, image_id):
     image_id : int
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
+    path_to_thumbnail : str or None, optional
+        If you would like to use a different thumbnail
+        image, specify the path to the thumbnail.
+        Defaults to None.
 
     Displays
     --------
     display : IPython.core.display.HTML
         The HTML display of the thumbnail image.
     """
-    display(HTML(get_thumbnail_as_html(path_to_image, image_id)))
+    display(HTML(get_thumbnail_as_html(path_to_image,
+                                       image_id,
+                                       path_to_thumbnail)))
 
 
 def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):

@@ -308,13 +308,16 @@ class TestIntermediateFiles:
 
 class TestThumbnail:
 
-    def get_result(self, path, id_num='1'):
+    def get_result(self, path, id_num='1', other_path=None):
+
+        if other_path is None:
+            other_path = path
 
         # get the expected HTML output
 
         result = """
         <img id='{}' src='{}'
-        onclick='getPicture("#{}")'
+        onclick='getPicture("{}")'
         title="Click to enlarge">
         </img>
         <style>
@@ -332,7 +335,7 @@ class TestThumbnail:
             var src = $(picid).attr('src');
             window.open(src, 'Image', resizable=1);
         }};
-        </script>""".format(id_num, path, id_num)
+        </script>""".format(id_num, path, other_path)
         return "".join(result.strip().split())
 
     def test_convert_to_html(self):
@@ -397,6 +400,20 @@ class TestThumbnail:
 
         path = 'random/path/to/figure1.svg'
         get_thumbnail_as_html(path, 1)
+
+    def test_convert_to_html_with_different_thumbnail(self):
+
+        # test converting image to HTML with absolute path
+
+        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
+
+        image = get_thumbnail_as_html(path1, 1, path2)
+
+        clean_image = "".join(image.strip().split())
+        clean_thumb = self.get_result(path1, other_path=path2)
+
+        eq_(clean_image, clean_thumb)
 
 
 class TestExpectedScores():
