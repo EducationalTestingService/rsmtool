@@ -22,7 +22,8 @@ from rsmtool.utils import (float_format_func,
                            get_output_directory_extension,
                            get_thumbnail_as_html,
                            get_files_as_html,
-                           compute_expected_scores_from_model)
+                           compute_expected_scores_from_model,
+                           standardized_mean_difference)
 
 from sklearn.datasets import make_classification
 from skll import FeatureSet, Learner
@@ -264,6 +265,32 @@ def test_get_output_directory_extension():
 def test_get_output_directory_extension_error():
     directory = join(test_dir, 'data', 'files')
     get_output_directory_extension(directory, 'id_1')
+
+
+def test_standardized_mean_difference():
+
+    # test SMD
+
+    expected = 1 / 3
+    smd = standardized_mean_difference(9, 8, 3, 3)
+    eq_(round(smd, 3), round(expected, 3))
+
+
+def test_standardized_mean_difference_zero_denominator():
+
+    # test SMD with zero denominator
+
+    smd = standardized_mean_difference(4.2, 3.2, 0, 0)
+    assert np.isnan(smd)
+
+
+def test_standardized_mean_difference_zero_difference():
+
+    # test SMD with zero difference between groups
+
+    expected = 0.0
+    smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1)
+    eq_(smd, expected)
 
 
 class TestIntermediateFiles:

@@ -501,6 +501,51 @@ def agreement(score1, score2, tolerance=0):
     return agreement_value
 
 
+def standardized_mean_difference(mean_system_score,
+                                 mean_human_score,
+                                 population_system_score_sd,
+                                 population_human_score_sd):
+    """
+    This function computes the standardized mean
+    difference between a system score and human score
+    for a particular subgroup.
+
+    Parameters
+    ----------
+    mean_system_score : float
+        The mean system score for the group or subgroup.
+    mean_human_score: float
+        The mean human score for the group or subgroup.
+    population_system_score_sd : float
+        The population system score standard deviation.
+        When the SMD is being calculated for a subgroup,
+        this should be the standard deviation for the whole
+        population.
+    population_system_score_sd : float
+        The population human score standard deviation.
+        When the SMD is being calculated for a subgroup,
+        this should be the standard deviation for the whole
+        population.
+
+    Returns
+    -------
+    smd : float
+        The SMD for the given group or subgroup.
+
+    Notes
+    -----
+    This implementation was recommended by Williamson et al (2012).
+    The metric is only applicable when both sets of scores are on
+    the same scale.
+    """
+    numerator = mean_system_score - mean_human_score
+    denominator = np.sqrt((population_system_score_sd**2 + population_human_score_sd**2) / 2)
+
+    # if the denominator is zero, then return NaN as the SMD
+    smd = np.nan if denominator == 0 else numerator / denominator
+    return smd
+
+
 def float_format_func(num, prec=3):
     """
     Format the given floating point number to the specified precision
