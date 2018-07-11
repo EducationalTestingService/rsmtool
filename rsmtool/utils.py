@@ -812,7 +812,7 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     # if `path_to_thumbnail` is None, use `path_to_image`;
     # otherwise, get the relative path to the thumbnail
     if path_to_thumbnail is None:
-        path_to_thumbnail = '{}'.format(relative_path)
+        path_to_thumbnail = relative_path
     else:
         path_to_thumbnail = relpath(path_to_thumbnail)
 
@@ -832,9 +832,8 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     # on click, open larger image in new window
     script = """
     <script>
-    function getPicture(picid) {{
-        var src = $(picid).attr('src');
-        window.open(src, 'Image', resizable=1);
+    function getPicture(picpath) {{
+        window.open(picpath, 'Image', resizable=1);
     }};
     </script>""".format(image_id)
 

@@ -331,9 +331,8 @@ class TestThumbnail:
         </style>
 
         <script>
-        function getPicture(picid) {{
-            var src = $(picid).attr('src');
-            window.open(src, 'Image', resizable=1);
+        function getPicture(picpath) {{
+            window.open(picpath, 'Image', resizable=1);
         }};
         </script>""".format(id_num, path, other_path)
         return "".join(result.strip().split())
