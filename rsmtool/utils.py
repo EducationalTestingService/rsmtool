@@ -786,7 +786,7 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
         be unique for each <img> tag.
     path_to_thumbnail : str or None, optional
         If you would like to use a different thumbnail
-        image, specify the path to the thumbnail.
+        image, specify the path to this thumbnail.
         Defaults to None.
 
     Returns
