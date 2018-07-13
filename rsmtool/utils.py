@@ -548,12 +548,12 @@ def standardized_mean_difference(mean_system_score,
         numerator = mean_system_score - mean_human_score
         denominator = np.sqrt((population_system_score_sd**2 +
                                population_human_score_sd**2) / 2)
-
-        # if the denominator is zero, then return NaN as the SMD
-        smd = np.nan if denominator == 0 else numerator / denominator
     else:
         raise ValueError("Currently, only the 'williamson' SMD method is "
                          "supported. You specified: {}".format(method))
+
+    # if the denominator is zero, then return NaN as the SMD
+    smd = np.nan if denominator == 0 else numerator / denominator
     return smd
 
 
