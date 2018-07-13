@@ -24,8 +24,10 @@ class DataContainer:
         Parameters
         ----------
         datasets : list of dicts, optional
-            A list of dataset dicts. Each dict should be in the following format:
-            {'name': 'name_of_dataset', 'frame' <pd.DataFrame object>}
+            A list of dataset dicts. Each dict should be
+            in the following format:
+            {'name': 'name_of_dataset',
+             'frame' <pd.DataFrame object>}
         """
         self._names = []
         self._dataframes = {}
@@ -126,6 +128,46 @@ class DataContainer:
         if key not in self._names:
             return default
         return self._dataframes[key]
+
+    def get_frames(self, prefix=None, suffix=None):
+        """
+        Get all data frames in the container that have
+        a specified prefix and/or suffix.
+
+        Parameters
+        ----------
+        prefix : str or None, optional
+            Only return frames with the given prefix.
+            If None, then do not exclude any frames based
+            on their prefix.
+            Defaults to None.
+        suffix : str or None, optional
+            Only return frames with the given suffix.
+            If None, then do not exclude any frames based
+            on their suffix.
+            Defaults to None.
+
+        Returns
+        -------
+        frames : dict
+            A dictionary with all of the data frames
+            that contain the specified prefix and suffix.
+            The keys are the names of the data frames.
+        """
+        if prefix is None:
+            prefix = ''
+
+        if suffix is None:
+            suffix = ''
+
+        names = [name for name in self._names if
+                 name.lower().startswith(prefix) and
+                 name.lower().endswith(suffix)]
+
+        frames = {}
+        for name in names:
+            frames[name] = self._dataframes[name]
+        return frames
 
     def keys(self):
         """
@@ -241,8 +283,8 @@ class DataContainer:
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)
         if common_keys:
-            raise KeyError('The key(s) `{}` already exist'
-                           'in the DataContainer.'.format(', '.join(common_keys)))
+            raise KeyError('The key(s) `{}` already exist in the '
+                           'DataContainer.'.format(', '.join(common_keys)))
 
         dicts = DataContainer.to_datasets(self)
         dicts.extend(DataContainer.to_datasets(other))
@@ -259,6 +301,50 @@ class DataContainer:
         """
         for key in self.keys():
             yield key
+
+    def drop(self, name):
+        """
+        Drop a given data frame from the
+        container.
+
+        Parameters
+        ----------
+        name : str
+            The name of the data frame to drop from the
+            container object.
+
+        Returns
+        -------
+        self
+        """
+        if name in self._names:
+            self._names.remove(name)
+            self._dataframes.pop(name)
+            self._data_paths.pop(name)
+        return self
+
+    def rename(self, name, new_name):
+        """
+        Rename a given data frame in the
+        container.
+
+        Parameters
+        ----------
+        name : str
+            The name of the current data frame
+            in the container object.
+        new_name : str
+            The the new name for the data frame
+            in the container object.
+
+        Returns
+        -------
+        self
+        """
+        df = self._dataframes[name]
+        self.add_dataset({'name': new_name, 'frame': df}, update=True)
+        self.drop(name)
+        return self
 
     def copy(self, deep=True):
         """
