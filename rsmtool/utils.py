@@ -799,22 +799,24 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     FileNotFoundError
         If the image file cannot be located.
     """
+    error_message = 'The file `{}` could not be located.'
     if not exists(path_to_image):
-        raise FileNotFoundError('The file `{}` could not be '
-                                'located.'.format(path_to_image))
+        raise FileNotFoundError(error_message.format(path_to_image))
 
     # check if the path is relative or absolute
     if isabs(path_to_image):
-        relative_path = relpath(path_to_image)
+        rel_image_path = relpath(path_to_image)
     else:
-        relative_path = path_to_image
+        rel_image_path = path_to_image
 
     # if `path_to_thumbnail` is None, use `path_to_image`;
     # otherwise, get the relative path to the thumbnail
     if path_to_thumbnail is None:
-        path_to_thumbnail = relative_path
+        rel_thumbnail_path = rel_image_path
     else:
-        path_to_thumbnail = relpath(path_to_thumbnail)
+        if not exists(path_to_thumbnail):
+            raise FileNotFoundError(error_message.format(path_to_thumbnail))
+        rel_thumbnail_path = relpath(path_to_thumbnail)
 
     # specify the thumbnail style
     style = """
@@ -841,8 +843,8 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     image = ("""<img id='{}' src='{}' onclick='getPicture("{}")' """
              """title="Click to enlarge">"""
              """</img>""").format(image_id,
-                                  relative_path,
-                                  path_to_thumbnail)
+                                  rel_image_path,
+                                  rel_thumbnail_path)
 
     # create the image HTML
     image += style
