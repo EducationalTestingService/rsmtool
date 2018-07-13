@@ -424,22 +424,31 @@ class TestThumbnail:
 
         # test FileNotFound error properly raised
 
-        path = 'random/path/to/figure1.svg'
+        path = 'random/path/asftesfa/to/figure1.svg'
         get_thumbnail_as_html(path, 1)
 
     def test_convert_to_html_with_different_thumbnail(self):
 
-        # test converting image to HTML with absolute path
+        # test converting image to HTML with different thumbnail
 
         path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
 
-        image = get_thumbnail_as_html(path1, 1, path2)
+        image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
         clean_image = "".join(image.strip().split())
         clean_thumb = self.get_result(path1, other_path=path2)
 
         eq_(clean_image, clean_thumb)
+
+    @raises(FileNotFoundError)
+    def test_convert_to_html_thumbnail_not_found_error(self):
+
+        # test FileNotFound error properly raised for thumbnail
+
+        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = 'random/path/asftesfa/to/figure1.svg'
+        image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
 class TestExpectedScores():
