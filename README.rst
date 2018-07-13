@@ -62,6 +62,7 @@ Contributing
 ------------
 Contributions to RSMTool are very welcome. Please refer to the `documentation <http://rsmtool.readthedocs.io/en/latest/contributing.html>`_ for how to get started on developing new features or functionality for RSMTool.
 
+
 Citing
 ------
 If you are using RSMTool in your work, you can cite it as follows:
