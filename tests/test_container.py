@@ -6,7 +6,7 @@ import pandas as pd
 
 from nose.tools import assert_false, eq_
 from pandas.util.testing import assert_frame_equal
-from rsmbuilder.builder_container import BuilderContainer
+from rsmtool.container import DataContainer
 
 
 class TestBuilderDataContainer:
@@ -20,30 +20,30 @@ class TestBuilderDataContainer:
                                  ['Edwin', 9, 1.0]],
                                 columns=['string', 'numeric', 'numeric_missing'])
 
-        container = BuilderContainer([{'frame': expected, 'name': 'test'}])
+        container = DataContainer([{'frame': expected, 'name': 'test'}])
         container.rename('test', 'flerf')
         assert_frame_equal(container.flerf, expected)
 
     def test_drop(self):
 
-        container = BuilderContainer([{'frame': pd.DataFrame(), 'name': 'test'}])
+        container = DataContainer([{'frame': pd.DataFrame(), 'name': 'test'}])
         container.drop('test')
         assert_false('test' in container)
 
     def test_get_frames_by_prefix(self):
 
-        container = BuilderContainer([{'frame': pd.DataFrame(), 'name': 'test_two'},
-                                      {'frame': pd.DataFrame(), 'name': 'test_three'},
-                                      {'frame': pd.DataFrame(), 'name': 'exclude'}])
+        container = DataContainer([{'frame': pd.DataFrame(), 'name': 'test_two'},
+                                   {'frame': pd.DataFrame(), 'name': 'test_three'},
+                                   {'frame': pd.DataFrame(), 'name': 'exclude'}])
 
         frames = container.get_frames(prefix='test')
         eq_(sorted(list(frames.keys())), sorted(['test_two', 'test_three']))
 
     def test_get_frames_by_suffix(self):
 
-        container = BuilderContainer([{'frame': pd.DataFrame(), 'name': 'include_this_one'},
-                                      {'frame': pd.DataFrame(), 'name': 'include_this_one_not'},
-                                      {'frame': pd.DataFrame(), 'name': 'we_want_this_one'}])
+        container = DataContainer([{'frame': pd.DataFrame(), 'name': 'include_this_one'},
+                                   {'frame': pd.DataFrame(), 'name': 'include_this_one_not'},
+                                   {'frame': pd.DataFrame(), 'name': 'we_want_this_one'}])
 
         frames = container.get_frames(prefix='one')
         eq_(sorted(list(frames.keys())), sorted(['include_this_one', 'we_want_this_one']))
