@@ -504,7 +504,8 @@ def agreement(score1, score2, tolerance=0):
 def standardized_mean_difference(mean_system_score,
                                  mean_human_score,
                                  population_system_score_sd,
-                                 population_human_score_sd):
+                                 population_human_score_sd,
+                                 method='williamson'):
     """
     This function computes the standardized mean
     difference between a system score and human score
@@ -526,6 +527,10 @@ def standardized_mean_difference(mean_system_score,
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
+    method : str, optional
+        The SMD method to use. Currently, only
+        'williamson' is supported.
+        Defaults to 'williamson'.
 
     Returns
     -------
@@ -534,15 +539,21 @@ def standardized_mean_difference(mean_system_score,
 
     Notes
     -----
-    This implementation was recommended by Williamson et al (2012).
-    The metric is only applicable when both sets of scores are on
-    the same scale.
+    The current implementation was recommended by Williamson et al (2012).
+    The metric is only applicable when both sets of scores are on the same
+    scale. Additional implementations may be added in the future.
     """
-    numerator = mean_system_score - mean_human_score
-    denominator = np.sqrt((population_system_score_sd**2 + population_human_score_sd**2) / 2)
+    method = method.lower()
+    if method == 'williamson':
+        numerator = mean_system_score - mean_human_score
+        denominator = np.sqrt((population_system_score_sd**2 +
+                               population_human_score_sd**2) / 2)
 
-    # if the denominator is zero, then return NaN as the SMD
-    smd = np.nan if denominator == 0 else numerator / denominator
+        # if the denominator is zero, then return NaN as the SMD
+        smd = np.nan if denominator == 0 else numerator / denominator
+    else:
+        raise ValueError("Currently, only the 'williamson' SMD method is "
+                         "supported. You specified: {}".format(method))
     return smd
 
 
