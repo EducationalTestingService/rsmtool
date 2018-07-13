@@ -45,5 +45,5 @@ class TestBuilderDataContainer:
                                    {'frame': pd.DataFrame(), 'name': 'include_this_one_not'},
                                    {'frame': pd.DataFrame(), 'name': 'we_want_this_one'}])
 
-        frames = container.get_frames(prefix='one')
+        frames = container.get_frames(suffix='one')
         eq_(sorted(list(frames.keys())), sorted(['include_this_one', 'we_want_this_one']))
