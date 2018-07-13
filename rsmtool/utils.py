@@ -521,7 +521,7 @@ def standardized_mean_difference(mean_system_score,
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-    population_system_score_sd : float
+    population_human_score_sd : float
         The population human score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
