@@ -622,6 +622,74 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
+    def train_non_negative_lr_iterative(self, df_train, feature_columns):
+        """
+        Train `NNLR_iterative` -
+        An alternate method of training NNLR by iteratively fitting OLS
+        models, checking the coefficients, and dropping negative coefficients.
+        First, fit an OLD model. Then, identify any variables whose coefficients
+        are negative. Drop these variables from the model. Finally, refit the
+        model. If any coefficients are still negative, set these to zero.
+
+        Parameters
+        ----------
+        df_train : pd.DataFrame
+            Data frame containing the features on which
+            to train the model.
+        feature_columns : list
+            A list of feature columns to use in training the model.
+
+        Returns
+        -------
+        learner : skll.Learner
+            The SKLL learner object.
+        fit : statsmodels.RegressionResults
+            A statsmodels regression results object.
+        df_coef : pd.DataFrame
+            The model coefficients in a data frame
+        used_features : list
+            A list of features used in the final model.
+
+        Train NNLR the old-fashioned way, which DART currently
+        uses in eBuilder. First, fit an OLS model. Second, identify
+        any variables with coefficients that are negative.
+        Third, remove these variables from the dataset. Fourth,
+        refit the model.
+        """
+        X = df_train[feature_columns]
+        X = sm.add_constant(X)
+
+        y = df_train['sc1']
+
+        fit = sm.OLS(y, X).fit()
+
+        non_zero_features = []
+        for name, value in fit.params.items():
+            if value > 0 and name != 'const':
+                non_zero_features.append(name)
+
+        X = df_train[non_zero_features]
+        X = sm.add_constant(X)
+
+        fit = sm.OLS(y, X).fit()
+
+        # if any parameters are still negative, set them to zero
+        params = fit.params.copy()
+        params = params.drop('const')
+        if not (params >= 0).all():
+            fit.params[(fit.params < 0) & (fit.params.index != 'const')] = 0
+
+        # convert this model's parameters to a data frame
+        df_coef = self.ols_coefficients_to_dataframe(fit.params)
+
+        # create fake SKLL learner with these coefficients
+        learner = self.create_fake_skll_learner(df_coef)
+
+        # we used only the non-zero features
+        used_features = non_zero_features
+
+        return learner, fit, df_coef, used_features
+
     def train_lasso_fixed_lambda_then_non_negative_lr(self, df_train, feature_columns):
         """
         Train `LassoFixedLambdaThenNNLR` (formerly empWtDropNegLasso) -
@@ -926,6 +994,10 @@ class Modeler:
         # NNLR
         elif model_name == 'NNLR':
             result = self.train_non_negative_lr(df_train, feature_columns)
+
+        # NNLRIterative
+        elif model_name == 'NNLRIterative':
+            result = self.train_non_negative_lr_iterative(df_train, feature_columns)
 
         # LassoFixedLambdaThenNNLR
         elif model_name == 'LassoFixedLambdaThenNNLR':
