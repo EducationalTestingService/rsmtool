@@ -22,7 +22,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from rsmtool.container import DataContainer
-from rsmtool.utils import agreement, partial_correlations, standardized_mean_difference
+from rsmtool.utils import (agreement,
+                           partial_correlations,
+                           standardized_mean_difference)
 
 
 class Analyzer:
@@ -665,7 +667,7 @@ class Analyzer:
         if not population_human_score_sd:
             population_human_score_sd = human_score_sd
 
-        # calculate the standardized mean difference
+        # calculate the (Williamson) standardized mean difference
         SMD = standardized_mean_difference(mean_system_score,
                                            mean_human_score,
                                            population_system_score_sd,
