@@ -18,7 +18,8 @@ class TestBuilderDataContainer:
                                  ['Sally', 6, np.nan],
                                  ['Jeff', 3, 9.0],
                                  ['Edwin', 9, 1.0]],
-                                columns=['string', 'numeric', 'numeric_missing'])
+                                columns=['string', 'numeric',
+                                         'numeric_missing'])
 
         container = DataContainer([{'frame': expected, 'name': 'test'}])
         container.rename('test', 'flerf')
