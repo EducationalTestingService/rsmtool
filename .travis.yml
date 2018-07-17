@@ -3,9 +3,11 @@ python:
 - 3.6
 notifications:
   email: false
+  webhooks: https://coveralls.io/webhook?repo_token=26O5nwca92Yp0383fqlTwPQKAz4652pEo
   slack:
     secure: QshUa/5NpsPSu8DlOS3VtpxcV2ijiXsRGKTR7AFn53vIaZaZ/0hTLJLpf+cz3E73kpMbj75jFGu54habUm3+SlHHQm60iJ+A8QHg625R9yp7x8A3Yv2KrrYsVrOHFoEmQQ60aDrS/MtxLd6yCr5sSyZdEedhhetkSlr6t+Mz8pxeWL8S/iuA3nkVUWzLyXtf59PpaVg3FkcrWNOsjXz6m1QlyvX1ZeDeLSm3Ag3hW2aJDcJWXj7mlSX4wwwgYkj8FJLTmzAMjN7BOQA2txe+G5TjS/bl6UEo5hNPUVJ6fa4IpU/saafsqVy5kOvDHxPXKJsFGBS4vTQAQzPrAG4tFZL+LO/X4cCyQtsXiUsIMP8oQ0yg2qdBgbQsmBpDVj/sp+5kuCJVd9W6OPupiQ53INllp019nMzqiqjGtylHhxFHi8X5V89LBdN9ajMCVkxbfUTcM/jUqJoCfPntD+3nZHu3VTgDka0vVY+gQDFHJnAew/n4hbYx4qoleAiOxh6eXJ8fRQwNO7R0L6gdFxqVvZ69fKDUlMnzCqGMwI0s4mjDQ8duNSUPf6t1k+u0U9HzV9BKBiGnBIUw2s1YcALILggUQT4B+5rRmeoTx5+mOXGI3IPbUpcNuAMstO/vAG+Ub4mY+w0dhabNtTb2oPD6PBe4SRcEggB3EU8Qd/3xpkA=
 env:
+- COVERALLS_PARALLEL=true
 - TESTFILES="tests/test_experiment_rsmtool_1.py"
 - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
 - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py"
