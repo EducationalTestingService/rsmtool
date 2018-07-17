@@ -627,7 +627,7 @@ class Modeler:
         Train `NNLR_iterative` -
         An alternate method of training NNLR by iteratively fitting OLS
         models, checking the coefficients, and dropping negative coefficients.
-        First, fit an OLD model. Then, identify any variables whose coefficients
+        First, fit an OLS model. Then, identify any variables whose coefficients
         are negative. Drop these variables from the model. Finally, refit the
         model. If any coefficients are still negative, set these to zero.
 

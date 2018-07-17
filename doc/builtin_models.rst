@@ -26,6 +26,8 @@ Models with automatic feature selection
 
 - ``NNLR``: A model that learns empirical OLS regression weights with feature selection using non-negative least squares regression. Note that only the coefficients are constrained to be positive: the intercept can be either positive or negative.
 
+- ``NNLRIterative``: A model that learns empirical OLS regression weights with feature selection using an iterative implementation of non-negative least squares regression. Under this implementation, an initial OLS model is fit. Then, any variables whose coefficients are negative are dropped and the model is re-fit. Any coefficients that are still negative after re-fitting are set to zero.
+
 - ``LassoFixedLambdaThenNNLR``: A model that learns empirical OLS regression weights with feature selection using Lasso regression as above followed by non-negative least squares regression. The latter ensures that no feature has negative coefficients even when the coefficients are estimated using least squares without penalization.
 
 - ``LassoFixedLambda``: same as ``LassoFixedLambdaThenLR`` but the model uses the original Lasso weights. Note that the coefficients in Lasso model are estimated using an optimization routine which may produce slightly different results on different systems.
@@ -34,6 +36,6 @@ Models with automatic feature selection
 
 .. note::
 
-    1. ``NNLR``, ``LassoFixedLambdaThenNNLR``, ``LassoFixedLambda`` and ``PositiveLassoCV`` all have no negative coefficients.
+    1. ``NNLR``, ``NNLRIterative``, ``LassoFixedLambdaThenNNLR``, ``LassoFixedLambda`` and ``PositiveLassoCV`` all have no negative coefficients.
 
     2. For all feature selection models, the final set of features will be saved in the ``feature`` folder in the experiment output directory.
