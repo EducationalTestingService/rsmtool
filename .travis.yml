@@ -7,31 +7,32 @@ notifications:
   slack:
     secure: QshUa/5NpsPSu8DlOS3VtpxcV2ijiXsRGKTR7AFn53vIaZaZ/0hTLJLpf+cz3E73kpMbj75jFGu54habUm3+SlHHQm60iJ+A8QHg625R9yp7x8A3Yv2KrrYsVrOHFoEmQQ60aDrS/MtxLd6yCr5sSyZdEedhhetkSlr6t+Mz8pxeWL8S/iuA3nkVUWzLyXtf59PpaVg3FkcrWNOsjXz6m1QlyvX1ZeDeLSm3Ag3hW2aJDcJWXj7mlSX4wwwgYkj8FJLTmzAMjN7BOQA2txe+G5TjS/bl6UEo5hNPUVJ6fa4IpU/saafsqVy5kOvDHxPXKJsFGBS4vTQAQzPrAG4tFZL+LO/X4cCyQtsXiUsIMP8oQ0yg2qdBgbQsmBpDVj/sp+5kuCJVd9W6OPupiQ53INllp019nMzqiqjGtylHhxFHi8X5V89LBdN9ajMCVkxbfUTcM/jUqJoCfPntD+3nZHu3VTgDka0vVY+gQDFHJnAew/n4hbYx4qoleAiOxh6eXJ8fRQwNO7R0L6gdFxqVvZ69fKDUlMnzCqGMwI0s4mjDQ8duNSUPf6t1k+u0U9HzV9BKBiGnBIUw2s1YcALILggUQT4B+5rRmeoTx5+mOXGI3IPbUpcNuAMstO/vAG+Ub4mY+w0dhabNtTb2oPD6PBe4SRcEggB3EU8Qd/3xpkA=
 env:
-  secure: RMWNpa72AaJrxikSnVGWWa/9im5cQywhoAy6GFhTxZYkDxFMmUjjw6zEg9xGPbcRvrr9XKJjvS0jrW/8Ie7aDd/uQQAzfXK11xBXHdYZXZjo2BXPvNEs2QwlWvoBi+63jIu6vu4/UCZrrp73i3l+fRNRGFcBHwBDSyQlXOjcxE6igNseEPEjB6afungEYKUmOVRz309gthesi5UjmlObFeCdIuzYGt4DnzEOmYclaTC+VpeGRAxWpGNtUefoGP44yfQSOiWPzcVLhftXW48kmNqYyvtcUg+16bnXYN4iA4ZMIAsQC/ugRuY7UX+8P3x6Xw9onte3IpAtT8Wc08GkFfX81z+BtKoQRAiO0ep6PK05Li7QmG8wlU29ocriCeXdqpSvdoDYMmJSRdIPvIC2YkiPWrGF46fFWVfQTYUf5t5ur955GTVgBI36dCbjEvFNxRsTD4/9tXLCNSKWr0cHsisDbAq607W7+CTmFi3UlRuZjfJ3S26HbLmdY74sMYQb9QajGnUrU5yhqpVT0ixJDCjkq7Q8drAXnLvoEwH15b2kdjZM+mBI+O1JkmeqgKhxaMdn49Ls6e729qPVpbrEN3jP8ZqaF77q8VmwqgCQmshh1TLP9rmGeP09Uu3faalyyzCiCuGYC4aXxMS7JrAnv9/gAJP497oF6+5QrmZsYTA=
   global:
-    - COVERALLS_PARALLEL=true
+  - COVERALLS_PARALLEL=true
+  - secure: IP81drVpT4dUa/cy8MIHDWBrBEk/+gGIpPbyIBMOv93NoU2jPcBskqEY9aVeDIvo6j5Ltq/mxGp8U+Z/tX5fOnPH7gFDqgZ8uvMSbsXzu3YHxQNYfSfJwNdw3i6zG08f6Dq7fYLrvGOak8N6/YAcfDe34qBa4MLSUvsCU/6vLovKgfffJbwGhtJ1KZxE2tdWKsSu3d3qPNtzXtb3GqTeKG9W5VjO9uTN/iRwiSXCKnga6x8THVlYE/bHQAcnwJu089zAGvGBzmylPJkfCHUmT6+xvc9WprdYq0qpqce48KTJlkBk2dKZz0PF8Bfxwg9k20pIbjBi8bOsfVM+ZaYFa1KKeqO1KE64ZfFMO2XJpwPeJ2d+kx6M1zLPfhCzvfHyNFP+SjJrpx7w+Q9t7z6GGC2T5rk1pYzVhJqzyA2LLl1Kc57OPEW8Bnx+i0ADn7opUmqUvpeoCNs3VS7LLT7XyjZN5f0Jjq+xdjLuk8WJ59qhE19dVgWEPeBySz3iGpz8TIjoI3m7DNGSumti+Jv9DXGSEiLNIWD6R9jIf5x2Z3hepvC2vCaYS1WMf0UjyaksmCr0npgwtDnuJk+EWen6XlZMPPrvZ7DABD8pHT+k25NQeYGK10+coIghtkuyvVSTWrpxkblLqP3uc98u5v5Gs7Wy4LOZsgoubU7Axx9BAdE=
   matrix:
-    - TESTFILES="tests/test_experiment_rsmtool_1.py"
-    - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
-    - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py"
-    - TESTFILES="tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
-    - TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
+  - TESTFILES="tests/test_experiment_rsmtool_1.py"
+  - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
+  - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py"
+  - TESTFILES="tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py
+    tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
+  - TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py
+    tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
 sudo: false
 before_install:
 - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
 - chmod +x miniconda.sh
-- ./miniconda.sh -b -f
-- ${HOME}/miniconda3/bin/conda update --yes conda
-
+- "./miniconda.sh -b -f"
+- "${HOME}/miniconda3/bin/conda update --yes conda"
 install:
-- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes --quiet
-- ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
-- ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
-
+- "${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c
+  desilinguist --file conda_requirements.txt --yes --quiet"
+- "${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls"
+- "${HOME}/miniconda3/envs/rsmenv/bin/pip install -e ."
 script:
-- ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
-
+- "${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool
+  --cov-config .coveragerc ${TESTFILES}"
 after_success:
-- ${HOME}/miniconda3/envs/rsmenv/bin/coveralls -c .coveragerc
+- "${HOME}/miniconda3/envs/rsmenv/bin/coveralls -c .coveragerc"
 - curl -k https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN -d "payload[build_num]=$TRAVIS_JOB_NUMBER&payload[status]=done"
