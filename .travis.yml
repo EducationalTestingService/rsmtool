@@ -35,4 +35,4 @@ script:
   --cov-config .coveragerc ${TESTFILES}"
 after_success:
 - "${HOME}/miniconda3/envs/rsmenv/bin/coveralls -c .coveragerc"
-- curl -k https://coveralls.io/webhook?repo_token=COVERALLS_REPO_TOKEN -d "payload[build_num]=$TRAVIS_JOB_NUMBER&payload[status]=done"
+- curl -k https://coveralls.io/webhook?repo_token=$COVERALLS_REPO_TOKEN -d "payload[build_num]=$TRAVIS_JOB_NUMBER&payload[status]=done"
