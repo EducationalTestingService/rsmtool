@@ -51,9 +51,9 @@ Data preprocessing
 
 2. Apply pre-specified :ref:`transformations <feature_list_transformation>` to feature values.
 
-3. Flip the signs for feature values if necessary.
+3. Standardize all transformed feature values into *z*-scores.
 
-4. Standardize all transformed feature values into *z*-scores.
+4. Flip the signs for feature values if necessary.
 
 .. _preprocessing_parameters:
 
