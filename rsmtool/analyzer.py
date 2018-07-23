@@ -22,7 +22,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from rsmtool.container import DataContainer
-from rsmtool.utils import agreement, partial_correlations
+from rsmtool.utils import (agreement,
+                           partial_correlations,
+                           standardized_mean_difference)
 
 
 class Analyzer:
@@ -665,14 +667,11 @@ class Analyzer:
         if not population_human_score_sd:
             population_human_score_sd = human_score_sd
 
-        # compute standardized mean difference as recommended
-        # by Williamson et al (2012). Note this metrics is only
-        # applicable when both sets of scores are on the same scale.
-        numerator = mean_system_score - mean_human_score
-        denominator = np.sqrt((population_system_score_sd**2 + population_human_score_sd**2) / 2)
-
-        # if the denominator is zero, then return NaN as the SMD
-        SMD = np.nan if denominator == 0 else numerator / denominator
+        # calculate the (Williamson) standardized mean difference
+        SMD = standardized_mean_difference(mean_system_score,
+                                           mean_human_score,
+                                           population_system_score_sd,
+                                           population_human_score_sd)
 
         # compute r2 and MSE
         r2 = r2_score(human_scores, system_scores)
