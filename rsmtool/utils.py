@@ -543,7 +543,7 @@ def standardized_mean_difference(mean_system_score,
 
     Notes
     -----
-    The current implementation was recommended by Williamson et al (2012).
+    The current implementation was recommended by Williamson, et al. (2012).
     The metric is only applicable when both sets of scores are on the same
     scale. Additional implementations may be added in the future.
     """
