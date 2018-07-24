@@ -11,6 +11,7 @@ and converting them to DataContainer objects.
 """
 
 import warnings
+import pandas as pd
 
 from functools import partial
 from os.path import (abspath,
@@ -18,9 +19,55 @@ from os.path import (abspath,
                      join,
                      splitext)
 
-import pandas as pd
-
 from rsmtool.container import DataContainer
+
+
+def try_to_load_file(filename,
+                     converters=None,
+                     raise_error=False,
+                     raise_warning=False,
+                     **kwargs):
+    """
+    A helper function for reading a single
+    file, if it exists. Optionally raise an
+    error or warning if the file cannot be found.
+    Otherwise, simply return None.
+
+    Parameters
+    ----------
+    filename : str
+        Name of file to read.
+    converters : dict or None, optional
+        A dictionary specifying how the types of the columns
+        in the file should be converted. Specified in the same
+        format as for `pd.read_csv()`.
+    raise_error : bool, optional
+        Raise an error if the file cannot be located.
+        Defaults to False.
+    raise_warning : bool, optional
+        Raise a warning if the file cannot be located
+        Defaults to False.
+
+    Returns
+    -------
+    df : pd.DataFrame or None
+        DataFrame containing the data in the given file,
+        or None if the file does not exist
+
+    Raises
+    ------
+    FileNotFoundError
+        If `raise_error` is True and file cannot be located.
+    """
+    if exists(filename):
+        return DataReader.read_from_file(filename, converters, **kwargs)
+
+    message = 'The file `{}` could not be located.'.format(filename)
+    if raise_error:
+        raise FileNotFoundError(message)
+
+    if raise_warning:
+        warnings.warn(message)
 
 
 class DataReader:
@@ -145,9 +192,15 @@ class DataReader:
             do_read = partial(pd.read_csv, sep=sep, converters=converters)
         elif file_extension in ['.xls', '.xlsx']:
             do_read = partial(pd.read_excel, converters=converters)
+        elif file_extension in ['.sas7bdat']:
+            if 'encoding' not in kwargs:
+                encoding = 'latin-1'
+            else:
+                encoding = kwargs.pop('encoding')
+            do_read = partial(pd.read_sas, encoding=encoding)
         else:
             raise ValueError("RSMTool only supports files in .csv, "
-                             ".tsv or .xls/.xlsx format. "
+                             ".tsv, .xls/.xlsx, or .sas7bdat format. "
                              "The file should have the extension "
                              "which matches its format. The file you "
                              "passed is: {}.".format(filename))

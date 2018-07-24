@@ -1,13 +1,32 @@
 import os
 import tempfile
-
 import pandas as pd
+import warnings
 
 from nose.tools import raises, eq_
 from pandas.util.testing import assert_frame_equal
 from shutil import rmtree
 
-from rsmtool.reader import DataReader
+from rsmtool.reader import DataReader, try_to_load_file
+
+
+def test_try_to_load_file_none():
+
+    assert try_to_load_file('bdadui88asldfkas;j.sarasd') is None
+
+
+@raises(FileNotFoundError)
+def test_try_to_load_file_fail():
+
+    try_to_load_file('bdadui88asldfkas;j.sarasd', raise_error=True)
+
+
+@raises(Warning)
+def test_try_to_load_file_warn():
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('error')
+        try_to_load_file('bdadui88asldfkas;j.sarasd', raise_warning=True)
 
 
 class TestDataReader:
@@ -241,4 +260,4 @@ class TestDataReader:
     def test_setup_none_in_path(self):
         paths = ['path1.csv', None, 'path2.csv']
         framenames = ['train', 'test', 'features']
-        _ = DataReader(paths, framenames)
+        DataReader(paths, framenames)

@@ -28,6 +28,7 @@ else:
     param('lr-no-standardization', 'lr_no_standardization'),
     param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
     param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
+    param('lr-with-sas', 'lr_with_sas'),
     param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
     param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
     param('lr-with-thumbnails', 'lr_with_thumbnails'),
