@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train.sas7bdat",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test.sas7bdat",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_with_sas",
+    "description": "Using all features with an LinearRegression model."
+}
