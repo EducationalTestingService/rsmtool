@@ -10,6 +10,8 @@ in a pd.DataFrame object.
 :organization: ETS
 """
 
+import warnings
+
 
 class DataContainer:
     """
@@ -27,7 +29,8 @@ class DataContainer:
             A list of dataset dicts. Each dict should be
             in the following format:
             {'name': 'name_of_dataset',
-             'frame' <pd.DataFrame object>}
+             'frame' <pd.DataFrame object>,
+             'path': 'path_to_file'}
         """
         self._names = []
         self._dataframes = {}
@@ -132,7 +135,9 @@ class DataContainer:
     def get_frames(self, prefix=None, suffix=None):
         """
         Get all data frames in the container that have
-        a specified prefix and/or suffix.
+        a specified prefix and/or suffix. Note that
+        the selection by prefix or suffix will be
+        case-insensitive.
 
         Parameters
         ----------
@@ -321,6 +326,10 @@ class DataContainer:
             self._names.remove(name)
             self._dataframes.pop(name)
             self._data_paths.pop(name)
+        else:
+            warnings.warn('The name `{}` is not in the '
+                          'container. No data frames will '
+                          'be dropped.'.format(name))
         return self
 
     def rename(self, name, new_name):
@@ -341,26 +350,33 @@ class DataContainer:
         -------
         self
         """
-        df = self._dataframes[name]
-        self.add_dataset({'name': new_name, 'frame': df}, update=True)
+        frame = self._dataframes[name]
+        path = self._data_paths[name]
+        self.add_dataset({'name': new_name,
+                          'frame': frame,
+                          'path': path},
+                         update=True)
         self.drop(name)
         return self
 
     def copy(self, deep=True):
         """
-        Create a copy of the DataContainer object
+        Create a copy of the DataContainer object.
 
         Parameters
         ----------
         deep : bool, optional
-            If True, create a deep copy.
+            If True, create a deep copy of the
+            underlying data frames.
             Defaults to True.
         """
         dataset_list = []
         for name in self.keys():
-            frame = self[name].copy(deep=deep)
+            frame = self._dataframes[name].copy(deep=deep)
+            path = self._data_paths[name]
             dataset_dict = {'name': name,
-                            'frame': frame}
+                            'frame': frame,
+                            'path': path}
             dataset_list.append(dataset_dict)
 
         return DataContainer(dataset_list)
