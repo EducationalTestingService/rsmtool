@@ -625,7 +625,8 @@ class Modeler:
     def train_non_negative_lr_iterative(self, df_train, feature_columns):
         """
         Train `NNLR_iterative` -
-        An alternate method of training NNLR by iteratively fitting OLS
+        For applications where there is a concern that standard NNLS may not
+        converge, an alternate method of training NNLR by iteratively fitting OLS
         models, checking the coefficients, and dropping negative coefficients.
         First, fit an OLS model. Then, identify any variables whose coefficients
         are negative. Drop these variables from the model. Finally, refit the
@@ -649,12 +650,6 @@ class Modeler:
             The model coefficients in a data frame
         used_features : list
             A list of features used in the final model.
-
-        Train NNLR the old-fashioned way, which DART currently
-        uses in eBuilder. First, fit an OLS model. Second, identify
-        any variables with coefficients that are negative.
-        Third, remove these variables from the dataset. Fourth,
-        refit the model.
         """
         X = df_train[feature_columns]
         X = sm.add_constant(X)
