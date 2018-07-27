@@ -41,6 +41,106 @@ class DataContainer:
                 self.add_dataset(dataset_dict,
                                  update=False)
 
+    def __contains__(self, key):
+        """
+        Check if DataContainer object
+        contains a given key.
+
+        Parameters
+        ----------
+        key : str
+            A key to check in the DataContainer object
+
+        Returns
+        -------
+        key_check : bool
+            True if key in DataContainer object, else False
+        """
+        return key in self._names
+
+    def __getitem__(self, key):
+        """
+        Get frame, given key.
+
+        Parameters
+        ----------
+        key : str
+            Name for the data.
+
+        Returns
+        -------
+        frame : pd.DataFrame
+            The DataFrame.
+
+        Raises
+        ------
+        KeyError
+            If the key does not exist.
+        """
+        return self.get_frame(key)
+
+    def __len__(self):
+        """
+        Return the length of the
+        DataContainer names.
+
+        Returns
+        -------
+        length : int
+            The length of the container (i.e. number of frames)
+        """
+        return len(self._names)
+
+    def __str__(self):
+        """
+        String representation of the object.
+
+        Returns
+        -------
+        container_names : str
+            A comma-separated list of names from the container.
+        """
+        return ', '.join(self._names)
+
+    def __add__(self, other):
+        """
+        Add two DataContainer objects together and return a new
+        DataContainer object with DataFrames common to both
+        DataContainers
+
+        Raises
+        ------
+        ValueError
+            If the object being added is not a DataContainer
+        KeyError
+            If there are duplicate keys in the two DataContainers.
+        """
+        if not isinstance(other, DataContainer):
+            raise ValueError('Object must be `DataContainer`, '
+                             'not {}.'.format(type(other)))
+
+        # Make sure there are no duplicate keys
+        common_keys = set(other._names).intersection(self._names)
+        if common_keys:
+            raise KeyError('The key(s) `{}` already exist in the '
+                           'DataContainer.'.format(', '.join(common_keys)))
+
+        dicts = DataContainer.to_datasets(self)
+        dicts.extend(DataContainer.to_datasets(other))
+        return DataContainer(dicts)
+
+    def __iter__(self):
+        """
+        Iterate through configuration object keys.
+
+        Yields
+        ------
+        key
+            A key in the container dictionary
+        """
+        for key in self.keys():
+            yield key
+
     @staticmethod
     def to_datasets(data_container):
         """
@@ -207,106 +307,6 @@ class DataContainer:
         """
         return [(name, self._dataframe[name]) for name in self._names]
 
-    def __contains__(self, key):
-        """
-        Check if DataContainer object
-        contains a given key.
-
-        Parameters
-        ----------
-        key : str
-            A key to check in the DataContainer object
-
-        Returns
-        -------
-        key_check : bool
-            True if key in DataContainer object, else False
-        """
-        return key in self._names
-
-    def __getitem__(self, key):
-        """
-        Get frame, given key.
-
-        Parameters
-        ----------
-        key : str
-            Name for the data.
-
-        Returns
-        -------
-        frame : pd.DataFrame
-            The DataFrame.
-
-        Raises
-        ------
-        KeyError
-            If the key does not exist.
-        """
-        return self.get_frame(key)
-
-    def __len__(self):
-        """
-        Return the length of the
-        DataContainer names.
-
-        Returns
-        -------
-        length : int
-            The length of the container (i.e. number of frames)
-        """
-        return len(self._names)
-
-    def __str__(self):
-        """
-        String representation of the object.
-
-        Returns
-        -------
-        container_names : str
-            A comma-separated list of names from the container.
-        """
-        return ', '.join(self._names)
-
-    def __add__(self, other):
-        """
-        Add two DataContainer objects together and return a new
-        DataContainer object with DataFrames common to both
-        DataContainers
-
-        Raises
-        ------
-        ValueError
-            If the object being added is not a DataContainer
-        KeyError
-            If there are duplicate keys in the two DataContainers.
-        """
-        if not isinstance(other, DataContainer):
-            raise ValueError('Object must be `DataContainer`, '
-                             'not {}.'.format(type(other)))
-
-        # Make sure there are no duplicate keys
-        common_keys = set(other._names).intersection(self._names)
-        if common_keys:
-            raise KeyError('The key(s) `{}` already exist in the '
-                           'DataContainer.'.format(', '.join(common_keys)))
-
-        dicts = DataContainer.to_datasets(self)
-        dicts.extend(DataContainer.to_datasets(other))
-        return DataContainer(dicts)
-
-    def __iter__(self):
-        """
-        Iterate through configuration object keys.
-
-        Yields
-        ------
-        key
-            A key in the container dictionary
-        """
-        for key in self.keys():
-            yield key
-
     def drop(self, name):
         """
         Drop a given data frame from the
@@ -322,14 +322,14 @@ class DataContainer:
         -------
         self
         """
-        if name in self._names:
-            self._names.remove(name)
-            self._dataframes.pop(name)
-            self._data_paths.pop(name)
-        else:
+        if name not in self:
             warnings.warn('The name `{}` is not in the '
                           'container. No data frames will '
                           'be dropped.'.format(name))
+        else:
+            self._names.remove(name)
+            self._dataframes.pop(name)
+            self._data_paths.pop(name)
         return self
 
     def rename(self, name, new_name):
@@ -350,13 +350,18 @@ class DataContainer:
         -------
         self
         """
-        frame = self._dataframes[name]
-        path = self._data_paths[name]
-        self.add_dataset({'name': new_name,
-                          'frame': frame,
-                          'path': path},
-                         update=True)
-        self.drop(name)
+        if name not in self:
+            warnings.warn('The name `{}` is not in the '
+                          'container and cannot '
+                          'be renamed.'.format(name))
+        else:
+            frame = self._dataframes[name]
+            path = self._data_paths[name]
+            self.add_dataset({'name': new_name,
+                              'frame': frame,
+                              'path': path},
+                             update=True)
+            self.drop(name)
         return self
 
     def copy(self, deep=True):
