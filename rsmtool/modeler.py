@@ -660,7 +660,7 @@ class Modeler:
 
         non_zero_features = []
         for name, value in fit.params.items():
-            if value > 0 and name != 'const':
+            if value >= 0 and name != 'const':
                 non_zero_features.append(name)
 
         X = df_train[non_zero_features]
