@@ -10,6 +10,8 @@ in a pd.DataFrame object.
 :organization: ETS
 """
 
+import warnings
+
 
 class DataContainer:
     """
@@ -27,7 +29,8 @@ class DataContainer:
             A list of dataset dicts. Each dict should be
             in the following format:
             {'name': 'name_of_dataset',
-             'frame' <pd.DataFrame object>}
+             'frame' <pd.DataFrame object>,
+             'path': 'path_to_file'}
         """
         self._names = []
         self._dataframes = {}
@@ -37,170 +40,6 @@ class DataContainer:
             for dataset_dict in datasets:
                 self.add_dataset(dataset_dict,
                                  update=False)
-
-    @staticmethod
-    def to_datasets(data_container):
-        """
-        Convert a DataContainer object to a list of dataset dictionaries
-        with keys {`name`, `path`, `frame`}.
-
-        Parameters
-        ----------
-        data_container : DataContainer
-            A DataContainer object.
-
-        Returns
-        -------
-        datasets_dict : list of dicts
-            A list of dataset dictionaries.
-        """
-        dataset_dicts = []
-        for name in data_container.keys():
-            dataset_dict = {'name': name,
-                            'path': data_container.get_path(name),
-                            'frame': data_container.get_frame(name)}
-            dataset_dicts.append(dataset_dict)
-        return dataset_dicts
-
-    def add_dataset(self, dataset_dict, update=False):
-        """
-        Update or add a new DataFrame to the instance.
-
-        Parameters
-        ----------
-        dataset_dict : pd.DataFrame
-            The dataset dictionary to add.
-        update : bool, optional
-            Update an existing DataFrame, if True.
-            Defaults to False.
-        """
-        name = dataset_dict['name']
-        data_frame = dataset_dict['frame']
-        path = dataset_dict.get('path')
-
-        if not update:
-            if name in self._names:
-                raise KeyError('The name {} already exists in the '
-                               'DataContainer dictionary.'.format(name))
-
-        if name not in self._names:
-            self._names.append(name)
-
-        self._dataframes[name] = data_frame
-        self._data_paths[name] = path
-
-        self.__setattr__(name, data_frame)
-
-    def get_path(self, key, default=None):
-        """
-        Get path, given key.
-
-        Parameters
-        ----------
-        key : str
-            Name for the data.
-
-        Returns
-        -------
-        path : str
-            Path to the data.
-        """
-        if key not in self._names:
-            return default
-        return self._data_paths[key]
-
-    def get_frame(self, key, default=None):
-        """
-        Get frame, given key.
-
-        Parameters
-        ----------
-        key : str
-            Name for the data.
-        default
-            The default argument, if the frame does not exist
-
-        Returns
-        -------
-        frame : pd.DataFrame
-            The DataFrame.
-        """
-        if key not in self._names:
-            return default
-        return self._dataframes[key]
-
-    def get_frames(self, prefix=None, suffix=None):
-        """
-        Get all data frames in the container that have
-        a specified prefix and/or suffix.
-
-        Parameters
-        ----------
-        prefix : str or None, optional
-            Only return frames with the given prefix.
-            If None, then do not exclude any frames based
-            on their prefix.
-            Defaults to None.
-        suffix : str or None, optional
-            Only return frames with the given suffix.
-            If None, then do not exclude any frames based
-            on their suffix.
-            Defaults to None.
-
-        Returns
-        -------
-        frames : dict
-            A dictionary with all of the data frames
-            that contain the specified prefix and suffix.
-            The keys are the names of the data frames.
-        """
-        if prefix is None:
-            prefix = ''
-
-        if suffix is None:
-            suffix = ''
-
-        names = [name for name in self._names if
-                 name.lower().startswith(prefix) and
-                 name.lower().endswith(suffix)]
-
-        frames = {}
-        for name in names:
-            frames[name] = self._dataframes[name]
-        return frames
-
-    def keys(self):
-        """
-        Return keys as a list.
-
-        Returns
-        -------
-        keys : list
-            A list of keys in the Configuration object.
-        """
-        return self._names
-
-    def values(self):
-        """
-        Return values as a list.
-
-        Returns
-        -------
-        values : list
-            A list of values in the Configuration object.
-        """
-        return [self._dataframes[name] for name in self._names]
-
-    def items(self):
-        """
-        Return items as a list of tuples.
-
-        Returns
-        -------
-        items : list of tuples
-            A list of (key, value) tuples in the Configuration object.
-        """
-        return [(name, self._dataframe[name]) for name in self._names]
 
     def __contains__(self, key):
         """
@@ -302,6 +141,172 @@ class DataContainer:
         for key in self.keys():
             yield key
 
+    @staticmethod
+    def to_datasets(data_container):
+        """
+        Convert a DataContainer object to a list of dataset dictionaries
+        with keys {`name`, `path`, `frame`}.
+
+        Parameters
+        ----------
+        data_container : DataContainer
+            A DataContainer object.
+
+        Returns
+        -------
+        datasets_dict : list of dicts
+            A list of dataset dictionaries.
+        """
+        dataset_dicts = []
+        for name in data_container.keys():
+            dataset_dict = {'name': name,
+                            'path': data_container.get_path(name),
+                            'frame': data_container.get_frame(name)}
+            dataset_dicts.append(dataset_dict)
+        return dataset_dicts
+
+    def add_dataset(self, dataset_dict, update=False):
+        """
+        Update or add a new DataFrame to the instance.
+
+        Parameters
+        ----------
+        dataset_dict : pd.DataFrame
+            The dataset dictionary to add.
+        update : bool, optional
+            Update an existing DataFrame, if True.
+            Defaults to False.
+        """
+        name = dataset_dict['name']
+        data_frame = dataset_dict['frame']
+        path = dataset_dict.get('path')
+
+        if not update:
+            if name in self._names:
+                raise KeyError('The name {} already exists in the '
+                               'DataContainer dictionary.'.format(name))
+
+        if name not in self._names:
+            self._names.append(name)
+
+        self._dataframes[name] = data_frame
+        self._data_paths[name] = path
+
+        self.__setattr__(name, data_frame)
+
+    def get_path(self, key, default=None):
+        """
+        Get path, given key.
+
+        Parameters
+        ----------
+        key : str
+            Name for the data.
+
+        Returns
+        -------
+        path : str
+            Path to the data.
+        """
+        if key not in self._names:
+            return default
+        return self._data_paths[key]
+
+    def get_frame(self, key, default=None):
+        """
+        Get frame, given key.
+
+        Parameters
+        ----------
+        key : str
+            Name for the data.
+        default
+            The default argument, if the frame does not exist
+
+        Returns
+        -------
+        frame : pd.DataFrame
+            The DataFrame.
+        """
+        if key not in self._names:
+            return default
+        return self._dataframes[key]
+
+    def get_frames(self, prefix=None, suffix=None):
+        """
+        Get all data frames in the container that have
+        a specified prefix and/or suffix. Note that
+        the selection by prefix or suffix will be
+        case-insensitive.
+
+        Parameters
+        ----------
+        prefix : str or None, optional
+            Only return frames with the given prefix.
+            If None, then do not exclude any frames based
+            on their prefix.
+            Defaults to None.
+        suffix : str or None, optional
+            Only return frames with the given suffix.
+            If None, then do not exclude any frames based
+            on their suffix.
+            Defaults to None.
+
+        Returns
+        -------
+        frames : dict
+            A dictionary with all of the data frames
+            that contain the specified prefix and suffix.
+            The keys are the names of the data frames.
+        """
+        if prefix is None:
+            prefix = ''
+
+        if suffix is None:
+            suffix = ''
+
+        names = [name for name in self._names if
+                 name.lower().startswith(prefix) and
+                 name.lower().endswith(suffix)]
+
+        frames = {}
+        for name in names:
+            frames[name] = self._dataframes[name]
+        return frames
+
+    def keys(self):
+        """
+        Return keys as a list.
+
+        Returns
+        -------
+        keys : list
+            A list of keys in the Configuration object.
+        """
+        return self._names
+
+    def values(self):
+        """
+        Return values as a list.
+
+        Returns
+        -------
+        values : list
+            A list of values in the Configuration object.
+        """
+        return [self._dataframes[name] for name in self._names]
+
+    def items(self):
+        """
+        Return items as a list of tuples.
+
+        Returns
+        -------
+        items : list of tuples
+            A list of (key, value) tuples in the Configuration object.
+        """
+        return [(name, self._dataframe[name]) for name in self._names]
+
     def drop(self, name):
         """
         Drop a given data frame from the
@@ -317,7 +322,11 @@ class DataContainer:
         -------
         self
         """
-        if name in self._names:
+        if name not in self:
+            warnings.warn('The name `{}` is not in the '
+                          'container. No data frames will '
+                          'be dropped.'.format(name))
+        else:
             self._names.remove(name)
             self._dataframes.pop(name)
             self._data_paths.pop(name)
@@ -341,26 +350,38 @@ class DataContainer:
         -------
         self
         """
-        df = self._dataframes[name]
-        self.add_dataset({'name': new_name, 'frame': df}, update=True)
-        self.drop(name)
+        if name not in self:
+            warnings.warn('The name `{}` is not in the '
+                          'container and cannot '
+                          'be renamed.'.format(name))
+        else:
+            frame = self._dataframes[name]
+            path = self._data_paths[name]
+            self.add_dataset({'name': new_name,
+                              'frame': frame,
+                              'path': path},
+                             update=True)
+            self.drop(name)
         return self
 
     def copy(self, deep=True):
         """
-        Create a copy of the DataContainer object
+        Create a copy of the DataContainer object.
 
         Parameters
         ----------
         deep : bool, optional
-            If True, create a deep copy.
+            If True, create a deep copy of the
+            underlying data frames.
             Defaults to True.
         """
         dataset_list = []
         for name in self.keys():
-            frame = self[name].copy(deep=deep)
+            frame = self._dataframes[name].copy(deep=deep)
+            path = self._data_paths[name]
             dataset_dict = {'name': name,
-                            'frame': frame}
+                            'frame': frame,
+                            'path': path}
             dataset_list.append(dataset_dict)
 
         return DataContainer(dataset_list)
