@@ -64,7 +64,7 @@ Contributions to RSMTool are very welcome. Please refer to the `documentation <h
 
 Citing
 ------
-If you are using RSMTool in your work, you can cite it as follows:
+If you are using RSMTool in your work, please cite it as follows:
 
 MLA
 ===
