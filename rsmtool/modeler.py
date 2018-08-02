@@ -625,7 +625,8 @@ class Modeler:
     def train_non_negative_lr_iterative(self, df_train, feature_columns):
         """
         Train `NNLR_iterative` -
-        An alternate method of training NNLR by iteratively fitting OLS
+        For applications where there is a concern that standard NNLS may not
+        converge, an alternate method of training NNLR by iteratively fitting OLS
         models, checking the coefficients, and dropping negative coefficients.
         First, fit an OLS model. Then, identify any variables whose coefficients
         are negative. Drop these variables from the model. Finally, refit the
@@ -649,12 +650,6 @@ class Modeler:
             The model coefficients in a data frame
         used_features : list
             A list of features used in the final model.
-
-        Train NNLR the old-fashioned way, which DART currently
-        uses in eBuilder. First, fit an OLS model. Second, identify
-        any variables with coefficients that are negative.
-        Third, remove these variables from the dataset. Fourth,
-        refit the model.
         """
         X = df_train[feature_columns]
         X = sm.add_constant(X)
@@ -663,12 +658,12 @@ class Modeler:
 
         fit = sm.OLS(y, X).fit()
 
-        non_zero_features = []
+        positive_features = []
         for name, value in fit.params.items():
-            if value > 0 and name != 'const':
-                non_zero_features.append(name)
+            if value >= 0 and name != 'const':
+                positive_features.append(name)
 
-        X = df_train[non_zero_features]
+        X = df_train[positive_features]
         X = sm.add_constant(X)
 
         fit = sm.OLS(y, X).fit()
@@ -686,7 +681,7 @@ class Modeler:
         learner = self.create_fake_skll_learner(df_coef)
 
         # we used only the non-zero features
-        used_features = non_zero_features
+        used_features = positive_features
 
         return learner, fit, df_coef, used_features
 
