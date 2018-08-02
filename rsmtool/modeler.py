@@ -658,12 +658,12 @@ class Modeler:
 
         fit = sm.OLS(y, X).fit()
 
-        non_zero_features = []
+        positive_features = []
         for name, value in fit.params.items():
             if value >= 0 and name != 'const':
-                non_zero_features.append(name)
+                positive_features.append(name)
 
-        X = df_train[non_zero_features]
+        X = df_train[positive_features]
         X = sm.add_constant(X)
 
         fit = sm.OLS(y, X).fit()
@@ -681,7 +681,7 @@ class Modeler:
         learner = self.create_fake_skll_learner(df_coef)
 
         # we used only the non-zero features
-        used_features = non_zero_features
+        used_features = positive_features
 
         return learner, fit, df_coef, used_features
 
