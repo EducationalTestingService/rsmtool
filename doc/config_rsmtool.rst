@@ -211,11 +211,11 @@ If set to ``true``, certain evaluations (confusion matrices, score distributions
 
 use_truncations *(Optional)*
 """""""""""""""""""""""""""""""""""
-If set to ``true``, use the ``min`` and ``max`` columns specified the ``features`` file to clamp outlier feature values. This is useful if users would like to clamp feature values based on some pre-defined boundaries, rather than having these boundaries calculated based on the training set. Defaults to ``false``.
+If set to ``true``, use the ``min`` and ``max`` columns specified in the ``features`` file to clamp outlier feature values. This is useful if users would like to clamp feature values based on some pre-defined boundaries, rather than having these boundaries calculated based on the training set. Defaults to ``false``.
 
 .. note::
 
-    If ``use_truncations`` is passed, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
+    If ``use_truncations`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
 
 
 .. _subgroups_rsmtool:
