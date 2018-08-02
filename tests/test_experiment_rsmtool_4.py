@@ -40,6 +40,7 @@ else:
     param('lassofixedlambdathenlr', 'lassofixedlambdathenlr'),
     param('positivelassocvthenlr', 'positivelassocvthenlr'),
     param('nnlr', 'nnlr'),
+    param('nnlr_iterative', 'nnlr_iterative'),
     param('lassofixedlambdathennnlr', 'lassofixedlambdathennnlr'),
     param('lassofixedlambda', 'lassofixedlambda'),
     param('positivelassocv', 'positivelassocv'),
