@@ -2,7 +2,7 @@
     "train_file": "../../files/train.csv",
     "id_column": "ID",
     "use_scaled_predictions": true,
-    "use_truncations": true,
+    "use_truncation_thresholds": true,
     "test_label_column": "score",
     "train_label_column": "score",
     "test_file": "../../files/test.csv",

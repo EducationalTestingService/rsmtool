@@ -327,8 +327,8 @@ class FeatureSpecsProcessor:
 
         if use_truncations:
             if not all(col in df_specs_new for col in ['min', 'max']):
-                raise ValueError('The ``use_truncations`` configuration option was '
-                                 'specified, but no ``min`` or ``max`` columns exist '
+                raise ValueError('The ``use_truncation_thresholds`` configuration option '
+                                 'was specified, but no ``min`` or ``max`` columns exist '
                                  'in the feature file.')
 
             # add ``min`` and ``max`` to the
@@ -1732,7 +1732,7 @@ class FeaturePreprocessor:
         use_scaled_predictions = config_obj['use_scaled_predictions']
 
         # are we using truncations from the feature specs?
-        use_truncations = config_obj['use_truncations']
+        use_truncations = config_obj['use_truncation_thresholds']
 
         # get the subgroups if any
         subgroups = config_obj.get('subgroups')

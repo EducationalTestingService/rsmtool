@@ -10,6 +10,6 @@
     "trim_min": 1,
     "model": "LinearRegression",
     "experiment_id": "lr_with_truncations_no_features_columns",
-    "use_truncations": true,
+    "use_truncation_thresholds": true,
     "description": "Using all features with an LinearRegression model, truncations, but no min/max columns."
 }
