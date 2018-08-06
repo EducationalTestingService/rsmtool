@@ -256,7 +256,7 @@ class FeatureSpecsProcessor:
         return feature_sign_numeric
 
     @classmethod
-    def validate_feature_specs(cls, df):
+    def validate_feature_specs(cls, df, use_truncations=False):
         """
         Check the supplied feature specs to make sure that there are no duplicate
         feature names and that all columns are in the right format. Add the default values
@@ -266,6 +266,11 @@ class FeatureSpecsProcessor:
         ----------
         df : pd.DataFrame
             The feature specification DataFrame to validate.
+        use_truncations : bool, optional
+            Whether to use truncation values. If this is
+            True and truncation values are not specified,
+            raise an error.
+            Defaults to False.
 
         Returns
         ------
@@ -275,17 +280,22 @@ class FeatureSpecsProcessor:
         Raises
         ------
         KeyError :
-               If the data frame does not have a ``feature`` column.
+            If the data frame does not have a ``feature`` column.
         ValueError:
-               If there are duplicate values in the ``feature`` column
-               or if the ``sign`` column contains invalid values.
+            If there are duplicate values in the ``feature`` column
+            or if the ``sign`` column contains invalid values.
+        ValueError
+            If ``use_truncations`` is set to True, and no
+            ``min`` and ``max`` columns exist in the data set.
         """
         df_specs_org = df
         df_specs_new = df_specs_org.copy()
 
+        expected_columns = ['feature', 'sign', 'transform']
+
         # we allow internally the use of 'Feature' since
         # this is the column name in subset_feature_file.
-        if "Feature" in df_specs_org:
+        if 'Feature' in df_specs_org:
             df_specs_new['feature'] = df_specs_org['Feature']
 
         # check that we have a column named `feature`
@@ -315,7 +325,17 @@ class FeatureSpecsProcessor:
         if 'transform' not in df_specs_new:
             df_specs_new['transform'] = 'raw'
 
-        df_specs_new = df_specs_new[['feature', 'sign', 'transform']]
+        if use_truncations:
+            if not all(col in df_specs_new for col in ['min', 'max']):
+                raise ValueError('The ``use_truncation_thresholds`` configuration option '
+                                 'was specified, but no ``min`` or ``max`` columns exist '
+                                 'in the feature file.')
+
+            # add ``min`` and ``max`` to the
+            # list of expected columns
+            expected_columns.extend(['min', 'max'])
+
+        df_specs_new = df_specs_new[expected_columns]
         return df_specs_new
 
     @classmethod
@@ -371,6 +391,7 @@ class FeatureSpecsProcessor:
             # Change the sign for inverse and addOneInv transformations
             if feature_dict['transform'] in ['inv', 'addOneInv']:
                 feature_dict['sign'] = feature_dict['sign'] * -1
+
             feature_specs.append(feature_dict)
             feature_dict = {}
 
@@ -505,6 +526,42 @@ class FeaturePreprocessor:
 
         new_values[new_values > ceiling] = ceiling
         new_values[new_values < floor] = floor
+        return new_values
+
+    @staticmethod
+    def remove_outliers_using_truncations(values,
+                                          feature_name,
+                                          truncations):
+        """
+        Remove outliers using truncation groups,
+        rather than calculating the outliers based
+        on the training set.
+
+        Parameters
+        ----------
+        values : np.array
+            The values from which to remove outliers.
+        feature_name : str
+            Name of the feature whose outliers are
+            being clamped.
+        truncations : pd.DataFrame
+            A data frame with truncation values. The
+            features should be set as the index.
+
+        Returns
+        -------
+        new_values : numpy array
+            Numpy array with the outliers clamped.
+        """
+
+        # convert data to a numpy float array before doing any clamping
+        new_values = np.array(values, dtype=np.float)
+
+        minimum = truncations.loc[feature_name, 'min']
+        maximum = truncations.loc[feature_name, 'max']
+
+        new_values[new_values > maximum] = maximum
+        new_values[new_values < minimum] = minimum
         return new_values
 
     @staticmethod
@@ -1003,7 +1060,8 @@ class FeaturePreprocessor:
                            feature_mean,
                            feature_sd,
                            exclude_zero_sd=False,
-                           raise_error=True):
+                           raise_error=True,
+                           truncations=None):
         """
         Remove outliers and transform the values in the given numpy array
         using the given outlier and transformation parameters. The values
@@ -1030,7 +1088,11 @@ class FeaturePreprocessor:
         raise_error : bool, optional
             Raise error if any of the transformations lead to inf values
             or may change the ranking of feature values.
-            Defaults to True
+            Defaults to True.
+        truncations : pd.DataFrame or None, optional
+            The truncations set, if we are using pre-defined
+            truncation values. Otherwise, None.
+            Defaults to None.
 
         Returns
         -------
@@ -1045,11 +1107,20 @@ class FeaturePreprocessor:
             `exclude_zero_sd` is set to `True`.
         """
 
-        # clamp any outlier values that are 4 standard deviations
-        # away from the mean
-        features_no_outliers = self.remove_outliers(values,
-                                                    mean=feature_mean,
-                                                    sd=feature_sd)
+        if truncations is not None:
+
+            # clamp outlier values using the truncations set
+            features_no_outliers = self.remove_outliers_using_truncations(values,
+                                                                          feature_name,
+                                                                          truncations)
+
+        else:
+
+            # clamp any outlier values that are 4 standard deviations
+            # away from the mean
+            features_no_outliers = self.remove_outliers(values,
+                                                        mean=feature_mean,
+                                                        sd=feature_sd)
 
         # apply the requested transformation to the feature
         transformed_feature = FeatureTransformer.transform_feature(features_no_outliers,
@@ -1076,7 +1147,8 @@ class FeaturePreprocessor:
                             df_train,
                             df_test,
                             df_feature_specs,
-                            standardize_features=True):
+                            standardize_features=True,
+                            use_truncations=False):
         """
         Pre-process those features in the given training and testing
         data frame `df` whose specifications are contained in
@@ -1094,9 +1166,13 @@ class FeaturePreprocessor:
         df_feature_specs : pandas DataFrame
             Data frame containing the various specifications
             from the feature file.
-        standardize_features : bool
+        standardize_features : bool, optional
             Whether to standardize the features
             Defaults to True.
+        use_truncations : bool, optional
+            Whether we should use the truncation set
+            for removing outliers.
+            Defaults to False.
 
         Returns
         -------
@@ -1120,6 +1196,13 @@ class FeaturePreprocessor:
         # make feature the index of df_feature_specs
         df_feature_specs.index = df_feature_specs['feature']
 
+        # if we are should be using truncations, then we create the truncations
+        # set from the feature specifications
+        if use_truncations:
+            truncations = df_feature_specs[['feature', 'min', 'max']].set_index('feature')
+        else:
+            truncations = None
+
         # now iterate over each feature
         for feature_name in df_feature_specs['feature']:
 
@@ -1135,14 +1218,16 @@ class FeaturePreprocessor:
                                                                           feature_transformation,
                                                                           train_feature_mean,
                                                                           train_feature_sd,
-                                                                          exclude_zero_sd=True)
+                                                                          exclude_zero_sd=True,
+                                                                          truncations=truncations)
 
             testing_feature_values = df_test[feature_name].values
             df_test_preprocessed[feature_name] = self.preprocess_feature(testing_feature_values,
                                                                          feature_name,
                                                                          feature_transformation,
                                                                          train_feature_mean,
-                                                                         train_feature_sd)
+                                                                         train_feature_sd,
+                                                                         truncations=truncations)
 
             # Standardize the features using the mean and sd computed on the
             # training set. These are computed separately because we need to
@@ -1646,6 +1731,9 @@ class FeaturePreprocessor:
         # are we analyzing scaled or raw prediction values
         use_scaled_predictions = config_obj['use_scaled_predictions']
 
+        # are we using truncations from the feature specs?
+        use_truncations = config_obj['use_truncation_thresholds']
+
         # get the subgroups if any
         subgroups = config_obj.get('subgroups')
 
@@ -1697,8 +1785,15 @@ class FeaturePreprocessor:
 
         elif feature_field is not None:
             generate_feature_specs_automatically = False
-            feature_specs = FeatureSpecsProcessor.validate_feature_specs(feature_specs)
+            feature_specs = FeatureSpecsProcessor.validate_feature_specs(feature_specs,
+                                                                         use_truncations)
             requested_features = feature_specs['feature'].tolist()
+
+        # if we get to this point and both ``generate_feature_specs_automatically``
+        # and ``use_truncations`` are True, then we need to raise an error
+        if use_truncations and generate_feature_specs_automatically:
+            raise ValueError('You have specified the ``use_truncations`` configuration '
+                             'option, but a feature file could not be found.')
 
         # check to make sure that `length_column` or `second_human_score_column`
         # are not also included in the requested features, if they are specified
@@ -1835,7 +1930,8 @@ class FeaturePreprocessor:
          df_feature_info) = self.preprocess_features(df_train_features,
                                                      df_test_features,
                                                      feature_specs,
-                                                     standardize_features)
+                                                     standardize_features,
+                                                     use_truncations)
 
         new_config_dict = {'experiment_id': experiment_id,
                            'subgroups': subgroups,

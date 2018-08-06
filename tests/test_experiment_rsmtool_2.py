@@ -18,7 +18,9 @@ else:
 
 
 @parameterized([
-    param('lr-with-defaults-as-extra-columns', 'lr_with_defaults_as_extra_columns', consistency=True),
+    param('lr-with-defaults-as-extra-columns', 'lr_with_defaults_as_extra_columns',
+          consistency=True),
+    param('lr-with-truncations', 'lr_with_truncations'),
     param('lr-exclude-listwise', 'lr_exclude_listwise'),
     param('lr-with-custom-order', 'lr_with_custom_order'),
     param('lr-with-custom-sections', 'lr_with_custom_sections'),
@@ -120,6 +122,34 @@ def test_run_experiment_lr_with_length_as_feature_name():
     # when a length analysis is requested using a different feature
     source = 'lr-with-length-as-feature-name'
     experiment_id = 'lr_with_length_as_feature_name'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_lr_with_truncations_no_features_field():
+
+    # rsmtool experiment with truncations, but no feature field
+    source = 'lr-with-truncations-no-features-field'
+    experiment_id = 'lr_with_truncations_no_features_field'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_lr_with_truncations_no_features_columns():
+
+    # rsmtool experiment with truncations, but no min/max columns in feature file
+    source = 'lr-with-truncations-no-features-columns'
+    experiment_id = 'lr_with_truncations_no_features_columns'
     config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',
