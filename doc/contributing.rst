@@ -113,7 +113,7 @@ To write a new experiment test for RSMTool (or any of the other tools):
         |   field in the configuration file.                                         |
         +----------------------------------------------------------------------------+
 
-Once you have added all new functional tests, commit all of your changes. Next, you should run ``nosetests --noglogcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. 
+Once you have added all new functional tests, commit all of your changes. Next, you should run ``nosetests --nologcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. 
 
 To do this, you should now run the following:
 
