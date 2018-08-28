@@ -29,8 +29,8 @@ from rsmtool.utils import (agreement,
 
 class Analyzer:
     """
-    Analyzer class, which performs analysis on all metrics, predictions,
-    etc.
+    Analyzer class, which performs analysis on all metrics,
+    predictions, etc.
     """
 
     @staticmethod
