@@ -24,7 +24,7 @@ To set up a local development environment, follow the steps below:
 
 7. Make your changes and add tests. See the next section for more on writing new tests. 
 
-8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
 RSMTool tests
 -------------
