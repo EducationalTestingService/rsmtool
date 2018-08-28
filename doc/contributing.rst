@@ -24,7 +24,7 @@ To set up a local development environment, follow the steps below:
 
 7. Make your changes and add tests. See the next section for more on writing new tests. 
 
-8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
 RSMTool tests
 -------------
@@ -113,7 +113,7 @@ To write a new experiment test for RSMTool (or any of the other tools):
         |   field in the configuration file.                                         |
         +----------------------------------------------------------------------------+
 
-Once you have added all new functional tests, commit all of your changes. Next, you should run ``nosetests --noglogcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. 
+Once you have added all new functional tests, commit all of your changes. Next, you should run ``nosetests --nologcapture`` to run all the tests. Obviously, the newly added tests will fail since you have not yet generated the expected output for that test. 
 
 To do this, you should now run the following:
 
