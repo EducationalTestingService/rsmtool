@@ -172,7 +172,8 @@ class Configuration:
         Parameters
         ----------
         new_path : str
-            A new file path for the Configuration object.
+            A new file path for the
+            configuration object.
         """
         self._filepath = new_path
 
@@ -182,6 +183,19 @@ class Configuration:
         Get the context.
         """
         return self._context
+
+    @context.setter
+    def context(self, new_context):
+        """
+        Set a new context
+
+        Parameters
+        ----------
+        new_context : str
+            A new context  for the
+            configuration object.
+        """
+        self._context = new_context
 
     def get(self, key, default=None):
         """
@@ -242,19 +256,20 @@ class Configuration:
         Returns
         -------
         items : list of tuples
-            A list of (key, value) tuples in the Configuration object.
+            A list of (key, value) tuples in the
+            configuration object.
         """
         return [(k, v) for k, v in self._config.items()]
 
     def pop(self, key, default=None):
         """
         Remove and returns an element from
-        the object  having the given key.
+        the object having the given key.
 
         Parameters
         ----------
         key : str
-            Key to pop in the Configuration object.
+            Key to pop in the configuration object.
         default, optional
             The default value to return, if no key exists.
             Defaults to None.

@@ -485,6 +485,14 @@ class TestConfiguration:
                                context=context)
         eq_(config.context, context)
 
+    def test_set_context(self):
+        context = 'rsmtool'
+        new_context = 'rsmcompare'
+        config = Configuration({"flag_column": "[advisories]"},
+                               context=context)
+        config.context = new_context
+        eq_(config.context, new_context)
+
     def test_get(self):
         config = Configuration({"flag_column": "[advisories]"})
         eq_(config.get('flag_column'), "[advisories]")
