@@ -65,3 +65,18 @@ def test_run_experiment_empwtdropneg():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_requested_feature_zero_sd():
+
+    # rsmtool experiment when a requested feature has zero sd
+    source = 'lr-with-requested-feature-with-zero-sd'
+    experiment_id = 'lr_with_requested_feature_with_zero_sd'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
