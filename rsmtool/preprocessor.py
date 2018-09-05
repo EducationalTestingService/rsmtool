@@ -1508,7 +1508,7 @@ class FeaturePreprocessor:
             # specified in the .json file because sd == 0.
             omitted_features = set(requested_feature_names).difference(df_filtered.columns)
             if omitted_features:
-                logging.warning("The following requested features "
+                raise ValueError("The following requested features "
                                 "were excluded because their standard "
                                 "deviation on the training set was 0: {}.\n"
                                 "Please edit the feature file to exclude "
