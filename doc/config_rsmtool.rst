@@ -129,7 +129,7 @@ flag_column *(Optional)*
 """"""""""""""""""""""""
 This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. 
 If this field is used without ``flag_column_test``, the conditions will be applied to *both* training and evaluation set and the specified columns must be present in both sets. 
-When this field is used in conjunction with ``_flag_column_test``, the conditions will be applied to *training set only* and the specified columns must be present in the training set.
+When this field is used in conjunction with ``flag_column_test``, the conditions will be applied to *training set only* and the specified columns must be present in the training set.
 Defaults to ``None``.
 
 .. note::
