@@ -290,29 +290,63 @@ class Configuration:
             exclude_listwise = True
         return exclude_listwise
 
-    def check_flag_column(self, flag_column='flag_column'):
+    
+    def check_flag_column(self,
+                          flag_column='flag_column',
+                          partition='unknown'):
         """
         Make sure the `flag_column` field is in the correct format. Get
         flag columns and values for filtering if any and convert single
         values to lists. Raises an exception if `flag_column` is not
         correctly specified.
 
+        Parameters
+        ----------
+        flag_column : str
+            The flag column to check. Currently used fields are `flag_column` or 
+            `flag_column_test`.
+            Defaults to 'flag_column'.
+
+        partition: str
+            Partition which is filtered based on the flag column.
+            This is used to display more helpful warning messages.
+            Defaults to 'both'
+
         Returns
         -------
         new_filtering_dict : dict
             Properly formatted `flag_column` dictionary.
-        flag_column : {'flag_column', 'flag_column_test'}
-            The flag column to check.
-            Defaults to 'flag_column'.
 
         Raises
         ------
         ValueError
             If the `flag_column` is not  a dictionary
+
+            If `partition` value if not in the expected list
+
+            If `partition` value does not match the `flag_column` 
         """
         config = self._config
 
         new_filter_dict = {}
+
+        flag_message = {'train': 'training',
+                        'test': 'evaluating',
+                        'both': 'training and evaluating',
+                        'unknown': 'training and/or evaluating'}
+
+        if not partition in flag_message:
+            raise ValueError("Unknown value for partition: {} "
+                            "This must be one of "
+                            "the following: {}".format(partition,
+                                                       ','.join(flag_message.keys())))
+
+
+        if flag_column == 'flag_column_test':
+            if partition in ['both', 'train']:
+                raise ValueError("The conditions specified in `flag_column_test` "
+                                 "can only be applied to the evaluation partition")
+
         if config.get(flag_column):
 
             original_filter_dict = config[flag_column]
@@ -332,7 +366,7 @@ class Configuration:
                                     " for column {} was converted "
                                     "to list. Only responses where "
                                     "{} == {} will be used for "
-                                    "training and/or evaluating the "
+                                    "{} the "
                                     "model. You can ignore this "
                                     "warning if this is the correct "
                                     "interpretation of your "
@@ -340,7 +374,8 @@ class Configuration:
                                     ".".format(original_filter_dict[column],
                                                column,
                                                column,
-                                               original_filter_dict[column])
+                                               original_filter_dict[column],
+                                               flag_message[partition])
                                     )
                 else:
                     new_filter_dict[column] = original_filter_dict[column]
@@ -349,9 +384,9 @@ class Configuration:
                                                original_filter_dict[column]))
                     logging.info("Only responses where "
                                  "{} equals one of the following values "
-                                 "will be used for training and/or "
-                                 "evaluating the model: "
+                                 "will be used for {} the model: "
                                  "{}.".format(column,
+                                              flag_message[partition],
                                               model_eval))
         return new_filter_dict
 

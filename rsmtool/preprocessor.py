@@ -1718,8 +1718,16 @@ class FeaturePreprocessor:
                             " unexpected behavior.")
 
         # are we filtering on any other columns?
-        flag_column_dict = config_obj.check_flag_column()
-        flag_column_test_dict = config_obj.check_flag_column('flag_column_test')
+        # is `flag_column` applied to training partition only 
+        # or both partitions?
+        if 'flag_column_test' in config_obj:
+            flag_partition = 'train'
+        else:
+            flag_partition = 'both'
+
+        flag_column_dict = config_obj.check_flag_column(partition=flag_partition)
+        flag_column_test_dict = config_obj.check_flag_column('flag_column_test',
+                                                             partition='test')
 
         if (flag_column_dict and not flag_column_test_dict):
             flag_column_test_dict = flag_column_dict
@@ -2104,7 +2112,7 @@ class FeaturePreprocessor:
                             " unexpected behavior.")
 
         # are we filtering on any other columns?
-        flag_column_dict = config_obj.check_flag_column()
+        flag_column_dict = config_obj.check_flag_column(partition='test')
 
         # do we have the training set predictions and human scores CSV file
         scale_with = config_obj.get('scale_with')
@@ -2386,7 +2394,7 @@ class FeaturePreprocessor:
         predict_expected_scores = config_obj['predict_expected_scores']
 
         # get the column names for flag columns (if any)
-        flag_column_dict = config_obj.check_flag_column()
+        flag_column_dict = config_obj.check_flag_column(partition='test')
 
         # get the name for the candidate_column (if any)
         candidate_column = config_obj['candidate_column']

@@ -371,6 +371,13 @@ class TestConfiguration:
         output_dict = config.check_flag_column()
         eq_(input_dict, output_dict)
 
+
+    def test_check_flag_column_flag_column_test(self):
+        input_dict = {"advisory flag": ['0']}
+        config = Configuration({"flag_column_test": input_dict})
+        output_dict = config.check_flag_column("flag_column_test")
+        eq_(input_dict, output_dict)
+
     def test_check_flag_column_keep_numeric(self):
         input_dict = {"advisory flag": [1, 2, 3]}
         config = Configuration({"flag_column": input_dict})
@@ -387,10 +394,30 @@ class TestConfiguration:
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": ['0']})
 
+
+    def test_check_flag_column_convert_to_list_test(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = config.check_flag_column(partition='test')
+        eq_(flag_dict, {"advisories": ['0']})
+
+
+    def test_check_flag_column_convert_to_list_train(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = config.check_flag_column(partition='train')
+        eq_(flag_dict, {"advisories": ['0']})
+
+
+    def test_check_flag_column_convert_to_list_both(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = config.check_flag_column(partition='both')
+        eq_(flag_dict, {"advisories": ['0']})
+
+
     def test_check_flag_column_convert_to_list_keep_numeric(self):
         config = Configuration({"flag_column": {"advisories": 123}})
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": [123]})
+
 
     def test_contains_key(self):
         config = Configuration({"flag_column": {"advisories": 123}})
@@ -421,6 +448,26 @@ class TestConfiguration:
     def test_check_flag_column_wrong_format(self):
         config = Configuration({"flag_column": "[advisories]"})
         config.check_flag_column()
+
+    
+    @raises(ValueError)
+    def test_check_flag_column_wrong_partition(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        flag_dict = config.check_flag_column(partition='eval')
+
+
+    @raises(ValueError)
+    def test_check_flag_column_mismatched_partition(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        flag_dict = config.check_flag_column(flag_column='flag_column_test',
+                                             partition='train')
+
+
+    @raises(ValueError)
+    def test_check_flag_column_mismatched_partition_both(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        flag_dict = config.check_flag_column(flag_column='flag_column_test',
+                                             partition='both')
 
     def test_str_correct(self):
         config_dict = {'flag_column': '[advisories]'}
