@@ -2583,7 +2583,7 @@ class FeaturePreprocessor:
 
         extra_features = set(input_feature_columns).difference(required_features + ['spkitemid'])
         if extra_features:
-            logging.warning('The following extraenous features '
+            logging.warning('The following extraneous features '
                             'will be ignored: {}'.format(extra_features))
 
         # keep the required features plus the id
