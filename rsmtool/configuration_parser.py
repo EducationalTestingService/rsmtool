@@ -290,7 +290,6 @@ class Configuration:
             exclude_listwise = True
         return exclude_listwise
 
-    
     def check_flag_column(self,
                           flag_column='flag_column',
                           partition='unknown'):
@@ -303,11 +302,11 @@ class Configuration:
         Parameters
         ----------
         flag_column : str
-            The flag column to check. Currently used fields are `flag_column` or 
+            The flag column to check. Currently used fields are `flag_column` or
             `flag_column_test`.
             Defaults to 'flag_column'.
 
-        partition: str
+        partition: {'train', 'test', 'both', 'unknown'}
             Partition which is filtered based on the flag column.
             This is used to display more helpful warning messages.
             Defaults to 'both'
@@ -324,7 +323,7 @@ class Configuration:
 
             If `partition` value if not in the expected list
 
-            If `partition` value does not match the `flag_column` 
+            If `partition` value does not match the `flag_column`
         """
         config = self._config
 
@@ -335,17 +334,15 @@ class Configuration:
                         'both': 'training and evaluating',
                         'unknown': 'training and/or evaluating'}
 
-        if not partition in flag_message:
+        if partition not in flag_message:
             raise ValueError("Unknown value for partition: {} "
-                            "This must be one of "
-                            "the following: {}".format(partition,
-                                                       ','.join(flag_message.keys())))
-
+                             "This must be one of the following: {}."
+                             "".format(partition, ','.join(flag_message.keys())))
 
         if flag_column == 'flag_column_test':
             if partition in ['both', 'train']:
                 raise ValueError("The conditions specified in `flag_column_test` "
-                                 "can only be applied to the evaluation partition")
+                                 "can only be applied to the evaluation partition.")
 
         if config.get(flag_column):
 
@@ -353,9 +350,9 @@ class Configuration:
 
             # first check that the value is a dictionary
             if not isinstance(original_filter_dict, dict):
-                raise ValueError("'flag_column' must be a dictionary. "
+                raise ValueError("`flag_column` must be a dictionary. "
                                  "Please refer to the documentation for "
-                                 "further information")
+                                 "further information.")
 
             for column in original_filter_dict:
 

@@ -1,9 +1,11 @@
 import json
+import logging
 import os
 import tempfile
 import warnings
 import pandas as pd
 
+from io import StringIO
 from os.path import dirname, join
 from shutil import rmtree
 
@@ -365,12 +367,38 @@ class TestConfigurationParser:
 
 class TestConfiguration:
 
+    def check_logging_output(self, expected, function, *args, **kwargs):
+
+        # check if the `expected` text is in the actual logging output
+
+        root_logger = logging.getLogger()
+        with StringIO() as string_io:
+
+            # add a stream handler
+            handler = logging.StreamHandler(string_io)
+            root_logger.addHandler(handler)
+
+            result = function(*args, **kwargs)
+            logging_text = string_io.getvalue()
+
+            try:
+                assert expected in logging_text
+            except AssertionError:
+
+                # remove the stream handler and raise error
+                root_logger.handlers = []
+                raise AssertionError('`{}` not in logging output: '
+                                     '`{}`.'.format(expected, logging_text))
+
+            # remove the stream handler, even if we have no errors
+            root_logger.handlers = []
+        return result
+
     def test_check_flag_column(self):
         input_dict = {"advisory flag": ['0']}
         config = Configuration({"flag_column": input_dict})
         output_dict = config.check_flag_column()
         eq_(input_dict, output_dict)
-
 
     def test_check_flag_column_flag_column_test(self):
         input_dict = {"advisory flag": ['0']}
@@ -394,30 +422,46 @@ class TestConfiguration:
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": ['0']})
 
-
     def test_check_flag_column_convert_to_list_test(self):
         config = Configuration({"flag_column": {"advisories": "0"}})
-        flag_dict = config.check_flag_column(partition='test')
-        eq_(flag_dict, {"advisories": ['0']})
 
+        flag_dict = self.check_logging_output('evaluating',
+                                              config.check_flag_column,
+                                              partition='test')
+        eq_(flag_dict, {"advisories": ['0']})
 
     def test_check_flag_column_convert_to_list_train(self):
         config = Configuration({"flag_column": {"advisories": "0"}})
-        flag_dict = config.check_flag_column(partition='train')
+        flag_dict = self.check_logging_output('training',
+                                              config.check_flag_column,
+                                              partition='train')
         eq_(flag_dict, {"advisories": ['0']})
-
 
     def test_check_flag_column_convert_to_list_both(self):
         config = Configuration({"flag_column": {"advisories": "0"}})
-        flag_dict = config.check_flag_column(partition='both')
+        flag_dict = self.check_logging_output('training and evaluating',
+                                              config.check_flag_column,
+                                              partition='both')
         eq_(flag_dict, {"advisories": ['0']})
 
+    def test_check_flag_column_convert_to_list_unknown(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = self.check_logging_output('training and/or evaluating',
+                                              config.check_flag_column,
+                                              partition='unknown')
+        eq_(flag_dict, {"advisories": ['0']})
+
+    @raises(AssertionError)
+    def test_check_flag_column_convert_to_list_test_error(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        self.check_logging_output('training',
+                                  config.check_flag_column,
+                                  partition='test')
 
     def test_check_flag_column_convert_to_list_keep_numeric(self):
         config = Configuration({"flag_column": {"advisories": 123}})
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": [123]})
-
 
     def test_contains_key(self):
         config = Configuration({"flag_column": {"advisories": 123}})
@@ -449,25 +493,22 @@ class TestConfiguration:
         config = Configuration({"flag_column": "[advisories]"})
         config.check_flag_column()
 
-    
     @raises(ValueError)
     def test_check_flag_column_wrong_partition(self):
         config = Configuration({"flag_column_test": {"advisories": 123}})
-        flag_dict = config.check_flag_column(partition='eval')
-
+        config.check_flag_column(partition='eval')
 
     @raises(ValueError)
     def test_check_flag_column_mismatched_partition(self):
         config = Configuration({"flag_column_test": {"advisories": 123}})
-        flag_dict = config.check_flag_column(flag_column='flag_column_test',
-                                             partition='train')
-
+        config.check_flag_column(flag_column='flag_column_test',
+                                 partition='train')
 
     @raises(ValueError)
     def test_check_flag_column_mismatched_partition_both(self):
         config = Configuration({"flag_column_test": {"advisories": 123}})
-        flag_dict = config.check_flag_column(flag_column='flag_column_test',
-                                             partition='both')
+        config.check_flag_column(flag_column='flag_column_test',
+                                 partition='both')
 
     def test_str_correct(self):
         config_dict = {'flag_column': '[advisories]'}

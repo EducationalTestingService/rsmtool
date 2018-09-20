@@ -1509,11 +1509,11 @@ class FeaturePreprocessor:
             omitted_features = set(requested_feature_names).difference(df_filtered.columns)
             if omitted_features:
                 raise ValueError("The following requested features "
-                                "were excluded because their standard "
-                                "deviation on the training set was 0: {}.\n"
-                                "Please edit the feature file to exclude "
-                                "these features and re-run the "
-                                "tool".format(', '.join(omitted_features)))
+                                 "were excluded because their standard "
+                                 "deviation on the training set was 0: {}.\n"
+                                 "Please edit the feature file to exclude "
+                                 "these features and re-run the "
+                                 "tool".format(', '.join(omitted_features)))
             # Update the feature names
             feature_names = [feature for feature in feature_names
                              if feature in df_filtered]
@@ -1718,7 +1718,7 @@ class FeaturePreprocessor:
                             " unexpected behavior.")
 
         # are we filtering on any other columns?
-        # is `flag_column` applied to training partition only 
+        # is `flag_column` applied to training partition only
         # or both partitions?
         if 'flag_column_test' in config_obj:
             flag_partition = 'train'
