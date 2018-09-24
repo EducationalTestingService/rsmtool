@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train_with_identical_lengths.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test_with_identical_lengths.csv",
+    "trim_max": 6,
+    "features": ["LENGTH", "FEATURE1", "FEATURE2", "FEATURE3", "FEATURE4"],
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_with_requested_feature_with_zero_sd",
+    "description": "Using all features with a LinearRegression model."
+}
