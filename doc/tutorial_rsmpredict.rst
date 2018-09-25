@@ -71,7 +71,7 @@ Now that we have the model, the features in the right format, and our configurat
 
 This should produce output like::
 
-    WARNING: The following extraenous features will be ignored: {'spkitemid', 'sc1', 'sc2', 'LENGTH'}
+    WARNING: The following extraneous features will be ignored: {'spkitemid', 'sc1', 'sc2', 'LENGTH'}
     Pre-processing input features
     Generating predictions
     Rescaling predictions
