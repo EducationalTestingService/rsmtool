@@ -11,6 +11,7 @@ in a pd.DataFrame object.
 """
 
 import warnings
+from copy import copy, deepcopy
 
 
 class DataContainer:
@@ -375,13 +376,6 @@ class DataContainer:
             underlying data frames.
             Defaults to True.
         """
-        dataset_list = []
-        for name in self.keys():
-            frame = self._dataframes[name].copy(deep=deep)
-            path = self._data_paths[name]
-            dataset_dict = {'name': name,
-                            'frame': frame,
-                            'path': path}
-            dataset_list.append(dataset_dict)
-
-        return DataContainer(dataset_list)
+        if deep:
+            return deepcopy(self)
+        return copy(self)

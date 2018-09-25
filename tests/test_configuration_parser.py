@@ -1,9 +1,11 @@
 import json
+import logging
 import os
 import tempfile
 import warnings
 import pandas as pd
 
+from io import StringIO
 from os.path import dirname, join
 from shutil import rmtree
 
@@ -11,6 +13,7 @@ from numpy.testing import assert_array_equal
 from pandas.util.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
+                        assert_not_equal,
                         assert_raises,
                         eq_,
                         ok_,
@@ -365,10 +368,81 @@ class TestConfigurationParser:
 
 class TestConfiguration:
 
+    def check_logging_output(self, expected, function, *args, **kwargs):
+
+        # check if the `expected` text is in the actual logging output
+
+        root_logger = logging.getLogger()
+        with StringIO() as string_io:
+
+            # add a stream handler
+            handler = logging.StreamHandler(string_io)
+            root_logger.addHandler(handler)
+
+            result = function(*args, **kwargs)
+            logging_text = string_io.getvalue()
+
+            try:
+                assert expected in logging_text
+            except AssertionError:
+
+                # remove the stream handler and raise error
+                root_logger.handlers = []
+                raise AssertionError('`{}` not in logging output: '
+                                     '`{}`.'.format(expected, logging_text))
+
+            # remove the stream handler, even if we have no errors
+            root_logger.handlers = []
+        return result
+
+    def test_pop_value(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        value = config.pop("experiment_id")
+        eq_(value, '001')
+
+    def test_pop_value_default(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        value = config.pop("foo", "bar")
+        eq_(value, 'bar')
+
+    def test_copy(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
+                      "object": [1, 2, 3]}
+        config = Configuration(dictionary)
+        config_copy = config.copy()
+        assert_not_equal(id(config), id(config_copy))
+        for key in config.keys():
+
+            # check to make sure this is a deep copy
+            if key == "object":
+                assert_not_equal(id(config[key]), id(config_copy[key]))
+            assert_equal(config[key], config_copy[key])
+
+    def test_copy_not_deep(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
+                      "object": [1, 2, 3]}
+        config = Configuration(dictionary)
+        config_copy = config.copy(deep=False)
+        assert_not_equal(id(config), id(config_copy))
+        for key in config.keys():
+
+            # check to make sure this is a shallow copy
+            if key == "object":
+                assert_equal(id(config[key]), id(config_copy[key]))
+            assert_equal(config[key], config_copy[key])
+
     def test_check_flag_column(self):
         input_dict = {"advisory flag": ['0']}
         config = Configuration({"flag_column": input_dict})
         output_dict = config.check_flag_column()
+        eq_(input_dict, output_dict)
+
+    def test_check_flag_column_flag_column_test(self):
+        input_dict = {"advisory flag": ['0']}
+        config = Configuration({"flag_column_test": input_dict})
+        output_dict = config.check_flag_column("flag_column_test")
         eq_(input_dict, output_dict)
 
     def test_check_flag_column_keep_numeric(self):
@@ -386,6 +460,42 @@ class TestConfiguration:
         config = Configuration({"flag_column": {"advisories": "0"}})
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": ['0']})
+
+    def test_check_flag_column_convert_to_list_test(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+
+        flag_dict = self.check_logging_output('evaluating',
+                                              config.check_flag_column,
+                                              partition='test')
+        eq_(flag_dict, {"advisories": ['0']})
+
+    def test_check_flag_column_convert_to_list_train(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = self.check_logging_output('training',
+                                              config.check_flag_column,
+                                              partition='train')
+        eq_(flag_dict, {"advisories": ['0']})
+
+    def test_check_flag_column_convert_to_list_both(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = self.check_logging_output('training and evaluating',
+                                              config.check_flag_column,
+                                              partition='both')
+        eq_(flag_dict, {"advisories": ['0']})
+
+    def test_check_flag_column_convert_to_list_unknown(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        flag_dict = self.check_logging_output('training and/or evaluating',
+                                              config.check_flag_column,
+                                              partition='unknown')
+        eq_(flag_dict, {"advisories": ['0']})
+
+    @raises(AssertionError)
+    def test_check_flag_column_convert_to_list_test_error(self):
+        config = Configuration({"flag_column": {"advisories": "0"}})
+        self.check_logging_output('training',
+                                  config.check_flag_column,
+                                  partition='test')
 
     def test_check_flag_column_convert_to_list_keep_numeric(self):
         config = Configuration({"flag_column": {"advisories": 123}})
@@ -422,6 +532,23 @@ class TestConfiguration:
         config = Configuration({"flag_column": "[advisories]"})
         config.check_flag_column()
 
+    @raises(ValueError)
+    def test_check_flag_column_wrong_partition(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config.check_flag_column(partition='eval')
+
+    @raises(ValueError)
+    def test_check_flag_column_mismatched_partition(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config.check_flag_column(flag_column='flag_column_test',
+                                 partition='train')
+
+    @raises(ValueError)
+    def test_check_flag_column_mismatched_partition_both(self):
+        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config.check_flag_column(flag_column='flag_column_test',
+                                 partition='both')
+
     def test_str_correct(self):
         config_dict = {'flag_column': '[advisories]'}
         config = Configuration(config_dict)
@@ -445,6 +572,14 @@ class TestConfiguration:
         config = Configuration({"flag_column": "[advisories]"},
                                context=context)
         eq_(config.context, context)
+
+    def test_set_context(self):
+        context = 'rsmtool'
+        new_context = 'rsmcompare'
+        config = Configuration({"flag_column": "[advisories]"},
+                               context=context)
+        config.context = new_context
+        eq_(config.context, new_context)
 
     def test_get(self):
         config = Configuration({"flag_column": "[advisories]"})

@@ -128,7 +128,8 @@ The name for an optional column in the test data containing a second human score
 flag_column *(Optional)*
 """"""""""""""""""""""""
 This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. 
-When this field is used, the specified columns must be present in the training set and, if ``flag_column_tes`` is not passed, the evaluation set, as well. 
+If this field is used without ``flag_column_test``, the conditions will be applied to *both* training and evaluation set and the specified columns must be present in both sets. 
+When this field is used in conjunction with ``flag_column_test``, the conditions will be applied to *training set only* and the specified columns must be present in the training set.
 Defaults to ``None``.
 
 .. note::
@@ -147,8 +148,13 @@ flag_column_test *(Optional)*
 """""""""""""""""""""""""""""
 This field makes it possible to only use a separate Python flag dictionary for the evaluation set. If this field is not passed, and ``flag_column`` is passed, then the same advisories will be used for both training and evaluation sets. 
 
+
 When this field is used, the specified columns must be present in the evaluation set. 
 Defaults to ``None`` or `flag_column``, if ``flag_column`` is present. Use ``flag_column_test`` only if you want filtering of the test set.
+
+.. note::
+    
+    When used, ``flag_column_test`` field determines *all* filtering conditions for the evaluation set. If it is used in conjunction with ``flag_column`` field, the filtering conditions defined in ``flag_column`` will *only* be applied to the training set. If you want to apply a subset of conditions to both partitions with additional conditions applied to the evaluation set only, you will need to specify the overlapping conditions separately for each partition.   
 
 .. _exclude_zero_scores_rsmtool:
 

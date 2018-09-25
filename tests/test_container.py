@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
-from nose.tools import assert_false, eq_, raises
+from nose.tools import assert_false, assert_equal, assert_not_equal, eq_, raises
 from pandas.util.testing import assert_frame_equal
 from rsmtool.container import DataContainer
 
@@ -25,6 +25,7 @@ class TestBuilderDataContainer:
         container = DataContainer([{'frame': expected, 'name': 'test', 'path': 'foo'}])
         new_container = container.copy()
 
+        assert_not_equal(id(new_container), id(container))
         for name in new_container.keys():
 
             frame = new_container.get_frame(name)
@@ -35,6 +36,33 @@ class TestBuilderDataContainer:
 
             eq_(path, old_path)
             assert_frame_equal(frame, old_frame)
+            assert_not_equal(id(frame), id(old_frame))
+
+    def test_copy_not_deep(self):
+
+        expected = pd.DataFrame([['John', 1, 5.0],
+                                 ['Mary', 2, 4.0],
+                                 ['Sally', 6, np.nan],
+                                 ['Jeff', 3, 9.0],
+                                 ['Edwin', 9, 1.0]],
+                                columns=['string', 'numeric',
+                                         'numeric_missing'])
+
+        container = DataContainer([{'frame': expected, 'name': 'test', 'path': 'foo'}])
+        new_container = container.copy(deep=False)
+
+        assert_not_equal(id(new_container), id(container))
+        for name in new_container.keys():
+
+            frame = new_container.get_frame(name)
+            path = new_container.get_path(name)
+
+            old_frame = container.get_frame(name)
+            old_path = container.get_path(name)
+
+            eq_(path, old_path)
+            assert_frame_equal(frame, old_frame)
+            assert_equal(id(frame), id(old_frame))
 
     def test_rename(self):
 
