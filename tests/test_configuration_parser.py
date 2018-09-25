@@ -13,6 +13,7 @@ from numpy.testing import assert_array_equal
 from pandas.util.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
+                        assert_not_equal,
                         assert_raises,
                         eq_,
                         ok_,
@@ -394,6 +395,44 @@ class TestConfiguration:
             root_logger.handlers = []
         return result
 
+    def test_pop_value(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        value = config.pop("experiment_id")
+        eq_(value, '001')
+
+    def test_pop_value_default(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        value = config.pop("foo", "bar")
+        eq_(value, 'bar')
+
+    def test_copy(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
+                      "object": [1, 2, 3]}
+        config = Configuration(dictionary)
+        config_copy = config.copy()
+        assert_not_equal(id(config), id(config_copy))
+        for key in config.keys():
+
+            # check to make sure this is a deep copy
+            if key == "object":
+                assert_not_equal(id(config[key]), id(config_copy[key]))
+            assert_equal(config[key], config_copy[key])
+
+    def test_copy_not_deep(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
+                      "object": [1, 2, 3]}
+        config = Configuration(dictionary)
+        config_copy = config.copy(deep=False)
+        assert_not_equal(id(config), id(config_copy))
+        for key in config.keys():
+
+            # check to make sure this is a shallow copy
+            if key == "object":
+                assert_equal(id(config[key]), id(config_copy[key]))
+            assert_equal(config[key], config_copy[key])
+
     def test_check_flag_column(self):
         input_dict = {"advisory flag": ['0']}
         config = Configuration({"flag_column": input_dict})
@@ -533,6 +572,14 @@ class TestConfiguration:
         config = Configuration({"flag_column": "[advisories]"},
                                context=context)
         eq_(config.context, context)
+
+    def test_set_context(self):
+        context = 'rsmtool'
+        new_context = 'rsmcompare'
+        config = Configuration({"flag_column": "[advisories]"},
+                               context=context)
+        config.context = new_context
+        eq_(config.context, new_context)
 
     def test_get(self):
         config = Configuration({"flag_column": "[advisories]"})
