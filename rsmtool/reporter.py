@@ -614,29 +614,38 @@ class Reporter:
                            'in Configuration object. Please make sure you have included '
                            'one of these parameters in the configuration object.')
 
-        environ_config = {'experiment_id': config['experiment_id'],
-                          'description': config['description'],
-                          'model_type': config.get('model_type', ''),
-                          'model_name': config.get('model_name', ''),
-                          'train_file_location': config.get('train_file_location', ''),
-                          'test_file_location': test_file_location,
-                          'subgroups': config['subgroups'],
-                          'length_column': config.get('length_column', None),
-                          'second_human_score_column': config['second_human_score_column'],
-                          'min_items_per_candidate': config['min_items_per_candidate'],
-                          'chosen_notebook_files': config['chosen_notebook_files'],
-                          'feature_subset_file': config.get('feature_subset_file'),
-                          'exclude_zero_scores': config.get('exclude_zero_scores', True),
-                          'use_scaled_predictions': config.get('use_scaled_predictions', False),
-                          'standardize_features': config.get('standardize_features', True),
-                          'file_format': config.get('file_format', 'csv'),
-                          'use_thumbnails': config.get('use_thumbnails', False),
-                          'skll_objective': config.get('skll_objective', ''),
-                          'predict_expected_scores': config.get('predict_expected_scores', False),
-                          'context': context,
-                          'javascript_path': javascript_path,
-                          'output_dir': csvdir,
-                          'figure_dir': figdir
+        # if the features subset file is None, just use empty string
+        feature_subset_file = ('' if config.get('feature_subset_file') is None
+                               else config['feature_subset_file'])
+
+        # if the min items is None, just set it to zero
+        min_items = (0 if config['min_items_per_candidate'] is None
+                     else config['min_items_per_candidate'])
+
+        environ_config = {'EXPERIMENT_ID': config['experiment_id'],
+                          'DESCRIPTION': config['description'],
+                          'MODEL_TYPE': config.get('model_type', ''),
+                          'MODEL_NAME': config.get('model_name', ''),
+                          'TRAIN_FILE_LOCATION': config.get('train_file_location', ''),
+                          'TEST_FILE_LOCATION': test_file_location,
+                          'SUBGROUPS': config.get('subgroups', []),
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'LENGTH_COLUMN': config.get('length_column', None),
+                          'H2_COLUMN': config['second_human_score_column'],
+                          'MIN_ITEMS': min_items,
+                          'FEATURE_SUBSET_FILE': feature_subset_file,
+                          'EXCLUDE_ZEROS': config.get('exclude_zero_scores', True),
+                          'SCALED': config.get('use_scaled_predictions', False),
+                          'STANDARDIZE_FEATURES': config.get('standardize_features', True),
+                          'FILE_FORMAT': config.get('file_format', 'csv'),
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'SKLL_OBJECTIVE': config.get('skll_objective', ''),
+                          'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
+                          'CONTEXT': context,
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR': csvdir,
+                          'FIGURE_DIR': figdir
                           }
 
         # get the report directory which is at the same level
@@ -644,7 +653,10 @@ class Reporter:
         reportdir = abspath(join(csvdir, '..', 'report'))
         report_name = '{}_report'.format(config['experiment_id'])
         merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
-        environ_config_file = join(reportdir, '.environ_{}.json'.format(report_name))
+        environ_config_file = join(reportdir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = reportdir
 
         # write out hidden environment JSON file
         with open(environ_config_file, 'w') as out_environ_config:
@@ -696,31 +708,34 @@ class Reporter:
 
         logger = logging.getLogger(__name__)
 
+        # whether to use scaled predictions for both new and old; default to false
         use_scaled_predictions_old = config.get('use_scaled_predictions_old', False)
         use_scaled_predictions_new = config.get('use_scaled_predictions_new', False)
 
-        environ_config = {'comparison_id': config['comparison_id'],
-                          'experiment_id_old': config['experiment_id_old'],
-                          'experiment_id_new': config['experiment_id_new'],
-                          'description_old': config['description_old'],
-                          'description_new': config['description_new'],
-                          'subgroups': config.get('subgroups'),
-                          'chosen_notebook_files': config['chosen_notebook_files'],
-                          'use_scaled_predictions_old': use_scaled_predictions_old,
-                          'use_scaled_predictions_new': use_scaled_predictions_new,
-                          'use_thumbnails': config.get('use_thumbnails', False),
-                          'javascript_path': javascript_path,
-                          'output_dir_new': csvdir_new,
-                          'figure_dir_new': figdir_new,
-                          'output_dir_old': csvdir_old,
-                          'figure_dir_old': figdir_old,
+        environ_config = {'EXPERIMENT_ID_OLD': config['experiment_id_old'],
+                          'EXPERIMENT_ID_NEW': config['experiment_id_new'],
+                          'DESCRIPTION_OLD': config['description_old'],
+                          'DESCRIPTION_NEW': config['description_new'],
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'SCALED_OLD': use_scaled_predictions_old,
+                          'SCALED_NEW': use_scaled_predictions_new,
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR_NEW': csvdir_new,
+                          'FIGURE_DIR_NEW': figdir_new,
+                          'OUTPUT_DIR_OLD': csvdir_old,
+                          'FIGURE_DIR_OLD': figdir_old,
                           }
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
         report_name = '{}_report'.format(config['comparison_id'])
         merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
-        environ_config_file = join(output_dir, '.environ_{}.json'.format(report_name))
+        environ_config_file = join(output_dir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = abspath(output_dir)
 
         # write out hidden environment JSON file
         with open(environ_config_file, 'w') as out_environ_config:
@@ -763,22 +778,24 @@ class Reporter:
 
         logger = logging.getLogger(__name__)
 
-        environ_config = {'summary_id': config['summary_id'],
-                          'description': config['description'],
-                          'subgroups': config.get('subgroups'),
-                          'chosen_notebook_files': config['chosen_notebook_files'],
-                          'use_scaled_predictions_old': use_scaled_predictions_old,
-                          'use_scaled_predictions_new': use_scaled_predictions_new,
-                          'use_thumbnails': config.get('use_thumbnails', False),
-                          'file_format': config.get('file_format', 'csv'),
-                          'javascript_path': javascript_path,
-                          'output_dir': csvdir
+        environ_config = {'SUMMARY_ID': config['summary_id'],
+                          'DESCRIPTION': config['description'],
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'FILE_FORMAT': config.get('file_format', 'csv'),
+                          'JSONS': all_experiments,
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR': csvdir
                           }
 
         report_name = '{}_report'.format(config['summary_id'])
         reportdir = abspath(join(csvdir, '..', 'report'))
         merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
-        environ_config_file = join(reportdir, '.environ_{}.json'.format(report_name))
+        environ_config_file = join(reportdir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = reportdir
 
         # write out hidden environment JSON file
         with open(environ_config_file, 'w') as out_environ_config:
