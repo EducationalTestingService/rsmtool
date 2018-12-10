@@ -570,7 +570,7 @@ class Reporter:
         return chosen_notebook_files
 
     def create_report(self,
-                      configuration,
+                      config,
                       csvdir,
                       figdir,
                       context='rsmtool'):
@@ -581,7 +581,7 @@ class Reporter:
         Parameters
         ----------
 
-        configuration : configuration_parser.Configuration
+        config : configuration_parser.Configuration
             A configuration object
         csvdir : str
             The CSV output directory.
@@ -599,35 +599,14 @@ class Reporter:
         Raises
         ------
         KeyError
-            If `test_file_location or `pred_file_location` not in configuration.
+            If `test_file_location or `pred_file_location` not in config.
         """
 
         logger = logging.getLogger(__name__)
 
-        # get all required configuration parameters
-        experiment_id = configuration['experiment_id']
-        description = configuration['description']
-        model_type = configuration.get('model_type', '')
-        model_name = configuration.get('model_name', '')
-        train_file_location = configuration.get('train_file_location', '')
-        subgroups = configuration['subgroups']
-        length_column = configuration.get('length_column', None)
-        second_human_score_column = configuration['second_human_score_column']
-        min_items_per_candidate = configuration['min_items_per_candidate']
-        chosen_notebook_files = configuration['chosen_notebook_files']
-        feature_subset_file = configuration.get('feature_subset_file')
-        exclude_zero_scores = configuration.get('exclude_zero_scores', True)
-        use_scaled_predictions = configuration.get('use_scaled_predictions', False)
-        standardize_features = configuration.get('standardize_features', True)
-        file_format = configuration.get('file_format', 'csv')
-        use_thumbnails = configuration.get('use_thumbnails', False)
-        skll_objective = configuration.get('skll_objective', '')
-        predict_expected_scores = configuration.get('predict_expected_scores', False)
-
-        # get either test or predictions file location
-        test_file_location = configuration.get('test_file_location')
+        test_file_location = config.get('test_file_location')
         if test_file_location is None:
-            test_file_location = configuration.get('pred_file_location')
+            test_file_location = config.get('pred_file_location')
 
         # raise error if location is still None
         if test_file_location is None:
@@ -635,48 +614,57 @@ class Reporter:
                            'in Configuration object. Please make sure you have included '
                            'one of these parameters in the configuration object.')
 
-        # set the environment variables we want
-        os.environ['EXPERIMENT_ID'] = experiment_id
-        os.environ['DESCRIPTION'] = description
-        os.environ['CONTEXT'] = context
-        os.environ['TRAIN_FILE_LOCATION'] = train_file_location
-        os.environ['TEST_FILE_LOCATION'] = test_file_location
-        os.environ['OUTPUT_DIR'] = csvdir
-        os.environ['FIGURE_DIR'] = figdir
-        os.environ['MODEL_NAME'] = model_name
-        os.environ['MODEL_TYPE'] = model_type
-        os.environ['STANDARDIZE_FEATURES'] = '1' if standardize_features else '0'
-        os.environ['SCALED'] = '1' if use_scaled_predictions else '0'
-        os.environ['EXCLUDE_ZEROS'] = '1' if exclude_zero_scores else '0'
-        os.environ['LENGTH_COLUMN'] = '' if length_column is None else length_column
-        os.environ['H2_COLUMN'] = ('' if second_human_score_column is None
-                                   else second_human_score_column)
-        os.environ['MIN_ITEMS'] = ('0' if min_items_per_candidate is None
-                                   else str(min_items_per_candidate))
-        os.environ['FEATURE_SUBSET_FILE'] = ('' if feature_subset_file is None
-                                             else feature_subset_file)
-        os.environ['JAVASCRIPT_PATH'] = javascript_path
+        # if the features subset file is None, just use empty string
+        feature_subset_file = ('' if config.get('feature_subset_file') is None
+                               else config['feature_subset_file'])
 
-        # we define separate groups to allow future flexibility in defining
-        # what groups are used for descriptives and evaluations
-        os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
-        os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
+        # if the min items is None, just set it to zero
+        min_items = (0 if config['min_items_per_candidate'] is None
+                     else config['min_items_per_candidate'])
 
-        # pass in other useful information to the report
-        os.environ['FILE_FORMAT'] = file_format
-        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
-        os.environ['SKLL_OBJECTIVE'] = '' if skll_objective is None else skll_objective
-        os.environ['PREDICT_EXPECTED_SCORES'] = '1' if predict_expected_scores else '0'
+        environ_config = {'EXPERIMENT_ID': config['experiment_id'],
+                          'DESCRIPTION': config['description'],
+                          'MODEL_TYPE': config.get('model_type', ''),
+                          'MODEL_NAME': config.get('model_name', ''),
+                          'TRAIN_FILE_LOCATION': config.get('train_file_location', ''),
+                          'TEST_FILE_LOCATION': test_file_location,
+                          'SUBGROUPS': config.get('subgroups', []),
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'LENGTH_COLUMN': config.get('length_column', None),
+                          'H2_COLUMN': config['second_human_score_column'],
+                          'MIN_ITEMS': min_items,
+                          'FEATURE_SUBSET_FILE': feature_subset_file,
+                          'EXCLUDE_ZEROS': config.get('exclude_zero_scores', True),
+                          'SCALED': config.get('use_scaled_predictions', False),
+                          'STANDARDIZE_FEATURES': config.get('standardize_features', True),
+                          'FILE_FORMAT': config.get('file_format', 'csv'),
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'SKLL_OBJECTIVE': config.get('skll_objective', ''),
+                          'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
+                          'CONTEXT': context,
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR': csvdir,
+                          'FIGURE_DIR': figdir
+                          }
 
         # get the report directory which is at the same level
         # as the output and the figure directory
         reportdir = abspath(join(csvdir, '..', 'report'))
-        report_name = '{}_report'.format(experiment_id)
+        report_name = '{}_report'.format(config['experiment_id'])
         merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        environ_config_file = join(reportdir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = reportdir
+
+        # write out hidden environment JSON file
+        with open(environ_config_file, 'w') as out_environ_config:
+            json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
         logger.info('Merging sections')
-        self.merge_notebooks(chosen_notebook_files, merged_notebook_file)
+        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
@@ -685,7 +673,7 @@ class Reporter:
                                    join(reportdir, '{}.html'.format(report_name)))
 
     def create_comparison_report(self,
-                                 configuration,
+                                 config,
                                  csvdir_old,
                                  figdir_old,
                                  csvdir_new,
@@ -699,7 +687,7 @@ class Reporter:
         Parameters
         ----------
 
-        configuration : configuration_parser.Configuration
+        config : configuration_parser.Configuration
             A configuration object
         csvdir_old : str
             The old experiment CSV output directory.
@@ -720,47 +708,42 @@ class Reporter:
 
         logger = logging.getLogger(__name__)
 
-        # get all required configuration parameters
-        comparison_id = configuration['comparison_id']
-        experiment_id_old = configuration['experiment_id_old']
-        description_old = configuration['description_old']
-        experiment_id_new = configuration['experiment_id_new']
-        description_new = configuration['description_new']
-        subgroups = configuration.get('subgroups')
-        chosen_notebook_files = configuration['chosen_notebook_files']
-        use_scaled_predictions_old = configuration.get('use_scaled_predictions_old', False)
-        use_scaled_predictions_new = configuration.get('use_scaled_predictions_new', False)
-        use_thumbnails = configuration.get('use_thumbnails', False)
+        # whether to use scaled predictions for both new and old; default to false
+        use_scaled_predictions_old = config.get('use_scaled_predictions_old', False)
+        use_scaled_predictions_new = config.get('use_scaled_predictions_new', False)
 
-        # set the environment variables we want
-        os.environ['COMPARISON_ID'] = comparison_id
-        os.environ['EXPERIMENT_ID_OLD'] = experiment_id_old
-        os.environ['DESCRIPTION_OLD'] = description_old
-        os.environ['OUTPUT_DIR_OLD'] = csvdir_old
-        os.environ['FIGURE_DIR_OLD'] = figdir_old
-        os.environ['SCALED_OLD'] = '1' if use_scaled_predictions_old else '0'
-
-        os.environ['EXPERIMENT_ID_NEW'] = experiment_id_new
-        os.environ['DESCRIPTION_NEW'] = description_new
-        os.environ['OUTPUT_DIR_NEW'] = csvdir_new
-        os.environ['FIGURE_DIR_NEW'] = figdir_new
-        os.environ['SCALED_NEW'] = '1' if use_scaled_predictions_new else '0'
-        os.environ['JAVASCRIPT_PATH'] = javascript_path
-
-        # we define separate groups to allow future flexibility in defining
-        # what groups are used for descriptives and evaluations
-        os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
-        os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
-        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
+        environ_config = {'EXPERIMENT_ID_OLD': config['experiment_id_old'],
+                          'EXPERIMENT_ID_NEW': config['experiment_id_new'],
+                          'DESCRIPTION_OLD': config['description_old'],
+                          'DESCRIPTION_NEW': config['description_new'],
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'SCALED_OLD': use_scaled_predictions_old,
+                          'SCALED_NEW': use_scaled_predictions_new,
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR_NEW': csvdir_new,
+                          'FIGURE_DIR_NEW': figdir_new,
+                          'OUTPUT_DIR_OLD': csvdir_old,
+                          'FIGURE_DIR_OLD': figdir_old,
+                          }
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
-        report_name = '{}_report'.format(comparison_id)
+        report_name = '{}_report'.format(config['comparison_id'])
         merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+        environ_config_file = join(output_dir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = abspath(output_dir)
+
+        # write out hidden environment JSON file
+        with open(environ_config_file, 'w') as out_environ_config:
+            json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
         logger.info('Merging sections')
-        self.merge_notebooks(chosen_notebook_files, merged_notebook_file)
+        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
@@ -769,7 +752,7 @@ class Reporter:
                                    join(output_dir, '{}.html'.format(report_name)))
 
     def create_summary_report(self,
-                              configuration,
+                              config,
                               all_experiments,
                               csvdir):
         """
@@ -780,7 +763,7 @@ class Reporter:
         Parameters
         ----------
 
-        configuration : configuration_parser.Configuration
+        config : configuration_parser.Configuration
             A configuration object
         all_experiments : list
             A list of experiments to summarize.
@@ -795,35 +778,32 @@ class Reporter:
 
         logger = logging.getLogger(__name__)
 
-        # get all required configuration parameters
-        summary_id = configuration['summary_id']
-        description = configuration['description']
-        subgroups = configuration.get('subgroups')
-        chosen_notebook_files = configuration['chosen_notebook_files']
-        use_thumbnails = configuration.get('use_thumbnails', False)
-        file_format = configuration.get('file_format', 'csv')
+        environ_config = {'SUMMARY_ID': config['summary_id'],
+                          'DESCRIPTION': config['description'],
+                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
+                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'FILE_FORMAT': config.get('file_format', 'csv'),
+                          'JSONS': all_experiments,
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'OUTPUT_DIR': csvdir
+                          }
 
-        # set the environment variables we want
-        os.environ['SUMMARY_ID'] = summary_id
-        os.environ['DESCRIPTION'] = description
-        os.environ['JSONS'] = '%%'.join(all_experiments)
-        os.environ['OUTPUT_DIR'] = csvdir
-        os.environ['JAVASCRIPT_PATH'] = javascript_path
-
-        # we define separate groups to allow future flexibility in defining
-        # what groups are used for descriptives and evaluations
-        os.environ['GROUPS_FOR_DESCRIPTIVES'] = '%%'.join(subgroups)
-        os.environ['GROUPS_FOR_EVALUATIONS'] = '%%'.join(subgroups)
-        os.environ['USE_THUMBNAILS'] = '1' if use_thumbnails else '0'
-        os.environ['FILE_FORMAT'] = file_format
-
-        report_name = '{}_report'.format(summary_id)
+        report_name = '{}_report'.format(config['summary_id'])
         reportdir = abspath(join(csvdir, '..', 'report'))
         merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        environ_config_file = join(reportdir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = reportdir
+
+        # write out hidden environment JSON file
+        with open(environ_config_file, 'w') as out_environ_config:
+            json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
         logger.info('Merging sections')
-        self.merge_notebooks(chosen_notebook_files, merged_notebook_file)
+        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory

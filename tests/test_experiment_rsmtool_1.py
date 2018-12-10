@@ -5,7 +5,11 @@ from os.path import join
 from nose.tools import raises
 from parameterized import param, parameterized
 
-from rsmtool.test_utils import (check_run_experiment,
+from nbconvert.preprocessors import CellExecutionError
+
+from rsmtool.reporter import Reporter
+from rsmtool.test_utils import (check_report,
+                                check_run_experiment,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
@@ -41,6 +45,54 @@ def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
+
+
+def test_run_experiment_lr_with_notebook_rerun():
+    # basic experiment with LinearRegression model and notebook
+    # run-run after the experiment after `RSM_REPORT_DIR` is deleted
+    # to ensure that the `.environ.json` file can be located
+
+    source = 'lr-with-notebook-rerun'
+    experiment_id = 'lr'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    report_ipynb = join('test_outputs', source, 'report', '{}_report.ipynb'.format(experiment_id))
+    report_html = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    del os.environ['RSM_REPORT_DIR']
+
+    Reporter.convert_ipynb_to_html(report_ipynb, report_html)
+    check_report(report_html)
+
+
+@raises(CellExecutionError)
+def test_run_experiment_lr_with_notebook_rerun_fail():
+    # basic experiment with LinearRegression model and notebook
+    # run-run after the experiment after `RSM_REPORT_DIR` is deleted
+    # and `.environ.json` is deleted, so the notebook execution will fail
+
+    source = 'lr-with-notebook-rerun-fail'
+    experiment_id = 'lr'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+    do_run_experiment(source, experiment_id, config_file)
+
+    report_env = join('test_outputs', source, 'report', '.environ.json'.format(experiment_id))
+    report_ipynb = join('test_outputs', source, 'report', '{}_report.ipynb'.format(experiment_id))
+    report_html = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    del os.environ['RSM_REPORT_DIR']
+    os.remove(report_env)
+
+    Reporter.convert_ipynb_to_html(report_ipynb, report_html)
 
 
 @raises(ValueError)
