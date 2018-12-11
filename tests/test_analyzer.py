@@ -122,6 +122,7 @@ class TestAnalyzer:
                                        'sys_min': 1.0,
                                        'sys_sd': 0.81782496620652367,
                                        'wtkappa': 0.82732732732732728})
+
         # and now compute them specifying the population SDs
         computed_metrics2 = Analyzer.metrics_helper(df_new_features['score'],
                                                     df_new_features['score2'],
@@ -131,8 +132,8 @@ class TestAnalyzer:
         expected_metrics2 = expected_metrics1.copy()
         expected_metrics2['SMD'] = 0.066259
 
-        assert_series_equal(computed_metrics1, expected_metrics1)
-        assert_series_equal(computed_metrics2, expected_metrics2)
+        assert_series_equal(computed_metrics1.sort_index(), expected_metrics1.sort_index())
+        assert_series_equal(computed_metrics2.sort_index(), expected_metrics2.sort_index())
 
     def test_compute_pca_less_components_than_features(self):
         # test pca when we have less components than features

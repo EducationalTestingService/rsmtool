@@ -419,7 +419,7 @@ def covariance_to_correlation(m):
     if not numrows == numcols:
         raise ValueError('Input matrix must be square')
 
-    Is = np.sqrt(1 / np.diag(m))
+    Is = np.sqrt(np.abs(1 / np.diag(m)))
     retval = Is * m * np.repeat(Is, numrows).reshape(numrows, numrows)
     np.fill_diagonal(retval, 1.0)
     return retval
@@ -466,6 +466,7 @@ def partial_correlations(df):
             icvx = np.linalg.inv(df_cov)
         except np.linalg.LinAlgError:
             icvx = empty_array
+
     pcor = -1 * covariance_to_correlation(icvx)
     np.fill_diagonal(pcor, 1.0)
     df_pcor = pd.DataFrame(pcor, columns=columns, index=columns)

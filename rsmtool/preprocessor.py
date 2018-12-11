@@ -823,7 +823,7 @@ class FeaturePreprocessor:
             zero_rows = pd.DataFrame()
 
         # combine all the filtered rows into a single data frame
-        df_exclude = pd.concat([bad_rows, zero_rows])
+        df_exclude = pd.concat([bad_rows, zero_rows], sort=True)
 
         # reset the index so that the indexing works correctly
         # for the next feature with missing values
@@ -838,8 +838,8 @@ class FeaturePreprocessor:
         if exclude_zero_sd is True:
             feature_sd = df_filter[column].std()
             if np.isclose(feature_sd, 0, atol=1e-07):
-                logging.info("Feature {} was excluded from the model"
-                             " because its standard deviation in the "
+                logging.info("Feature {} was excluded from the model "
+                             "because its standard deviation in the "
                              "training set is equal to 0.".format(column))
                 df_filter = df_filter.drop(column, 1)
                 df_exclude = df_exclude.drop(column, 1)
@@ -1306,7 +1306,6 @@ class FeaturePreprocessor:
         subgroup and candidate (metadata) and the data frame with all other
         columns.
 
-
         Parameters
         ----------
         df : pd.DataFrame
@@ -1496,7 +1495,7 @@ class FeaturePreprocessor:
                 del df_filtered
                 df_filtered = newdf
                 with np.errstate(divide='ignore'):
-                    df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+                    df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
             # make sure that the remaining data frame is not empty
             if len(df_filtered) == 0:
@@ -1540,11 +1539,11 @@ class FeaturePreprocessor:
         if (length_column and
             (len(df_filtered[df_filtered['length'].isnull()]) != 0 or
                 df_filtered['length'].std() <= 0)):
-            logging.warning("The {} column either has missing values or a standard"
-                            " deviation <= 0. No length-based analysis will be"
-                            " provided. The column will be renamed as ##{}## and"
-                            " saved in *train_other_columns.csv.".format(length_column,
-                                                                         length_column))
+            logging.warning("The {} column either has missing values or a standard "
+                            "deviation <= 0. No length-based analysis will be "
+                            "provided. The column will be renamed as ##{}## and "
+                            "saved in *train_other_columns.csv.".format(length_column,
+                                                                        length_column))
             df_filtered.rename(columns={'length': '##{}##'.format(length_column)},
                                inplace=True)
 
@@ -1565,9 +1564,9 @@ class FeaturePreprocessor:
             df_filtered = df_filtered_candidates.copy()
 
             # update df_excluded
-            df_excluded = pd.concat([df_excluded, df_excluded_candidates])
+            df_excluded = pd.concat([df_excluded, df_excluded_candidates], sort=True)
 
-        # create separate data-frames for features and sc1, all other
+        # create separate data frames for features and sc1, all other
         # information, and responses excluded during filtering
         not_other_columns = set()
         feature_columns = ['spkitemid', 'sc1'] + feature_names
@@ -1591,6 +1590,7 @@ class FeaturePreprocessor:
         if second_human_score_column and 'sc2' in df_filtered:
             df_filtered_human_scores = df_filtered[human_score_columns].copy()
             not_other_columns.update(['sc2'])
+
             # filter out any non-numeric value rows
             # as well as zeros, if we were asked to
             df_filtered_human_scores['sc2'] = pd.to_numeric(df_filtered_human_scores['sc2'],
@@ -1599,8 +1599,12 @@ class FeaturePreprocessor:
                 df_filtered_human_scores['sc2'] = df_filtered_human_scores['sc2'].replace(0,
                                                                                           np.nan)
 
+        # we need to make sure that `spkitemid` is the first column
+        df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
+                                                   if column != 'spkitemid']]
+
         # now extract all other columns and add 'spkitemid'
-        other_columns = ['spkitemid'] + [column for column in df_filtered.columns
+        other_columns = ['spkitemid'] + [column for column in df_filtered
                                          if column not in not_other_columns]
         df_filtered_other_columns = df_filtered[other_columns]
 
@@ -1632,7 +1636,6 @@ class FeaturePreprocessor:
         -------
         config_obj : configuration_parser.Configuration
             A Configuration object.
-
         data_container : container.DataContainer
             A DataContainer object.
 
@@ -1641,7 +1644,6 @@ class FeaturePreprocessor:
         ValueError
             If the columns in the config file do not exist in the data.
         """
-
         train = data_container_obj.train
         test = data_container_obj.test
         feature_specs = data_container_obj.get_frame('feature_specs')
@@ -2210,7 +2212,7 @@ class FeaturePreprocessor:
                              "can be run. ")
 
         with np.errstate(divide='ignore'):
-            df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+            df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
         # if requested, exclude the candidates with less than X responses
         # left after filtering
@@ -2230,7 +2232,9 @@ class FeaturePreprocessor:
             df_filtered_pred = df_filtered_candidates.copy()
 
             # update df_excluded
-            df_excluded = pd.concat([df_excluded, df_excluded_candidates])
+            df_excluded = pd.concat([df_excluded, df_excluded_candidates], sort=True)
+            df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
+                                                       if column != 'spkitemid']]
 
         # set default values for scaling
         scale_pred_mean = 0
@@ -2320,6 +2324,10 @@ class FeaturePreprocessor:
         config_as_dict.update(new_config_dict)
 
         new_config = Configuration(config_as_dict, config_obj.filepath)
+
+        # we need to make sure that `spkitemid` is the first column
+        df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
+                                                   if column != 'spkitemid']]
 
         frames = [df_predictions_only,
                   df_test_metadata,
@@ -2482,6 +2490,10 @@ class FeaturePreprocessor:
         else:
             df_predictions_with_metadata = df_predictions.copy()
 
+        # we need to make sure that `spkitemid` is the first column
+        df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
+                                                   if column != 'spkitemid']]
+
         datasets = [{'name': 'features_processed', 'frame': df_features_preprocessed},
                     {'name': 'excluded', 'frame': df_excluded},
                     {'name': 'predictions_with_metadata', 'frame': df_predictions_with_metadata},
@@ -2622,7 +2634,7 @@ class FeaturePreprocessor:
             del df_filtered
             df_filtered = newdf
             with np.errstate(divide='ignore'):
-                df_excluded = pd.merge(df_excluded, newdf_excluded, how='outer')
+                df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
         # make sure that the remaining data frame is not empty
         if len(df_filtered) == 0:
@@ -2689,5 +2701,9 @@ class FeaturePreprocessor:
             # Multiply features by sign.
             df_features_preprocess[feature_name] = (df_features_preprocess[feature_name] *
                                                     feature_sign)
+
+        # we need to make sure that `spkitemid` is the first column
+        df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
+                                                   if column != 'spkitemid']]
 
         return (df_features_preprocess, df_excluded)

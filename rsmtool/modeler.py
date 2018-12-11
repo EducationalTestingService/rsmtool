@@ -169,7 +169,7 @@ class Modeler:
                                       'coefficient': coefs['const']}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
+        df_coef = df_intercept.append(df_non_intercept, sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[['feature', 'coefficient']]
@@ -216,7 +216,7 @@ class Modeler:
                                       'coefficient': intercept}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = df_intercept.append(df_non_intercept, ignore_index=True)
+        df_coef = df_intercept.append(df_non_intercept, sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[['feature', 'coefficient']]

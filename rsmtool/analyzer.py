@@ -310,9 +310,8 @@ class Analyzer:
                                   'N': len(df_desc)})
 
         # reorder the columns to make it look better
-        df_output = df_output[['mean', 'std. dev.', 'min', 'max',
-                               'skewness', 'kurtosis', 'Correlation',
-                               'p', 'N']]
+        df_output = df_output[['mean', 'std. dev.', 'min', 'max', 'skewness',
+                               'kurtosis', 'Correlation', 'p', 'N']]
 
         return df_output
 
@@ -599,7 +598,7 @@ class Analyzer:
             Reference standard deviation for system scores.  This is used to compute SMD and
             should be the standard deviation for the whole population when SMD are computed
             for individual subgroups.
-            When None, this will be computed as the standard devaiation of `system_scores`.
+            When None, this will be computed as the standard deviation of `system_scores`.
 
         Returns
         -------
@@ -679,7 +678,6 @@ class Analyzer:
         rmse = np.sqrt(mse)
 
         # return everything as a series
-
         metrics = pd.Series({'kappa': unweighted_kappa,
                              'wtkappa': quadratic_weighted_kappa,
                              'exact_agr': human_system_agreement,
@@ -715,7 +713,8 @@ class Analyzer:
             Series containing of pearson's correlation coefficients human-machine correlations
         human_human_corr : pandas Series
             Series containing of pearson's correlation coefficients for human-human correlations.
-            This can contain a single value or have the index matching that of human-machine correlations
+            This can contain a single value or have the index matching that of human-machine
+            correlations
 
         Returns
         -------
@@ -733,6 +732,7 @@ class Analyzer:
         # we now concatenate the two series on index
         df_correlations = pd.concat([human_machine_corr, human_human_corr],
                                     axis=1,
+                                    sort=True,
                                     keys=['corr_HM', 'corr_HH'])
 
         # if any of the HH correlations are negative, we will ignore these
@@ -740,7 +740,8 @@ class Analyzer:
         with np.errstate(invalid='ignore'):
             df_correlations['sqrt_HH'] = np.sqrt(df_correlations['corr_HH'])
 
-        df_correlations['corr_disattenuated'] = df_correlations['corr_HM'] / df_correlations['sqrt_HH']
+        df_correlations['corr_disattenuated'] = (df_correlations['corr_HM'] /
+                                                 df_correlations['sqrt_HH'])
 
         return df_correlations
 
@@ -791,7 +792,7 @@ class Analyzer:
         df_desc_all[grouping_variable] = 'All data'
 
         # combine the two data frames
-        df_desc_combined = pd.concat([df_desc, df_desc_all])
+        df_desc_combined = pd.concat([df_desc, df_desc_all], sort=True)
         df_desc_combined.reset_index(drop=True, inplace=True)
 
         # compute the various (marginal and partial) correlations with score
@@ -1085,7 +1086,7 @@ class Analyzer:
         df_preds_all[grouping_variable] = 'All data'
 
         # combine the two data frames
-        df_preds_combined = pd.concat([df_test, df_preds_all])
+        df_preds_combined = pd.concat([df_test, df_preds_all], sort=True)
         df_preds_combined.reset_index(drop=True, inplace=True)
 
         # group by the grouping_variable columns
