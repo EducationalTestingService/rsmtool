@@ -161,8 +161,9 @@ class TestFeaturePreprocessor:
         assert_frame_equal(df_out, df_expected)
 
     def test_filter_on_column(self):
-        data = {'spkitemlab': np.arange(1, 9, dtype='int64'), 'sc1': ['00', 'TD', '02', '03'] * 2}
-        bad_df = pd.DataFrame(data=data)
+
+        bad_df = pd.DataFrame({'spkitemlab': np.arange(1, 9, dtype='int64'),
+                               'sc1': ['00', 'TD', '02', '03'] * 2})
 
         df_filtered_with_zeros = pd.DataFrame({'spkitemlab': [1, 3, 4, 5, 7, 8],
                                                'sc1': [0.0, 2.0, 3.0] * 2})
@@ -179,8 +180,9 @@ class TestFeaturePreprocessor:
         assert_frame_equal(output_df, df_filtered)
 
     def test_filter_on_column_all_non_numeric(self):
-        data = {'spkitemlab': range(1, 9), 'sc1': ['A', 'I', 'TD', 'TD'] * 2}
-        bad_df = pd.DataFrame(data=data)
+
+        bad_df = pd.DataFrame({'sc1': ['A', 'I', 'TD', 'TD'] * 2,
+                               'spkitemlab': range(1, 9)})
 
         expected_df_excluded = bad_df.copy()
         expected_df_excluded['sc1'] = np.nan
@@ -196,26 +198,27 @@ class TestFeaturePreprocessor:
         # Test that the function exclude columns where std is returned as
         # very low value rather than 0
         data = {'id': np.arange(1, 21, dtype='int64'),
-                'feature_zero_sd': [1.5601] * 20,
-                'feature_ok': np.arange(1, 21)}
+                'feature_ok': np.arange(1, 21),
+                'feature_zero_sd': [1.5601] * 20}
         bad_df = pd.DataFrame(data=data)
 
-        output_df, output_excluded_df = self.fpp.filter_on_column(bad_df, 'feature_zero_sd',
+        output_df, output_excluded_df = self.fpp.filter_on_column(bad_df,
+                                                                  'feature_zero_sd',
                                                                   'id',
                                                                   exclude_zeros=False,
                                                                   exclude_zero_sd=True)
 
-        good_df = bad_df[['feature_ok', 'id']].copy()
+        good_df = bad_df[['id', 'feature_ok']].copy()
         assert_frame_equal(output_df, good_df)
         ok_(output_excluded_df.empty)
 
     def test_filter_on_column_with_inf(self):
         # Test that the function exclude columns where feature value is 'inf'
-        data = pd.DataFrame({'id': np.arange(1, 5, dtype='int64'),
-                             'feature_1': [1.5601, 0, 2.33, 11.32],
+        data = pd.DataFrame({'feature_1': [1.5601, 0, 2.33, 11.32],
                              'feature_ok': np.arange(1, 5)})
 
         data['feature_with_inf'] = 1 / data['feature_1']
+        data['id'] = np.arange(1, 5, dtype='int64')
         bad_df = data[np.isinf(data['feature_with_inf'])].copy()
         good_df = data[~np.isinf(data['feature_with_inf'])].copy()
         bad_df.reset_index(drop=True, inplace=True)
@@ -772,12 +775,12 @@ class TestFeaturePreprocessor:
         test_expected = pd.DataFrame(test_expected)
 
         info_expected = pd.DataFrame({'feature': ['A'],
-                                      'transform': ['raw'],
                                       'sign': [1],
                                       'train_mean': [train.A.mean()],
                                       'train_sd': [train.A.std()],
                                       'train_transformed_mean': [train.A.mean()],
-                                      'train_transformed_sd': [test.A.std()]})
+                                      'train_transformed_sd': [test.A.std()],
+                                      'transform': ['raw']})
 
         specs = pd.DataFrame({'feature': ['A'],
                               'transform': ['raw'],
@@ -1183,30 +1186,31 @@ class TestFeatureSpecsProcessor:
 
     def test_validate_feature_specs(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': [1.0, 1.0, -1.0]})
+                                         'sign': [1.0, 1.0, -1.0],
+                                         'transform': ['raw', 'inv', 'sqrt']})
 
         df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_feature_specs, df_new_feature_specs)
 
     def test_validate_feature_specs_with_Feature_as_column(self):
         df_feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': [1.0, 1.0, -1.0]})
+                                         'sign': [1.0, 1.0, -1.0],
+                                         'transform': ['raw', 'inv', 'sqrt']})
         df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                                  'transform': ['raw', 'inv', 'sqrt'],
-                                                  'sign': [1.0, 1.0, -1.0]})
+                                                  'sign': [1.0, 1.0, -1.0],
+                                                  'transform': ['raw', 'inv', 'sqrt']})
 
         df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
 
     def test_validate_feature_specs_sign_to_float(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': ['1', '1', '-1']})
+                                         'sign': ['1', '1', '-1'],
+                                         'transform': ['raw', 'inv', 'sqrt']})
         df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                                  'transform': ['raw', 'inv', 'sqrt'],
-                                                  'sign': [1.0, 1.0, -1.0]})
+                                                  'sign': [1.0, 1.0, -1.0],
+                                                  'transform': ['raw', 'inv', 'sqrt']})
 
         df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
@@ -1214,8 +1218,8 @@ class TestFeatureSpecsProcessor:
     def test_validate_feature_specs_add_default_values(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3']})
         df_expected_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                                  'transform': ['raw', 'raw', 'raw'],
-                                                  'sign': [1, 1, 1]})
+                                                  'sign': [1, 1, 1],
+                                                  'transform': ['raw', 'raw', 'raw']})
 
         df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
@@ -1223,23 +1227,23 @@ class TestFeatureSpecsProcessor:
     @raises(ValueError)
     def test_validate_feature_specs_wrong_sign_format(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': ['+', '+', '-']})
+                                         'sign': ['+', '+', '-'],
+                                         'transform': ['raw', 'inv', 'sqrt']})
 
         FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
 
     @raises(ValueError)
     def test_validate_feature_duplicate_feature(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f1', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': ['+', '+', '-']})
+                                         'sign': ['+', '+', '-'],
+                                         'transform': ['raw', 'inv', 'sqrt']})
         FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
 
     @raises(KeyError)
     def test_validate_feature_missing_feature_column(self):
         df_feature_specs = pd.DataFrame({'FeatureName': ['f1', 'f1', 'f3'],
-                                         'transform': ['raw', 'inv', 'sqrt'],
-                                         'sign': ['+', '+', '-']})
+                                         'sign': ['+', '+', '-'],
+                                         'transform': ['raw', 'inv', 'sqrt']})
         FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
 
 

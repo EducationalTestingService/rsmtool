@@ -103,7 +103,7 @@ class Comparer:
                 warnings.simplefilter('ignore')
                 series.append(df.apply(summary_func))
 
-        res = pd.concat(series, axis=1)
+        res = pd.concat(series, axis=1, sort=True)
         res.columns = ['MEAN', 'SD', 'MEDIAN', 'MIN', 'MAX']
         return res
 
@@ -197,7 +197,7 @@ class Comparer:
                                                        df_merged['{}%%%old'.format(feature)])[0]})
             correlation_list.append(df_cor)
 
-        df_correlations = pd.concat(correlation_list)
+        df_correlations = pd.concat(correlation_list, sort=True)
         df_correlations.index = df_correlations['Feature']
         df_correlations.index.name = None
 
