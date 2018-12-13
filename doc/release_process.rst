@@ -11,7 +11,7 @@ This process is only meant for the project administrators, not users and develop
 
 4. Build the new conda package locally on your mac using the following command::
 
-    conda build -c defaults -c conda-forge --python=3.6 --numpy=1.13 rsmtool
+    conda build -c defaults -c conda-forge --python=3.6 --numpy=1.14 rsmtool
 
 5. Convert the package for both linux and windows::
 
