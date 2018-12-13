@@ -9,7 +9,7 @@ Installing with conda
 
 Currently, the recommended way to install RSMTool is by using the ``conda`` package manager. If you have already installed ``conda``, you can skip straight to Step 2.
 
-1. To install ``conda``, follow the instructions on `this page <http://conda.pydata.org/docs/install/quick.html>`_.
+1. To install ``conda``, follow the instructions on `this page <https://conda.io/docs/install/quick.html>`_.
 
 2. Create a new conda environment (say, ``rsmtool``) and install the RSMTool conda package by running::
 
@@ -20,7 +20,7 @@ Currently, the recommended way to install RSMTool is by using the ``conda`` pack
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by RSMTool will not affect other projects.
 
 RSMTool can also be downloaded directly from
-`GitHub <http://github.com/EducationalTestingService/rsmtool>`_.
+`GitHub <https://github.com/EducationalTestingService/rsmtool>`_.
 
 Installing with pip
 -------------------

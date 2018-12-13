@@ -5,7 +5,7 @@ Who is RSMTool for?
 
 We expect the primary users of RSMTool to be researchers working on developing new automated scoring engines or on improving existing ones. Here's the most common scenario.
 
-A researcher already *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores by human graders. He has also processed these responses and extracted a set of (numeric) features using systems such as `Coh-Metrix <http://cohmetrix.com/>`_, `TextEvaluator <https://texteval-pilot.ets.org/TextEvaluator/>`_, `OpenSmile <http://audeering.com/research/opensmile/>`_, or using his own custom text/speech processing pipeline. He wishes to understand how well the set of chosen features can predict the human score.
+A researcher already *has* a set of responses such as essays or recorded spoken responses which have already been assigned numeric scores by human graders. He has also processed these responses and extracted a set of (numeric) features using systems such as `Coh-Metrix <http://cohmetrix.com/>`_, `TextEvaluator <https://textevaluator.ets.org/TextEvaluator/>`_, `OpenSmile <https://audeering.com/research/opensmile/>`_, or using his own custom text/speech processing pipeline. He wishes to understand how well the set of chosen features can predict the human score.
 
 He can then run an RSMTool "experiment" to build a regression-based scoring model (using one of many available regressors) and produce a report. The report includes descriptive statistics for all his features, diagnostic information about the trained regression model, and a comprehensive evaluation of model performance on a held-out set of responses.
 

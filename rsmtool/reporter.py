@@ -192,9 +192,7 @@ class Reporter:
 
         Note
         ----
-        Adapted from: http://stackoverflow.com/questions/
-        20454668/how-to-merge-two-ipython-notebooks-correctly
-        -without-getting-json-error.
+        Adapted from: https://stackoverflow.com/q/20454668.
         """
 
         # Merging ipython notebooks basically means that we keep the

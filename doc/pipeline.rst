@@ -12,7 +12,7 @@ As its primary input, RSMTool takes a :ref:`data file <input_file_format>` conta
 
 This trained model can then be used to generate scores for a held-out evaluation data whose feature values are pre-processed using the same :ref:`Pre-processing Parameters <preprocessing_parameters>`. In addition to the raw scores predicted by the model, the **Prediction Analysis** component of the pipline generates several additional :ref:`post-processed scores <score_postprocessing>` that are commonly used in automated scoring.
 
-The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different evaluation measures illustrating model efficacy [#]_. More Details about these analyses can be found in a separate `technical paper <https://github.com/EducationalTestingService/rsmtool/raw/master/doc/rsmtool.pdf>`_.
+The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different evaluation measures illustrating model efficacy [#]_. More Details about these analyses can be found in a separate `technical paper <https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/doc/rsmtool.pdf>`_.
 
 In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as :ref:`CSV files <intermediate_files_rsmtool>`.
 
@@ -90,7 +90,7 @@ The raw_trim predictions rounded to the nearest integer.
 
 .. note::
 
-    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <http://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
+    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
 
 scale
 ~~~~~

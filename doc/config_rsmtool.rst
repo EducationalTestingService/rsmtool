@@ -13,7 +13,7 @@ An identifier for the experiment that will be used to name the report and all :r
 
 model
 """""
-The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
+The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
 
 train_file
 """"""""""
@@ -27,7 +27,7 @@ The path to the evaluation data feature file in one of the :ref:`supported forma
 
 skll_objective *(Optional)*
 """""""""""""""""""""""""""
-The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <http://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _predict_expected_scores:
 
@@ -216,7 +216,7 @@ If set to ``true``, certain evaluations (confusion matrices, score distributions
 .. _use_truncation_thresholds:
 
 use_truncation_thresholds *(Optional)*
-"""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""
 If set to ``true``, use the ``min`` and ``max`` columns specified in the ``features`` file to clamp outlier feature values. This is useful if users would like to clamp feature values based on some pre-defined boundaries, rather than having these boundaries calculated based on the training set. Defaults to ``false``.
 
 .. note::

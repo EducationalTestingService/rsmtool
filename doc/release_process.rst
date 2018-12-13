@@ -7,7 +7,7 @@ This process is only meant for the project administrators, not users and develop
 
 2. Create a release branch on GitHub.
 
-3. In that release branch, update the version numbers in ``version.py``, update the conda-recipe, and update the README, if necessary.
+3. In that release branch, update the version numbers in ``version.py``, update the conda-recipe, and update the README, if necessary. You should also run `make linkcheck` on the documentation to fix and update any broken/redirected links.
 
 4. Build the new conda package locally on your mac using the following command::
 

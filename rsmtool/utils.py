@@ -314,7 +314,7 @@ def parse_json_with_comments(filename):
     Note
     ----
     This code was adapted from:
-    http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html.
+    https://web.archive.org/web/20150520154859/http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
     """
 
     # Regular expression to identify comments
