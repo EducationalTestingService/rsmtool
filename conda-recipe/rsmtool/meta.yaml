@@ -65,7 +65,6 @@ requirements:
     - zeromq
     - coverage
     - parameterized
-    - setuptools
     - openpyxl
     - xlrd
     - xlwt
