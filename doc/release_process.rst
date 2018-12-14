@@ -19,7 +19,7 @@ This process is only meant for the project administrators, not users and develop
 
     conda convert -p win-64 -p linux-64 <mac package tarball>
 
-7. Upload all packages to anaconda.org using ``anaconda upload``.
+7. Upload each of the packages to anaconda.org using ``anaconda upload <package tarball>``.
 
 8. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and PyPI packages on Linux and Windows.
 
