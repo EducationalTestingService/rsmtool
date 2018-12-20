@@ -3,23 +3,23 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Run `tests/update_files.py` to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
+1. Run ``tests/update_files.py`` to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
 
 2. Create a release branch on GitHub.
 
-3. In that release branch, update the version numbers in ``version.py``, update the conda-recipe, and update the README, if necessary.
+3. In that release branch, update the version numbers in ``version.py``, update the conda-recipe, and update the README, if necessary. You should also run `make linkcheck` on the documentation to fix and update any broken/redirected links.
 
-4. Build the new conda package locally on your mac using the following command::
+4. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-    conda build -c defaults -c conda-forge --python=3.6 --numpy=1.13 rsmtool
+5. Build the new conda package locally on your mac using the following command (*Note*: you may have to replace the contents of the ``requirements()`` function in ``setup.py`` with a ``pass`` statement to get ``conda build`` to work)::
 
-5. Convert the package for both linux and windows::
+    conda build -c defaults -c conda-forge --python=3.6 --numpy=1.14 rsmtool
+
+6. Convert the package for both linux and windows::
 
     conda convert -p win-64 -p linux-64 <mac package tarball>
 
-6. Upload all packages to anaconda.org using ``anaconda upload``.
-
-7. Upload source package to PyPI using ``python setup.py sdist upload``.
+7. Upload each of the packages to anaconda.org using ``anaconda upload <package tarball>``.
 
 8. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and PyPI packages on Linux and Windows.
 

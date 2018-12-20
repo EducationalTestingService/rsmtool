@@ -372,7 +372,7 @@ class Modeler:
         """
         Train `RebalancedLR` (formerly empWtBalanced) -
         Balanced empirical weights by changing betas
-        [adapted from http://bit.ly/UTP7gS]
+        [adapted from: https://stats.stackexchange.com/q/30876]
 
         Parameters
         ----------
@@ -959,9 +959,8 @@ class Modeler:
         Returns
         -------
         learner : `Learner` object
-            SKLL `LinearRegression` `Learner <http://skll.readthedocs.io/en/
-            latest/api/skll.html#skll.Learner>`_ object containing the
-            coefficients learned by training the built-in model.
+            SKLL `LinearRegression` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner`_ object containing
+            the coefficients learned by training the built-in model.
         """
         # get the columns that actually contain the feature values
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
