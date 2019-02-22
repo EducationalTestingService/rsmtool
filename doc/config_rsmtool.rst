@@ -248,7 +248,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
         - a table showing mean, standard deviation, min, max, correlation with human score etc.;
         - a table with percentiles and outliers; and
-        - a barplot showing he number of truncated outliers for each feature.
+        - a barplot showing the number of truncated outliers for each feature.
 
     - ``features_by_group``: Shows boxplots with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
