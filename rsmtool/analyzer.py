@@ -1533,6 +1533,10 @@ class Analyzer:
                     {'name': 'confMatrix', 'frame': df_confmatrix},
                     {'name': 'score_dist', 'frame': df_score_dist}]
 
+        # compute true-score analyses if we have second score
+        if include_second_score:
+            pass
+
         for group in eval_by_group_dict:
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
 
