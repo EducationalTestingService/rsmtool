@@ -209,12 +209,14 @@ def compute_mse_all_double_scored(df,
 
 
 def compute_prmse(df, system_score_columns):
-    """ Compute PMSE for predicting true score from system scores.
+    """ Compute Proportional Reduction in Mean Squared Error (PRMSE) 
+    for predicting true score from system scores.
 
     Parameters
     ----------
     df: pandas DataFrame
-        Input dataframe. Must contain columns 'sc1', 'sc2' and system.   
+        Input dataframe. Must contain columns `sc1`, `sc2` and the columns 
+        `listed in system_score_columns`.   
     system_score_columns: list
         List of columns containing system scores
 
@@ -223,12 +225,19 @@ def compute_prmse(df, system_score_columns):
     prmse_metrics: pandas Series
         Series containing different evaluation metrics related to the evaluation
         of system scores against true scores:
-
+   
+        - `N`: total number of responses
+        - `N_single`: total number of responses with a single human score
+        - `N_double`: total number of responses with two human scores
+        - `h1_var_single`: variance of first human score for single-scored responses
+        - `h1_var_double`: variance of first human score for double-scored responses
+        - `h2_var_double`: variance of second human score for double-scored responses
+        - `tru_var`: estimated true score variance
         - `system_var_all`:  variance of system scores for all responses
         - `system_var_double`:  variance of system scores for double-scored responses
         - `mse_true`: mean squared error for predicting true score from machine score
         - `prmse`: proportional reduction in mean squared error for predicting true score
-        - `N`: total number of responses
+
             """
 
     score_mask = df['sc2'].isnull() 

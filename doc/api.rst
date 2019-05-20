@@ -87,6 +87,11 @@ From :py:mod:`~rsmtool.preprocessor` Module
     :undoc-members:
     :show-inheritance:
 
+
+From :py:mod:`~rsmtool.prmse_utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. autofunction:: rsmtool.prmse_utils.compute_prmse
+
 From :py:mod:`~rsmtool.reader` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.reader
