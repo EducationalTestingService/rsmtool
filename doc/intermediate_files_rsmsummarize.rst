@@ -11,14 +11,14 @@ Although the primary output of RSMSummarize is an HTML report, we also want the 
 
 
 Marginal and partial correlations with score
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 filenames: ``margcor_score_all_data``, ``pcor_score_all_data``, ```pcor_score_no_length_all_data``
 
 The first file contains the marginal correlations between each pre-processed feature and human score. The second file contains the partial correlation between each pre-processed feature and human score after controlling for all other features. The third file contains the partial correlations between each pre-processed feature and human score after controlling for response length, if ``length_column`` was specified in the configuration file.
 
 Model information
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 - ``model_summary``
 
@@ -39,7 +39,7 @@ This file contains the main information about the models included into the repor
 
 
 Evaluation metrics
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 - ``eval_short`` - descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
