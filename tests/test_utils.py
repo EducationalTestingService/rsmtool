@@ -271,14 +271,14 @@ def test_standardized_mean_difference():
 
     # test SMD
     expected = 1 / 4
-    smd = standardized_mean_difference(9, 8, 4, 4)
+    smd = standardized_mean_difference(8, 9, 4, 4)
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_zero_denominator():
 
     # test SMD with zero denominator
-    smd = standardized_mean_difference(4.2, 3.2, 0, 0)
+    smd = standardized_mean_difference(3.2, 4.2, 0, 0)
     assert np.isnan(smd)
 
 

@@ -24,7 +24,8 @@ from sklearn.metrics import r2_score
 from rsmtool.container import DataContainer
 from rsmtool.utils import (agreement,
                            partial_correlations,
-                           standardized_mean_difference)
+                           standardized_mean_difference,
+                           quadratic_weighted_kappa)
 
 
 class Analyzer:
@@ -577,7 +578,8 @@ class Analyzer:
     def metrics_helper(human_scores,
                        system_scores,
                        population_human_score_sd=None,
-                       population_system_score_sd=None):
+                       population_system_score_sd=None,
+                       smd_method='unpooled'):
         """
         This is a helper function that computes some basic agreement
         and association metrics between the system scores and the
@@ -590,15 +592,19 @@ class Analyzer:
         system_scores: pandas Series
             Series containing numeric scores predicted by the model.
         population_human_score_sd : float, optional
-            Reference standard deviation for human scores. This is used to compute SMD and
-            should be the standard deviation for the whole population when SMD are computed
-            for individual subgroups.
-            When None, this will be computed as the standard deviation of `human_scores`
+            Reference standard deviation for human scores. If `smd_method='williamson'`, this is
+            used to compute SMD and should be the standard deviation for the whole population.
+            Otherwise, it is ignored.
         population_system_score_sd : float, optional
-            Reference standard deviation for system scores.  This is used to compute SMD and
-            should be the standard deviation for the whole population when SMD are computed
-            for individual subgroups.
-            When None, this will be computed as the standard deviation of `system_scores`.
+            Reference standard deviation for system scores. If `smd_method='williamson'`, this is
+            used to compute SMD and should be the standard deviation for the whole population.
+            Otherwise, it is ignored.
+        smd_method : {'williamson', 'pooled', 'unpooled'}, optional
+            The SMD method to use.
+            - `williamson`: Denominator equal to pooled population std.
+            - `pooled`: Denominator equal to the pooled std. of `human_scores` and `system_scores`.
+            - `unpooled`: Denominator equal to std. of `human_scores`.
+            Defaults to 'unpooled'.
 
         Returns
         -------
@@ -627,9 +633,8 @@ class Analyzer:
 
         # compute the kappas
         unweighted_kappa = kappa(human_scores, system_scores)
-        quadratic_weighted_kappa = kappa(human_scores,
-                                         round(system_scores),
-                                         weights='quadratic')
+        weighted_kappa = quadratic_weighted_kappa(human_scores,
+                                                  system_scores)
 
         # compute the agreement statistics
         human_system_agreement = agreement(human_scores, system_scores)
@@ -660,17 +665,12 @@ class Analyzer:
         system_score_sd = np.std(system_scores, ddof=1)
         human_score_sd = np.std(human_scores, ddof=1)
 
-        if not population_system_score_sd:
-            population_system_score_sd = system_score_sd
-
-        if not population_human_score_sd:
-            population_human_score_sd = human_score_sd
-
         # calculate the (Williamson) standardized mean difference
-        SMD = standardized_mean_difference(mean_system_score,
-                                           mean_human_score,
+        smd = standardized_mean_difference(human_scores,
+                                           system_scores,
+                                           population_human_score_sd,
                                            population_system_score_sd,
-                                           population_human_score_sd)
+                                           method=smd_method)
 
         # compute r2 and MSE
         r2 = r2_score(human_scores, system_scores)
@@ -679,10 +679,10 @@ class Analyzer:
 
         # return everything as a series
         metrics = pd.Series({'kappa': unweighted_kappa,
-                             'wtkappa': quadratic_weighted_kappa,
+                             'wtkappa': weighted_kappa,
                              'exact_agr': human_system_agreement,
                              'adj_agr': human_system_adjacent_agreement,
-                             'SMD': SMD,
+                             'SMD': smd,
                              'corr': correlations,
                              'R2': r2,
                              'RMSE': rmse,

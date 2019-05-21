@@ -506,11 +506,12 @@ def agreement(score1, score2, tolerance=0):
     return agreement_value
 
 
-def standardized_mean_difference(mean_system_score,
-                                 mean_human_score,
-                                 population_system_score_sd,
-                                 population_human_score_sd,
-                                 method='williamson'):
+def standardized_mean_difference(y_true,
+                                 y_pred,
+                                 population_y_true_sd=None,
+                                 population_y_pred_sd=None,
+                                 method='williamson',
+                                 ddof=1):
     """
     This function computes the standardized mean
     difference between a system score and human score
@@ -518,29 +519,44 @@ def standardized_mean_difference(mean_system_score,
 
     Parameters
     ----------
-    mean_system_score : float
-        The mean system score for the group or subgroup.
-    mean_human_score: float
-        The mean human score for the group or subgroup.
-    population_system_score_sd : float
-        The population system score standard deviation.
+    y_true : array-like
+        The true score for the group or subgroup.
+    y_pred : array-like
+        The predicted score for the group or subgroup.
+    population_y_true_sd : float
+        The population true score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-    population_human_score_sd : float
-        The population human score standard deviation.
+    population_y_pred_sd : float
+        The predicted score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-    method : str, optional
-        The SMD method to use. Currently, only
-        'williamson' is supported.
-        Defaults to 'williamson'.
+    method : {'williamson', 'pooled', 'unpooled'}, optional
+        The SMD method to use.
+        - `williamson`: Denominator equal to pooled population std.
+        - `pooled`: Denominator equal to the pooled std. of `y_true` and `y_pred`.
+        - `unpooled`: Denominator equal to std. of `y_true`.
+        Defaults to 'unpooled'.
+    ddof : int, optional
+        Means Delta Degrees of Freedom. The divisor used in
+        calculations is N - ddof, where N represents the
+        number of elements. By default ddof is zero.
+        Defaults to 1.
 
     Returns
     -------
     smd : float
         The SMD for the given group or subgroup.
+
+    Raises
+    ------
+    ValueError
+        If method='williamson' and either population_y_true_sd or
+        population_y_pred_sd is None.
+    ValueError
+        If method is not in {'unpooled', 'pooled', 'williamson'}.
 
     Notes
     -----
@@ -548,18 +564,138 @@ def standardized_mean_difference(mean_system_score,
     The metric is only applicable when both sets of scores are on the same
     scale. Additional implementations may be added in the future.
     """
+    y_true_avg = np.mean(y_true)
+    y_pred_avg = np.mean(y_pred)
+    numerator = y_true_avg - y_pred_avg
+
     method = method.lower()
-    if method == 'williamson':
-        numerator = mean_system_score - mean_human_score
-        denominator = np.sqrt((population_system_score_sd**2 +
-                               population_human_score_sd**2) / 2)
+    if method == 'unpooled':
+        denominator = np.std(y_true, ddof=ddof)
+    elif method == 'pooled':
+        denominator = np.sqrt((np.std(y_true, ddof=ddof)**2 +
+                               np.std(y_pred, ddof=ddof)**2) / 2)
+    elif method == 'williamson':
+        if population_y_true_sd is None or population_y_pred_sd is None:
+            raise ValueError("If `method='williamson', both `population_y_true_sd` "
+                             "and `population_y_pred_sd` must be provided.")
+        numerator = y_pred_avg - y_true_avg
+        denominator = np.sqrt((population_y_true_sd**2 +
+                               population_y_pred_sd**2) / 2)
     else:
-        raise ValueError("Currently, only the 'williamson' SMD method is "
-                         "supported. You specified: {}".format(method))
+        possible_methods = {"'unpooled'", "'pooled'", "'williamson'"}
+        raise ValueError("The available methods are {{{}}}; you selected {}."
+                         "".format(', '.join(possible_methods), method))
 
     # if the denominator is zero, then return NaN as the SMD
     smd = np.nan if denominator == 0 else numerator / denominator
     return smd
+
+
+def difference_of_standardized_means_by_subgroup(y_true,
+                                                 y_pred,
+                                                 subgroup,
+                                                 ddof=1):
+    """
+    Calculate the standardized mean difference by subgroup.
+
+    Parameters
+    ----------
+    y_true : array-like
+        The true scores.
+    y_pred : array-like
+        The predicted scores.
+    subgroup : array-like
+        The subgroup for each record.
+    ddof : int, optional
+        Means Delta Degrees of Freedom. The divisor used in
+        calculations is N - ddof, where N represents the
+        number of elements. By default ddof is zero.
+        Defaults to 1.
+
+    Returns
+    -------
+    SMDs : pandas DataFrame
+        The standardized mean difference by subgroup,
+        where each row is a different subgroup. Missing
+        values in the category named '*~Missing~*'
+
+    Raises
+    ------
+    AssertionError
+        If len(y_true) != len(y_pred) != len(subgroup)
+    """
+    assert len(y_true) == len(y_pred) == len(subgroup)
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    y_true_std, y_true_avg = np.std(y_true, ddof=ddof), np.mean(y_true)
+    y_pred_std, y_pred_avg = np.std(y_pred, ddof=ddof), np.mean(y_pred)
+
+    # temporarily convert `NaN` to infinity
+    # because handling `NaN` is really annoying;
+    # also use `pd.isna()` because it works
+    # with strings and `np.isnan()` does not
+    # we do all of this so that we can handle
+    # numpy arrays, along with pandas data frames
+    null_temp = np.inf
+    subgroup = np.array(subgroup)
+    subgroup[pd.isna(subgroup)] = null_temp
+
+    smds = {}
+    for group in set(subgroup):
+
+        # subset the true and predicted scores for the given subgroup
+        y_true_subgroup = y_true[np.where(subgroup == group)].copy()
+        y_pred_subgroup = y_pred[np.where(subgroup == group)].copy()
+
+        # calculate the z scores for true and predicted
+        y_true_subgroup_z = (y_true_subgroup - y_true_avg) / y_true_std
+        y_pred_subgroup_z = (y_pred_subgroup - y_pred_avg) / y_pred_std
+
+        # calculate the SMD, given the z scores for true and predicted
+        smds[group] = [np.mean(y_true_subgroup_z - y_pred_subgroup_z)]
+
+    # rename missing values from infinity
+    # to 'missing', if they exist
+    if null_temp in smds:
+        smds['Missing'] = smds[null_temp]
+        del smds[null_temp]
+
+    # convert everything to a data frame,
+    # transpose it, and rename the columns
+    result = pd.DataFrame(smds).T
+    result.columns = ['Diff. of Std. Means']
+    return result
+
+
+def quadratic_weighted_kappa(y_true, y_pred):
+    """
+    Calculate the quadratic weighted Kappa
+    in the discrete or continuous cases.
+
+    Parameters
+    ----------
+    y_true : array-like
+        The true scores
+    y_pred : array-like
+        The predicted scores
+
+    Returns
+    -------
+    kappa : float
+        The quadratic weighted kappa
+
+    Raises
+    ------
+    AssertionError
+        If len(y_true) != len(y_pred)
+    """
+    assert len(y_true) == len(y_pred)
+    y_true_var, y_true_avg = np.var(y_true), np.mean(y_true)
+    y_pred_var, y_pred_avg = np.var(y_pred), np.mean(y_pred)
+
+    numerator = np.mean((y_true - y_pred)**2)
+    denominator = y_true_var + y_pred_var + (y_true_avg - y_pred_avg)**2
+    kappa = 1.0 - (numerator / denominator)
+    return kappa
 
 
 def float_format_func(num, prec=3):
