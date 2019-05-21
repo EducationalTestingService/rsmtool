@@ -225,6 +225,8 @@ Evaluation metrics
 
     Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
 
+- ``true_score_eval`` - evaluation of how well system scores can predict true scores.
+
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
