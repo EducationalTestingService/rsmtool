@@ -16,5 +16,6 @@
                       "data_description",
                       "data_description_by_group",
                       "intermediate_file_paths",
+                      "true_score_evaluation",
                       "sysinfo"]
 }

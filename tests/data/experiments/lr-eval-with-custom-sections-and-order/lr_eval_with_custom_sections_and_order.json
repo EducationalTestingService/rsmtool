@@ -13,6 +13,7 @@
     "custom_sections": ["custom1.ipynb", "custom2.ipynb"],
     "section_order": ["consistency",
                       "evaluation",
+                      "true_score_evaluation",
                       "custom1",
                       "evaluation_by_group",
                       "data_description",

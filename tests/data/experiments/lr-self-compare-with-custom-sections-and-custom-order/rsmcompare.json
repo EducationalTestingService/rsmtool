@@ -19,6 +19,7 @@
                       "score_distributions",
                       "features_by_group",
                       "evaluation",
+                      "true_score_evaluation",
                       "model",
                       "consistency",
                       "custom2",
