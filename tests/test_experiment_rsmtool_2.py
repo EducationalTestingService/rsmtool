@@ -33,8 +33,10 @@ else:
     param('lr-tsv-input-files', 'lr_tsv_input_files'),
     param('lr-tsv-input-and-subset-files', 'lr_tsv_input_and_subset_files'),
     param('lr-xlsx-input-files', 'lr_xlsx_input_files'),
-    param('lr-xlsx-input-and-subset-files', 'lr_xlsx_input_and_subset_files')
-])
+    param('lr-xlsx-input-and-subset-files', 'lr_xlsx_input_and_subset_files'),
+    param('lr-with-subset-double-scored', 'lr_with_subset_double_scored',
+          consistency=True)])
+
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
