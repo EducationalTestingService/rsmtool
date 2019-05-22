@@ -23,9 +23,10 @@ from sklearn.metrics import r2_score
 
 from rsmtool.container import DataContainer
 from rsmtool.utils import (agreement,
+                           difference_of_standardized_means,
                            partial_correlations,
-                           standardized_mean_difference,
-                           quadratic_weighted_kappa)
+                           quadratic_weighted_kappa,
+                           standardized_mean_difference)
 
 
 class Analyzer:
@@ -526,7 +527,7 @@ class Analyzer:
             partial correlations between each feature and `target_variable`
             after controlling for all other features. If include_length is
             set to True, `length` will not be included into partial
-            correlation comutation.
+            correlation computation.
         df_target_partcors_no_length: pandas DataFrame
             If `include_length` is set to `true`: Data frame containing
             Pearson's correlation coefficients for partial correlations
@@ -579,7 +580,10 @@ class Analyzer:
                        system_scores,
                        population_human_score_sd=None,
                        population_system_score_sd=None,
-                       smd_method='unpooled'):
+                       population_human_score_mn=None,
+                       population_system_score_mn=None,
+                       smd_method='unpooled',
+                       use_diff_std_means=False):
         """
         This is a helper function that computes some basic agreement
         and association metrics between the system scores and the
@@ -593,18 +597,34 @@ class Analyzer:
             Series containing numeric scores predicted by the model.
         population_human_score_sd : float, optional
             Reference standard deviation for human scores. If `smd_method='williamson'`, this is
-            used to compute SMD and should be the standard deviation for the whole population.
+            used to compute SMD and should be the standard deviation for the whole population. If
+            `use_std_diff=True`, this must be used with `population_human_score_mn`.
             Otherwise, it is ignored.
+            Defaults to None.
         population_system_score_sd : float, optional
             Reference standard deviation for system scores. If `smd_method='williamson'`, this is
-            used to compute SMD and should be the standard deviation for the whole population.
+            used to compute SMD and should be the standard deviation for the whole population.If
+            `use_std_diff=True`, this must be used with `population_human_score_mn`.
             Otherwise, it is ignored.
+            Defaults to None.
+        population_human_score_mn : float, optional
+            Reference mean for human scores. If `use_std_diff=True`, this must be used with
+            `population_human_score_mn`. Otherwise, it is ignored.
+            Defaults to None.
+        population_system_score_mn : float, optional
+            Reference mean for system scores. If  `use_std_diff=True`, this must be used with
+            `population_human_score_mn`. Otherwise, it is ignored.
+            Defaults to None.
         smd_method : {'williamson', 'pooled', 'unpooled'}, optional
             The SMD method to use.
             - `williamson`: Denominator equal to pooled population std.
             - `pooled`: Denominator equal to the pooled std. of `human_scores` and `system_scores`.
             - `unpooled`: Denominator equal to std. of `human_scores`.
             Defaults to 'unpooled'.
+        use_std_diff : bool, optional
+            Whether to use the difference of standardized means, rather than the standardized mean
+            difference. This is most useful with subgroup analysis.
+            Defaults to False.
 
         Returns
         -------
@@ -616,7 +636,7 @@ class Analyzer:
             - `wtkappa`:  quadratic weighted kappa
             - `exact_agr`: exact agreement
             - `adj_agr`: adjacent agreement with tolerance set to 1
-            - `SMD`: standardized mean difference
+            - `SMD` (or `diff_of_std_means`) : standardized mean difference (or diff. std. means).
             - `corr`: Pearson's r
             - `R2`: r squared
             - `RMSE`: root mean square error
@@ -642,7 +662,7 @@ class Analyzer:
                                                     system_scores,
                                                     tolerance=1)
 
-        # compute the pearson correlation after removing
+        # compute the Pearson correlation after removing
         # any cases where either of the scores are NaNs.
         df = pd.DataFrame({'human': human_scores,
                            'system': system_scores}).dropna(how='any')
@@ -665,12 +685,24 @@ class Analyzer:
         system_score_sd = np.std(system_scores, ddof=1)
         human_score_sd = np.std(human_scores, ddof=1)
 
-        # calculate the (Williamson) standardized mean difference
-        smd = standardized_mean_difference(human_scores,
-                                           system_scores,
-                                           population_human_score_sd,
-                                           population_system_score_sd,
-                                           method=smd_method)
+        if use_diff_std_means:
+
+            # calculate the difference of standardized means
+            smd = difference_of_standardized_means(human_scores,
+                                                   system_scores,
+                                                   population_human_score_mn,
+                                                   population_system_score_mn,
+                                                   population_human_score_sd,
+                                                   population_system_score_sd)
+
+        else:
+
+            # calculate the standardized mean difference
+            smd = standardized_mean_difference(human_scores,
+                                               system_scores,
+                                               population_human_score_sd,
+                                               population_system_score_sd,
+                                               method=smd_method)
 
         # compute r2 and MSE
         r2 = r2_score(human_scores, system_scores)
@@ -902,7 +934,10 @@ class Analyzer:
                         compute_shortened=False,
                         use_scaled_predictions=False,
                         include_second_score=False,
-                        population_sd_dict=None):
+                        population_sd_dict=None,
+                        population_mn_dict=None,
+                        method='unpooled',
+                        use_diff_std_means=False):
         """
         Compute the evaluation metrics for the scores in the given data frame.
         This function compute metrics for all score types.
@@ -951,8 +986,11 @@ class Analyzer:
 
         # get the population standard deviations for SMD if none were supplied
         if not population_sd_dict:
-            population_sd_dict = {col: df[col].std(ddof=1) for col in df.columns
-                                  if not col == 'spkitemid'}
+            population_sd_dict = {col: None for col in df.columns}
+
+        # get the population standard deviations for SMD if none were supplied
+        if not population_mn_dict:
+            population_mn_dict = {col: None for col in df.columns}
 
         # if the second human score column is available, the values are
         # probably not available for all of the responses in the test
@@ -968,15 +1006,24 @@ class Analyzer:
                                                self.metrics_helper(df_single['sc1'],
                                                                    s,
                                                                    population_sd_dict['sc1'],
-                                                                   population_sd_dict[s.name]))
+                                                                   population_sd_dict[s.name],
+                                                                   population_mn_dict['sc1'],
+                                                                   population_mn_dict[s.name],
+                                                                   method,
+                                                                   use_diff_std_means))
             df_double = df[df['sc2'].notnull()][['sc1', 'sc2']]
             df_human_human = df_double.apply(lambda s:
                                              self.metrics_helper(df_double['sc1'],
                                                                  s,
                                                                  population_sd_dict['sc1'],
-                                                                 population_sd_dict[s.name]))
+                                                                 population_sd_dict[s.name],
+                                                                 population_mn_dict['sc1'],
+                                                                 population_mn_dict[s.name],
+                                                                 method,
+                                                                 use_diff_std_means))
             # drop the sc1 column from the human-human agreement frame
             df_human_human = df_human_human.drop('sc1', 1)
+
             # sort the rows in the correct order
             df_human_human = df_human_human.reindex(['N', 'h_mean', 'h_sd',
                                                           'h_min', 'h_max',
@@ -1001,7 +1048,11 @@ class Analyzer:
             df_human_machine = df.apply(lambda s: self.metrics_helper(df['sc1'],
                                                                       s,
                                                                       population_sd_dict['sc1'],
-                                                                      population_sd_dict[s.name]))
+                                                                      population_sd_dict[s.name],
+                                                                      population_mn_dict['sc1'],
+                                                                      population_mn_dict[s.name],
+                                                                      method,
+                                                                      use_diff_std_means))
 
         # drop 'sc1' column from the human-machine frame and transpose
         df_human_machine = df_human_machine.drop('sc1', 1)
@@ -1080,6 +1131,10 @@ class Analyzer:
                               for col in df_test.columns if col not in ['spkitemid',
                                                                         grouping_variable]}
 
+        population_mn_dict = {col: df_test[col].mean()
+                              for col in df_test.columns if col not in ['spkitemid',
+                                                                        grouping_variable]}
+
         # create a duplicate data frame to compute evaluations
         # over the whole data, i.e., across groups
         df_preds_all = df_test.copy()
@@ -1105,7 +1160,9 @@ class Analyzer:
                                       compute_shortened=True,
                                       use_scaled_predictions=use_scaled_predictions,
                                       include_second_score=include_second_score,
-                                      population_sd_dict=population_sd_dict)
+                                      population_sd_dict=population_sd_dict,
+                                      population_mn_dict=population_mn_dict,
+                                      use_diff_std_means=True)
 
             # we need to convert the shortened data frame to a series here
             df_human_machine_by_group[group] = df_human_machine_metrics_short.iloc[0]

@@ -591,10 +591,13 @@ def standardized_mean_difference(y_true,
     return smd
 
 
-def difference_of_standardized_means_by_subgroup(y_true,
-                                                 y_pred,
-                                                 subgroup,
-                                                 ddof=1):
+def difference_of_standardized_means(y_true,
+                                     y_pred,
+                                     population_y_true_mn=None,
+                                     population_y_pred_mn=None,
+                                     population_y_true_sd=None,
+                                     population_y_pred_sd=None,
+                                     ddof=1):
     """
     Calculate the standardized mean difference by subgroup.
 
@@ -621,49 +624,42 @@ def difference_of_standardized_means_by_subgroup(y_true,
 
     Raises
     ------
-    AssertionError
-        If len(y_true) != len(y_pred) != len(subgroup)
+    ValueError
+        If only one of `population_y_true_mn` and `population_y_true_sd` is
+        not None.
+    ValueError
+        If only one of `population_y_pred_mn` and `population_y_pred_sd` is
+        not None.
     """
-    assert len(y_true) == len(y_pred) == len(subgroup)
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    y_true_std, y_true_avg = np.std(y_true, ddof=ddof), np.mean(y_true)
-    y_pred_std, y_pred_avg = np.std(y_pred, ddof=ddof), np.mean(y_pred)
+    assert len(y_true) == len(y_pred)
 
-    # temporarily convert `NaN` to infinity
-    # because handling `NaN` is really annoying;
-    # also use `pd.isna()` because it works
-    # with strings and `np.isnan()` does not
-    # we do all of this so that we can handle
-    # numpy arrays, along with pandas data frames
-    null_temp = np.inf
-    subgroup = np.array(subgroup)
-    subgroup[pd.isna(subgroup)] = null_temp
+    # all of this is just to make sure users aren't passing the population
+    # standard deviation and not population mean for either true or predicted
+    y_true_population_params = [population_y_true_mn, population_y_true_sd]
+    y_pred_population_params = [population_y_pred_mn, population_y_pred_sd]
 
-    smds = {}
-    for group in set(subgroup):
+    if (any(y_true_population_params) and not all(y_true_population_params)):
+        raise ValueError('You must pass both `population_y_true_mn` and '
+                         '`population_y_true_sd` or neither.')
 
-        # subset the true and predicted scores for the given subgroup
-        y_true_subgroup = y_true[np.where(subgroup == group)].copy()
-        y_pred_subgroup = y_pred[np.where(subgroup == group)].copy()
+    if (any(y_pred_population_params) and not all(y_pred_population_params)):
+        raise ValueError('You must pass both `population_y_pred_mn` and '
+                         '`population_y_pred_sd` or neither.')
 
-        # calculate the z scores for true and predicted
-        y_true_subgroup_z = (y_true_subgroup - y_true_avg) / y_true_std
-        y_pred_subgroup_z = (y_pred_subgroup - y_pred_avg) / y_pred_std
+    if not population_y_true_mn or not population_y_true_sd:
+        population_y_true_sd, population_y_true_mn = np.std(y_true, ddof=ddof), np.mean(y_true)
 
-        # calculate the SMD, given the z scores for true and predicted
-        smds[group] = [np.mean(y_true_subgroup_z - y_pred_subgroup_z)]
+    if not population_y_pred_mn or not population_y_pred_sd:
+        population_y_pred_sd, population_y_pred_mn = np.std(y_pred, ddof=ddof), np.mean(y_pred)
 
-    # rename missing values from infinity
-    # to 'missing', if they exist
-    if null_temp in smds:
-        smds['Missing'] = smds[null_temp]
-        del smds[null_temp]
+    # calculate the z scores for true and predicted
+    y_true_subgroup_z = (y_true - population_y_true_mn) / population_y_true_sd
+    y_pred_subgroup_z = (y_pred - population_y_pred_mn) / population_y_pred_sd
 
-    # convert everything to a data frame,
-    # transpose it, and rename the columns
-    result = pd.DataFrame(smds).T
-    result.columns = ['Diff. of Std. Means']
-    return result
+    # calculate the SMD, given the z scores for true and predicted
+    difference_of_std_means = np.mean(y_true_subgroup_z - y_pred_subgroup_z)
+
+    return difference_of_std_means
 
 
 def quadratic_weighted_kappa(y_true, y_pred):
