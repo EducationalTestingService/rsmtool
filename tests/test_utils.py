@@ -23,7 +23,8 @@ from rsmtool.utils import (difference_of_standardized_means,
                            get_thumbnail_as_html,
                            get_files_as_html,
                            compute_expected_scores_from_model,
-                           standardized_mean_difference)
+                           standardized_mean_difference,
+                           quadratic_weighted_kappa)
 
 from sklearn.datasets import make_classification
 from skll import FeatureSet, Learner
@@ -318,6 +319,26 @@ def test_standardized_mean_difference_unpooled():
     eq_(smd, expected)
 
 
+def test_standardized_mean_difference_johnson():
+
+    expected = -0.9782608695652175
+    smd = standardized_mean_difference([8, 4, 6, 3],
+                                       [9, 4, 5, 12],
+                                       method='johnson',
+                                       population_y_true_sd=2.3,
+                                       ddof=0)
+    eq_(smd, expected)
+
+
+@raises(ValueError)
+def test_standardized_mean_difference_johnson_error():
+
+    standardized_mean_difference([8, 4, 6, 3],
+                                 [9, 4, 5, 12],
+                                 method='johnson',
+                                 ddof=0)
+
+
 @raises(AssertionError)
 def test_difference_of_standardized_means_unequal_lengths():
 
@@ -375,6 +396,21 @@ def test_difference_of_standardized_means_with_no_population_info():
                       np.array([94, 42, 54, 12, 92, 10, 77]))
     diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
+
+
+def test_quadratic_weighted_kappa():
+
+    expected = -0.09210526315789469
+    qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+                                   np.array([9, 4, 5, 12]))
+    eq_(qwk, expected)
+
+
+@raises(AssertionError)
+def test_quadratic_weighted_kappa_error():
+
+    quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+                             np.array([9, 4, 5, 12, 11]))
 
 
 class TestIntermediateFiles:
