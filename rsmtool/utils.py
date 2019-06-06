@@ -514,8 +514,11 @@ def standardized_mean_difference(y_true,
                                  ddof=1):
     """
     This function computes the standardized mean
-    difference between a system score and human score
-    for a particular subgroup.
+    difference between a system score and human score.
+    The when `method` is in {'johnson', 'pooled', 'unpooled'},
+    the numerator is equal to `mean(y_true) - mean(y_pred)`.
+    When `method='williamson'` (the default), the numerator
+    is equal to `mean(y_pred) - mean(y_true)`.
 
     Parameters
     ----------
@@ -523,22 +526,26 @@ def standardized_mean_difference(y_true,
         The true score for the group or subgroup.
     y_pred : array-like
         The predicted score for the group or subgroup.
-    population_y_true_sd : float
+    population_y_true_sd : float or None, optional
         The population true score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-    population_y_pred_sd : float
+        Defaults to None.
+    population_y_pred_sd : float or None, optional
         The predicted score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-    method : {'williamson', 'pooled', 'unpooled'}, optional
+        Defaults to None.
+    method : {'williamson', 'johnson', 'pooled', 'unpooled'}, optional
         The SMD method to use.
-        - `williamson`: Denominator equal to pooled population std.
-        - `pooled`: Denominator equal to the pooled std. of `y_true` and `y_pred`.
-        - `unpooled`: Denominator equal to std. of `y_true`.
-        Defaults to 'unpooled'.
+        - `williamson`: Denominator is the pooled population std.;
+          numerator is `mean(y_pred) - mean(y_true)`.
+        - `johnson`: Denominator is the population std. of `y_true`.
+        - `pooled`: Denominator is the pooled std. of `y_true` and `y_pred`.
+        - `unpooled`: Denominator is the std. of `y_true`.
+        Defaults to 'williamson'.
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
@@ -556,13 +563,13 @@ def standardized_mean_difference(y_true,
         If method='williamson' and either population_y_true_sd or
         population_y_pred_sd is None.
     ValueError
-        If method is not in {'unpooled', 'pooled', 'williamson'}.
+        If method is not in {'unpooled', 'pooled', 'williamson', 'johnson'}.
 
     Notes
     -----
-    The current implementation was recommended by Williamson, et al. (2012).
+    The 'williamson' implementation was recommended by Williamson, et al. (2012).
     The metric is only applicable when both sets of scores are on the same
-    scale. Additional implementations may be added in the future.
+    scale.
     """
     y_true_avg = np.mean(y_true)
     y_pred_avg = np.mean(y_pred)
@@ -574,15 +581,20 @@ def standardized_mean_difference(y_true,
     elif method == 'pooled':
         denominator = np.sqrt((np.std(y_true, ddof=ddof)**2 +
                                np.std(y_pred, ddof=ddof)**2) / 2)
+    elif method == 'johnson':
+        if population_y_true_sd is None:
+            raise ValueError("If `method='johnson'`, then `population_y_true_sd` "
+                             "must be provided.")
+        denominator = population_y_true_sd
     elif method == 'williamson':
         if population_y_true_sd is None or population_y_pred_sd is None:
-            raise ValueError("If `method='williamson', both `population_y_true_sd` "
+            raise ValueError("If `method='williamson'`, both `population_y_true_sd` "
                              "and `population_y_pred_sd` must be provided.")
         numerator = y_pred_avg - y_true_avg
         denominator = np.sqrt((population_y_true_sd**2 +
                                population_y_pred_sd**2) / 2)
     else:
-        possible_methods = {"'unpooled'", "'pooled'", "'williamson'"}
+        possible_methods = {"'unpooled'", "'pooled'", "'johnson'", "'williamson'"}
         raise ValueError("The available methods are {{{}}}; you selected {}."
                          "".format(', '.join(possible_methods), method))
 
@@ -599,16 +611,39 @@ def difference_of_standardized_means(y_true,
                                      population_y_pred_sd=None,
                                      ddof=1):
     """
-    Calculate the standardized mean difference by subgroup.
+    Calculate the difference of standardized means.
 
     Parameters
     ----------
     y_true : array-like
-        The true scores.
+        The true score for the group or subgroup.
     y_pred : array-like
+        The predicted score for the group or subgroup.
         The predicted scores.
-    subgroup : array-like
-        The subgroup for each record.
+    population_y_true_mn : float or None, optional
+        The population true score mean.
+        When the DSM is being calculated for a subgroup,
+        this should be the mean for the whole
+        population.
+        Defaults to None.
+    population_y_pred_mn : float or None, optional
+        The predicted score mean.
+        When the DSM is being calculated for a subgroup,
+        this should be the mean for the whole
+        population.
+        Defaults to None.
+    population_y_true_sd : float or None, optional
+        The population true score standard deviation.
+        When the DSM is being calculated for a subgroup,
+        this should be the standard deviation for the whole
+        population.
+        Defaults to None.
+    population_y_pred_sd : float or None, optional
+        The predicted score standard deviation.
+        When the DSM is being calculated for a subgroup,
+        this should be the standard deviation for the whole
+        population.
+        Defaults to None.
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
@@ -617,10 +652,8 @@ def difference_of_standardized_means(y_true,
 
     Returns
     -------
-    SMDs : pandas DataFrame
-        The standardized mean difference by subgroup,
-        where each row is a different subgroup. Missing
-        values in the category named '*~Missing~*'
+    difference_of_std_means : array-like
+        The difference of standardized means
 
     Raises
     ------
@@ -638,14 +671,15 @@ def difference_of_standardized_means(y_true,
     y_true_population_params = [population_y_true_mn, population_y_true_sd]
     y_pred_population_params = [population_y_pred_mn, population_y_pred_sd]
 
-    if (any(y_true_population_params) and not all(y_true_population_params)):
+    if any(y_true_population_params) and not all(y_true_population_params):
         raise ValueError('You must pass both `population_y_true_mn` and '
                          '`population_y_true_sd` or neither.')
 
-    if (any(y_pred_population_params) and not all(y_pred_population_params)):
+    if any(y_pred_population_params) and not all(y_pred_population_params):
         raise ValueError('You must pass both `population_y_pred_mn` and '
                          '`population_y_pred_sd` or neither.')
 
+    # if the population means and stds. were not provided, calculate from the data
     if not population_y_true_mn or not population_y_true_sd:
         population_y_true_sd, population_y_true_mn = np.std(y_true, ddof=ddof), np.mean(y_true)
 
@@ -656,7 +690,7 @@ def difference_of_standardized_means(y_true,
     y_true_subgroup_z = (y_true - population_y_true_mn) / population_y_true_sd
     y_pred_subgroup_z = (y_pred - population_y_pred_mn) / population_y_pred_sd
 
-    # calculate the SMD, given the z scores for true and predicted
+    # calculate the DSM, given the z scores for true and predicted
     difference_of_std_means = np.mean(y_true_subgroup_z - y_pred_subgroup_z)
 
     return difference_of_std_means

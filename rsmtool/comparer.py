@@ -269,8 +269,6 @@ class Comparer:
         feature_distplots_file = join(figdir, '{}_distrib.svg'.format(experiment_id))
         if exists(feature_distplots_file):
             figs['feature_distplots'] = feature_distplots_file
-            # with open(feature_distplots_file, 'rb') as f:
-            #     figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
 
         feature_cors_file = join(filedir, '{}_cors_processed.{}'.format(experiment_id,
                                                                         file_format))
@@ -364,8 +362,25 @@ class Comparer:
                                                                       file_format))
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
-                df_eval = df_eval[existing_eval_cols]
-                df_eval = df_eval.rename(columns=rename_dict)
+
+                # now that we have the eval data frame, we need to check if SMD was calculated,
+                # or DSM; we check for both because we want this to be backward compatible, but
+                # with newer version of RSMTool, all of the evaluations by subgroup should be
+                # using DSM, rather than SMD.
+                if any(col.startswith('DSM') for col in df_eval):
+                    smd_name = 'DSM'
+                    existing_eval_cols_new = [col.replace('SMD', 'DSM')
+                                              for col in existing_eval_cols]
+                    rename_dict_new = {key.replace('SMD', 'DSM'): val.replace('SMD', 'DSM')
+                                       for key, val in rename_dict.items()}
+
+                else:
+                    smd_name = 'SMD'
+                    existing_eval_cols_new = existing_eval_cols
+                    rename_dict_new = rename_dict
+
+                df_eval = df_eval[existing_eval_cols_new]
+                df_eval = df_eval.rename(columns=rename_dict_new)
                 files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
                 files['df_eval_by_{}'.format(group)].index.name = None
 
@@ -378,7 +393,8 @@ class Comparer:
                                                                      'score SD(br)',
                                                                      'score mean(b)',
                                                                      'score SD(b)',
-                                                                     'SMD(br)', 'SMD(b)']]
+                                                                     '{}(br)'.format(smd_name),
+                                                                     '{}(b)'.format(smd_name)]]
                 files['df_eval_by_{}_m_sd'.format(group)].index.name = None
 
         # read in the partial correlations vs. score for all data

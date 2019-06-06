@@ -615,11 +615,13 @@ class Analyzer:
             Reference mean for system scores. If  `use_std_diff=True`, this must be used with
             `population_human_score_mn`. Otherwise, it is ignored.
             Defaults to None.
-        smd_method : {'williamson', 'pooled', 'unpooled'}, optional
+        smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
             The SMD method to use.
-            - `williamson`: Denominator equal to pooled population std.
-            - `pooled`: Denominator equal to the pooled std. of `human_scores` and `system_scores`.
-            - `unpooled`: Denominator equal to std. of `human_scores`.
+            - `williamson`: Denominator is the pooled population std.;
+              numerator is `mean(y_pred) - mean(y_true)`.
+            - `johnson`: Denominator is the population std. of `y_true`.
+            - `pooled`: Denominator is the pooled std. of `y_true` and `y_pred`.
+            - `unpooled`: Denominator is the std. of `y_true`.
             Defaults to 'unpooled'.
         use_std_diff : bool, optional
             Whether to use the difference of standardized means, rather than the standardized mean
@@ -636,7 +638,7 @@ class Analyzer:
             - `wtkappa`:  quadratic weighted kappa
             - `exact_agr`: exact agreement
             - `adj_agr`: adjacent agreement with tolerance set to 1
-            - `SMD` (or `diff_of_std_means`) : standardized mean difference (or diff. std. means).
+            - `SMD`: standardized mean difference (or `DSM`).
             - `corr`: Pearson's r
             - `R2`: r squared
             - `RMSE`: root mean square error
@@ -688,6 +690,7 @@ class Analyzer:
         if use_diff_std_means:
 
             # calculate the difference of standardized means
+            smd_name = 'DSM'
             smd = difference_of_standardized_means(human_scores,
                                                    system_scores,
                                                    population_human_score_mn,
@@ -698,6 +701,7 @@ class Analyzer:
         else:
 
             # calculate the standardized mean difference
+            smd_name = 'SMD'
             smd = standardized_mean_difference(human_scores,
                                                system_scores,
                                                population_human_score_sd,
@@ -714,7 +718,7 @@ class Analyzer:
                              'wtkappa': weighted_kappa,
                              'exact_agr': human_system_agreement,
                              'adj_agr': human_system_adjacent_agreement,
-                             'SMD': smd,
+                             smd_name: smd,
                              'corr': correlations,
                              'R2': r2,
                              'RMSE': rmse,
@@ -853,7 +857,7 @@ class Analyzer:
         - 'wtkappa'
         - 'exact_agr'
         - 'adj_agr'
-        - 'SMD'
+        - 'SMD' (or `DSM`)
         - 'RMSE'
         - 'R2'
         - 'sys_min'
@@ -900,13 +904,14 @@ class Analyzer:
         if chosen_metric_dict:
             chosen_metrics = chosen_metric_dict
         else:
+            smd_name = 'DSM' if 'DSM' in df_metrics else 'SMD'
             chosen_metrics = {'{}_trim'.format(score_prefix): ['N',
                                                                'h_mean',
                                                                'h_sd',
                                                                'sys_mean',
                                                                'sys_sd',
                                                                'corr',
-                                                               'SMD',
+                                                               smd_name,
                                                                'RMSE',
                                                                'R2'],
                               '{}_trim_round'.format(score_prefix): ['sys_mean',
@@ -915,7 +920,7 @@ class Analyzer:
                                                                      'kappa',
                                                                      'exact_agr',
                                                                      'adj_agr',
-                                                                     'SMD']}
+                                                                     smd_name]}
 
         # extract the metrics we need from the given metrics frame
         metricdict = {}
@@ -984,6 +989,9 @@ class Analyzer:
         # shorter variable name is easier to work with
         use_scaled = use_scaled_predictions
 
+        # are we using DSM or SMD?
+        smd_name = 'DSM' if use_diff_std_means else 'SMD'
+
         # get the population standard deviations for SMD if none were supplied
         if not population_sd_dict:
             population_sd_dict = {col: None for col in df.columns}
@@ -1031,7 +1039,7 @@ class Analyzer:
                                                           'sys_min', 'sys_max',
                                                           'corr', 'wtkappa', 'R2',
                                                           'kappa', 'exact_agr',
-                                                          'adj_agr', 'SMD', 'RMSE'])
+                                                          'adj_agr', smd_name, 'RMSE'])
             # rename `h_*` -> `h1_*` and `sys_*` -> `h2_*`
             df_human_human.rename(lambda c: c.replace('h_', 'h1_').replace('sys_', 'h2_'),
                                   inplace=True)
@@ -1067,7 +1075,7 @@ class Analyzer:
                                              'corr',
                                              'wtkappa', 'R2', 'kappa',
                                              'exact_agr', 'adj_agr',
-                                             'SMD', 'RMSE']]
+                                             smd_name, 'RMSE']]
 
         # make N column an integer if it's not NaN else set it to 0
         df_human_machine['N'] = df_human_machine['N'].astype(int)
