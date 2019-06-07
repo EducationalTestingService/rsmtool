@@ -43,6 +43,11 @@ RSMTool provides pre-defined sections for ``rsmsummarize`` (listed below) and, b
 
     - ``evaluation``: Compares the standard set of evaluations recommended for scoring models on the evaluation data.
 
+    -  ``true_score_evaluation``: compares the evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
+
+        - variance of human scores for single and double-scored responses;
+        - variance of system scores and proportional reduction in mean squared error (PRMSE) for predicting true score with system score.
+
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the summary.
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.

@@ -62,3 +62,8 @@ Evaluation metrics
 .. note::
 
     Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
+
+Evaluations based on test theory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variances for human and system scores for these sets of responses, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) for predicting true score using system score. 
