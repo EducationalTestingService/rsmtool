@@ -598,32 +598,33 @@ class Analyzer:
         population_human_score_sd : float, optional
             Reference standard deviation for human scores. If `smd_method='williamson'`, this is
             used to compute SMD and should be the standard deviation for the whole population. If
-            `use_std_diff=True`, this must be used with `population_human_score_mn`.
+            `use_diff_std_means=True`, this must be used with `population_human_score_mn`.
             Otherwise, it is ignored.
             Defaults to None.
         population_system_score_sd : float, optional
             Reference standard deviation for system scores. If `smd_method='williamson'`, this is
             used to compute SMD and should be the standard deviation for the whole population.If
-            `use_std_diff=True`, this must be used with `population_human_score_mn`.
+            `use_diff_std_means=True`, this must be used with `population_human_score_mn`.
             Otherwise, it is ignored.
             Defaults to None.
         population_human_score_mn : float, optional
-            Reference mean for human scores. If `use_std_diff=True`, this must be used with
+            Reference mean for human scores. If `use_diff_std_means=True`, this must be used with
             `population_human_score_mn`. Otherwise, it is ignored.
             Defaults to None.
         population_system_score_mn : float, optional
-            Reference mean for system scores. If  `use_std_diff=True`, this must be used with
+            Reference mean for system scores. If  `use_diff_std_means=True`, this must be used with
             `population_human_score_mn`. Otherwise, it is ignored.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
-            The SMD method to use.
-            - `williamson`: Denominator is the pooled population std.;
-              numerator is `mean(y_pred) - mean(y_true)`.
-            - `johnson`: Denominator is the population std. of `y_true`.
-            - `pooled`: Denominator is the pooled std. of `y_true` and `y_pred`.
-            - `unpooled`: Denominator is the std. of `y_true`.
+            The SMD method to use, only used if `use_diff_std_means=False`
+            - `williamson`: Denominator is the pooled population standard deviation of
+               `y_true_observed` and `y_pred`.
+            - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
+            - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and
+               `y_pred` for this group.
+            - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
             Defaults to 'unpooled'.
-        use_std_diff : bool, optional
+        use_diff_std_means : bool, optional
             Whether to use the difference of standardized means, rather than the standardized mean
             difference. This is most useful with subgroup analysis.
             Defaults to False.
@@ -638,7 +639,9 @@ class Analyzer:
             - `wtkappa`:  quadratic weighted kappa
             - `exact_agr`: exact agreement
             - `adj_agr`: adjacent agreement with tolerance set to 1
-            - `SMD`: standardized mean difference (or `DSM`).
+            - One of the following:
+              * `SMD`: standardized mean difference, if `use_diff_std_means=False`
+              * `DSM`: difference of standardized means, if `use_diff_std_means=True`
             - `corr`: Pearson's r
             - `R2`: r squared
             - `RMSE`: root mean square error
@@ -857,7 +860,7 @@ class Analyzer:
         - 'wtkappa'
         - 'exact_agr'
         - 'adj_agr'
-        - 'SMD' (or `DSM`)
+        - 'SMD' or `DSM`, depending on what is in `df_metrics`.
         - 'RMSE'
         - 'R2'
         - 'sys_min'
@@ -889,9 +892,9 @@ class Analyzer:
         then, the following dictionary, containing the recommended
         metrics, is used ::
 
-           {'raw/scale_trim': ['N', 'h_mean', 'h_sd', 'sys_mean', 'sys_sd',
+           {'raw/scale_trim': ['N', 'h_mean', 'h_sd', 'sys_mean', 'sys_sd', 'wtkappa',
                                'corr', 'RMSE', 'R2', 'SMD'],
-            'raw/scale_trim_round': ['sys_mean', 'sys_sd', 'wtkappa', 'kappa',
+            'raw/scale_trim_round': ['sys_mean', 'sys_sd', 'kappa',
                                      'exact_agr', 'adj_agr', 'SMD']}
 
         where raw/scale is chosen depending on whether `use_scaled_predictions`
@@ -910,13 +913,13 @@ class Analyzer:
                                                                'h_sd',
                                                                'sys_mean',
                                                                'sys_sd',
+                                                               'wtkappa',
                                                                'corr',
                                                                smd_name,
                                                                'RMSE',
                                                                'R2'],
                               '{}_trim_round'.format(score_prefix): ['sys_mean',
                                                                      'sys_sd',
-                                                                     'wtkappa',
                                                                      'kappa',
                                                                      'exact_agr',
                                                                      'adj_agr',
@@ -941,7 +944,7 @@ class Analyzer:
                         include_second_score=False,
                         population_sd_dict=None,
                         population_mn_dict=None,
-                        method='unpooled',
+                        smd_method='unpooled',
                         use_diff_std_means=False):
         """
         Compute the evaluation metrics for the scores in the given data frame.
@@ -963,15 +966,36 @@ class Analyzer:
             Input data frame
         compute_shortened : bool, optional
             Also compute a shortened version of the full
-            metrics data frame, defaults to False.
+            metrics data frame.
+            Defaults to False.
         use_scaled_predictions : bool, optional
             Use evaluations based on scaled predictions in
             the shortened version of the metrics data frame.
+            Defaults to False.
         include_second_score : bool, optional
-            Second human score available, defaults to False.
+            Second human score available.
+            Defaults to False.
         population_sd_dict : dict, optional
             Dictionary containing population standard deviation for each column containing
             human or system scores. This is used to compute SMD for subgroups.
+            Defaults to None.
+        population_mn_dict : dict, optional
+            Dictionary containing population mean for each column containing
+            human or system scores. This is used to compute SMD for subgroups.
+            Defaults to None.
+        smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
+            The SMD method to use, only used if `use_diff_std_means=False`
+            - `williamson`: Denominator is the pooled population standard deviation of
+               `y_true_observed` and `y_pred`.
+            - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
+            - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and
+               `y_pred` for this group.
+            - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+            Defaults to 'unpooled'.
+        use_diff_std_means : bool, optional
+            Whether to use the difference of standardized means, rather than the standardized mean
+            difference. This is most useful with subgroup analysis.
+            Defaults to False.
 
         Returns
         -------
@@ -1017,7 +1041,7 @@ class Analyzer:
                                                                    population_sd_dict[s.name],
                                                                    population_mn_dict['sc1'],
                                                                    population_mn_dict[s.name],
-                                                                   method,
+                                                                   smd_method,
                                                                    use_diff_std_means))
             df_double = df[df['sc2'].notnull()][['sc1', 'sc2']]
             df_human_human = df_double.apply(lambda s:
@@ -1027,7 +1051,7 @@ class Analyzer:
                                                                  population_sd_dict[s.name],
                                                                  population_mn_dict['sc1'],
                                                                  population_mn_dict[s.name],
-                                                                 method,
+                                                                 smd_method,
                                                                  use_diff_std_means))
             # drop the sc1 column from the human-human agreement frame
             df_human_human = df_human_human.drop('sc1', 1)
@@ -1059,7 +1083,7 @@ class Analyzer:
                                                                       population_sd_dict[s.name],
                                                                       population_mn_dict['sc1'],
                                                                       population_mn_dict[s.name],
-                                                                      method,
+                                                                      smd_method,
                                                                       use_diff_std_means))
 
         # drop 'sc1' column from the human-machine frame and transpose

@@ -88,7 +88,7 @@ class TestAnalyzer:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.human_scores[0:1],
                                             self.system_scores[0:1])
-            assert_equal(evals.isnull().values.sum(), 4)
+            assert_equal(evals.isnull().values.sum(), 5)
 
     def test_that_metrics_helper_works_for_data_with_the_same_label(self):
         # There should be NaNs for correlation and SMD.
@@ -109,7 +109,7 @@ class TestAnalyzer:
         expected_metrics1 = pd.Series({'N': 500.0,
                                        'R2': 0.65340566606389394,
                                        'RMSE': 0.47958315233127197,
-                                       'SMD': -0.03679030063229779,
+                                       'SMD': 0.03679030063229779,
                                        'adj_agr': 100.0,
                                        'corr': 0.82789026370069529,
                                        'exact_agr': 77.0,
@@ -122,7 +122,7 @@ class TestAnalyzer:
                                        'sys_mean': 3.4500000000000002,
                                        'sys_min': 1.0,
                                        'sys_sd': 0.81782496620652367,
-                                       'wtkappa': 0.82732732732732728})
+                                       'wtkappa': 0.8276724397975914})
 
         # and now compute them specifying the population SDs
         computed_metrics2 = Analyzer.metrics_helper(df_new_features['score'],

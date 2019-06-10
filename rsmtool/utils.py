@@ -12,6 +12,7 @@ Utility classes and functions.
 import json
 import logging
 import re
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -506,27 +507,25 @@ def agreement(score1, score2, tolerance=0):
     return agreement_value
 
 
-def standardized_mean_difference(y_true,
+def standardized_mean_difference(y_true_observed,
                                  y_pred,
-                                 population_y_true_sd=None,
+                                 population_y_true_observed_sd=None,
                                  population_y_pred_sd=None,
-                                 method='williamson',
+                                 method='unpooled',
                                  ddof=1):
     """
     This function computes the standardized mean
     difference between a system score and human score.
-    The when `method` is in {'johnson', 'pooled', 'unpooled'},
-    the numerator is equal to `mean(y_true) - mean(y_pred)`.
-    When `method='williamson'` (the default), the numerator
-    is equal to `mean(y_pred) - mean(y_true)`.
+    The numerator is calculated as mean(y_pred) - mean(y_true_observed)
+    for all of the available methods.
 
     Parameters
     ----------
-    y_true : array-like
-        The true score for the group or subgroup.
+    y_true_observed : array-like
+        The observed scores for the group or subgroup.
     y_pred : array-like
         The predicted score for the group or subgroup.
-    population_y_true_sd : float or None, optional
+    population_y_true_observed_sd : float or None, optional
         The population true score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
@@ -540,12 +539,13 @@ def standardized_mean_difference(y_true,
         Defaults to None.
     method : {'williamson', 'johnson', 'pooled', 'unpooled'}, optional
         The SMD method to use.
-        - `williamson`: Denominator is the pooled population std.;
-          numerator is `mean(y_pred) - mean(y_true)`.
-        - `johnson`: Denominator is the population std. of `y_true`.
-        - `pooled`: Denominator is the pooled std. of `y_true` and `y_pred`.
-        - `unpooled`: Denominator is the std. of `y_true`.
-        Defaults to 'williamson'.
+        - `williamson`: Denominator is the pooled population standard deviation of
+           `y_true_observed` and `y_pred`.
+        - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
+        - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and `y_pred`
+           for this group.
+        - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+        Defaults to 'unpooled'.
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
@@ -560,7 +560,7 @@ def standardized_mean_difference(y_true,
     Raises
     ------
     ValueError
-        If method='williamson' and either population_y_true_sd or
+        If method='williamson' and either population_y_true_observed_sd or
         population_y_pred_sd is None.
     ValueError
         If method is not in {'unpooled', 'pooled', 'williamson', 'johnson'}.
@@ -571,27 +571,24 @@ def standardized_mean_difference(y_true,
     The metric is only applicable when both sets of scores are on the same
     scale.
     """
-    y_true_avg = np.mean(y_true)
-    y_pred_avg = np.mean(y_pred)
-    numerator = y_true_avg - y_pred_avg
+    numerator = np.mean(y_pred) - np.mean(y_true_observed)
 
     method = method.lower()
     if method == 'unpooled':
-        denominator = np.std(y_true, ddof=ddof)
+        denominator = np.std(y_true_observed, ddof=ddof)
     elif method == 'pooled':
-        denominator = np.sqrt((np.std(y_true, ddof=ddof)**2 +
+        denominator = np.sqrt((np.std(y_true_observed, ddof=ddof)**2 +
                                np.std(y_pred, ddof=ddof)**2) / 2)
     elif method == 'johnson':
-        if population_y_true_sd is None:
-            raise ValueError("If `method='johnson'`, then `population_y_true_sd` "
+        if population_y_true_observed_sd is None:
+            raise ValueError("If `method='johnson'`, then `population_y_true_observed_sd` "
                              "must be provided.")
-        denominator = population_y_true_sd
+        denominator = population_y_true_observed_sd
     elif method == 'williamson':
-        if population_y_true_sd is None or population_y_pred_sd is None:
-            raise ValueError("If `method='williamson'`, both `population_y_true_sd` "
+        if population_y_true_observed_sd is None or population_y_pred_sd is None:
+            raise ValueError("If `method='williamson'`, both `population_y_true_observed_sd` "
                              "and `population_y_pred_sd` must be provided.")
-        numerator = y_pred_avg - y_true_avg
-        denominator = np.sqrt((population_y_true_sd**2 +
+        denominator = np.sqrt((population_y_true_observed_sd**2 +
                                population_y_pred_sd**2) / 2)
     else:
         possible_methods = {"'unpooled'", "'pooled'", "'johnson'", "'williamson'"}
@@ -603,24 +600,27 @@ def standardized_mean_difference(y_true,
     return smd
 
 
-def difference_of_standardized_means(y_true,
+def difference_of_standardized_means(y_true_observed,
                                      y_pred,
-                                     population_y_true_mn=None,
+                                     population_y_true_observed_mn=None,
                                      population_y_pred_mn=None,
-                                     population_y_true_sd=None,
+                                     population_y_true_observed_sd=None,
                                      population_y_pred_sd=None,
                                      ddof=1):
     """
-    Calculate the difference of standardized means.
+    Calculate the difference of standardized means. This is done by standardizing
+    both observed and predicted scores to z-scores using mean and standard deviation
+    for the whole population and then calculating differences between standardized
+    means for each subgroup.
 
     Parameters
     ----------
-    y_true : array-like
-        The true score for the group or subgroup.
+    y_true_observed : array-like
+        The observed scores for the group or subgroup.
     y_pred : array-like
         The predicted score for the group or subgroup.
         The predicted scores.
-    population_y_true_mn : float or None, optional
+    population_y_true_observed_mn : float or None, optional
         The population true score mean.
         When the DSM is being calculated for a subgroup,
         this should be the mean for the whole
@@ -632,7 +632,7 @@ def difference_of_standardized_means(y_true,
         this should be the mean for the whole
         population.
         Defaults to None.
-    population_y_true_sd : float or None, optional
+    population_y_true_observed_sd : float or None, optional
         The population true score standard deviation.
         When the DSM is being calculated for a subgroup,
         this should be the standard deviation for the whole
@@ -658,55 +658,75 @@ def difference_of_standardized_means(y_true,
     Raises
     ------
     ValueError
-        If only one of `population_y_true_mn` and `population_y_true_sd` is
+        If only one of `population_y_true_observed_mn` and `population_y_true_observed_sd` is
         not None.
     ValueError
         If only one of `population_y_pred_mn` and `population_y_pred_sd` is
         not None.
     """
-    assert len(y_true) == len(y_pred)
+    assert len(y_true_observed) == len(y_pred)
 
     # all of this is just to make sure users aren't passing the population
     # standard deviation and not population mean for either true or predicted
-    y_true_population_params = [population_y_true_mn, population_y_true_sd]
-    y_pred_population_params = [population_y_pred_mn, population_y_pred_sd]
+    y_true_observed_population_params = [population_y_true_observed_mn,
+                                         population_y_true_observed_sd]
+    y_pred_population_params = [population_y_pred_mn,
+                                population_y_pred_sd]
 
-    if any(y_true_population_params) and not all(y_true_population_params):
-        raise ValueError('You must pass both `population_y_true_mn` and '
-                         '`population_y_true_sd` or neither.')
+    if any(y_true_observed_population_params) and not all(y_true_observed_population_params):
+        raise ValueError('You must pass both `population_y_true_observed_mn` and '
+                         '`population_y_true_observed_sd` or neither.')
 
     if any(y_pred_population_params) and not all(y_pred_population_params):
         raise ValueError('You must pass both `population_y_pred_mn` and '
                          '`population_y_pred_sd` or neither.')
 
-    # if the population means and stds. were not provided, calculate from the data
-    if not population_y_true_mn or not population_y_true_sd:
-        population_y_true_sd, population_y_true_mn = np.std(y_true, ddof=ddof), np.mean(y_true)
+    warning_msg = ('You did not pass population mean and std. for `{}`; '
+                   'thus, the calculated z-scores will be zero.')
+
+    # if the population means and standard deviations were not provided, calculate from the data
+    if not population_y_true_observed_mn or not population_y_true_observed_sd:
+
+        warnings.warn(warning_msg.format('y_true_observed'))
+        (population_y_true_observed_sd,
+         population_y_true_observed_mn) = (np.std(y_true_observed, ddof=ddof),
+                                           np.mean(y_true_observed))
 
     if not population_y_pred_mn or not population_y_pred_sd:
-        population_y_pred_sd, population_y_pred_mn = np.std(y_pred, ddof=ddof), np.mean(y_pred)
 
-    # calculate the z scores for true and predicted
-    y_true_subgroup_z = (y_true - population_y_true_mn) / population_y_true_sd
-    y_pred_subgroup_z = (y_pred - population_y_pred_mn) / population_y_pred_sd
+        warnings.warn(warning_msg.format('y_pred'))
+        (population_y_pred_sd,
+         population_y_pred_mn) = (np.std(y_pred, ddof=ddof),
+                                  np.mean(y_pred))
 
-    # calculate the DSM, given the z scores for true and predicted
-    difference_of_std_means = np.mean(y_true_subgroup_z - y_pred_subgroup_z)
+    # calculate the z-scores for observed and predicted
+    y_true_observed_subgroup_z = ((y_true_observed - population_y_true_observed_mn) /
+                                  population_y_true_observed_sd)
+    y_pred_subgroup_z = ((y_pred - population_y_pred_mn) /
+                         population_y_pred_sd)
+
+    # calculate the DSM, given the z-scores for observed and predicted
+    difference_of_std_means = np.mean(y_pred_subgroup_z - y_true_observed_subgroup_z)
 
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true, y_pred):
+def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     """
     Calculate the quadratic weighted Kappa
     in the discrete or continuous cases.
 
     Parameters
     ----------
-    y_true : array-like
-        The true scores
+    y_true_observed : array-like
+        The observed scores.
     y_pred : array-like
-        The predicted scores
+        The predicted scores.
+    ddof : int, optional
+        Means Delta Degrees of Freedom. The divisor used in
+        calculations is N - ddof, where N represents the
+        number of elements. By default ddof is zero.
+        Defaults to 1.
 
     Returns
     -------
@@ -716,14 +736,16 @@ def quadratic_weighted_kappa(y_true, y_pred):
     Raises
     ------
     AssertionError
-        If len(y_true) != len(y_pred)
+        If len(y_true_observed) != len(y_pred)
     """
-    assert len(y_true) == len(y_pred)
-    y_true_var, y_true_avg = np.var(y_true), np.mean(y_true)
-    y_pred_var, y_pred_avg = np.var(y_pred), np.mean(y_pred)
+    assert len(y_true_observed) == len(y_pred)
+    y_true_observed_var, y_true_observed_avg = (np.var(y_true_observed, ddof=ddof),
+                                                np.mean(y_true_observed))
+    y_pred_var, y_pred_avg = (np.var(y_pred, ddof=ddof),
+                              np.mean(y_pred))
 
-    numerator = np.mean((y_true - y_pred)**2)
-    denominator = y_true_var + y_pred_var + (y_true_avg - y_pred_avg)**2
+    numerator = np.mean((y_true_observed - y_pred)**2)
+    denominator = y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg)**2
     kappa = 1.0 - (numerator / denominator)
     return kappa
 

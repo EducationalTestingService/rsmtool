@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from copy import deepcopy
 from collections import defaultdict
 from scipy.stats import pearsonr
 from os.path import exists, join
@@ -30,7 +31,7 @@ _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
                                  "sys_sd.raw_trim_round",
                                  "exact_agr.raw_trim_round",
                                  "kappa.raw_trim_round",
-                                 "wtkappa.raw_trim_round",
+                                 "wtkappa.raw_trim",
                                  "adj_agr.raw_trim_round",
                                  "SMD.raw_trim_round",
                                  "R2.raw_trim",
@@ -45,7 +46,7 @@ _df_eval_columns_existing_scale = ["N", "h_mean", "h_sd",
                                    "sys_sd.scale_trim_round",
                                    "exact_agr.scale_trim_round",
                                    "kappa.scale_trim_round",
-                                   "wtkappa.scale_trim_round",
+                                   "wtkappa.scale_trim",
                                    "adj_agr.scale_trim_round",
                                    "SMD.scale_trim_round",
                                    "R2.scale_trim",
@@ -61,7 +62,7 @@ _df_eval_columns_renamed = ["N", "H1 mean", "H1 SD",
                             "score SD(br)",
                             "Agmt.(br)",
                             "K(br)",
-                            "QWK(br)",
+                            "QWK(b)",
                             "Adj. Agmt.(br)",
                             "SMD(br)",
                             "R2(b)",
@@ -77,6 +78,80 @@ class Comparer:
     """
     A class to perform comparisons between two RSMTool experiments.
     """
+
+    @staticmethod
+    def _modify_eval_columns_to_ensure_version_compatibilty(df,
+                                                            rename_dict,
+                                                            existing_eval_cols,
+                                                            short_metrics_list):
+        """
+        This is a helper method to ensure that the column names for eval data frames
+        are forward and backward compatible. There are two major changes in RSMTool (>6.1)
+        that necessitate this: (1) for subgroup calculations, 'DSM' is not used
+        instead of 'SMD', and (2) QWK statistics are now calculated on un-rounded scores.
+        Thus, we need to check these columns to see which sets of names are being used.
+
+        Parameters
+        ----------
+        df : pandas Data Frame
+            The evaluation data frame
+        rename_dict : dict
+            The rename dictionary
+        existing_eval_cols : list
+            The existing evaluation columns
+        short_metrics_list : list
+            The list of columns for the short metrics file.
+
+        Returns
+        -------
+        rename_dict_new : dict
+            The updated rename dictionary
+        existing_eval_cols_new : list
+            The updated existing evaluation columns
+        short_metrics_list_new : list
+            The updated list of columns for the short metrics file.
+        smd_name : str
+            The SMD column name (either 'SMD' or 'DSM')
+        """
+
+        rename_dict_new = deepcopy(rename_dict)
+        existing_eval_cols_new = deepcopy(existing_eval_cols)
+        short_metrics_list_new = deepcopy(short_metrics_list)
+        smd_name = 'SMD'
+
+        # previously, the QWK metric used `trim_round` scores; now, we use just `trim` scores;
+        # to ensure backward compatibility, we check whether `trim_round` scores were used and
+        # if so, we update the rename dictionary and column lists accordingly
+        if any(col.endswith('trim_round') for col in df if col.startswith('wtkappa')):
+
+            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
+            rename_dict_new = {(key.replace('_trim', '_trim_round')
+                                if key.startswith('wtkappa') else key):
+                               (val.replace("(b)", "(br)")
+                                if val.startswith('QWK') else val)
+                               for key, val in rename_dict_new.items()}
+
+            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
+            existing_eval_cols_new = [col.replace('_trim', '_trim_round')
+                                      if col.startswith('wtkappa') else col
+                                      for col in existing_eval_cols_new]
+
+            # replace the `QWK(b)` with `QWK(br)`
+            short_metrics_list_new = [col.replace("(b)", "(br)")
+                                      if col.startswith('QWK') else col
+                                      for col in short_metrics_list_new]
+
+        # we check if DSM was calculated (which is what we expect for subgroup evals),
+        # and if so, we update the rename dictionary and column lists accordingly; we
+        # also set `smd_name` equal to 'DSM'
+        if any(col.startswith('DSM') for col in df):
+            smd_name = 'DSM'
+            existing_eval_cols_new = [col.replace('SMD', 'DSM')
+                                      for col in existing_eval_cols_new]
+            rename_dict_new = {key.replace('SMD', 'DSM'): val.replace('SMD', 'DSM')
+                               for key, val in rename_dict_new.items()}
+
+        return rename_dict_new, existing_eval_cols_new, short_metrics_list_new, smd_name
 
     @staticmethod
     def make_summary_stat_df(df):
@@ -122,7 +197,7 @@ class Comparer:
         df_old : pandas DataFrame
             Data frame with feature values for the 'old' model.
         df_new : pandas DataFrame
-            Data frame with feature valeus for the 'new' model.
+            Data frame with feature values for the 'new' model.
         human_score : str, optional
             Name of the column containing human score. Defaults to ``sc1``.
             Must be the same for both data sets.
@@ -341,14 +416,23 @@ class Comparer:
 
         # read in the short version of the evaluation metrics for all data
         short_metrics_list = ["N", "Adj. Agmt.(br)", "Agmt.(br)", "K(br)",
-                              "Pearson(b)", "QWK(br)", "R2(b)", "RMSE(b)"]
+                              "Pearson(b)", "QWK(b)", "R2(b)", "RMSE(b)"]
         eval_file_short = join(filedir, '{}_eval_short.{}'.format(experiment_id, file_format))
 
         if exists(eval_file_short):
             df_eval = DataReader.read_from_file(eval_file_short, index_col=0)
-            df_eval = df_eval[existing_eval_cols]
-            df_eval = df_eval.rename(columns=rename_dict)
-            files['df_eval'] = df_eval[short_metrics_list]
+
+            (rename_dict_new,
+             existing_eval_cols_new,
+             short_metrics_list_new,
+             _) = self._modify_eval_columns_to_ensure_version_compatibilty(df_eval,
+                                                                           rename_dict,
+                                                                           existing_eval_cols,
+                                                                           short_metrics_list)
+
+            df_eval = df_eval[existing_eval_cols_new]
+            df_eval = df_eval.rename(columns=rename_dict_new)
+            files['df_eval'] = df_eval[short_metrics_list_new]
             files['df_eval'].index.name = None
 
         eval_file = join(filedir, '{}_eval.{}'.format(experiment_id, file_format))
@@ -363,25 +447,26 @@ class Comparer:
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
 
-                # now that we have the eval data frame, we need to check if SMD was calculated,
-                # or DSM; we check for both because we want this to be backward compatible, but
-                # with newer version of RSMTool, all of the evaluations by subgroup should be
-                # using DSM, rather than SMD.
-                if any(col.startswith('DSM') for col in df_eval):
-                    smd_name = 'DSM'
-                    existing_eval_cols_new = [col.replace('SMD', 'DSM')
-                                              for col in existing_eval_cols]
-                    rename_dict_new = {key.replace('SMD', 'DSM'): val.replace('SMD', 'DSM')
-                                       for key, val in rename_dict.items()}
+                (rename_dict_new,
+                 existing_eval_cols_new,
+                 short_metrics_list_new,
+                 smd_name
+                 ) = self._modify_eval_columns_to_ensure_version_compatibilty(df_eval,
+                                                                              rename_dict,
+                                                                              existing_eval_cols,
+                                                                              short_metrics_list)
 
-                else:
-                    smd_name = 'SMD'
-                    existing_eval_cols_new = existing_eval_cols
-                    rename_dict_new = rename_dict
+                # if `SMD` is being used, rather than `DSM`, we print a note for the user; we don't
+                # want to go so far as to raise a warning, but we do want to give the user some info
+                if smd_name == 'SMD':
+                    print("INFO: The the subgroup evaluations in `{}` use 'SMD'. Please note "
+                          "that newer versions of RSMTool (>6.1) use 'DSM' with subgroup "
+                          "evaluations. For additional details on how these metrics "
+                          "differ, see the RSMTool documentation.".format(group_eval_file))
 
                 df_eval = df_eval[existing_eval_cols_new]
                 df_eval = df_eval.rename(columns=rename_dict_new)
-                files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
+                files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list_new]
                 files['df_eval_by_{}'.format(group)].index.name = None
 
                 series = files['df_eval_by_{}'.format(group)]

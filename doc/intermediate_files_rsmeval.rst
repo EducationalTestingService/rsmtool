@@ -98,7 +98,7 @@ Evaluation metrics
     - adj_agr [raw/scale trim_round]
     - exact_agr [raw/scale trim_round]
     - kappa [raw/scale trim_round]
-    - wtkappa [raw/scale trim_round]
+    - wtkappa [raw/scale trim]
     - sys_mean [raw/scale trim_round]
     - sys_sd [raw/scale trim_round]
     - SMD [raw/scale trim_round]
