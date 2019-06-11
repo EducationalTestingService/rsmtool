@@ -234,7 +234,7 @@ def compute_prmse(df,
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements. By default ddof is zero.
+        number of elements.
         Defaults to 1.
 
     Returns
