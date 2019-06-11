@@ -38,12 +38,12 @@ def compute_variance_of_errors(df,
     Raises
     ------
     ValueError
-         If any of the values in `sc1` or `sc2` are NaN.
+         If any of the values in `h2_column` or `h1_column` are NaN.
     """
 
     # check that all responses are double scored
-    if (len(df[df[h2_column].isnull()]) > 0) or (len(df[df[h1_column].isnull()]) > 0):
-        raise ValueError("Variance of errors should only be computed on double-scored responses")
+    if df[h2_column].isnull().any() or df[h1_column].isnull().any():
+        raise ValueError("Variance of errors should only be computed on double-scored responses.")
 
     N = len(df)
 
@@ -91,7 +91,7 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
     squared_dist_single = (single_human_scores - sc_bar_mean)**2
     squared_dist_double = 2 * (double_human_scores - sc_bar_mean)**2
 
-    # concatenate both dataframes
+    # concatenate both data frames
     squared_dist = pd.concat([squared_dist_single, squared_dist_double], sort=True)
 
     # third, compute variance of true scores
@@ -227,10 +227,10 @@ def compute_prmse(df,
         System score column name or list of columns containing system scores
     h1_column : str, optional
         The first human score column name.
-        Defaults to 'sc1'
+        Defaults to 'sc1'.
     h2_column : str, optional
         The second human score column name.
-        Defaults to 'sc2'
+        Defaults to 'sc2'.
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
