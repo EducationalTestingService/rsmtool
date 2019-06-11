@@ -1,12 +1,6 @@
-#python
-
-# Test functions for prmse_utils.py
-
-import numpy as np
 import pandas as pd
 
-from nose.tools import (assert_equal,
-                        eq_,
+from nose.tools import (eq_,
                         raises,
                         assert_almost_equal)
 
@@ -22,6 +16,7 @@ from rsmtool.prmse_utils import (compute_variance_of_errors,
 # get the directory containing the tests
 test_dir = dirname(__file__)
 
+
 def test_compute_variance_of_erors_zero():
     sc1 = [1, 2, 3, 1, 2, 3]
     sc2 = [1, 2, 3, 1, 2, 3]
@@ -30,13 +25,13 @@ def test_compute_variance_of_erors_zero():
     eq_(compute_variance_of_errors(df), 0)
 
 
-
 def test_compute_variance_of_erors_one():
     sc1 = [1, 2, 3, 1, 2]
     sc2 = [2, 1, 4, 2, 3]
     df = pd.DataFrame({'sc1': sc1,
                        'sc2': sc2})
     eq_(compute_variance_of_errors(df), 0.5)
+
 
 @raises(ValueError)
 def test_compute_variance_of_erors_error():
@@ -64,7 +59,7 @@ def test_compute_true_score_var_subset():
     v_e = 0.5
     eq_(compute_true_score_var_subset_double_scored(single,
                                                     double,
-                                                    v_e), 4/3)
+                                                    v_e), 4 / 3)
 
 
 def test_compute_true_score_compare():
@@ -73,8 +68,9 @@ def test_compute_true_score_compare():
 
     v_e = 0.3
 
-    variance_subset = compute_true_score_var_subset_double_scored(single,                                                  double,
-                                                                 v_e)
+    variance_subset = compute_true_score_var_subset_double_scored(single,
+                                                                  double,
+                                                                  v_e)
     variance_all = compute_true_score_var_all_double_scored(double, v_e)
 
     eq_(variance_subset, variance_all)
@@ -101,7 +97,7 @@ def test_compute_mse_subset_double_scored():
                                            system_single,
                                            system_single,
                                            v_e)
-    eq_(mse, 2/3)
+    eq_(mse, 2 / 3)
 
 
 def test_compute_mse_compare():
@@ -117,5 +113,3 @@ def test_compute_mse_compare():
                                             system_double,
                                             v_e)
     assert_almost_equal(mse_subset, mse_all)
-
-
