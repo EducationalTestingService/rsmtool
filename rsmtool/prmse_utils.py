@@ -58,7 +58,7 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
     """
     Compute variance of true scores
     in a situation where only some
-    of the responses are double scored
+    of the responses are double scored.
 
     Parameters
     ----------
