@@ -28,7 +28,6 @@ from rsmtool.utils import (agreement,
                            standardized_mean_difference)
 
 
-
 class Analyzer:
     """
     Analyzer class, which performs analysis on all metrics,
@@ -169,7 +168,6 @@ class Analyzer:
 
         return df_full_crosstab
 
-
     @staticmethod
     def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
         """
@@ -230,7 +228,6 @@ class Analyzer:
         df_analysis = df_analysis[columns]
         return df_analysis
 
-
     @staticmethod
     def analyze_used_predictions(df_test, subgroups, candidate_column):
         """
@@ -269,7 +266,6 @@ class Analyzer:
 
         df_analysis = df_analysis[df_columns]
         return df_analysis
-
 
     @staticmethod
     def compute_basic_descriptives(df, selected_features):
@@ -319,7 +315,6 @@ class Analyzer:
                                'kurtosis', 'Correlation', 'p', 'N']]
 
         return df_output
-
 
     @staticmethod
     def compute_percentiles(df,
@@ -390,7 +385,6 @@ class Analyzer:
 
         return df_output
 
-
     @staticmethod
     def compute_outliers(df, selected_features):
         """
@@ -439,7 +433,6 @@ class Analyzer:
                                   'bothperc': round(both_s / len(df_desc) * 100, 2)})
 
         return df_output
-
 
     @staticmethod
     def compute_pca(df, selected_features):
@@ -495,7 +488,6 @@ class Analyzer:
         df_variance = df_variance.transpose()
 
         return df_components, df_variance
-
 
     @staticmethod
     def correlation_helper(df,
@@ -707,7 +699,6 @@ class Analyzer:
 
         return metrics
 
-
     @staticmethod
     def compute_disattenuated_correlations(human_machine_corr,
                                            human_human_corr):
@@ -754,7 +745,6 @@ class Analyzer:
                                                  df_correlations['sqrt_HH'])
 
         return df_correlations
-
 
     def compute_correlations_by_group(self,
                                       df,
@@ -813,7 +803,6 @@ class Analyzer:
                                       include_length=include_length)
 
         return ret
-
 
     def filter_metrics(self,
                        df_metrics,
@@ -908,7 +897,6 @@ class Analyzer:
 
         df_filtered_metrics = pd.DataFrame([metricdict])
         return df_filtered_metrics
-
 
     def compute_metrics(self,
                         df,
@@ -1051,7 +1039,6 @@ class Analyzer:
                 df_human_machine_filtered,
                 df_human_human)
 
-
     def compute_metrics_by_group(self,
                                  df_test,
                                  grouping_variable,
@@ -1135,7 +1122,6 @@ class Analyzer:
 
         return (df_human_machine_by_group, df_human_human_by_group)
 
-
     def compute_degradation_and_disattenuated_correlations(self,
                                                            df,
                                                            use_all_responses=True):
@@ -1196,7 +1182,6 @@ class Analyzer:
                                                      row - df_human_human_eval.loc[''], axis=1)
 
         return (df_degradation, df_correlations)
-
 
     def run_training_analyses(self,
                               data_container,
@@ -1404,7 +1389,6 @@ class Analyzer:
 
         return configuration, DataContainer(datasets=datasets)
 
-
     def run_prediction_analyses(self,
                                 data_container,
                                 configuration):
@@ -1553,11 +1537,11 @@ class Analyzer:
 
         # compute true-score analyses if we have second score
         if include_second_score:
-            system_score_columns = [col for col in prediction_columns if not
-                             col in ['sc1', 'sc2']]
+            system_score_columns = [col for col in prediction_columns
+                                    if col not in ['sc1', 'sc2']]
             df_prmse = compute_prmse(df_preds_second_score,
                                      system_score_columns)
-            
+
             datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 
         for group in eval_by_group_dict:
@@ -1578,7 +1562,6 @@ class Analyzer:
                               'frame': dis_corr_by_group}])
 
         return configuration, DataContainer(datasets=datasets)
-
 
     def run_data_composition_analyses_for_rsmtool(self,
                                                   data_container,
@@ -1682,7 +1665,6 @@ class Analyzer:
 
         return configuration, DataContainer(datasets=datasets)
 
-
     def run_data_composition_analyses_for_rsmeval(self,
                                                   data_container,
                                                   configuration):
@@ -1774,4 +1756,3 @@ class Analyzer:
                              'frame': data_composition_by_group_dict[group]})
 
         return configuration, DataContainer(datasets=datasets)
-
