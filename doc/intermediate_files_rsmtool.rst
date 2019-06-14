@@ -225,6 +225,8 @@ Evaluation metrics
 
     Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
 
+- ``true_score_eval`` - evaluation of how well system scores can predict true scores.
+
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
@@ -236,6 +238,11 @@ These files are created only if a second human score has been made available via
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
 
+Evaluations based on test theory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 - ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores, and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
 
 - ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
+
+- ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variances for human and system scores for these sets of responses, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) for predicting true score using system score. 

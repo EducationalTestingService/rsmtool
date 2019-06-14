@@ -64,7 +64,7 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-Once the run finishes, you will see an HTML file named ``model_comparison_report.html``. This is the final ``rsmsummarize`` summary report.
+Once the run finishes, you will see a new folder ``report`` containing an HTML file named ``model_comparison_report.html``. This is the final ``rsmsummarize`` summary report.
 
 Examine the report
 ~~~~~~~~~~~~~~~~~~

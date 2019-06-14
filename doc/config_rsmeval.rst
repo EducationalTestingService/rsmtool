@@ -122,6 +122,13 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
+    
+    - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
+
+        - variance of human scores for single and double-scored responses;
+        - variance of system scores and proportional reduction in mean squared error (PRMSE) for predicting true score with system score.
+
+
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the evaluation.
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.

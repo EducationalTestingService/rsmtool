@@ -30,8 +30,11 @@ else:
     param('lr-self-summary-with-tsv-inputs'),
     param('lr-self-summary-with-tsv-output', file_format='tsv'),
     param('lr-self-summary-with-xlsx-output', file_format='xlsx'),
-    param('lr-self-summary-no-scaling')
+    param('lr-self-summary-no-scaling'),
+    param('lr-self-summary-with-h2')
 ])
+
+
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR

@@ -37,7 +37,8 @@ else:
     param('lr-eval-with-h2', 'lr_eval_with_h2', subgroups=['QUESTION', 'L1'], consistency=True),
     param('lr-eval-with-h2-named-sc1', 'lr_eval_with_h2_named_sc1', consistency=True),
     param('lr-eval-with-scaling-and-h2-keep-zeros', 'lr_eval_with_scaling_and_h2_keep_zeros', consistency=True),
-    param('lr-eval-with-continuous-human-scores', 'lr_eval_with_continuous_human_scores', consistency=True)
+    param('lr-eval-with-continuous-human-scores', 'lr_eval_with_continuous_human_scores', consistency=True),
+    param('lr-eval-with-subset-double-scored', 'lr_eval_with_subset_double_scored', consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
