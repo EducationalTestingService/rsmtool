@@ -9,6 +9,7 @@ Classes for comparing outputs of two RSMTool experiments.
 :organization: ETS
 """
 
+import logging
 import numpy as np
 import pandas as pd
 import warnings
@@ -87,7 +88,7 @@ class Comparer:
         """
         This is a helper method to ensure that the column names for eval data frames
         are forward and backward compatible. There are two major changes in RSMTool (>6.1)
-        that necessitate this: (1) for subgroup calculations, 'DSM' is not used
+        that necessitate this: (1) for subgroup calculations, 'DSM' is now used
         instead of 'SMD', and (2) QWK statistics are now calculated on un-rounded scores.
         Thus, we need to check these columns to see which sets of names are being used.
 
@@ -140,6 +141,11 @@ class Comparer:
             short_metrics_list_new = [col.replace("(b)", "(br)")
                                       if col.startswith('QWK') else col
                                       for col in short_metrics_list_new]
+
+            logging.warning("Please note that newer versions of RSMTool (>6.1) use only the trimmed "
+                            "scores for weighted kappa calculations. Comparisons with experiments using "
+                            "`trim_round` for weighted kappa calculations will be deprecated in the next "
+                            "major release.")
 
         # we check if DSM was calculated (which is what we expect for subgroup evals),
         # and if so, we update the rename dictionary and column lists accordingly; we
@@ -459,10 +465,12 @@ class Comparer:
                 # if `SMD` is being used, rather than `DSM`, we print a note for the user; we don't
                 # want to go so far as to raise a warning, but we do want to give the user some info
                 if smd_name == 'SMD':
-                    print("INFO: The the subgroup evaluations in `{}` use 'SMD'. Please note "
-                          "that newer versions of RSMTool (>6.1) use 'DSM' with subgroup "
-                          "evaluations. For additional details on how these metrics "
-                          "differ, see the RSMTool documentation.".format(group_eval_file))
+                    logging.warning("The the subgroup evaluations in `{}` use 'SMD'. Please note "
+                                    "that newer versions of RSMTool (>6.1) use 'DSM' with subgroup "
+                                    "evaluations. For additional details on how these metrics "
+                                    "differ, see the RSMTool documentation. Comparisons with experiments "
+                                    "using SMD for subgroup calculations will be deprecated in the next major "
+                                    "release.".format(group_eval_file))
 
                 df_eval = df_eval[existing_eval_cols_new]
                 df_eval = df_eval.rename(columns=rename_dict_new)

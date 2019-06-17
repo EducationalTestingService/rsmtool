@@ -197,7 +197,7 @@ Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
 - ``eval``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
 
-- ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup. However, rather than SMD, a difference of standardized means will be calculated (DSM) using z-scores.
+- ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
 - ``eval_short`` -  a shortened version of ``eval`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
@@ -232,7 +232,7 @@ These files are created only if a second human score has been made available via
 - ``consistency``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
 
 
-- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group. However, rather than SMD, a difference of standardized means will be calculated (DSM) using z-scores.
+- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
 
