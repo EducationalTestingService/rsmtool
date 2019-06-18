@@ -1,7 +1,6 @@
 
 import tempfile
 
-
 import numpy as np
 
 from itertools import count
@@ -9,7 +8,8 @@ from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
 from os.path import abspath, dirname, join, relpath
 
-from rsmtool.utils import (float_format_func,
+from rsmtool.utils import (difference_of_standardized_means,
+                           float_format_func,
                            int_or_float_format_func,
                            custom_highlighter,
                            bold_highlighter,
@@ -23,7 +23,8 @@ from rsmtool.utils import (float_format_func,
                            get_thumbnail_as_html,
                            get_files_as_html,
                            compute_expected_scores_from_model,
-                           standardized_mean_difference)
+                           standardized_mean_difference,
+                           quadratic_weighted_kappa)
 
 from sklearn.datasets import make_classification
 from skll import FeatureSet, Learner
@@ -271,14 +272,14 @@ def test_standardized_mean_difference():
 
     # test SMD
     expected = 1 / 4
-    smd = standardized_mean_difference(9, 8, 4, 4)
+    smd = standardized_mean_difference(8, 9, 4, 4, method='williamson')
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_zero_denominator():
 
     # test SMD with zero denominator
-    smd = standardized_mean_difference(4.2, 3.2, 0, 0)
+    smd = standardized_mean_difference(3.2, 4.2, 0, 0)
     assert np.isnan(smd)
 
 
@@ -286,7 +287,7 @@ def test_standardized_mean_difference_zero_difference():
 
     # test SMD with zero difference between groups
     expected = 0.0
-    smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1)
+    smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method='williamson')
     eq_(smd, expected)
 
 
@@ -296,6 +297,120 @@ def test_standardized_mean_difference_fake_method():
     # test SMD with fake method
     standardized_mean_difference(4.2, 4.2, 1.1, 1.1,
                                  method='foobar')
+
+
+def test_standardized_mean_difference_pooled():
+
+    expected = 0.8523247028586811
+    smd = standardized_mean_difference([8, 4, 6, 3],
+                                       [9, 4, 5, 12],
+                                       method='pooled',
+                                       ddof=0)
+    eq_(smd, expected)
+
+
+def test_standardized_mean_difference_unpooled():
+
+    expected = 1.171700198827415
+    smd = standardized_mean_difference([8, 4, 6, 3],
+                                       [9, 4, 5, 12],
+                                       method='unpooled',
+                                       ddof=0)
+    eq_(smd, expected)
+
+
+def test_standardized_mean_difference_johnson():
+
+    expected = 0.9782608695652175
+    smd = standardized_mean_difference([8, 4, 6, 3],
+                                       [9, 4, 5, 12],
+                                       method='johnson',
+                                       population_y_true_observed_sd=2.3,
+                                       ddof=0)
+    eq_(smd, expected)
+
+
+@raises(ValueError)
+def test_standardized_mean_difference_johnson_error():
+
+    standardized_mean_difference([8, 4, 6, 3],
+                                 [9, 4, 5, 12],
+                                 method='johnson',
+                                 ddof=0)
+
+
+@raises(AssertionError)
+def test_difference_of_standardized_means_unequal_lengths():
+
+    difference_of_standardized_means([8, 4, 6, 3],
+                                     [9, 4, 5, 12, 17])
+
+
+@raises(ValueError)
+def test_difference_of_standardized_means_with_y_true_mn_but_no_sd():
+
+    difference_of_standardized_means([8, 4, 6, 3],
+                                     [9, 4, 5, 12],
+                                     population_y_true_observed_mn=4.5)
+
+
+@raises(ValueError)
+def test_difference_of_standardized_means_with_y_true_sd_but_no_mn():
+
+    difference_of_standardized_means([8, 4, 6, 3],
+                                     [9, 4, 5, 12],
+                                     population_y_true_observed_sd=1.5)
+
+
+@raises(ValueError)
+def test_difference_of_standardized_means_with_y_pred_mn_but_no_sd():
+
+    difference_of_standardized_means([8, 4, 6, 3],
+                                     [9, 4, 5, 12],
+                                     population_y_pred_mn=4.5)
+
+
+@raises(ValueError)
+def test_difference_of_standardized_means_with_y_pred_sd_but_no_mn():
+
+    difference_of_standardized_means([8, 4, 6, 3],
+                                     [9, 4, 5, 12],
+                                     population_y_pred_sd=1.5)
+
+
+def test_difference_of_standardized_means_with_all_values():
+
+    expected = 0.7083333333333336
+    y_true, y_pred = np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12])
+    diff_std_means = difference_of_standardized_means(y_true, y_pred,
+                                                      population_y_true_observed_mn=4.5,
+                                                      population_y_pred_mn=5.1,
+                                                      population_y_true_observed_sd=1.2,
+                                                      population_y_pred_sd=1.8)
+    eq_(diff_std_means, expected)
+
+
+def test_difference_of_standardized_means_with_no_population_info():
+    expected = -1.7446361815538174e-16
+    y_true, y_pred = (np.array([98, 18, 47, 64, 32, 11, 100]),
+                      np.array([94, 42, 54, 12, 92, 10, 77]))
+    diff_std_means = difference_of_standardized_means(y_true, y_pred)
+    eq_(diff_std_means, expected)
+
+
+def test_quadratic_weighted_kappa():
+
+    expected = 0.12246696035242288
+    qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+                                   np.array([9, 4, 5, 12]))
+    eq_(qwk, expected)
+
+
+@raises(AssertionError)
+def test_quadratic_weighted_kappa_error():
+
+    quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+                             np.array([9, 4, 5, 12, 11]))
 
 
 class TestIntermediateFiles:

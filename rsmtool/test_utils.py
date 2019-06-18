@@ -5,6 +5,7 @@ import warnings
 import numpy as np
 
 from ast import literal_eval as eval
+from bs4 import BeautifulSoup
 from filecmp import clear_cache, dircmp
 from glob import glob
 from importlib.machinery import SourceFileLoader
@@ -204,7 +205,13 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
         do_run_comparison(source, config_file)
 
     html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
-    check_report(html_report)
+    check_report(html_report, raise_warnings=False)
+
+    # we want to ignore deprecation warnings for RSMCompare, so we remove
+    # them from the list; then, we make sure that there are no other warnings
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0) 
 
 
 def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
@@ -488,7 +495,39 @@ def check_file_output(file1, file2, file_format='csv'):
         raise
 
 
-def check_report(html_file):
+def collect_warning_messages_from_report(html_file):
+    """
+    Collect the warning messages from HTML report file.
+
+    Parameters
+    ----------
+    html_file : str
+        Path the HTML report file on disk.
+
+    Returns
+    -------
+    warnings_text : list of str
+        The list of warnings
+    """
+    with open(html_file, 'r') as htmlf:
+        soup = BeautifulSoup(htmlf.read(), 'html.parser')
+
+    warnings_text = []
+    for div in soup.findAll("div", {"class": "output_stderr"}):
+
+        # we collect the text in the <pre> tags after the standard error,
+        # and split the lines; we only keep the lines that contain 'Warning:'
+        for pre in div.findAll("pre"):
+            warnings_msgs = pre.text.splitlines()
+            warnings_msgs = [msg for msg in warnings_msgs if 'Warning:' in msg]
+            warnings_text.extend(warnings_msgs)
+
+    return warnings_text
+
+
+def check_report(html_file,
+                 raise_errors=True,
+                 raise_warnings=True):
     """
     Checks if the HTML report contains any errors.
     Raises an AssertionError if it does.
@@ -497,9 +536,18 @@ def check_report(html_file):
     ----------
     html_file : str
         Path the HTML report file on disk.
+    raise_errors : bool, optional
+        Whether to raise assertion error if there
+        are any errors in the report.
+        Defaults to True.
+    raise_warnings : bool, optional
+        Whether to raise assertion error if there
+        are any warnings in the report.
+        Defaults to True.
     """
     report_errors = 0
     report_warnings = 0
+
     with open(html_file, 'r') as htmlf:
         for line in htmlf:
             m_error = html_error_regexp.search(line)
@@ -508,8 +556,11 @@ def check_report(html_file):
             m_warning = html_warning_regexp.search(line)
             if m_warning:
                 report_warnings += 1
-    assert_equal(report_errors, 0)
-    assert_equal(report_warnings, 0)
+
+    if raise_errors:
+        assert_equal(report_errors, 0)
+    if raise_warnings:
+        assert_equal(report_warnings, 0)
 
 
 def check_scaled_coefficients(source, experiment_id, file_format='csv'):
