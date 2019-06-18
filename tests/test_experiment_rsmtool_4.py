@@ -2,10 +2,11 @@ import os
 
 from os.path import join
 
-from nose.tools import raises
+from nose.tools import raises, assert_equal
 from parameterized import param, parameterized
 
 from rsmtool.test_utils import (check_run_experiment,
+                                collect_warning_messages_from_report,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
@@ -80,3 +81,30 @@ def test_run_experiment_requested_feature_zero_sd():
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
 
+
+def test_run_experiment_with_warnings():
+
+  source = 'lr-with-warnings'
+  experiment_id = 'lr_with_warnings'
+  config_file = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source,
+                     '{}.json'.format(experiment_id))
+
+  do_run_experiment(source, experiment_id, config_file)
+
+  html_file = join('test_outputs', source, 'report', experiment_id + '_report.html')
+  report_warnings = collect_warning_messages_from_report(html_file)
+
+  syntax_warnings = [msg for msg in report_warnings if 'SyntaxWarning:' in msg]
+  deprecation_warnings = [msg for msg in report_warnings if 'DeprecationWarning:' in msg]
+  unicode_warnings = [msg for msg in report_warnings if 'UnicodeWarning:' in msg]
+  runtime_warnings = [msg for msg in report_warnings if 'RuntimeWarning:' in msg]
+  user_warnings = [msg for msg in report_warnings if 'UserWarning:' in msg]
+
+  assert_equal(len(syntax_warnings), 1) 
+  assert_equal(len(deprecation_warnings), 2) 
+  assert_equal(len(unicode_warnings), 1) 
+  assert_equal(len(runtime_warnings), 1)
+  assert_equal(len(user_warnings), 1) 

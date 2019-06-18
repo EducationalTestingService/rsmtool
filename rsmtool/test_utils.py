@@ -514,7 +514,7 @@ def collect_warning_messages_from_report(html_file):
         soup = BeautifulSoup(htmlf.read(), 'html.parser')
 
     warnings_text = []
-    for div in soup.find("body").findAll("div", {"class": "output_stderr"}):
+    for div in soup.findAll("div", {"class": "output_stderr"}):
 
         # we collect the text in the <pre> tags after the standard error,
         # and split the lines; we only keep the lines that contain 'Warning:'
