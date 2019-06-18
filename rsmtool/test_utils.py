@@ -208,7 +208,7 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
     check_report(html_report, raise_warnings=False)
 
     # we want to ignore deprecation warnings for RSMCompare, so we remove
-    # them from the list; then, we make sure there there are no other warnings
+    # them from the list; then, we make sure that there are no other warnings
     warning_msgs = collect_warning_messages_from_report(html_report)
     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0) 
