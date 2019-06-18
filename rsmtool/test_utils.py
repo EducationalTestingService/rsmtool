@@ -211,7 +211,6 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
     # them form the list; then, we make sure there there are no other warnings
     warning_msgs = collect_warning_messages_from_report(html_report)
     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
-    print(warning_msgs)
     assert_equal(len(warning_msgs), 0) 
 
 
