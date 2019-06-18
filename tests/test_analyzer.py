@@ -98,7 +98,6 @@ class TestAnalyzer:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.same_human_scores,
                                             self.system_scores)
-            print(evals)
             assert_equal(evals.isnull().values.sum(), 2)
 
     def test_metrics_helper_population_sds(self):
