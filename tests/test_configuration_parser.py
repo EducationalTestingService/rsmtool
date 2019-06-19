@@ -397,8 +397,8 @@ class TestConfigurationParser:
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
 
-    @raises(ValueError)
-    def test_builtin_model_for_expected_scores(self):
+
+    def test_proces_validate_correct_order_boolean(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
@@ -408,7 +408,26 @@ class TestConfigurationParser:
 
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        newdata = self.parser.normalize_validate_and_process_config()
+        eq_(newdata['predict_expected_scores'], False)
+
+
+    def test_process_validate_correct_order_list(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.normalize_validate_and_process_config(context='rsmsummarize')
+
+    
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
 
 
     def test_get_correct_configparser_cfg(self):
