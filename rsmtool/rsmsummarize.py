@@ -141,6 +141,19 @@ def run_summary(config_file_or_obj, output_dir):
         experiments = check_experiment_dir(experiment_dir, configpath)
         all_experiments.extend(experiments)
 
+    # Get experiment names if any
+    experiment_names = configuration['experiment_names']
+    # Raise an error if the user specified a list of experiment names 
+    # but we found several .jsons in the same directory
+    if experiment_names:
+        if len(all_experiments) != len(experiment_names):
+            raise ValueError("The number of .json files found in experiment_dirs "
+                             "does not match the number of specified "
+                             "experiment names. To use experiment names "
+                             "You must have a separate "
+                             "directory for each experiment.")
+
+
     # get the subgroups if any
     # Note: at the moment no comparison are reported for subgroups.
     # this option is added to the code to make it easier to add
