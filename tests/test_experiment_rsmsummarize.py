@@ -122,15 +122,3 @@ def test_run_experiment_summary_no_json():
     do_run_summary(source, config_file)
 
 
-@raises(ValueError)
-def test_run_experiment_summary_wrong_names():
-
-    # rsmsummarize experiment where the list of
-    # supplied model names is shorter than the list of experiments
-    source = 'summary-wrong-names'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmsummarize.json')
-    do_run_summary(source, config_file)
