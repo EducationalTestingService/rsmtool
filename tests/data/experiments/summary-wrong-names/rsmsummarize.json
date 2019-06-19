@@ -1,0 +1,6 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
+    "experiment_names": ["Experiment 1", "Experiment 2"],
+    "description": "Comparison of rsmtool experiment with itself."
+}
