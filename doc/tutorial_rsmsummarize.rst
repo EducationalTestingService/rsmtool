@@ -44,6 +44,7 @@ Let's take a look at the options in our configuration file.
 - **Line 2**: We provide the ``summary_id`` for the comparison. This will be used to generate the name of the final report. 
 - **Line 3**: We give a short description of this comparison experiment. This will be shown in the report.
 - **Line 4**: We also give the list of paths to the directories containing the outputs of the experiments we want to compare.
+- **Line 5**: Since all experiments we want to compare used the same experiment ids (``ASAP2``), we list the names that we want to use for each experiment in the summary report. 
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmsummarize>`.
 
