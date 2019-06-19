@@ -1,0 +1,5 @@
+,N features,N negative,learner,train_label
+lr 1,8,2,LinearRegression,score
+logReg 1,-,-,LogisticRegression,score
+logReg 2,-,-,LogisticRegression,score
+lr 2,8,2,LinearRegression,score

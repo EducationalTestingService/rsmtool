@@ -1,4 +1,0 @@
-,N features,N negative,learner,train_label
-Experiment 1,8,2,LinearRegression,score
-Experiment 2,8,2,LinearRegression,score
-Experiment 3,8,2,LinearRegression,score

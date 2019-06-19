@@ -32,7 +32,7 @@ else:
     param('lr-self-summary-with-xlsx-output', file_format='xlsx'),
     param('lr-self-summary-no-scaling'),
     param('lr-self-summary-with-h2'),
-    param('lr-self-summary-with-custom-names'),
+    param('summary-with-custom-names'),
 ])
 
 
