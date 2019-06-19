@@ -254,7 +254,30 @@ class TestConfigurationParser:
 
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')    
+
+
+    @raises(ValueError)
+    def test_validate_config_too_many_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2', 'exp3', 'exp4']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
         self.parser.validate_config(context='rsmsummarize')
+
+
+    @raises(ValueError)
+    def test_validate_config_too_many_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')
+
 
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',
@@ -317,6 +340,24 @@ class TestConfigurationParser:
         # Add data to `ConfigurationParser` object
         self.parser._config = newdata
         newdata = self.parser.process_config()
+
+    def test_process_fields_rsmsummarize(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.process_config(inplace=False)
+
+    
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
+       
 
     @raises(ValueError)
     def test_invalid_skll_objective(self):
@@ -708,6 +749,7 @@ class TestConfiguration:
                                                        ['train', 'test',
                                                         'feature_specs'])
         eq_(values_for_reader, expected)
+
 
 
 class TestJSONFeatureConversion:
