@@ -952,7 +952,14 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 12. Clean up config dict to keep only context-specific fields
+        # 12. If we have `experiment_names`, check that the length of the list
+        # matches the list of experiment_dirs.
+        if context == 'rsmsummarize' and new_config['experiment_names']:
+            if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
+                raise ValueError("The total number of specified experiment names should be the same"
+                                 " as the total number of specified experiment dirs")
+
+        # 13. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
@@ -1055,8 +1062,8 @@ class ConfigurationParser:
         self._check_config_is_loaded()
 
         self.normalize_config()
-        self.validate_config(context=context)
         self.process_config()
+        self.validate_config(context=context)
         return Configuration(self._config, self._filepath, context=context)
 
     def read_normalize_validate_and_process_config(self,
