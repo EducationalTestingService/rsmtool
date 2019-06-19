@@ -224,6 +224,12 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
 
 POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
 
+ID_FIELDS = {'rsmtool': 'experiment_id',
+             'rsmeval': 'experiment_id',
+             'rsmcompare': 'comparison_id',
+             'rsmsummarize': 'summary_id',
+             'rsmpredict': 'experiment_id'}
+
 _skll_module = import_module('skll.learner')
 
 

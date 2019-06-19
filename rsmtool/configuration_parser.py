@@ -34,6 +34,7 @@ from rsmtool.utils import (DEFAULTS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
                            FIELD_NAME_MAPPING,
+                           ID_FIELDS,
                            is_skll_model)
 
 from skll import Learner
@@ -318,8 +319,9 @@ class Configuration:
         output_dir = join(output_dir, 'output')
         makedirs(output_dir, exist_ok=True)
 
+        id_field = ID_FIELDS[self._context]
         outjson = join(output_dir,
-                       '{}_{}.json'.format(self._config['experiment_id'],
+                       '{}_{}.json'.format(self._config[id_field],
                                            self._context))
 
         expected_fields = (CHECK_FIELDS[self._context]['required'] +
@@ -838,13 +840,9 @@ class ConfigurationParser:
 
         # 4. Check to make sure that the ID fields that will be
         # used as part of filenames formatted correctly
-        id_fields = ['comparison_id',
-                     'experiment_id',
-                     'summary_id']
-        id_field_values = {field: new_config[field] for field in new_config
-                           if field in id_fields}
+        id_field = ID_FIELDS[context]
+        id_field_values = {id_field: new_config[id_field]}
 
-        # we do not need to validate any IDs for `rsmpredict`
         self.check_id_fields(id_field_values)
 
         # 5. Check that the feature file and feature subset/subset file are not

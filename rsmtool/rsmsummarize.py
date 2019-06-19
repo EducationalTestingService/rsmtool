@@ -129,6 +129,9 @@ def run_summary(config_file_or_obj, output_dir):
         else:
             configpath = os.getcwd()
 
+    logger.info('Saving configuration file.')
+    configuration.save(output_dir)
+
     # get the list of the experiment dirs
     experiment_dirs = configuration['experiment_dirs']
 

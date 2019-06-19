@@ -124,7 +124,7 @@ class TestConfigurationParser:
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_equal(newdata['use_scaled_predictions'], False)
         assert_equal(newdata['select_transformations'], False)
-        assert_equal(newdata['general_sections'], 'all')
+        assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
 
     @raises(ValueError)
@@ -692,6 +692,31 @@ class TestConfiguration:
             config_new = json.loads(buff.read())
         rmtree('output')
         eq_(config_new, dictionary)
+
+    def test_save_rsmcompare(self):
+        dictionary = {"comparison_id": '001'}
+        config = Configuration(dictionary,
+                              context='rsmcompare')
+        config.save()
+
+        out_path = 'output/001_rsmcompare.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
+    def test_save_rsmsummarize(self):
+        dictionary = {"summary_id": '001'}
+        config = Configuration(dictionary,
+                              context='rsmsummarize')
+        config.save()
+
+        out_path = 'output/001_rsmsummarize.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
 
     def test_check_exclude_listwise_true(self):
         dictionary = {"experiment_id": '001', "min_items_per_candidate": 4}
