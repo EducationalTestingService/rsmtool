@@ -1062,8 +1062,8 @@ class ConfigurationParser:
         self._check_config_is_loaded()
 
         self.normalize_config()
-        self.process_config()
         self.validate_config(context=context)
+        self.process_config()
         return Configuration(self._config, self._filepath, context=context)
 
     def read_normalize_validate_and_process_config(self,
