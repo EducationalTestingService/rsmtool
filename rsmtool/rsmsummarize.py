@@ -33,7 +33,9 @@ from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
 
 
-def check_experiment_dir(experiment_dir, configpath):
+def check_experiment_dir(experiment_dir,
+                         experiment_name,
+                         configpath):
     """
     Check that the supplied experiment directory exists and contains
     the output of the rsmtool experiment.
@@ -75,7 +77,15 @@ def check_experiment_dir(experiment_dir, configpath):
                                     "the .json configuration files for rsmtool "
                                     "experiments.".format(full_path_experiment_dir))
 
-        return jsons
+        # Raise an error if the user specified a list of experiment names 
+        # but we found several .jsons in the same directory
+        if experiment_name and len(jsons) > 1:
+            raise ValueError("{} contains several experiment jsons "
+                             "To use custom experiment names "
+                             "You must have a separate "
+                             "directory for each experiment.")
+        
+        return list(zip(jsons, [experiment_name]*len(jsons)))
 
 
 def run_summary(config_file_or_obj, output_dir):
@@ -135,23 +145,21 @@ def run_summary(config_file_or_obj, output_dir):
     # get the list of the experiment dirs
     experiment_dirs = configuration['experiment_dirs']
 
+    # Get experiment names if any
+    experiment_names = configuration.get('experiment_names')
+    if experiment_names:
+        dirs_with_names = zip(experiment_dirs, experiment_names)
+    else:
+        dirs_with_names = zip(experiment_dirs, [None]*len(experiment_dirs))
+
+
     # check the experiment dirs and assemble the list of csvdir and jsons
     all_experiments = []
-    for experiment_dir in experiment_dirs:
-        experiments = check_experiment_dir(experiment_dir, configpath)
+    for (experiment_dir, experiment_name) in dirs_with_names:
+        experiments = check_experiment_dir(experiment_dir, 
+                                           experiment_name,
+                                           configpath)
         all_experiments.extend(experiments)
-
-    # Get experiment names if any
-    experiment_names = configuration['experiment_names']
-    # Raise an error if the user specified a list of experiment names 
-    # but we found several .jsons in the same directory
-    if experiment_names:
-        if len(all_experiments) != len(experiment_names):
-            raise ValueError("The number of .json files found in experiment_dirs "
-                             "does not match the number of specified "
-                             "experiment names. To use experiment names "
-                             "You must have a separate "
-                             "directory for each experiment.")
 
 
     # get the subgroups if any
