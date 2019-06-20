@@ -2496,8 +2496,8 @@ class FeaturePreprocessor:
         logging.info(logged_str)
 
         # compute minimum and maximum score for expected predictions
-        min_score = np.rint(trim_min - trim_tolerance)
-        max_score = np.rint(trim_max + trim_tolerance)
+        min_score = int(np.rint(trim_min - trim_tolerance))
+        max_score = int(np.rint(trim_max + trim_tolerance))
 
         df_predictions = model.predict(df_features_preprocessed,
                                        min_score,

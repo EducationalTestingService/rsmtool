@@ -38,7 +38,8 @@ else:
     param('logistic-regression-predict'),
     param('logistic-regression-predict-expected-scores'),
     param('svc-predict-expected-scores'),
-    param('lr-predict-with-custom-tolerance')
+    param('lr-predict-with-custom-tolerance'),
+    param('lr-predict-no-tolerance')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
