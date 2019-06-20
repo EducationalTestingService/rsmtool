@@ -722,6 +722,15 @@ class TestFeaturePreprocessor:
         actual = FeaturePreprocessor.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
+
+    def test_trim_with_custom_tolerance(self):
+
+        values = [0.6, 8.4, 7.4]
+        expected = np.array([0.75, 8.25, 7.4])
+        actual = FeaturePreprocessor.trim(values, 1, 8, 0.25)
+        assert_array_equal(actual, expected)
+
+
     def test_preprocess_feature_fail(self):
 
         np.random.seed(10)

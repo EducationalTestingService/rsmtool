@@ -444,7 +444,7 @@ class Configuration:
                                               model_eval))
         return new_filter_dict
 
-    def get_trim_min_max(self):
+    def get_trim_min_max_tolerance(self):
         """
         Get the specified trim min and max, if any,
         and make sure they are numeric.
@@ -455,17 +455,22 @@ class Configuration:
             Specified trim min value
         spec_trim_max : float
             Specified trim max value
+        spec_trim_tolerance: float
+            specified trim tolerance value
         """
         config = self._config
 
         spec_trim_min = config.get('trim_min', None)
         spec_trim_max = config.get('trim_max', None)
+        spec_trim_tolerance = config.get('trim_tolerance', None)
 
         if spec_trim_min:
             spec_trim_min = float(spec_trim_min)
         if spec_trim_max:
             spec_trim_max = float(spec_trim_max)
-        return (spec_trim_min, spec_trim_max)
+        if spec_trim_tolerance:
+            spec_trim_tolerance = float(spec_trim_tolerance)
+        return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
     def get_default_converter(self):
         """

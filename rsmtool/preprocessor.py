@@ -854,7 +854,8 @@ class FeaturePreprocessor:
                             human_labels_mean,
                             human_labels_sd,
                             trim_min,
-                            trim_max):
+                            trim_max,
+                            trim_tolerance):
         """
         Process predictions to create scaled, trimmed
         and rounded predictions.
@@ -880,6 +881,9 @@ class FeaturePreprocessor:
         trim_max : float
             The highest score on the score point, used for
             trimming the raw regression predictions.
+        trim_tolerance: float
+            Tolerance to be added to trim_max and substracted from
+            trim_min
 
         Returns
         -------
@@ -900,14 +904,16 @@ class FeaturePreprocessor:
         # trim and round the predictions before running the analyses
         df_pred_process['raw_trim'] = FeaturePreprocessor.trim(df_pred_process['raw'],
                                                                trim_min,
-                                                               trim_max)
+                                                               trim_max,
+                                                               trim_tolerance)
 
         df_pred_process['raw_trim_round'] = np.rint(df_pred_process['raw_trim'])
         df_pred_process['raw_trim_round'] = df_pred_process['raw_trim_round'].astype('int64')
 
         df_pred_process['scale_trim'] = FeaturePreprocessor.trim(df_pred_process['scale'],
                                                                  trim_min,
-                                                                 trim_max)
+                                                                 trim_max,
+                                                                 trim_tolerance)
 
         df_pred_process['scale_trim_round'] = np.rint(df_pred_process['scale_trim'])
         df_pred_process['scale_trim_round'] = df_pred_process['scale_trim_round'].astype('int64')
@@ -1675,8 +1681,10 @@ class FeaturePreprocessor:
         # both the training and the test data
         id_column = config_obj['id_column']
 
-        # get the specified trim min and max values
-        spec_trim_min, spec_trim_max = config_obj.get_trim_min_max()
+        # get the specified trim min, trim max and trim tolerance values
+        (spec_trim_min,
+         spec_trim_max,
+         spec_trim_tolerance) = config_obj.get_trim_min_max_tolerance()
 
         # get the name of the optional column that
         # contains response length.
@@ -2064,7 +2072,9 @@ class FeaturePreprocessor:
 
         # get the specified trim min and max, if any
         # and make sure they are numeric
-        spec_trim_min, spec_trim_max = config_obj.get_trim_min_max()
+        (spec_trim_min,
+         spec_trim_max,
+         spec_trim_tolerance) = config_obj.get_trim_min_max_tolerance()
 
         # get the subgroups if any
         subgroups = config_obj.get('subgroups')
@@ -2261,7 +2271,8 @@ class FeaturePreprocessor:
                                                      scale_human_mean,
                                                      scale_human_sd,
                                                      spec_trim_min,
-                                                     spec_trim_max)
+                                                     spec_trim_max,
+                                                     spec_trim_tolerance)
         if not scale_with:
             expected_score_types = ['raw', 'raw_trim', 'raw_trim_round']
         elif scale_with == 'asis':

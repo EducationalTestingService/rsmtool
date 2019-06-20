@@ -37,7 +37,8 @@ else:
     param('lr-predict-with-xlsx-output', file_format='xlsx'),
     param('logistic-regression-predict'),
     param('logistic-regression-predict-expected-scores'),
-    param('svc-predict-expected-scores')
+    param('svc-predict-expected-scores'),
+    param('lr-predict-with-custom-tolerance')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
