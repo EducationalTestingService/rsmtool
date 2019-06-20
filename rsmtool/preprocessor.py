@@ -1330,9 +1330,9 @@ class FeaturePreprocessor:
             A list of requested feature names.
         reserved_column_names : list
             A list of reserved column names.
-        given_trim_min : int
+        given_trim_min : float
             The minimum trim value.
-        given_trim_max : int
+        given_trim_max : float
             The maximum trim value.
         flag_column_dict : dict
             A dictionary of flag columns.
@@ -1377,6 +1377,8 @@ class FeaturePreprocessor:
             The maximum trim value
         trim_max : float
             The minimum trim value
+        trim_tolerance: float
+            Tolerance for trimming
         feature_names  : list
             A list of feature names
         """
@@ -1968,6 +1970,7 @@ class FeaturePreprocessor:
                            'feature_subset_file': feature_subset_file,
                            'trim_min': used_trim_min,
                            'trim_max': used_trim_max,
+                           'trim_tolerance': spec_trim_tolerance,
                            'use_scaled_predictions': use_scaled_predictions,
                            'exclude_zero_scores': exclude_zero_scores,
                            'exclude_listwise': exclude_listwise,
