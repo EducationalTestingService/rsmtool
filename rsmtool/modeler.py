@@ -1318,7 +1318,7 @@ class Modeler:
                                                                       train_predictions_sd,
                                                                       human_labels_mean,
                                                                       human_labels_sd,
-                                                                      trim_min, trim_max.
+                                                                      trim_min, trim_max,
                                                                       trim_tolerance)
 
         df_postproc_params = pd.DataFrame([{'trim_min': trim_min,

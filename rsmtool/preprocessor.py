@@ -2477,13 +2477,31 @@ class FeaturePreprocessor:
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
 
+        #if the we are using a newly trained model, use trim_tolerance from the
+        # df_postproc_params. If not, set it to the default value and show
+        # deprecation warning
+        if 'trim_tolerance' in df_postproc_params.columns:
+            trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
+        else:
+            trim_tolerance = 0.49998
+            logging.warning("The tolerance for trimming scores will be assumed to be 0.49998, "
+                            "the default value in previous versions of RSMTool. "
+                            "We recommend re-training the model to ensure future "
+                            "compatibility.")
+
+
         # now generate the predictions for the features using this model
         logged_str = 'Generating predictions'
         logged_str += ' (expected scores).' if predict_expected_scores else '.'
         logging.info(logged_str)
+
+        # compute minimum and maximum score for expected predictions
+        min_score = np.rint(trim_min - trim_tolerance)
+        max_score = np.rint(trim_max + trim_tolerance)
+
         df_predictions = model.predict(df_features_preprocessed,
-                                       int(trim_min),
-                                       int(trim_max),
+                                       min_score,
+                                       max_score,
                                        predict_expected=predict_expected_scores)
 
         train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
@@ -2494,7 +2512,8 @@ class FeaturePreprocessor:
                                                   train_predictions_sd,
                                                   h1_mean,
                                                   h1_sd,
-                                                  trim_min, trim_max)
+                                                  trim_min, trim_max,
+                                                  trim_tolerance)
 
         # add back the columns that we were requested to copy if any
         if len(columns_to_copy) > 0:
