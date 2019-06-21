@@ -855,7 +855,7 @@ class FeaturePreprocessor:
                             human_labels_sd,
                             trim_min,
                             trim_max,
-                            trim_tolerance):
+                            trim_tolerance=0.49998):
         """
         Process predictions to create scaled, trimmed
         and rounded predictions.
@@ -883,7 +883,7 @@ class FeaturePreprocessor:
             trimming the raw regression predictions.
         trim_tolerance: float
             Tolerance to be added to trim_max and substracted from
-            trim_min
+            trim_min. Defaults to 0.49998.
 
         Returns
         -------
@@ -1377,8 +1377,6 @@ class FeaturePreprocessor:
             The maximum trim value
         trim_max : float
             The minimum trim value
-        trim_tolerance: float
-            Tolerance for trimming
         feature_names  : list
             A list of feature names
         """
