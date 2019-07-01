@@ -132,9 +132,9 @@ def compute_mse_subset_double_scored(single_human_scores,
     double_human_scores : pandas Series
        Human scores for double-scored responses
     single_system_scores : pandas Series
-        System scores for single_scored responses
+        System scores for single-scored responses
     double_human_scores : pandas Series
-        System scores for double_scored responses
+        System scores for double-scored responses
     variance_errors_human : float
         Variance of errors in human scores
 
@@ -187,15 +187,12 @@ def compute_true_score_var_all_double_scored(human_scores,
     """
     N = len(human_scores)
 
-    # compute sum of squared deviations of observed human scores from
-    # mean score
-    numerator = ((human_scores - human_scores.mean())**2).sum() 
-
-    denominator = (N - 1)
+    # compute variance of observed human scores:
+    variance_observed_scores = ((human_scores - human_scores.mean())**2).sum() / (N-1)
 
     # compute variance of true scores as variance of observed
     # scores adjusted for estimated variance of errors in human scores
-    variance_true_scores = numerator/denominator  - variance_errors_human/ 2
+    variance_true_scores = variance_observed_scores - variance_errors_human / 2
 
     return variance_true_scores
 
