@@ -320,7 +320,7 @@ def compute_prmse(df,
         prmse_metrics = pd.Series({'sys_var_single': df_single[system].var(ddof=ddof),
                                    'sys_var_double': df_double[system].var(ddof=ddof),
                                    'mse_true': mse,
-                                   'prmse_true': 1 - mse / var_t}, name=system)
+                                   'prmse_true': 1 - mse / variance_true_scores}, name=system)
         prmse_all.append(prmse_metrics)
 
     # combine all results together
@@ -333,6 +333,6 @@ def compute_prmse(df,
     df_prmse.insert(3, 'h1_var_single', df_single[h1_column].var(ddof=ddof))
     df_prmse.insert(4, 'h1_var_double', df_double[h1_column].var(ddof=ddof))
     df_prmse.insert(5, 'h2_var_double', df_double[h2_column].var(ddof=ddof))
-    df_prmse.insert(6, 'true_var', var_t)
+    df_prmse.insert(6, 'true_var', variance_true_scores)
 
     return df_prmse
