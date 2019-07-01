@@ -121,9 +121,9 @@ def compute_mse_subset_double_scored(single_human_scores,
                                      double_system_scores,
                                      variance_errors_human):
     """
-    Compute MSE for predicting true score from system scores
+    Compute MSE when predicting true score from system scores
     in a situation where only some
-    of the responses are double scored
+    of the responses are double scored.
 
     Parameters
     ----------
@@ -160,17 +160,18 @@ def compute_mse_subset_double_scored(single_human_scores,
     # concatenate both sets
     se = pd.concat([se_single, se_double], sort=True)
 
-    # Compute mean squared error for predicting true score
+    # Compute mean squared error when predicting true score
     mse = (se.sum() - N * variance_errors_human) / (n_1 + 2 * n_2)
 
     return mse
 
 
-def compute_true_score_var_all_double_scored(human_scores, v_e):
+def compute_true_score_var_all_double_scored(human_scores,
+                                             variance_errors_human):
     """
     Compute variance of true scores
-    in a situation where only some
-    of the responses are double scored
+    in a situation where all
+    responses are double scored.
 
     Parameters
     ----------
@@ -181,16 +182,20 @@ def compute_true_score_var_all_double_scored(human_scores, v_e):
 
     Returns
     -------
-    var_t : float
+    variance_true_scores : float
         Variance of true scores
     """
     N = len(human_scores)
 
+    # compute sum of squared deviations of observed human scores from
+    # mean score
     numerator = ((human_scores - human_scores.mean())**2).sum() 
 
-    denominator = (N - 1) - variance_errors_human/ 2
+    denominator = (N - 1)
 
-    variance_true_scores = numerator/denomnator
+    # compute variance of true scores as variance of observed
+    # scores adjusted for estimated variance of errors in human scores
+    variance_true_scores = numerator/denominator  - variance_errors_human/ 2
 
     return variance_true_scores
 
@@ -199,9 +204,9 @@ def compute_mse_all_double_scored(human_scores,
                                   system_scores,
                                   variance_errors_human):
     """
-    Compute MSE for predicting true score from system scores
+    Compute MSE when predicting true score from system scores
     in a situation where all
-    of the responses are double scored
+    of the responses are double scored.
 
     Parameters
     ----------
@@ -220,7 +225,9 @@ def compute_mse_all_double_scored(human_scores,
 
     N = len(human_scores)
 
-    # compute mse for redicting true score from system score
+    # compute MSE when predicting true score from system score
+    # as MSE for observed scores adjusted for estimated variance of errors
+    # in human scores
     mse = ((human_scores - system_scores)**2).sum() / N - variance_errors_human / 2
 
     return mse
@@ -233,7 +240,7 @@ def compute_prmse(df,
                   ddof=1):
     """
     Compute Proportional Reduction in Mean Squared Error (PRMSE)
-    for predicting true score from system scores.
+    when predicting true score from system scores.
 
     Parameters
     ----------
@@ -268,12 +275,13 @@ def compute_prmse(df,
         - `tru_var`: estimated true score variance
         - `system_var_all`:  variance of system scores for all responses
         - `system_var_double`: variance of system scores for double-scored responses
-        - `mse_true`: mean squared error for predicting true score from machine score
-        - `prmse`: proportional reduction in mean squared error for predicting true score
+        - `mse_true`: mean squared error when predicting true score from machine score
+        - `prmse`: proportional reduction in mean squared error when predicting true score
     """
     if isinstance(system_score_columns, str):
         system_score_columns = [system_score_columns]
 
+    # Split the data into single-scored and double-scored responses
     score_mask = df[h2_column].isnull()
 
     df_single = df[score_mask].copy()

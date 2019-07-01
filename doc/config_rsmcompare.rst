@@ -95,7 +95,7 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
     - ``true_score_evaluation``: compares the evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
 
         - variance of human scores for single and double-scored responses;
-        - variance of system scores and proportional reduction in mean squared error (PRMSE) for predicting true score with system score.
+        - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
     - ``pca``: Shows the results of principal components analysis on the processed feature values for the new model only:
 
