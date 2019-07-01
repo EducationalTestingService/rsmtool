@@ -1,0 +1,5 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": ["lr-with-h2", "lr-with-h2", "lr-with-h2"],
+    "description": "Comparison of rsmtool experiment with itself."
+}

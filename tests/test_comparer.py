@@ -216,7 +216,8 @@ class TestComparer:
                              'df_percentiles',
                              'df_score_dist',
                              'df_scores',
-                             'df_train_features']
+                             'df_train_features',
+                             'df_true_score_eval']
 
         expected_fig_keys = ['betas',
                              'eval_barplot_by_L1',

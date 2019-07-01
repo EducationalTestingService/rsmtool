@@ -53,6 +53,7 @@ else:
                                     'model',
                                     'evaluation',
                                     'evaluation_by_group',
+                                    'true_score_evaluation',
                                     'pca',
                                     'intermediate_file_paths',
                                     'sysinfo']
@@ -62,6 +63,7 @@ else:
                                     'consistency',
                                     'evaluation',
                                     'evaluation_by_group',
+                                    'true_score_evaluation',
                                     'intermediate_file_paths',
                                     'sysinfo']
 
@@ -73,6 +75,7 @@ else:
                                        'score_distributions',
                                        'model',
                                        'evaluation',
+                                       'true_score_evaluation',
                                        'pca',
                                        'notes',
                                        'sysinfo']
@@ -80,6 +83,7 @@ else:
     ordered_section_list_rsmsummarize = ['preprocessed_features',
                                          'model',
                                          'evaluation',
+                                         'true_score_evaluation',
                                          'intermediate_file_paths',
                                          'sysinfo']
 

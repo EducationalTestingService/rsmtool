@@ -420,6 +420,16 @@ class Comparer:
                 files['df_disattenuated_correlations_by_{}'.format(group)] = df_dis_cor_group
                 files['df_disattenuated_correlations_by_{}_overview'.format(group)] = self.make_summary_stat_df(df_dis_cor_group)
 
+        # true score evaluations
+        true_score_eval_file = join(filedir, "{}_true_score_eval.{}".format(experiment_id,
+                                                                            file_format))
+
+        # load true score evaluations if present
+        if exists(true_score_eval_file):
+            df_true_score_eval = DataReader.read_from_file(true_score_eval_file, index_col=0)
+            # we only use the row for raw_trim or scale_trim score
+            files['df_true_score_eval'] = df_true_score_eval.loc[['{}_trim'.format(prefix)]]
+
         # use the raw columns or the scale columns depending on the prefix
         existing_eval_cols = (_df_eval_columns_existing_raw if prefix == 'raw'
                               else _df_eval_columns_existing_scale)

@@ -15,6 +15,7 @@
                       "score_distributions",
                       "evaluation",
                       "model",
+                      "true_score_evaluation",
                       "consistency",
                       "features_by_group",
 		                  "preprocessed_features_by_group",

@@ -693,7 +693,8 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format='c
     """
     file_must_have = ["_consistency.{}".format(file_format),
                       "_degradation.{}".format(file_format),
-                      "_disattenuated_correlations.{}".format(file_format)]
+                      "_disattenuated_correlations.{}".format(file_format),
+                      "_true_score_eval.{}".format(file_format)]
 
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]

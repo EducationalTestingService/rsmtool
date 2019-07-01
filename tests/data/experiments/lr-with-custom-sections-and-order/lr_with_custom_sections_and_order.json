@@ -15,6 +15,7 @@
         "pca",
         "evaluation",
         "evaluation_by_group",
+        "true_score_evaluation",
         "custom2",
         "intermediate_file_paths",
         "sysinfo"

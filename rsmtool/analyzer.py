@@ -22,6 +22,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from rsmtool.container import DataContainer
+from rsmtool.prmse_utils import compute_prmse
 from rsmtool.utils import (agreement,
                            difference_of_standardized_means,
                            partial_correlations,
@@ -1512,6 +1513,7 @@ class Analyzer:
             - eval_by_*
             - consistency_by_*
             - disattenduated_correlations_by_*
+            - true_score_eval
 
         configuration : configuration_parser.Configuration
             A new Configuration object.
@@ -1621,6 +1623,15 @@ class Analyzer:
                     {'name': 'disattenuated_correlations', 'frame': df_correlations},
                     {'name': 'confMatrix', 'frame': df_confmatrix},
                     {'name': 'score_dist', 'frame': df_score_dist}]
+
+        # compute true-score analyses if we have second score
+        if include_second_score:
+            system_score_columns = [col for col in prediction_columns
+                                    if col not in ['sc1', 'sc2']]
+            df_prmse = compute_prmse(df_preds_second_score,
+                                     system_score_columns)
+
+            datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 
         for group in eval_by_group_dict:
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
