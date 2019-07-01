@@ -123,7 +123,7 @@ def compute_mse_subset_double_scored(single_human_scores,
     single_system_scores : pandas Series
         System scores for single-scored responses
     double_human_scores : pandas Series
-        System scores for double_scored responses
+        System scores for double-scored responses
     v_e : float
         Variance of errors in human scores
 
