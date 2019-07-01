@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from nose.tools import (eq_,
@@ -10,14 +11,15 @@ from rsmtool.prmse_utils import (compute_variance_of_errors,
                                  compute_true_score_var_subset_double_scored,
                                  compute_true_score_var_all_double_scored,
                                  compute_mse_subset_double_scored,
-                                 compute_mse_all_double_scored)
+                                 compute_mse_all_double_scored,
+                                 compute_prmse)
 
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
 
 
-def test_compute_variance_of_erors_zero():
+def test_compute_variance_of_errors_zero():
     sc1 = [1, 2, 3, 1, 2, 3]
     sc2 = [1, 2, 3, 1, 2, 3]
     df = pd.DataFrame({'sc1': sc1,
@@ -25,7 +27,7 @@ def test_compute_variance_of_erors_zero():
     eq_(compute_variance_of_errors(df), 0)
 
 
-def test_compute_variance_of_erors_one():
+def test_compute_variance_of_errors_one():
     sc1 = [1, 2, 3, 1, 2]
     sc2 = [2, 1, 4, 2, 3]
     df = pd.DataFrame({'sc1': sc1,
@@ -34,7 +36,7 @@ def test_compute_variance_of_erors_one():
 
 
 @raises(ValueError)
-def test_compute_variance_of_erors_error():
+def test_compute_variance_of_errors_error():
     sc1 = [1, 2, 3, 1, None]
     sc2 = [2, 1, None, 2, 3]
     df = pd.DataFrame({'sc1': sc1,
@@ -113,3 +115,23 @@ def test_compute_mse_compare():
                                             system_double,
                                             v_e)
     assert_almost_equal(mse_subset, mse_all)
+
+
+def test_compute_prmse_zero():
+    sc1 = [1, 2, 1, 3, 1, 2]
+    sc2 = [np.nan, 1, np.nan, 3, np.nan, 3]
+    system_correct = pd.Series([1, 1.5, 1, 3, 1, 2.5])
+    system_wrong = pd.Series([1, 1, 4, 5, 3, 1])
+    df  = pd.DataFrame({'sc1': sc1,
+                        'sc2': sc2,
+                        'system_correct': system_correct,
+                        'system_wrong': system_wrong})
+
+    prmse = compute_prmse(df,
+                          ['system_correct', 'system_wrong'])
+    print(prmse)
+    eq_(prmse.loc['system_correct', 'N'], 6)
+    eq_(prmse.loc['system_correct', 'N_single'], 3)
+    eq_(prmse.loc['system_correct', 'N_double'], 3)
+
+

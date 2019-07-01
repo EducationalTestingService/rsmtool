@@ -17,12 +17,12 @@ def compute_variance_of_errors(df,
                                h1_column='sc1',
                                h2_column='sc2',):
     """
-    Compute variance of errors in human scores
+    Compute variance of errors in human scores.
 
     Parameters
     ----------
     df : pandas DataFrame
-        Input data frame. Must contain columns `h1_column` and `h2_column`
+        Input data frame. Must contain columns `h1_column` and `h2_column`.
     h1_column : str, optional
         The first human score column name.
         Defaults to 'sc1'.
@@ -32,7 +32,7 @@ def compute_variance_of_errors(df,
 
     Returns
     -------
-    v_e: float
+    variance_errors_human: float
          Variance of errors in human scores
 
     Raises
@@ -47,14 +47,16 @@ def compute_variance_of_errors(df,
 
     N = len(df)
 
-    v_e = 1 / (2 * N) * ((df[h1_column] - df[h2_column])**2).sum()
+    # estimate variance of errors in human scores for double-scored responses
+    # as 1/2 of average squared difference between the two scores
+    variance_errors_human = 1 / (2 * N) * ((df[h1_column] - df[h2_column])**2).sum()
 
-    return v_e
+    return variance_errors_human
 
 
 def compute_true_score_var_subset_double_scored(single_human_scores,
                                                 double_human_scores,
-                                                v_e):
+                                                variance_errors_human):
     """
     Compute variance of true scores
     in a situation where only some
@@ -66,12 +68,12 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
         Human scores for single-scored responses
     double_human_scores : pandas Series
        Human scores for double-scored responses
-    v_e : float
-        Variance of errors in human scores
+    variance_errors_human : float
+        Estimated variance of errors in human scores
 
     Returns
     -------
-    var_t : float
+    variance_true_scores : float
         Variance of true scores
     """
 
@@ -83,8 +85,12 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
 
     N = n_1 + n_2
 
-    # compute squared distance c_i*(sc_bar_i - sc_bar)**2 for each response.
-    # Note that for double scored responses c = 2.
+    # compute squared deviation of sc_bar score for each responses
+    # from mean sc_bar score.
+    # This is then multiplied by a coefficient corresponding to the number
+    # of human scores (1 for single scores responses, 2 for double-scored responses)
+    # so that the responses with higher number of human scores are
+    # weighed higher
 
     sc_bar_mean = pd.concat([single_human_scores, double_human_scores]).mean()
 
@@ -94,25 +100,30 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
     # concatenate both data frames
     squared_dist = pd.concat([squared_dist_single, squared_dist_double], sort=True)
 
-    # third, compute variance of true scores
-    numerator = (squared_dist.sum() - (N - 1) * v_e)
+    # third, compute variance of true scores.
 
+    # the numerator corresponds to the weighed sum of squares adjusted for
+    # the estimated variance or errors in human scores
+    numerator = (squared_dist.sum() - (N - 1) * variance_errors_human)
+
+    # the denominator is construed to ensure correct treatment of 
+    # all cases regardless of what percentage responses is double-scored
     denominator = (N - 1) + (n_2 * (n_1 + 2 * n_2 - 2)) / (n_1 + 2 * n_2)
 
-    var_t = numerator / denominator
+    variance_true_scores = numerator / denominator
 
-    return var_t
+    return variance_true_scores
 
 
 def compute_mse_subset_double_scored(single_human_scores,
                                      double_human_scores,
                                      single_system_scores,
                                      double_system_scores,
-                                     v_e):
+                                     variance_errors_human):
     """
-    Compute MSE for predicting true score from system scores
+    Compute MSE when predicting true score from system scores
     in a situation where only some
-    of the responses are double scored
+    of the responses are double scored.
 
     Parameters
     ----------
@@ -121,10 +132,10 @@ def compute_mse_subset_double_scored(single_human_scores,
     double_human_scores : pandas Series
        Human scores for double-scored responses
     single_system_scores : pandas Series
-        System scores for single_scored responses
+        System scores for single-scored responses
     double_human_scores : pandas Series
-        System scores for double_scored responses
-    v_e : float
+        System scores for double-scored responses
+    variance_errors_human : float
         Variance of errors in human scores
 
     Returns
@@ -149,42 +160,50 @@ def compute_mse_subset_double_scored(single_human_scores,
     # concatenate both sets
     se = pd.concat([se_single, se_double], sort=True)
 
-    # Compute mean squared error for predicting true score
-    mse = (se.sum() - N * v_e) / (n_1 + 2 * n_2)
+    # Compute mean squared error when predicting true score
+    mse = (se.sum() - N * variance_errors_human) / (n_1 + 2 * n_2)
 
     return mse
 
 
-def compute_true_score_var_all_double_scored(human_scores, v_e):
+def compute_true_score_var_all_double_scored(human_scores,
+                                             variance_errors_human):
     """
     Compute variance of true scores
-    in a situation where only some
-    of the responses are double scored
+    in a situation where all
+    responses are double scored.
 
     Parameters
     ----------
     human_scores : pandas Series
         Human scores used to compute the variance
-    v_e : float
+    variance_errors_human : float
         Variance of errors in human scores
 
     Returns
     -------
-    var_t : float
+    variance_true_scores : float
         Variance of true scores
     """
     N = len(human_scores)
 
-    var_t = ((human_scores - human_scores.mean())**2).sum() / (N - 1) - v_e / 2
+    # compute variance of observed human scores:
+    variance_observed_scores = ((human_scores - human_scores.mean())**2).sum() / (N-1)
 
-    return var_t
+    # compute variance of true scores as variance of observed
+    # scores adjusted for estimated variance of errors in human scores
+    variance_true_scores = variance_observed_scores - variance_errors_human / 2
+
+    return variance_true_scores
 
 
-def compute_mse_all_double_scored(human_scores, system_scores, v_e):
+def compute_mse_all_double_scored(human_scores,
+                                  system_scores,
+                                  variance_errors_human):
     """
-    Compute MSE for predicting true score from system scores
+    Compute MSE when predicting true score from system scores
     in a situation where all
-    of the responses are double scored
+    of the responses are double scored.
 
     Parameters
     ----------
@@ -192,7 +211,7 @@ def compute_mse_all_double_scored(human_scores, system_scores, v_e):
         Human scores
     system_scores : pandas Series
         System scores
-    v_e : float
+    variance_errors_human : float
         Variance of errors in human scores
 
     Returns
@@ -203,8 +222,10 @@ def compute_mse_all_double_scored(human_scores, system_scores, v_e):
 
     N = len(human_scores)
 
-    # compute mse_t_m
-    mse = ((human_scores - system_scores)**2).sum() / N - v_e / 2
+    # compute MSE when predicting true score from system score
+    # as MSE for observed scores adjusted for estimated variance of errors
+    # in human scores
+    mse = ((human_scores - system_scores)**2).sum() / N - variance_errors_human / 2
 
     return mse
 
@@ -216,7 +237,7 @@ def compute_prmse(df,
                   ddof=1):
     """
     Compute Proportional Reduction in Mean Squared Error (PRMSE)
-    for predicting true score from system scores.
+    when predicting true score from system scores.
 
     Parameters
     ----------
@@ -251,33 +272,37 @@ def compute_prmse(df,
         - `tru_var`: estimated true score variance
         - `system_var_all`:  variance of system scores for all responses
         - `system_var_double`: variance of system scores for double-scored responses
-        - `mse_true`: mean squared error for predicting true score from machine score
-        - `prmse`: proportional reduction in mean squared error for predicting true score
+        - `mse_true`: mean squared error when predicting true score from machine score
+        - `prmse`: proportional reduction in mean squared error when predicting true score
     """
     if isinstance(system_score_columns, str):
         system_score_columns = [system_score_columns]
 
+    # Split the data into single-scored and double-scored responses
     score_mask = df[h2_column].isnull()
 
     df_single = df[score_mask].copy()
     df_double = df[~score_mask].copy()
 
     # compute variance of errors
-    v_e = compute_variance_of_errors(df_double, h1_column, h2_column)
+    variance_errors_human = compute_variance_of_errors(df_double,
+                                                       h1_column,
+                                                       h2_column)
 
     # compute average score for double-scored responses
     df_double['sc_bar'] = (df_double[h1_column] + df_double[h2_column]) / 2
 
     # compute variance of true scores
     if len(df_single) > 0:
-        var_t = compute_true_score_var_subset_double_scored(df_single[h1_column],
-                                                            df_double['sc_bar'],
-                                                            v_e)
+        variance_true_scores = compute_true_score_var_subset_double_scored(df_single[h1_column],
+                                                                           df_double['sc_bar'],
+                                                                           variance_errors_human)
 
     else:
-        var_t = compute_true_score_var_all_double_scored(df_double['sc_bar'],
-                                                         v_e)
+        variance_true_scores = compute_true_score_var_all_double_scored(df_double['sc_bar'],
+                                                                        variance_errors_human)
 
+    
     # compute MSE for each type of score
     prmse_all = []
     for system in system_score_columns:
@@ -286,16 +311,16 @@ def compute_prmse(df,
                                                    df_double['sc_bar'],
                                                    df_single[system],
                                                    df_double[system],
-                                                   v_e)
+                                                   variance_errors_human)
         else:
             mse = compute_mse_all_double_scored(df_double['sc_bar'],
                                                 df_double[system],
-                                                v_e,)
+                                                variance_errors_human)
 
         prmse_metrics = pd.Series({'sys_var_single': df_single[system].var(ddof=ddof),
                                    'sys_var_double': df_double[system].var(ddof=ddof),
                                    'mse_true': mse,
-                                   'prmse_true': 1 - mse / var_t}, name=system)
+                                   'prmse_true': 1 - mse / variance_true_scores}, name=system)
         prmse_all.append(prmse_metrics)
 
     # combine all results together
@@ -308,6 +333,6 @@ def compute_prmse(df,
     df_prmse.insert(3, 'h1_var_single', df_single[h1_column].var(ddof=ddof))
     df_prmse.insert(4, 'h1_var_double', df_double[h1_column].var(ddof=ddof))
     df_prmse.insert(5, 'h2_var_double', df_double[h2_column].var(ddof=ddof))
-    df_prmse.insert(6, 'true_var', var_t)
+    df_prmse.insert(6, 'true_var', variance_true_scores)
 
     return df_prmse
