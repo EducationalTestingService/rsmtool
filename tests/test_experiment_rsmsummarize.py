@@ -122,7 +122,7 @@ def test_run_experiment_summary_no_json():
     do_run_summary(source, config_file)
 
 
-@raises(FileNotFoundError)
+@raises(ValueError)
 def test_run_experiment_summary_too_many_jsons():
 
     # rsmsummarize experiment where the specified directory
