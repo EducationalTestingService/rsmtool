@@ -39,7 +39,7 @@ Defaults to 0.49998.
 
 .. note::
     
-    You can use set ``trim_tolerance`` to 0 and use ``trim_min`` and ``trim_max`` to specify exact floor and ceiling values.  
+    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
 
 description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
