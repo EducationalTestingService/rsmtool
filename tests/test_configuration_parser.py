@@ -124,7 +124,7 @@ class TestConfigurationParser:
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_equal(newdata['use_scaled_predictions'], False)
         assert_equal(newdata['select_transformations'], False)
-        assert_equal(newdata['general_sections'], 'all')
+        assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
 
     @raises(ValueError)
@@ -254,7 +254,30 @@ class TestConfigurationParser:
 
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')    
+
+
+    @raises(ValueError)
+    def test_validate_config_too_many_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2', 'exp3', 'exp4']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
         self.parser.validate_config(context='rsmsummarize')
+
+
+    @raises(ValueError)
+    def test_validate_config_too_few_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')
+
 
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',
@@ -318,6 +341,23 @@ class TestConfigurationParser:
         self.parser._config = newdata
         newdata = self.parser.process_config()
 
+    def test_process_fields_rsmsummarize(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.process_config(inplace=False)
+
+    
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
+       
     @raises(ValueError)
     def test_invalid_skll_objective(self):
         data = {'experiment_id': 'experiment_1',
@@ -356,6 +396,39 @@ class TestConfigurationParser:
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
+
+
+    def test_proces_validate_correct_order_boolean(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'NNLR',
+                'predict_expected_scores': 'false'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.normalize_validate_and_process_config()
+        eq_(newdata['predict_expected_scores'], False)
+
+
+    def test_process_validate_correct_order_list(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.normalize_validate_and_process_config(context='rsmsummarize')
+
+    
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
+
 
     def test_get_correct_configparser_cfg(self):
         config_parser = ConfigurationParser.get_configparser('config.cfg')
@@ -620,6 +693,31 @@ class TestConfiguration:
         rmtree('output')
         eq_(config_new, dictionary)
 
+    def test_save_rsmcompare(self):
+        dictionary = {"comparison_id": '001'}
+        config = Configuration(dictionary,
+                              context='rsmcompare')
+        config.save()
+
+        out_path = 'output/001_rsmcompare.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
+    def test_save_rsmsummarize(self):
+        dictionary = {"summary_id": '001'}
+        config = Configuration(dictionary,
+                              context='rsmsummarize')
+        config.save()
+
+        out_path = 'output/001_rsmsummarize.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
+
     def test_check_exclude_listwise_true(self):
         dictionary = {"experiment_id": '001', "min_items_per_candidate": 4}
         config = Configuration(dictionary)
@@ -708,6 +806,7 @@ class TestConfiguration:
                                                        ['train', 'test',
                                                         'feature_specs'])
         eq_(values_for_reader, expected)
+
 
 
 class TestJSONFeatureConversion:

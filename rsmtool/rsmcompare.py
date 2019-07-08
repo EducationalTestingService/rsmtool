@@ -104,6 +104,9 @@ def run_comparison(config_file_or_obj, output_dir):
         else:
             configpath = os.getcwd()
 
+    logger.info('Saving configuration file.')
+    configuration.save(output_dir)
+
     # get the information about the "old" experiment
     experiment_id_old = configuration['experiment_id_old']
     experiment_dir_old = DataReader.locate_files(configuration['experiment_dir_old'], configpath)

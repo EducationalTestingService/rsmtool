@@ -21,6 +21,11 @@ description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the summary. The description can contain spaces and punctuation.
 
+
+experiment_names *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The list of experiment names to use in the summary report and :ref:`intermediate files<intermediate_files_rsmsummarize>`. The names should be listed in the same order as the experiments in `experiment_dirs`. When this field is not specified, the report will show the original ``experiment_id`` for each experiment. 
+
 .. _file_format_summarize:
 
 file_format *(Optional)*

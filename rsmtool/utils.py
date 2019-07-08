@@ -69,7 +69,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'file_format': 'csv',
             'form_level_scores': None,
             'candidate_column': None,
-            'general_sections': 'all',
+            'general_sections': ['all'],
             'special_sections': None,
             'custom_sections': None,
             'feature_subset_file': None,
@@ -82,7 +82,8 @@ DEFAULTS = {'id_column': 'spkitemid',
             'section_order': None,
             'flag_column': None,
             'flag_column_test': None,
-            'min_items_per_candidate': None}
+            'min_items_per_candidate': None,
+            'experiment_names': None}
 
 LIST_FIELDS = ['feature_prefix',
                'general_sections',
@@ -90,7 +91,8 @@ LIST_FIELDS = ['feature_prefix',
                'custom_sections',
                'subgroups',
                'section_order',
-               'experiment_dirs']
+               'experiment_dirs',
+               'experiment_names']
 
 BOOLEAN_FIELDS = ['exclude_zero_scores',
                   'predict_expected_scores',
@@ -210,6 +212,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                 'rsmsummarize': {'required': ['summary_id',
                                               'experiment_dirs'],
                                  'optional': ['description',
+                                              'experiment_names',
                                               'file_format',
                                               'general_sections',
                                               'custom_sections',
@@ -220,6 +223,12 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
 
 
 POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
+
+ID_FIELDS = {'rsmtool': 'experiment_id',
+             'rsmeval': 'experiment_id',
+             'rsmcompare': 'comparison_id',
+             'rsmsummarize': 'summary_id',
+             'rsmpredict': 'experiment_id'}
 
 _skll_module = import_module('skll.learner')
 

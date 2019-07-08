@@ -1,0 +1,20 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": [
+        "lr-subgroups",
+        "lr-eval",
+        "lr-subgroups",
+        "lr-eval"
+    ],
+    "description": "Comparison of rsmtool and rsmeval experiments.",
+    "use_thumbnails": false,
+    "file_format": "csv",
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "subgroups": [],
+    "section_order": null,
+    "experiment_names": null
+}

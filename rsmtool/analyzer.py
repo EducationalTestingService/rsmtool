@@ -617,14 +617,17 @@ class Analyzer:
             `population_human_score_mn`. Otherwise, it is ignored.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
-            The SMD method to use, only used if `use_diff_std_means=False`
-            - `williamson`: Denominator is the pooled population standard deviation of
-               `y_true_observed` and `y_pred`.
-            - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
-            - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and
-               `y_pred` for this group.
-            - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+            The SMD method to use, only used if `use_diff_std_means=False`.
+            All methods have the same numerator mean(`y_pred`) - mean(`y_true_observed`)
+            and the following denominators :
+
+            - `williamson`: pooled population standard deviation of `y_true_observed` and `y_pred`
+            - `johnson`: population standard deviation of `y_true_observed`.
+            - `pooled`: pooled standard deviation of `y_true_observed` and `y_pred` for this group.
+            - `unpooled`: standard deviation of `y_true_observed` for this group.
+            
             Defaults to 'unpooled'.
+
         use_diff_std_means : bool, optional
             Whether to use the difference of standardized means, rather than the standardized mean
             difference. This is most useful with subgroup analysis.
@@ -634,15 +637,17 @@ class Analyzer:
         -------
         metrics: pandas Series
             Series containing different evaluation metrics comparing human
-            and system scores. The following metrics are included ::
+            and system scores. The following metrics are included :
 
             - `kappa`:  unweighted Cohen's kappa
             - `wtkappa`:  quadratic weighted kappa
             - `exact_agr`: exact agreement
             - `adj_agr`: adjacent agreement with tolerance set to 1
-            - One of the following:
+            - One of the following :
+
               * `SMD`: standardized mean difference, if `use_diff_std_means=False`
               * `DSM`: difference of standardized means, if `use_diff_std_means=True`
+
             - `corr`: Pearson's r
             - `R2`: r squared
             - `RMSE`: root mean square error
@@ -985,13 +990,15 @@ class Analyzer:
             human or system scores. This is used to compute SMD for subgroups.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
-            The SMD method to use, only used if `use_diff_std_means=False`
-            - `williamson`: Denominator is the pooled population standard deviation of
-               `y_true_observed` and `y_pred`.
-            - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
-            - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and
-               `y_pred` for this group.
-            - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+            The SMD method to use, only used if `use_diff_std_means=False`.
+            All methods have the same numerator mean(`y_pred`) - mean(`y_true_observed`)
+            and the following denominators :
+
+            - `williamson`: pooled population standard deviation of `y_true_observed` and `y_pred`
+            - `johnson`: population standard deviation of `y_true_observed`.
+            - `pooled`: pooled standard deviation of `y_true_observed` and `y_pred` for this group.
+            - `unpooled`: standard deviation of `y_true_observed` for this group.
+            
             Defaults to 'unpooled'.
         use_diff_std_means : bool, optional
             Whether to use the difference of standardized means, rather than the standardized mean

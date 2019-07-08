@@ -31,7 +31,8 @@ else:
     param('lr-self-summary-with-tsv-output', file_format='tsv'),
     param('lr-self-summary-with-xlsx-output', file_format='xlsx'),
     param('lr-self-summary-no-scaling'),
-    param('lr-self-summary-with-h2')
+    param('lr-self-summary-with-h2'),
+    param('summary-with-custom-names'),
 ])
 
 
@@ -113,6 +114,21 @@ def test_run_experiment_summary_no_json():
     # rsmsummarize experiment where the specified directory
     # does not contain any json files
     source = 'summary-no-json-file'
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+    do_run_summary(source, config_file)
+
+
+@raises(ValueError)
+def test_run_experiment_summary_too_many_jsons():
+
+    # rsmsummarize experiment where the specified directory
+    # does contains several jsons files and the user
+    # specified experiment names
+    source = 'summary-too-many-jsons'
     config_file = join(rsmtool_test_dir,
                        'data',
                        'experiments',

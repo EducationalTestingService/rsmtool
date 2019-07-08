@@ -1,0 +1,19 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": [
+        "lr-subgroups",
+        "lr-subgroups",
+        "lr-subgroups"
+    ],
+    "description": "Comparison of rsmtool experiment with itself.",
+    "file_format": "tsv",
+    "use_thumbnails": false,
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "subgroups": [],
+    "section_order": null,
+    "experiment_names": null
+}
