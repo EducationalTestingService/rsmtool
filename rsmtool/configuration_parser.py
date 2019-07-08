@@ -955,7 +955,7 @@ class ConfigurationParser:
         if context == 'rsmsummarize' and new_config['experiment_names']:
             if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
                 raise ValueError("The number of specified experiment names should be the same"
-                                 " as the total number of specified experiment dirs")
+                                 " as the number of specified experiment directories.")
 
         # 13. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
