@@ -80,11 +80,15 @@ def check_experiment_dir(experiment_dir,
         # Raise an error if the user specified a list of experiment names 
         # but we found several .jsons in the same directory
         if experiment_name and len(jsons) > 1:
-            raise ValueError("{} contains several experiment jsons "
-                             "To use custom experiment names "
-                             "You must have a separate "
-                             "directory for each experiment.")
+            raise ValueError("{} seems to contain the output of multiple experiments. "
+                             "In order to use custom experiment names, you must have "
+                             "a separate directory "
+                             "for each experiment".format(full_path_experiment_dir))
         
+        # return [(json, experiment_name)] when we have experiment name or 
+        # [(json, None)] if no experiment name has been specified. 
+        # If the folder contains the output of multiple experiments, return
+        # [(json1, None), (json2, None) .... ]
         return list(zip(jsons, [experiment_name]*len(jsons)))
 
 
@@ -147,10 +151,8 @@ def run_summary(config_file_or_obj, output_dir):
 
     # Get experiment names if any
     experiment_names = configuration.get('experiment_names')
-    if experiment_names:
-        dirs_with_names = zip(experiment_dirs, experiment_names)
-    else:
-        dirs_with_names = zip(experiment_dirs, [None]*len(experiment_dirs))
+    experiment_names = experiment_names if experiment_names else [None]*len(experiment_dirs)
+    dirs_with_names = zip(experiment_dirs, experiment_names)
 
 
     # check the experiment dirs and assemble the list of csvdir and jsons

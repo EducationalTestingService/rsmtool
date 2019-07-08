@@ -269,7 +269,7 @@ class TestConfigurationParser:
 
 
     @raises(ValueError)
-    def test_validate_config_too_many_experiment_names(self):
+    def test_validate_config_too_few_experiment_names(self):
         data = {'summary_id': 'summary',
                 'experiment_dirs': ["dir1", "dir2", "dir3"],
                 'experiment_names': ['exp1', 'exp2']}
