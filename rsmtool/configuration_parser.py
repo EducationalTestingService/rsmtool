@@ -457,7 +457,7 @@ class Configuration:
         spec_trim_max : float
             Specified trim max value
         """
-        logging.warning("This function has been replaced by  "
+        logging.warning("get_trim_min_max method has been replaced by  "
                         "get_trim_min_max_tolerance() and will "
                         "not be supported in future releases.")
         (trim_min, trim_max, tolerance) = self.get_trim_min_max_tolerance()

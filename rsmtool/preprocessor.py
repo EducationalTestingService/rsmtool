@@ -2478,7 +2478,7 @@ class FeaturePreprocessor:
         #if the we are using a newly trained model, use trim_tolerance from the
         # df_postproc_params. If not, set it to the default value and show
         # deprecation warning
-        if 'trim_tolerance' in df_postproc_params.columns:
+        if 'trim_tolerance' in df_postproc_params:
             trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
         else:
             trim_tolerance = 0.49998
