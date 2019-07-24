@@ -166,14 +166,26 @@ By default, responses with human scores of 0 will be excluded from both training
 
 trim_min *(Optional)*
 """""""""""""""""""""
-The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - 0.49998. Defaults to the lowest observed human score in the training data or 1 if there are no numeric human scores available.
+The single numeric value for the lowest possible integer score that the machine should predict. This value will be used to compute the floor value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_min`` - ``trim_tolerance``. Defaults to the lowest observed human score in the training data or 1 if there are no numeric human scores available.
 
 
 .. _trim_max_rsmtool:
 
 trim_max *(Optional)*
 """""""""""""""""""""
-The single numeric value for the highest possible integer score that the machine should predict. This value will be used to compute the ceiling value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + 0.49998. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
+The single numeric value for the highest possible integer score that the machine should predict. This value will be used to compute the ceiling value for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance``. Defaults to the highest observed human score in the training data or 10 if there are no numeric human scores available.
+
+.. _trim_tolerance_rsmtool:
+
+trim_tolerance *(Optional)*
+"""""""""""""""""""""""""""
+
+The single numeric value that will be used to pad the trimming range specified in ``trim_min`` and ``trim_max``. This value will be used to compute the ceiling and floor values for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance`` for ceiling value and ``trim_min``-``trim_tolerance`` for floor value.
+Defaults to 0.49998.
+
+.. note::
+    
+    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
 
 .. _select_transformations_rsmtool:
 

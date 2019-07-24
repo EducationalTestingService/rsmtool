@@ -29,6 +29,7 @@
     "custom_sections": null,
     "feature_subset_file": null,
     "feature_subset": null,
+    "trim_tolerance": 0.49998,
     "subgroups": [],
     "skll_objective": null,
     "section_order": null,

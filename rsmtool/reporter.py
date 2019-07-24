@@ -624,6 +624,10 @@ class Reporter:
         min_items = (0 if config['min_items_per_candidate'] is None
                      else config['min_items_per_candidate'])
 
+        # determine minimum and maximum scores for trimming
+        min_score = config['trim_min'] - config['trim_tolerance']
+        max_score = config['trim_max'] + config['trim_tolerance']
+
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'DESCRIPTION': config['description'],
                           'MODEL_TYPE': config.get('model_type', ''),
@@ -639,6 +643,8 @@ class Reporter:
                           'FEATURE_SUBSET_FILE': feature_subset_file,
                           'EXCLUDE_ZEROS': config.get('exclude_zero_scores', True),
                           'SCALED': config.get('use_scaled_predictions', False),
+                          'MIN_SCORE': min_score,
+                          'MAX_SCORE': max_score,
                           'STANDARDIZE_FEATURES': config.get('standardize_features', True),
                           'FILE_FORMAT': config.get('file_format', 'csv'),
                           'USE_THUMBNAILS': config.get('use_thumbnails', False),
