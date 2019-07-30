@@ -188,7 +188,9 @@ If this option is set to ``true`` the system will try apply feature transformati
     * ``addOneInv``: 1/(x+1)
     * ``addOneLn``: ln(x+1)
 
-Note that ``inv`` is never used for features with positive values. Defaults to ``false``.
+Only transformations that produce numeric results for *all* values for a given feature will be considered. Thus for example if a feature has a single negative value, `sqrt` transformation will be ignored even if it would have resulted in the highest correlation for the remaining values.  In addition,  ``inv`` and ``addOneInv`` transformations are never used for features with both positive and negative values.
+
+Defaults to ``false``.
 
 .. seealso::
 
