@@ -10,7 +10,10 @@ Utility classes and functions related to computing fairness evaluations
 """
 
 import pandas as pd
+import pickle 
 import numpy as np
+
+from os.path import join
 
 import statsmodels.formula.api as smf
 from statsmodels.stats.anova import anova_lm
@@ -118,11 +121,13 @@ def write_fairness_results(fit_dictionary,
     
     # let's first save model files and summaries
     for model in fit_dictionary:
+        fit = fit_dictionary[model]
+
         ols_file = join(output_dir, '{}_{}_by_{}.ols'.format(experiment_id,
-                                                             fairness_metrics,
+                                                             model,
                                                              group))
         summary_file = join(output_dir, '{}_{}_by_{}_ols_summary.txt'.format(experiment_id,
-                                                                             fairness_metrics,
+                                                                             model,
                                                                              group))
         with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
             pickle.dump(fit, olsf)
@@ -173,7 +178,7 @@ def get_fairness_analysis(df,
     
     # compute error and squared error
 
-    df['error'] = df[system-score_column]-df[human_score_column]
+    df['error'] = df[system_score_column]-df[human_score_column]
     df['SE'] = df['error']**2
 
     # convert group values to category and reorder them using 
