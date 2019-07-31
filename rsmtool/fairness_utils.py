@@ -137,7 +137,8 @@ def write_fairness_results(fit_dictionary,
     writer = DataWriter(experiment_id)
     writer.write_experiment_output(output_dir,
                                    fairness_container,
-                                   file_format=file_format)
+                                   file_format=file_format,
+                                   index=True)
 
     
     
