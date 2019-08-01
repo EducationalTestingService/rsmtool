@@ -16,6 +16,7 @@
                       "true_score_evaluation",
                       "custom1",
                       "evaluation_by_group",
+                      "fairness_analyses",
                       "data_description",
                       "data_description_by_group",
                       "custom2",
