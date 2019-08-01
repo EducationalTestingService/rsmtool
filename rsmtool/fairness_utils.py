@@ -196,9 +196,9 @@ def get_fairness_analysis(df,
     # convert group values to category and reorder them using 
     # the largest category as reference
     
-    df['group'] = convert_to_category(df[group])
+    df['group'] = convert_to_ordered_category(df[group])
     base_group = df['group'].cat.categories[0]
-    df['sc1_cat'] = convert_to_category(df[human_score_column])
+    df['sc1_cat'] = convert_to_ordered_category(df[human_score_column])
 
     # Overall score accuracy (OSA)
     # Variance in squared error explained by L1
