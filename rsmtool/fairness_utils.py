@@ -44,9 +44,9 @@ def convert_to_ordered_category(group_values):
     # This makes sure that the order is consistent and reproducible across runs
     # when there are more than
     # one group with the maximum number of occurrences. 
-    df_groups_by_size = pd.DataFrame(group_values.value_counts())
+    df_groups_by_size = pd.DataFrame(group_values.value_counts()).reset_index()
     df_groups_by_size.columns = ['group_name', 'count']
-    df_group_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
+    df_groups_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
                                                             ascending=[False, True])
     groups_by_size = df_groups_by_size_sorted['group_name'].values
 
