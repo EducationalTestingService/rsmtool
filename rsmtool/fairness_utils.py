@@ -23,9 +23,11 @@ from rsmtool.container import DataContainer
 
 
 
-def convert_to_category(group_values):
+def convert_to_ordered_category(group_values):
     """Convert supplied series to an ordered category
-    with levels ordered by category size
+    with levels ordered by category size.
+    If multiple categories have the same size,
+    the order is determined alphabetically. 
 
     Parameters
     ----------
@@ -37,7 +39,16 @@ def convert_to_category(group_values):
     """
     
     # get ordered list by size
-    groups_by_size = group_values.value_counts().index
+
+    # We convert the  value counts to data frame to allow for multilevel sorting.
+    # This makes sure that the order is consistent and reproducible across runs
+    # when there are more than
+    # one group with the maximum number of occurrences. 
+    df_groups_by_size = pd.DataFrame(group_values.value_counts())
+    df_groups_by_size.columns = ['group_name', 'count']
+    df_group_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
+                                                            ascending=[False, True])
+    groups_by_size = df_groups_by_size_sorted['group_name'].values
 
     #convert to category and reorder
     group_category = group_values.astype("category")
