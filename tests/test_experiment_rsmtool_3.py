@@ -36,7 +36,13 @@ else:
     param('lr-with-feature-list', 'lr_with_feature_list'),
     param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
     param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
-    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance')
+    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
+    param('lr-subgroups-with-dictionary-threshold-empty-group', 
+          'lr_subgroups_with_dictionary_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-with-numeric-threshold-and_empty-group', 
+          'lr_subgroups_with_numeric_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION'])
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:

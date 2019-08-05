@@ -1,0 +1,20 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test.csv",
+    "subgroups": [
+        "QUESTION",
+        "L1"
+    ],
+    "trim_max": 6,
+    "length_column": "LENGTH",
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_subgroups_with_length",
+    "description": "Threshold for subgroup display provided as dictionary. No category in QUESTION meets the threshold. Only some L1 in the trainign set do",
+    "min_n_per_group": {"QUESTION": 101, "L1": 120}
+}
