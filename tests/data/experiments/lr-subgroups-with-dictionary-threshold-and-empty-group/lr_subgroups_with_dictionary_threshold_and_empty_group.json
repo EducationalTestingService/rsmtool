@@ -14,7 +14,7 @@
     "features": "features.csv",
     "trim_min": 1,
     "model": "LinearRegression",
-    "experiment_id": "lr_subgroups_with_length",
+    "experiment_id": "lr_subgroups_with_dictionary_threshold_and_empty_group",
     "description": "Threshold for subgroup display provided as dictionary. No category in QUESTION meets the threshold. Only some L1 in the trainign set do",
     "min_n_per_group": {"QUESTION": 101, "L1": 120}
 }
