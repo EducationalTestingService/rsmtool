@@ -1276,10 +1276,14 @@ class Modeler:
         information.
         """
 
-        Analyzer.check_param_names(configuration, ['trim_max', 'trim_min'])
+        Analyzer.check_param_names(configuration, ['trim_max',
+                                                   'trim_min',
+                                                   'trim_tolerance'])
 
         trim_max = configuration['trim_max']
         trim_min = configuration['trim_min']
+        trim_tolerance = configuration['trim_tolerance']
+
         predict_expected_scores = configuration['predict_expected_scores']
 
         df_train_predictions = self.predict(df_train,
@@ -1305,7 +1309,9 @@ class Modeler:
                                                                        train_predictions_sd,
                                                                        human_labels_mean,
                                                                        human_labels_sd,
-                                                                       trim_min, trim_max)
+                                                                       trim_min,
+                                                                       trim_max,
+                                                                       trim_tolerance)
 
         logging.info('Processing test set predictions.')
         df_test_predictions = FeaturePreprocessor.process_predictions(df_test_predictions,
@@ -1313,10 +1319,13 @@ class Modeler:
                                                                       train_predictions_sd,
                                                                       human_labels_mean,
                                                                       human_labels_sd,
-                                                                      trim_min, trim_max)
+                                                                      trim_min,
+                                                                      trim_max,
+                                                                      trim_tolerance)
 
         df_postproc_params = pd.DataFrame([{'trim_min': trim_min,
                                             'trim_max': trim_max,
+                                            'trim_tolerance': trim_tolerance,
                                             'h1_mean': human_labels_mean,
                                             'h1_sd': human_labels_sd,
                                             'train_predictions_mean': train_predictions_mean,
