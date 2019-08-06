@@ -470,20 +470,20 @@ def partial_correlations(df):
     if numcols > numrows:
         icvx = empty_array
     else:
+        # if the determinant is less than the lowest representable
+        # 32 bit integer, then we use the pseudo-inverse;
+        # otherwise, use the inverse; if a linear algebra error
+        # occurs, then we just set the matrix to empty
         try:
-            # if the determinant is less than the lowest representable
-            # 32 bit integer, then we use the try the pseudo-inverse;
-            # otherwise, we try the inverse; if neither works, we
-            # set the entire matrix to NaNs
-            if np.linalg.det(df_cov) < np.finfo(np.float32).eps:
-                icvx = np.linalg.pinv(df_cov)
-                warnings.warn('The inverse of the variance-covariance matrix '
-                              'was calculated using the Moore-Penrose generalized '
-                              'matrix inversion, due to its determinant being at '
-                              'or very close to zero.')
-            else:
-                icvx = np.linalg.inv(df_cov)
-        except:
+            assert np.linalg.det(df_cov) > np.finfo(np.float32).eps
+            icvx = np.linalg.inv(df_cov)
+        except AssertionError:
+            icvx = np.linalg.pinv(df_cov)
+            warnings.warn('The inverse of the variance-covariance matrix '
+                          'was calculated using the Moore-Penrose generalized '
+                          'matrix inversion, due to its determinant being at '
+                          'or very close to zero.')
+        except np.linalg.LinAlgError:
             icvx = empty_array
 
     pcor = -1 * covariance_to_correlation(icvx)
