@@ -1,12 +1,15 @@
 
 import tempfile
+import warnings
 
 import numpy as np
+import pandas as pd
 
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
 from os.path import abspath, dirname, join, relpath
+from pandas.util.testing import assert_frame_equal
 
 from rsmtool.utils import (difference_of_standardized_means,
                            float_format_func,
@@ -17,6 +20,7 @@ from rsmtool.utils import (difference_of_standardized_means,
                            int_to_float,
                            convert_to_float,
                            compute_subgroup_plot_params,
+                           partial_correlations,
                            parse_json_with_comments,
                            has_files_with_extension,
                            get_output_directory_extension,
@@ -411,6 +415,27 @@ def test_quadratic_weighted_kappa_error():
 
     quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
                              np.array([9, 4, 5, 12, 11]))
+
+
+def test_partial_correlations_with_singular_matrix():
+
+    expected = pd.DataFrame({0: [1.0, -1.0], 1: [-1.0, 1.0]})
+    df_singular = pd.DataFrame(np.tile(np.random.randn(100), (2, 1))).T
+    assert_frame_equal(partial_correlations(df_singular), expected)
+
+
+def test_partial_correlations_pinv():
+
+    msg = ('The inverse of the variance-covariance matrix was calculated '
+           'using the Moore-Penrose generalized matrix inversion, due to '
+           'its determinant being at or very close to zero.')
+    df_small_det = pd.DataFrame({'X1': [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],
+                                 'X2': [1.3, 1.2, 1.5, 1.7001, 1.8, 1.9, 2.0]})
+
+    with warnings.catch_warnings(record=True) as wrn:
+        warnings.simplefilter("always")
+        partial_correlations(df_small_det)
+        eq_(str(wrn[-1].message), msg)
 
 
 class TestIntermediateFiles:
