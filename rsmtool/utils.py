@@ -432,7 +432,7 @@ def covariance_to_correlation(m):
     if not numrows == numcols:
         raise ValueError('Input matrix must be square')
 
-    Is = np.sqrt(np.abs(1 / np.diag(m)))
+    Is = np.sqrt(1 / np.diag(m))
     retval = Is * m * np.repeat(Is, numrows).reshape(numrows, numrows)
     np.fill_diagonal(retval, 1.0)
     return retval
@@ -473,10 +473,19 @@ def partial_correlations(df):
     if numcols > numrows:
         icvx = empty_array
     else:
-        # we also return nans if there is singularity in the data
-        # (e.g. all human scores are the same)
+        # if the determinant is less than the lowest representable
+        # 32 bit integer, then we use the pseudo-inverse;
+        # otherwise, use the inverse; if a linear algebra error
+        # occurs, then we just set the matrix to empty
         try:
+            assert np.linalg.det(df_cov) > np.finfo(np.float32).eps
             icvx = np.linalg.inv(df_cov)
+        except AssertionError:
+            icvx = np.linalg.pinv(df_cov)
+            warnings.warn('The inverse of the variance-covariance matrix '
+                          'was calculated using the Moore-Penrose generalized '
+                          'matrix inversion, due to its determinant being at '
+                          'or very close to zero.')
         except np.linalg.LinAlgError:
             icvx = empty_array
 
@@ -484,7 +493,6 @@ def partial_correlations(df):
     np.fill_diagonal(pcor, 1.0)
     df_pcor = pd.DataFrame(pcor, columns=columns, index=columns)
     return df_pcor
-
 
 def agreement(score1, score2, tolerance=0):
     """
