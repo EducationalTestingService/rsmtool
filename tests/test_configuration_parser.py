@@ -730,17 +730,41 @@ class TestConfiguration:
         exclude_list_wise = config.check_exclude_listwise()
         eq_(exclude_list_wise, False)
 
-    def test_get_trim_min_max_none(self):
+    def test_get_trim_min_max_tolerance_none(self):
         dictionary = {"experiment_id": '001'}
         config = Configuration(dictionary)
-        trim_min_max = config.get_trim_min_max()
-        eq_(trim_min_max, (None, None))
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (None, None, None))
 
-    def test_get_trim_min_max_values(self):
+    def test_get_trim_min_max_no_tolerance(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (1.0, 6.0, None))
+
+    def test_get_trim_min_max_values_tolerance(self):
+        dictionary = {"experiment_id": '001',
+                      'trim_min': 1,
+                      'trim_max': 6,
+                      'trim_tolerance': 0.49}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (1.0, 6.0, 0.49))
+
+    def test_get_trim_min_max_deprecated(self):
         dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
         config = Configuration(dictionary)
         trim_min_max = config.get_trim_min_max()
         eq_(trim_min_max, (1.0, 6.0))
+
+
+    def test_get_trim_tolerance_no_min_max(self):
+        dictionary = {"experiment_id": '001',
+                      'trim_tolerance': 0.49}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (None, None, 0.49))
+
 
     def test_get_names_and_paths_with_feature_file(self):
 

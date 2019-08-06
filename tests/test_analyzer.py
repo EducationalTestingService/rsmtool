@@ -71,7 +71,7 @@ class TestAnalyzer:
         # matrix for partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:4], 'sc1', 'group')
         assert_equal(retval[0].isnull().values.sum(), 0)
-        assert_almost_equal(abs(retval[1].values).sum(), 3)
+        assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
 
     def test_that_correlation_helper_works_for_data_with_the_same_label(self):
 
