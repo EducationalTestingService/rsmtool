@@ -285,13 +285,13 @@ class TestConfigurationParser:
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
                 'model': 'LinearRegression',
-                'subgroups': ['L1', 'L2'],
+                'subgroups': ['L2', 'L1'],
                 'min_n_per_group': 100}
         self.parser._config = data
         newdata = self.parser.validate_config()
         eq_(type(newdata['min_n_per_group']), dict)
-        assert_equal(newdata['L1'], 100)
-        assert_equal(newdata['L2'], 100)
+        assert_equal(newdata['min_n_per_group']['L1'], 100)
+        assert_equal(newdata['min_n_per_group']['L2'], 100)
 
 
 
@@ -345,7 +345,6 @@ class TestConfigurationParser:
                                     "L2": 50}}
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
-
 
 
     def test_process_fields(self):

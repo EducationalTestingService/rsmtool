@@ -983,7 +983,29 @@ class ConfigurationParser:
                 raise ValueError("The number of specified experiment names should be the same"
                                  " as the number of specified experiment directories.")
 
-        # 13. Clean up config dict to keep only context-specific fields
+        # 13. Check that if the user specified min_n_per_group, they also
+        # specified subgroups. If they supplied a dictionary, make 
+        # sure the keys match
+        if new_config['min_n_per_group']:
+            # make sure we have subgroups
+            if not 'subgroups' in new_config:
+                raise ValueEror("You must specify a list of subgroups in "
+                                "in `subgroups` field "
+                                "you want to use `min_n_per_group` field")
+            # if we got dictionary, make sure the keys match
+            elif type(new_config['min_n_per_group']) == dict:
+                if sorted(new_config['min_n_per_group'].keys()) != sorted(new_config['subgroups']):
+                    raise ValueError("The keys in `min_n_per_group` must "
+                                     "match the subgroups in `subgroups` field")
+            # else convert to dictionary
+            else:
+                new_config['min_n_per_group'] = dict([(group, new_config['min_n_per_group'])
+                                                      for group in new_config['subgroups']])
+                print(new_config['min_n_per_group'])
+
+
+
+        # 14. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
