@@ -22,13 +22,13 @@ In addition to the HTML report, RSMTool also saves the intermediate outputs of a
 Input file format
 """""""""""""""""
 
-The input files containing feature values and scores for all responses in training and evaluation data should be in tabular format with features and scores stored in columns and each row correponding to a single response.
+The input files containing feature values and scores for all responses in training and evaluation data should be either in tabular format with features and scores stored in columns and each row correponding to a single response or in ``jsonlines`` format with one line per response. See below for further description of ``.jsonlines`` format. 
 
 RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``xls``/``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
 
 For ``Excel`` spreadsheets all data must be stored in the first sheet. 
 
-Each line in ``.jsonlines`` format should correspond to one response with column names as keys and values as values. For example:
+Each line in ``.jsonlines`` format should correspond to one response represented as a dictionary with column names as keys and values as values. For example:
 
 .. literalinclude:: ../tests/data/files/train.jsonlines
    :lines: 1,2
