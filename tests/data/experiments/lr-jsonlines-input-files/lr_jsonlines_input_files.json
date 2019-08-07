@@ -1,0 +1,14 @@
+{
+    "test_label_column": "y",
+    "train_file": "../../files/train.jsonlines",
+    "description": "Using a subset of features selected using subset spec file with an LinearRegression model.",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "id_column": "id",
+    "model": "LinearRegression",
+    "train_label_column": "y",
+    "experiment_id": "lr_jsonlines_input_files",
+    "trim_max": 6,
+    "test_file": "../../files/test.jsonlines",
+    "features" : "features.jsonlines"
+}

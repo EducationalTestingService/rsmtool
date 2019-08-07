@@ -22,6 +22,42 @@ from os.path import (abspath,
 from rsmtool.container import DataContainer
 
 
+
+def read_jsonlines(filename):
+    """ Read jsonlines from a file. 
+    Normalize nested jsons with up to one level of nesting
+
+    Parameters
+    ----------
+    filename: str
+    Name of file to read
+
+    Returns
+    -------
+    df : pandas DataFrame
+         Data frame containing the data in the given file.
+    """
+
+    df = pd.read_json(filename,
+                      orient='records',
+                      lines=True)
+        
+    # let's check if we have nested columns
+    nested_cols = [c for c in df.columns if isinstance(df[c][0],dict)]
+
+    if len(nested_cols) > 0:
+        dfs = []
+        for col in nested_cols:
+            df_nested_column = pd.io.json.json_normalize(df[col])
+            dfs.append(df_nested_column)
+            df.drop(col, axis=1, inplace=True)
+        df_new = pd.concat([df] + dfs, axis=1)
+    else:
+        df_new = df
+        
+    return df_new
+
+
 def try_to_load_file(filename,
                      converters=None,
                      raise_error=False,
@@ -153,10 +189,11 @@ class DataReader:
         # Default file_converters dict
         self.file_converters = {} if file_converters is None else file_converters
 
+
     @staticmethod
     def read_from_file(filename, converters=None, **kwargs):
         """
-        Read a CSV/TSV/XLS/XLSX file and return a data frame.
+        Read a CSV/TSV/XLS/XLSX/JSONLINES/SAS7BDAT file and return a data frame.
 
         Parameters
         ----------
@@ -198,6 +235,8 @@ class DataReader:
             else:
                 encoding = kwargs.pop('encoding')
             do_read = partial(pd.read_sas, encoding=encoding)
+        elif file_extension in ['.jsonlines']:
+            do_read = partial(read_jsonlines)
         else:
             raise ValueError("RSMTool only supports files in .csv, "
                              ".tsv, .xls/.xlsx, or .sas7bdat format. "
