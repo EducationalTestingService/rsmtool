@@ -26,30 +26,17 @@ The input files containing feature values and scores for all responses in traini
 
 RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``xls``/``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
 
-For `Excel` spreadsheets all data must be stored in the first sheet. 
+For ``Excel`` spreadsheets all data must be stored in the first sheet. 
 
-Each line in `.jsonlines` format should correspond to one response with column names as keys and values as values. For example:
+Each line in ``.jsonlines`` format should correspond to one response with column names as keys and values as values. For example:
 
-```{"ID": "RESPONSE_1",
-	"FEATURE1":4.9380646013,
-	"FEATURE2":-0.0584019308,
-	"FEATURE3":-0.0846667513,
-	"FEATURE4":-0.3167939755,
-	"LENGTH":279,
-	"QUESTION":"QUESTION_1",
-	"score":3}```
+.. literalinclude:: ../tests/data/files/train.jsonlines
+   :lines: 1,2
 
-RSMTool allows nested `jsons` in each line of `.jsonlines` file with no more than one level of nesting as in the following example. Note that only lower level keys will be used when parsing the files and processing the data. For example, in the example below `x` and `metadata` will be ignored. 
+RSMTool allows nested ``jsons`` in each line of ``.jsonlines`` file with no more than one level of nesting as in the following example. Note that only lower level keys will be used when parsing the files and processing the data. For example, in the example below second level names ``x`` and ``metadata`` will be ignored. 
 
-```{"ID": "RESPONSE_1",
-    {"x":{"FEATURE1":4.9380646013,
-		  "FEATURE2":-0.0584019308,
-		  "FEATURE3":-0.0846667513,
-		  "FEATURE4":-0.3167939755,
-	"metadata":{"QUESTION":"QUESTION_1",
-				"L1":"Esperanto",
-				"score2":3}}```
-
+.. literalinclude:: ../tests/data/files/train_nested.jsonlines
+   :lines: 1,2
 
 
 .. _feature_preprocessing:
