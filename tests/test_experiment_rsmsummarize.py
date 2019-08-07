@@ -33,6 +33,7 @@ else:
     param('lr-self-summary-no-scaling'),
     param('lr-self-summary-with-h2'),
     param('summary-with-custom-names'),
+    param('lr-self-summary-null-trim-min')
 ])
 
 
