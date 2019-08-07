@@ -15,6 +15,6 @@
     "trim_min": 1,
     "model": "LinearRegression",
     "experiment_id": "lr_subgroups_with_numeric_threshold_and_empty_group",
-    "description": "Experiment with threshold set for subgroup display. No category in QUESTION has enough responses to display in evaluation results.",
-     "min_n_per_group": 50
+    "description": "Experiment with threshold set for subgroup display. No category in QUESTION has enough responses to display in evaluation results. Only one group is available for L1.",
+     "min_n_per_group": 60
 }
