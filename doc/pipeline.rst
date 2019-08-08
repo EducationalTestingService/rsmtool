@@ -33,7 +33,7 @@ Each line in ``.jsonlines`` format should correspond to one response represented
 .. literalinclude:: ../tests/data/files/train.jsonlines
    :lines: 1,2
 
-RSMTool allows nested ``jsons`` in each line of ``.jsonlines`` file with no more than one level of nesting as in the following example. Note that only lower level keys will be used when parsing the files and processing the data. For example, in the example below second level names ``x`` and ``metadata`` will be ignored. 
+RSMTool allows nested ``jsons`` in each line of ``.jsonlines`` file with no more than one level of nesting as in the following example. Note that only the lower level keys will be used when parsing the files and processing the data. Thus in the example below second level labels ``x`` and ``metadata`` will be ignored. 
 
 .. literalinclude:: ../tests/data/files/train_nested.jsonlines
    :lines: 1,2
