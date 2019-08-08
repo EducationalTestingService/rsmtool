@@ -384,7 +384,7 @@ class Reporter:
 
         if len(subgroups) == 0:
             subgroup_sections = [section for section in chosen_general_sections
-                                 if section.endswith('by_group')]
+                                 if section.endswith('by_group') or section == 'fairness_analyses']
             # if we were given a list of general sections, raise an error if
             # that list included subgroup sections but no subgroups were specified
 
