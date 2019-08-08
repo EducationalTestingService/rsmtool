@@ -23,14 +23,18 @@ from rsmtool.container import DataContainer
 
 
 
-def read_jsonlines(filename):
+def read_jsonlines(filename, converters=None):
     """ Read jsonlines from a file. 
     Normalize nested jsons with up to one level of nesting
 
     Parameters
     ----------
     filename: str
-    Name of file to read
+        Name of file to read
+    converters : dict or None, optional
+        A dictionary specifying how the types of the columns
+        in the file should be converted. Specified in the same
+        format as for `pd.read_csv()`.
 
     Returns
     -------
@@ -40,7 +44,8 @@ def read_jsonlines(filename):
 
     df = pd.read_json(filename,
                       orient='records',
-                      lines=True)
+                      lines=True,
+                      dtype=converters)
         
     # let's check if we have nested columns
     nested_cols = [c for c in df.columns if isinstance(df[c][0],dict)]
@@ -236,7 +241,7 @@ class DataReader:
                 encoding = kwargs.pop('encoding')
             do_read = partial(pd.read_sas, encoding=encoding)
         elif file_extension in ['.jsonlines']:
-            do_read = partial(read_jsonlines)
+            do_read = partial(read_jsonlines, converters=converters)
         else:
             raise ValueError("RSMTool only supports files in .csv, "
                              ".tsv, .xls/.xlsx, or .sas7bdat format. "

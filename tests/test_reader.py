@@ -7,7 +7,9 @@ from nose.tools import raises, eq_
 from pandas.util.testing import assert_frame_equal
 from shutil import rmtree
 
-from rsmtool.reader import DataReader, try_to_load_file
+from rsmtool.reader import (DataReader,
+                            read_jsonlines,
+                            try_to_load_file)
 
 
 def test_try_to_load_file_none():
@@ -27,6 +29,7 @@ def test_try_to_load_file_warn():
     with warnings.catch_warnings():
         warnings.filterwarnings('error')
         try_to_load_file('bdadui88asldfkas;j.sarasd', raise_warning=True)
+
 
 
 class TestDataReader:
@@ -71,6 +74,10 @@ class TestDataReader:
             df.to_csv(tempf.name, sep='\t', index=False)
         elif ext.lower() in ['xls', 'xlsx']:
             df.to_excel(tempf.name, index=False)
+        elif ext.lower() in ['jsonlines']:
+            df.to_json(tempf.name, 
+                       orient='records',
+                       lines=True)
         tempf.close()
         return tempf.name
 
@@ -121,12 +128,14 @@ class TestDataReader:
     def check_train(self, name_ext_tuples, converters=None):
         container = self.get_container(name_ext_tuples, converters)
         frame = container.train
-        assert_frame_equal(frame, self.df_train)
+        assert_frame_equal(frame.sort_index(axis=1),
+                          self.df_train.sort_index(axis=1))
 
     def check_feature_specs(self, name_ext_tuples, converters=None):
         container = self.get_container(name_ext_tuples, converters)
         frame = container.feature_specs
-        assert_frame_equal(frame, self.df_specs)
+        assert_frame_equal(frame.sort_index(axis=1),
+                           self.df_specs.sort_index(axis=1))
 
     def test_read_data_file(self):
         # note that we cannot check for capital .xls and .xlsx
@@ -141,11 +150,13 @@ class TestDataReader:
     def test_container_train_property(self):
         test_lists = [[('train', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('test', 'xls'), ('train_metadata', 'tsv')]]
+                      [('train', 'csv'), ('test', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'jsonlines'), ('test', 'jsonlines')]]
 
         converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
         converters = [{'train': converter, 'test': converter},
                       {'train': converter},
+                      {'train': converter, 'test': converter},
                       {'train': converter, 'test': converter}]
         for idx, test_list in enumerate(test_lists):
             yield self.check_train, test_list, converters[idx]
@@ -153,7 +164,8 @@ class TestDataReader:
     def test_container_feature_specs_property(self):
         test_lists = [[('feature_specs', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('feature_specs', 'xls'), ('train_metadata', 'tsv')]]
+                      [('train', 'csv'), ('feature_specs', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'jsonlines'), ('feature_specs', 'jsonlines')]]
         for test_list in test_lists:
             yield self.check_feature_specs, test_list
 
@@ -170,7 +182,9 @@ class TestDataReader:
         container.test
 
     def test_container_test_property_frame_equal(self):
-        test_lists = [('feature_specs', 'csv'), ('test', 'tsv'), ('train_metadata', 'xlsx')]
+        test_lists = [('feature_specs', 'csv'),
+                      ('test', 'tsv'),
+                       ('train_metadata', 'xlsx')]
         converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
         converters = {'test': converter}
         container = self.get_container(test_lists, converters)
