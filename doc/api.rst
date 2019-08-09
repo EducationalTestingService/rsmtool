@@ -115,12 +115,20 @@ From :py:mod:`~rsmtool.transformer` Module
 
 From :py:mod:`~rsmtool.utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _agreement_api:
 .. autofunction:: rsmtool.utils.agreement
 .. autofunction:: rsmtool.utils.partial_correlations
 .. autofunction:: rsmtool.utils.get_thumbnail_as_html
 .. autofunction:: rsmtool.utils.show_thumbnail
 .. autofunction:: rsmtool.utils.compute_expected_scores_from_model
 .. autofunction:: rsmtool.utils.parse_json_with_comments
+.. _qwk_api:
+.. autofunction:: rsmtool.utils.quadratic_weighted_kappa
+.. _smd_api:
+.. autofunction:: rsmtool.utils.standardized_mean_difference
+.. _dsm_api:
+.. autofunction:: rsmtool.utils.difference_of_standardized_means
 
 From :py:mod:`~rsmtool.writer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -55,6 +55,9 @@ id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmeval`` will look for a column called ``spkitemid`` in the prediction file.
 
+
+.. _human_score_column_eval:
+
 human_score_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The name for the column containing the human scores for each response. The values in this column will be used as observed scores. Defaults to ``sc1``.

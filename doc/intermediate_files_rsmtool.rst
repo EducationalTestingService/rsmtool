@@ -193,6 +193,9 @@ filenames: ``pred_processed``, ``pred_train``
 
 The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores.
 
+
+.. _rsmtool_eval_files:
+
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
 - ``eval``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
@@ -227,6 +230,8 @@ Evaluation metrics
 
 - ``true_score_eval`` - evaluation of how well system scores can predict true scores.
 
+.. _rsmtool_consistency_files:
+
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
@@ -237,6 +242,9 @@ These files are created only if a second human score has been made available via
 - ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+
+
+.. _rsmtool_true_score_eval:
 
 Evaluations based on test theory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

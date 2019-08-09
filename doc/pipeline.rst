@@ -116,6 +116,4 @@ scale_trim_round
 ~~~~~~~~~~~~~~~~
 The scale_trim scores scores rounded to the nearest integer.
 
-.. rubric:: Footnotes
-
-.. [#] The primary evaluation analyses in the RSMTool report are conducted for *all* six types of :ref:`scores <score_postprocessing>`. For some additional evaluations , the user can pick between raw and scaled scores.
+.. include:: evaluation.rst
