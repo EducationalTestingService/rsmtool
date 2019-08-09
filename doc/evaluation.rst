@@ -14,6 +14,7 @@ The following conventions are used in the formulas in this section:
 :math:`H` - human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
 
 .. _h2:
+
 :math:`H2` - second human score (if available). The score values in :ref:`second_human_score_column<second_human_score_column_rsmtool>`.
 
 :math:`N_2` - total number of responses in the evaluation set where both :math:`H` and :math:`H2` are available and are numeric and non-zero (unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``).
@@ -91,6 +92,7 @@ where
 
 Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
+
 .. _qwk:
 
 Quadratic weighted kappa (QWK)
@@ -105,6 +107,7 @@ QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` wit
 .. note::
 
 	In RSMTool v.6 and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``quadratic``. Continuous scores were rounded for computation. Both formulas produce the same scores for discreet (rounded scores) but the QWK values for continous scores computed by RSMTool 7.0 are *different* from those computed by earlier versions.
+
 
 .. _r: 
 
@@ -159,7 +162,7 @@ Accuracy (True score)
 
 According to Test Theory, an observed score is a combination of true score :math:`T` and measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such estimation requires double human scores available for at least a subset of responses in the evaluation set.
 
-The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<smtool_true_score_eval>` ``true_score_eval``. 
+The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``. 
 
 Proportional reduction in mean squared error for true scores (PRMSE)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -298,7 +301,7 @@ Same as :ref:`Cohen's kappa for observed scores<kappa>` but substituting :math:`
 Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
-Same as :ref:`QWK for observed scores<QWK>` but substituting :math:`H2` for :math:`M` and :math:`N_2` for :math:`N`.
+Same as :ref:`QWK for observed scores<qwk>` but substituting :math:`H2` for :math:`M` and :math:`N_2` for :math:`N`.
 
 .. _r: 
 
@@ -314,7 +317,7 @@ Standardized mean difference (SMD)
 
 :math:`SMD = \frac{\bar{H2}-\bar{H1}}{ \sqrt{\frac{\sigma_{H}^2 + \sigma_{H2}^2}{2}}}`
 
-Unlike :ref:SMD for human-system scores<smd>`, the denominator in this case is pooled standard deviation of :math:`H1` and :math:`H2`.
+Unlike :ref:`SMD for human-system scores<smd>`, the denominator in this case is pooled standard deviation of :math:`H1` and :math:`H2`.
 
 
 SMD between two human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with ``method`` set to ``pooled``.
