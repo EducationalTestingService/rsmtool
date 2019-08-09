@@ -97,6 +97,8 @@ exclude_zero_scores *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 By default, responses with human scores of 0 will be excluded from evaluations. Set this field to ``false`` if you want to keep responses with scores of 0. Defaults to ``true``.
 
+.. _scale_with_eval:
+
 scale_with *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
 In many scoring applications, system scores are :ref:`re-scaled <score_postprocessing>` so that their mean and standard deviation match those of the human scores for the training data.

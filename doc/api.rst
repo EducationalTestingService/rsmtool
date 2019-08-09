@@ -73,6 +73,12 @@ From :py:mod:`~rsmtool.convert_feature_json` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.convert_feature_json_file
 
+
+From :py:mod:`~rsmtool.fairness_utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _fairness_api:
+.. autofunction:: rsmtool.fairness_utils.get_fairness_analysis
+
 From :py:mod:`~rsmtool.modeler` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.modeler
@@ -90,6 +96,7 @@ From :py:mod:`~rsmtool.preprocessor` Module
 
 From :py:mod:`~rsmtool.prmse_utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _prmse_api:
 .. autofunction:: rsmtool.prmse_utils.compute_prmse
 
 From :py:mod:`~rsmtool.reader` Module
