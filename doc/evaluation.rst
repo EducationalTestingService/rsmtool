@@ -207,13 +207,13 @@ PRMSE for true scores is defined similar to :ref:`PRMSE for observed scored<r2>`
 
 - :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and thus partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
 
-- To compute estimates for true scores, the values for observed scores are adjusted for **variance of measurement errors** (:math:`\sigma_{e}^2 `) in human scores defined as:
+- To compute estimates for true scores, the values for observed scores are adjusted for **variance of measurement errors** (:math:`\sigma_{e}^2`) in human scores defined as:
 
 :math:`\sigma_{e}^2 = \frac{1}{2 \times N2}\sum_{i=1}^{N2}{(H_{i} - H2_{i})^2}`
 
 Thus the **mean squared error** when predicting true score with system score (MSE(T|M)) is estimated as:
 
-:math:`MSE(T|M) = MSE(\hat{H}|M)-\frac{1}{2}\sigma_{e}^2 `
+:math:`MSE(T|M) = MSE(\hat{H}|M)-\frac{1}{2}\sigma_{e}^2`
 
 The **variance of true score** (:math:`\sigma_T^2`) is estimated as: 
 
@@ -236,27 +236,27 @@ Same as :ref:`percent exact agreement for observed scores<exact_agreement>` but 
 Percent exact + ajdacent agreement
 ++++++++++++++++++++++++++++++++++
 
-Same as :ref:`percent adjacent agreement for observed scores<exact_agreement>` but substituting :math:`H2` for :math:`M` and :math:`N2`for :math:`N`.
+Same as :ref:`percent adjacent agreement for observed scores<exact_agreement>` but substituting :math:`H2` for :math:`M` and :math:`N2` for :math:`N`.
 
 
 Cohen's kappa
 +++++++++++++
 
-Same as :ref:`Cohen's kappa for observed scores<kappa>` but substituting :math:`H2` for :math:`M` and :math:`N2`for :math:`N`.
+Same as :ref:`Cohen's kappa for observed scores<kappa>` but substituting :math:`H2` for :math:`M` and :math:`N2` for :math:`N`.
 
 .. _qwk:
 
 Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
-Same as :ref:`QWK for observed scores<QWK>` but substituting :math:`H2` for :math:`M` and :math:`N2`for :math:`N`.
+Same as :ref:`QWK for observed scores<QWK>` but substituting :math:`H2` for :math:`M` and :math:`N2` for :math:`N`.
 
 .. _r: 
 
 Pearson Correlation coefficient (r)
 ++++++++++++++++++++++++++++++++++++
 
-Same as :ref:`r for observed scores<r>` but substituting :math:`H2` for :math:`M` and :math:`N2`for :math:`N`.
+Same as :ref:`r for observed scores<r>` but substituting :math:`H2` for :math:`M` and :math:`N2` for :math:`N`.
 
 .. _smd:
 
