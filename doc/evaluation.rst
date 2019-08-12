@@ -251,8 +251,9 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 
  ``population_y_pred_sd`` = :math:`\sigma_M` for the whole evaluation set
 
- .. _note:
-	In RSMTool v.6 and earlier...
+ .. note::
+
+	In RSMTool v.6 and earlier subgroup differences were computed using :ref:`standardized mean difference <SMD>` with ``method`` set to ``williamson``. Since this metrics was very sensitive to score distributions, these are no longer computed by RSMTool 7.0. 
 
 
 .. _fairness_extra: 
@@ -324,7 +325,7 @@ SMD between two human scores is computed using :ref:`rsmtool.utils.standardized_
 
 .. note::
 
-	In RSMTool v.6 and earlier SMD was with ``method`` set to ``williamson`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool 7.0 are *different* from those computed by earlier versions.
+	In RSMTool v.6 and earlier SMD was computed with ``method`` set to ``williamson`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool 7.0 are *different* from those computed by earlier versions.
 
 
 
