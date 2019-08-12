@@ -296,21 +296,18 @@ Cohen's kappa
 
 Same as :ref:`Cohen's kappa for observed scores<kappa>` but substituting :math:`H2` for :math:`M` and :math:`N_2` for :math:`N`.
 
-.. _qwk:
 
 Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
 Same as :ref:`QWK for observed scores<qwk>` but substituting :math:`H2` for :math:`M` and :math:`N_2` for :math:`N`.
 
-.. _r: 
 
 Pearson Correlation coefficient (r)
 ++++++++++++++++++++++++++++++++++++
 
 Same as :ref:`r for observed scores<r>` but substituting :math:`H2` for :math:`M` and :math:`N_2` for :math:`N`.
 
-.. _smd:
 
 Standardized mean difference (SMD)
 ++++++++++++++++++++++++++++++++++
