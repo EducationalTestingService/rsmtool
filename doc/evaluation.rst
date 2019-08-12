@@ -160,14 +160,14 @@ R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/
 Accuracy (True score)
 ~~~~~~~~~~~~~~~~~~~~~
 
-According to Test Theory, an observed score is a combination of true score :math:`T` and measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such estimation requires double human scores available for at least a subset of responses in the evaluation set.
+According to Test Theory, an observed score is a combination of true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such estimation requires double human scores available for at least a subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
 
 The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``. 
 
 Proportional reduction in mean squared error for true scores (PRMSE)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-PRMSE shows how well how well system score can predict true scores. It generally varies between 0 and 1, although in some cases in can take negative values (very bad fit) or exceed 1 (very low human-human agreement). 
+PRMSE shows how well system score can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (very bad fit) or exceed 1 (very low human-human agreement). 
 
 PRMSE for true scores is defined similar to :ref:`PRMSE for observed scored<r2>`, but with true score :math:`T` used instead of the observed score :math:`H`:
 
@@ -255,6 +255,8 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 	In RSMTool v.6 and earlier...
 
 
+.. _fairness_extra: 
+
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
@@ -272,6 +274,7 @@ Please refer to the paper for the full description of this metrics.
 
 The fairness metrics are computed using :ref:`rsmtool.fariness_utils.get_fairness_analysis<fairness_api>`
 
+.. _consistency_metrics:
 
 Human-human agreement
 ~~~~~~~~~~~~~~~~~~~~~~

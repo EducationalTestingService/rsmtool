@@ -136,9 +136,9 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``data_description_by_group``: Shows the total number of responses for each of the :ref:`subgroups <subgroups_eval>` specified in the configuration file. This section only covers the responses used to evaluate the model.
 
-    - ``consistency``: Shows metrics for human-human agreement, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations.. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
+    - ``consistency``: shows metrics for :ref:`human-human agreement <consistency_metrics>`, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations.. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_eval>`
 
-    - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
+    - ``evaluation``: Shows the :ref:`standard set of evaluations <observed_score_evaluation>` recommended for scoring models on the evaluation data:
 
        - a table showing system-human association metrics;
        - the confusion matrix; and
@@ -147,7 +147,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
     - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
 
-    - ``fairness_analyses``: Additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
+    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
         - percentage of variance in absolute error explained by subgroup membership

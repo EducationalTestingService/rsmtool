@@ -289,11 +289,11 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score. 
 
-     - ``consistency``: Shows metrics for human-human agreement, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
+     - ``consistency``: Shows metrics for :ref:`human-human agreement <consistency_metrics>`, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 
-    - ``evaluation``: Shows the standard set of evaluations recommended for scoring models on the evaluation data:
+    - ``evaluation``: Shows the :ref:`standard set of evaluations <observed_score_evaluation>` recommended for scoring models on the evaluation data:
 
        - a table showing system-human association metrics;
        - the confusion matrix; and
@@ -301,7 +301,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``evaluation_by_group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
-    - ``fairness_analyses``: Additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
+    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
         - percentage of variance in absolute error explained by subgroup membership
@@ -309,7 +309,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - plots showing estimates for each subgroup for each model
 
 
-    - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
+    - ``true_score_evaluation``: evaluation of system scores against the :ref:`true scores <true_score_evaluation>`  estimated according to test theory. The notebook shows:
     
         - variance of human scores for single and double-scored responses;
         - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
