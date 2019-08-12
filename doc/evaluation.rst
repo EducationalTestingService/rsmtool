@@ -169,7 +169,7 @@ Proportional reduction in mean squared error for true scores (PRMSE)
 
 PRMSE shows how well system score can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (very bad fit) or exceed 1 (very low human-human agreement). 
 
-PRMSE for true scores is defined similar to :ref:`PRMSE for observed scored<r2>`, but with true score :math:`T` used instead of the observed score :math:`H`:
+PRMSE for true scores is defined similar to :ref:`PRMSE for observed scored<r2>`, but with true score :math:`T` used instead of the observed score :math:`H`: the percentage of variance in true score explained by the system score. 
 
 :math:`PRMSE=1-\frac{MSE(T|M)}{\sigma_T^2}`
 
@@ -225,7 +225,7 @@ All fairness evaluations are conducted on the evaluation set. The metrics is onl
 Difference between standardized means for subgroups (DSM)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-This is a standard evaluation used for evaluating subgroup differences. The  metrics are available in :ref:`intermediate files<rsmtool_eval_files:>` ``eval_by_<SUBGROUP>``.
+This is a standard evaluation used for evaluating subgroup differences. The  metrics are available in :ref:`intermediate files<rsmtool_eval_files>` ``eval_by_<SUBGROUP>``.
 
 DSM is computed in the following way:
 
@@ -260,7 +260,7 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
-RSMTool v.7 includes aditional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The computed metrics are available in :ref:`intermediate files<rsmtool_fairness_eval:>` ``fairness_metrics_by_<SUBGROUP>``.
+RSMTool v.7 includes aditional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The computed metrics are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
 
 These include: 
 
