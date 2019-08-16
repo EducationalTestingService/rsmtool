@@ -159,8 +159,8 @@ def get_fairness_analyses(df,
                           system_score_column,
                           human_score_column='sc1'):
     """ 
-    Compute fairness analyses described in Loukina et al. (2019) https://aclweb.org/anthology/papers/W/W19/W19-4401/
-    The functions computes how muach variance group memebership explains in 
+    Compute fairness analyses described in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
+    The functions computes how much variance group memebership explains in 
     overall score accuracy (osa), overall score difference (osd) and conditional score difference (csd). 
     See paper for further detail. 
 
@@ -183,10 +183,9 @@ def get_fairness_analyses(df,
         and fitted models as values
     fairness_container: container.DataContainer
         A datacontainer with the following datasets:
-            - `estimates_METRICS_by_GROUP` where `GROUP` corresponds to group
-            and `METRICS` can be osa, osd and csd
-            Estimates for each group computed by the respective models
+            - `estimates_METRICS_by_GROUP` where `GROUP` corresponds to group and `METRICS` can be osa, osd and csd estimates for each group computed by the respective models
             - `fairness_metrics_by_GROUP` - a summary of model fits (R2 and p values)
+
     """
     
     # compute error and squared error
