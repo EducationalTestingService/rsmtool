@@ -63,7 +63,8 @@ def convert_to_ordered_category(group_values):
 def get_coefficients(fit,
                      base_category):
     
-    """ Extract estimates, significance and confidence intervals
+    """
+    Extract estimates, significance and confidence intervals
     for members of the group of interest. The names of the 
     predictors are processed to remove the prefix added by Statmodels.
     The name of the base category is added in parenthesis to the Intercept. 
