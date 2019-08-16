@@ -24,7 +24,8 @@ from rsmtool.container import DataContainer
 
 
 def convert_to_ordered_category(group_values):
-    """Convert supplied series to an ordered category
+    """
+    Convert supplied series to an ordered category
     with levels ordered by category size.
     If multiple categories have the same size,
     the order is determined alphabetically. 
