@@ -159,7 +159,7 @@ def get_fairness_analyses(df,
                           system_score_column,
                           human_score_column='sc1'):
     """ 
-    Compute fairness analyses described in Loukina et al. (2019) (https://aclweb.org/anthology/papers/W/W19/W19-4401/)
+    Compute fairness analyses described in Loukina et al. (2019) https://aclweb.org/anthology/papers/W/W19/W19-4401/
     The functions computes how muach variance group memebership explains in 
     overall score accuracy (osa), overall score difference (osd) and conditional score difference (csd). 
     See paper for further detail. 
