@@ -155,7 +155,7 @@ def write_fairness_results(fit_dictionary,
 
     
     
-def get_fairness_analysis(df,
+def get_fairness_analyses(df,
                           group,
                           system_score_column,
                           human_score_column='sc1'):
