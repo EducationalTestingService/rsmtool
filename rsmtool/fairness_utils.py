@@ -60,8 +60,7 @@ def convert_to_ordered_category(group_values):
 
 
 
-def get_coefficients(fit,
-                     base_category):
+def get_coefficients(fit, base_category):
     
     """
     Extract estimates, significance, and confidence intervals
