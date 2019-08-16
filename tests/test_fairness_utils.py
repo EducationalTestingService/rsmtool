@@ -50,7 +50,6 @@ def test_get_fairness_analyses_no_effect():
                                  'raw')
     eq_(len(model_dict), 3)
     eq_(len(dc), 4)
-    print(dc['fairness_metrics_by_L1'])
     sig_osa = dc['fairness_metrics_by_L1'].loc['sig',
                                                'Overall score accuracy']
     sig_osd = dc['fairness_metrics_by_L1'].loc['sig',
@@ -74,7 +73,6 @@ def test_get_fairness_analyses_osa_difference():
                                  'raw')
     eq_(len(model_dict), 3)
     eq_(len(dc), 4)
-    print(dc['fairness_metrics_by_L1'])
     sig_osa = dc['fairness_metrics_by_L1'].loc['sig',
                                                'Overall score accuracy']
     assert_almost_equal(sig_osa, 0, places=4)
@@ -93,7 +91,6 @@ def test_get_fairness_analyses_osd_difference():
                                  'raw')
     eq_(len(model_dict), 3)
     eq_(len(dc), 4)
-    print(dc['fairness_metrics_by_L1'])
     sig_osa = dc['fairness_metrics_by_L1'].loc['sig',
                                                'Overall score accuracy']
     sig_osd = dc['fairness_metrics_by_L1'].loc['sig',
@@ -119,7 +116,6 @@ def test_get_fairness_analyses_csd_difference():
                                  'raw')
     eq_(len(model_dict), 3)
     eq_(len(dc), 4)
-    print(dc['fairness_metrics_by_L1'])
     sig_osa = dc['fairness_metrics_by_L1'].loc['sig',
                                                'Overall score accuracy']
     sig_osd = dc['fairness_metrics_by_L1'].loc['sig',
