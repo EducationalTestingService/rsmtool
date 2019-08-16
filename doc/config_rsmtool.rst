@@ -304,7 +304,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
     - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
-        - percentage of variance in absolute error explained by subgroup membership
+        - percentage of variance in raw (signed) error  error explained by subgroup membership
         - percentage of variance in absolute error explained by subgroup membership when controlling for human score
         - plots showing estimates for each subgroup for each model
 

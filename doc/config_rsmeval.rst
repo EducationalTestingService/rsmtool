@@ -32,7 +32,7 @@ The single numeric value for the highest possible integer score that the machine
     Although the ``trim_min`` and ``trim_max`` fields are optional for ``rsmtool``, they are *required* for ``rsmeval``.
 
 trim_tolerance *(Optional)*
-"""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The single numeric value that will be used to pad the trimming range specified in ``trim_min`` and ``trim_max``. This value will be used to compute the ceiling and floor values for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance`` for ceiling value and ``trim_min``-``trim_tolerance`` for floor value.
 Defaults to 0.49998.
@@ -150,7 +150,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
     - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
-        - percentage of variance in absolute error explained by subgroup membership
+        - percentage of variance in raw (signed) error explained by subgroup membership
         - percentage of variance in absolute error explained by subgroup membership when controlling for human score
         - plots showing estimates for each subgroup for each model
 
