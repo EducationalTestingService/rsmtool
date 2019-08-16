@@ -273,7 +273,7 @@ These include:
 
 Please refer to the paper for the full description of this metrics. 
 
-The fairness metrics are computed using :ref:`rsmtool.fariness_utils.get_fairness_analysis<fairness_api>`
+The fairness metrics are computed using :ref:`rsmtool.fairness_utils.get_fairness_analyses`<fairness_api>`
 
 .. _consistency_metrics:
 

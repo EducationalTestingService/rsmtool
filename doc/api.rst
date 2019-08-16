@@ -77,7 +77,7 @@ From :py:mod:`~rsmtool.convert_feature_json` Module
 From :py:mod:`~rsmtool.fairness_utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. _fairness_api:
-.. autofunction:: rsmtool.fairness_utils.get_fairness_analysis
+.. autofunction:: rsmtool.fairness_utils.get_fairness_analyses
 
 From :py:mod:`~rsmtool.modeler` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
