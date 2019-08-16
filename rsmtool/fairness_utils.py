@@ -48,7 +48,7 @@ def convert_to_ordered_category(group_values):
     df_groups_by_size = pd.DataFrame(group_values.value_counts()).reset_index()
     df_groups_by_size.columns = ['group_name', 'count']
     df_groups_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
-                                                            ascending=[False, True])
+                                                             ascending=[False, True])
     groups_by_size = df_groups_by_size_sorted['group_name'].values
 
     #convert to category and reorder
@@ -210,7 +210,7 @@ def get_fairness_analyses(df,
     
     # collect the results
     osa_dict = {'R2': osa_fit.rsquared_adj,
-               'sig': osa_fit.f_pvalue}
+                'sig': osa_fit.f_pvalue}
 
     osa_results = pd.Series(osa_dict, name='Overall score accuracy')
 
@@ -225,7 +225,7 @@ def get_fairness_analyses(df,
     
     # collect the results
     osd_dict = {'R2': osd_fit.rsquared_adj,
-               'sig': osd_fit.f_pvalue}
+                'sig': osd_fit.f_pvalue}
 
     osd_results = pd.Series(osd_dict, name='Overall score difference')
 
@@ -254,7 +254,7 @@ def get_fairness_analyses(df,
     # collect the results. Note that R2 in this case is a difference
     # in R2 between the two models and significance is obtained from anova
     csd_dict = {'R2': csd_fit.rsquared_adj - csd_null_fit.rsquared_adj,
-               'sig': anova_results.values[1][-1]}
+                'sig': anova_results.values[1][-1]}
     csd_results = pd.Series(csd_dict, name='Conditional score difference')
 
     df_coefficients_csd = get_coefficients(osd_fit, base_group)

@@ -1001,7 +1001,6 @@ class ConfigurationParser:
             else:
                 new_config['min_n_per_group'] = dict([(group, new_config['min_n_per_group'])
                                                       for group in new_config['subgroups']])
-                print(new_config['min_n_per_group'])
 
 
 
