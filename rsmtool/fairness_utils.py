@@ -75,7 +75,7 @@ def get_coefficients(fit,
         Linear regression object fitted using statsmodels
 
     base_category: str
-        Name of the group used a reference category when fitting the model
+        Name of the group used as reference category when fitting the model
 
     Returns:
     -------
