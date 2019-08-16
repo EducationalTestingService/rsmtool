@@ -70,7 +70,7 @@ def get_coefficients(fit, base_category):
 
     Parameters:
     -----------
-    fit: fit
+    fit: pandas.stats.ols.OLS
         Linear regression object fitted using statsmodels
 
     base_category: str
