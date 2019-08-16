@@ -13,6 +13,7 @@
     "section_order": ["consistency",
                       "evaluation",
                       "evaluation_by_group",
+                      "fairness_analyses",
                       "data_description",
                       "data_description_by_group",
                       "intermediate_file_paths",

@@ -132,3 +132,16 @@ Evaluations based on test theory
 - ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
 
 - ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variances for human and system scores for these sets of responses, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score using system score. 
+
+Additional fairness analyses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These files contain the results of additional fairness analyses suggested in suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. 
+
+- ``<METRICS>_by_<SUBGROUP>.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model for estimating the variance attributed to a given subgroup membership for a given metric. The subgroups are defined by the :ref:`configuration file<subgroups_eval>`. The metrics are ``osa`` (overall score accuracy), ``osd`` (overall score difference), and ``csd`` (conditional score difference). 
+
+- ``<METRICS>_by_<SUBGROUP>_ols_summary.txt``: a text file containing a summary of the above model
+
+- ``estimates_<METRICS>_by_<SUBGROUP>```: coefficients, confidence intervals and *p*-values estimated by the model for each subgroup.
+
+- ``fairness_metrics_by_<SUBGROUP>``: the :math:`R^2` (percentage of variance) and *p*-values for all  models. 

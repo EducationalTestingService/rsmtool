@@ -286,6 +286,14 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``evaluation_by_group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
+    - ``fairness_analyses``: Additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
+
+        - percentage of variance in squared error explained by subgroup membership
+        - percentage of variance in raw (signed) error  error explained by subgroup membership
+        - percentage of variance in raw (signed) error explained by subgroup membership when controlling for human score
+        - plots showing estimates for each subgroup for each model
+
+
     - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
     
         - variance of human scores for single and double-scored responses;

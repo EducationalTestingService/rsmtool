@@ -14,6 +14,7 @@
         "pca",
         "evaluation",
         "evaluation_by_group",
+        "fairness_analyses",
         "true_score_evaluation",
         "intermediate_file_paths",
         "sysinfo"
