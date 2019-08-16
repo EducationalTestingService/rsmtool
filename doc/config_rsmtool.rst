@@ -251,7 +251,7 @@ A list of column names indicating grouping variables used for generating analyse
 
 min_n_per_group *(Optional)*
 """""""""""""""""""""""""""""""
-A single numeric value or a dictionary where keys correpond to subgroups listed in `subgroups` field and values are threshold for each group. When specified, only groups with *at least* this number of cases will be displayed into the tables and plots **in the report**. This parameter only affects what is displayed in the .html reports and figures. The data from all groups will be used for all analyses including the computation of the population parameters and the results for all groups will still be shown in the :ref:`intermediate files <intermediate_files_rsmtool>`.
+A single numeric value or a dictionary where keys correpond to subgroups listed in `subgroups` field and values are threshold for each group. When specified, only groups with *at least* this number of cases will be displayed in tables and plots **in the report**. This parameter only affects what is displayed in the .html reports and figures. The data from all groups will be used for all analyses including the computation of the population parameters and the results for all groups will still be shown in the :ref:`intermediate files <intermediate_files_rsmtool>`.
 
 .. note::
 
