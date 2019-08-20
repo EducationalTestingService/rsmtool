@@ -988,7 +988,7 @@ class ConfigurationParser:
         # sure the keys match
         if new_config['min_n_per_group']:
             # make sure we have subgroups
-            if not 'subgroups' in new_config:
+            if 'subgroups' not in new_config:
                 raise ValueEror("You must specify a list of subgroups in "
                                 "in `subgroups` field "
                                 "you want to use `min_n_per_group` field")
