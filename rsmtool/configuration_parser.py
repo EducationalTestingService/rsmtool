@@ -1000,7 +1000,7 @@ class ConfigurationParser:
             # else convert to dictionary
             else:
                 new_config['min_n_per_group'] = {group: new_config['min_n_per_group'] 
-                                                      for group in new_config['subgroups']])
+                                                 for group in new_config['subgroups']}
 
 
 
