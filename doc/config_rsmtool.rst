@@ -255,7 +255,7 @@ A single numeric value or a dictionary where keys correpond to subgroups listed 
 
 .. note::
 
-    If you supply a dictionary of values, the dictionary must contain a key for each of the subgroups listed in `subgroup` field. If no threshold should be applied for some of the groups, set the threshold value for this group to 0. 
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
 .. note::
     The threshold when provided will be applied both when displaying feature descriptive analyses conducted on the training set and when displaying the results of the performance analyses computed on the evaluation set. 
