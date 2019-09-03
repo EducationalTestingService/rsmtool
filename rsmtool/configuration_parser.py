@@ -990,10 +990,10 @@ class ConfigurationParser:
             # make sure we have subgroups
             if 'subgroups' not in new_config:
                 raise ValueEror("You must specify a list of subgroups in "
-                                "in `subgroups` field "
-                                "you want to use `min_n_per_group` field")
+                                "in the `subgroups` field if "
+                                "you want to use the `min_n_per_group` field")
             # if we got dictionary, make sure the keys match
-            elif type(new_config['min_n_per_group']) == dict:
+            elif isinstance(new_config['min_n_per_group'], dict):
                 if sorted(new_config['min_n_per_group'].keys()) != sorted(new_config['subgroups']):
                     raise ValueError("The keys in `min_n_per_group` must "
                                      "match the subgroups in `subgroups` field")
