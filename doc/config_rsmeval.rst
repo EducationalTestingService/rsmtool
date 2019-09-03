@@ -112,6 +112,15 @@ A list of column names indicating grouping variables used for generating analyse
 
     - tables and barplots showing system-human agreement for each subgroup on the evaluation set.
 
+
+min_n_per_group *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmeval>` will still show the results for *all* groups. 
+
+.. note::
+
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
+
 .. _general_sections_rsmeval:
 
 general_sections *(Optional)*

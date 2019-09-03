@@ -639,6 +639,7 @@ class Reporter:
                           'SUBGROUPS': config.get('subgroups', []),
                           'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
                           'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'MIN_N_PER_GROUP': config.get('min_n_per_group', {}),
                           'LENGTH_COLUMN': config.get('length_column', None),
                           'H2_COLUMN': config['second_human_score_column'],
                           'MIN_ITEMS': min_items,

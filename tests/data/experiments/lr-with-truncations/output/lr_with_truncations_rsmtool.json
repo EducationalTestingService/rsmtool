@@ -31,6 +31,7 @@
     "feature_subset": null,
     "trim_tolerance": 0.49998,
     "subgroups": [],
+    "min_n_per_group": null,
     "skll_objective": null,
     "section_order": null,
     "flag_column": null,

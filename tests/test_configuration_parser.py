@@ -268,6 +268,7 @@ class TestConfigurationParser:
         self.parser.validate_config(context='rsmsummarize')
 
 
+
     @raises(ValueError)
     def test_validate_config_too_few_experiment_names(self):
         data = {'summary_id': 'summary',
@@ -277,6 +278,87 @@ class TestConfigurationParser:
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
         self.parser.validate_config(context='rsmsummarize')
+
+
+    def test_validate_config_numeric_subgroup_threshold(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L2', 'L1'],
+                'min_n_per_group': 100}
+        self.parser._config = data
+        newdata = self.parser.validate_config()
+        eq_(type(newdata['min_n_per_group']), dict)
+        assert_equal(newdata['min_n_per_group']['L1'], 100)
+        assert_equal(newdata['min_n_per_group']['L2'], 100)
+
+
+    def test_validate_config_dictionary_subgroup_threshold(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L2', 'L1'],
+                'min_n_per_group': {"L1": 100, 
+                                    "L2": 200}}
+        self.parser._config = data
+        newdata = self.parser.validate_config()
+        eq_(type(newdata['min_n_per_group']), dict)
+        assert_equal(newdata['min_n_per_group']['L1'], 100)
+        assert_equal(newdata['min_n_per_group']['L2'], 200)
+
+
+
+    @raises(ValueError)
+    def test_valdiate_config_too_few_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+
+    @raises(ValueError)
+    def test_valdiate_config_too_many_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100,
+                                    "L2": 100,
+                                    "L4": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+
+    @raises(ValueError)
+    def test_valdiate_config_mismatched_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100,
+                                    "L4": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+
+    @raises(ValueError)
+    def test_valdiate_config_min_n_without_subgroups(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'min_n_per_group': {"L1": 100,
+                                    "L2": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
 
 
     def test_process_fields(self):
