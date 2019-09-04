@@ -41,10 +41,13 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_summary(*args, **kwargs)
 
 
-def test_run_experiment_lr_summary_no_trim():
+def test_run_experiment_lr_summary_with_object():
 
-    # experiment to check the condition where no trim values can be located
-    source = 'lr-self-summary-no-trim'
+    # test rsmsummarize using the Configuration object, rather than a file;
+    # we pass the `filepath` attribute after constructing the Configuraiton object
+    # to ensure that the results are identical to what we would expect if we had
+    # run this test with a configuration file instead.
+    source = 'lr-self-summary-object'
 
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -54,12 +57,12 @@ def test_run_experiment_lr_summary_no_trim():
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
-                   "description": "Comparison of rsmtool without trim values"}
+                   "description": "Comparison of rsmtool experiment with itself."}
 
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
-    config_obj = config_file
+    config_obj.filepath = config_file
 
     do_run_summary(source, config_obj)
 
@@ -79,10 +82,11 @@ def test_run_experiment_lr_summary_no_trim():
     yield check_report, html_report
 
 
-def test_run_experiment_lr_summary_with_object():
+def test_run_experiment_lr_summary_no_trim():
 
-    # basic rsmsummarize experiment comparing several rsmtool experiments
-    source = 'lr-self-summary-object'
+    # experiment to check the condition where no trim values can be located
+    # also uses the `Configuration` object directly
+    source = 'lr-self-summary-no-trim'
 
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -92,12 +96,12 @@ def test_run_experiment_lr_summary_with_object():
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
-                   "description": "Comparison of rsmtool experiment with itself."}
+                   "description": "Comparison of rsmtool without trim values"}
 
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
-    config_obj = config_file
+    config_obj.filepath = config_file
 
     do_run_summary(source, config_obj)
 
