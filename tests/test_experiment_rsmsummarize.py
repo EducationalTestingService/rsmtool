@@ -35,12 +35,48 @@ else:
     param('summary-with-custom-names'),
     param('lr-self-summary-null-trim-min')
 ])
-
-
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_summary(*args, **kwargs)
+
+
+def test_run_experiment_lr_summary_no_trim():
+
+    # experiment to check the condition where no trim values can be located
+    source = 'lr-self-summary-no-trim'
+
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       'rsmsummarize.json')
+
+    config_dict = {"summary_id": "model_comparison",
+                   "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
+                   "description": "Comparison of rsmtool without trim values"}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
+    config_obj = config_file
+
+    do_run_summary(source, config_obj)
+
+    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_report, html_report
 
 
 def test_run_experiment_lr_summary_with_object():
