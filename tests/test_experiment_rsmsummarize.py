@@ -95,7 +95,7 @@ def test_run_experiment_lr_summary_no_trim():
                        'rsmsummarize.json')
 
     config_dict = {"summary_id": "model_comparison",
-                   "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
+                   "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
                    "description": "Comparison of rsmtool without trim values"}
 
     config_parser = ConfigurationParser()
