@@ -23,7 +23,7 @@ from rsmtool.container import DataContainer
 
 
 
-def convert_to_ordered_category(group_values):
+def convert_to_ordered_category(group_values, base_group=None):
     """
     Convert supplied series to an ordered category
     with levels ordered by category size.
@@ -33,6 +33,8 @@ def convert_to_ordered_category(group_values):
     Parameters
     ----------
     group_values: pandas Series
+    base_group: str
+        group to use as reference
 
     Returns
     -------
@@ -49,7 +51,16 @@ def convert_to_ordered_category(group_values):
     df_groups_by_size.columns = ['group_name', 'count']
     df_groups_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
                                                              ascending=[False, True])
-    groups_by_size = df_groups_by_size_sorted['group_name'].values
+    groups_by_size = list(df_groups_by_size_sorted['group_name'].values)
+
+    if base_group is not None:
+        # if we have user-supplied base group, check that it's actually in the data
+        if not base_group in group_values.values:
+            raise ValueError("The dataset must contain the values for reference group")
+        else:
+            # move the supplied reference group to the beginning of the list
+            base_index = groups_by_size.index(base_group)
+            groups_by_size.insert(0, groups_by_size.pop(base_index))
 
     #convert to category and reorder
     group_category = group_values.astype("category")
@@ -157,7 +168,8 @@ def write_fairness_results(fit_dictionary,
 def get_fairness_analyses(df,
                           group,
                           system_score_column,
-                          human_score_column='sc1'):
+                          human_score_column='sc1',
+                          base_group=None):
     """ 
     Compute fairness analyses described in Loukina et al. (2019) https://aclweb.org/anthology/papers/W/W19/W19-4401/
     The functions computes how muach variance group memebership explains in 
@@ -175,6 +187,8 @@ def get_fairness_analyses(df,
         Name of the column containing system scores
     human_score_column: str
         Name of the column containing human scores
+    base_group: str
+        Name of the group to use as a reference category
 
     Returns
     -------
@@ -197,8 +211,8 @@ def get_fairness_analyses(df,
     # convert group values to category and reorder them using 
     # the largest category as reference
     
-    df['group'] = convert_to_ordered_category(df[group])
-    base_group = df['group'].cat.categories[0]
+    df['group'] = convert_to_ordered_category(df[group], base_group)
+
     df['sc1_cat'] = convert_to_ordered_category(df[human_score_column])
 
     # Overall score accuracy (OSA)
