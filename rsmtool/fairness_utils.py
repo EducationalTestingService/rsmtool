@@ -257,7 +257,7 @@ def get_fairness_analyses(df,
                 'sig': anova_results.values[1][-1]}
     csd_results = pd.Series(csd_dict, name='Conditional score difference')
 
-    df_coefficients_csd = get_coefficients(osd_fit, base_group)
+    df_coefficients_csd = get_coefficients(csd_fit, base_group)
 
     # create a summary table
 
