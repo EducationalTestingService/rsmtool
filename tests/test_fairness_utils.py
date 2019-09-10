@@ -36,17 +36,20 @@ def test_convert_to_ordered_category_several_maximums():
     cat_values = convert_to_ordered_category(values)
     eq_(cat_values.cat.categories[0], 'a_1')
 
+
 def test_convert_to_ordered_category_base_category():
     values = pd.Series(['a', 'a', 'b', 'b', 'b',
-                         'c', 'c', 'd'])
+                        'c', 'c', 'd'])
     cat_values = convert_to_ordered_category(values, 'a')
     eq_(cat_values.cat.categories[0], 'a')
+
 
 @raises(ValueError)
 def test_convert_to_ordered_category_wrong_base_category():
     values = pd.Series(['a', 'a', 'b', 'b', 'b',
-                         'c', 'c', 'd'])
-    cat_values = convert_to_ordered_category(values, 'e')
+                        'c', 'c', 'd'])
+    __ = convert_to_ordered_category(values, 'e')
+
 
 def test_get_fairness_analyses_no_effect():
     df = pd.DataFrame({'sc1': [1, 1, 4, 4],
