@@ -22,18 +22,18 @@ In addition to the HTML report, RSMTool also saves the intermediate outputs of a
 Input file format
 """""""""""""""""
 
-The input files containing feature values and scores for all responses in training and evaluation data should be either in tabular format with features and scores stored in columns and each row correponding to a single response or in ``jsonlines`` format with one line per response. See below for further description of ``.jsonlines`` format. 
+The input files for the training and evaluation data should either be in a tabular format with responses as rows and features and score(s) in the columns  in the ``jsonlines`` format with a JSON object per responses on each line. See below for a more detailed description of the ``.jsonlines`` format. 
 
 RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``xls``/``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
 
-For ``Excel`` spreadsheets all data must be stored in the first sheet. 
+For ``Excel`` spreadsheets, all data must be stored in the first sheet. 
 
-Each line in ``.jsonlines`` format should correspond to one response represented as a dictionary with column names as keys and values as values. For example:
+In a ``.jsonlines`` format file, each line corresponds to a response and is represented as a dictionary with column names as the keys and column values as the values. For example:
 
 .. literalinclude:: ../tests/data/files/train.jsonlines
    :lines: 1,2
 
-RSMTool allows nested ``jsons`` in each line of ``.jsonlines`` file with no more than one level of nesting as in the following example. Note that only the lower level keys will be used when parsing the files and processing the data. Thus in the example below second level labels ``x`` and ``metadata`` will be ignored. 
+Although RSMTool does allow for a single level of nesting in the JSON objects on each line of a ``.jsonlines`` format file, *only* the top-level keys are actually used when parsing the files and processing the data. Therefore, in the example bellow, the keys ``x`` and ``metadata`` will be ignored. 
 
 .. literalinclude:: ../tests/data/files/train_nested.jsonlines
    :lines: 1,2
