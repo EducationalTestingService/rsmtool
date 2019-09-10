@@ -171,8 +171,9 @@ def get_fairness_analyses(df,
                           base_group=None):
     """
     Compute fairness analyses described in Loukina et al. (2019) https://aclweb.org/anthology/papers/W/W19/W19-4401/
-    The functions computes how muach variance group memebership explains in
-    overall score accuracy (osa), overall score difference (osd) and conditional score difference (csd).
+    The functions computes how much variance group membership explains in
+    overall score accuracy (osa), overall score difference (osd),
+    and conditional score difference (csd).
     See paper for further detail.
 
     Parameters
@@ -295,4 +296,3 @@ def get_fairness_analyses(df,
                   'csd': csd_fit}
 
     return model_dict, DataContainer(datasets=datasets)
-
