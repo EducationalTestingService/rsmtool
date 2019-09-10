@@ -318,25 +318,13 @@ class TestJsonLines:
         jsonlines = [{'id': '001',
                       'feature1': 1,
                       'feature2': 1.5},
-                      {'id': '002',
+                     {'id': '002',
                       'feature1': 2,
                       'feature2': 2.5},
-                      {'id': '003',
+                     {'id': '003',
                       'feature1': 3,
                       'feature2': 3.5}]
         self.check_jsonlines_output(jsonlines)
-
-    def test_read_nested_jsonlines(self):
-        nested_jsonlines = [{'id': '001',
-                            'features': {'feature1': 1,
-                                         'feature2': 1.5}},
-                            {'id': '002',
-                            'features': {'feature1': 2,
-                                         'feature2': 2.5}},
-                            {'id': '003',
-                            'features': {'feature1': 3,
-                                         'feature2': 3.5}}]
-        self.check_jsonlines_output(nested_jsonlines)
 
     def test_read_nested_jsonlines(self):
         nested_jsonlines = [{'id': '001',
@@ -380,8 +368,7 @@ class TestJsonLines:
 
     @raises(ValueError)
     def test_read_plain_json(self):
-        plain_json =  {'id': ['001', '002', '003'],
-                       'feature1': [1, 2, 3],
-                       'feature2': [1.5, 2.5, 3.5]}
+        plain_json = {'id': ['001', '002', '003'],
+                      'feature1': [1, 2, 3],
+                      'feature2': [1.5, 2.5, 3.5]}
         self.check_jsonlines_output(plain_json)
-
