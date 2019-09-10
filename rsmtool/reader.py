@@ -24,7 +24,8 @@ from rsmtool.container import DataContainer
 
 
 def read_jsonlines(filename, converters=None):
-    """ Read jsonlines from a file. 
+    """
+    Read jsonlines from a file. 
     Normalize nested jsons with up to one level of nesting
 
     Parameters
