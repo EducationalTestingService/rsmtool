@@ -253,14 +253,15 @@ A list of column names indicating grouping variables used for generating analyse
 
 min_n_per_group *(Optional)*
 """""""""""""""""""""""""""""""
-A single numeric value or a dictionary where keys correpond to subgroups listed in `subgroups` field and values are threshold for each group. When specified, only groups with *at least* this number of cases will be displayed into the tables and plots **in the report**. This parameter only affects what is displayed in the .html reports and figures. The data from all groups will be used for all analyses including the computation of the population parameters and the results for all groups will still be shown in the :ref:`intermediate files <intermediate_files_rsmtool>`.
+A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmtool>` will still show the results for *all* groups. 
+
 
 .. note::
 
-    If you supply a dictionary of values, the dictionary must contain a key for each of the subgroups listed in `subgroup` field. If no threshold should be applied for some of the groups, set the threshold value for this group to 0. 
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
 .. note::
-    The threshold when provided will be applied both when displaying feature descriptive analyses conducted on the training set and when displaying the results of the performance analyses computed on the evaluation set. 
+    Any provided thresholds will be applied when displaying the feature descriptive analyses conducted on the training set *and* the results of the performance analyses computed on the evaluation set. 
 
 
 .. _general_sections_rsmtool:
