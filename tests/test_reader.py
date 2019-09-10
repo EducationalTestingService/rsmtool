@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 import pandas as pd
 import warnings
@@ -75,7 +76,7 @@ class TestDataReader:
         elif ext.lower() in ['xls', 'xlsx']:
             df.to_excel(tempf.name, index=False)
         elif ext.lower() in ['jsonlines']:
-            df.to_json(tempf.name, 
+            df.to_json(tempf.name,
                        orient='records',
                        lines=True)
         tempf.close()
@@ -184,7 +185,7 @@ class TestDataReader:
     def test_container_test_property_frame_equal(self):
         test_lists = [('feature_specs', 'csv'),
                       ('test', 'tsv'),
-                       ('train_metadata', 'xlsx')]
+                      ('train_metadata', 'xlsx')]
         converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
         converters = {'test': converter}
         container = self.get_container(test_lists, converters)
@@ -275,3 +276,112 @@ class TestDataReader:
         paths = ['path1.csv', None, 'path2.csv']
         framenames = ['train', 'test', 'features']
         DataReader(paths, framenames)
+
+
+
+class TestJsonLines:
+
+    def setUp(self):
+        self.filepaths = []
+
+        self.expected = pd.DataFrame({'id': ['001', '002', '003'],
+                                      'feature1': [1, 2, 3],
+                                      'feature2': [1.5, 2.5, 3.5]})
+
+
+    def tearDown(self):
+        for path in self.filepaths:
+            if os.path.exists(path):
+                os.unlink(path)
+        self.filepaths = []
+
+
+    @staticmethod
+    def create_jsonlines_file(jsondict):
+        tempf = tempfile.NamedTemporaryFile(mode='w',
+                                            suffix='.jsonlines',
+                                            delete=False)
+        for entry in jsondict:
+            json.dump(entry, tempf)
+            tempf.write('\n')
+        return tempf.name
+
+    def check_jsonlines_output(self, jsondict):
+        fname = self.create_jsonlines_file(jsondict)
+        self.filepaths.append(fname)
+        df = read_jsonlines(fname, converters={'id': str})
+        print(df)
+        assert_frame_equal(df.sort_index(axis=1), self.expected.sort_index(axis=1))
+
+
+    def test_read_jsonlines(self):
+        jsonlines = [{'id': '001',
+                      'feature1': 1,
+                      'feature2': 1.5},
+                      {'id': '002',
+                      'feature1': 2,
+                      'feature2': 2.5},
+                      {'id': '003',
+                      'feature1': 3,
+                      'feature2': 3.5}]
+        self.check_jsonlines_output(jsonlines)
+
+    def test_read_nested_jsonlines(self):
+        nested_jsonlines = [{'id': '001',
+                            'features': {'feature1': 1,
+                                         'feature2': 1.5}},
+                            {'id': '002',
+                            'features': {'feature1': 2,
+                                         'feature2': 2.5}},
+                            {'id': '003',
+                            'features': {'feature1': 3,
+                                         'feature2': 3.5}}]
+        self.check_jsonlines_output(nested_jsonlines)
+
+    def test_read_nested_jsonlines(self):
+        nested_jsonlines = [{'id': '001',
+                            'features': {'feature1': 1,
+                                         'feature2': 1.5}},
+                            {'id': '002',
+                            'features': {'feature1': 2,
+                                         'feature2': 2.5}},
+                            {'id': '003',
+                            'features': {'feature1': 3,
+                                         'feature2': 3.5}}]
+        self.check_jsonlines_output(nested_jsonlines)
+
+
+    def test_read_nested_jsonlines_all_nested(self):
+        all_nested_jsonlines = [{'values': {'id': '001',
+                                           'feature1': 1,
+                                           'feature2': 1.5}},
+                                {'values': {'id': '002',
+                                           'feature1': 2,
+                                           'feature2': 2.5}},
+                                {'values': {'id': '003',
+                                           'feature1': 3,
+                                           'feature2': 3.5}}]
+        self.check_jsonlines_output(all_nested_jsonlines)
+
+    def test_read_jsonlines_more_than_2_levels(self):
+        mlt_nested_jsonlines = [{'values': {'id': '001',
+                                           'features': {'feature1': 1,
+                                                        'feature2': 1.5}}},
+                                {'values': {'id': '002',
+                                           'features': {'feature1': 2,
+                                                        'feature2': 2.5}}},
+                                {'values': {'id': '003',
+                                           'features': {'feature1': 3,
+                                                        'feature2': 3.5}}}]
+        self.expected.columns = ['id',
+                                 'features.feature1',
+                                 'features.feature2']
+        self.check_jsonlines_output(mlt_nested_jsonlines)
+
+    @raises(ValueError)
+    def test_read_plain_json(self):
+        plain_json =  {'id': ['001', '002', '003'],
+                       'feature1': [1, 2, 3],
+                       'feature2': [1.5, 2.5, 3.5]}
+        self.check_jsonlines_output(plain_json)
+

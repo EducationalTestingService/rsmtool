@@ -33,10 +33,12 @@ In a ``.jsonlines`` format file, each line corresponds to a response and is repr
 .. literalinclude:: ../tests/data/files/train.jsonlines
    :lines: 1,2
 
-Although RSMTool does allow for a single level of nesting in the JSON objects on each line of a ``.jsonlines`` format file, *only* the top-level keys are actually used when parsing the files and processing the data. Therefore, in the example bellow, the keys ``x`` and ``metadata`` will be ignored. 
+Although RSMTool does allow for nesting in the JSON objects on each line of a ``.jsonlines`` format file, the top-level keys will be ignored when parsing the files and processing the data. Therefore, in the example bellow, the keys ``x`` and ``metadata`` will be ignored. 
 
 .. literalinclude:: ../tests/data/files/train_nested.jsonlines
    :lines: 1,2
+
+If the data contains nested records with more than two levels, the column names for nested records beyond the top level will be generated using ``.`` to separate levels: ``{'foo': {'bar': {'foo2': 0, 'foo3': 0}}`` -> ``foo`` will be ignored, the columns will be named ``bar.foo2`` and ``bar.foo3``.
 
 
 .. _feature_preprocessing:
