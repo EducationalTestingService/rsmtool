@@ -33,7 +33,7 @@ def convert_to_ordered_category(group_values, base_group=None):
     Parameters
     ----------
     group_values: pandas Series
-    base_group: str
+    base_group: str, optional
         group to use as reference
 
     Returns
