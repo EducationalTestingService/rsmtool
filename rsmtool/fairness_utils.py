@@ -220,7 +220,7 @@ def get_fairness_analyses(df,
     # convert group values to category and reorder them using
     # the largest category as reference
 
-    df['group'] = convert_to_ordered_category(df[group], base_group)
+    df['group'] = convert_to_ordered_category(df[group], base_group=base_group)
     base_group = df['group'].cat.categories[0]
 
     df['sc1_cat'] = convert_to_ordered_category(df[human_score_column])
