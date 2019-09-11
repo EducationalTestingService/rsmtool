@@ -38,7 +38,7 @@ Although RSMTool does allow for nesting in the JSON objects on each line of a ``
 .. literalinclude:: ../tests/data/files/train_nested.jsonlines
    :lines: 1,2
 
-If the data contains nested records with more than two levels, the column names for nested records beyond the top level will be generated using ``.`` to separate levels: ``{'foo': {'bar': {'foo2': 0, 'foo3': 0}}`` -> ``foo`` will be ignored, the columns will be named ``bar.foo2`` and ``bar.foo3``.
+If the file contains nesting of more than two levels, the column names for nested records beyond the top level will be generated using ``.`` to separate levels: For example, given the JSON object ``{'foo': {'bar': {'foo2': 0, 'foo3': 0}}``,  ``foo`` will be ignored and the columns will be named ``bar.foo2`` and ``bar.foo3``.
 
 
 .. _feature_preprocessing:
