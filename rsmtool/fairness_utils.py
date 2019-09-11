@@ -34,7 +34,7 @@ def convert_to_ordered_category(group_values, base_group=None):
     ----------
     group_values: pandas Series
     base_group: str, optional
-        group to use as reference
+        The group to use as the reference. Defaults to `None`.
 
     Returns
     -------
