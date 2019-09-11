@@ -193,7 +193,7 @@ def get_fairness_analyses(df,
         Name of the column containing system scores
     human_score_column: str
         Name of the column containing human scores
-    base_group: str
+    base_group: str, optional
         Name of the group to use as the reference category.
         Defaults to `None` in which case the group with the largest number
         of cases will be used a reference category. In case of a tie, the groups
