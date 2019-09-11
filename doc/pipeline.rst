@@ -22,14 +22,23 @@ In addition to the HTML report, RSMTool also saves the intermediate outputs of a
 Input file format
 """""""""""""""""
 
-The input files containing feature values and scores for all responses in training and evaluation data should be in tabular format with features and scores stored in columns and each row correponding to a single response.
+The input files for the training and evaluation data should either be in a tabular format with responses as rows and features and score(s) in the columns  in the ``jsonlines`` format with a JSON object per responses on each line. See below for a more detailed description of the ``.jsonlines`` format. 
 
 RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``xls``/``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
 
-For *Excel* spreadsheets all data must be stored in the first sheet. 
+For ``Excel`` spreadsheets, all data must be stored in the first sheet. 
 
-Jsonlines: 
+In a ``.jsonlines`` format file, each line corresponds to a response and is represented as a dictionary with column names as the keys and column values as the values. For example:
 
+.. literalinclude:: ../tests/data/files/train.jsonlines
+   :lines: 1,2
+
+Although RSMTool does allow for nesting in the JSON objects on each line of a ``.jsonlines`` format file, the top-level keys will be ignored when parsing the files and processing the data. Therefore, in the example below, the keys ``x`` and ``metadata`` will be ignored. 
+
+.. literalinclude:: ../tests/data/files/train_nested.jsonlines
+   :lines: 1,2
+
+If the file contains nesting of more than two levels, the column names for nested records beyond the top level will be generated using ``.`` to separate levels: For example, given the JSON object ``{'foo': {'bar': {'foo2': 0, 'foo3': 0}}``,  ``foo`` will be ignored and the columns will be named ``bar.foo2`` and ``bar.foo3``.
 
 
 .. _feature_preprocessing:
