@@ -34,7 +34,9 @@ def convert_to_ordered_category(group_values, base_group=None):
     ----------
     group_values: pandas Series
     base_group: str, optional
-        The group to use as the reference. Defaults to `None`.
+        The group to use as the first category. 
+        This overrides the default ordering.
+        Defaults to None 
 
     Returns
     -------
@@ -188,7 +190,7 @@ def get_fairness_analyses(df,
     human_score_column: str
         Name of the column containing human scores
     base_group: str
-        Name of the group to use as a reference category. 
+        Name of the group to use as the reference category. 
         Defaults to None in which case the group with the largest number 
         of cases will be used a reference category. In case of a tie, the groups
         are sorted alphabetically. 
