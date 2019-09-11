@@ -393,6 +393,21 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
 
+    def test_read_jsons_with_nones(self):
+        all_nested_jsonlines = [{'values': {'id': '001',
+                                           'feature1': None,
+                                           'feature2': 1.5}},
+                                {'values': {'id': '002',
+                                           'feature1': 2,
+                                           'feature2': None}},
+                                {'values': {'id': '003',
+                                           'feature1': 3,
+                                           'feature2': ''}}]
+        self.expected.loc[0, 'feature1'] = np.nan
+        self.expected.loc[1, 'feature2'] = np.nan
+        self.expected.loc[2, 'feature2'] = np.nan
+        self.check_jsonlines_output(all_nested_jsonlines)
+
     @raises(ValueError)
     def test_read_plain_json(self):
         plain_json = {'id': ['001', '002', '003'],
