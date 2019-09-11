@@ -32,6 +32,8 @@ else:
     param('lr-eval-with-custom-sections-and-order', 'lr_eval_with_custom_sections_and_order', subgroups=['QUESTION', 'L1']),
     param('lr-eval-tsv-input-files', 'lr_eval_tsv_input_files'),
     param('lr-eval-xlsx-input-files', 'lr_eval_xlsx_input_files'),
+    param('lr-eval-jsonlines-input-files', 'lr_eval_jsonlines_input_files'),
+    param('lr-eval-nested-jsonlines-input-files', 'lr_eval_nested_jsonlines_input_files'),
     param('lr-eval-with-tsv-output', 'lr_eval_with_tsv_output', file_format='tsv'),
     param('lr-eval-with-xlsx-output', 'lr_eval_with_xlsx_output', file_format='xlsx'),
     param('lr-eval-with-h2', 'lr_eval_with_h2', subgroups=['QUESTION', 'L1'], consistency=True),
