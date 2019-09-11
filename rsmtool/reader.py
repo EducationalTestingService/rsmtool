@@ -36,7 +36,7 @@ def read_jsonlines(filename, converters=None):
     converters : dict or None, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv()`.
+        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
 
     Returns
     -------
@@ -213,7 +213,7 @@ class DataReader:
         converters : None, optional
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
-            format as for ``pandas.read_csv()``.
+            format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
 
         Returns
         -------
