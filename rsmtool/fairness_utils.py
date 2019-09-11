@@ -33,6 +33,8 @@ def convert_to_ordered_category(group_values, base_group=None):
     Parameters
     ----------
     group_values: pandas Series
+        A series indicating group membership
+        
     base_group: str, optional
         The group to use as the first category. 
         This overrides the default ordering.
