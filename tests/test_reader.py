@@ -393,7 +393,9 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
 
-    def test_read_jsons_with_nones(self):
+    def test_read_jsons_with_nulls(self):
+        '''None is written to json as `null`.
+        We test if those are handled correctly'''
         all_nested_jsonlines = [{'values': {'id': '001',
                                            'feature1': None,
                                            'feature2': 1.5}},
@@ -402,10 +404,26 @@ class TestJsonLines:
                                            'feature2': None}},
                                 {'values': {'id': '003',
                                            'feature1': 3,
-                                           'feature2': ''}}]
+                                           'feature2': None}}]
         self.expected.loc[0, 'feature1'] = np.nan
         self.expected.loc[1, 'feature2'] = np.nan
         self.expected.loc[2, 'feature2'] = np.nan
+        self.check_jsonlines_output(all_nested_jsonlines)
+
+    @raises(ValueError)
+    def test_read_json_with_NaNs(self):
+        '''np.nan by default is written as NaN'''
+        ''' This is not correct json and will raise an'''
+        ''' exception'''
+        all_nested_jsonlines = [{'values': {'id': '001',
+                                           'feature1': np.nan,
+                                           'feature2': 1.5}},
+                                {'values': {'id': '002',
+                                           'feature1': 2,
+                                           'feature2': np.nan}},
+                                {'values': {'id': '003',
+                                           'feature1': 3,
+                                           'feature2': np.nan}}]
         self.check_jsonlines_output(all_nested_jsonlines)
 
     @raises(ValueError)

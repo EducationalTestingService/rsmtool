@@ -44,10 +44,15 @@ def read_jsonlines(filename, converters=None):
          Data frame containing the data in the given file.
     """
 
-    df = pd.read_json(filename,
-                      orient='records',
-                      lines=True,
-                      dtype=converters)
+    try:
+        df = pd.read_json(filename,
+                          orient='records',
+                          lines=True,
+                          dtype=converters)
+    except ValueError:
+        raise ValueError("The jsonlines file contains invalid values. "
+                         "Please check for NaN : these should be Null.")
+
 
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:
