@@ -38,7 +38,7 @@ def convert_to_ordered_category(group_values, base_group=None):
     base_group: str, optional
         The group to use as the first category.
         This overrides the default ordering.
-        Defaults to None
+        Defaults to `None`.
 
     Returns
     -------
