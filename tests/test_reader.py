@@ -330,45 +330,45 @@ class TestJsonLines:
 
     def test_read_nested_jsonlines(self):
         nested_jsonlines = [{'id': '001',
-                            'features': {'feature1': 1,
-                                         'feature2': 1.5}},
+                             'features': {'feature1': 1,
+                                          'feature2': 1.5}},
                             {'id': '002',
-                            'features': {'feature1': 2,
-                                         'feature2': 2.5}},
+                             'features': {'feature1': 2,
+                                          'feature2': 2.5}},
                             {'id': '003',
-                            'features': {'feature1': 3,
-                                         'feature2': 3.5}}]
+                             'features': {'feature1': 3,
+                                          'feature2': 3.5}}]
         self.check_jsonlines_output(nested_jsonlines)
 
 
     def test_read_nested_jsonlines_all_nested(self):
         all_nested_jsonlines = [{'values': {'id': '001',
-                                           'feature1': 1,
-                                           'feature2': 1.5}},
+                                            'feature1': 1,
+                                            'feature2': 1.5}},
                                 {'values': {'id': '002',
-                                           'feature1': 2,
-                                           'feature2': 2.5}},
+                                            'feature1': 2,
+                                            'feature2': 2.5}},
                                 {'values': {'id': '003',
-                                           'feature1': 3,
-                                           'feature2': 3.5}}]
+                                            'feature1': 3,
+                                            'feature2': 3.5}}]
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_jsonlines_more_than_2_levels(self):
         multi_nested_jsonlines = [{'values': {'id': '001',
-                                           'features': {'feature1': 1,
-                                                        'feature2': 1.5}}},
-                                {'values': {'id': '002',
-                                           'features': {'feature1': 2,
-                                                        'feature2': 2.5}}},
-                                {'values': {'id': '003',
-                                           'features': {'feature1': 3,
-                                                        'feature2': 3.5}}}]
+                                              'features': {'feature1': 1,
+                                                           'feature2': 1.5}}},
+                                  {'values': {'id': '002',
+                                              'features': {'feature1': 2,
+                                                           'feature2': 2.5}}},
+                                  {'values': {'id': '003',
+                                              'features': {'feature1': 3,
+                                                           'feature2': 3.5}}}]
         self.expected.columns = ['id',
                                  'features.feature1',
                                  'features.feature2']
         self.check_jsonlines_output(multi_nested_jsonlines)
 
-    
+
     def test_read_jsonlines_single_line(self):
         jsonlines = [{'id': '001',
                       'feature1': 1,
@@ -379,13 +379,13 @@ class TestJsonLines:
 
     def test_read_jsonlines_mismatched_keys(self):
         all_nested_jsonlines = [{'values': {'id': '001',
-                                           'feature1': 1,
-                                           'feature2': 1.5}},
+                                            'feature1': 1,
+                                            'feature2': 1.5}},
                                 {'values': {'id': '002',
-                                           'feature2': 2,
-                                           'feature3': 2.5}},
+                                            'feature2': 2,
+                                            'feature3': 2.5}},
                                 {'values': {'id': '003',
-                                           'feature1': 3}}]
+                                            'feature1': 3}}]
         self.expected = pd.DataFrame({'id': self.expected['id'],
                                       'feature1': [1, np.nan, 3],
                                       'feature2': [1.5, 2, np.nan],
@@ -397,14 +397,14 @@ class TestJsonLines:
         '''None is written to json as `null`.
         We test if those are handled correctly'''
         all_nested_jsonlines = [{'values': {'id': '001',
-                                           'feature1': None,
-                                           'feature2': 1.5}},
+                                            'feature1': None,
+                                            'feature2': 1.5}},
                                 {'values': {'id': '002',
-                                           'feature1': 2,
-                                           'feature2': None}},
+                                            'feature1': 2,
+                                            'feature2': None}},
                                 {'values': {'id': '003',
-                                           'feature1': 3,
-                                           'feature2': None}}]
+                                            'feature1': 3,
+                                            'feature2': None}}]
         self.expected.loc[0, 'feature1'] = np.nan
         self.expected.loc[1, 'feature2'] = np.nan
         self.expected.loc[2, 'feature2'] = np.nan
@@ -412,18 +412,18 @@ class TestJsonLines:
 
     @raises(ValueError)
     def test_read_json_with_NaNs(self):
-        '''np.nan by default is written as NaN'''
-        ''' This is not correct json and will raise an'''
-        ''' exception'''
+        '''np.nan by default is written as NaN
+        This is not correct json and will raise an
+        exception'''
         all_nested_jsonlines = [{'values': {'id': '001',
-                                           'feature1': np.nan,
-                                           'feature2': 1.5}},
+                                            'feature1': np.nan,
+                                            'feature2': 1.5}},
                                 {'values': {'id': '002',
-                                           'feature1': 2,
-                                           'feature2': np.nan}},
+                                            'feature1': 2,
+                                            'feature2': np.nan}},
                                 {'values': {'id': '003',
-                                           'feature1': 3,
-                                           'feature2': np.nan}}]
+                                            'feature1': 3,
+                                            'feature2': np.nan}}]
         self.check_jsonlines_output(all_nested_jsonlines)
 
     @raises(ValueError)
