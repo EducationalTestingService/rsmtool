@@ -38,7 +38,7 @@ else:
           consistency=True),
     param('lr-jsonlines-input-files', 'lr_jsonlines_input_files'),
     param('lr-nested-jsonlines-input-files', 'lr_nested_jsonlines_input_files')])
-  
+
 
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:

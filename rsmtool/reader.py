@@ -11,7 +11,6 @@ and converting them to DataContainer objects.
 """
 
 import warnings
-import pandas as pd
 
 from functools import partial
 from os.path import (abspath,
@@ -19,12 +18,15 @@ from os.path import (abspath,
                      join,
                      splitext)
 
+import pandas as pd
+
 from rsmtool.container import DataContainer
 
 
 
 def read_jsonlines(filename, converters=None):
-    """ Read jsonlines from a file. 
+    """
+    Read jsonlines from a file.
     Normalize nested jsons with up to one level of nesting
 
     Parameters
@@ -34,7 +36,7 @@ def read_jsonlines(filename, converters=None):
     converters : dict or None, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv()`.
+        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
 
     Returns
     -------
@@ -42,25 +44,37 @@ def read_jsonlines(filename, converters=None):
          Data frame containing the data in the given file.
     """
 
-    df = pd.read_json(filename,
-                      orient='records',
-                      lines=True,
-                      dtype=converters)
-        
-    # let's check if we have nested columns
-    nested_cols = [c for c in df.columns if isinstance(df[c][0],dict)]
+    try:
+        df = pd.read_json(filename,
+                          orient='records',
+                          lines=True,
+                          dtype=converters)
+    except ValueError:
+        raise ValueError("The jsonlines file is not formatted correctly. "
+                         "Please check that each line ends with a comma, "
+                         "there is no comma at the end of the last line, "
+                         "and that all quotes match. Please also check that"
+                         "any undefined values are written out as `null` and not `NaN`.")
 
-    if len(nested_cols) > 0:
-        dfs = []
-        for col in nested_cols:
-            df_nested_column = pd.io.json.json_normalize(df[col])
-            dfs.append(df_nested_column)
-            df.drop(col, axis=1, inplace=True)
-        df_new = pd.concat([df] + dfs, axis=1)
-    else:
-        df_new = df
-        
-    return df_new
+
+    # make sure we didn't get a plain json
+    if type(df.columns) == pd.RangeIndex:
+        raise ValueError("It looks like {} is a simple json file. "
+                         "Please check documentation (for the expected "
+                         "file format".format(filename))
+
+    dfs = []
+    for column in df:
+        try:
+            df_column = pd.io.json.json_normalize(df[column])
+        except AttributeError:
+            df_column = df[column].copy()
+
+        dfs.append(df_column)
+
+    df = pd.concat(dfs, axis=1)
+
+    return df
 
 
 def try_to_load_file(filename,
@@ -81,7 +95,7 @@ def try_to_load_file(filename,
     converters : dict or None, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv()`.
+        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
     raise_error : bool, optional
         Raise an error if the file cannot be located.
         Defaults to False.
@@ -207,7 +221,7 @@ class DataReader:
         converters : None, optional
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
-            format as for ``pandas.read_csv()``.
+            format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
 
         Returns
         -------

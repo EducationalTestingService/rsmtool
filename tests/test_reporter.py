@@ -276,7 +276,7 @@ class TestReporter:
         custom_sections = []
         subgroups = []
         no_subgroup_list = [s for s in general_section_list_rsmeval
-                            if not s.endswith('by_group') and s!='fairness_analyses']
+                            if not s.endswith('by_group') and s != 'fairness_analyses']
         chosen_sections = self.reporter.determine_chosen_sections(general_sections,
                                                                   special_sections,
                                                                   custom_sections,
@@ -396,7 +396,7 @@ class TestReporter:
                                                                   model_type='skll',
                                                                   context='rsmtool')
         no_subgroup_list = [s for s in general_section_list_rsmtool
-                            if not s.endswith('by_group') and s!='fairness_analyses']
+                            if not s.endswith('by_group') and s != 'fairness_analyses']
         section_list = ['header'] + no_subgroup_list + ['footer']
 
         # replace model section with skll_model.
@@ -441,7 +441,7 @@ class TestReporter:
         notebook_files = self.reporter.get_ordered_notebook_files(general_sections,
                                                                   context='rsmeval')
         no_subgroup_list = [s for s in general_section_list_rsmeval
-                            if not s.endswith('by_group') and s!='fairness_analyses']
+                            if not s.endswith('by_group') and s != 'fairness_analyses']
         section_list = ['header'] + no_subgroup_list + ['footer']
 
         general_section_plus_extension = ['{}.ipynb'.format(s) for s in section_list]

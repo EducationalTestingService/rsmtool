@@ -33,8 +33,12 @@ def convert_to_ordered_category(group_values, base_group=None):
     Parameters
     ----------
     group_values: pandas Series
-    base_group: str
-        group to use as reference
+        A series indicating group membership
+
+    base_group: str, optional
+        The group to use as the first category.
+        This overrides the default ordering.
+        Defaults to `None`.
 
     Returns
     -------
@@ -56,7 +60,8 @@ def convert_to_ordered_category(group_values, base_group=None):
     if base_group is not None:
         # if we have user-supplied base group, check that it's actually in the data
         if base_group not in group_values.values:
-            raise ValueError("The dataset must contain the values for reference group")
+            raise ValueError("The reference group {} must be one of the existing "
+                             "values for this group".format(group_values))
         else:
             # move the supplied reference group to the beginning of the list
             base_index = groups_by_size.index(base_group)
@@ -76,7 +81,7 @@ def get_coefficients(fit, base_category):
     """
     Extract estimates, significance, and confidence intervals
     for members of the group of interest. The names of the
-    predictors are processed to remove the prefix added by Statmodels.
+    predictors are processed to remove the prefix added by `statmodels`.
     The name of the base category is added in parenthesis to the Intercept.
 
     Parameters:
@@ -169,8 +174,8 @@ def get_fairness_analyses(df,
                           system_score_column,
                           human_score_column='sc1',
                           base_group=None):
-    """ 
-    Compute fairness analyses described in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
+    '''Compute fairness analyses described
+    in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
     The functions computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),
     and conditional score difference (csd).
@@ -187,8 +192,11 @@ def get_fairness_analyses(df,
         Name of the column containing system scores
     human_score_column: str
         Name of the column containing human scores
-    base_group: str
-        Name of the group to use as a reference category
+    base_group: str, optional
+        Name of the group to use as the reference category.
+        Defaults to `None` in which case the group with the largest number
+        of cases will be used a reference category. In case of a tie, the groups
+        are sorted alphabetically.
 
     Returns
     -------
@@ -210,7 +218,7 @@ def get_fairness_analyses(df,
     # convert group values to category and reorder them using
     # the largest category as reference
 
-    df['group'] = convert_to_ordered_category(df[group], base_group)
+    df['group'] = convert_to_ordered_category(df[group], base_group=base_group)
     base_group = df['group'].cat.categories[0]
 
     df['sc1_cat'] = convert_to_ordered_category(df[human_score_column])
