@@ -1,8 +1,10 @@
 import os
 import json
 import tempfile
-import pandas as pd
 import warnings
+
+import numpy as np
+import pandas as pd
 
 from nose.tools import raises, eq_
 from pandas.util.testing import assert_frame_equal
@@ -352,7 +354,7 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_jsonlines_more_than_2_levels(self):
-        mlt_nested_jsonlines = [{'values': {'id': '001',
+        multi_nested_jsonlines = [{'values': {'id': '001',
                                            'features': {'feature1': 1,
                                                         'feature2': 1.5}}},
                                 {'values': {'id': '002',
@@ -364,7 +366,32 @@ class TestJsonLines:
         self.expected.columns = ['id',
                                  'features.feature1',
                                  'features.feature2']
-        self.check_jsonlines_output(mlt_nested_jsonlines)
+        self.check_jsonlines_output(multi_nested_jsonlines)
+
+    
+    def test_read_jsonlines_single_line(self):
+        jsonlines = [{'id': '001',
+                      'feature1': 1,
+                      'feature2': 1.5}]
+        self.expected = self.expected.iloc[0:1]
+        self.check_jsonlines_output(jsonlines)
+
+
+    def test_read_jsonlines_mismatched_keys(self):
+        all_nested_jsonlines = [{'values': {'id': '001',
+                                           'feature1': 1,
+                                           'feature2': 1.5}},
+                                {'values': {'id': '002',
+                                           'feature2': 2,
+                                           'feature3': 2.5}},
+                                {'values': {'id': '003',
+                                           'feature1': 3}}]
+        self.expected = pd.DataFrame({'id': self.expected['id'],
+                                      'feature1': [1, np.nan, 3],
+                                      'feature2': [1.5, 2, np.nan],
+                                      'feature3': [np.nan, 2.5, np.nan]})
+        self.check_jsonlines_output(all_nested_jsonlines)
+
 
     @raises(ValueError)
     def test_read_plain_json(self):
