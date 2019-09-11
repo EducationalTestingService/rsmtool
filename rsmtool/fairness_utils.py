@@ -58,7 +58,8 @@ def convert_to_ordered_category(group_values, base_group=None):
     if base_group is not None:
         # if we have user-supplied base group, check that it's actually in the data
         if base_group not in group_values.values:
-            raise ValueError("The dataset must contain the values for reference group")
+            raise ValueError("The reference group {} must be one of the existing "
+                             "values for this group".format(group_values))
         else:
             # move the supplied reference group to the beginning of the list
             base_index = groups_by_size.index(base_group)
