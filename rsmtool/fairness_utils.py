@@ -34,11 +34,11 @@ def convert_to_ordered_category(group_values, base_group=None):
     ----------
     group_values: pandas Series
         A series indicating group membership
-        
+
     base_group: str, optional
-        The group to use as the first category. 
+        The group to use as the first category.
         This overrides the default ordering.
-        Defaults to None 
+        Defaults to None
 
     Returns
     -------
@@ -175,7 +175,8 @@ def get_fairness_analyses(df,
                           human_score_column='sc1',
                           base_group=None):
     """
-    Compute fairness analyses described in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
+    Compute fairness analyses described 
+    in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
     The functions computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),
     and conditional score difference (csd).
@@ -193,10 +194,10 @@ def get_fairness_analyses(df,
     human_score_column: str
         Name of the column containing human scores
     base_group: str
-        Name of the group to use as the reference category. 
-        Defaults to None in which case the group with the largest number 
+        Name of the group to use as the reference category.
+        Defaults to None in which case the group with the largest number
         of cases will be used a reference category. In case of a tie, the groups
-        are sorted alphabetically. 
+        are sorted alphabetically.
 
     Returns
     -------
