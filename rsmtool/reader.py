@@ -54,7 +54,7 @@ def read_jsonlines(filename, converters=None):
                          "Please check that each line ends with a comma, "
                          "there is no comma at the end of the last line, "
                          "and that all quotes match. Please also check that"
-                         "Nones are written as `Null` and not `NaN.")
+                         "any undefined values are written out as `null` and not `NaN`.")
 
 
     # make sure we didn't get a plain json
