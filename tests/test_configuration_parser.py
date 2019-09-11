@@ -337,7 +337,7 @@ class TestConfigurationParser:
 
 
     @raises(ValueError)
-    def test_valdiate_config_mismatched_subgroup_keys(self):
+    def test_validate_config_mismatched_subgroup_keys(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
@@ -350,7 +350,7 @@ class TestConfigurationParser:
 
 
     @raises(ValueError)
-    def test_valdiate_config_min_n_without_subgroups(self):
+    def test_validate_config_min_n_without_subgroups(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',

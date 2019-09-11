@@ -50,8 +50,11 @@ def read_jsonlines(filename, converters=None):
                           lines=True,
                           dtype=converters)
     except ValueError:
-        raise ValueError("The jsonlines file contains invalid values. "
-                         "Please check for NaN : these should be Null.")
+        raise ValueError("The jsonlines file is not formatted correctly. "
+                         "Please check that each line ends with a comma, "
+                         "there is no comma at the end of the last line, "
+                         "and that all quotes match. Please also check that"
+                         "Nones are written as `Null` and not `NaN.")
 
 
     # make sure we didn't get a plain json
