@@ -562,12 +562,11 @@ def standardized_mean_difference(y_true_observed,
         Defaults to None.
     method : {'williamson', 'johnson', 'pooled', 'unpooled'}, optional
         The SMD method to use.
-        - `williamson`: Denominator is the pooled population standard deviation of
-           `y_true_observed` and `y_pred`.
+        - `williamson`: Denominator is the pooled population standard deviation of `y_true_observed` and `y_pred`.
         - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
-        - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and `y_pred`
-           for this group.
+        - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and `y_pred for this group.
         - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+
         Defaults to 'unpooled'.
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
@@ -748,7 +747,7 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements. By default ddof is zero.
+        number of elements.
         Defaults to 1.
 
     Returns
