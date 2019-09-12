@@ -55,7 +55,7 @@ def convert_to_ordered_category(group_values, base_group=None):
     df_groups_by_size.columns = ['group_name', 'count']
     df_groups_by_size_sorted = df_groups_by_size.sort_values(['count', 'group_name'],
                                                              ascending=[False, True])
-    groups_by_size = df_groups_by_size_sorted['group_name'].to_list()
+    groups_by_size = df_groups_by_size_sorted['group_name'].tolist()
 
     if base_group is not None:
         # if we have user-supplied base group, check that it's actually in the data
