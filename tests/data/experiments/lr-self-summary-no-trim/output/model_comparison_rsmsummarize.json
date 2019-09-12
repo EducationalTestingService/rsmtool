@@ -1,11 +1,11 @@
 {
     "summary_id": "model_comparison",
     "experiment_dirs": [
-        "lr-subgroups1",
-        "lr-subgroups2",
-        "lr-subgroups3"
+        "lr-subgroups",
+        "lr-subgroups",
+        "lr-subgroups"
     ],
-    "description": "Comparison of rsmtool without trim values",
+    "description": "Comparison of rsmtool experiment with itself.",
     "use_thumbnails": false,
     "file_format": "csv",
     "general_sections": [

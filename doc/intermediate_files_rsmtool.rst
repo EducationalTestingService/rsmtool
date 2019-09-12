@@ -193,9 +193,6 @@ filenames: ``pred_processed``, ``pred_train``
 
 The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores.
 
-
-.. _rsmtool_eval_files:
-
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
 - ``eval``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
@@ -230,8 +227,6 @@ Evaluation metrics
 
 - ``true_score_eval`` - evaluation of how well system scores can predict true scores.
 
-.. _rsmtool_consistency_files:
-
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
@@ -243,9 +238,6 @@ These files are created only if a second human score has been made available via
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
 
-
-.. _rsmtool_true_score_eval:
-
 Evaluations based on test theory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -254,8 +246,6 @@ Evaluations based on test theory
 - ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
 
 - ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variances for human and system scores for these sets of responses, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score using system score. 
-
-.. _rsmtool_fairness_eval:
 
 Additional fairness analyses
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -1059,7 +1059,7 @@ class Analyzer:
                                                                  population_sd_dict[s.name],
                                                                  population_mn_dict['sc1'],
                                                                  population_mn_dict[s.name],
-                                                                 'pooled',
+                                                                 smd_method,
                                                                  use_diff_std_means))
             # drop the sc1 column from the human-human agreement frame
             df_human_human = df_human_human.drop('sc1', 1)

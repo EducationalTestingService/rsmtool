@@ -32,7 +32,6 @@ Documentation
 
    who
    pipeline
-   evaluation
    getting_started
    tutorial
    usage_rsmtool
