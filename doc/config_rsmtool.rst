@@ -248,7 +248,7 @@ A list of column names indicating grouping variables used for generating analyse
 
     - description of the data by each subgroup;
     - boxplots showing the feature distribution for each subgroup on the training set; and
-    - tables and barplots showing system-human agreement for each subgroup on the evaluation set.
+    - tables and barplots showing human-system agreement for each subgroup on the evaluation set.
 
 
 min_n_per_group *(Optional)*
@@ -296,7 +296,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``evaluation``: Shows the :ref:`standard set of evaluations <observed_score_evaluation>` recommended for scoring models on the evaluation data:
 
-       - a table showing system-human association metrics;
+       - a table showing human-system association metrics;
        - the confusion matrix; and
        - a barplot showing the distributions for both human and machine scores.
 

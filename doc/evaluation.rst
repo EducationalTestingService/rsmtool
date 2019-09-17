@@ -98,7 +98,9 @@ Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/late
 Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
-Quadratic weighted kappa is computed for continuous scores using the following formula: 
+
+Unlike Cohen's kaapp which is only computed for rounded scores, Quadratic weighted kappa is computed for continous scores using the following formula: 
+
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 

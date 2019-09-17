@@ -115,7 +115,7 @@ subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in the input predictions file. If subgroups are specified, ``rsmeval`` will generate:
 
-    - tables and barplots showing system-human agreement for each subgroup on the evaluation set.
+    - tables and barplots showing human-system agreement for each subgroup on the evaluation set.
 
 
 min_n_per_group *(Optional)*
@@ -140,7 +140,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``evaluation``: Shows the :ref:`standard set of evaluations <observed_score_evaluation>` recommended for scoring models on the evaluation data:
 
-       - a table showing system-human association metrics;
+       - a table showing human-system association metrics;
        - the confusion matrix; and
        - a barplot showing the distributions for both human and machine scores.
 
