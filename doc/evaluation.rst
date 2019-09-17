@@ -99,7 +99,7 @@ Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
 
-Unlike Cohen's kaapp which is only computed for rounded scores, Quadratic weighted kappa is computed for continous scores using the following formula: 
+Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continous scores using the following formula: 
 
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
@@ -175,7 +175,7 @@ PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2
 
 :math:`PRMSE=1-\frac{MSE(T|M)}{\sigma_T^2}`
 
-:math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:MSE(H|M) and :math:\sigma_{H}^2 as follows:
+:math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
 
 - :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
 
