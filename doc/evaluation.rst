@@ -33,7 +33,7 @@ The following conventions are used in the formulas in this section:
 .. _observed_score_evaluation:
 
 Accuracy Metrics (Observed score)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These metrics show how well system scores :math:`M` predict observed human scores :math:`H`. The computed metrics are available in the :ref:`intermediate file<rsmtool_eval_files>` ``eval``, with a subset of the metrics also available in the intermediate file ``eval_short``. 
 
@@ -160,7 +160,7 @@ R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/
 .. _true_score_evaluation:
 
 Accuracy Metrics (True score)
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 According to test theory, an observed score is a combination of the true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such an estimation requires that two human scores be available for *at least a* subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
 
@@ -225,7 +225,7 @@ All fairness evaluations are conducted on the evaluation set. The metrics are on
 .. _dsm:
 
 Differences between standardized means for subgroups (DSM)
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 This is a standard evaluation used for evaluating subgroup differences. The metrics are available in the :ref:`intermediate files<rsmtool_eval_files>` ``eval_by_<SUBGROUP>``.
 
