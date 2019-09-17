@@ -1,15 +1,15 @@
 .. _evaluation:
 
-Evaluation metrics
+Evaluation Metrics
 """"""""""""""""""
 
-This section docments the exact mathematical definition of the main metrics used at ETS for evaluating the performance of automated scoring engines. RSMTool reports include many additional evaluations documented in the descriptions of the :ref:`intermediary files<rsmtool_eval_files>` and the :ref:`report sections<general_sections_rsmtool>`.
+This section documents the exact mathematical definitions of the primary metrics used in RSMTool for evaluating the performance of automated scoring engines. RSMTool reports also include many secondary evaluations as described in :ref:`intermediary files<rsmtool_eval_files>` and the :ref:`report sections<general_sections_rsmtool>`.
  
 The following conventions are used in the formulas in this section:
 
-:math:`N` - total number of responses in the :ref:`evaluation set<test_file>` with numeric human score and numeric system score. Zero human scores are by default also excluded from the evaluation unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
+:math:`N` - total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
 
-:math:`M` - system score. The primary evaluation analyses in the RSMTool report are conducted for *all* six types of :ref:`scores <score_postprocessing>`. For some additional evaluations, the user can pick between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field in RSMTool or :ref:`scale_with<scale_with_eval>` in RSMEval.
+:math:`M` - system score. The primary evaluation metrics in the RSMTool report are computed for *all* six types of :ref:`scores <score_postprocessing>`. For some secondary evaluations, the user can choose between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field for RSMTool or the :ref:`scale_with<scale_with_eval>` field for RSMEval.
 
 :math:`H` - human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
 
@@ -32,10 +32,10 @@ The following conventions are used in the formulas in this section:
 
 .. _observed_score_evaluation:
 
-Accuracy (Observed score)
+Accuracy Metrics (Observed score)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These metrics show how well system scores :math:`M` predict observed human scores :math:`H`. The computed metrics are available in the :ref:`intermediate file<rsmtool_eval_files>` ``eval`` with subset of metrics available in ``eval_short``. 
+These metrics show how well system scores :math:`M` predict observed human scores :math:`H`. The computed metrics are available in the :ref:`intermediate file<rsmtool_eval_files>` ``eval``, with a subset of the metrics also available in the intermediate file ``eval_short``. 
 
 .. _exact_agreement:
 
@@ -98,7 +98,7 @@ Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/late
 Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
-Quadratic weighted kappa is computed for real-value scores using the following formula: 
+Quadratic weighted kappa is computed for continuous scores using the following formula: 
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
@@ -106,7 +106,7 @@ QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` wit
 
 .. note::
 
-	In RSMTool v.6 and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``quadratic``. Continuous scores were rounded for computation. Both formulas produce the same scores for discreet (rounded scores) but the QWK values for continous scores computed by RSMTool 7.0 are *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``"quadratic"``. Continuous scores were rounded for computation. Both formulas produce the same scores for discrete (rounded scores) but QWK values for continuous scores computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
 
 
 .. _r: 
@@ -128,11 +128,11 @@ This metrics ensures that the distribution of system scores is centered on a poi
 
 :math:`SMD = \frac{\bar{M}-\bar{H}}{\sigma_H}`
 
-SMD between system and human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with ``method`` set to ``unpooled``.
+SMD between system and human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with the ``method`` argument set to ``"unpooled"``.
 
 .. note::
 
-	In RSMTool v.6 and earlier SMD was with ``method`` set to ``williamson`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool 7.0 are *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
 
 
 .. _mse:
@@ -157,19 +157,19 @@ R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/
 
 .. _true_score_evaluation:
 
-Accuracy (True score)
+Accuracy Metrics (True score)
 ~~~~~~~~~~~~~~~~~~~~~
 
-According to Test Theory, an observed score is a combination of true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such estimation requires double human scores available for at least a subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
+According to test theory, an observed score is a combination of the true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such an estimation requires that two human scores be available for *at least a* subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
 
 The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``. 
 
 Proportional reduction in mean squared error for true scores (PRMSE)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-PRMSE shows how well system score can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (very bad fit) or exceed 1 (very low human-human agreement). 
+PRMSE shows how well system scores can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (suggesting a very bad fit) or exceed 1 (suggesting very low human-human agreement). 
 
-PRMSE for true scores is defined similar to :ref:`PRMSE for observed scored<r2>`, but with true score :math:`T` used instead of the observed score :math:`H`: the percentage of variance in true score explained by the system score. 
+PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2>`, but with the true score :math:`T` used instead of the observed score :math:`H`, that is, as the percentage of variance in the true scores explained by the system scores. 
 
 :math:`PRMSE=1-\frac{MSE(T|M)}{\sigma_T^2}`
 

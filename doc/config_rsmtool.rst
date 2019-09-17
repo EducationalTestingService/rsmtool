@@ -290,7 +290,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score. 
 
-     - ``consistency``: Shows metrics for :ref:`human-human agreement <consistency_metrics>`, the difference ('degradation') between the human-human and human-system agreement, and the disattenuated human-machine correlations. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`
+     - ``consistency``: Shows metrics for :ref:`human-human agreement <consistency_metrics>`, the difference ("degradation") between the human-human and human-system agreement, and the disattenuated human-machine correlations. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`.
 
     - ``model``: Shows the parameters of the learned regression model. For linear models, it also includes the standardized and relative coefficients as well as model diagnostic plots.
 
