@@ -175,21 +175,21 @@ PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2
 
 :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:MSE(H|M) and :math:\sigma_{H^2} as follows:
 
-- :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and thus partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
+- :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
 
 - To compute estimates for true scores, the values for observed scores are adjusted for **variance of measurement errors** (:math:`\sigma_{e}^2`) in human scores defined as:
 
-:math:`\sigma_{e}^2 = \frac{1}{2 \times N_2}\sum_{i=1}^{N_2}{(H_{i} - H2_{i})^2}`
+        :math:`\sigma_{e}^2 = \frac{1}{2 \times N_2}\sum_{i=1}^{N_2}{(H_{i} - H2_{i})^2}`
 
-In a simple case where **all responses are double-scored**, the **mean squared error** when predicting true score with system score :math:`MSE(T|M)` is estimated as:
+In the simple case, where **all responses are double-scored**, :math:`MSE(T|M)` is estimated as:
 
 :math:`MSE(T|M) = MSE(\hat{H}|M)-\frac{1}{2}\sigma_{e}^2`
 
-The **variance of true score** (:math:`\sigma_T^2`) is estimated as: 
+and :math:`\sigma_T^2` is estimated as: 
 
 :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and allows for both all responses to be double-scored and **only subset of responses to be double-scored**. This formula uses the same computation for :math:`\sigma_{e}^2` but more complex formulas for :math:`MSE(T|M)` and :math:`\sigma_T^2`. The formulas were derived to ensure consistent results regardless of what percentage of data was double-scored. 
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where **only a subset** of responses are double-scored. The formula in this case uses the same computation for :math:`\sigma_{e}^2` but more complex formulas for :math:`MSE(T|M)` and :math:`\sigma_T^2`. The formulas are derived to ensure consistent results regardless of what percentage of data was double-scored and are as follows:
 
 
 :math:`MSE(T|M) = \frac{\sum_{i=1}^{N}{c_i(\hat{H_i} - M_i)^2} - N\sigma_{e}^2}{N_1+2N_2}`
@@ -204,7 +204,7 @@ where
 
 * :math:`N_1` is the number of responses with only one human score available (:math:`N_1+N_2=N`)
 
-PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`
+PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
 
 .. note::
 
@@ -216,28 +216,27 @@ Fairness
 
 Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://www.aclweb.org/anthology/papers/W/W17/W17-1605/>`_).
 
-When defining the experiment, the user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations. 
+When defining an experiment, the RSMTool user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations. 
 
-All fairness evaluations are conducted on the evaluation set. The metrics is only computed for either `raw_trim` or `scale_trim` score (see :ref:`score postprocessing<score_postprocessing>` for further detail) depending on the value of :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` in RSMTool or :ref:`scale_with<scale_with_eval>` in RSMEval. 
+All fairness evaluations are conducted on the evaluation set. The metrics are only computed for either `raw_trim` or `scale_trim` scores (see :ref:`score postprocessing<score_postprocessing>` for further details) depending on the value of :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` in RSMTool or the value of :ref:`scale_with<scale_with_eval>` in RSMEval. 
 
 .. _dsm:
 
-Difference between standardized means for subgroups (DSM)
+Differences between standardized means for subgroups (DSM)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-This is a standard evaluation used for evaluating subgroup differences. The  metrics are available in :ref:`intermediate files<rsmtool_eval_files>` ``eval_by_<SUBGROUP>``.
+This is a standard evaluation used for evaluating subgroup differences. The metrics are available in the :ref:`intermediate files<rsmtool_eval_files>` ``eval_by_<SUBGROUP>``.
 
-DSM is computed in the following way:
+DSM is computed as follows:
 
-1. For each group, get the *z*-score for each response, using the :math:`\bar{H}`, :math:`\bar{M}`, :math:`\sigma_H`, and :math:`\sigma_S` for system and human scores for the whole evaluation set:
+1. For each group, get the *z*-score for each response :math:i, using the :math:`\bar{H}`, :math:`\bar{M}`, :math:`\sigma_H`, and :math:`\sigma_S` for system and human scores for the whole evaluation set:
 
-:math:`z_{H_{i}} = \frac{H_i - \bar{H}}{\sigma_H}`
+        :math:`z_{H_{i}} = \frac{H_i - \bar{H}}{\sigma_H}`
 
-:math:`z_{M_{i}} = \frac{M_i - \bar{M}}{\sigma_M}`
+        :math:`z_{M_{i}} = \frac{M_i - \bar{M}}{\sigma_M}`
 
-Where i = response i
 
-2. For each response, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
+2. For each response :math:i, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
 
 3. Calculate the mean of the difference :math:`z_{M_{i}} - z_{H_{i}}` by subgroup of interest. 
 
@@ -253,7 +252,7 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 
  .. note::
 
-	In RSMTool v.6 and earlier subgroup differences were computed using :ref:`standardized mean difference <SMD>` with ``method`` set to ``williamson``. Since this metrics was very sensitive to score distributions, these are no longer computed by RSMTool 7.0. 
+	In RSMTool v6.x and earlier, subgroup differences were computed using :ref:`standardized mean difference <SMD>` with the ``method`` argument set to ``"williamson"``. Since the differences computed in this manner were very sensitive to score distributions, RSMTool no longer uses this function to compute subgroup differences starting with v7.0.
 
 
 .. _fairness_extra: 
@@ -261,7 +260,7 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
-RSMTool v.7 includes aditional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The computed metrics are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
+Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
 
 These include: 
 
@@ -271,16 +270,16 @@ These include:
 
 - Conditional score difference: percentage of variance in absolute error :math:`(M-H)` explained by subgroup membership when controlling for human score
 
-Please refer to the paper for the full description of this metrics. 
+Please refer to the paper for full descriptions of these metrics. 
 
-The fairness metrics are computed using :ref:`rsmtool.fairness_utils.get_fairness_analyses<fairness_api>`
+The fairness metrics are computed using :ref:`rsmtool.fairness_utils.get_fairness_analyses<fairness_api>`.
 
 .. _consistency_metrics:
 
 Human-human agreement
 ~~~~~~~~~~~~~~~~~~~~~~
 
-If :ref:`H2<h2>` values are available, RSMTool computes the following metrics of human-human agreement using only the :math:`N_2` responses with numeric values available for both :math:`H` and :math:`H2`.
+If scores from a second human (:ref:`H2<h2>`) are available, RSMTool computes the following additional metrics for human-human agreement using only the :math:`N_2` responses, including only responses that contain numeric values for both the :math:`H` and :math:`H2` columns.
 
 The computed metrics are available in the :ref:`intermediate file<rsmtool_consistency_files>` ``consistency``.
 
@@ -318,14 +317,14 @@ Standardized mean difference (SMD)
 
 :math:`SMD = \frac{\bar{H2}-\bar{H1}}{ \sqrt{\frac{\sigma_{H}^2 + \sigma_{H2}^2}{2}}}`
 
-Unlike :ref:`SMD for human-system scores<smd>`, the denominator in this case is pooled standard deviation of :math:`H1` and :math:`H2`.
+Unlike :ref:`SMD for human-system scores<smd>`, the denominator in this case is the "pooled" standard deviation of :math:`H1` and :math:`H2`.
 
 
-SMD between two human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with ``method`` set to ``pooled``.
+Therefore, SMD between two human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with the ``method`` argument set to ``"pooled"``.
 
 .. note::
 
-	In RSMTool v.6 and earlier SMD was computed with ``method`` set to ``williamson`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool 7.0 are *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.
 
 
 
