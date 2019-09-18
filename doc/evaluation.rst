@@ -209,7 +209,7 @@ PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
 
 .. note::
 
-	The formula assigns higher weight to discrepancies between system scores and human score when human score is the average of two human scores than when the human score is based on a single score.
+	The PRMSE formula assigns higher weight to discrepancies between system scores and human scores when human score is the average of two human scores than when the human score is based on a single score.
 
 
 Fairness
