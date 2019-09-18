@@ -81,14 +81,13 @@ where:
 
 - :math:`X_{jk}` is the number times where :math:`H=j` and :math:`M=k`. 
 
--  :math:`m_{jk}` is the percent chance agreement:
+- :math:`m_{jk}` is the percent chance agreement:
 
-:math:`m_{jk} = \sum_{k=1}^{K}{\frac{n_{k+}}{N}\frac{n_{+k}}{N}}`
+    :math:`m_{jk} = \sum_{k=1}^{K}{\frac{n_{k+}}{N}\frac{n_{+k}}{N}}`, where
 
-where 
-* :math:`n_{k+}` - total number of responses where :math:`H_i=k` 
+        * :math:`n_{k+}` - total number of responses where :math:`H_i=k` 
 
-* :math:`n_{+k}` - total number of responses where :math:`M_i=k` 
+        * :math:`n_{+k}` - total number of responses where :math:`M_i=k` 
 
 Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
@@ -210,7 +209,7 @@ PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
 
 .. note::
 
-	The formula assigns higher weight to discrepancies between system scores and human score when human score is the average of two human scores than when the human score is based on a single score.
+	The PRMSE formula assigns higher weight to discrepancies between system scores and human scores when human score is the average of two human scores than when the human score is based on a single score.
 
 
 Fairness
