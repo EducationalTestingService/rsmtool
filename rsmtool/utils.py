@@ -735,8 +735,25 @@ def difference_of_standardized_means(y_true_observed,
 
 def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     """
-    Calculate the quadratic weighted Kappa
-    in the discrete or continuous cases.
+    Calculate Quadratic-weighted Kappa that works
+    for both discrete and continuous values.
+
+    The formula to compute quadratic-weighted kappa
+    for continuous values was developed at ETS by
+    Matt Johnson (mjohnson@ets.org) and Dan McCaffrey
+    (dmccaffrey@ets.org). The discrete case is simply
+    treated as a special case of the continuous one.
+
+    The formula is as follows:
+
+    :math:`QWK=\\frac{E[M-H]^2}{Var(H)+Var(M)+(\\bar{M}-\\bar{H})^2}`, where
+
+        - :math:`H` - the human score
+        - :math:`M` - the system score
+        - :math:`\\bar{H}` - mean of :math:`H`
+        - :math:`\\bar{M}` - the mean of :math:`M`
+        - :math:`Var(X)` - variance of X
+
 
     Parameters
     ----------
@@ -758,8 +775,10 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     Raises
     ------
     AssertionError
-        If len(y_true_observed) != len(y_pred)
+        If the number of elements in ``y_true_observed`` is not equal
+        to the number of elements in ``y_pred``.
     """
+
     assert len(y_true_observed) == len(y_pred)
     y_true_observed_var, y_true_observed_avg = (np.var(y_true_observed, ddof=ddof),
                                                 np.mean(y_true_observed))
