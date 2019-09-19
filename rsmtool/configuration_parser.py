@@ -463,7 +463,6 @@ class Configuration:
         (trim_min, trim_max, tolerance) = self.get_trim_min_max_tolerance()
         return (trim_min, trim_max)
 
-
     def get_trim_min_max_tolerance(self):
         """
         Get the specified trim min and max,
@@ -984,14 +983,14 @@ class ConfigurationParser:
                                  " as the number of specified experiment directories.")
 
         # 13. Check that if the user specified min_n_per_group, they also
-        # specified subgroups. If they supplied a dictionary, make 
+        # specified subgroups. If they supplied a dictionary, make
         # sure the keys match
         if new_config['min_n_per_group']:
             # make sure we have subgroups
             if 'subgroups' not in new_config:
-                raise ValueEror("You must specify a list of subgroups in "
-                                "in the `subgroups` field if "
-                                "you want to use the `min_n_per_group` field")
+                raise ValueError("You must specify a list of subgroups in "
+                                 "in the `subgroups` field if "
+                                 "you want to use the `min_n_per_group` field")
             # if we got dictionary, make sure the keys match
             elif isinstance(new_config['min_n_per_group'], dict):
                 if sorted(new_config['min_n_per_group'].keys()) != sorted(new_config['subgroups']):
@@ -999,10 +998,8 @@ class ConfigurationParser:
                                      "match the subgroups in `subgroups` field")
             # else convert to dictionary
             else:
-                new_config['min_n_per_group'] = {group: new_config['min_n_per_group'] 
+                new_config['min_n_per_group'] = {group: new_config['min_n_per_group']
                                                  for group in new_config['subgroups']}
-
-
 
         # 14. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +

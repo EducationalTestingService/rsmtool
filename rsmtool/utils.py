@@ -334,10 +334,8 @@ def parse_json_with_comments(filename):
     """
 
     # Regular expression to identify comments
-    comment_re = re.compile(
-        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
-        re.DOTALL | re.MULTILINE
-    )
+    comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+                            re.DOTALL | re.MULTILINE)
 
     with open(filename) as file_buff:
         content = ''.join(file_buff.readlines())
@@ -496,6 +494,7 @@ def partial_correlations(df):
     np.fill_diagonal(pcor, 1.0)
     df_pcor = pd.DataFrame(pcor, columns=columns, index=columns)
     return df_pcor
+
 
 def agreement(score1, score2, tolerance=0):
     """

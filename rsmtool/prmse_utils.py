@@ -106,7 +106,7 @@ def compute_true_score_var_subset_double_scored(single_human_scores,
     # the estimated variance or errors in human scores
     numerator = (squared_dist.sum() - (N - 1) * variance_errors_human)
 
-    # the denominator is construed to ensure correct treatment of 
+    # the denominator is construed to ensure correct treatment of
     # all cases regardless of what percentage responses is double-scored
     denominator = (N - 1) + (n_2 * (n_1 + 2 * n_2 - 2)) / (n_1 + 2 * n_2)
 
@@ -188,7 +188,7 @@ def compute_true_score_var_all_double_scored(human_scores,
     N = len(human_scores)
 
     # compute variance of observed human scores:
-    variance_observed_scores = ((human_scores - human_scores.mean())**2).sum() / (N-1)
+    variance_observed_scores = ((human_scores - human_scores.mean())**2).sum() / (N - 1)
 
     # compute variance of true scores as variance of observed
     # scores adjusted for estimated variance of errors in human scores
@@ -302,7 +302,6 @@ def compute_prmse(df,
         variance_true_scores = compute_true_score_var_all_double_scored(df_double['sc_bar'],
                                                                         variance_errors_human)
 
-    
     # compute MSE for each type of score
     prmse_all = []
     for system in system_score_columns:

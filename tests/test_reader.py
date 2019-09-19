@@ -34,7 +34,6 @@ def test_try_to_load_file_warn():
         try_to_load_file('bdadui88asldfkas;j.sarasd', raise_warning=True)
 
 
-
 class TestDataReader:
 
     def setUp(self):
@@ -132,7 +131,7 @@ class TestDataReader:
         container = self.get_container(name_ext_tuples, converters)
         frame = container.train
         assert_frame_equal(frame.sort_index(axis=1),
-                          self.df_train.sort_index(axis=1))
+                           self.df_train.sort_index(axis=1))
 
     def check_feature_specs(self, name_ext_tuples, converters=None):
         container = self.get_container(name_ext_tuples, converters)
@@ -280,7 +279,6 @@ class TestDataReader:
         DataReader(paths, framenames)
 
 
-
 class TestJsonLines:
 
     def setUp(self):
@@ -290,13 +288,11 @@ class TestJsonLines:
                                       'feature1': [1, 2, 3],
                                       'feature2': [1.5, 2.5, 3.5]})
 
-
     def tearDown(self):
         for path in self.filepaths:
             if os.path.exists(path):
                 os.unlink(path)
         self.filepaths = []
-
 
     @staticmethod
     def create_jsonlines_file(jsondict):
@@ -314,7 +310,6 @@ class TestJsonLines:
         df = read_jsonlines(fname, converters={'id': str})
         print(df)
         assert_frame_equal(df.sort_index(axis=1), self.expected.sort_index(axis=1))
-
 
     def test_read_jsonlines(self):
         jsonlines = [{'id': '001',
@@ -339,7 +334,6 @@ class TestJsonLines:
                              'features': {'feature1': 3,
                                           'feature2': 3.5}}]
         self.check_jsonlines_output(nested_jsonlines)
-
 
     def test_read_nested_jsonlines_all_nested(self):
         all_nested_jsonlines = [{'values': {'id': '001',
@@ -368,14 +362,12 @@ class TestJsonLines:
                                  'features.feature2']
         self.check_jsonlines_output(multi_nested_jsonlines)
 
-
     def test_read_jsonlines_single_line(self):
         jsonlines = [{'id': '001',
                       'feature1': 1,
                       'feature2': 1.5}]
         self.expected = self.expected.iloc[0:1]
         self.check_jsonlines_output(jsonlines)
-
 
     def test_read_jsonlines_mismatched_keys(self):
         all_nested_jsonlines = [{'values': {'id': '001',
@@ -391,7 +383,6 @@ class TestJsonLines:
                                       'feature2': [1.5, 2, np.nan],
                                       'feature3': [np.nan, 2.5, np.nan]})
         self.check_jsonlines_output(all_nested_jsonlines)
-
 
     def test_read_jsons_with_nulls(self):
         '''None is written to json as `null`.

@@ -593,7 +593,7 @@ class TestThumbnail:
 
         path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         path2 = 'random/path/asftesfa/to/figure1.svg'
-        image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
+        _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
 class TestExpectedScores():

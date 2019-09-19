@@ -10,7 +10,7 @@ Utility classes and functions related to computing fairness evaluations
 """
 
 import pandas as pd
-import pickle 
+import pickle
 import numpy as np
 
 from os.path import join
@@ -20,7 +20,6 @@ from statsmodels.stats.anova import anova_lm
 
 from rsmtool.writer import DataWriter
 from rsmtool.container import DataContainer
-
 
 
 def convert_to_ordered_category(group_values, base_group=None):
@@ -67,13 +66,11 @@ def convert_to_ordered_category(group_values, base_group=None):
             base_index = groups_by_size.index(base_group)
             groups_by_size.insert(0, groups_by_size.pop(base_index))
 
-    #convert to category and reorder
+    # convert to category and reorder
     group_category = group_values.astype("category")
     group_ordered_category = group_category.cat.reorder_categories(groups_by_size,
                                                                    ordered=True)
     return group_ordered_category
-
-
 
 
 def get_coefficients(fit, base_category):
@@ -118,8 +115,6 @@ def get_coefficients(fit, base_category):
                         for v in df_results.index]
 
     return df_results
-
-
 
 
 def write_fairness_results(fit_dictionary,
@@ -212,7 +207,7 @@ def get_fairness_analyses(df,
 
     # compute error and squared error
 
-    df['error'] = df[system_score_column]-df[human_score_column]
+    df['error'] = df[system_score_column] - df[human_score_column]
     df['SE'] = df['error']**2
 
     # convert group values to category and reorder them using

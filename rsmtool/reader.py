@@ -23,7 +23,6 @@ import pandas as pd
 from rsmtool.container import DataContainer
 
 
-
 def read_jsonlines(filename, converters=None):
     """
     Read jsonlines from a file.
@@ -55,7 +54,6 @@ def read_jsonlines(filename, converters=None):
                          "there is no comma at the end of the last line, "
                          "and that all quotes match. Please also check that"
                          "any undefined values are written out as `null` and not `NaN`.")
-
 
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:
@@ -207,7 +205,6 @@ class DataReader:
 
         # Default file_converters dict
         self.file_converters = {} if file_converters is None else file_converters
-
 
     @staticmethod
     def read_from_file(filename, converters=None, **kwargs):
