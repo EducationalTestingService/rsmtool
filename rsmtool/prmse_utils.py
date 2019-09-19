@@ -6,7 +6,6 @@ theory based evaluations
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 05/20/2019
 :organization: ETS
 """
 

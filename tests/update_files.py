@@ -22,7 +22,8 @@ The script prints a log detailing the changes made for each experiment test.
 :author: Nitin Madnani
 :author: Anastassia Loukina
 :author: Jeremy Biggs
-:date: Feburary 2018
+
+:organization: ETS
 """
 
 import argparse

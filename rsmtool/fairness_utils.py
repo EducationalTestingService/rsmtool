@@ -5,7 +5,6 @@ Utility classes and functions related to computing fairness evaluations
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 07/29/2019
 :organization: ETS
 """
 
