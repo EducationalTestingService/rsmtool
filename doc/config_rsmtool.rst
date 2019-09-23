@@ -27,8 +27,9 @@ The path to the evaluation data feature file in one of the :ref:`supported forma
 
 .. note ::
 
-    1. By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns optionally identified as containing other information (e.g., :ref:`flag_column <flag_column_rsmtool>`, :ref:`id_column <id_column_rsmtool>`, :ref:`train_label_column <train_label_column_rsmtool>` et cetera below). 
-    2. The four optional fields :ref:`features <feature_file_rsmtool>`, :ref:`feature_subset_file <feature_subset_file>`, :ref:`feature_subset <feature_subset>`, and :ref:`sign <sign>` are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+    1. For both the training and evaluation files, the default behavior of ``rsmtool`` is to look for columns named ``spkitemid`` and ``sc1`` in order to get the unique IDs and the train/test labels for each response, respectively. The optional fields :ref:`id_column <id_column_rsmtool>` and  :ref:`train_label_column <train_label_column_rsmtool>` can be used to specify different names for the id and label columns respectively. 
+    2. ``rsmtool`` also assumes that any columns present in these files (other than those containing IDs and labels) contain feature values. If this is not the case, one can identify columns containing other, non-feature information, e.g., :ref:`second_human_score_column <second_human_score_column_rsmtool>`, :ref:`flag_column <flag_column_rsmtool>`, :ref:`subgroups <subgroups_rsmtool>` et cetera below. 
+    3. Any columns not explicitly identified in (1) and (2) will be considered feature columns and used by ``rsmtool`` in the model. To use only a *subset* of these remaining columns as features, one can employ the four optional fields :ref:`features <feature_file_rsmtool>`, :ref:`feature_subset_file <feature_subset_file>`, :ref:`feature_subset <feature_subset>`, and :ref:`sign <sign>`. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details on how to achieve this.
 
 candidate_column *(Optional)*
 """""""""""""""""""""""""""""
