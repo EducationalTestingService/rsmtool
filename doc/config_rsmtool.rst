@@ -25,6 +25,11 @@ test_file
 """""""""
 The path to the evaluation data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
+.. note ::
+
+    1. By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns optionally identified as containing other information (e.g., :ref:`flag_column <flag_column_rsmtool>`, :ref:`id_column <id_column_rsmtool>`, :ref:`train_label_column <train_label_column_rsmtool>` et cetera below). 
+    2. The four optional fields :ref:`features <feature_file_rsmtool>`, :ref:`feature_subset_file <feature_subset_file>`, :ref:`feature_subset <feature_subset>`, and :ref:`sign <sign>` are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
+
 candidate_column *(Optional)*
 """""""""""""""""""""""""""""
 The name for an optional column in the training and test data containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
@@ -62,12 +67,6 @@ Path to the feature subset file if using :ref:`subset-based column selection <su
 features *(Optional)*
 """""""""""""""""""""
 Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include in the experiment.
-
-.. _feature_fields_note:
-
-.. note ::
-
-    By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). The following four fields (``features``, ``feature_subset_file``, ``feature_subset``, and ``sign``) are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _file_format:
 
