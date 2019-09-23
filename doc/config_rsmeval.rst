@@ -5,7 +5,7 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_.
 
-There are four required fields and the rest are all optional.
+There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 experiment_id
 ~~~~~~~~~~~~~
@@ -31,50 +31,32 @@ The single numeric value for the highest possible integer score that the machine
 
     Although the ``trim_min`` and ``trim_max`` fields are optional for ``rsmtool``, they are *required* for ``rsmeval``.
 
-trim_tolerance *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+candidate_column *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The name for an optional column in prediction file containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
 
-The single numeric value that will be used to pad the trimming range specified in ``trim_min`` and ``trim_max``. This value will be used to compute the ceiling and floor values for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance`` for ceiling value and ``trim_min``-``trim_tolerance`` for floor value.
-Defaults to 0.49998.
+.. _custom_sections_rsmeval:
 
-.. note::
-    
-    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
+custom_sections *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :ref:`pre-defined variables <custom_notebooks>`.
 
 description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the experiment. This will be included in the report. The description can contain spaces and punctuation. It's blank by default.
+
+.. _exclude_zero_scores_eval:
+
+exclude_zero_scores *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+By default, responses with human scores of 0 will be excluded from evaluations. Set this field to ``false`` if you want to keep responses with scores of 0. Defaults to ``true``.
 
 .. _file_format_eval:
 
 file_format *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 The format of the :ref:`intermediate files <intermediate_files_rsmeval>`. Options are ``csv``, ``tsv``, or ``xlsx``. Defaults to ``csv`` if this is not specified.
-
-id_column *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~
-The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmeval`` will look for a column called ``spkitemid`` in the prediction file.
-
-
-.. _human_score_column_eval:
-
-human_score_column *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The name for the column containing the human scores for each response. The values in this column will be used as observed scores. Defaults to ``sc1``.
-
-.. note::
-
-    All responses with non-numeric values or zeros in either ``human_score_column`` or ``system_score_column`` will be automatically excluded from evaluation. You can use :ref:`exclude_zero_scores_eval` to keep responses with zero scores.
-
-.. _second_human_score_column_eval:
-
-second_human_score_column *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_eval` option below will apply to this column too.
-
-.. note::
-
-    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
 
 .. _flag_column_eval:
 
@@ -89,42 +71,6 @@ This field makes it possible to only use responses with particular values in a g
 .. note::
 
     When reading the values in the supplied dictionary, ``rsmeval`` treats numeric strings, floats and integers as the same value. Thus ``1``, ``1.0``, ``"1"`` and ``"1.0"`` are all treated as the ``1.0``.
-
-
-.. _exclude_zero_scores_eval:
-
-exclude_zero_scores *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-By default, responses with human scores of 0 will be excluded from evaluations. Set this field to ``false`` if you want to keep responses with scores of 0. Defaults to ``true``.
-
-.. _scale_with_eval:
-
-scale_with *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~
-In many scoring applications, system scores are :ref:`re-scaled <score_postprocessing>` so that their mean and standard deviation match those of the human scores for the training data.
-
-If you want ``rsmeval`` to re-scale the supplied predictions, you need to provide -- as the value for this field -- the path to a second file in one of the :ref:`supported formats <input_file_format>` containing the human scores and predictions of the same system on its training data. This file *must* have two columns: the human scores under the ``sc1`` column and the predicted score under the ``prediction``.
-
-This field can also be set to ``"asis"`` if the scores are already scaled. In this case, no additional scaling will be performed by ``rsmeval`` but the report will refer to the scores as "scaled".
-
-Defaults to ``"raw"`` which means that no-rescaling is performed and the report refers to the scores as "raw".
-
-.. _subgroups_eval:
-
-subgroups *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~
-A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in the input predictions file. If subgroups are specified, ``rsmeval`` will generate:
-
-    - tables and barplots showing human-system agreement for each subgroup on the evaluation set.
-
-
-min_n_per_group *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmeval>` will still show the results for *all* groups. 
-
-.. note::
-
-    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
 .. _general_sections_rsmeval:
 
@@ -146,38 +92,69 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
-
     - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
         - percentage of variance in raw (signed) error explained by subgroup membership
         - percentage of variance in raw (signed) error explained by subgroup membership when controlling for human score
         - plots showing estimates for each subgroup for each model
-
-
     
     - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
 
         - variance of human scores for single and double-scored responses;
         - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
-
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the evaluation.
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
-.. _custom_sections_rsmeval:
+.. _human_score_column_eval:
 
-custom_sections *(Optional)*
+human_score_column *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The name for the column containing the human scores for each response. The values in this column will be used as observed scores. Defaults to ``sc1``.
+
+.. note::
+
+    All responses with non-numeric values or zeros in either ``human_score_column`` or ``system_score_column`` will be automatically excluded from evaluation. You can use :ref:`exclude_zero_scores_eval` to keep responses with zero scores.
+
+id_column *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~
+The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmeval`` will look for a column called ``spkitemid`` in the prediction file.
+
+min_items_per_candidate *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
+
+min_n_per_group *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmeval>` will still show the results for *all* groups. 
 
-A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :ref:`pre-defined variables <custom_notebooks>`.
+.. note::
 
-.. _special_sections_rsmeval:
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
-special_sections *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A list specifying special ETS-only sections to be included into the final report. These sections are available *only* to ETS employees via the ``rsmextra`` package.
+.. _scale_with_eval:
+
+scale_with *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~
+In many scoring applications, system scores are :ref:`re-scaled <score_postprocessing>` so that their mean and standard deviation match those of the human scores for the training data.
+
+If you want ``rsmeval`` to re-scale the supplied predictions, you need to provide -- as the value for this field -- the path to a second file in one of the :ref:`supported formats <input_file_format>` containing the human scores and predictions of the same system on its training data. This file *must* have two columns: the human scores under the ``sc1`` column and the predicted score under the ``prediction``.
+
+This field can also be set to ``"asis"`` if the scores are already scaled. In this case, no additional scaling will be performed by ``rsmeval`` but the report will refer to the scores as "scaled".
+
+Defaults to ``"raw"`` which means that no-rescaling is performed and the report refers to the scores as "raw".
+
+.. _second_human_score_column_eval:
+
+second_human_score_column *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The name for an optional column in the test data containing a second human score for each response. If specified, additional information about human-human agreement and degradation will be computed and included in the report. Note that this column must contain either numbers or be empty. Non-numeric values are *not* accepted. Note also that the :ref:`exclude_zero_scores_eval` option below will apply to this column too.
+
+.. note::
+
+    You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
 
 section_order *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,16 +166,32 @@ A list containing the order in which the sections in the report should be genera
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmeval>`.
 
+.. _special_sections_rsmeval:
+
+special_sections *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A list specifying special ETS-only sections to be included into the final report. These sections are available *only* to ETS employees via the ``rsmextra`` package.
+
+.. _subgroups_eval:
+
+subgroups *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~
+A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in the input predictions file. If subgroups are specified, ``rsmeval`` will generate:
+
+    - tables and barplots showing human-system agreement for each subgroup on the evaluation set.
+
+trim_tolerance *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The single numeric value that will be used to pad the trimming range specified in ``trim_min`` and ``trim_max``. This value will be used to compute the ceiling and floor values for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance`` for ceiling value and ``trim_min``-``trim_tolerance`` for floor value.
+Defaults to 0.49998.
+
+.. note::
+    
+    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
+
+.. _use_thumbnails_rsmeval:
+
 use_thumbnails *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
-
-candidate_column *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The name for an optional column in prediction file containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
-
-min_items_per_candidate *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-An integer value for the minimum number of responses expected from each candidate. If any candidates have fewer responses than the specified value, all responses from those candidates will be excluded from further analysis. Defaults to ``None``.
-
-.. _use_thumbnails_rsmeval:
