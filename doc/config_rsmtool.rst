@@ -25,6 +25,12 @@ test_file
 """""""""
 The path to the evaluation data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
 
+.. note ::
+
+    1. For both the training and evaluation files, the default behavior of ``rsmtool`` is to look for a column named ``spkitemid`` in order to get the unique IDs for each response and a column named ``sc1`` to get train/test labels. The optional fields :ref:`id_column <id_column_rsmtool>` and  :ref:`train_label_column <train_label_column_rsmtool>` can be used to specify different names for these columns. 
+    2. ``rsmtool`` also assumes that all other columns present in these files (other than those containing IDs and labels) contain feature values. If this is not the case, one can use other configuration file fields to identify columns containing non-feature information useful for various analyses, e.g., :ref:`second_human_score_column <second_human_score_column_rsmtool>`, :ref:`flag_column <flag_column_rsmtool>`, :ref:`subgroups <subgroups_rsmtool>` et cetera below. 
+    3. Any columns not explicitly identified in (1) and (2) will be considered feature columns and used by ``rsmtool`` in the model. To use only a *subset* of these remaining columns as features, one can employ the four optional fields :ref:`features <feature_file_rsmtool>`, :ref:`feature_subset_file <feature_subset_file>`, :ref:`feature_subset <feature_subset>`, and :ref:`sign <sign>`. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details on how to achieve this.
+
 candidate_column *(Optional)*
 """""""""""""""""""""""""""""
 The name for an optional column in the training and test data containing unique candidate IDs. Candidate IDs are different from response IDs since the same candidate (test-taker) might have responded to multiple questions.
@@ -62,12 +68,6 @@ Path to the feature subset file if using :ref:`subset-based column selection <su
 features *(Optional)*
 """""""""""""""""""""
 Path to the file with list of features if using :ref:`fine-grained column selection <feature_list_column_selection>`. Alternatively, you can pass a ``list`` of feature names to include in the experiment.
-
-.. _feature_fields_note:
-
-.. note ::
-
-    By default, ``rsmtool`` will use all of the columns present in the training and evaluation files as features except for any columns explicitly identified in the configuration file (see below). The following four fields (``features``, ``feature_subset_file``, ``feature_subset``, and ``sign``) are useful if you want to use only a specific set of columns as features. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details.
 
 .. _file_format:
 
@@ -344,4 +344,4 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 
 .. note::
 
-    If ``_use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
+    If ``use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
