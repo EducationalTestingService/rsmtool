@@ -738,9 +738,9 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
 
     The formula to compute quadratic-weighted kappa
     for continuous values was developed at ETS by
-    Matt Johnson (mjohnson@ets.org) and Dan McCaffrey
-    (dmccaffrey@ets.org). The discrete case is simply
-    treated as a special case of the continuous one.
+    Shelby Haberman. See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full
+    derivation. The discrete case is simply treated as
+    a special case of the continuous one.
 
     The formula is as follows:
 

@@ -2474,7 +2474,7 @@ class FeaturePreprocessor:
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
 
-        # if the we are using a newly trained model, use trim_tolerance from the
+        # if we are using a newly trained model, use trim_tolerance from the
         # df_postproc_params. If not, set it to the default value and show
         # deprecation warning
         if 'trim_tolerance' in df_postproc_params:
