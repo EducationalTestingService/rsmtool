@@ -1,3 +1,5 @@
+{% set data = load_setup_py_data() %}
+
 package:
   name: rsmtool
   version: 6.1.0
@@ -9,7 +11,7 @@ build:
   number: 0
   script:
     - cd $SRC_DIR
-    - $PYTHON setup.py install
+    - $PYTHON setup.py install --single-version-externally-managed --record=record.txt
   entry_points:
     - rsmtool = rsmtool.rsmtool:main
     - rsmcompare = rsmtool.rsmcompare:main
@@ -19,55 +21,20 @@ build:
     - render_notebook = rsmtool.reporter:main
     - convert_feature_json = rsmtool.convert_feature_json:main
 
+
+{% block requirements -%}
 requirements:
   build:
     - python
-    - numpy>=1.14.0,<1.15
-    - scipy>=1.1.0,<1.2.0
-    - ipython>=6.5.0,<6.5.1
-    - jupyter>=1.0.0,<1.1
-    - joblib>=0.11,<0.12
-    - matplotlib>=2.1.2,<2.2
-    - nose>=1.3.7,<1.4
-    - notebook>=5.7.2,<5.8
-    - pandas>=0.23.4,<0.23.5
-    - scikit-learn>=0.19.1,<0.19.2
-    - seaborn>=0.9.0,<0.10.0
-    - skll>=1.5,<1.6
-    - statsmodels>=0.9.0,<0.9.1
-    - sphinx
-    - sphinx_rtd_theme
-    - zeromq
-    - coverage
-    - parameterized
-    - setuptools
-    - openpyxl
-    - xlrd
-    - xlwt
-
+    {% for req in data.get('install_requires', []) -%}
+    - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
+    {% endfor %}
   run:
     - python
-    - numpy>=1.14.0,<1.15
-    - scipy>=1.1.0,<1.2.0
-    - ipython>=6.5.0,<6.5.1
-    - jupyter>=1.0.0,<1.1
-    - joblib>=0.11,<0.12
-    - matplotlib>=2.1.2,<2.2
-    - nose>=1.3.7,<1.4
-    - notebook>=5.7.2,<5.8
-    - pandas>=0.23.4,<0.23.5
-    - scikit-learn>=0.19.1,<0.19.2
-    - seaborn>=0.9.0,<0.10.0
-    - skll>=1.5,<1.6
-    - statsmodels>=0.9.0,<0.9.1
-    - sphinx
-    - sphinx_rtd_theme
-    - zeromq
-    - coverage
-    - parameterized
-    - openpyxl
-    - xlrd
-    - xlwt
+    {% for req in data.get('install_requires', []) -%}
+    - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
+    {% endfor %}
+{%- endblock %}
 
 test:
   # Python imports
