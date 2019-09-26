@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from os.path import join
 

@@ -122,10 +122,10 @@ def test_compute_prmse_zero():
     sc2 = [np.nan, 1, np.nan, 3, np.nan, 3]
     system_correct = pd.Series([1, 1.5, 1, 3, 1, 2.5])
     system_wrong = pd.Series([1, 1, 4, 5, 3, 1])
-    df  = pd.DataFrame({'sc1': sc1,
-                        'sc2': sc2,
-                        'system_correct': system_correct,
-                        'system_wrong': system_wrong})
+    df = pd.DataFrame({'sc1': sc1,
+                       'sc2': sc2,
+                       'system_correct': system_correct,
+                       'system_wrong': system_wrong})
 
     prmse = compute_prmse(df,
                           ['system_correct', 'system_wrong'])
@@ -133,5 +133,3 @@ def test_compute_prmse_zero():
     eq_(prmse.loc['system_correct', 'N'], 6)
     eq_(prmse.loc['system_correct', 'N_single'], 3)
     eq_(prmse.loc['system_correct', 'N_double'], 3)
-
-

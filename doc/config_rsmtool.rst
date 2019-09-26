@@ -269,7 +269,7 @@ A list specifying special ETS-only sections to be included into the final report
 
 standardize_features *(Optional)*
 """""""""""""""""""""""""""""""""
-If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
+If this option is set to ``false`` features will not be standardized by subtracting the mean and dividing by the standard deviation. Defaults to ``true``.
 
 .. _subgroups_rsmtool:
 

@@ -5,7 +5,6 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -625,7 +624,7 @@ class Analyzer:
             - `johnson`: population standard deviation of `y_true_observed`.
             - `pooled`: pooled standard deviation of `y_true_observed` and `y_pred` for this group.
             - `unpooled`: standard deviation of `y_true_observed` for this group.
-            
+
             Defaults to 'unpooled'.
 
         use_diff_std_means : bool, optional
@@ -998,7 +997,7 @@ class Analyzer:
             - `johnson`: population standard deviation of `y_true_observed`.
             - `pooled`: pooled standard deviation of `y_true_observed` and `y_pred` for this group.
             - `unpooled`: standard deviation of `y_true_observed` for this group.
-            
+
             Defaults to 'unpooled'.
         use_diff_std_means : bool, optional
             Whether to use the difference of standardized means, rather than the standardized mean

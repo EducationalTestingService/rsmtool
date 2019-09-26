@@ -5,7 +5,6 @@ Classes for preprocessing input data in various contexts.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -123,9 +122,9 @@ class FeatureSubsetProcessor:
         if sign:
             if ('sign_{}'.format(sign) not in df_feature_specs and
                     'Sign_{}'.format(sign) not in df_feature_specs):
-                    raise ValueError("The feature_subset_file must "
-                                     "contain the requested "
-                                     "sign column 'sign_{}'".format(sign))
+                raise ValueError("The feature_subset_file must "
+                                 "contain the requested "
+                                 "sign column 'sign_{}'".format(sign))
 
             if not df_feature_specs[subset].isin(['-', '+']).all():
                 raise ValueError("The sign columns in feature "
@@ -428,7 +427,7 @@ class FeaturePreprocessor:
         if is_built_in_model(model_name):
             model_type = 'BUILTIN'
         elif is_skll_model(model_name):
-                model_type = 'SKLL'
+            model_type = 'SKLL'
         else:
             raise ValueError("The specified model {} "
                              "was not found. Please "
@@ -1442,12 +1441,12 @@ class FeaturePreprocessor:
         # make sure that feature names do not contain reserved column names
         illegal_feature_names = set(feature_names).intersection(reserved_column_names)
         if illegal_feature_names:
-                    raise ValueError("The following reserved "
-                                     "column names cannot be "
-                                     "used as feature names: '{}'. "
-                                     "Please rename these columns "
-                                     "and re-run the "
-                                     "experiment.".format(', '.join(illegal_feature_names)))
+            raise ValueError("The following reserved "
+                             "column names cannot be "
+                             "used as feature names: '{}'. "
+                             "Please rename these columns "
+                             "and re-run the "
+                             "experiment.".format(', '.join(illegal_feature_names)))
 
         # check to make sure that the subgroup columns are all present
         df = FeaturePreprocessor.check_subgroups(df, subgroups)
@@ -2475,7 +2474,7 @@ class FeaturePreprocessor:
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
 
-        #if the we are using a newly trained model, use trim_tolerance from the
+        # if we are using a newly trained model, use trim_tolerance from the
         # df_postproc_params. If not, set it to the default value and show
         # deprecation warning
         if 'trim_tolerance' in df_postproc_params:
@@ -2486,7 +2485,6 @@ class FeaturePreprocessor:
                             "the default value in previous versions of RSMTool. "
                             "We recommend re-training the model to ensure future "
                             "compatibility.")
-
 
         # now generate the predictions for the features using this model
         logged_str = 'Generating predictions'
@@ -2704,21 +2702,22 @@ class FeaturePreprocessor:
                 # check that there are indeed inf or Nan values
                 if np.isnan(df_features_preprocess[feature_name]).any() or \
                    np.isinf(df_features_preprocess[feature_name]).any():
-                        (newdf,
-                         newdf_excluded) = self.filter_on_column(df_features_preprocess,
-                                                                 feature_name,
-                                                                 'spkitemid',
-                                                                 exclude_zeros=False,
-                                                                 exclude_zero_sd=False)
-                        del df_features_preprocess
-                        df_features_preprocess = newdf
-                        # add the response(s) with missing values to the excluded responses
-                        # but make sure we are adding the original values, not the
-                        # preprocessed ones
-                        missing_values = df_features['spkitemid'].isin(newdf_excluded['spkitemid'])
+                    (newdf,
+                     newdf_excluded) = self.filter_on_column(df_features_preprocess,
+                                                             feature_name,
+                                                             'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocess
+                    df_features_preprocess = newdf
 
-                        df_excluded_original = df_features[missing_values].copy()
-                        df_excluded = pd.merge(df_excluded, df_excluded_original, how='outer')
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the
+                    # preprocessed ones
+                    missing_values = df_features['spkitemid'].isin(newdf_excluded['spkitemid'])
+
+                    df_excluded_original = df_features[missing_values].copy()
+                    df_excluded = pd.merge(df_excluded, df_excluded_original, how='outer')
 
             # print(standardized_features)
             if standardize_features:
