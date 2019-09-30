@@ -92,7 +92,7 @@ where:
 Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
 .. note::
-    See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how skll implementation differs from the `sklearn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations would produce different results if the matrix contains missing labels, for example ``1, 2, 4``. In ``skll`` implementation the missing ``2``  will be automatically added to the list of labels. ``sklearn`` implementation would only add ``2`` if full label list is passed to the function as the optional ``labels`` parameter. 
+    See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how `skll <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ implementation differs from the `sklearn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations might produce different results if the matrix contains missing labels, for example ``1, 2, 4``. In ``skll`` implementation the missing ``2``  will be automatically added to the list of labels. ``sklearn`` implementation would only add ``2`` if full label list is passed to the function as the optional ``labels`` parameter. 
 
 
 .. _qwk:
