@@ -31,6 +31,7 @@ from rsmtool.utils import (difference_of_standardized_means,
                            quadratic_weighted_kappa)
 
 from sklearn.datasets import make_classification
+from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 
 from skll.metrics import kappa
@@ -418,6 +419,17 @@ def test_quadratic_weighted_kappa_discreet_values_match_skll():
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
     qwk_skll = kappa(data[0], data[1], weights='quadratic')
     eq_(qwk_rsmtool, qwk_skll)
+
+
+def test_quadratic_weighted_kappa_discreet_values_match_sklearn():
+    data = (np.array([8, 4, 6, 3]),
+            np.array([9, 4, 5, 12]))
+    qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
+    qwk_sklearn = cohen_kappa_score(data[0], data[1],
+                                    weights='quadratic',
+                                    labels=[3, 4, 5, 6, 7,
+                                            8, 9, 10, 11, 12])
+    eq_(qwk_rsmtool, qwk_sklearn)
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
