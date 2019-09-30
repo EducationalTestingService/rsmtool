@@ -762,7 +762,7 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements. When ddof is 0 to zero, the results
+        number of elements. When ddof is set to zero, the results
         for discrete case match those from the standard implementations.
         Defaults to 0.
 

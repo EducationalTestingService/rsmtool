@@ -92,7 +92,7 @@ where:
 Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
 .. note::
-    See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how `skll <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ implementation differs from the `sklearn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations might produce different results if the matrix contains missing labels, for example ``1, 2, 4``. In ``skll`` implementation the missing ``2``  will be automatically added to the list of labels. ``sklearn`` implementation would only add ``2`` if full label list is passed to the function as the optional ``labels`` parameter. 
+   See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how the `SKLL implementation <https://skll.readthedocs.io/en/latest/api/skll.html#skll.kappa>`_  differs from the `scikit-learn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations might produce different results if the matrix contains missing labels. For example, consider the hypothetical scenario where our predictions only contain the labels ``1``, ``2``, and ``4``. In the SKLL implementation, the missing ``3``  will be automatically added to the list of labels whereas in the scikit-learn implementation, the ``3`` would only be added if a complete list of labels was passed to the function via the optional ``labels`` keyword argument.
 
 
 .. _qwk:
@@ -106,7 +106,7 @@ Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, qu
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
-Note that in this case the variance is the population variance and thus it is computed by dividing by ``N`` and not ``N-1`` as in other cases.  
+Note that in this case the variance is the population variance and, thus, it is computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
 
 QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
 
