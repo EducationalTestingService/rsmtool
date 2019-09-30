@@ -33,6 +33,8 @@ from rsmtool.utils import (difference_of_standardized_means,
 from sklearn.datasets import make_classification
 from skll import FeatureSet, Learner
 
+from skll.metrics import kappa
+
 # get the directory containing the tests
 test_dir = dirname(__file__)
 
@@ -404,11 +406,18 @@ def test_difference_of_standardized_means_with_no_population_info():
 
 def test_quadratic_weighted_kappa():
 
-    expected = 0.12246696035242288
+    expected = -0.09210526315789469
     qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
                                    np.array([9, 4, 5, 12]))
     eq_(qwk, expected)
 
+
+def test_quadratic_weighted_kappa_discreet_values_match_skll():
+    data = (np.array([8, 4, 6, 3]),
+            np.array([9, 4, 5, 12]))
+    qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
+    qwk_skll = kappa(data[0], data[1], weights='quadratic')
+    eq_(qwk_rsmtool, qwk_skll)
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
