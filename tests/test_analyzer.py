@@ -84,11 +84,13 @@ class TestAnalyzer:
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
         # There should be NaNs for SMD, correlations and both sds
+        # note that we will get a value for QWK since we are 
+        # dividing by N and not N-1
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.human_scores[0:1],
                                             self.system_scores[0:1])
-            assert_equal(evals.isnull().values.sum(), 5)
+            assert_equal(evals.isnull().values.sum(), 4)
 
     def test_that_metrics_helper_works_for_data_with_the_same_label(self):
         # There should be NaNs for correlation and SMD.
@@ -121,7 +123,7 @@ class TestAnalyzer:
                                        'sys_mean': 3.4500000000000002,
                                        'sys_min': 1.0,
                                        'sys_sd': 0.81782496620652367,
-                                       'wtkappa': 0.8276724397975914})
+                                       'wtkappa': 0.8273273273273274})
 
         # and now compute them specifying the population SDs
         computed_metrics2 = Analyzer.metrics_helper(df_new_features['score'],
