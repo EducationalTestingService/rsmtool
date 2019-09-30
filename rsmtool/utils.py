@@ -731,7 +731,7 @@ def difference_of_standardized_means(y_true_observed,
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
+def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     """
     Calculate Quadratic-weighted Kappa that works
     for both discrete and continuous values.
@@ -740,7 +740,7 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     for continuous values was developed at ETS by
     Shelby Haberman. See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full
     derivation. The discrete case is simply treated as
-    a special case of the continuous one.
+    a special case of the continuous one. 
 
     The formula is as follows:
 
@@ -762,8 +762,9 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements.
-        Defaults to 1.
+        number of elements. When ddof is 0 to zero, the results
+        for discreet case match those from the standard implementations. 
+        Defaults to 0.
 
     Returns
     -------
