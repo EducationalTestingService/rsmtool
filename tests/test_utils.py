@@ -413,7 +413,7 @@ def test_quadratic_weighted_kappa():
     eq_(qwk, expected)
 
 
-def test_quadratic_weighted_kappa_discreet_values_match_skll():
+def test_quadratic_weighted_kappa_discrete_values_match_skll():
     data = (np.array([8, 4, 6, 3]),
             np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
@@ -421,7 +421,7 @@ def test_quadratic_weighted_kappa_discreet_values_match_skll():
     eq_(qwk_rsmtool, qwk_skll)
 
 
-def test_quadratic_weighted_kappa_discreet_values_match_sklearn():
+def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
     data = (np.array([8, 4, 6, 3]),
             np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
