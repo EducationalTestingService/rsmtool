@@ -98,12 +98,16 @@ Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
 
-Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continous scores using the following formula: 
+Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continuous scores using the following formula: 
 
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
-QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``1``.
+Note that in this case the variance is the population variance and thus is computed by dividing by ``N`` and not ``N-1`` as in other cases.  
+
+QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
+
+See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one. 
 
 .. note::
 
