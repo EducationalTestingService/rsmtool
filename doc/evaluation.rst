@@ -106,11 +106,11 @@ Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, qu
 
 :math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
-Note that in this case the variance is the population variance and thus is computed by dividing by ``N`` and not ``N-1`` as in other cases.  
+Note that in this case the variance is the population variance and thus it is computed by dividing by ``N`` and not ``N-1`` as in other cases.  
 
 QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
 
-See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one. 
+See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_ for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one. 
 
 .. note::
 
