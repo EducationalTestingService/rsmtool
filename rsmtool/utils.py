@@ -784,9 +784,11 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     y_pred_var, y_pred_avg = (np.var(y_pred, ddof=ddof),
                               np.mean(y_pred))
 
-    numerator = np.mean((y_true_observed - y_pred)**2)
+    y_true_series = pd.Series(y_true_observed)
+    y_pred_series = pd.Series(y_pred)
+    numerator = 2 * (y_true_series.cov(y_pred_series))
     denominator = y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg)**2
-    kappa = 1.0 - (numerator / denominator)
+    kappa = (numerator / denominator)
     return kappa
 
 
