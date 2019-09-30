@@ -84,7 +84,7 @@ class TestAnalyzer:
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
         # There should be NaNs for SMD, correlations and both sds
-        # note that we will get a value for QWK since we are 
+        # note that we will get a value for QWK since we are
         # dividing by N and not N-1
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=RuntimeWarning)
