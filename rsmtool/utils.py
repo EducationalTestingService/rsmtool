@@ -731,7 +731,7 @@ def difference_of_standardized_means(y_true_observed,
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
+def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     """
     Calculate Quadratic-weighted Kappa that works
     for both discrete and continuous values.
@@ -762,8 +762,9 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements.
-        Defaults to 1.
+        number of elements. When ddof is set to zero, the results
+        for discrete case match those from the standard implementations.
+        Defaults to 0.
 
     Returns
     -------
