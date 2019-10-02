@@ -789,7 +789,7 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     y_pred_array = np.array(y_pred)
     numerator = 2 * np.cov(y_true_array, y_pred_array, bias=True)[0][1]
     denominator = y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg)**2
-    kappa = (numerator / denominator)
+    kappa = numerator / denominator
     return kappa
 
 
