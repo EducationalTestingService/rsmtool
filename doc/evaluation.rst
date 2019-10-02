@@ -104,7 +104,7 @@ Quadratic weighted kappa (QWK)
 Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continuous scores using the following formula: 
 
 
-:math:`QWK=\frac{E[M-H]^2}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
+:math:`QWK=\frac{2*Cov[M-H]}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
 Note that in this case the variance is the population variance and, thus, it is computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
 
