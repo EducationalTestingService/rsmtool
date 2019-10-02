@@ -106,7 +106,7 @@ Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, qu
 
 :math:`QWK=\frac{2*Cov(M,H)}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
-Note that in this case the variance is the population variance and, thus, it is computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
+Note that in this case the variances and covariance are computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
 
 QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
 
