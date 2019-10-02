@@ -744,8 +744,9 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
 
     The formula is as follows:
 
-    :math:`QWK=\\frac{E[M-H]^2}{Var(H)+Var(M)+(\\bar{M}-\\bar{H})^2}`, where
+    :math:`QWK=\\frac{2*Cov[M-H]}{Var(H)+Var(M)+(\\bar{M}-\\bar{H})^2}`, where
 
+        - :math:'Cov' - Covariance with normalization by the number of observations given
         - :math:`H` - the human score
         - :math:`M` - the system score
         - :math:`\\bar{H}` - mean of :math:`H`
