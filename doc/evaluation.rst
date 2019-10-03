@@ -7,27 +7,27 @@ This section documents the exact mathematical definitions of the primary metrics
  
 The following conventions are used in the formulas in this section:
 
-:math:`N` - total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
+:math:`N` = total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
 
-:math:`M` - system score. The primary evaluation metrics in the RSMTool report are computed for *all* six types of :ref:`scores <score_postprocessing>`. For some secondary evaluations, the user can choose between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field for RSMTool or the :ref:`scale_with<scale_with_eval>` field for RSMEval.
+:math:`M` = system score. The primary evaluation metrics in the RSMTool report are computed for *all* six types of :ref:`scores <score_postprocessing>`. For some secondary evaluations, the user can choose between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field for RSMTool or the :ref:`scale_with<scale_with_eval>` field for RSMEval.
 
-:math:`H` - human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
+:math:`H` = human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
 
 .. _h2:
 
-:math:`H2` - second human score (if available). The score values in :ref:`second_human_score_column<second_human_score_column_rsmtool>`.
+:math:`H2` = second human score (if available). The score values in :ref:`second_human_score_column<second_human_score_column_rsmtool>`.
 
-:math:`N_2` - total number of responses in the evaluation set where both :math:`H` and :math:`H2` are available and are numeric and non-zero (unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``).
+:math:`N_2` = total number of responses in the evaluation set where both :math:`H` and :math:`H2` are available and are numeric and non-zero (unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``).
 
-:math:`\bar{M} = \sum_{n=1}^{N}{\frac{M_i}{N}}` - mean of :math:`M`
+Mean of :math:`M` = :math:`\bar{M} = \displaystyle\sum_{n=1}^{N}{\frac{M_i}{N}}`
 
-:math:`\bar{H} = \sum_{n=1}^{N}{\frac{H_i}{N}}` - mean of :math:`H`
+Mean of :math:`H` = :math:`\bar{H} = \displaystyle\sum_{n=1}^{N}{\frac{H_i}{N}}`
 
-:math:`\sigma_M = \sqrt{\frac{\sum_{i=1}^{N}{(M_i-\bar{M})^2}}{N-1}}` - standard deviation of :math:`M`
+Standard deviation of :math:`M` = :math:`\sigma_M = \displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(M_i-\bar{M})^2}}{N-1}}` - 
 
-:math:`\sigma_H = \sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}` - standard deviation of :math:`H`
+Standard deviation of :math:`H` = :math:`\sigma_H = \displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}` 
 
-:math:`\sigma_{H2} = \sqrt{\frac{\sum_{i=1}^{N_2}{(H2_i-\bar{H2})^2}}{N_2-1}}` - standard deviation of :math:`H2`
+Standard deviation of :math:`H2` = :math:`\sigma_{H2} = \displaystyle\sqrt{\frac{\sum_{i=1}^{N_2}{(H2_i-\bar{H2})^2}}{N_2-1}}`
 
 
 .. _observed_score_evaluation:
@@ -44,7 +44,7 @@ Percent exact agreement (rounded scores only)
 
 Percentage responses where human and system scores match exactly. 
 
-:math:`A = \sum_{i=1}^{N}\frac{w_i}{N} \times 100`
+:math:`A = \displaystyle\sum_{i=1}^{N}\frac{w_i}{N} \times 100`
 
 where :math:`w_i=1` if :math:`M_i = H_i` and :math:`w_i=0` if  :math:`M_i \neq H_i`
 
@@ -58,7 +58,7 @@ Percent exact + adjacent agreement
 
 Percentage responses where the absolute difference between human and system scores is ``1`` or less.
 
-:math:`A_{adj} = \sum_{i=1}^{N}\frac{w_i}{N} \times 100`
+:math:`A_{adj} = \displaystyle\sum_{i=1}^{N}\frac{w_i}{N} \times 100`
 
 where :math:`w_i=1` if :math:`|M_i-H_i| \leq 1` and :math:`w_i=0` if  :math:`|M_i-H_i| \gt 1`.
 
@@ -70,7 +70,7 @@ The percent exact + adjacent agreement is computed using :ref:`rsmtool.utils.agr
 Cohen's kappa (rounded scores only)
 +++++++++++++++++++++++++++++++++++
 
-:math:`\kappa=1-\frac{\sum_{k=0}^{K-1}{}\sum_{j=1}^{K}{w_{jk}X_{jk}}}{\sum_{k=0}^{K-1}{}\sum_{j=1}^{K}{w_{jk}m_{jk}}}`
+:math:`\kappa=1-\displaystyle\frac{\sum_{k=0}^{K-1}{}\sum_{j=1}^{K}{w_{jk}X_{jk}}}{\sum_{k=0}^{K-1}{}\sum_{j=1}^{K}{w_{jk}m_{jk}}}`
 
 when :math:`k=j` then :math:`w_{jk}` = 0 and
 when :math:`k \neq j` then :math:`w_{jk}` = 1
@@ -83,7 +83,7 @@ where:
 
 - :math:`m_{jk}` is the percent chance agreement:
 
-    :math:`m_{jk} = \sum_{k=1}^{K}{\frac{n_{k+}}{N}\frac{n_{+k}}{N}}`, where
+    :math:`m_{jk} = \displaystyle\sum_{k=1}^{K}{\frac{n_{k+}}{N}\frac{n_{+k}}{N}}`, where
 
         * :math:`n_{k+}` - total number of responses where :math:`H_i=k` 
 
@@ -104,7 +104,7 @@ Quadratic weighted kappa (QWK)
 Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continuous scores using the following formula: 
 
 
-:math:`QWK=\frac{2*Cov(M,H)}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
+:math:`QWK=\displaystyle\frac{2*Cov(M,H)}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
 Note that in this case the variances and covariance are computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
 
@@ -122,7 +122,7 @@ See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258
 Pearson Correlation coefficient (r)
 ++++++++++++++++++++++++++++++++++++
 
-:math:`r=\frac{\sum_{i=1}^{N}{(H_i-\bar{H})(M_i-\bar{M})}}{\sqrt{\sum_{i=1}^{N}{(H_i-\bar{H})^2} \sum_{i=1}^{N}{(M-\bar{M})^2}}}`
+:math:`r=\displaystyle\frac{\sum_{i=1}^{N}{(H_i-\bar{H})(M_i-\bar{M})}}{\sqrt{\sum_{i=1}^{N}{(H_i-\bar{H})^2} \sum_{i=1}^{N}{(M-\bar{M})^2}}}`
 
 Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html>`_. If the variance of human or system scores is ``0`` (all scores are the same), RSMTool returns ``None``.
 
@@ -134,7 +134,7 @@ Standardized mean difference (SMD)
 
 This metrics ensures that the distribution of system scores is centered on a point close to what is observed with human scoring.
 
-:math:`SMD = \frac{\bar{M}-\bar{H}}{\sigma_H}`
+:math:`SMD = \displaystyle\frac{\bar{M}-\bar{H}}{\sigma_H}`
 
 SMD between system and human scores is computed using :ref:`rsmtool.utils.standardized_mean_difference<smd_api>` with the ``method`` argument set to ``"unpooled"``.
 
@@ -150,7 +150,7 @@ Mean squared error (MSE)
 
 The mean squared error of a machine score 𝑀 as a predictor of observed human score H:
 
-:math:`MSE(H|M) = \frac{1}{N}\sum_{i=1}^{N}{(H_{i}-M_{i})^2}`
+:math:`MSE(H|M) = \displaystyle\frac{1}{N}\sum_{i=1}^{N}{(H_{i}-M_{i})^2}`
 
 MSE is computed using `sklearn.metrics.mean_squared_error <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html>`_.
 
@@ -159,7 +159,7 @@ MSE is computed using `sklearn.metrics.mean_squared_error <https://scikit-learn.
 Proportional reduction in mean squared error for observed score (R2)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-:math:`R2=1-\frac{MSE(H|M)}{\sigma_H^2}`
+:math:`R2=1-\displaystyle\frac{MSE(H|M)}{\sigma_H^2}`
 
 R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html>`_.
 
@@ -179,7 +179,7 @@ PRMSE shows how well system scores can predict true scores. This metric generall
 
 PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2>`, but with the true score :math:`T` used instead of the observed score :math:`H`, that is, as the percentage of variance in the true scores explained by the system scores. 
 
-:math:`PRMSE=1-\frac{MSE(T|M)}{\sigma_T^2}`
+:math:`PRMSE=1-\displaystyle\frac{MSE(T|M)}{\sigma_T^2}`
 
 :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
 
@@ -187,30 +187,29 @@ PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2
 
 - To compute estimates for true scores, the values for observed scores are adjusted for **variance of measurement errors** (:math:`\sigma_{e}^2`) in human scores defined as:
 
-        :math:`\sigma_{e}^2 = \frac{1}{2 \times N_2}\sum_{i=1}^{N_2}{(H_{i} - H2_{i})^2}`
+        :math:`\displaystyle\sigma_{e}^2 = \frac{1}{2 \times N_2}\sum_{i=1}^{N_2}{(H_{i} - H2_{i})^2}`
 
 In the simple case, where **all responses are double-scored**, :math:`MSE(T|M)` is estimated as:
 
-:math:`MSE(T|M) = MSE(\hat{H}|M)-\frac{1}{2}\sigma_{e}^2`
+   :math:`MSE(T|M) = MSE(\hat{H}|M)-\displaystyle\frac{1}{2}\sigma_{e}^2`
 
 and :math:`\sigma_T^2` is estimated as: 
 
-:math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \frac{1}{2}\sigma_{e}^2`
+   :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
 The PRMSE formula implemented in RSMTool is more general and can also handle the case where **only a subset** of responses are double-scored. The formula in this case uses the same computation for :math:`\sigma_{e}^2` but more complex formulas for :math:`MSE(T|M)` and :math:`\sigma_T^2`. The formulas are derived to ensure consistent results regardless of what percentage of data was double-scored and are as follows:
 
+   :math:`MSE(T|M) = \displaystyle\frac{\sum_{i=1}^{N}{c_i(\hat{H_i} - M_i)^2} - N\sigma_{e}^2}{N_1+2N_2}`
 
-:math:`MSE(T|M) = \frac{\sum_{i=1}^{N}{c_i(\hat{H_i} - M_i)^2} - N\sigma_{e}^2}{N_1+2N_2}`
+   :math:`\sigma_T^2=\displaystyle\frac{\sum_{i=1}^{N}{c_i(\hat{H}_i - \bar{\hat{H}})^2}-(N-1)\sigma_{e}^2}{(N-1) + \displaystyle\frac{N_2(N_1+2N_2-2)}{N_1+2N_2}}`
 
-:math:`\sigma_T^2=\frac{\sum_{i=1}^{N}{c_i(\hat{H}_i - \bar{\hat{H}})^2}-(N-1)\sigma_{e}^2}{(N-1) + \frac{N_2(N_1+2N_2-2)}{N_1+2N_2}}`
+   where 
 
-where 
+   * :math:`C_i=1` or 2 depending on the number of human scores observed for individual 𝑖.
 
-* :math:`C_i=1` or 2 depending on the number of human scores observed for individual 𝑖.
+   * :math:`\hat{H}` is the average of two human scores :math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}` when two scores available or :math:`\hat{H_i} = H_i` when only one score is available. 
 
-* :math:`\hat{H}` is the average of two human scores :math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}` when two scores available or :math:`\hat{H_i} = H_i` when only one score is available. 
-
-* :math:`N_1` is the number of responses with only one human score available (:math:`N_1+N_2=N`)
+   * :math:`N_1` is the number of responses with only one human score available (:math:`N_1+N_2=N`)
 
 PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
 
@@ -239,9 +238,9 @@ DSM is computed as follows:
 
 1. For each group, get the *z*-score for each response :math:i, using the :math:`\bar{H}`, :math:`\bar{M}`, :math:`\sigma_H`, and :math:`\sigma_S` for system and human scores for the whole evaluation set:
 
-        :math:`z_{H_{i}} = \frac{H_i - \bar{H}}{\sigma_H}`
+        :math:`z_{H_{i}} = \displaystyle\frac{H_i - \bar{H}}{\sigma_H}`
 
-        :math:`z_{M_{i}} = \frac{M_i - \bar{M}}{\sigma_M}`
+        :math:`z_{M_{i}} = \displaystyle\frac{M_i - \bar{M}}{\sigma_M}`
 
 
 2. For each response :math:i, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
@@ -323,7 +322,7 @@ Same as :ref:`r for observed scores<r>` but substituting :math:`H2` for :math:`M
 Standardized mean difference (SMD)
 ++++++++++++++++++++++++++++++++++
 
-:math:`SMD = \frac{\bar{H2}-\bar{H1}}{ \sqrt{\frac{\sigma_{H}^2 + \sigma_{H2}^2}{2}}}`
+:math:`SMD = \displaystyle\frac{\bar{H2}-\bar{H1}}{ \sqrt{\frac{\sigma_{H}^2 + \sigma_{H2}^2}{2}}}`
 
 Unlike :ref:`SMD for human-system scores<smd>`, the denominator in this case is the "pooled" standard deviation of :math:`H1` and :math:`H2`.
 
