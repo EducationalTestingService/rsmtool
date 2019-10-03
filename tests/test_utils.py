@@ -429,7 +429,7 @@ def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
                                     weights='quadratic',
                                     labels=[3, 4, 5, 6, 7,
                                             8, 9, 10, 11, 12])
-    npt.assert_almost_equal(qwk_rsmtool, qwk_sklearn)
+    assert_almost_equal(qwk_rsmtool, qwk_sklearn)
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
