@@ -418,7 +418,7 @@ def test_quadratic_weighted_kappa_discrete_values_match_skll():
             np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
     qwk_skll = kappa(data[0], data[1], weights='quadratic')
-    npt.assert_almost_equal(qwk_rsmtool, qwk_skll)
+    assert_almost_equal(qwk_rsmtool, qwk_skll)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
