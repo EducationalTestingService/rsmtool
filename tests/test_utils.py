@@ -410,7 +410,7 @@ def test_quadratic_weighted_kappa():
     expected = -0.09210526315789469
     qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
                                    np.array([9, 4, 5, 12]))
-    npt.assert_almost_equal(qwk, expected)
+   assert_almost_equal(computed_qwk, expected_qwk)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_skll():
