@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import numpy.testing as npt
+from numpy.testing import assert_almost_equal
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
