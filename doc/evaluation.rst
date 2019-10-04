@@ -7,27 +7,27 @@ This section documents the exact mathematical definitions of the primary metrics
  
 The following conventions are used in the formulas in this section:
 
-:math:`N` = total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
+:math:`N` \\-\\- total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
 
-:math:`M` = system score. The primary evaluation metrics in the RSMTool report are computed for *all* six types of :ref:`scores <score_postprocessing>`. For some secondary evaluations, the user can choose between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field for RSMTool or the :ref:`scale_with<scale_with_eval>` field for RSMEval.
+:math:`M` \\-\\- system score. The primary evaluation metrics in the RSMTool report are computed for *all* six types of :ref:`scores <score_postprocessing>`. For some secondary evaluations, the user can choose between raw and scaled scores using the :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` configuration field for RSMTool or the :ref:`scale_with<scale_with_eval>` field for RSMEval.
 
-:math:`H` = human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
+:math:`H` \\-\\- human score. The score values in :ref:`test_label_column<test_label_column_rsmtool>` for RSMTool or :ref:`human_score_column<human_score_column_eval>` for RSMEval.
 
 .. _h2:
 
-:math:`H2` = second human score (if available). The score values in :ref:`second_human_score_column<second_human_score_column_rsmtool>`.
+:math:`H2` \\-\\- second human score (if available). The score values in :ref:`second_human_score_column<second_human_score_column_rsmtool>`.
 
-:math:`N_2` = total number of responses in the evaluation set where both :math:`H` and :math:`H2` are available and are numeric and non-zero (unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``).
+:math:`N_2` \\-\\- total number of responses in the evaluation set where both :math:`H` and :math:`H2` are available and are numeric and non-zero (unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``).
 
-Mean of :math:`M` = :math:`\bar{M} = \displaystyle\sum_{n=1}^{N}{\frac{M_i}{N}}`
+:math:`\bar{M}` \\-\\- Mean of :math:`M` ; :math:`\bar{M}`  = :math:`\displaystyle\sum_{n=1}^{N}{\frac{M_i}{N}}`
 
-Mean of :math:`H` = :math:`\bar{H} = \displaystyle\sum_{n=1}^{N}{\frac{H_i}{N}}`
+:math:`\bar{H}` \\-\\- Mean of :math:`H` ; :math:`\bar{H}` = :math:`\displaystyle\sum_{n=1}^{N}{\frac{H_i}{N}}`
 
-Standard deviation of :math:`M` = :math:`\sigma_M = \displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(M_i-\bar{M})^2}}{N-1}}` - 
+:math:`\sigma_M` \\-\\- Standard deviation of :math:`M` ; :math:`\sigma_M` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(M_i-\bar{M})^2}}{N-1}}`
 
-Standard deviation of :math:`H` = :math:`\sigma_H = \displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}` 
+:math:`\sigma_H` \\-\\- Standard deviation of :math:`H` ; :math:`\sigma_H` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}` 
 
-Standard deviation of :math:`H2` = :math:`\sigma_{H2} = \displaystyle\sqrt{\frac{\sum_{i=1}^{N_2}{(H2_i-\bar{H2})^2}}{N_2-1}}`
+:math:`\sigma_{H2}` \\-\\- Standard deviation of :math:`H2` ; :math:`\sigma_{H2}` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N_2}{(H2_i-\bar{H2})^2}}{N_2-1}}`
 
 
 .. _observed_score_evaluation:
@@ -207,7 +207,7 @@ The PRMSE formula implemented in RSMTool is more general and can also handle the
 
    * :math:`C_i=1` or 2 depending on the number of human scores observed for individual 𝑖.
 
-   * :math:`\hat{H}` is the average of two human scores :math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}` when two scores available or :math:`\hat{H_i} = H_i` when only one score is available. 
+   * :math:`\hat{H}` is the average of two human scores :math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}` when two scores are available or :math:`\hat{H_i} = H_i` when only one score is available. 
 
    * :math:`N_1` is the number of responses with only one human score available (:math:`N_1+N_2=N`)
 
