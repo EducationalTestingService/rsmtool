@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-
+from numpy.testing import assert_almost_equal
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
@@ -407,10 +407,10 @@ def test_difference_of_standardized_means_with_no_population_info():
 
 def test_quadratic_weighted_kappa():
 
-    expected = -0.09210526315789469
-    qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+    expected_qwk = -0.09210526315789469
+    computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
                                    np.array([9, 4, 5, 12]))
-    eq_(qwk, expected)
+    assert_almost_equal(computed_qwk, expected_qwk)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_skll():
@@ -418,7 +418,7 @@ def test_quadratic_weighted_kappa_discrete_values_match_skll():
             np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
     qwk_skll = kappa(data[0], data[1], weights='quadratic')
-    eq_(qwk_rsmtool, qwk_skll)
+    assert_almost_equal(qwk_rsmtool, qwk_skll)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
@@ -429,7 +429,7 @@ def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
                                     weights='quadratic',
                                     labels=[3, 4, 5, 6, 7,
                                             8, 9, 10, 11, 12])
-    eq_(qwk_rsmtool, qwk_sklearn)
+    assert_almost_equal(qwk_rsmtool, qwk_sklearn)
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
