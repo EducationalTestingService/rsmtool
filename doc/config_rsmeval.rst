@@ -184,7 +184,7 @@ trim_tolerance *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The single numeric value that will be used to pad the trimming range specified in ``trim_min`` and ``trim_max``. This value will be used to compute the ceiling and floor values for :ref:`trimmed (bound) <score_postprocessing>` machine scores as ``trim_max`` + ``trim_tolerance`` for ceiling value and ``trim_min``-``trim_tolerance`` for floor value.
-Defaults to 0.49998.
+Defaults to 0.4998.
 
 .. note::
     

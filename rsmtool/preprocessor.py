@@ -439,7 +439,7 @@ class FeaturePreprocessor:
     def trim(values,
              trim_min,
              trim_max,
-             tolerance=0.49998):
+             tolerance=0.4998):
         """
         Trim the values contained in the given numpy array to
         `trim_min` - `tolerance` as the floor and
@@ -457,7 +457,7 @@ class FeaturePreprocessor:
             trimming the raw regression predictions.
         tolerance : float, optional
             The tolerance that will be used to compute the
-            trim interval. Defaults to 0.49998.
+            trim interval. Defaults to 0.4998.
 
         Returns
         -------
@@ -854,7 +854,7 @@ class FeaturePreprocessor:
                             human_labels_sd,
                             trim_min,
                             trim_max,
-                            trim_tolerance=0.49998):
+                            trim_tolerance=0.4998):
         """
         Process predictions to create scaled, trimmed
         and rounded predictions.
@@ -882,7 +882,7 @@ class FeaturePreprocessor:
             trimming the raw regression predictions.
         trim_tolerance: float
             Tolerance to be added to trim_max and substracted from
-            trim_min. Defaults to 0.49998.
+            trim_min. Defaults to 0.4998.
 
         Returns
         -------
@@ -2480,8 +2480,8 @@ class FeaturePreprocessor:
         if 'trim_tolerance' in df_postproc_params:
             trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
         else:
-            trim_tolerance = 0.49998
-            logging.warning("The tolerance for trimming scores will be assumed to be 0.49998, "
+            trim_tolerance = 0.4998
+            logging.warning("The tolerance for trimming scores will be assumed to be 0.4998, "
                             "the default value in previous versions of RSMTool. "
                             "We recommend re-training the model to ensure future "
                             "compatibility.")
