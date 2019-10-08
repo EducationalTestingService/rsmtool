@@ -487,7 +487,7 @@ def check_file_output(file1, file2, file_format='csv'):
         assert_frame_equal(df1.sort_index(axis=1),
                            df2.sort_index(axis=1),
                            check_exact=False,
-                           check_less_precise=True)
+                           check_less_precise=False)
     except AssertionError as e:
         message = e.args[0]
         new_message = 'File {} - {}'.format(basename(file1), message)
