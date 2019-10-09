@@ -24,4 +24,3 @@ dependencies:
   - sphinx_rtd_theme
   - xlrd
   - xlwt
-  - zeromq
