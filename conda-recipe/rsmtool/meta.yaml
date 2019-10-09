@@ -21,7 +21,6 @@ build:
     - render_notebook = rsmtool.reporter:main
     - convert_feature_json = rsmtool.convert_feature_json:main
 
-
 {% block requirements -%}
 requirements:
   build:
