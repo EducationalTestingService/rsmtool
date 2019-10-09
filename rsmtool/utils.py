@@ -5,7 +5,6 @@ Utility classes and functions.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -77,7 +76,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'feature_prefix': None,
             'trim_min': None,
             'trim_max': None,
-            'trim_tolerance': 0.49998,
+            'trim_tolerance': 0.4998,
             'subgroups': [],
             'min_n_per_group': None,
             'skll_objective': None,
@@ -334,10 +333,8 @@ def parse_json_with_comments(filename):
     """
 
     # Regular expression to identify comments
-    comment_re = re.compile(
-        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
-        re.DOTALL | re.MULTILINE
-    )
+    comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+                            re.DOTALL | re.MULTILINE)
 
     with open(filename) as file_buff:
         content = ''.join(file_buff.readlines())
@@ -496,6 +493,7 @@ def partial_correlations(df):
     np.fill_diagonal(pcor, 1.0)
     df_pcor = pd.DataFrame(pcor, columns=columns, index=columns)
     return df_pcor
+
 
 def agreement(score1, score2, tolerance=0):
     """
@@ -733,10 +731,28 @@ def difference_of_standardized_means(y_true_observed,
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
+def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
     """
-    Calculate the quadratic weighted Kappa
-    in the discrete or continuous cases.
+    Calculate Quadratic-weighted Kappa that works
+    for both discrete and continuous values.
+
+    The formula to compute quadratic-weighted kappa
+    for continuous values was developed at ETS by
+    Shelby Haberman. See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full
+    derivation. The discrete case is simply treated as
+    a special case of the continuous one.
+
+    The formula is as follows:
+
+    :math:`QWK=\\displaystyle\\frac{2*Cov(M,H)}{Var(H)+Var(M)+(\\bar{M}-\\bar{H})^2}`, where
+
+        - :math:`Cov` - covariance with normalization by :math:`N` (the total number of observations given)
+        - :math:`H` - the human score
+        - :math:`M` - the system score
+        - :math:`\\bar{H}` - mean of :math:`H`
+        - :math:`\\bar{M}` - the mean of :math:`M`
+        - :math:`Var(X)` - variance of X
+
 
     Parameters
     ----------
@@ -747,8 +763,9 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     ddof : int, optional
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements.
-        Defaults to 1.
+        number of elements. When ddof is set to zero, the results
+        for discrete case match those from the standard implementations.
+        Defaults to 0.
 
     Returns
     -------
@@ -758,17 +775,19 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=1):
     Raises
     ------
     AssertionError
-        If len(y_true_observed) != len(y_pred)
+        If the number of elements in ``y_true_observed`` is not equal
+        to the number of elements in ``y_pred``.
     """
+
     assert len(y_true_observed) == len(y_pred)
     y_true_observed_var, y_true_observed_avg = (np.var(y_true_observed, ddof=ddof),
                                                 np.mean(y_true_observed))
     y_pred_var, y_pred_avg = (np.var(y_pred, ddof=ddof),
                               np.mean(y_pred))
 
-    numerator = np.mean((y_true_observed - y_pred)**2)
+    numerator = 2 * np.cov(y_true_observed, y_pred, ddof=ddof)[0][1]
     denominator = y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg)**2
-    kappa = 1.0 - (numerator / denominator)
+    kappa = numerator / denominator
     return kappa
 
 

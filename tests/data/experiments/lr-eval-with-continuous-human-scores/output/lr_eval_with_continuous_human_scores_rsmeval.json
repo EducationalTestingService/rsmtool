@@ -18,7 +18,7 @@
     ],
     "special_sections": null,
     "custom_sections": null,
-    "trim_tolerance": 0.49998,
+    "trim_tolerance": 0.4998,
     "subgroups": [],
     "min_n_per_group": null,
     "section_order": null,

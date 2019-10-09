@@ -42,7 +42,7 @@ else:
     param('lr-eval-with-continuous-human-scores', 'lr_eval_with_continuous_human_scores', consistency=True),
     param('lr-eval-with-subset-double-scored', 'lr_eval_with_subset_double_scored', consistency=True),
     param('lr-eval-with-trim-tolerance', 'lr_evaluation_with_trim_tolerance'),
-    param('lr-eval-with-numeric-threshold', 'lr_evaluation_with_numeric_threshold', subgroups=['QUESTION']), 
+    param('lr-eval-with-numeric-threshold', 'lr_evaluation_with_numeric_threshold', subgroups=['QUESTION']),
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:

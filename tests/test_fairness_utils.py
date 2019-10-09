@@ -3,7 +3,6 @@ Tests for function in fairness_utils.py
 """
 
 
-import numpy as np
 import pandas as pd
 
 from nose.tools import (eq_,
@@ -19,7 +18,6 @@ from rsmtool.fairness_utils import (convert_to_ordered_category,
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
-
 
 
 def test_convert_to_ordered_category():
@@ -121,7 +119,6 @@ def test_gest_fairness_analyses_coefficients():
     assert_almost_equal(coefs_csd.loc['Intercept (Esperanto)', 'estimate'], 1)
 
 
-
 def test_get_fairness_analyses_osa_difference():
     df = pd.DataFrame({'sc1': [1, 1, 4, 4],
                        'raw': [0.9, 5, 3.99, 0.01],
@@ -208,4 +205,3 @@ def test_get_fairness_analyses_custom_reference():
     intercept = dc['estimates_osa_by_L1'].index.values[0]
     eq_(base_group, 'Esperanto')
     eq_(intercept, 'Intercept (Esperanto)')
-

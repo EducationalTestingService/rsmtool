@@ -711,17 +711,16 @@ class TestFeaturePreprocessor:
     def test_trim(self):
 
         values = np.array([1.4, 8.5, 7.4])
-        expected = np.array([1.4, 8.49998, 7.4])
+        expected = np.array([1.4, 8.4998, 7.4])
         actual = FeaturePreprocessor.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
     def test_trim_with_list(self):
 
         values = [1.4, 8.5, 7.4]
-        expected = np.array([1.4, 8.49998, 7.4])
+        expected = np.array([1.4, 8.4998, 7.4])
         actual = FeaturePreprocessor.trim(values, 1, 8)
         assert_array_equal(actual, expected)
-
 
     def test_trim_with_custom_tolerance(self):
 
@@ -729,7 +728,6 @@ class TestFeaturePreprocessor:
         expected = np.array([0.75, 8.25, 7.4])
         actual = FeaturePreprocessor.trim(values, 1, 8, 0.25)
         assert_array_equal(actual, expected)
-
 
     def test_preprocess_feature_fail(self):
 

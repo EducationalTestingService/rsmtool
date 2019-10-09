@@ -211,7 +211,7 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
     # them from the list; then, we make sure that there are no other warnings
     warning_msgs = collect_warning_messages_from_report(html_report)
     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
-    assert_equal(len(warning_msgs), 0) 
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
@@ -487,7 +487,7 @@ def check_file_output(file1, file2, file_format='csv'):
         assert_frame_equal(df1.sort_index(axis=1),
                            df2.sort_index(axis=1),
                            check_exact=False,
-                           check_less_precise=True)
+                           check_less_precise=False)
     except AssertionError as e:
         message = e.args[0]
         new_message = 'File {} - {}'.format(basename(file1), message)

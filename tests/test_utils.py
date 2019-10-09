@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-
+from numpy.testing import assert_almost_equal
 from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
@@ -31,7 +31,10 @@ from rsmtool.utils import (difference_of_standardized_means,
                            quadratic_weighted_kappa)
 
 from sklearn.datasets import make_classification
+from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
+
+from skll.metrics import kappa
 
 # get the directory containing the tests
 test_dir = dirname(__file__)
@@ -404,11 +407,29 @@ def test_difference_of_standardized_means_with_no_population_info():
 
 def test_quadratic_weighted_kappa():
 
-    expected = 0.12246696035242288
-    qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
+    expected_qwk = -0.09210526315789469
+    computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
                                    np.array([9, 4, 5, 12]))
-    eq_(qwk, expected)
+    assert_almost_equal(computed_qwk, expected_qwk)
 
+
+def test_quadratic_weighted_kappa_discrete_values_match_skll():
+    data = (np.array([8, 4, 6, 3]),
+            np.array([9, 4, 5, 12]))
+    qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
+    qwk_skll = kappa(data[0], data[1], weights='quadratic')
+    assert_almost_equal(qwk_rsmtool, qwk_skll)
+
+
+def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
+    data = (np.array([8, 4, 6, 3]),
+            np.array([9, 4, 5, 12]))
+    qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
+    qwk_sklearn = cohen_kappa_score(data[0], data[1],
+                                    weights='quadratic',
+                                    labels=[3, 4, 5, 6, 7,
+                                            8, 9, 10, 11, 12])
+    assert_almost_equal(qwk_rsmtool, qwk_sklearn)
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
@@ -593,7 +614,7 @@ class TestThumbnail:
 
         path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
         path2 = 'random/path/asftesfa/to/figure1.svg'
-        image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
+        _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
 class TestExpectedScores():

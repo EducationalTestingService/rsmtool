@@ -5,7 +5,7 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an example configuration file for `rsmcompare <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmcompare/config_rsmcompare.json>`_.
 
-There are seven required fields and the rest are all optional.
+There are seven required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 comparison_id
 ~~~~~~~~~~~~~
@@ -35,25 +35,11 @@ description_new
 ~~~~~~~~~~~~~~~
 A brief description of the experiment with the new model. The description can contain spaces and punctuation.
 
-use_scaled_predictions_old *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Set to ``true`` if the "baseline" experiment used scaled machine scores for confusion matrices, score distributions, subgroup analyses, etc. Defaults to ``false``.
+.. _custom_sections_rsmcompare:
 
-use_scaled_predictions_new *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Set to ``true`` if the experiment with the new model used scaled machine scores for confusion matrices, score distributions, subgroup analyses, etc. Defaults to ``false``.
-
-.. warning::
-
-    For ``rsmtool`` and ``rsmeval``, primary evaluation analyses are computed on both raw and scaled scores, but some analyses (e.g., the confusion matrix) are only computed for either raw or re-scaled scores based on the value of ``use_scaled_predictions``. ``rsmcompare`` uses the existing outputs and does not perform any additional evaluations. Therefore if this field was set to ``true`` in the original experiment but is set to ``false`` for ``rsmcompare``, the report will be internally inconsistent: some evaluations use raw scores whereas others will use scaled scores.
-
-subgroups *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~
-A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``.
-
-.. note::
-
-    In order to include subgroups analyses in the comparison report, both experiments must have been run with the same set of subgroups.
+custom_sections *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :ref:`pre-defined variables <custom_notebooks>`.
 
 .. _general_sections_rsmcompare:
 
@@ -67,7 +53,6 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
         - a table showing the number of truncated outliers for each feature; and
         - a table with percentiles and outliers;
         - a table with correlations between raw feature values and human score in each model and the correlation between the values of the same feature in these two models. Note that this table only includes features and responses which occur in both training sets.
-
 
     - ``features_by_group``: Shows boxplots for both experiments with distributions of raw feature values by each of the :ref:`subgroups <subgroups_rsmtool>` specified in the configuration file.
 
@@ -107,20 +92,6 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
-
-
-.. _custom_sections_rsmcompare:
-
-custom_sections *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A list of custom, user-defined sections to be included into the final report. These are IPython notebooks (``.ipynb`` files) created by the user.  The list must contains paths to the notebook files, either absolute or relative to the configuration file. All custom notebooks have access to some :ref:`pre-defined variables <custom_notebooks>`.
-
-.. _special_sections_rsmcompare:
-
-special_sections *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A list specifying special ETS-only comparison sections to be included into the final report. These sections are available *only* to ETS employees via the `rsmextra` package.
-
 section_order *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 A list containing the order in which the sections in the report should be generated. Any specified order must explicitly list:
@@ -130,6 +101,32 @@ A list containing the order in which the sections in the report should be genera
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmcompare>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmcompare>`.
+
+.. _special_sections_rsmcompare:
+
+special_sections *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A list specifying special ETS-only comparison sections to be included into the final report. These sections are available *only* to ETS employees via the `rsmextra` package.
+
+subgroups *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~
+A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``.
+
+.. note::
+
+    In order to include subgroups analyses in the comparison report, both experiments must have been run with the same set of subgroups.
+
+use_scaled_predictions_old *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Set to ``true`` if the "baseline" experiment used scaled machine scores for confusion matrices, score distributions, subgroup analyses, etc. Defaults to ``false``.
+
+use_scaled_predictions_new *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Set to ``true`` if the experiment with the new model used scaled machine scores for confusion matrices, score distributions, subgroup analyses, etc. Defaults to ``false``.
+
+.. warning::
+
+    For ``rsmtool`` and ``rsmeval``, primary evaluation analyses are computed on both raw and scaled scores, but some analyses (e.g., the confusion matrix) are only computed for either raw or re-scaled scores based on the value of ``use_scaled_predictions``. ``rsmcompare`` uses the existing outputs and does not perform any additional evaluations. Therefore if this field was set to ``true`` in the original experiment but is set to ``false`` for ``rsmcompare``, the report will be internally inconsistent: some evaluations use raw scores whereas others will use scaled scores.
 
 .. _use_thumbnails_rsmcompare:
 

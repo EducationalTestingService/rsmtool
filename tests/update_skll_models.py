@@ -10,7 +10,8 @@ Before running this script, make sure that the outputs work as expected
 
 :author: Anastassia Loukina
 :author: Nitin Madnani
-:date: February 2017
+
+:organization: ETS
 """
 
 import glob

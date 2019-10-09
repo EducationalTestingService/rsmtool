@@ -5,11 +5,9 @@ Classes for comparing outputs of two RSMTool experiments.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
-import logging
 import numpy as np
 import pandas as pd
 import warnings
