@@ -25,12 +25,12 @@ build:
 {% block requirements -%}
 requirements:
   build:
-    - python
+    - python 3.6.8
     {% for req in data.get('install_requires', []) -%}
     - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
     {% endfor %}
   run:
-    - python
+    - python 3.6.8
     {% for req in data.get('install_requires', []) -%}
     - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
     {% endfor %}
