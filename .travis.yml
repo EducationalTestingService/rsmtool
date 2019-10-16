@@ -21,7 +21,7 @@ before_install:
 - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
 - chmod +x miniconda.sh
 - ./miniconda.sh -b -f
-- ${HOME}/miniconda3/bin/conda update --yes conda
+- ${HOME}/miniconda3/bin/conda install -c anaconda --yes setuptools
 
 install:
 - ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file requirements.txt --yes --quiet
