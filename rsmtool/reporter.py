@@ -51,9 +51,9 @@ else:
                                     'consistency',
                                     'model',
                                     'evaluation',
+                                    'true_score_evaluation',
                                     'evaluation_by_group',
                                     'fairness_analyses',
-                                    'true_score_evaluation',
                                     'pca',
                                     'intermediate_file_paths',
                                     'sysinfo']
@@ -62,9 +62,9 @@ else:
                                     'data_description_by_group',
                                     'consistency',
                                     'evaluation',
+                                    'true_score_evaluation',
                                     'evaluation_by_group',
                                     'fairness_analyses',
-                                    'true_score_evaluation',
                                     'intermediate_file_paths',
                                     'sysinfo']
 
