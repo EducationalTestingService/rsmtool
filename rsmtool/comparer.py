@@ -479,7 +479,7 @@ class Comparer:
                 # if `SMD` is being used, rather than `DSM`, we print a note for the user; we don't
                 # want to go so far as to raise a warning, but we do want to give the user some info
                 if smd_name == 'SMD':
-                    warnings.warn("The the subgroup evaluations in `{}` use 'SMD'. Please note "
+                    warnings.warn("The subgroup evaluations in `{}` use 'SMD'. Please note "
                                   "that newer versions of RSMTool (>6.1) use 'DSM' with subgroup "
                                   "evaluations. For additional details on how these metrics "
                                   "differ, see the RSMTool documentation. Comparisons with experiments "
