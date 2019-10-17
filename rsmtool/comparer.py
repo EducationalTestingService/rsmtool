@@ -86,7 +86,7 @@ class Comparer:
                                                             raise_warnings=True):
         """
         This is a helper method to ensure that the column names for eval data frames
-        are forward and backward compatible. There are two major changes in RSMTool (>6.1)
+        are forward and backward compatible. There are two major changes in RSMTool (7.0 or greater)
         that necessitate this: (1) for subgroup calculations, 'DSM' is now used
         instead of 'SMD', and (2) QWK statistics are now calculated on un-rounded scores.
         Thus, we need to check these columns to see which sets of names are being used.
@@ -145,7 +145,7 @@ class Comparer:
                                       for col in short_metrics_list_new]
 
             if raise_warnings:
-                warnings.warn("Please note that newer versions of RSMTool (>6.1) use only the trimmed "
+                warnings.warn("Please note that newer versions of RSMTool (7.0 or greater) use only the trimmed "
                               "scores for weighted kappa calculations. Comparisons with experiments using "
                               "`trim_round` for weighted kappa calculations will be deprecated in the next "
                               "major release.", category=DeprecationWarning)
@@ -480,7 +480,7 @@ class Comparer:
                 # want to go so far as to raise a warning, but we do want to give the user some info
                 if smd_name == 'SMD':
                     warnings.warn("The subgroup evaluations in `{}` use 'SMD'. Please note "
-                                  "that newer versions of RSMTool (>6.1) use 'DSM' with subgroup "
+                                  "that newer versions of RSMTool (7.0 or greater) use 'DSM' with subgroup "
                                   "evaluations. For additional details on how these metrics "
                                   "differ, see the RSMTool documentation. Comparisons with experiments "
                                   "using SMD for subgroup calculations will be deprecated in the next major "
