@@ -29,7 +29,7 @@ jobs:
     displayName: "Update conda"
 
   - script: |
-      conda create --name rsmdev --yes --quiet -c conda-forge -c defaults python=%PYTHON_VERSION% numpy=1.17 nose --file requirements.txt
+      conda create --name rsmdev --yes --quiet -c conda-forge -c defaults python=%PYTHON_VERSION% --file requirements.txt
       conda init cmd.exe
       CALL activate rsmdev
       pip install -e .
