@@ -43,7 +43,6 @@ jobs:
       echo $(pytestfiles)
       nosetests --with-xunit $(pytestfiles)
     displayName: 'Run tests'
-    continueOnError: true
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
