@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - desilinguist
 dependencies:
-  - python=3.6.8
+  - python
   - ipython=6.5.0
   - jupyter=1.0.0
   - joblib=0.11
@@ -19,7 +19,6 @@ dependencies:
   - coverage
   - openpyxl
   - parameterized
-  - setuptools
   - sphinx
   - sphinx_rtd_theme
   - xlrd

@@ -12,7 +12,7 @@ env:
   matrix:
   - TESTFILES="tests/test_experiment_rsmtool_1.py"
   - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
-  - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py tests/test_fairness_utils.py tests/test_prmse_utils.py"
+  - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py tests/test_fairness_utils.py tests/test_prmse_utils.py tests/test_container.py"
   - TESTFILES="tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
   - TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
 sudo: false

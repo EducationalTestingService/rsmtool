@@ -13,7 +13,6 @@ statsmodels==0.9.0
 coverage
 openpyxl
 parameterized
-setuptools
 sphinx
 sphinx_rtd_theme
 xlrd
