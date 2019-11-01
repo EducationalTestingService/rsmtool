@@ -155,7 +155,7 @@ class TestDataReader:
                       [('train', 'csv'), ('test', 'xls'), ('train_metadata', 'tsv')],
                       [('train', 'jsonlines'), ('test', 'jsonlines')]]
 
-        converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
+        converter = {'id': str, 'feature1': np.int64, 'feature2': np.int64, 'candidate': str}
         converters = [{'train': converter, 'test': converter},
                       {'train': converter},
                       {'train': converter, 'test': converter},
@@ -187,7 +187,7 @@ class TestDataReader:
         test_lists = [('feature_specs', 'csv'),
                       ('test', 'tsv'),
                       ('train_metadata', 'xlsx')]
-        converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
+        converter = {'id': str, 'feature1': np.int64, 'feature2': np.int64, 'candidate': str}
         converters = {'test': converter}
         container = self.get_container(test_lists, converters)
         frame = container.test
@@ -211,7 +211,7 @@ class TestDataReader:
 
     def test_getitem_test_from_key(self):
         test_lists = [('feature_specs', 'csv'), ('test', 'tsv'), ('train', 'xlsx')]
-        converter = {'id': str, 'feature1': int, 'feature2': int, 'candidate': str}
+        converter = {'id': str, 'feature1': np.int64, 'feature2': np.int64, 'candidate': str}
         converters = {'train': converter, 'test': converter}
         container = self.get_container(test_lists, converters)
         frame = container['test']
