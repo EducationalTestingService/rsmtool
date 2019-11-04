@@ -2,16 +2,17 @@
 
 package:
   name: rsmtool
-  version: 6.1.0
+  version: {{data.get('version')}}
 
 source:
   path: ../../../rsmtool
 
 build:
   number: 0
+  noarch: python
   script:
     - cd $SRC_DIR
-    - $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+    - "{{ PYTHON }} -m pip install . --no-deps -vv"
   entry_points:
     - rsmtool = rsmtool.rsmtool:main
     - rsmcompare = rsmtool.rsmcompare:main
@@ -65,3 +66,4 @@ test:
 about:
   home: https://github.com/EducationalTestingService/rsmtool
   license: Apache 2.0
+  license_file: LICENSE
