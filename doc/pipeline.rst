@@ -98,6 +98,9 @@ The raw predictions "trimmed" to be in the score range acceptable for the item. 
 
 This approach represents a compromise: it provides scores that are real-valued and, therefore, provide more information than human scores that are likely to be integer-valued. However, it also ensures that the scores fall within the expected scale.
 
+.. note::
+	In RSMTool v6.x and earlier default ``tolerance`` was set to 0.49998. The ``raw_trim`` values computed by RSMTool for outlier scores starting with v7.0 will be *different* from those computed by earlier versions. You can use the new :ref:`trim_tolerance<trim_tolerance_rsmtool>` field in the configuration file to reproduce old results. 
+
 raw_trim_round
 ~~~~~~~~~~~~~~
 The raw_trim predictions rounded to the nearest integer.
