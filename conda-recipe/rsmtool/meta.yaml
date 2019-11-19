@@ -25,14 +25,14 @@ build:
 {% block requirements -%}
 requirements:
   build:
-    - python
+    - python >=3.6
     {% for req in data.get('install_requires', []) -%}
-    - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
+    - {{req.replace(">", " >").replace("<", " <").replace("==", " ")}}
     {% endfor %}
   run:
-    - python
+    - python >=3.6
     {% for req in data.get('install_requires', []) -%}
-    - {{(req.replace(">", " >") if ">" in req else req.replace("==", " "))}}
+    - {{req.replace(">", " >").replace("<", " <").replace("==", " ")}}
     {% endfor %}
 {%- endblock %}
 
