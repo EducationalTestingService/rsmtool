@@ -8,17 +8,15 @@ Utility classes and functions related to computing fairness evaluations
 :organization: ETS
 """
 
-import pandas as pd
 import pickle
-import numpy as np
-
 from os.path import join
 
+import numpy as np
+import pandas as pd
 import statsmodels.formula.api as smf
-from statsmodels.stats.anova import anova_lm
-
-from rsmtool.writer import DataWriter
 from rsmtool.container import DataContainer
+from rsmtool.writer import DataWriter
+from statsmodels.stats.anova import anova_lm
 
 
 def convert_to_ordered_category(group_values, base_group=None):
@@ -169,7 +167,7 @@ def get_fairness_analyses(df,
                           human_score_column='sc1',
                           base_group=None):
     """Compute fairness analyses described
-    in `Loukina et al. 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_.
+    in `Loukina et al. 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
     The functions computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),
     and conditional score difference (csd).

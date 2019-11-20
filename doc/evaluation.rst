@@ -221,7 +221,7 @@ PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
 Fairness
 ~~~~~~~~
 
-Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://www.aclweb.org/anthology/papers/W/W17/W17-1605/>`_).
+Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://www.aclweb.org/anthology/W17-1605/>`_).
 
 When defining an experiment, the RSMTool user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations. 
 
@@ -267,7 +267,7 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
-Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
+Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
 
 These include: 
 
