@@ -8,5 +8,3 @@ dependencies:
   - numpy=1.14.6
   - skll=1.5.2
   - statsmodels=0.10.1
-  - sphinx
-  - sphinx_rtd_theme
