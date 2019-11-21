@@ -3,7 +3,7 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Run ``python tests/update_files.py`` to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
+1. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
 
 2. Create a release branch on GitHub.
 
@@ -25,12 +25,14 @@ This process is only meant for the project administrators, not users and develop
 
 10. Once the build for the PR passes and the reviewers approve, merge the release branch into ``master``.
 
-11. Make sure that the RTFD build for ``master`` passes.
+11. Make sure that the ReadTheDocs build for ``master`` passes.
 
 12. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
 
-13. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
+13. Make another PR to merge ``master`` branch into ``stable`` so that the ``stable`` ReadTheDocs build always points to the latest release.
 
-14. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+14. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
-15. Send an email around at ETS announcing the release and the changes.
+15. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+
+16. Send an email around at ETS announcing the release and the changes.
