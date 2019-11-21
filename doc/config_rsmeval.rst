@@ -92,7 +92,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
 
     - ``evaluation by group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
-    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclweb.org/anthology/papers/W/W19/W19-4401/>`_. The notebook shows:
+    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
         - percentage of variance in raw (signed) error explained by subgroup membership

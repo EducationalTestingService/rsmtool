@@ -130,4 +130,4 @@ Next, you should read the detailed documentation on :ref:`rsmtool <usage_rsmtool
 
 .. rubric:: References
 
-.. [#] Attali, Y., & Burstein, J. (2006). Automated essay scoring with e-rater® V.2. Journal of Technology, Learning, and Assessment, 4(3). https://ejournals.bc.edu/ojs/index.php/jtla/article/download/1650/1492
+.. [#] Attali, Y., & Burstein, J. (2006). Automated essay scoring with e-rater® V.2. Journal of Technology, Learning, and Assessment, 4(3). https://ejournals.bc.edu/index.php/jtla/article/download/1650/1492

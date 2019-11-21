@@ -10,13 +10,13 @@ To set up a local development environment, follow the steps below:
 
 1. Pull the latest version of RSMTool from GitHub and switch to the ``master`` branch.
 
-2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/docs/user-guide/install/index.html>`_ to install conda.
+2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 
-3. Create a new conda environment (say, ``rsmtool``) and install the packages specified in the ``requirements.txt`` file by running::
+3. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
 
-    conda create -n rsmtool -c defaults -c conda-forge -c desilinguist --file requirements.txt
+    conda create -n rsmdev -c conda-forge -c desilinguist --file requirements.txt
 
-4. Activate the environment using ``source activate rsmtool`` (use ``activate rsmtool`` if you are on Windows).
+4. Activate the environment using ``conda activate rsmdev``. [#]_
 
 5. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
 
@@ -137,3 +137,6 @@ Here are some advanced tips and tricks when working with RSMTool tests.
 
 3. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
 
+.. rubric:: Footnotes
+
+.. [#] For older versions of conda, you may have to do ``source activate rsmtool`` on Linux/macOS and ``activate rsmtool`` on Windows.
