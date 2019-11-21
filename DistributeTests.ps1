@@ -35,6 +35,7 @@ elseif ($agentNumber -eq 2) {
     $testsToRun = $testsToRun + "tests/test_comparer.py"
     $testsToRun = $testsToRun + "tests/test_configuration_parser.py"
     $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_2.py"
+    $testsToRun = $testsToRun + "tests/test_container.py"
 }
 elseif ($agentNumber -eq 3) {
     $testsToRun = $testsToRun + "tests/test_analyzer.py"

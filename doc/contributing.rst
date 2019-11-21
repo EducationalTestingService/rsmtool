@@ -12,9 +12,9 @@ To set up a local development environment, follow the steps below:
 
 2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/docs/user-guide/install/index.html>`_ to install conda.
 
-3. Create a new conda environment (say, ``rsmtool``) and install the packages specified in the ``conda_requirements.txt`` file by running::
+3. Create a new conda environment (say, ``rsmtool``) and install the packages specified in the ``requirements.txt`` file by running::
 
-    conda create -n rsmtool -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt
+    conda create -n rsmtool -c defaults -c conda-forge -c desilinguist --file requirements.txt
 
 4. Activate the environment using ``source activate rsmtool`` (use ``activate rsmtool`` if you are on Windows).
 
