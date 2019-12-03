@@ -42,7 +42,9 @@ else:
           subgroups=['L1', 'QUESTION']),
     param('lr-subgroups-with-numeric-threshold-and-empty-group',
           'lr_subgroups_with_numeric_threshold_and_empty_group',
-          subgroups=['L1', 'QUESTION'])
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-h2-long-feature-names',
+          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
