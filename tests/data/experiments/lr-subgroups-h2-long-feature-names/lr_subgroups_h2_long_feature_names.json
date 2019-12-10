@@ -1,0 +1,19 @@
+{
+    "train_file": "../../files/train_long_feature_names.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test_long_feature_names.csv",
+    "second_human_score_column": "score2",
+    "subgroups": [
+        "QUESTION",
+        "L1"
+    ],
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_subgroups_h2_long_feature_names",
+    "description": "Using all features with an LinearRegression model."
+}

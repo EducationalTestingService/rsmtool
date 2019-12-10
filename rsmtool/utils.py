@@ -947,7 +947,8 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     return ans
 
 
-def compute_subgroup_plot_params(group_names, num_plots):
+def compute_subgroup_plot_params(group_names,
+                                 num_plots):
     """
     Computing subgroup plot and figure parameters based on number of
     subgroups and number of plots to be generated.
