@@ -35,7 +35,7 @@ class DataWriter:
                                 index=False,
                                 **kwargs):
         """
-        Write out each of the given list of data frames as a ``.csv``, ''.tsv``,
+        Write out each of the given list of data frames as a ''.csv``, ''.tsv``,
         or ``.xlsx`` file in the given directory. Each data frame was generated
         as part of running an RSMTool experiment. All files are prefixed with the
         given experiment ID and suffixed with either the name of the data frame in
