@@ -5,7 +5,6 @@ Classes for dealing with report generation.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -52,7 +51,9 @@ else:
                                     'consistency',
                                     'model',
                                     'evaluation',
+                                    'true_score_evaluation',
                                     'evaluation_by_group',
+                                    'fairness_analyses',
                                     'pca',
                                     'intermediate_file_paths',
                                     'sysinfo']
@@ -61,7 +62,9 @@ else:
                                     'data_description_by_group',
                                     'consistency',
                                     'evaluation',
+                                    'true_score_evaluation',
                                     'evaluation_by_group',
+                                    'fairness_analyses',
                                     'intermediate_file_paths',
                                     'sysinfo']
 
@@ -73,6 +76,7 @@ else:
                                        'score_distributions',
                                        'model',
                                        'evaluation',
+                                       'true_score_evaluation',
                                        'pca',
                                        'notes',
                                        'sysinfo']
@@ -80,6 +84,7 @@ else:
     ordered_section_list_rsmsummarize = ['preprocessed_features',
                                          'model',
                                          'evaluation',
+                                         'true_score_evaluation',
                                          'intermediate_file_paths',
                                          'sysinfo']
 
@@ -378,7 +383,7 @@ class Reporter:
 
         if len(subgroups) == 0:
             subgroup_sections = [section for section in chosen_general_sections
-                                 if section.endswith('by_group')]
+                                 if section.endswith('by_group') or section == 'fairness_analyses']
             # if we were given a list of general sections, raise an error if
             # that list included subgroup sections but no subgroups were specified
 
@@ -620,6 +625,10 @@ class Reporter:
         min_items = (0 if config['min_items_per_candidate'] is None
                      else config['min_items_per_candidate'])
 
+        # determine minimum and maximum scores for trimming
+        min_score = config['trim_min'] - config['trim_tolerance']
+        max_score = config['trim_max'] + config['trim_tolerance']
+
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'DESCRIPTION': config['description'],
                           'MODEL_TYPE': config.get('model_type', ''),
@@ -629,12 +638,15 @@ class Reporter:
                           'SUBGROUPS': config.get('subgroups', []),
                           'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
                           'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
+                          'MIN_N_PER_GROUP': config.get('min_n_per_group', {}),
                           'LENGTH_COLUMN': config.get('length_column', None),
                           'H2_COLUMN': config['second_human_score_column'],
                           'MIN_ITEMS': min_items,
                           'FEATURE_SUBSET_FILE': feature_subset_file,
                           'EXCLUDE_ZEROS': config.get('exclude_zero_scores', True),
                           'SCALED': config.get('use_scaled_predictions', False),
+                          'MIN_SCORE': min_score,
+                          'MAX_SCORE': max_score,
                           'STANDARDIZE_FEATURES': config.get('standardize_features', True),
                           'FILE_FORMAT': config.get('file_format', 'csv'),
                           'USE_THUMBNAILS': config.get('use_thumbnails', False),

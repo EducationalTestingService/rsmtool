@@ -1,0 +1,3 @@
+,Overall score accuracy,Overall score difference,Conditional score difference,base_category
+R2,-0.009524894255878769,-0.009730740327740461,-0.010116751599620666,Vulcan
+sig,0.6614435876470453,0.6682461446037726,0.7408750749421544,Vulcan

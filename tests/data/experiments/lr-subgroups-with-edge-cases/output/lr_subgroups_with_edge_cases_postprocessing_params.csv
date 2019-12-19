@@ -1,2 +1,2 @@
-h1_mean,h1_sd,train_predictions_mean,train_predictions_sd,trim_max,trim_min
-3.37,0.7709011461622747,3.370000000000002,0.4842910569867619,6.0,1.0
+h1_mean,h1_sd,train_predictions_mean,train_predictions_sd,trim_max,trim_min,trim_tolerance
+3.37,0.7709011461622747,3.3700000000000028,0.4842910569867618,6.0,1.0,0.4998

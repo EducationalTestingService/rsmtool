@@ -5,7 +5,6 @@ Classes for preprocessing input data in various contexts.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -123,9 +122,9 @@ class FeatureSubsetProcessor:
         if sign:
             if ('sign_{}'.format(sign) not in df_feature_specs and
                     'Sign_{}'.format(sign) not in df_feature_specs):
-                    raise ValueError("The feature_subset_file must "
-                                     "contain the requested "
-                                     "sign column 'sign_{}'".format(sign))
+                raise ValueError("The feature_subset_file must "
+                                 "contain the requested "
+                                 "sign column 'sign_{}'".format(sign))
 
             if not df_feature_specs[subset].isin(['-', '+']).all():
                 raise ValueError("The sign columns in feature "
@@ -428,7 +427,7 @@ class FeaturePreprocessor:
         if is_built_in_model(model_name):
             model_type = 'BUILTIN'
         elif is_skll_model(model_name):
-                model_type = 'SKLL'
+            model_type = 'SKLL'
         else:
             raise ValueError("The specified model {} "
                              "was not found. Please "
@@ -440,7 +439,7 @@ class FeaturePreprocessor:
     def trim(values,
              trim_min,
              trim_max,
-             tolerance=0.49998):
+             tolerance=0.4998):
         """
         Trim the values contained in the given numpy array to
         `trim_min` - `tolerance` as the floor and
@@ -458,7 +457,7 @@ class FeaturePreprocessor:
             trimming the raw regression predictions.
         tolerance : float, optional
             The tolerance that will be used to compute the
-            trim interval. Defaults to 0.49998.
+            trim interval. Defaults to 0.4998.
 
         Returns
         -------
@@ -854,7 +853,8 @@ class FeaturePreprocessor:
                             human_labels_mean,
                             human_labels_sd,
                             trim_min,
-                            trim_max):
+                            trim_max,
+                            trim_tolerance=0.4998):
         """
         Process predictions to create scaled, trimmed
         and rounded predictions.
@@ -880,6 +880,9 @@ class FeaturePreprocessor:
         trim_max : float
             The highest score on the score point, used for
             trimming the raw regression predictions.
+        trim_tolerance: float
+            Tolerance to be added to trim_max and substracted from
+            trim_min. Defaults to 0.4998.
 
         Returns
         -------
@@ -900,14 +903,16 @@ class FeaturePreprocessor:
         # trim and round the predictions before running the analyses
         df_pred_process['raw_trim'] = FeaturePreprocessor.trim(df_pred_process['raw'],
                                                                trim_min,
-                                                               trim_max)
+                                                               trim_max,
+                                                               trim_tolerance)
 
         df_pred_process['raw_trim_round'] = np.rint(df_pred_process['raw_trim'])
         df_pred_process['raw_trim_round'] = df_pred_process['raw_trim_round'].astype('int64')
 
         df_pred_process['scale_trim'] = FeaturePreprocessor.trim(df_pred_process['scale'],
                                                                  trim_min,
-                                                                 trim_max)
+                                                                 trim_max,
+                                                                 trim_tolerance)
 
         df_pred_process['scale_trim_round'] = np.rint(df_pred_process['scale_trim'])
         df_pred_process['scale_trim_round'] = df_pred_process['scale_trim_round'].astype('int64')
@@ -1324,9 +1329,9 @@ class FeaturePreprocessor:
             A list of requested feature names.
         reserved_column_names : list
             A list of reserved column names.
-        given_trim_min : int
+        given_trim_min : float
             The minimum trim value.
-        given_trim_max : int
+        given_trim_max : float
             The maximum trim value.
         flag_column_dict : dict
             A dictionary of flag columns.
@@ -1436,12 +1441,12 @@ class FeaturePreprocessor:
         # make sure that feature names do not contain reserved column names
         illegal_feature_names = set(feature_names).intersection(reserved_column_names)
         if illegal_feature_names:
-                    raise ValueError("The following reserved "
-                                     "column names cannot be "
-                                     "used as feature names: '{}'. "
-                                     "Please rename these columns "
-                                     "and re-run the "
-                                     "experiment.".format(', '.join(illegal_feature_names)))
+            raise ValueError("The following reserved "
+                             "column names cannot be "
+                             "used as feature names: '{}'. "
+                             "Please rename these columns "
+                             "and re-run the "
+                             "experiment.".format(', '.join(illegal_feature_names)))
 
         # check to make sure that the subgroup columns are all present
         df = FeaturePreprocessor.check_subgroups(df, subgroups)
@@ -1675,8 +1680,10 @@ class FeaturePreprocessor:
         # both the training and the test data
         id_column = config_obj['id_column']
 
-        # get the specified trim min and max values
-        spec_trim_min, spec_trim_max = config_obj.get_trim_min_max()
+        # get the specified trim min, trim max and trim tolerance values
+        (spec_trim_min,
+         spec_trim_max,
+         spec_trim_tolerance) = config_obj.get_trim_min_max_tolerance()
 
         # get the name of the optional column that
         # contains response length.
@@ -1960,6 +1967,7 @@ class FeaturePreprocessor:
                            'feature_subset_file': feature_subset_file,
                            'trim_min': used_trim_min,
                            'trim_max': used_trim_max,
+                           'trim_tolerance': spec_trim_tolerance,
                            'use_scaled_predictions': use_scaled_predictions,
                            'exclude_zero_scores': exclude_zero_scores,
                            'exclude_listwise': exclude_listwise,
@@ -2064,7 +2072,9 @@ class FeaturePreprocessor:
 
         # get the specified trim min and max, if any
         # and make sure they are numeric
-        spec_trim_min, spec_trim_max = config_obj.get_trim_min_max()
+        (spec_trim_min,
+         spec_trim_max,
+         spec_trim_tolerance) = config_obj.get_trim_min_max_tolerance()
 
         # get the subgroups if any
         subgroups = config_obj.get('subgroups')
@@ -2261,7 +2271,8 @@ class FeaturePreprocessor:
                                                      scale_human_mean,
                                                      scale_human_sd,
                                                      spec_trim_min,
-                                                     spec_trim_max)
+                                                     spec_trim_max,
+                                                     spec_trim_tolerance)
         if not scale_with:
             expected_score_types = ['raw', 'raw_trim', 'raw_trim_round']
         elif scale_with == 'asis':
@@ -2463,13 +2474,30 @@ class FeaturePreprocessor:
         h1_mean = df_postproc_params['h1_mean'].values[0]
         h1_sd = df_postproc_params['h1_sd'].values[0]
 
+        # if we are using a newly trained model, use trim_tolerance from the
+        # df_postproc_params. If not, set it to the default value and show
+        # deprecation warning
+        if 'trim_tolerance' in df_postproc_params:
+            trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
+        else:
+            trim_tolerance = 0.4998
+            logging.warning("The tolerance for trimming scores will be assumed to be 0.4998, "
+                            "the default value in previous versions of RSMTool. "
+                            "We recommend re-training the model to ensure future "
+                            "compatibility.")
+
         # now generate the predictions for the features using this model
         logged_str = 'Generating predictions'
         logged_str += ' (expected scores).' if predict_expected_scores else '.'
         logging.info(logged_str)
+
+        # compute minimum and maximum score for expected predictions
+        min_score = int(np.rint(trim_min - trim_tolerance))
+        max_score = int(np.rint(trim_max + trim_tolerance))
+
         df_predictions = model.predict(df_features_preprocessed,
-                                       int(trim_min),
-                                       int(trim_max),
+                                       min_score,
+                                       max_score,
                                        predict_expected=predict_expected_scores)
 
         train_predictions_mean = df_postproc_params['train_predictions_mean'].values[0]
@@ -2480,7 +2508,8 @@ class FeaturePreprocessor:
                                                   train_predictions_sd,
                                                   h1_mean,
                                                   h1_sd,
-                                                  trim_min, trim_max)
+                                                  trim_min, trim_max,
+                                                  trim_tolerance)
 
         # add back the columns that we were requested to copy if any
         if len(columns_to_copy) > 0:
@@ -2673,21 +2702,22 @@ class FeaturePreprocessor:
                 # check that there are indeed inf or Nan values
                 if np.isnan(df_features_preprocess[feature_name]).any() or \
                    np.isinf(df_features_preprocess[feature_name]).any():
-                        (newdf,
-                         newdf_excluded) = self.filter_on_column(df_features_preprocess,
-                                                                 feature_name,
-                                                                 'spkitemid',
-                                                                 exclude_zeros=False,
-                                                                 exclude_zero_sd=False)
-                        del df_features_preprocess
-                        df_features_preprocess = newdf
-                        # add the response(s) with missing values to the excluded responses
-                        # but make sure we are adding the original values, not the
-                        # preprocessed ones
-                        missing_values = df_features['spkitemid'].isin(newdf_excluded['spkitemid'])
+                    (newdf,
+                     newdf_excluded) = self.filter_on_column(df_features_preprocess,
+                                                             feature_name,
+                                                             'spkitemid',
+                                                             exclude_zeros=False,
+                                                             exclude_zero_sd=False)
+                    del df_features_preprocess
+                    df_features_preprocess = newdf
 
-                        df_excluded_original = df_features[missing_values].copy()
-                        df_excluded = pd.merge(df_excluded, df_excluded_original, how='outer')
+                    # add the response(s) with missing values to the excluded responses
+                    # but make sure we are adding the original values, not the
+                    # preprocessed ones
+                    missing_values = df_features['spkitemid'].isin(newdf_excluded['spkitemid'])
+
+                    df_excluded_original = df_features[missing_values].copy()
+                    df_excluded = pd.merge(df_excluded, df_excluded_original, how='outer')
 
             # print(standardized_features)
             if standardize_features:

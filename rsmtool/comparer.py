@@ -5,7 +5,6 @@ Classes for comparing outputs of two RSMTool experiments.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -13,6 +12,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
+from copy import deepcopy
 from collections import defaultdict
 from scipy.stats import pearsonr
 from os.path import exists, join
@@ -30,7 +30,7 @@ _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
                                  "sys_sd.raw_trim_round",
                                  "exact_agr.raw_trim_round",
                                  "kappa.raw_trim_round",
-                                 "wtkappa.raw_trim_round",
+                                 "wtkappa.raw_trim",
                                  "adj_agr.raw_trim_round",
                                  "SMD.raw_trim_round",
                                  "R2.raw_trim",
@@ -45,7 +45,7 @@ _df_eval_columns_existing_scale = ["N", "h_mean", "h_sd",
                                    "sys_sd.scale_trim_round",
                                    "exact_agr.scale_trim_round",
                                    "kappa.scale_trim_round",
-                                   "wtkappa.scale_trim_round",
+                                   "wtkappa.scale_trim",
                                    "adj_agr.scale_trim_round",
                                    "SMD.scale_trim_round",
                                    "R2.scale_trim",
@@ -61,7 +61,7 @@ _df_eval_columns_renamed = ["N", "H1 mean", "H1 SD",
                             "score SD(br)",
                             "Agmt.(br)",
                             "K(br)",
-                            "QWK(br)",
+                            "QWK(b)",
                             "Adj. Agmt.(br)",
                             "SMD(br)",
                             "R2(b)",
@@ -77,6 +77,90 @@ class Comparer:
     """
     A class to perform comparisons between two RSMTool experiments.
     """
+
+    @staticmethod
+    def _modify_eval_columns_to_ensure_version_compatibilty(df,
+                                                            rename_dict,
+                                                            existing_eval_cols,
+                                                            short_metrics_list,
+                                                            raise_warnings=True):
+        """
+        This is a helper method to ensure that the column names for eval data frames
+        are forward and backward compatible. There are two major changes in RSMTool (7.0 or greater)
+        that necessitate this: (1) for subgroup calculations, 'DSM' is now used
+        instead of 'SMD', and (2) QWK statistics are now calculated on un-rounded scores.
+        Thus, we need to check these columns to see which sets of names are being used.
+
+        Parameters
+        ----------
+        df : pandas Data Frame
+            The evaluation data frame
+        rename_dict : dict
+            The rename dictionary
+        existing_eval_cols : list
+            The existing evaluation columns
+        short_metrics_list : list
+            The list of columns for the short metrics file.
+        raise_warnings : bool, optional
+            Whether to raise warnings.
+            Defaults to True.
+
+        Returns
+        -------
+        rename_dict_new : dict
+            The updated rename dictionary
+        existing_eval_cols_new : list
+            The updated existing evaluation columns
+        short_metrics_list_new : list
+            The updated list of columns for the short metrics file.
+        smd_name : str
+            The SMD column name (either 'SMD' or 'DSM')
+        """
+
+        rename_dict_new = deepcopy(rename_dict)
+        existing_eval_cols_new = deepcopy(existing_eval_cols)
+        short_metrics_list_new = deepcopy(short_metrics_list)
+        smd_name = 'SMD'
+
+        # previously, the QWK metric used `trim_round` scores; now, we use just `trim` scores;
+        # to ensure backward compatibility, we check whether `trim_round` scores were used and
+        # if so, we update the rename dictionary and column lists accordingly
+        if any(col.endswith('trim_round') for col in df if col.startswith('wtkappa')):
+
+            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
+            rename_dict_new = {(key.replace('_trim', '_trim_round')
+                                if key.startswith('wtkappa') else key):
+                               (val.replace("(b)", "(br)")
+                                if val.startswith('QWK') else val)
+                               for key, val in rename_dict_new.items()}
+
+            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
+            existing_eval_cols_new = [col.replace('_trim', '_trim_round')
+                                      if col.startswith('wtkappa') else col
+                                      for col in existing_eval_cols_new]
+
+            # replace the `QWK(b)` with `QWK(br)`
+            short_metrics_list_new = [col.replace("(b)", "(br)")
+                                      if col.startswith('QWK') else col
+                                      for col in short_metrics_list_new]
+
+            if raise_warnings:
+                warnings.warn("Please note that newer versions of RSMTool (7.0 or greater) use only the trimmed "
+                              "scores for weighted kappa calculations. Comparisons with experiments using "
+                              "`trim_round` for weighted kappa calculations will be deprecated in the next "
+                              "major release.", category=DeprecationWarning)
+
+        # we check if DSM was calculated (which is what we expect for subgroup evals),
+        # and if so, we update the rename dictionary and column lists accordingly; we
+        # also set `smd_name` equal to 'DSM'
+        if any(col.startswith('DSM') for col in df):
+            smd_name = 'DSM'
+            existing_eval_cols_new = [col.replace('SMD', 'DSM')
+                                      for col in existing_eval_cols_new]
+            rename_dict_new = {key.replace('SMD', 'DSM'): val.replace('SMD', 'DSM')
+                               for key, val in rename_dict_new.items()}
+
+        return rename_dict_new, existing_eval_cols_new, short_metrics_list_new, smd_name
 
     @staticmethod
     def make_summary_stat_df(df):
@@ -122,7 +206,7 @@ class Comparer:
         df_old : pandas DataFrame
             Data frame with feature values for the 'old' model.
         df_new : pandas DataFrame
-            Data frame with feature valeus for the 'new' model.
+            Data frame with feature values for the 'new' model.
         human_score : str, optional
             Name of the column containing human score. Defaults to ``sc1``.
             Must be the same for both data sets.
@@ -269,8 +353,6 @@ class Comparer:
         feature_distplots_file = join(figdir, '{}_distrib.svg'.format(experiment_id))
         if exists(feature_distplots_file):
             figs['feature_distplots'] = feature_distplots_file
-            # with open(feature_distplots_file, 'rb') as f:
-            #     figs['feature_distplots'] = base64.b64encode(f.read()).decode('utf-8')
 
         feature_cors_file = join(filedir, '{}_cors_processed.{}'.format(experiment_id,
                                                                         file_format))
@@ -336,6 +418,16 @@ class Comparer:
                 files['df_disattenuated_correlations_by_{}'.format(group)] = df_dis_cor_group
                 files['df_disattenuated_correlations_by_{}_overview'.format(group)] = self.make_summary_stat_df(df_dis_cor_group)
 
+        # true score evaluations
+        true_score_eval_file = join(filedir, "{}_true_score_eval.{}".format(experiment_id,
+                                                                            file_format))
+
+        # load true score evaluations if present
+        if exists(true_score_eval_file):
+            df_true_score_eval = DataReader.read_from_file(true_score_eval_file, index_col=0)
+            # we only use the row for raw_trim or scale_trim score
+            files['df_true_score_eval'] = df_true_score_eval.loc[['{}_trim'.format(prefix)]]
+
         # use the raw columns or the scale columns depending on the prefix
         existing_eval_cols = (_df_eval_columns_existing_raw if prefix == 'raw'
                               else _df_eval_columns_existing_scale)
@@ -343,14 +435,23 @@ class Comparer:
 
         # read in the short version of the evaluation metrics for all data
         short_metrics_list = ["N", "Adj. Agmt.(br)", "Agmt.(br)", "K(br)",
-                              "Pearson(b)", "QWK(br)", "R2(b)", "RMSE(b)"]
+                              "Pearson(b)", "QWK(b)", "R2(b)", "RMSE(b)"]
         eval_file_short = join(filedir, '{}_eval_short.{}'.format(experiment_id, file_format))
 
         if exists(eval_file_short):
             df_eval = DataReader.read_from_file(eval_file_short, index_col=0)
-            df_eval = df_eval[existing_eval_cols]
-            df_eval = df_eval.rename(columns=rename_dict)
-            files['df_eval'] = df_eval[short_metrics_list]
+
+            (rename_dict_new,
+             existing_eval_cols_new,
+             short_metrics_list_new,
+             _) = self._modify_eval_columns_to_ensure_version_compatibilty(df_eval,
+                                                                           rename_dict,
+                                                                           existing_eval_cols,
+                                                                           short_metrics_list)
+
+            df_eval = df_eval[existing_eval_cols_new]
+            df_eval = df_eval.rename(columns=rename_dict_new)
+            files['df_eval'] = df_eval[short_metrics_list_new]
             files['df_eval'].index.name = None
 
         eval_file = join(filedir, '{}_eval.{}'.format(experiment_id, file_format))
@@ -364,9 +465,30 @@ class Comparer:
                                                                       file_format))
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
-                df_eval = df_eval[existing_eval_cols]
-                df_eval = df_eval.rename(columns=rename_dict)
-                files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list]
+
+                (rename_dict_new,
+                 existing_eval_cols_new,
+                 short_metrics_list_new,
+                 smd_name
+                 ) = self._modify_eval_columns_to_ensure_version_compatibilty(df_eval,
+                                                                              rename_dict,
+                                                                              existing_eval_cols,
+                                                                              short_metrics_list,
+                                                                              raise_warnings=False)
+
+                # if `SMD` is being used, rather than `DSM`, we print a note for the user; we don't
+                # want to go so far as to raise a warning, but we do want to give the user some info
+                if smd_name == 'SMD':
+                    warnings.warn("The subgroup evaluations in `{}` use 'SMD'. Please note "
+                                  "that newer versions of RSMTool (7.0 or greater) use 'DSM' with subgroup "
+                                  "evaluations. For additional details on how these metrics "
+                                  "differ, see the RSMTool documentation. Comparisons with experiments "
+                                  "using SMD for subgroup calculations will be deprecated in the next major "
+                                  "release.".format(group_eval_file), category=DeprecationWarning)
+
+                df_eval = df_eval[existing_eval_cols_new]
+                df_eval = df_eval.rename(columns=rename_dict_new)
+                files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list_new]
                 files['df_eval_by_{}'.format(group)].index.name = None
 
                 series = files['df_eval_by_{}'.format(group)]
@@ -378,7 +500,8 @@ class Comparer:
                                                                      'score SD(br)',
                                                                      'score mean(b)',
                                                                      'score SD(b)',
-                                                                     'SMD(br)', 'SMD(b)']]
+                                                                     '{}(br)'.format(smd_name),
+                                                                     '{}(b)'.format(smd_name)]]
                 files['df_eval_by_{}_m_sd'.format(group)].index.name = None
 
         # read in the partial correlations vs. score for all data

@@ -13,8 +13,10 @@
         "custom1",
         "consistency",
         "pca",
+        "fairness_analyses",
         "evaluation",
         "evaluation_by_group",
+        "true_score_evaluation",
         "custom2",
         "intermediate_file_paths",
         "sysinfo"

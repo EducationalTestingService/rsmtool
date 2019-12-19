@@ -15,7 +15,7 @@ Rater Scoring Modeling Tool (RSMTool)
 
     .. image:: spacer.png
 
-Automated scoring of written and spoken responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `Project Essay Grade <https://pegwriting.com/>`_ for written responses and `SpeechRater <https://www.ets.org/research/topics/as_nlp/speech/>`_ for spoken responses.
+Automated scoring of written and spoken responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `MI Write <https://measurementinc.com/miwrite>`_ for written responses and `SpeechRater <https://www.ets.org/research/topics/as_nlp/speech/>`_ for spoken responses.
 
 RSMTool is a python package which automates and combines in a *single* :doc:`pipeline <pipeline>` multiple analyses that are commonly conducted when building and evaluating automated scoring models. The output of RSMTool is a comprehensive, customizable HTML statistical report that contains the outputs of these multiple analyses. While RSMTool does make it really simple to run this set of standard analyses using a single command, it is also fully customizable and allows users to easily exclude unneeded analyses, modify the standard analyses, and even include custom analyses in the report.
 
@@ -32,6 +32,7 @@ Documentation
 
    who
    pipeline
+   evaluation
    getting_started
    tutorial
    usage_rsmtool

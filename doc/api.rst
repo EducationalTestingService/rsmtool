@@ -73,6 +73,12 @@ From :py:mod:`~rsmtool.convert_feature_json` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: rsmtool.convert_feature_json_file
 
+
+From :py:mod:`~rsmtool.fairness_utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _fairness_api:
+.. autofunction:: rsmtool.fairness_utils.get_fairness_analyses
+
 From :py:mod:`~rsmtool.modeler` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.modeler
@@ -86,6 +92,12 @@ From :py:mod:`~rsmtool.preprocessor` Module
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+From :py:mod:`~rsmtool.prmse_utils` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _prmse_api:
+.. autofunction:: rsmtool.prmse_utils.compute_prmse
 
 From :py:mod:`~rsmtool.reader` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,12 +122,20 @@ From :py:mod:`~rsmtool.transformer` Module
 
 From :py:mod:`~rsmtool.utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _agreement_api:
 .. autofunction:: rsmtool.utils.agreement
 .. autofunction:: rsmtool.utils.partial_correlations
 .. autofunction:: rsmtool.utils.get_thumbnail_as_html
 .. autofunction:: rsmtool.utils.show_thumbnail
 .. autofunction:: rsmtool.utils.compute_expected_scores_from_model
 .. autofunction:: rsmtool.utils.parse_json_with_comments
+.. _qwk_api:
+.. autofunction:: rsmtool.utils.quadratic_weighted_kappa
+.. _smd_api:
+.. autofunction:: rsmtool.utils.standardized_mean_difference
+.. _dsm_api:
+.. autofunction:: rsmtool.utils.difference_of_standardized_means
 
 From :py:mod:`~rsmtool.writer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

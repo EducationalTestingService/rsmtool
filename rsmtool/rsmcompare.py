@@ -7,7 +7,6 @@ Script to compare two RSMTool experiments.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -103,6 +102,9 @@ def run_comparison(config_file_or_obj, output_dir):
             configpath = dirname(configuration.filepath)
         else:
             configpath = os.getcwd()
+
+    logger.info('Saving configuration file.')
+    configuration.save(output_dir)
 
     # get the information about the "old" experiment
     experiment_id_old = configuration['experiment_id_old']

@@ -12,7 +12,7 @@ env:
   matrix:
   - TESTFILES="tests/test_experiment_rsmtool_1.py"
   - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
-  - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py"
+  - TESTFILES="tests/test_analyzer.py tests/test_experiment_rsmeval.py tests/test_fairness_utils.py tests/test_prmse_utils.py tests/test_container.py"
   - TESTFILES="tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
   - TESTFILES="tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
 sudo: false
@@ -21,10 +21,10 @@ before_install:
 - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
 - chmod +x miniconda.sh
 - ./miniconda.sh -b -f
-- ${HOME}/miniconda3/bin/conda update --yes conda
+- ${HOME}/miniconda3/bin/conda install -c anaconda --yes setuptools
 
 install:
-- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file conda_requirements.txt --yes --quiet
+- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file requirements.txt --yes --quiet
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 

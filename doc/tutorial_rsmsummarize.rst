@@ -44,6 +44,7 @@ Let's take a look at the options in our configuration file.
 - **Line 2**: We provide the ``summary_id`` for the comparison. This will be used to generate the name of the final report. 
 - **Line 3**: We give a short description of this comparison experiment. This will be shown in the report.
 - **Line 4**: We also give the list of paths to the directories containing the outputs of the experiments we want to compare.
+- **Line 5**: Since we want to compare experiments that all used the same experiment id (``ASAP2``), we instead list the names that we want to use for each experiment in the summary report. 
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmsummarize>`.
 
@@ -64,7 +65,7 @@ This should produce output like::
     Exporting HTML
     Executing notebook with kernel: python3
 
-Once the run finishes, you will see an HTML file named ``model_comparison_report.html``. This is the final ``rsmsummarize`` summary report.
+Once the run finishes, you will see a new folder ``report`` containing an HTML file named ``model_comparison_report.html``. This is the final ``rsmsummarize`` summary report.
 
 Examine the report
 ~~~~~~~~~~~~~~~~~~

@@ -124,7 +124,7 @@ class TestConfigurationParser:
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_equal(newdata['use_scaled_predictions'], False)
         assert_equal(newdata['select_transformations'], False)
-        assert_equal(newdata['general_sections'], 'all')
+        assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
 
     @raises(ValueError)
@@ -256,6 +256,100 @@ class TestConfigurationParser:
         self.parser.load_config_from_dict(data)
         self.parser.validate_config(context='rsmsummarize')
 
+    @raises(ValueError)
+    def test_validate_config_too_many_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2', 'exp3', 'exp4']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')
+
+    @raises(ValueError)
+    def test_validate_config_too_few_experiment_names(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': ["dir1", "dir2", "dir3"],
+                'experiment_names': ['exp1', 'exp2']}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config(context='rsmsummarize')
+
+    def test_validate_config_numeric_subgroup_threshold(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L2', 'L1'],
+                'min_n_per_group': 100}
+        self.parser._config = data
+        newdata = self.parser.validate_config()
+        eq_(type(newdata['min_n_per_group']), dict)
+        assert_equal(newdata['min_n_per_group']['L1'], 100)
+        assert_equal(newdata['min_n_per_group']['L2'], 100)
+
+    def test_validate_config_dictionary_subgroup_threshold(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L2', 'L1'],
+                'min_n_per_group': {"L1": 100,
+                                    "L2": 200}}
+        self.parser._config = data
+        newdata = self.parser.validate_config()
+        eq_(type(newdata['min_n_per_group']), dict)
+        assert_equal(newdata['min_n_per_group']['L1'], 100)
+        assert_equal(newdata['min_n_per_group']['L2'], 200)
+
+    @raises(ValueError)
+    def test_valdiate_config_too_few_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+    @raises(ValueError)
+    def test_valdiate_config_too_many_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100,
+                                    "L2": 100,
+                                    "L4": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+    @raises(ValueError)
+    def test_validate_config_mismatched_subgroup_keys(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'subgroups': ['L1', 'L2'],
+                'min_n_per_group': {"L1": 100,
+                                    "L4": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
+    @raises(ValueError)
+    def test_validate_config_min_n_without_subgroups(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'min_n_per_group': {"L1": 100,
+                                    "L2": 50}}
+        self.parser.load_config_from_dict(data)
+        self.parser.validate_config()
+
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
@@ -318,6 +412,22 @@ class TestConfigurationParser:
         self.parser._config = newdata
         newdata = self.parser.process_config()
 
+    def test_process_fields_rsmsummarize(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.process_config(inplace=False)
+
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
+
     @raises(ValueError)
     def test_invalid_skll_objective(self):
         data = {'experiment_id': 'experiment_1',
@@ -356,6 +466,35 @@ class TestConfigurationParser:
         # Add data to `ConfigurationParser` object
         self.parser.load_config_from_dict(data)
         self.parser.validate_config()
+
+    def test_proces_validate_correct_order_boolean(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'description': 'Test',
+                'model': 'NNLR',
+                'predict_expected_scores': 'false'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.normalize_validate_and_process_config()
+        eq_(newdata['predict_expected_scores'], False)
+
+    def test_process_validate_correct_order_list(self):
+        data = {'summary_id': 'summary',
+                'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
+                'experiment_names': 'exp1, exp2, exp3'}
+
+        # Add data to `ConfigurationParser` object
+        self.parser.load_config_from_dict(data)
+        newdata = self.parser.normalize_validate_and_process_config(context='rsmsummarize')
+
+        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
+                                                        'home/dir2',
+                                                        'home/dir3'])
+        assert_array_equal(newdata['experiment_names'], ['exp1',
+                                                         'exp2',
+                                                         'exp3'])
 
     def test_get_correct_configparser_cfg(self):
         config_parser = ConfigurationParser.get_configparser('config.cfg')
@@ -620,6 +759,30 @@ class TestConfiguration:
         rmtree('output')
         eq_(config_new, dictionary)
 
+    def test_save_rsmcompare(self):
+        dictionary = {"comparison_id": '001'}
+        config = Configuration(dictionary,
+                               context='rsmcompare')
+        config.save()
+
+        out_path = 'output/001_rsmcompare.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
+    def test_save_rsmsummarize(self):
+        dictionary = {"summary_id": '001'}
+        config = Configuration(dictionary,
+                               context='rsmsummarize')
+        config.save()
+
+        out_path = 'output/001_rsmsummarize.json'
+        with open(out_path) as buff:
+            config_new = json.loads(buff.read())
+        rmtree('output')
+        eq_(config_new, dictionary)
+
     def test_check_exclude_listwise_true(self):
         dictionary = {"experiment_id": '001', "min_items_per_candidate": 4}
         config = Configuration(dictionary)
@@ -632,20 +795,41 @@ class TestConfiguration:
         exclude_list_wise = config.check_exclude_listwise()
         eq_(exclude_list_wise, False)
 
-    def test_get_trim_min_max_none(self):
+    def test_get_trim_min_max_tolerance_none(self):
         dictionary = {"experiment_id": '001'}
         config = Configuration(dictionary)
-        trim_min_max = config.get_trim_min_max()
-        eq_(trim_min_max, (None, None))
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (None, None, None))
 
-    def test_get_trim_min_max_values(self):
+    def test_get_trim_min_max_no_tolerance(self):
+        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (1.0, 6.0, None))
+
+    def test_get_trim_min_max_values_tolerance(self):
+        dictionary = {"experiment_id": '001',
+                      'trim_min': 1,
+                      'trim_max': 6,
+                      'trim_tolerance': 0.49}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (1.0, 6.0, 0.49))
+
+    def test_get_trim_min_max_deprecated(self):
         dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
         config = Configuration(dictionary)
         trim_min_max = config.get_trim_min_max()
         eq_(trim_min_max, (1.0, 6.0))
 
-    def test_get_names_and_paths_with_feature_file(self):
+    def test_get_trim_tolerance_no_min_max(self):
+        dictionary = {"experiment_id": '001',
+                      'trim_tolerance': 0.49}
+        config = Configuration(dictionary)
+        trim_min_max_tolerance = config.get_trim_min_max_tolerance()
+        eq_(trim_min_max_tolerance, (None, None, 0.49))
 
+    def test_get_names_and_paths_with_feature_file(self):
         filepaths = ['path/to/train.tsv',
                      'path/to/test.tsv',
                      'path/to/features.csv']

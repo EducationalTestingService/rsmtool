@@ -193,11 +193,14 @@ filenames: ``pred_processed``, ``pred_train``
 
 The first file contains the predicted scores for the evaluation set and the second file contains the predicted scores for the responses in the training set. Both of them contain the raw scores as well as different types of post-processed scores.
 
+
+.. _rsmtool_eval_files:
+
 Evaluation metrics
 ^^^^^^^^^^^^^^^^^^
 - ``eval``:  This file contains the descriptives for predicted and human scores (mean, std.dev etc.) as well as the association metrics (correlation, quadartic weighted kappa, SMD etc.) for the raw as well as the post-processed scores.
 
-- ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup.
+- ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
 - ``eval_short`` -  a shortened version of ``eval`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
@@ -210,7 +213,7 @@ Evaluation metrics
     - adj_agr [raw/scale_trim_round]
     - exact_agr [raw/scale_trim_round]
     - kappa [raw/scale_trim_round]
-    - wtkappa [raw/scale_trim_round]
+    - wtkappa [raw/scale_trim]
     - sys_mean [raw/scale_trim_round]
     - sys_sd [raw/scale_trim_round]
     - SMD [raw/scale_trim_round]
@@ -225,6 +228,10 @@ Evaluation metrics
 
     Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
 
+- ``true_score_eval`` - evaluation of how well system scores can predict true scores.
+
+.. _rsmtool_consistency_files:
+
 Human-human Consistency
 ^^^^^^^^^^^^^^^^^^^^^^^
 These files are created only if a second human score has been made available via the ``second_human_score_column`` option in the configuration file.
@@ -232,10 +239,33 @@ These files are created only if a second human score has been made available via
 - ``consistency``: contains descriptives for both human raters as well as the agreement metrics between their ratings.
 
 
-- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group
+- ``consistency_by_<SUBGROUP>``: contains the same metrics as in ``consistency`` file computed separately for each group. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
+
+
+.. _rsmtool_true_score_eval:
+
+Evaluations based on test theory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - ``disattenuated_correlations``: shows the correlation between human-machine scores, human-human scores, and the disattenuated human-machine correlation computed as human-machine correlation divided by the square root of human-human correlation.
 
 - ``disattenuated_correlations_by_<SUBGROUP>``: contains the same metrics as in ``disattenuated_correlations`` file computed separately for each group. 
+
+- ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variances for human and system scores for these sets of responses, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score using system score. 
+
+.. _rsmtool_fairness_eval:
+
+Additional fairness analyses
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These files contain the results of additional fairness analyses suggested in suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. 
+
+- ``<METRICS>_by_<SUBGROUP>.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model for estimating the variance attributed to a given subgroup membership for a given metric. The subgroups are defined by the :ref:`configuration file<subgroups_rsmtool>`. The metrics are ``osa`` (overall score accuracy), ``osd`` (overall score difference), and ``csd`` (conditional score difference). 
+
+- ``<METRICS>_by_<SUBGROUP>_ols_summary.txt``: a text file containing a summary of the above model
+
+- ``estimates_<METRICS>_by_<SUBGROUP>```: coefficients, confidence intervals and *p*-values estimated by the model for each subgroup.
+
+- ``fairness_metrics_by_<SUBGROUP>``: the :math:`R^2` (percentage of variance) and *p*-values for all  models. 

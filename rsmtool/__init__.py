@@ -3,7 +3,6 @@
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 01/25/2017
 :organization: ETS
 """
 
@@ -69,4 +68,4 @@ from .rsmsummarize import run_summary
 # which case do not enable them by default.
 warnings.filterwarnings('always',
                         category=DeprecationWarning,
-                        module='^{0}\.'.format(re.escape(__name__)))
+                        module=r'^{0}\.'.format(re.escape(__name__)))

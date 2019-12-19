@@ -35,7 +35,16 @@ else:
     param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
     param('lr-with-feature-list', 'lr_with_feature_list'),
     param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
-    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation')
+    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
+    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
+    param('lr-subgroups-with-dictionary-threshold-and-empty-group',
+          'lr_subgroups_with_dictionary_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-with-numeric-threshold-and-empty-group',
+          'lr_subgroups_with_numeric_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-h2-long-feature-names',
+          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -72,7 +81,11 @@ def test_run_experiment_lr_with_cfg():
 
 
 def test_run_experiment_lr_with_object():
-    # basic experiment with a LinearRegression model
+
+    # test rsmtool using the Configuration object, rather than a file;
+    # we pass the `filepath` attribute after constructing the Configuraiton object
+    # to ensure that the results are identical to what we would expect if we had
+    # run this test with a configuration file instead.
 
     source = 'lr-object'
     experiment_id = 'lr_object'
@@ -99,7 +112,7 @@ def test_run_experiment_lr_with_object():
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config()
-    config_obj = config_file
+    config_obj.filepath = config_file
 
     do_run_experiment(source, experiment_id, config_obj)
     output_dir = join('test_outputs', source, 'output')

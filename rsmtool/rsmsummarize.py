@@ -7,7 +7,6 @@ The script to create a summary report for experiment
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -33,7 +32,9 @@ from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
 
 
-def check_experiment_dir(experiment_dir, configpath):
+def check_experiment_dir(experiment_dir,
+                         experiment_name,
+                         configpath):
     """
     Check that the supplied experiment directory exists and contains
     the output of the rsmtool experiment.
@@ -75,7 +76,19 @@ def check_experiment_dir(experiment_dir, configpath):
                                     "the .json configuration files for rsmtool "
                                     "experiments.".format(full_path_experiment_dir))
 
-        return jsons
+        # Raise an error if the user specified a list of experiment names
+        # but we found several .jsons in the same directory
+        if experiment_name and len(jsons) > 1:
+            raise ValueError("{} seems to contain the output of multiple experiments. "
+                             "In order to use custom experiment names, you must have "
+                             "a separate directory "
+                             "for each experiment".format(full_path_experiment_dir))
+
+        # return [(json, experiment_name)] when we have experiment name or
+        # [(json, None)] if no experiment name has been specified.
+        # If the folder contains the output of multiple experiments, return
+        # [(json1, None), (json2, None) .... ]
+        return list(zip(jsons, [experiment_name] * len(jsons)))
 
 
 def run_summary(config_file_or_obj, output_dir):
@@ -129,13 +142,23 @@ def run_summary(config_file_or_obj, output_dir):
         else:
             configpath = os.getcwd()
 
+    logger.info('Saving configuration file.')
+    configuration.save(output_dir)
+
     # get the list of the experiment dirs
     experiment_dirs = configuration['experiment_dirs']
 
+    # Get experiment names if any
+    experiment_names = configuration.get('experiment_names')
+    experiment_names = experiment_names if experiment_names else [None] * len(experiment_dirs)
+    dirs_with_names = zip(experiment_dirs, experiment_names)
+
     # check the experiment dirs and assemble the list of csvdir and jsons
     all_experiments = []
-    for experiment_dir in experiment_dirs:
-        experiments = check_experiment_dir(experiment_dir, configpath)
+    for (experiment_dir, experiment_name) in dirs_with_names:
+        experiments = check_experiment_dir(experiment_dir,
+                                           experiment_name,
+                                           configpath)
         all_experiments.extend(experiments)
 
     # get the subgroups if any

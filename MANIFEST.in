@@ -1,8 +1,11 @@
 include LICENSE
 include *.rst
 include requirements.txt
+recursive-exclude doc *
+recursive-exclude tests *
+recursive-exclude examples *
 recursive-include rsmtool/notebooks *
-recursive-include doc *
 prune test_outputs
+prune rsmtool/rsmtool.egg-info
 prune rsmtool/notebooks/.ipynb_checkpoints
 prune rsmtool/notebooks/comparison/.ipynb_checkpoints

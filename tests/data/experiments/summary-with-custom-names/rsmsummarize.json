@@ -1,0 +1,6 @@
+{
+    "summary_id": "model_comparison",
+    "experiment_dirs": ["lr-subgroups", "logistic-regression-expected-scores", "logistic-regression-expected-scores", "lr-subgroups"],
+    "experiment_names": ["lr 1", "logReg 1", "logReg 2", "lr 2"],
+    "description": "Summary of two rsmtool experiments with custom names"
+}

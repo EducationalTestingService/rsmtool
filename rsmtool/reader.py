@@ -6,12 +6,10 @@ and converting them to DataContainer objects.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
 import warnings
-import pandas as pd
 
 from functools import partial
 from os.path import (abspath,
@@ -19,7 +17,61 @@ from os.path import (abspath,
                      join,
                      splitext)
 
+import pandas as pd
+
 from rsmtool.container import DataContainer
+
+
+def read_jsonlines(filename, converters=None):
+    """
+    Read jsonlines from a file.
+    Normalize nested jsons with up to one level of nesting
+
+    Parameters
+    ----------
+    filename: str
+        Name of file to read
+    converters : dict or None, optional
+        A dictionary specifying how the types of the columns
+        in the file should be converted. Specified in the same
+        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+
+    Returns
+    -------
+    df : pandas DataFrame
+         Data frame containing the data in the given file.
+    """
+
+    try:
+        df = pd.read_json(filename,
+                          orient='records',
+                          lines=True,
+                          dtype=converters)
+    except ValueError:
+        raise ValueError("The jsonlines file is not formatted correctly. "
+                         "Please check that each line ends with a comma, "
+                         "there is no comma at the end of the last line, "
+                         "and that all quotes match. Please also check that"
+                         "any undefined values are written out as `null` and not `NaN`.")
+
+    # make sure we didn't get a plain json
+    if type(df.columns) == pd.RangeIndex:
+        raise ValueError("It looks like {} is a simple json file. "
+                         "Please check documentation (for the expected "
+                         "file format".format(filename))
+
+    dfs = []
+    for column in df:
+        try:
+            df_column = pd.io.json.json_normalize(df[column])
+        except AttributeError:
+            df_column = df[column].copy()
+
+        dfs.append(df_column)
+
+    df = pd.concat(dfs, axis=1)
+
+    return df
 
 
 def try_to_load_file(filename,
@@ -40,7 +92,7 @@ def try_to_load_file(filename,
     converters : dict or None, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv()`.
+        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
     raise_error : bool, optional
         Raise an error if the file cannot be located.
         Defaults to False.
@@ -156,7 +208,7 @@ class DataReader:
     @staticmethod
     def read_from_file(filename, converters=None, **kwargs):
         """
-        Read a CSV/TSV/XLS/XLSX file and return a data frame.
+        Read a CSV/TSV/XLS/XLSX/JSONLINES/SAS7BDAT file and return a data frame.
 
         Parameters
         ----------
@@ -165,7 +217,7 @@ class DataReader:
         converters : None, optional
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
-            format as for ``pandas.read_csv()``.
+            format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
 
         Returns
         -------
@@ -198,6 +250,8 @@ class DataReader:
             else:
                 encoding = kwargs.pop('encoding')
             do_read = partial(pd.read_sas, encoding=encoding)
+        elif file_extension in ['.jsonlines']:
+            do_read = partial(read_jsonlines, converters=converters)
         else:
             raise ValueError("RSMTool only supports files in .csv, "
                              ".tsv, .xls/.xlsx, or .sas7bdat format. "

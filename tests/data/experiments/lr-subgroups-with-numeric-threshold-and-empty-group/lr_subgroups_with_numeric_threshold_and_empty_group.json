@@ -1,0 +1,20 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "test_file": "../../files/test.csv",
+    "subgroups": [
+        "QUESTION",
+        "L1"
+    ],
+    "trim_max": 6,
+    "length_column": "LENGTH",
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_subgroups_with_numeric_threshold_and_empty_group",
+    "description": "Experiment with threshold set for subgroup display. No category in QUESTION has enough responses to display in evaluation results. Only one group is available for L1.",
+     "min_n_per_group": 60
+}

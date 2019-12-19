@@ -6,7 +6,6 @@ and creating configuration objects.
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
 
-:date: 10/25/2017
 :organization: ETS
 """
 
@@ -34,6 +33,7 @@ from rsmtool.utils import (DEFAULTS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
                            FIELD_NAME_MAPPING,
+                           ID_FIELDS,
                            is_skll_model)
 
 from skll import Learner
@@ -318,8 +318,9 @@ class Configuration:
         output_dir = join(output_dir, 'output')
         makedirs(output_dir, exist_ok=True)
 
+        id_field = ID_FIELDS[self._context]
         outjson = join(output_dir,
-                       '{}_{}.json'.format(self._config['experiment_id'],
+                       '{}_{}.json'.format(self._config[id_field],
                                            self._context))
 
         expected_fields = (CHECK_FIELDS[self._context]['required'] +
@@ -444,8 +445,9 @@ class Configuration:
 
     def get_trim_min_max(self):
         """
-        Get the specified trim min and max, if any,
-        and make sure they are numeric.
+        This function is kept for backwards compatibility.
+        It is now replaced by get_trim_min_max_tolerance
+        and will be deprecated in future versions.
 
         Returns
         -------
@@ -454,16 +456,40 @@ class Configuration:
         spec_trim_max : float
             Specified trim max value
         """
+        logging.warning("get_trim_min_max method has been replaced by  "
+                        "get_trim_min_max_tolerance() and will "
+                        "not be supported in future releases.")
+        (trim_min, trim_max, tolerance) = self.get_trim_min_max_tolerance()
+        return (trim_min, trim_max)
+
+    def get_trim_min_max_tolerance(self):
+        """
+        Get the specified trim min and max,
+        and trim_tolerance if any,
+        and make sure they are numeric.
+
+        Returns
+        -------
+        spec_trim_min : float
+            Specified trim min value
+        spec_trim_max : float
+            Specified trim max value
+        spec_trim_tolerance: float
+            specified trim tolerance value
+        """
         config = self._config
 
         spec_trim_min = config.get('trim_min', None)
         spec_trim_max = config.get('trim_max', None)
+        spec_trim_tolerance = config.get('trim_tolerance', None)
 
         if spec_trim_min:
             spec_trim_min = float(spec_trim_min)
         if spec_trim_max:
             spec_trim_max = float(spec_trim_max)
-        return (spec_trim_min, spec_trim_max)
+        if spec_trim_tolerance:
+            spec_trim_tolerance = float(spec_trim_tolerance)
+        return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
     def get_default_converter(self):
         """
@@ -838,13 +864,9 @@ class ConfigurationParser:
 
         # 4. Check to make sure that the ID fields that will be
         # used as part of filenames formatted correctly
-        id_fields = ['comparison_id',
-                     'experiment_id',
-                     'summary_id']
-        id_field_values = {field: new_config[field] for field in new_config
-                           if field in id_fields}
+        id_field = ID_FIELDS[context]
+        id_field_values = {id_field: new_config[id_field]}
 
-        # we do not need to validate any IDs for `rsmpredict`
         self.check_id_fields(id_field_values)
 
         # 5. Check that the feature file and feature subset/subset file are not
@@ -952,7 +974,33 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 12. Clean up config dict to keep only context-specific fields
+        # 12. If we have `experiment_names`, check that the length of the list
+        # matches the list of experiment_dirs.
+        if context == 'rsmsummarize' and new_config['experiment_names']:
+            if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
+                raise ValueError("The number of specified experiment names should be the same"
+                                 " as the number of specified experiment directories.")
+
+        # 13. Check that if the user specified min_n_per_group, they also
+        # specified subgroups. If they supplied a dictionary, make
+        # sure the keys match
+        if new_config['min_n_per_group']:
+            # make sure we have subgroups
+            if 'subgroups' not in new_config:
+                raise ValueError("You must specify a list of subgroups in "
+                                 "in the `subgroups` field if "
+                                 "you want to use the `min_n_per_group` field")
+            # if we got dictionary, make sure the keys match
+            elif isinstance(new_config['min_n_per_group'], dict):
+                if sorted(new_config['min_n_per_group'].keys()) != sorted(new_config['subgroups']):
+                    raise ValueError("The keys in `min_n_per_group` must "
+                                     "match the subgroups in `subgroups` field")
+            # else convert to dictionary
+            else:
+                new_config['min_n_per_group'] = {group: new_config['min_n_per_group']
+                                                 for group in new_config['subgroups']}
+
+        # 14. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
@@ -1055,8 +1103,8 @@ class ConfigurationParser:
         self._check_config_is_loaded()
 
         self.normalize_config()
-        self.validate_config(context=context)
         self.process_config()
+        self.validate_config(context=context)
         return Configuration(self._config, self._filepath, context=context)
 
     def read_normalize_validate_and_process_config(self,

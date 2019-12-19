@@ -18,7 +18,9 @@
     ],
     "special_sections": null,
     "custom_sections": null,
+    "trim_tolerance": 0.4998,
     "subgroups": [],
+    "min_n_per_group": null,
     "section_order": null,
     "flag_column": null,
     "min_items_per_candidate": null

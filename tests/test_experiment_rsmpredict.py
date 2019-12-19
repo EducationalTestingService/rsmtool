@@ -32,12 +32,16 @@ else:
     param('lr-predict-illegal-transformations', excluded=True),
     param('lr-predict-tsv-input-files'),
     param('lr-predict-xlsx-input-files'),
+    param('lr-predict-jsonlines-input-files'),
+    param('lr-predict-nested-jsonlines-input-files'),
     param('lr-predict-no-standardization'),
     param('lr-predict-with-tsv-output', file_format='tsv'),
     param('lr-predict-with-xlsx-output', file_format='xlsx'),
     param('logistic-regression-predict'),
     param('logistic-regression-predict-expected-scores'),
-    param('svc-predict-expected-scores')
+    param('svc-predict-expected-scores'),
+    param('lr-predict-with-custom-tolerance'),
+    param('lr-predict-no-tolerance')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
