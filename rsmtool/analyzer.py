@@ -8,6 +8,8 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 :organization: ETS
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
 
@@ -440,6 +442,8 @@ class Analyzer:
         """
         Compute the PCA decomposition of features in the given data
         frame, restricted to the given columns.
+        The number of components is set to be 
+        min(n_features, n_samples). 
 
         Parameters
         ----------
@@ -457,12 +461,16 @@ class Analyzer:
             Data frame containing the variance information.
         """
 
+        # check if we have more features than samples
+
+
         # remove the spkitemid and sc1 column
 
         df_pca = df[selected_features]
 
         # fit the PCA
-        pca = PCA(n_components=len(selected_features))
+        n_components = min(len(selected_features), len(df_pca))
+        pca = PCA(n_components=n_components)
         pca.fit(df_pca)
 
         df_components = pd.DataFrame(pca.components_)

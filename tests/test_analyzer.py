@@ -5,7 +5,9 @@ from os.path import dirname, join
 import numpy as np
 import pandas as pd
 
-from nose.tools import (assert_almost_equal, assert_equal)
+from nose.tools import (assert_almost_equal,
+                        assert_equal,
+                        ok_)
 from numpy.random import RandomState
 from pandas.util.testing import assert_series_equal
 from numpy.testing import assert_array_equal
@@ -138,14 +140,16 @@ class TestAnalyzer:
         assert_series_equal(computed_metrics1.sort_index(), expected_metrics1.sort_index())
         assert_series_equal(computed_metrics2.sort_index(), expected_metrics2.sort_index())
 
-    def test_compute_pca_less_components_than_features(self):
-        # test pca when we have less components than features
-        df = pd.DataFrame({'a': range(100)})
+    def test_compute_pca_less_samples_than_features(self):
+        # test pca when we have less samples than
+        # features. In this case the number of components
+        # equals to the number of samples.
+        df = pd.DataFrame({'a': range(50)})
         for i in range(100):
             df[i] = df['a'] * i
         (components, variance) = Analyzer.compute_pca(df, df.columns)
-        assert_equal(len(components.columns), 100)
-        assert_equal(len(variance.columns), 100)
+        assert_equal(len(components.columns), 50)
+        assert_equal(len(variance.columns), 50)
 
     def test_compute_disattenuated_correlations_single_human(self):
         hm_corr = pd.Series([0.9, 0.8, 0.6],
