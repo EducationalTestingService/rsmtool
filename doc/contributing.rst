@@ -14,7 +14,7 @@ To set up a local development environment, follow the steps below:
 
 3. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
 
-    conda create -n rsmdev -c conda-forge -c desilinguist --file requirements.txt
+    conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
 
 4. Activate the environment using ``conda activate rsmdev``. [#]_
 

@@ -24,7 +24,7 @@ before_install:
 - ${HOME}/miniconda3/bin/conda install -c anaconda --yes setuptools
 
 install:
-- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c desilinguist --file requirements.txt --yes --quiet
+- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c ets --file requirements.txt --yes --quiet
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov python-coveralls
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
