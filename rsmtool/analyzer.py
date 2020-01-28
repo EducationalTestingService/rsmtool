@@ -552,26 +552,33 @@ class Analyzer:
 
         for group, df_group in grouped:
             df_group = df_group.drop(grouping_variable, 1)
-            # if we are asked to include length, that means 'length' is
-            # in the data frame which means that we want to exclude that
-            # before computing the regular marginal and partial correlations
-            if not include_length:
-                df_target_cors[group] = df_group.apply(lambda s:
-                                                       pearsonr(s, df_group[target_variable])[0])
-                df_target_pcorr[group] = partial_correlations(df_group)[target_variable]
+            
+            # first check if we have at least 2 cases and return np.nan otherwise
+            if len(df_group) == 1:
+                df_target_cors[group] = pd.Series(index=df_group.columns)
+                df_target_pcorr[group] = pd.Series(index=df_group.columns)
+                df_target_pcorr_no_length[group] = pd.Series(index=df_group.columns)
             else:
-                df_group_no_length = df_group.drop('length', axis=1)
+                # if we are asked to include length, that means 'length' is
+                # in the data frame which means that we want to exclude that
+                # before computing the regular marginal and partial correlations
+                if not include_length:
+                    df_target_cors[group] = df_group.apply(lambda s:
+                                                           pearsonr(s, df_group[target_variable])[0])
+                    df_target_pcorr[group] = partial_correlations(df_group)[target_variable]
+                else:
+                    df_group_no_length = df_group.drop('length', axis=1)
 
-                partial_pearsonr = partial(pearsonr, y=df_group_no_length[target_variable])
-                df_target_cors[group] = df_group_no_length.apply(lambda s:
-                                                                 partial_pearsonr(s)[0])
+                    partial_pearsonr = partial(pearsonr, y=df_group_no_length[target_variable])
+                    df_target_cors[group] = df_group_no_length.apply(lambda s:
+                                                                     partial_pearsonr(s)[0])
 
-                df_target_pcorr[group] = partial_correlations(df_group_no_length)[target_variable]
-                pcor_dict = {}
-                columns = [c for c in df_group.columns if c not in ['sc1', 'length']]
-                for c in columns:
-                    pcor_dict[c] = partial_correlations(df_group[[c, 'sc1', 'length']])['sc1'][c]
-                df_target_pcorr_no_length[group] = pd.Series(pcor_dict)
+                    df_target_pcorr[group] = partial_correlations(df_group_no_length)[target_variable]
+                    pcor_dict = {}
+                    columns = [c for c in df_group.columns if c not in ['sc1', 'length']]
+                    for c in columns:
+                        pcor_dict[c] = partial_correlations(df_group[[c, 'sc1', 'length']])['sc1'][c]
+                    df_target_pcorr_no_length[group] = pd.Series(pcor_dict)
 
         # remove the row containing the correlation of the target variable
         # with itself and take the transpose
@@ -685,7 +692,9 @@ class Analyzer:
         df = pd.DataFrame({'human': human_scores,
                            'system': system_scores}).dropna(how='any')
 
-        if len(df['human'].unique()) == 1 or len(df['system'].unique()) == 1:
+        if len(df) == 1:
+            correlations = np.nan
+        elif len(df['human'].unique()) == 1 or len(df['system'].unique()) == 1:
             correlations = np.nan
         else:
             correlations = pearsonr(df['human'], df['system'])[0]
@@ -724,8 +733,13 @@ class Analyzer:
                                                population_system_score_sd,
                                                method=smd_method)
 
-        # compute r2 and MSE
-        r2 = r2_score(human_scores, system_scores)
+        # compute r2
+        if len(df) == 1:
+            r2 = np.nan
+        else:
+            r2 = r2_score(human_scores, system_scores)
+        
+        # compute MSE
         mse = mean_squared_error(human_scores, system_scores)
         rmse = np.sqrt(mse)
 
