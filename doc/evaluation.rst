@@ -124,7 +124,16 @@ Pearson Correlation coefficient (r)
 
 :math:`r=\displaystyle\frac{\sum_{i=1}^{N}{(H_i-\bar{H})(M_i-\bar{M})}}{\sqrt{\sum_{i=1}^{N}{(H_i-\bar{H})^2} \sum_{i=1}^{N}{(M-\bar{M})^2}}}`
 
-Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html>`_. If the variance of human or system scores is ``0`` (all scores are the same), RSMTool returns ``None``.
+Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html>`_. 
+
+If the variance of human or system scores is ``0`` (all scores are the same) or only one response is available, RSMTool returns ``None``.
+
+.. note::
+  In `scipy` v1.4.1 and later the implementation uses the following formula: 
+
+  :math:`r=\displaystyle\frac{H-\bar{H}}{\left\|H-\bar{H}\right\|_2}\cdot\frac{M-\bar{M}}{\left\|M_i-\bar{M}\right\|_2}`
+
+  This implementation is more robust to very large values but is more likely to return a value slightly smaller than 1 (for example, 0.9999999999999998) for perfect correlation when `n` is small. See this `comment <https://github.com/scipy/scipy/commit/1acf46f508afa2c6d498e1001ca17e8ad98b46ef>`_ for further detail. 
 
 
 .. _smd:
@@ -161,7 +170,7 @@ Proportional reduction in mean squared error for observed score (R2)
 
 :math:`R2=1-\displaystyle\frac{MSE(H|M)}{\sigma_H^2}`
 
-R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html>`_.
+R2 is computed using `sklearn.metrics.r2_score <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html>`_. If only one response is available, RSMTool returns ``None``.
 
 .. _true_score_evaluation:
 
