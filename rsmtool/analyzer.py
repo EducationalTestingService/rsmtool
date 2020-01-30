@@ -459,9 +459,6 @@ class Analyzer:
             Data frame containing the variance information.
         """
 
-        # check if we have more features than samples
-
-
         # remove the spkitemid and sc1 column
 
         df_pca = df[selected_features]

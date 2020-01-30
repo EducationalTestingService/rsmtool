@@ -88,7 +88,6 @@ class TestAnalyzer:
     def test_correlation_helper_for_one_group_with_one_row(self):
         # this should return a data frames with nans for group with 1 row
         retval = Analyzer.correlation_helper(self.df_features_with_groups[:6], 'sc1', 'group')
-        print(retval)
         assert_equal(len(retval[0]), 2)
         assert_equal(len(retval[1]), 2)
         assert_equal(retval[0].isnull().values.sum(), 3)
@@ -126,7 +125,6 @@ class TestAnalyzer:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.human_scores[0:1],
                                             self.system_scores[0:1])
-            print(evals)
             assert_equal(evals.isnull().values.sum(), 5)
 
     def test_that_metrics_helper_works_for_data_with_the_same_label(self):
@@ -184,7 +182,7 @@ class TestAnalyzer:
             df[i] = df['a'] * i
         (components, variance) = Analyzer.compute_pca(df, df.columns)
         assert_equal(len(components.columns), 50)
-        assert_equal(len(components.columns), 50)
+        assert_equal(len(variance.columns), 50)
 
     def test_compute_disattenuated_correlations_single_human(self):
         hm_corr = pd.Series([0.9, 0.8, 0.6],
