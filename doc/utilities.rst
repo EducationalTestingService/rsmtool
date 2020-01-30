@@ -1,7 +1,7 @@
 Utility Scripts
 ===============
 
-In addition to the :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, and :ref:`rsmcompare <usage_rsmpredict>` scripts, RSMTool also comes with a number of helpful utility scripts.
+In addition to the :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, :ref:`rsmcompare <usage_rsmcompare>`, and :ref:`rsmsummarize <usage_rsmsummarize>` scripts, RSMTool also comes with a number of helpful utility scripts.
 
 .. _render_notebook:
 
