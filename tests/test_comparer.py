@@ -5,7 +5,7 @@ from os.path import dirname, join
 import numpy as np
 import pandas as pd
 
-from nose.tools import (assert_equal, 
+from nose.tools import (assert_equal,
                         assert_almost_equal,
                         raises)
 from pandas.util.testing import assert_frame_equal

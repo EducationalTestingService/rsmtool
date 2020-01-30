@@ -8,8 +8,6 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 :organization: ETS
 """
 
-import logging
-
 import numpy as np
 import pandas as pd
 
@@ -442,8 +440,8 @@ class Analyzer:
         """
         Compute the PCA decomposition of features in the given data
         frame, restricted to the given columns.
-        The number of components is set to be 
-        min(n_features, n_samples). 
+        The number of components is set to be
+        min(n_features, n_samples).
 
         Parameters
         ----------
@@ -552,7 +550,7 @@ class Analyzer:
 
         for group, df_group in grouped:
             df_group = df_group.drop(grouping_variable, 1)
-            
+
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
                 df_target_cors[group] = pd.Series(index=df_group.columns)
@@ -564,7 +562,8 @@ class Analyzer:
                 # before computing the regular marginal and partial correlations
                 if not include_length:
                     df_target_cors[group] = df_group.apply(lambda s:
-                                                           pearsonr(s, df_group[target_variable])[0])
+                                                           pearsonr(s,
+                                                                    df_group[target_variable])[0])
                     df_target_pcorr[group] = partial_correlations(df_group)[target_variable]
                 else:
                     df_group_no_length = df_group.drop('length', axis=1)
@@ -577,7 +576,9 @@ class Analyzer:
                     pcor_dict = {}
                     columns = [c for c in df_group.columns if c not in ['sc1', 'length']]
                     for c in columns:
-                        pcor_dict[c] = partial_correlations(df_group[[c, 'sc1', 'length']])['sc1'][c]
+                        pcor_dict[c] = partial_correlations(df_group[[c,
+                                                                      'sc1',
+                                                                      'length']])['sc1'][c]
                     df_target_pcorr_no_length[group] = pd.Series(pcor_dict)
 
         # remove the row containing the correlation of the target variable
@@ -738,7 +739,7 @@ class Analyzer:
             r2 = np.nan
         else:
             r2 = r2_score(human_scores, system_scores)
-        
+
         # compute MSE
         mse = mean_squared_error(human_scores, system_scores)
         rmse = np.sqrt(mse)

@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 from nose.tools import (assert_almost_equal,
-                        assert_equal,
-                        ok_)
+                        assert_equal)
+
 from numpy.random import RandomState
 from pandas.util.testing import assert_series_equal
 from numpy.testing import assert_array_equal
@@ -51,27 +51,27 @@ class TestAnalyzer:
         assert_equal(retval[0].isnull().values.sum(), 0)
         assert_equal(retval[1].isnull().values.sum(), 0)
 
-    def test_that_correlation_helper_works_for_data_with_one_row(self):
+    def test_correlation_helper_for_data_with_one_row(self):
         # this should return two data frames with nans
         retval = Analyzer.correlation_helper(self.df_features[:1], 'sc1', 'group')
         assert_equal(retval[0].isnull().values.sum(), 3)
         assert_equal(retval[1].isnull().values.sum(), 3)
 
-    def test_that_correlation_helper_works_for_data_with_two_rows(self):
+    def test_correlation_helper_for_data_with_two_rows(self):
         # this should return 1/-1 for marginal correlations and nans for
         # partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:2], 'sc1', 'group')
         assert_equal(abs(retval[0].values).sum(), 3)
         assert_equal(retval[1].isnull().values.sum(), 3)
 
-    def test_that_correlation_helper_works_for_data_with_three_rows(self):
+    def test_correlation_helper_for_data_with_three_rows(self):
         # this should compute marginal correlations but return Nans for
         # partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:3], 'sc1', 'group')
         assert_equal(retval[0].isnull().values.sum(), 0)
         assert_equal(retval[1].isnull().values.sum(), 3)
 
-    def test_that_correlation_helper_works_for_data_with_four_rows(self):
+    def test_correlation_helper_for_data_with_four_rows(self):
         # this should compute marginal correlations and return a unity
         # matrix for partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:4], 'sc1', 'group')
@@ -79,13 +79,13 @@ class TestAnalyzer:
         assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
 
 
-    def test_that_correlation_helper_works_for_data_with_groups(self):
+    def test_correlation_helper_for_data_with_groups(self):
         retval = Analyzer.correlation_helper(self.df_features_with_groups, 'sc1', 'group')
         assert_equal(len(retval[0]), 2)
         assert_equal(len(retval[1]), 2)
 
-    
-    def test_that_correlation_helper_works_for_data_with_one_group_with_one_row(self):
+
+    def test_correlation_helper_for_one_group_with_one_row(self):
         # this should return a data frames with nans for group with 1 row
         retval = Analyzer.correlation_helper(self.df_features_with_groups[:6], 'sc1', 'group')
         print(retval)
@@ -93,24 +93,23 @@ class TestAnalyzer:
         assert_equal(len(retval[1]), 2)
         assert_equal(retval[0].isnull().values.sum(), 3)
 
-    def test_that_correlation_helper_works_for_data_with_groups_and_length(self):
-        retval = Analyzer.correlation_helper(self.df_features_with_groups_and_length, 
+    def test_correlation_helper_for_groups_and_length(self):
+        retval = Analyzer.correlation_helper(self.df_features_with_groups_and_length,
                                              'sc1', 'group', include_length=True)
         for df in retval:
             assert_equal(len(df), 2)
             assert_equal(len(df.columns), 3)
-        
-    
-    def test_that_correlation_helper_works_for_data_with_one_group_with_one_row(self):
+
+
+    def test_correlation_helper_for_group_with_one_row_and_length(self):
         # this should return a data frames with nans for group with 1 row
-        retval = Analyzer.correlation_helper(self.df_features_with_groups_and_length[:6], 
+        retval = Analyzer.correlation_helper(self.df_features_with_groups_and_length[:6],
                                              'sc1', 'group', include_length=True)
         for df in retval:
             assert_equal(len(df), 2)
             assert_equal(len(df.columns), 3)
 
 
-    
 
     def test_that_correlation_helper_works_for_data_with_the_same_label(self):
         with warnings.catch_warnings():
