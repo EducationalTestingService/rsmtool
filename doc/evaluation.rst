@@ -131,7 +131,7 @@ If the variance of human or system scores is ``0`` (all scores are the same) or 
 .. note::
   In `scipy` v1.4.1 and later the implementation uses the following formula: 
 
-  :math:`r=\displaystyle\frac{H-\bar{H}}{\left\|H-\bar{H}\right\|_2}\cdot\frac{M-\bar{M}}{\left\|M_i-\bar{M}\right\|_2}`
+  :math:`r=\displaystyle\frac{H-\bar{H}}{\left\|H-\bar{H}\right\|_2}\cdot\frac{M-\bar{M}}{\left\|M-\bar{M}\right\|_2}`
 
   This implementation is more robust to very large values but is more likely to return a value slightly smaller than 1 (for example, 0.9999999999999998) for perfect correlation when `n` is small. See this `comment <https://github.com/scipy/scipy/commit/1acf46f508afa2c6d498e1001ca17e8ad98b46ef>`_ for further detail. 
 
