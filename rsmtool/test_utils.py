@@ -774,7 +774,7 @@ def copy_data_files(temp_dir_name,
                    input_file_dict,
                    given_test_dir=None):
     """
-    Copy input files from tests/data into 
+    Copy input files from tests/data into
     a temporary directory specified by the user.
     This is a utility function for testing
     situations where RSMTool is expected to use
@@ -784,9 +784,9 @@ def copy_data_files(temp_dir_name,
     Parameters
     ----------
     temp_dir_name : str
-        Name of the temporary directory. 
+        Name of the temporary directory.
     input_file_dict : dict
-        A dictionary of files list of files to copy. 
+        A dictionary of files list of files to copy.
         The keys show the type of file. The values should be
         paths to the files relative to `tests` directory.
     given_test_dir : str, optional
@@ -797,7 +797,7 @@ def copy_data_files(temp_dir_name,
     Returns
     -------
     output_file_dict : dict
-        The dictionary with the same keys as 
+        The dictionary with the same keys as
         input_file_dict and values showing new paths.
     """
 

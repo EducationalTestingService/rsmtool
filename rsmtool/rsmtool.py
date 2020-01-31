@@ -39,13 +39,13 @@ def run_experiment(config_file_or_obj_or_dict,
     config_file_or_obj_or_dict : str or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory
-        or a Python dictionary with keys corresponding to fields in the 
-        configuration file. 
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file.
         Relative paths in the configuration file will be interpreted relative
-        to the location of the file. For configuration object an optional attribute 
+        to the location of the file. For configuration object an optional attribute
         .filepath can be set to indicate the reference path. If no .filepath is set or if
         the users passes a dictionary, any relative paths will be resolved relative
-        to the current directory.  
+        to the current directory.
     output_dir : str
         Path to the experiment output directory.
 
@@ -81,7 +81,7 @@ def run_experiment(config_file_or_obj_or_dict,
 
         # get the directory where the configuration file lives
         configpath = dirname(config_file_or_obj_or_dict)
-    
+
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # initialize the parser from dict
@@ -91,7 +91,7 @@ def run_experiment(config_file_or_obj_or_dict,
         # set configpath to current directory
         configpath = getcwd()
         configuration.filepath = configpath
-    
+
     else:
 
         configuration = config_file_or_obj_or_dict

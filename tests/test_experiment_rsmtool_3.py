@@ -58,6 +58,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 def setup_func():
     global DIRS_TO_REMOVE
 
+
 def teardown_func():
     for d in DIRS_TO_REMOVE:
         shutil.rmtree(d)
@@ -128,14 +129,14 @@ def test_run_experiment_lr_with_object():
     check_run_experiment(source,
                          experiment_id,
                          input_is_file=False,
-                         config_obj_or_dict = config_obj)
+                         config_obj_or_dict=config_obj)
 
 
 @with_setup(setup_func, teardown_func)
 def test_run_experiment_lr_with_object_no_path():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we do not pass the `filepath` attribute 
+    # we do not pass the `filepath` attribute
     # to test whether the default setting of os.getcwd() is working
     # correctly
 
@@ -144,7 +145,7 @@ def test_run_experiment_lr_with_object_no_path():
 
     temp_dir = 'temp_for_testing_lr_object_no_path'
     DIRS_TO_REMOVE.append(temp_dir)
-    
+
     old_file_dict = {'train': 'data/files/train.csv',
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
@@ -172,8 +173,8 @@ def test_run_experiment_lr_with_object_no_path():
     check_run_experiment(source,
                          experiment_id,
                          input_is_file=False,
-                         config_obj_or_dict = config_obj)
-   
+                         config_obj_or_dict=config_obj)
+
 
 
 @with_setup(setup_func, teardown_func)
@@ -207,8 +208,8 @@ def test_run_experiment_lr_with_dictionary():
     check_run_experiment(source,
                          experiment_id,
                          input_is_file=False,
-                         config_obj_or_dict = config_dict)
-   
+                         config_obj_or_dict=config_dict)
+
 
 
 
