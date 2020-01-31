@@ -760,6 +760,55 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             ok_(length == partition_info.iloc[0][group])
 
 
+def copy_data_files(temp_dir_name,
+                   input_file_dict,
+                   given_test_dir=None):
+    """
+    Copy input files from tests/data into 
+    a temporary directory specified by the user.
+    This is a utility function for testing
+    situations where RSMTool is expected to use
+    current directory as a reference directory
+    for resolving paths in the configuration
+
+    Parameters
+    ----------
+    temp_dir_name : str
+        Name of the temporary directory. 
+    input_file_dict : dict
+        A dictionary of files list of files to copy. 
+        The keys show the type of file. The values should be
+        paths to the files relative to `tests` directory.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+
+    Returns
+    -------
+    output_file_dict : dict
+        The dictionary with the same keys as 
+        input_file_dict and values showing new paths.
+    """
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    temp_dir = Path(temp_dir_name)
+    temp_dir.mkdir()
+
+    output_file_dict = {}
+    for file in input_file_dict:
+        filepath = Path(input_file_dict[file])
+        filename = filepath.name
+        new_filepath = temp_dir / filename
+        copyfile(test_dir / 'data' / filepath,
+                 new_filepath)
+        output_file_dict[file] = str(new_filepath)
+
+    return output_file_dict
+
+
 class FileUpdater(object):
 
     """
