@@ -18,8 +18,8 @@ class TestCopyData():
 			shutil.rmtree(d)
 
 	def test_copy_data_files(self):
-		file_dict = {'train': 'files/train.csv',
-					 'features': 'experiments/lr/features.csv'}
+		file_dict = {'train': 'data/files/train.csv',
+					 'features': 'data/experiments/lr/features.csv'}
 		expected_dict = {'train': 'temp_test_copy_data_file/train.csv',
 						 'features': 'temp_test_copy_data_file/features.csv'}
 		self.dirs_to_remove.append('temp_test_copy_data_file')

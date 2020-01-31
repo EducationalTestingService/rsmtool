@@ -41,7 +41,7 @@ def check_run_experiment(source,
                          skll=False,
                          file_format='csv',
                          given_test_dir=None,
-                         input_format='config_path',
+                         input_is_file=True,
                          config_obj_or_dict=None):
     """
     Function to run for a parameterized rsmtool experiment test.
@@ -73,17 +73,16 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    input_format: str, optional
-        Input to the `run_experiment` script. Can be `config_path`
-        if the input is path to the config file, `config_obj` if the input
-        is configuration object or `config_dict` if the input is a dictionary.
+    input_is_file: bool, optional
+        Input to the `run_experiment` script should be a f file path
+        constructed from `source` and `experiment_id`.
     config_obj_or_dict: Configuration or dictionary
-        Configuration object or dictionary to use as an object
+        Configuration object or dictionary to use as an input
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    if input_format == 'config_path':
+    if input_is_file:
         config_input = join(test_dir,
                            'data',
                            'experiments',
