@@ -27,5 +27,3 @@ class TestCopyData():
         for f in expected_dict:
             eq_(output_dict[f], expected_dict[f])
             ok_(Path(output_dict[f]).exists())
-
-
