@@ -1,4 +1,5 @@
 import os
+import shutil
 import warnings
 
 from glob import glob
@@ -130,6 +131,63 @@ def test_run_experiment_lr_with_object():
     yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
+
+
+def test_run_experiment_lr_with_object_no_path():
+
+    # test rsmtool using the Configuration object, rather than a file;
+    # we pass the `filepath` attribute after constructing the Configuraiton object
+    # to ensure that the results are identical to what we would expect if we had
+    # run this test with a configuration file instead.
+
+    source = 'lr-object_no_path'
+    experiment_id = 'lr_object_no_path'
+
+    local_dir = 'temp_for_testing_config'
+    os.mkdir(local_dir)
+    for file in ['train.csv', 'test.csv']:
+      shutil.copy(join(rsmtool_test_dir, 'data', 'files', file),
+                  join(local_dir, file))
+    shutil.copy(join(rsmtool_test_dir, 'data', 'experiments', 
+                     'lr-object-no-path', 'features.csv'), 
+                join(local_dir, 'features.csv'))
+
+    config_dict = {"train_file": "{}/train.csv".format(local_dir),
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": "{}/test.csv".format(local_dir),
+                   "trim_max": 6,
+                   "features": "{}/features.csv".format(local_dir),
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_object",
+                   "description": "Using all features with an LinearRegression model."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config()
+
+    do_run_experiment(source, experiment_id, config_obj)
+    shutil.rmtree(local_dir)
+    output_dir = join('test_outputs', source, 'output')
+    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
+    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+
+    csv_files = glob(join(output_dir, '*.csv'))
+    for csv_file in csv_files:
+        csv_filename = basename(csv_file)
+        expected_csv_file = join(expected_output_dir, csv_filename)
+
+        if exists(expected_csv_file):
+            yield check_file_output, csv_file, expected_csv_file
+
+    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
+    yield check_scaled_coefficients, source, experiment_id
+    yield check_report, html_report
+
+
 
 
 @raises(ValueError)
