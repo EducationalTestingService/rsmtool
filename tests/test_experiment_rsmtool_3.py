@@ -84,7 +84,7 @@ def test_run_experiment_lr_with_cfg():
 def test_run_experiment_lr_with_object():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we pass the `filepath` attribute after constructing the Configuraiton object
+    # we pass the `filepath` attribute after constructing the Configuration object
     # to ensure that the results are identical to what we would expect if we had
     # run this test with a configuration file instead.
 
@@ -136,13 +136,15 @@ def test_run_experiment_lr_with_object():
 def test_run_experiment_lr_with_object_no_path():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we pass the `filepath` attribute after constructing the Configuraiton object
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
+    # we do not pass the `filepath` attribute 
+    # to test whether the default setting of os.getcwd() is working
+    # correctly
 
-    source = 'lr-object_no_path'
+    source = 'lr-object-no-path'
     experiment_id = 'lr_object_no_path'
 
+    # we need to copy the data files 
+    # to a temporary directory in the current folder
     local_dir = 'temp_for_testing_config'
     os.mkdir(local_dir)
     for file in ['train.csv', 'test.csv']:
@@ -162,7 +164,7 @@ def test_run_experiment_lr_with_object_no_path():
                    "features": "{}/features.csv".format(local_dir),
                    "trim_min": 1,
                    "model": "LinearRegression",
-                   "experiment_id": "lr_object",
+                   "experiment_id": "lr_object_no_path",
                    "description": "Using all features with an LinearRegression model."}
 
     config_parser = ConfigurationParser()
@@ -170,7 +172,11 @@ def test_run_experiment_lr_with_object_no_path():
     config_obj = config_parser.normalize_validate_and_process_config()
 
     do_run_experiment(source, experiment_id, config_obj)
+
+    # now clean-up
     shutil.rmtree(local_dir)
+
+    # and check the results
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))

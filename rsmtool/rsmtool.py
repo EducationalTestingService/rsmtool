@@ -83,6 +83,7 @@ def run_experiment(config_file_or_obj,
             configpath = dirname(configuration.filepath)
         else:
             configpath = getcwd()
+            configuration.filepath = configpath
 
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
