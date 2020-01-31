@@ -40,7 +40,9 @@ def check_run_experiment(source,
                          consistency=False,
                          skll=False,
                          file_format='csv',
-                         given_test_dir=None):
+                         given_test_dir=None,
+                         input_format='config_path',
+                         config_obj_or_dict=None):
     """
     Function to run for a parameterized rsmtool experiment test.
 
@@ -71,21 +73,30 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    input_format: str, optional
+        Input to the `run_experiment` script. Can be `config_path`
+        if the input is path to the config file, `config_obj` if the input
+        is configuration object or `config_dict` if the input is a dictionary.
+    config_obj_or_dict: Configuration or dictionary
+        Configuration object or dictionary to use as an object
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
+    if input_format == 'config_path':
+        config_input = join(test_dir,
+                           'data',
+                           'experiments',
+                           source,
+                           '{}.json'.format(experiment_id))
+    else:
+        config_input = config_obj_or_dict
 
     model_type = 'skll' if skll else 'rsmtool'
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, experiment_id, config_input)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -802,7 +813,7 @@ def copy_data_files(temp_dir_name,
         filepath = Path(input_file_dict[file])
         filename = filepath.name
         new_filepath = temp_dir / filename
-        copyfile(test_dir / 'data' / filepath,
+        copyfile(test_dir / filepath,
                  new_filepath)
         output_file_dict[file] = str(new_filepath)
 
