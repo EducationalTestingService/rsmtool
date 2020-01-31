@@ -57,6 +57,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 def setup_func():
     global DIRS_TO_REMOVE
+    DIRS_TO_REMOVE = []
 
 
 def teardown_func():
