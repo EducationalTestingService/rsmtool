@@ -5,7 +5,7 @@ import warnings
 from glob import glob
 from os.path import basename, exists, join
 
-from nose.tools import raises
+from nose.tools import raises, with_setup
 from parameterized import param, parameterized
 
 from rsmtool.configuration_parser import ConfigurationParser
@@ -14,6 +14,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_experiment,
+                                copy_data_files,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
@@ -24,6 +25,7 @@ if TEST_DIR:
 else:
     from rsmtool.test_utils import rsmtool_test_dir
 
+DIRS_TO_REMOVE = []
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
@@ -51,6 +53,14 @@ def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
+
+
+def setup_func():
+    global DIRS_TO_REMOVE
+
+def teardown_func():
+    for d in DIRS_TO_REMOVE:
+        shutil.rmtree(d)
 
 
 def test_run_experiment_lr_with_cfg():
@@ -115,24 +125,13 @@ def test_run_experiment_lr_with_object():
     config_obj = config_parser.normalize_validate_and_process_config()
     config_obj.filepath = config_file
 
-    do_run_experiment(source, experiment_id, config_obj)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
+    check_run_experiment(source,
+                         experiment_id,
+                         input_is_file=False,
+                         config_obj_or_dict = config_obj)
 
 
+@with_setup(setup_func, teardown_func)
 def test_run_experiment_lr_with_object_no_path():
 
     # test rsmtool using the Configuration object, rather than a file;
@@ -143,25 +142,24 @@ def test_run_experiment_lr_with_object_no_path():
     source = 'lr-object-no-path'
     experiment_id = 'lr_object_no_path'
 
-    # we need to copy the data files 
-    # to a temporary directory in the current folder
-    local_dir = 'temp_for_testing_config'
-    os.mkdir(local_dir)
-    for file in ['train.csv', 'test.csv']:
-      shutil.copy(join(rsmtool_test_dir, 'data', 'files', file),
-                  join(local_dir, file))
-    shutil.copy(join(rsmtool_test_dir, 'data', 'experiments', 
-                     'lr-object-no-path', 'features.csv'), 
-                join(local_dir, 'features.csv'))
+    temp_dir = 'temp_for_testing_lr_object_no_path'
+    DIRS_TO_REMOVE.append(temp_dir)
+    
+    old_file_dict = {'train': 'data/files/train.csv',
+                     'test': 'data/files/test.csv',
+                     'features': 'data/experiments/lr-object-no-path/features.csv'}
 
-    config_dict = {"train_file": "{}/train.csv".format(local_dir),
+    new_file_dict = copy_data_files(temp_dir,
+                                    old_file_dict)
+
+    config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
                    "use_scaled_predictions": True,
                    "test_label_column": "score",
                    "train_label_column": "score",
-                   "test_file": "{}/test.csv".format(local_dir),
+                   "test_file": new_file_dict['test'],
                    "trim_max": 6,
-                   "features": "{}/features.csv".format(local_dir),
+                   "features": new_file_dict['features'],
                    "trim_min": 1,
                    "model": "LinearRegression",
                    "experiment_id": "lr_object_no_path",
@@ -171,28 +169,46 @@ def test_run_experiment_lr_with_object_no_path():
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config()
 
-    do_run_experiment(source, experiment_id, config_obj)
+    check_run_experiment(source,
+                         experiment_id,
+                         input_is_file=False,
+                         config_obj_or_dict = config_obj)
+   
 
-    # now clean-up
-    shutil.rmtree(local_dir)
 
-    # and check the results
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+@with_setup(setup_func, teardown_func)
+def test_run_experiment_lr_with_dictionary():
+    # Passing a dictionary as input.
+    source = 'lr-dictionary'
+    experiment_id = 'lr_dictionary'
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+    temp_dir = 'temp_dir_for_experiment_lr_with_dictionary'
+    DIRS_TO_REMOVE.append(temp_dir)
 
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
+    input_file_dict = {'train': 'data/files/train.csv',
+                       'test': 'data/files/test.csv',
+                       'features': 'data/experiments/lr-dictionary/features.csv'}
 
-    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
+    file_dict = copy_data_files(temp_dir, input_file_dict)
 
+    config_dict = {"train_file": file_dict['train'],
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": file_dict['test'],
+                   "trim_max": 6,
+                   "features": file_dict['features'],
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_dictionary",
+                   "description": "Using all features with an LinearRegression model."}
+
+    check_run_experiment(source,
+                         experiment_id,
+                         input_is_file=False,
+                         config_obj_or_dict = config_dict)
+   
 
 
 
