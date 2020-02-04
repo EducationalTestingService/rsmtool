@@ -75,7 +75,7 @@ def check_run_experiment(source,
         experiments to run tests for RSMExtra.
     config_obj_or_dict: Configuration or dictionary
         Configuration object or dictionary to use as an input.
-        If None, the function will construct a path to the config file 
+        If None, the function will construct a path to the config file
         using `source` and `experiment_id`
     """
     # use the test directory from this file unless it's been overridden

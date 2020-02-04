@@ -102,10 +102,10 @@ def run_experiment(config_file_or_obj_or_dict,
             configuration.filepath = configpath
 
     else:
-      raise ValueError("The input to run_experiment must be "
-                       "a path to the file (str), a dictionary, "
-                       "or a configuration object. You passed "
-                       "{}.".format(type(config_file_or_obj_or_dict)))
+        raise ValueError("The input to run_experiment must be "
+                         "a path to the file (str), a dictionary, "
+                         "or a configuration object. You passed "
+                         "{}.".format(type(config_file_or_obj_or_dict)))
 
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
