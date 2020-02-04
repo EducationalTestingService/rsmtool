@@ -73,21 +73,20 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    input_is_file: bool, optional
-        Input to the `run_experiment` script should be a f file path
-        constructed from `source` and `experiment_id`.
     config_obj_or_dict: Configuration or dictionary
-        Configuration object or dictionary to use as an input
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file 
+        using `source` and `experiment_id`
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    if input_is_file:
+    if config_obj_or_dict is None:
         config_input = join(test_dir,
-                           'data',
-                           'experiments',
-                           source,
-                           '{}.json'.format(experiment_id))
+                            'data',
+                            'experiments',
+                            source,
+                            '{}.json'.format(experiment_id))
     else:
         config_input = config_obj_or_dict
 

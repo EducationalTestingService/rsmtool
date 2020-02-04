@@ -8,6 +8,8 @@ from os.path import basename, exists, join
 from nose.tools import raises, with_setup
 from parameterized import param, parameterized
 
+from rsmtool import run_experiment
+
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
@@ -62,7 +64,8 @@ def setup_func():
 
 def teardown_func():
     for d in DIRS_TO_REMOVE:
-        shutil.rmtree(d)
+        if exists(d):
+            shutil.rmtree(d)
 
 
 def test_run_experiment_lr_with_cfg():
@@ -129,7 +132,6 @@ def test_run_experiment_lr_with_object():
 
     check_run_experiment(source,
                          experiment_id,
-                         input_is_file=False,
                          config_obj_or_dict=config_obj)
 
 
@@ -173,7 +175,6 @@ def test_run_experiment_lr_with_object_no_path():
 
     check_run_experiment(source,
                          experiment_id,
-                         input_is_file=False,
                          config_obj_or_dict=config_obj)
 
 
@@ -208,10 +209,19 @@ def test_run_experiment_lr_with_dictionary():
 
     check_run_experiment(source,
                          experiment_id,
-                         input_is_file=False,
                          config_obj_or_dict=config_dict)
 
 
+
+
+@with_setup(setup_func, teardown_func)
+@raises(ValueError)
+def test_run_experiment_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    temp_dir = 'temp_dir_for_experiment_wrong_input'
+    DIRS_TO_REMOVE.append(temp_dir)
+    run_experiment(config_list, temp_dir)
 
 
 @raises(ValueError)
