@@ -691,8 +691,8 @@ class Analyzer:
                            'system': system_scores}).dropna(how='any')
 
         if (len(df) == 1 or
-            len(df['human'].unique()) == 1 or
-            len(df['system'].unique()) == 1):
+                len(df['human'].unique()) == 1 or
+                len(df['system'].unique()) == 1):
             # set correlations to 1 if we have a single instance or zero variance
             correlations = np.nan
         else:
