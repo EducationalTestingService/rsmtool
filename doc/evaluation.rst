@@ -129,7 +129,7 @@ Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https:
 If the variance of human or system scores is ``0`` (all scores are the same) or only one response is available, RSMTool returns ``None``.
 
 .. note::
-  In `scipy` v1.4.1 and later the implementation uses the following formula: 
+  In `scipy` v1.4.1 and later, the implementation uses the following formula: 
 
   :math:`r=\displaystyle\frac{H-\bar{H}}{\left\|H-\bar{H}\right\|_2}\cdot\frac{M-\bar{M}}{\left\|M-\bar{M}\right\|_2}`
 
@@ -341,6 +341,5 @@ Therefore, SMD between two human scores is computed using :ref:`rsmtool.utils.st
 .. note::
 
 	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.
-
 
 
