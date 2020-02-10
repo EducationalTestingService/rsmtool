@@ -21,10 +21,10 @@ before_install:
 - if [ -x ${HOME}/miniconda3/pkgs ]; then pushd ${HOME}/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
 - chmod +x miniconda.sh
 - ./miniconda.sh -b -f
-- ${HOME}/miniconda3/bin/conda install -c anaconda --yes setuptools
+- ${HOME}/miniconda3/bin/conda update conda --yes
 
 install:
-- ${HOME}/miniconda3/bin/conda create --name rsmenv -c defaults -c conda-forge -c ets --file requirements.txt --yes --quiet
+- ${HOME}/miniconda3/bin/conda create --name rsmenv -c conda-forge -c defaults -c ets --file requirements.txt --yes --quiet
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 
