@@ -165,7 +165,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the variances; and
         - a Scree plot.
 
-    The analysis keeps all components. The total number of components usually equals the total number of features. In cases where the total number of responses is smaller than the number of features, the number of components is the same as the number of responses.  
+      The analysis keeps all components. The total number of components usually equals the total number of features. In cases where the total number of responses is smaller than the number of features, the number of components is the same as the number of responses.  
 
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the experiment.
 
