@@ -5,7 +5,9 @@ from os.path import dirname, join
 import numpy as np
 import pandas as pd
 
-from nose.tools import assert_equal, raises
+from nose.tools import (assert_equal,
+                        assert_almost_equal,
+                        raises)
 from pandas.util.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
@@ -78,8 +80,8 @@ class TestComparer:
                                'feature2': [1.1, 6.2, 2.1],
                                'sc1': [2, 3, 4]})
         df_cors = Comparer.compute_correlations_between_versions(df_old, df_new)
-        assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
-        assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+        assert_almost_equal(df_cors.at['feature1', 'old_new'], -1.0)
+        assert_almost_equal(df_cors.at['feature2', 'old_new'], 1.0)
         assert_equal(df_cors.at['feature1', 'human_old'], pearsonr(df_old['feature1'],
                                                                    df_old['sc1'])[0])
         assert_equal(df_cors.at['feature1', 'human_new'], pearsonr(df_new['feature1'],
@@ -101,8 +103,8 @@ class TestComparer:
                                                                  human_score='r1',
                                                                  id_column='id')
 
-        assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
-        assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+        assert_almost_equal(df_cors.at['feature1', 'old_new'], -1.0)
+        assert_almost_equal(df_cors.at['feature2', 'old_new'], 1.0)
         assert_equal(df_cors.at['feature1', 'human_old'], pearsonr(df_old['feature1'],
                                                                    df_old['r1'])[0])
         assert_equal(df_cors.at['feature1', 'human_new'], pearsonr(df_new['feature1'],
@@ -137,8 +139,8 @@ class TestComparer:
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore')
             df_cors = Comparer.compute_correlations_between_versions(df_old, df_new)
-        assert_equal(df_cors.at['feature1', 'old_new'], -1.0)
-        assert_equal(df_cors.at['feature2', 'old_new'], 1.0)
+        assert_almost_equal(df_cors.at['feature1', 'old_new'], -1.0)
+        assert_almost_equal(df_cors.at['feature2', 'old_new'], 1.0)
         assert_equal(df_cors.at['feature1', "N"], 3)
         assert_equal(len(df_cors), 2)
 

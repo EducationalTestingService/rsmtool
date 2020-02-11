@@ -1,11 +1,11 @@
 channels:
   - conda-forge
-  - desilinguist
+  - ets
 dependencies:
   - python=3.6
   - ipython=7.9.0
   - jupyter_console=6.0.0
   - notebook=6.0.1
   - numpy=1.14.6
-  - skll=1.5.2
+  - skll=2.0.0
   - statsmodels=0.10.1
