@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from glob import glob
 from os.path import basename, exists, join
