@@ -4,6 +4,7 @@ from os.path import join
 
 from nose.tools import raises, assert_equal
 from parameterized import param, parameterized
+from sklearn.exceptions import ConvergenceWarning
 
 from rsmtool.test_utils import (check_run_experiment,
                                 collect_warning_messages_from_report,
