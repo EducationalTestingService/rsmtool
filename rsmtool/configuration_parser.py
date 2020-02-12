@@ -51,9 +51,17 @@ class Configuration:
     parameters.
     """
 
-    def __init__(self, config_dict, filepath=None, context='rsmtool'):
+    def __init__(self, config_dict,
+                 filepath=None,
+                 config_dir=None,
+                 context='rsmtool'):
         """
         Create an object of the `Configuration` class.
+
+        .. deprecated:: 8.0
+          `filepath` will be removed in RSMTool 8.0.0, it is replaced by
+          `config_dir` because the latter is applicable to both 
+          configuration files and configuration passed as object/dictionary.
 
         Parameters
         ----------
@@ -62,12 +70,21 @@ class Configuration:
         filepath : str, optional
             The path to the configuration file.
             Defaults to None.
+        config_dir : str, optional
+            The reference path used to 
+            resolve any relative paths in the configuration
+            object
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
             The context of the tool.
             Defaults to 'rsmtool'.
         """
+        if filepath is not None:
+            warnings.warn("The `filepath` attribute of the Configuration "
+                          "object will be removed n RSMTool 8.0 "
+                          "used config_dir instead", DeprecationWarning)
         self._config = config_dict
+        self._config_dir = config_dir
         self._filepath = filepath
         self._context = context
 
@@ -162,6 +179,9 @@ class Configuration:
         filepath : str
             The path for the config file.
         """
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed n RSMTool 8.0 "
+                      "used config_dir instead", DeprecationWarning)
         return self._filepath
 
     @filepath.setter
@@ -175,6 +195,9 @@ class Configuration:
             A new file path for the
             configuration object.
         """
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed n RSMTool 8.0 "
+                      "used config_dir instead", DeprecationWarning)
         self._filepath = new_path
 
     @property

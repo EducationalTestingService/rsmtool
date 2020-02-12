@@ -694,17 +694,33 @@ class TestConfiguration:
         print(config)
         eq_(config.__str__(), 'flag_column')
 
+    # this test tests for a deprecated attribute
     def test_get_filepath(self):
-        filepath = '/path/to/file.json'
-        config = Configuration({"flag_column": "[advisories]"}, filepath)
-        eq_(config.filepath, filepath)
+        with warnings.catch_warnings(record=True) as w:
+            filepath = '/path/to/file.json'
+            # this should trigger deprecatin warning
+            config = Configuration({"flag_column": "[advisories]"}, filepath)
+            # this shouls also trigger a deprecation warning
+            eq_(config.filepath, filepath)
+            assert len(w) == 2 # we get two deprecation warnings here
+            assert issubclass(w[-2].category, DeprecationWarning)
+            assert issubclass(w[-1].category, DeprecationWarning)
 
+    # this test tests for a deprecated attribute
     def test_set_filepath(self):
-        filepath = '/path/to/file.json'
-        new_file_path = 'path/that/is/new.json'
-        config = Configuration({"flag_column": "[advisories]"}, filepath)
-        config.filepath = new_file_path
-        eq_(config.filepath, new_file_path)
+        with warnings.catch_warnings(record=True) as w:
+            filepath = '/path/to/file.json'
+            new_file_path = 'path/that/is/new.json'
+            # this will trigger a warning
+            config = Configuration({"flag_column": "[advisories]"}, filepath)
+            # this will trigger a warning
+            config.filepath = new_file_path
+            # this will trigger a warning
+            eq_(config.filepath, new_file_path)
+            assert len(w) == 3 
+            assert issubclass(w[-3].category, DeprecationWarning)
+            assert issubclass(w[-2].category, DeprecationWarning)
+            assert issubclass(w[-1].category, DeprecationWarning)
 
     def test_get_context(self):
         context = 'rsmtool'
