@@ -40,7 +40,8 @@ def check_run_experiment(source,
                          consistency=False,
                          skll=False,
                          file_format='csv',
-                         given_test_dir=None):
+                         given_test_dir=None,
+                         suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmtool experiment test.
 
@@ -71,6 +72,9 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
@@ -83,9 +87,10 @@ def check_run_experiment(source,
 
     model_type = 'skll' if skll else 'rsmtool'
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_experiment(source, experiment_id, config_file)
+    do_run_experiment(source,
+                      experiment_id,
+                      config_file,
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -304,7 +309,10 @@ def check_run_summary(source, file_format='csv', given_test_dir=None):
     check_report(html_report)
 
 
-def do_run_experiment(source, experiment_id, config_file):
+def do_run_experiment(source,
+                      experiment_id,
+                      config_file,
+                      suppress_warnings_for=[]):
     """
     Run RSMTool experiment using the given experiment
     configuration file located in the given source directory
@@ -318,6 +326,10 @@ def do_run_experiment(source, experiment_id, config_file):
         Experiment ID to use when running.
     config_file : str
         Path to the experiment configuration file.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed
+        when running the experiments. Note that ``RuntimeWarning``s
+        are always suppressed.
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
@@ -327,7 +339,17 @@ def do_run_experiment(source, experiment_id, config_file):
         files = glob(join(source_output_dir, source, output_subdir, '*'))
         for f in files:
             remove(f)
-    run_experiment(config_file, experiment_dir)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        run_experiment(config_file, experiment_dir)
 
 
 def do_run_evaluation(source, experiment_id, config_file):
