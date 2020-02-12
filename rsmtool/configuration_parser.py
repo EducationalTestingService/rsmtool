@@ -1314,7 +1314,7 @@ class JSONConfigurationParser(ConfigurationParser):
 
         self._config = config
         self._filepath = filepath
-        self._config_dir = dirname(abspath(self._filepath))
+        self._config_dir = dirname(abspath(filepath))
 
 
 class CFGConfigurationParser(ConfigurationParser):
@@ -1398,9 +1398,8 @@ class CFGConfigurationParser(ConfigurationParser):
                     config[name] = value
 
         self._config = config
-        # this attribute will be deprecated in future versions
         self._filepath = filepath
-        self._config_dir = dirname(filepath)
+        self._config_dir = dirname(abspath(filepath))
 
 
 # Global config types
