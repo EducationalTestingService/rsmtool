@@ -13,6 +13,7 @@ The main RSMTool script.
 import argparse
 import logging
 import sys
+import warnings
 
 from os import listdir, getcwd, makedirs
 from os.path import abspath, exists, join, dirname
@@ -43,7 +44,8 @@ def run_experiment(config_file_or_obj_or_dict,
         configuration file.
         Relative paths in the configuration file will be interpreted relative
         to the location of the file. For configuration object an optional attribute
-        .filepath can be set to indicate the reference path. If no .filepath is set or if
+        .config_dir can be set to indicate the reference path. 
+        If no .config_dir is set or if
         the users passes a dictionary, any relative paths will be resolved relative
         to the current directory.
     output_dir : str
@@ -73,33 +75,37 @@ def run_experiment(config_file_or_obj_or_dict,
     makedirs(reportdir, exist_ok=True)
 
     # check what sort of input we got
+    # if we got a string we consider this to be path to config file
     if isinstance(config_file_or_obj_or_dict, str):
 
         # Instantiate configuration parser object
         parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
         configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict)
 
-        # get the directory where the configuration file lives
-        configpath = dirname(config_file_or_obj_or_dict)
-
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # initialize the parser from dict
         parser = ConfigurationParser()
-        parser.load_config_from_dict(config_file_or_obj_or_dict)
-        configuration = parser.normalize_validate_and_process_config()
-        # set configpath to current directory
-        configpath = getcwd()
-        configuration.filepath = configpath
+        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
         configuration = config_file_or_obj_or_dict
-        if configuration.filepath is not None:
-            configpath = dirname(configuration.filepath)
-        else:
-            configpath = getcwd()
-            configuration.filepath = configpath
+
+        # if the user hasn't specified the config_dir
+        if configuration.config_dir is None:
+            # for backwards compatibility we'll derive the config_dir attribute from
+            # filepath but will raise a deprecation warning.
+            if configuration.filepath is not None:
+                warnings.warn("In RSMTool 8.0 if you pass a Configuration object "
+                              "to `run_experiment`, you will need to specify the "
+                              "config_dir attribute.", DeprecationWarning)
+                configuration.config_dir = abspath(dirname(configuration.filepath))
+            else:
+                configuration.config_dir = getcwd()
+            logger.info("The reference directory for resolving relative paths "
+                        "was set to {}.".format(configuration.config_dir))
+
 
     else:
         raise ValueError("The input to run_experiment must be "
@@ -126,7 +132,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                                           'feature_specs',
                                                           'feature_subset_specs'])
 
-    file_paths = DataReader.locate_files(file_paths_org, configpath)
+    file_paths = DataReader.locate_files(file_paths_org, configuration.config_dir)
 
     # if there are any missing files after trying to locate
     # all expected files, raise an error

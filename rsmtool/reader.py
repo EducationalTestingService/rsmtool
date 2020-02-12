@@ -282,7 +282,8 @@ class DataReader:
         filepath_or_paths : str or list
             Name of the experiment file we want to locate.
         config_dir : str
-            Path to the experiment configuration file.
+            Path to the reference configuration directory 
+            (usually the directory of the config file)
 
         Returns
         --------
@@ -325,7 +326,7 @@ class DataReader:
                 retval = abspath(filepath)
 
             # otherwise check if it exists relative
-            # to the directory that contains the main config file
+            # to the reference directory
             elif exists(alternate_path):
                 retval = alternate_path
 

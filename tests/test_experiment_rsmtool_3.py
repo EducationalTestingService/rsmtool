@@ -95,22 +95,64 @@ def test_run_experiment_lr_with_cfg():
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
-
-def test_run_experiment_lr_with_object():
+# this test should be raising deprecation warning
+def test_run_experiment_lr_with_object_and_filepath():
 
     # test rsmtool using the Configuration object, rather than a file;
     # we pass the `filepath` attribute after constructing the Configuration object
     # to ensure that the results are identical to what we would expect if we had
     # run this test with a configuration file instead.
 
+    with warnings.catch_warnings(record=True) as w:
+      source = 'lr-object'
+      experiment_id = 'lr_object'
+
+      config_file = join(rsmtool_test_dir,
+                         'data',
+                         'experiments',
+                         source,
+                         '{}.json'.format(experiment_id))
+
+      config_dict = {"train_file": "../../files/train.csv",
+                     "id_column": "ID",
+                     "use_scaled_predictions": True,
+                     "test_label_column": "score",
+                     "train_label_column": "score",
+                     "test_file": "../../files/test.csv",
+                     "trim_max": 6,
+                     "features": "features.csv",
+                     "trim_min": 1,
+                     "model": "LinearRegression",
+                     "experiment_id": "lr_object",
+                     "description": "Using all features with an LinearRegression model."}
+
+      config_parser = ConfigurationParser()
+      config_parser.load_config_from_dict(config_dict)
+      config_obj = config_parser.normalize_validate_and_process_config()
+      config_obj.filepath = config_file
+
+      check_run_experiment(source,
+                           experiment_id,
+                           config_obj_or_dict=config_obj)
+      assert len(w) == 1 
+      assert issubclass(w[-1].category, DeprecationWarning)
+
+
+
+def test_run_experiment_lr_with_object_and_config_dir():
+
+    # test rsmtool using the Configuration object, rather than a file;
+    # we pass the `config_dir` attribute after constructing the Configuration object
+    # to ensure that the results are identical to what we would expect if we had
+    # run this test with a configuration file instead.
+
     source = 'lr-object'
     experiment_id = 'lr_object'
 
-    config_file = join(rsmtool_test_dir,
+    config_dir = join(rsmtool_test_dir,
                        'data',
                        'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
+                       source)
 
     config_dict = {"train_file": "../../files/train.csv",
                    "id_column": "ID",
@@ -128,11 +170,12 @@ def test_run_experiment_lr_with_object():
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config()
-    config_obj.filepath = config_file
+    config_obj.config_dir = config_dir
 
     check_run_experiment(source,
                          experiment_id,
                          config_obj_or_dict=config_obj)
+
 
 
 @with_setup(setup_func, teardown_func)

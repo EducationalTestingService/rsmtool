@@ -6,6 +6,7 @@ import warnings
 import pandas as pd
 
 from io import StringIO
+from os import getcwd
 from os.path import dirname, join
 from shutil import rmtree
 
@@ -91,6 +92,66 @@ class TestConfigurationParser:
             self.parser._config = data
             newdata = self.parser.normalize_config()
             ok_('use_scaled_predictions' not in newdata.keys())
+
+    def test_load_config_from_dict(self):
+        data = {'expID': 'test'}
+        config_dir = '/path/to/config_dir'
+        self.parser.load_config_from_dict(data,
+                                          config_dir=config_dir)
+        eq_(self.parser.config_dir, config_dir)
+
+
+    def test_load_config_from_dict_no_config_dir(self):
+        data = {'expID': 'test'}
+        config_dir = getcwd()
+        self.parser.load_config_from_dict(data)
+        eq_(self.parser.config_dir, config_dir)
+
+
+    @raises(AttributeError)
+    def test_load_config_from_dict_dict_already_assigned(self):
+        data = {'expID': 'test'}
+        config_dir = 'some/config/dir'
+        self.parser._config = data
+        self.parser.load_config_from_dict(data, config_dir)
+
+    @raises(TypeError)
+    def test_load_config_from_dict_wrong_type(self):
+        data = [('expID', 'test')]
+        config_dir = 'some/config/dir'
+        self.parser.load_config_from_dict(data, config_dir)
+
+    def test_load_and_normalize_config_from_dict_rsmtool(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression'}
+
+        # Add data to `ConfigurationParser` object
+        newdata = self.parser.load_normalize_and_validate_config_from_dict(data)
+        assert_equal(newdata['id_column'], 'spkitemid')
+        assert_equal(newdata['use_scaled_predictions'], False)
+        assert_equal(newdata['select_transformations'], False)
+        assert_array_equal(newdata['general_sections'], ['all'])
+        assert_equal(newdata['description'], '')
+        assert_equal(self.parser.config_dir, getcwd())
+
+
+    def test_load_and_normalize_config_from_dict_rsmeval(self):
+        data = {'experiment_id': 'experiment_1',
+                'predictions_file': 'data/rsmtool_smTrain.csv',
+                'system_score_column': 'system',
+                'trim_min': 1,
+                'trim_max': 5}
+
+        # Add data to `ConfigurationParser` object
+        newdata=self.parser.load_normalize_and_validate_config_from_dict(data,
+                                                                         context='rsmeval')
+        assert_equal(newdata['id_column'], 'spkitemid')
+        assert_array_equal(newdata['general_sections'], ['all'])
+        assert_equal(newdata['description'], '')
+        assert_equal(self.parser.config_dir, getcwd())
+
 
     @raises(ValueError)
     def test_validate_config_missing_fields(self):
@@ -507,6 +568,50 @@ class TestConfigurationParser:
 
 class TestConfiguration:
 
+    def test_init_with_filepath_as_positional_argument(self):
+        with warnings.catch_warnings(record=True) as w:
+            filepath = 'some/path/'
+            config_dict = {'exp_id': 'my_experiment'}
+            config = Configuration(config_dict, filepath)
+            eq_(config._filepath, filepath)
+            assert len(w) == 1 
+            assert issubclass(w[-1].category, DeprecationWarning)
+
+    def test_init_with_filepath_as_kword_argument(self):
+        filepath = 'some/path/file.json'
+        config_dict = {'exp_id': 'my_experiment'}
+        config = Configuration(config_dict, filepath=filepath)
+        eq_(config._filepath, filepath)
+
+    def test_init_with_filepath_and_config_dir_as_kword_argument(self):
+        filepath = 'some/path/file.json'
+        config_dir = 'some/path'
+        config_dict = {'exp_id': 'my_experiment'}
+        config = Configuration(config_dict, 
+                              filepath=filepath,
+                              config_dir=config_dir)
+        eq_(config._filepath, filepath)
+        eq_(config._config_dir, config_dir)
+
+
+    def test_init_with_config_dir_only_as_kword_argument(self):
+        config_dir = 'some/path'
+        config_dict = {'exp_id': 'my_experiment'}
+        config = Configuration(config_dict, 
+                              config_dir=config_dir)
+        eq_(config._filepath, None)
+        eq_(config._config_dir, config_dir)
+
+
+    @ raises(ValueError)
+    def test_init_with_filepath_as_positional_and_keyword(self):
+        filepath = 'some/path/'
+        config_dict = {'exp_id': 'my_experiment'}
+        _ = Configuration(config_dict, filepath,
+                          filepath=filepath)
+
+    
+
     def check_logging_output(self, expected, function, *args, **kwargs):
 
         # check if the `expected` text is in the actual logging output
@@ -694,34 +799,34 @@ class TestConfiguration:
         print(config)
         eq_(config.__str__(), 'flag_column')
 
-    # this test tests for a deprecated attribute
     def test_get_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
-            filepath = '/path/to/file.json'
-            # this should trigger deprecatin warning
-            config = Configuration({"flag_column": "[advisories]"}, filepath)
-            # this shouls also trigger a deprecation warning
-            eq_(config.filepath, filepath)
-            assert len(w) == 2 # we get two deprecation warnings here
-            assert issubclass(w[-2].category, DeprecationWarning)
-            assert issubclass(w[-1].category, DeprecationWarning)
+        filepath = '/path/to/file.json'
+        config = Configuration({"flag_column": "[advisories]"}, 
+                               filepath=filepath)
+        eq_(config.filepath, filepath)
 
-    # this test tests for a deprecated attribute
     def test_set_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
-            filepath = '/path/to/file.json'
-            new_file_path = 'path/that/is/new.json'
-            # this will trigger a warning
-            config = Configuration({"flag_column": "[advisories]"}, filepath)
-            # this will trigger a warning
-            config.filepath = new_file_path
-            # this will trigger a warning
-            eq_(config.filepath, new_file_path)
-            assert len(w) == 3 
-            assert issubclass(w[-3].category, DeprecationWarning)
-            assert issubclass(w[-2].category, DeprecationWarning)
-            assert issubclass(w[-1].category, DeprecationWarning)
+        filepath = '/path/to/file.json'
+        new_file_path = 'path/that/is/new.json'
+        config = Configuration({"flag_column": "[advisories]"}, 
+                               filepath=filepath)
+        config.filepath = new_file_path
+        eq_(config.filepath, new_file_path)
 
+    def test_get_config_dir(self):
+        config_dir = '/path/to/dir/'
+        config = Configuration({"flag_column": "[advisories]"}, 
+                               config_dir=config_dir)
+        eq_(config.config_dir, config_dir)
+
+    def test_set_config_dir(self):
+        config_dir = '/path/to/dir/'
+        new_config_dir = 'path/that/is/new/'
+        config = Configuration({"flag_column": "[advisories]"},
+                               config_dir=config_dir)
+        config.config_dir = new_config_dir
+        eq_(config.config_dir, new_config_dir)
+        
     def test_get_context(self):
         context = 'rsmtool'
         config = Configuration({"flag_column": "[advisories]"},
