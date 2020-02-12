@@ -61,7 +61,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 
-# @raises(ValueError)
+@raises(ValueError)
 def test_run_experiment_empwtdropneg():
 
     # rsmtool experiment with no longer supported empWtDropNeg model
