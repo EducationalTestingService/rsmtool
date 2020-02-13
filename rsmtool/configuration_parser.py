@@ -122,8 +122,8 @@ class Configuration:
         configdir : str, optional, keyword-only
             The reference path used to
             resolve any relative paths in the configuration
-            object. When None, will be set to
-            current working directory.
+            object. When None, will be set during
+            initialization to the current working directory.
             Defaults to None
         filename : str, optional, keyword-only
             The name of the configuration file.
@@ -145,10 +145,10 @@ class Configuration:
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
             configdir = getcwd()
+            logging.info("Configuration directory will be set to {}".format(configdir))
         else:
             configdir = abspath(configdir)
-            logging.info("Configuration directory will be set to {}".format(configdir))
-
+        
         self._configdir = configdir
         self._filename = filename
 
@@ -250,11 +250,9 @@ class Configuration:
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed n RSMTool 8.0 "
-                      "use `configdir` to retrieve the configuration "
-                      "directory. If you need "
-                      "the full path to the configuration file, "
-                      "use os.path.join(self.configdir, self._filename).",
-                       DeprecationWarning)
+                      "use `configdir` and `_filename` if you "
+                      "need to retrieve a full path to the "
+                      "configuration file", DeprecationWarning)
         filepath = join(self.configdir, self._filename)
         return filepath
 
@@ -275,11 +273,9 @@ class Configuration:
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed n RSMTool 8.0 "
-                      "Use `configdir` to  set a new path to the "
-                      "configuration directory. You can optionally "
-                      "set `_filename` to the name of the configuration file"
-                      "if you want to store the full path.",
-                      DeprecationWarning)
+                      "use `configdir` and `_filename` if you "
+                      "need to set a new path to the "
+                      "configuration file", DeprecationWarning)
         new_filename = basename(new_path)
         new_configdir = dirname(abspath(new_path))
         self._filename = new_filename
@@ -762,11 +758,9 @@ class ConfigurationParser:
         warnings.warn("The `_filepath` attribute of the "
                       "ConfigurationParser object "
                       "will be removed n RSMTool 8.0 "
-                      "use `configdir` to retrieve the configuration "
-                      "directory. If you need "
-                      "the full path to the configuration file, "
-                      "use os.path.join(self.configdir, self._filename).",
-                       DeprecationWarning)
+                      "use `_configdir` and `_filename` if you "
+                      "need to retrieve a full path to the "
+                      "configuration file", DeprecationWarning)
         filepath = join(self._configdir, self._filename)
         return filepath
 
@@ -787,14 +781,12 @@ class ConfigurationParser:
             A new file path for the
             configuration object.
         """
-        warnings.warn("The `filepath` attribute of the "
+        warnings.warn("The `_filepath` attribute of the "
                       "ConfigurationParser object "
-                      "will be removed in RSMTool 8.0 "
-                      "Use `configdir` to  set a new path to the "
-                      "configuration directory. You can optionally "
-                      "set `_filename` to the name of the configuration file"
-                      "if you want to store the full path.", 
-                      DeprecationWarning)
+                      "ill be removed n RSMTool 8.0 "
+                      "use `_configdir` and `_filename` if you "
+                      "need to set a new path to the "
+                      "configuration file", DeprecationWarning)
         new_filename = basename(new_path)
         new_configdir = dirname(abspath(new_path))
         self._filename = new_filename
