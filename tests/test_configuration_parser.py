@@ -134,7 +134,7 @@ class TestConfigurationParser:
         assert_equal(newdata['select_transformations'], False)
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
-        assert_equal(self.parser.config_dir, getcwd())
+        assert_equal(newdata.config_dir, getcwd())
 
 
     def test_load_and_normalize_config_from_dict_rsmeval(self):
@@ -150,7 +150,7 @@ class TestConfigurationParser:
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
-        assert_equal(self.parser.config_dir, getcwd())
+        assert_equal(newdata.config_dir, getcwd())
 
 
     @raises(ValueError)
