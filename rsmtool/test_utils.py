@@ -97,7 +97,7 @@ def check_run_experiment(source,
 
     do_run_experiment(source,
                       experiment_id,
-                      config_file,
+                      config_input,
                       suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
