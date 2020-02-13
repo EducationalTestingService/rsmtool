@@ -122,8 +122,8 @@ class Configuration:
         configdir : str, optional, keyword-only
             The reference path used to
             resolve any relative paths in the configuration
-            object. When None, will be set to
-            current working directory.
+            object. When None, will be set during
+            initialization to the current working directory.
             Defaults to None
         filename : str, optional, keyword-only
             The name of the configuration file.
@@ -145,10 +145,10 @@ class Configuration:
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
             configdir = getcwd()
+            logging.info("Configuration directory will be set to {}".format(configdir))
         else:
             configdir = abspath(configdir)
-            logging.info("Configuration directory will be set to {}".format(configdir))
-
+        
         self._configdir = configdir
         self._filename = filename
 
