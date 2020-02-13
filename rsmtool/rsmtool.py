@@ -87,7 +87,6 @@ def run_experiment(config_file_or_obj_or_dict,
         # initialize the parser from dict
         parser = ConfigurationParser()
         configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict)
-        print(configuration.config_dir)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
