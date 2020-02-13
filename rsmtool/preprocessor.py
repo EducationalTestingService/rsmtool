@@ -2327,7 +2327,6 @@ class FeaturePreprocessor:
                            'id_column': id_column,
                            'second_human_score_column': second_human_score_column,
                            'candidate_column': candidate_column,
-                           'subgroups': subgroups,
                            'use_scaled_predictions': use_scaled_predictions,
                            'exclude_zero_scores': exclude_zero_scores,
                            'exclude_listwise': exclude_listwise,
