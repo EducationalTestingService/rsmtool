@@ -42,14 +42,13 @@ def run_experiment(config_file_or_obj_or_dict,
         or a Python dictionary with keys corresponding to fields in the
         configuration file.
         Relative paths in the configuration file will be interpreted relative
-        to the location of the file. For configuration object an optional attribute
-        .configdir can be set to indicate the reference path.
-        If no .configdir is set or if
+        to the location of the file. For configuration object 
+        .configdir needs to be set to indicate the reference path. If
         the users passes a dictionary, any relative paths will be resolved relative
         to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    
+
     Raises
     ------
     ValueError

@@ -52,7 +52,7 @@ class TestConfigurationParser:
 
             # this triggers deprecation warning
             eq_(self.parser._filepath, abspath(filepath))
-            assert len(w) == 1 # we get one deprecation warnings here
+            assert len(w) == 1  # we get one deprecation warnings here
             assert issubclass(w[-1].category, DeprecationWarning)
 
     # this is a test for an attribute that will be
@@ -70,8 +70,8 @@ class TestConfigurationParser:
             self.parser._filepath = new_file_path
             eq_(self.parser._filename, 'new.json')
             eq_(self.parser._configdir, abspath('/newpath/to'))
-            eq_(self.parser._filepath, abspath(new_file_path)) # second deprecation warning
-            assert len(w) == 2 # we get two deprecation warnings here
+            eq_(self.parser._filepath, abspath(new_file_path))  # second deprecation warning
+            assert len(w) == 2  # we get two deprecation warnings here
             assert issubclass(w[-2].category, DeprecationWarning)
             assert issubclass(w[-1].category, DeprecationWarning)
 
@@ -655,16 +655,18 @@ class TestConfiguration:
     def test_init_with_filepath_as_positional_and_keyword(self):
         filepath = 'some/path/file.json'
         config_dict = {'exp_id': 'my_experiment'}
-        _ = Configuration(config_dict, filepath,
-                               filename=filepath)
+        _ = Configuration(config_dict,
+                          filepath,
+                          filename=filepath)
 
     @ raises(ValueError)
     def test_init_with_filepath_as_positional_and_configdir_keyword(self):
         filepath = 'some/path/file.json'
         configdir = 'some/path'
         config_dict = {'exp_id': 'my_experiment'}
-        _ = Configuration(config_dict, filepath,
-                               configdir=configdir)
+        _ = Configuration(config_dict,
+                          filepath,
+                          configdir=configdir)
 
 
     def check_logging_output(self, expected, function, *args, **kwargs):
@@ -863,7 +865,7 @@ class TestConfiguration:
                                    configdir='/path/to/',
                                    filename='file.json')
             eq_(config.filepath, abspath(filepath))
-            assert len(w) == 1  #we get one deprecation warnings here
+            assert len(w) == 1  # we get one deprecation warnings here
             assert issubclass(w[-1].category, DeprecationWarning)
 
 
@@ -871,16 +873,15 @@ class TestConfiguration:
     # deprecated
     def test_set_filepath(self):
         with warnings.catch_warnings(record=True) as w:
-            filepath = '/path/to/file.json'
             new_file_path = '/newpath/to/new.json'
             config = Configuration({"flag_column": "[advisories]"},
-                                    configdir='/path/to/',
-                                    filename='file.json',)
-            config.filepath = new_file_path  #  first deprecation warning
+                                   configdir='/path/to/',
+                                   filename='file.json',)
+            config.filepath = new_file_path  # first deprecation warning
             eq_(config._filename, 'new.json')
             eq_(config.configdir, abspath('/newpath/to'))
-            eq_(config.filepath, abspath(new_file_path)) # second deprecation warning
-            assert len(w) == 2 # we get two deprecation warnings here
+            eq_(config.filepath, abspath(new_file_path))  # second deprecation warning
+            assert len(w) == 2  # we get two deprecation warnings here
             assert issubclass(w[-2].category, DeprecationWarning)
             assert issubclass(w[-1].category, DeprecationWarning)
 
