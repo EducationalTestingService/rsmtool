@@ -4,6 +4,7 @@ from os.path import join
 
 from nose.tools import raises, assert_equal
 from parameterized import param, parameterized
+from sklearn.exceptions import ConvergenceWarning
 
 from rsmtool.test_utils import (check_run_experiment,
                                 collect_warning_messages_from_report,
@@ -51,6 +52,12 @@ else:
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
+
+    # suppress known convergence warnings for LinearSVR-based experiments
+    # TODO: once SKLL hyperparameters can be passed, replace this code
+    if args[0].startswith('linearsvr'):
+        kwargs['suppress_warnings_for'] = [ConvergenceWarning]
+
     check_run_experiment(*args, **kwargs)
 
 
