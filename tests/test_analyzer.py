@@ -74,9 +74,13 @@ class TestAnalyzer:
     def test_correlation_helper_for_data_with_four_rows(self):
         # this should compute marginal correlations and return a unity
         # matrix for partial correlations
-        retval = Analyzer.correlation_helper(self.df_features[:4], 'sc1', 'group')
+        # it should also raise a UserWarning
+        with warnings.catch_warnings(record=True) as w:
+            retval = Analyzer.correlation_helper(self.df_features[:4], 'sc1', 'group')
         assert_equal(retval[0].isnull().values.sum(), 0)
         assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
+        assert issubclass(w[-1].category, UserWarning)
+
 
 
     def test_correlation_helper_for_data_with_groups(self):
@@ -110,12 +114,17 @@ class TestAnalyzer:
 
 
 
-    def test_that_correlation_helper_works_for_data_with_the_same_label(self):
-        with warnings.catch_warnings():
+    def test_that_correlation_helper_works_for_data_with_the_same_human_score(self):
+        # this test should raise UserWarning because the determinant is very close to
+        # zero
+        with warnings.catch_warnings(record=True) as w:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             retval = Analyzer.correlation_helper(self.df_features_same_score, 'sc1', 'group')
             assert_equal(retval[0].isnull().values.sum(), 3)
             assert_equal(retval[1].isnull().values.sum(), 3)
+            print([w2.message for w2 in w])
+            assert issubclass(w[-1].category, UserWarning)
+
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
         # There should be NaNs for SMD, correlations and both sds
