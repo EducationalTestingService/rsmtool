@@ -250,9 +250,11 @@ class Configuration:
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed n RSMTool 8.0 "
-                      "use `configdir` and `_filename` if you "
-                      "need to retrieve a full path to the "
-                      "configuration file", DeprecationWarning)
+                      "use `configdir` to retrieve the configuration "
+                      "directory. If you need "
+                      "the full path to the configuration file, "
+                      "use os.path.join(self.configdir, self._filename).",
+                       DeprecationWarning)
         filepath = join(self.configdir, self._filename)
         return filepath
 
@@ -273,9 +275,11 @@ class Configuration:
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed n RSMTool 8.0 "
-                      "use `configdir` and `_filename` if you "
-                      "need to set a new path to the "
-                      "configuration file", DeprecationWarning)
+                      "Use `configdir` to  set a new path to the "
+                      "configuration directory. You can optionally "
+                      "set `_filename` to the name of the configuration file"
+                      "if you want to store the full path.",
+                      DeprecationWarning)
         new_filename = basename(new_path)
         new_configdir = dirname(abspath(new_path))
         self._filename = new_filename
@@ -758,9 +762,11 @@ class ConfigurationParser:
         warnings.warn("The `_filepath` attribute of the "
                       "ConfigurationParser object "
                       "will be removed n RSMTool 8.0 "
-                      "use `_configdir` and `_filename` if you "
-                      "need to retrieve a full path to the "
-                      "configuration file", DeprecationWarning)
+                      "use `configdir` to retrieve the configuration "
+                      "directory. If you need "
+                      "the full path to the configuration file, "
+                      "use os.path.join(self.configdir, self._filename).",
+                       DeprecationWarning)
         filepath = join(self._configdir, self._filename)
         return filepath
 
@@ -781,12 +787,14 @@ class ConfigurationParser:
             A new file path for the
             configuration object.
         """
-        warnings.warn("The `_filepath` attribute of the "
+        warnings.warn("The `filepath` attribute of the "
                       "ConfigurationParser object "
-                      "ill be removed n RSMTool 8.0 "
-                      "use `_configdir` and `_filename` if you "
-                      "need to set a new path to the "
-                      "configuration file", DeprecationWarning)
+                      "will be removed in RSMTool 8.0 "
+                      "Use `configdir` to  set a new path to the "
+                      "configuration directory. You can optionally "
+                      "set `_filename` to the name of the configuration file"
+                      "if you want to store the full path.", 
+                      DeprecationWarning)
         new_filename = basename(new_path)
         new_configdir = dirname(abspath(new_path))
         self._filename = new_filename
