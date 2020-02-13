@@ -31,6 +31,7 @@ from rsmtool.utils import (difference_of_standardized_means,
                            quadratic_weighted_kappa)
 
 from sklearn.datasets import make_classification
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 
@@ -283,10 +284,16 @@ def test_standardized_mean_difference():
     eq_(smd, expected)
 
 
-def test_standardized_mean_difference_zero_denominator():
+def test_standardized_mean_difference_zero_denominator_jonson():
 
     # test SMD with zero denominator
-    smd = standardized_mean_difference(3.2, 4.2, 0, 0)
+    # we pass 0 as standard deviation of population
+    # and use Johnson method
+    # which uses it as denominator
+    smd = standardized_mean_difference([3.2, 3.5],
+                                       [4.2, 3.1],
+                                       0, 0,
+                                       method='Johnson')
     assert np.isnan(smd)
 
 
@@ -398,11 +405,17 @@ def test_difference_of_standardized_means_with_all_values():
 
 
 def test_difference_of_standardized_means_with_no_population_info():
+    # this test is expected to raise two UserWarning
+    # because we did not pass population means for y_true and y_pred
     expected = -1.7446361815538174e-16
     y_true, y_pred = (np.array([98, 18, 47, 64, 32, 11, 100]),
                       np.array([94, 42, 54, 12, 92, 10, 77]))
-    diff_std_means = difference_of_standardized_means(y_true, y_pred)
+    with warnings.catch_warnings(record=True) as w:
+        diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
+    eq_(len(w), 2)
+    assert issubclass(w[0].category, UserWarning)
+    assert issubclass(w[1].category, UserWarning)
 
 
 def test_quadratic_weighted_kappa():
@@ -439,10 +452,14 @@ def test_quadratic_weighted_kappa_error():
 
 
 def test_partial_correlations_with_singular_matrix():
-
+    # This test is expected to pass UserWarning becaus
+    # of singularity
     expected = pd.DataFrame({0: [1.0, -1.0], 1: [-1.0, 1.0]})
     df_singular = pd.DataFrame(np.tile(np.random.randn(100), (2, 1))).T
-    assert_frame_equal(partial_correlations(df_singular), expected)
+    with warnings.catch_warnings(record=True) as w:
+        assert_frame_equal(partial_correlations(df_singular), expected)
+    eq_(len(w), 1)
+    assert issubclass(w[-1].category, UserWarning)
 
 
 def test_partial_correlations_pinv():
@@ -639,8 +656,12 @@ class TestExpectedScores():
         cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
 
         # train some test SKLL learners that we will use in our tests
-        cls.linearsvc = Learner('LinearSVC')
-        _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
+        
+        # we catch convergence warnings since the model doesn't converge
+        with warnings.catch_warnings() as w:
+            warnings.filterwarnings('ignore', category=ConvergenceWarning)
+            cls.linearsvc = Learner('LinearSVC')
+            _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
 
         cls.svc = Learner('SVC')
         _ = cls.svc.train(cls.train_fs, grid_search=False)
