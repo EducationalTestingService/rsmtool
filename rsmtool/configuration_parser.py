@@ -74,9 +74,9 @@ def deprecated_positional_argument():
                 warnings.warn("Starting from RSMTool 8.0, you will need to "
                               "specify configdir as a keyword-only argument "
                               "when initializing a Configuration object ",
-                               DeprecationWarning)
+                              DeprecationWarning)
 
-                # split filepath into  
+                # split filepath into
                 # configdir and filename
                 filepath = args[-1]
                 kwargs['filename'] = basename(filepath)
@@ -109,7 +109,7 @@ class Configuration:
         `ConfigurationParser.load_normalize_and_validate_config_from_dict` or
         `ConfigurationParser.read_normalize_validate_and_process_config`.
         The Configuration class should only be used to create a configuration
-        object if you already have a normalized configuration dictionary 
+        object if you already have a normalized configuration dictionary
         (for example from previos RSMTool experiments)
 
 
@@ -122,7 +122,7 @@ class Configuration:
         configdir : str, optional, keyword-only
             The reference path used to
             resolve any relative paths in the configuration
-            object. When None, will be set to 
+            object. When None, will be set to
             current working directory.
             Defaults to None
         filename : str, optional, keyword-only
@@ -902,7 +902,7 @@ class ConfigurationParser:
 
     def load_normalize_and_validate_config_from_dict(self,
                                                      config_dict,
-                                                     configdir=getcwd(), 
+                                                     configdir=getcwd(),
                                                      context='rsmtool'):
         """
         Load configuration dictionary.

@@ -13,7 +13,6 @@ The main RSMTool script.
 import argparse
 import logging
 import sys
-import warnings
 
 from os import listdir, getcwd, makedirs
 from os.path import abspath, exists, join, dirname
@@ -50,7 +49,7 @@ def run_experiment(config_file_or_obj_or_dict,
         to the current directory.
     output_dir : str
         Path to the experiment output directory.
-
+    
     Raises
     ------
     ValueError
@@ -92,7 +91,7 @@ def run_experiment(config_file_or_obj_or_dict,
 
         configuration = config_file_or_obj_or_dict
         # raise an error if we are passed a Configuration object
-        # without a configdir attribute. This can only 
+        # without a configdir attribute. This can only
         # happen if the object was constructed using an earlier version
         # of RSMTool and stored
         if configuration.configdir is None:

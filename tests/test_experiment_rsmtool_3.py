@@ -100,15 +100,15 @@ def test_run_experiment_lr_with_cfg():
 def test_run_experiment_lr_with_object_and_configdir():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # with specified `configdir` attribute 
+    # with specified `configdir` attribute
 
     source = 'lr-object'
     experiment_id = 'lr_object'
 
     configdir = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source)
+                     'data',
+                     'experiments',
+                     source)
 
     config_dict = {"train_file": "../../files/train.csv",
                    "id_column": "ID",
@@ -245,7 +245,7 @@ def test_run_experiment_lr_with_object_and_filepath():
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=DeprecationWarning)
         config_obj.filepath = config_file
-    # we have to explicitly remove configdir attribute 
+    # we have to explicitly remove configdir attribute
     # since it will always be assigned a value by the current code
     del(config_obj.configdir)
 
