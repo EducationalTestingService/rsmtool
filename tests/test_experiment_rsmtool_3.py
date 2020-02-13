@@ -31,25 +31,25 @@ DIRS_TO_REMOVE = []
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
-    param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
-    param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
-    param('lr-with-sas', 'lr_with_sas'),
-    param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
-    param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
-    param('lr-with-thumbnails', 'lr_with_thumbnails'),
-    param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
-    param('lr-with-feature-list', 'lr_with_feature_list'),
-    param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
-    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
-    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
-    param('lr-subgroups-with-dictionary-threshold-and-empty-group',
-          'lr_subgroups_with_dictionary_threshold_and_empty_group',
-          subgroups=['L1', 'QUESTION']),
-    param('lr-subgroups-with-numeric-threshold-and-empty-group',
-          'lr_subgroups_with_numeric_threshold_and_empty_group',
-          subgroups=['L1', 'QUESTION']),
-    param('lr-subgroups-h2-long-feature-names',
-          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
+    #param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
+    #param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
+    #param('lr-with-sas', 'lr_with_sas'),
+    #param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
+    #param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
+    #param('lr-with-thumbnails', 'lr_with_thumbnails'),
+    #param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
+    #param('lr-with-feature-list', 'lr_with_feature_list'),
+    #param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
+    #param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
+    #param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
+    #param('lr-subgroups-with-dictionary-threshold-and-empty-group',
+    #      'lr_subgroups_with_dictionary_threshold_and_empty_group',
+    #      subgroups=['L1', 'QUESTION']),
+    #param('lr-subgroups-with-numeric-threshold-and-empty-group',
+    #      'lr_subgroups_with_numeric_threshold_and_empty_group',
+    #      subgroups=['L1', 'QUESTION']),
+    #param('lr-subgroups-h2-long-feature-names',
+    #      'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -130,6 +130,7 @@ def test_run_experiment_lr_with_object_and_filepath():
       config_parser.load_config_from_dict(config_dict)
       config_obj = config_parser.normalize_validate_and_process_config()
       config_obj.filepath = config_file
+      config_obj.config_dir = None
 
       check_run_experiment(source,
                            experiment_id,

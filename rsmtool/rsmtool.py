@@ -87,6 +87,7 @@ def run_experiment(config_file_or_obj_or_dict,
         # initialize the parser from dict
         parser = ConfigurationParser()
         configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict)
+        print(configuration.config_dir)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
@@ -94,9 +95,9 @@ def run_experiment(config_file_or_obj_or_dict,
 
         # if the user hasn't specified the config_dir
         if configuration.config_dir is None:
-            # for backwards compatibility we'll derive the config_dir attribute from
-            # filepath but will raise a deprecation warning.
             if configuration.filepath is not None:
+                # for backwards compatibility we'll derive the config_dir attribute from
+                # filepath but will raise a deprecation warning.
                 warnings.warn("In RSMTool 8.0 if you pass a Configuration object "
                               "to `run_experiment`, you will need to specify the "
                               "config_dir attribute.", DeprecationWarning)

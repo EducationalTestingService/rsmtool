@@ -98,14 +98,14 @@ class TestConfigurationParser:
         config_dir = '/path/to/config_dir'
         self.parser.load_config_from_dict(data,
                                           config_dir=config_dir)
-        eq_(self.parser.config_dir, config_dir)
+        eq_(self.parser._config_dir, config_dir)
 
 
     def test_load_config_from_dict_no_config_dir(self):
         data = {'expID': 'test'}
         config_dir = getcwd()
         self.parser.load_config_from_dict(data)
-        eq_(self.parser.config_dir, config_dir)
+        eq_(self.parser._config_dir, config_dir)
 
 
     @raises(AttributeError)

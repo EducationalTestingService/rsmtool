@@ -781,8 +781,9 @@ class ConfigurationParser:
 
         if config_dir is None:
             config_dir = getcwd()
-        self.config_dir = abspath(config_dir)
-        logging.info("Reference directory config_dir was set to {}".format(self.config_dir))
+
+        self._config_dir = abspath(config_dir)
+        logging.info("Reference directory config_dir was set to {}".format(self._config_dir))
 
 
 
@@ -934,7 +935,7 @@ class ConfigurationParser:
             self._config = new_config
         return Configuration(self._config,
                              filepath=self._filepath,
-                             config_dir=self.config_dir)
+                             config_dir=self._config_dir)
 
     def validate_config(self, context='rsmtool', inplace=True):
         """
