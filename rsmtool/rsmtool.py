@@ -44,8 +44,8 @@ def run_experiment(config_file_or_obj_or_dict,
         configuration file.
         Relative paths in the configuration file will be interpreted relative
         to the location of the file. For configuration object an optional attribute
-        .config_dir can be set to indicate the reference path. 
-        If no .config_dir is set or if
+        .configdir can be set to indicate the reference path. 
+        If no .configdir is set or if
         the users passes a dictionary, any relative paths will be resolved relative
         to the current directory.
     output_dir : str
@@ -92,19 +92,19 @@ def run_experiment(config_file_or_obj_or_dict,
 
         configuration = config_file_or_obj_or_dict
 
-        # if the user hasn't specified the config_dir
-        if configuration.config_dir is None:
+        # if the user hasn't specified the configdir
+        if configuration.configdir is None:
             if configuration.filepath is not None:
-                # for backwards compatibility we'll derive the config_dir attribute from
+                # for backwards compatibility we'll derive the configdir attribute from
                 # filepath but will raise a deprecation warning.
                 warnings.warn("In RSMTool 8.0 if you pass a Configuration object "
                               "to `run_experiment`, you will need to specify the "
-                              "config_dir attribute.", DeprecationWarning)
-                configuration.config_dir = abspath(dirname(configuration.filepath))
+                              "configdir attribute.", DeprecationWarning)
+                configuration.configdir = abspath(dirname(configuration.filepath))
             else:
-                configuration.config_dir = getcwd()
+                configuration.configdir = getcwd()
             logger.info("The reference directory for resolving relative paths "
-                        "was set to {}.".format(configuration.config_dir))
+                        "was set to {}.".format(configuration.configdir))
 
 
     else:
@@ -132,7 +132,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                                           'feature_specs',
                                                           'feature_subset_specs'])
 
-    file_paths = DataReader.locate_files(file_paths_org, configuration.config_dir)
+    file_paths = DataReader.locate_files(file_paths_org, configuration.configdir)
 
     # if there are any missing files after trying to locate
     # all expected files, raise an error

@@ -1654,7 +1654,7 @@ class FeaturePreprocessor:
         feature_specs = data_container_obj.get_frame('feature_specs')
         feature_subset = data_container_obj.get_frame('feature_subset_specs')
 
-        configdir = config_obj.config_dir
+        configdir = config_obj.configdir
 
         (test_file_location,
          train_file_location) = DataReader.locate_files([config_obj['test_file'],
@@ -1979,7 +1979,7 @@ class FeaturePreprocessor:
         config_as_dict.update(new_config_dict)
 
         new_config = Configuration(config_as_dict, 
-                                   config_dir=config_obj.config_dir,
+                                   configdir=config_obj.configdir,
                                    filepath=config_obj.filepath)
 
         new_container = [{'name': 'train_features',
@@ -2338,7 +2338,7 @@ class FeaturePreprocessor:
 
         new_config = Configuration(config_as_dict, 
                                    filepath=config_obj.filepath,
-                                   config_dir=config_obj.config_dir)
+                                   configdir=config_obj.configdir)
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded

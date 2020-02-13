@@ -95,31 +95,31 @@ class TestConfigurationParser:
 
     def test_load_config_from_dict(self):
         data = {'expID': 'test'}
-        config_dir = '/path/to/config_dir'
+        configdir = '/path/to/configdir'
         self.parser.load_config_from_dict(data,
-                                          config_dir=config_dir)
-        eq_(self.parser._config_dir, config_dir)
+                                          configdir=configdir)
+        eq_(self.parser._configdir, configdir)
 
 
-    def test_load_config_from_dict_no_config_dir(self):
+    def test_load_config_from_dict_no_configdir(self):
         data = {'expID': 'test'}
-        config_dir = getcwd()
+        configdir = getcwd()
         self.parser.load_config_from_dict(data)
-        eq_(self.parser._config_dir, config_dir)
+        eq_(self.parser._configdir, configdir)
 
 
     @raises(AttributeError)
     def test_load_config_from_dict_dict_already_assigned(self):
         data = {'expID': 'test'}
-        config_dir = 'some/config/dir'
+        configdir = 'some/config/dir'
         self.parser._config = data
-        self.parser.load_config_from_dict(data, config_dir)
+        self.parser.load_config_from_dict(data, configdir)
 
     @raises(TypeError)
     def test_load_config_from_dict_wrong_type(self):
         data = [('expID', 'test')]
-        config_dir = 'some/config/dir'
-        self.parser.load_config_from_dict(data, config_dir)
+        configdir = 'some/config/dir'
+        self.parser.load_config_from_dict(data, configdir)
 
     def test_load_and_normalize_config_from_dict_rsmtool(self):
         data = {'experiment_id': 'experiment_1',
@@ -134,7 +134,7 @@ class TestConfigurationParser:
         assert_equal(newdata['select_transformations'], False)
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
-        assert_equal(newdata.config_dir, getcwd())
+        assert_equal(newdata.configdir, getcwd())
 
 
     def test_load_and_normalize_config_from_dict_rsmeval(self):
@@ -150,7 +150,7 @@ class TestConfigurationParser:
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
-        assert_equal(newdata.config_dir, getcwd())
+        assert_equal(newdata.configdir, getcwd())
 
 
     @raises(ValueError)
@@ -583,24 +583,24 @@ class TestConfiguration:
         config = Configuration(config_dict, filepath=filepath)
         eq_(config._filepath, filepath)
 
-    def test_init_with_filepath_and_config_dir_as_kword_argument(self):
+    def test_init_with_filepath_and_configdir_as_kword_argument(self):
         filepath = 'some/path/file.json'
-        config_dir = 'some/path'
+        configdir = 'some/path'
         config_dict = {'exp_id': 'my_experiment'}
         config = Configuration(config_dict, 
                               filepath=filepath,
-                              config_dir=config_dir)
+                              configdir=configdir)
         eq_(config._filepath, filepath)
-        eq_(config._config_dir, config_dir)
+        eq_(config._configdir, configdir)
 
 
-    def test_init_with_config_dir_only_as_kword_argument(self):
-        config_dir = 'some/path'
+    def test_init_with_configdir_only_as_kword_argument(self):
+        configdir = 'some/path'
         config_dict = {'exp_id': 'my_experiment'}
         config = Configuration(config_dict, 
-                              config_dir=config_dir)
+                              configdir=configdir)
         eq_(config._filepath, None)
-        eq_(config._config_dir, config_dir)
+        eq_(config._configdir, configdir)
 
 
     @ raises(ValueError)
@@ -813,19 +813,19 @@ class TestConfiguration:
         config.filepath = new_file_path
         eq_(config.filepath, new_file_path)
 
-    def test_get_config_dir(self):
-        config_dir = '/path/to/dir/'
+    def test_get_configdir(self):
+        configdir = '/path/to/dir/'
         config = Configuration({"flag_column": "[advisories]"}, 
-                               config_dir=config_dir)
-        eq_(config.config_dir, config_dir)
+                               configdir=configdir)
+        eq_(config.configdir, configdir)
 
-    def test_set_config_dir(self):
-        config_dir = '/path/to/dir/'
-        new_config_dir = 'path/that/is/new/'
+    def test_set_configdir(self):
+        configdir = '/path/to/dir/'
+        new_configdir = 'path/that/is/new/'
         config = Configuration({"flag_column": "[advisories]"},
-                               config_dir=config_dir)
-        config.config_dir = new_config_dir
-        eq_(config.config_dir, new_config_dir)
+                               configdir=configdir)
+        config.configdir = new_configdir
+        eq_(config.configdir, new_configdir)
         
     def test_get_context(self):
         context = 'rsmtool'

@@ -148,7 +148,7 @@ class Reporter:
     """
 
     @staticmethod
-    def locate_custom_sections(custom_report_section_paths, config_dir):
+    def locate_custom_sections(custom_report_section_paths, configdir):
         """
         Get the absolute paths for custom report sections and check that
         the files exist. If a file does not exist, raise an exception.
@@ -158,8 +158,8 @@ class Reporter:
         custom_report_section_paths : list of str
             List of paths to IPython notebook
             files representing the custom sections.
-        config_dir : str
-            Path to the experiment configuration file.
+        configdir : str
+            Path to the experiment configuration directory.
 
         Returns
         -------
@@ -175,7 +175,7 @@ class Reporter:
 
         custom_report_sections = []
         for cs_path in custom_report_section_paths:
-            cs_location = DataReader.locate_files(cs_path, config_dir)
+            cs_location = DataReader.locate_files(cs_path, configdir)
             if not cs_location:
                 raise FileNotFoundError("Error: custom section not found at "
                                         "{}.".format(cs_path))
