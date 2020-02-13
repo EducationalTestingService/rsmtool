@@ -1978,9 +1978,9 @@ class FeaturePreprocessor:
         config_as_dict = config_obj.to_dict()
         config_as_dict.update(new_config_dict)
 
-        new_config = Configuration(config_as_dict, 
+        new_config = Configuration(config_as_dict,
                                    configdir=config_obj.configdir,
-                                   filepath=config_obj.filepath)
+                                   filename=config_obj._filename)
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2035,7 +2035,7 @@ class FeaturePreprocessor:
         # get the directory where the config file lives
         # if this is the 'expm' directory, then go
         # up one level.
-        configpath = dirname(abspath(config_obj.filepath))
+        configpath = config_obj.configdir
 
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
@@ -2336,8 +2336,8 @@ class FeaturePreprocessor:
         config_as_dict = config_obj.to_dict()
         config_as_dict.update(new_config_dict)
 
-        new_config = Configuration(config_as_dict, 
-                                   filepath=config_obj.filepath,
+        new_config = Configuration(config_as_dict,
+                                   filename=config_obj._filename,
                                    configdir=config_obj.configdir)
 
         # we need to make sure that `spkitemid` is the first column

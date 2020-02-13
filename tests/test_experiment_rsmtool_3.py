@@ -31,25 +31,25 @@ DIRS_TO_REMOVE = []
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
-    #param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
-    #param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
-    #param('lr-with-sas', 'lr_with_sas'),
-    #param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
-    #param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
-    #param('lr-with-thumbnails', 'lr_with_thumbnails'),
-    #param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
-    #param('lr-with-feature-list', 'lr_with_feature_list'),
-    #param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
-    #param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
-    #param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
-    #param('lr-subgroups-with-dictionary-threshold-and-empty-group',
-    #      'lr_subgroups_with_dictionary_threshold_and_empty_group',
-    #      subgroups=['L1', 'QUESTION']),
-    #param('lr-subgroups-with-numeric-threshold-and-empty-group',
-    #      'lr_subgroups_with_numeric_threshold_and_empty_group',
-    #      subgroups=['L1', 'QUESTION']),
-    #param('lr-subgroups-h2-long-feature-names',
-    #      'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
+    param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
+    param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
+    param('lr-with-sas', 'lr_with_sas'),
+    param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
+    param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
+    param('lr-with-thumbnails', 'lr_with_thumbnails'),
+    param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
+    param('lr-with-feature-list', 'lr_with_feature_list'),
+    param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
+    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
+    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
+    param('lr-subgroups-with-dictionary-threshold-and-empty-group',
+          'lr_subgroups_with_dictionary_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-with-numeric-threshold-and-empty-group',
+          'lr_subgroups_with_numeric_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-h2-long-feature-names',
+          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -95,62 +95,17 @@ def test_run_experiment_lr_with_cfg():
     yield check_scaled_coefficients, source, experiment_id
     yield check_report, html_report
 
-# this test should be raising deprecation warning
-def test_run_experiment_lr_with_object_and_filepath():
+
+
+def test_run_experiment_lr_with_object_and_configdir():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we pass the `filepath` attribute after constructing the Configuration object
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
-
-    with warnings.catch_warnings(record=True) as w:
-      source = 'lr-object'
-      experiment_id = 'lr_object'
-
-      config_file = join(rsmtool_test_dir,
-                         'data',
-                         'experiments',
-                         source,
-                         '{}.json'.format(experiment_id))
-
-      config_dict = {"train_file": "../../files/train.csv",
-                     "id_column": "ID",
-                     "use_scaled_predictions": True,
-                     "test_label_column": "score",
-                     "train_label_column": "score",
-                     "test_file": "../../files/test.csv",
-                     "trim_max": 6,
-                     "features": "features.csv",
-                     "trim_min": 1,
-                     "model": "LinearRegression",
-                     "experiment_id": "lr_object",
-                     "description": "Using all features with an LinearRegression model."}
-
-      config_parser = ConfigurationParser()
-      config_parser.load_config_from_dict(config_dict)
-      config_obj = config_parser.normalize_validate_and_process_config()
-      config_obj.filepath = config_file
-      config_obj.config_dir = None
-
-      check_run_experiment(source,
-                           experiment_id,
-                           config_obj_or_dict=config_obj)
-      assert len(w) == 1 
-      assert issubclass(w[-1].category, DeprecationWarning)
-
-
-
-def test_run_experiment_lr_with_object_and_config_dir():
-
-    # test rsmtool using the Configuration object, rather than a file;
-    # we pass the `config_dir` attribute after constructing the Configuration object
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
+    # with specified `configdir` attribute 
 
     source = 'lr-object'
     experiment_id = 'lr_object'
 
-    config_dir = join(rsmtool_test_dir,
+    configdir = join(rsmtool_test_dir,
                        'data',
                        'experiments',
                        source)
@@ -169,9 +124,8 @@ def test_run_experiment_lr_with_object_and_config_dir():
                    "description": "Using all features with an LinearRegression model."}
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
+    config_parser.load_config_from_dict(config_dict, configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config()
-    config_obj.config_dir = config_dir
 
     check_run_experiment(source,
                          experiment_id,
@@ -180,16 +134,18 @@ def test_run_experiment_lr_with_object_and_config_dir():
 
 
 @with_setup(setup_func, teardown_func)
-def test_run_experiment_lr_with_object_no_path():
+def test_run_experiment_lr_with_object_no_configdir():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we do not pass the `filepath` attribute
+    # without passing configdir attribute
     # to test whether the default setting of os.getcwd() is working
     # correctly
 
     source = 'lr-object-no-path'
     experiment_id = 'lr_object_no_path'
 
+    # set up a temporary directory since
+    # we will be using getcwd
     temp_dir = 'temp_for_testing_lr_object_no_path'
     DIRS_TO_REMOVE.append(temp_dir)
 
@@ -255,6 +211,47 @@ def test_run_experiment_lr_with_dictionary():
                          experiment_id,
                          config_obj_or_dict=config_dict)
 
+
+@raises(AttributeError)
+def test_run_experiment_lr_with_object_and_filepath():
+    # This test checks for a rare potential use case where a user
+    # is trying to pass an old Configuration object
+    source = 'lr-object'
+    experiment_id = 'lr_object'
+
+    config_file = join(rsmtool_test_dir,
+                       'data',
+                       'experiments',
+                       source,
+                       '{}.json'.format(experiment_id))
+
+    config_dict = {"train_file": "../../files/train.csv",
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": "../../files/test.csv",
+                   "trim_max": 6,
+                   "features": "features.csv",
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_object",
+                   "description": "Using all features with an LinearRegression model."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config()
+    # we catch the deprecation warning triggered by this line
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        config_obj.filepath = config_file
+    # we have to explicitly remove configdir attribute 
+    # since it will always be assigned a value by the current code
+    del(config_obj.configdir)
+
+    check_run_experiment(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
 
 
 

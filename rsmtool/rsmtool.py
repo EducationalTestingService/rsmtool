@@ -44,7 +44,7 @@ def run_experiment(config_file_or_obj_or_dict,
         configuration file.
         Relative paths in the configuration file will be interpreted relative
         to the location of the file. For configuration object an optional attribute
-        .configdir can be set to indicate the reference path. 
+        .configdir can be set to indicate the reference path.
         If no .configdir is set or if
         the users passes a dictionary, any relative paths will be resolved relative
         to the current directory.
@@ -91,21 +91,12 @@ def run_experiment(config_file_or_obj_or_dict,
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
         configuration = config_file_or_obj_or_dict
-
-        # if the user hasn't specified the configdir
+        # raise an error if we are passed a Configuration object
+        # without a configdir attribute. This can only 
+        # happen if the object was constructed using an earlier version
+        # of RSMTool and stored
         if configuration.configdir is None:
-            if configuration.filepath is not None:
-                # for backwards compatibility we'll derive the configdir attribute from
-                # filepath but will raise a deprecation warning.
-                warnings.warn("In RSMTool 8.0 if you pass a Configuration object "
-                              "to `run_experiment`, you will need to specify the "
-                              "configdir attribute.", DeprecationWarning)
-                configuration.configdir = abspath(dirname(configuration.filepath))
-            else:
-                configuration.configdir = getcwd()
-            logger.info("The reference directory for resolving relative paths "
-                        "was set to {}.".format(configuration.configdir))
-
+            raise AttributeError("Configuration object must have configdir attribute.")
 
     else:
         raise ValueError("The input to run_experiment must be "
