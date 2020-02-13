@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from glob import glob
 from os.path import basename, exists, join
@@ -160,9 +159,10 @@ def test_run_experiment_lr_old_config():
                        '{}.json'.format(experiment_id))
 
     # run this experiment but suppress the expected deprecation warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
-        do_run_experiment(source, experiment_id, config_file)
+    do_run_experiment(source,
+                      experiment_id,
+                      config_file,
+                      suppress_warnings_for=[DeprecationWarning])
 
 
 @raises(ValueError)
@@ -179,9 +179,10 @@ def test_run_experiment_lr_feature_json():
                        '{}.json'.format(experiment_id))
 
     # run this experiment but suppress the expected deprecation warnings
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=DeprecationWarning)
-        do_run_experiment(source, experiment_id, config_file)
+    do_run_experiment(source,
+                      experiment_id,
+                      config_file,
+                      suppress_warnings_for=[DeprecationWarning])
 
 
 @raises(FileNotFoundError)
