@@ -1,5 +1,4 @@
 jupyter
-jupyter_console==6.0.0
 nose
 notebook
 numpy==1.14.6
