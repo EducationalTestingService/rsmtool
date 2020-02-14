@@ -128,10 +128,8 @@ class Configuration:
         filename : str, optional, keyword-only
             The name of the configuration file.
             The file must be stored in configdir.
-            This is an optional argument that is not used by RSMTool.
-            It is added for backwards compatibility
-            to allow users to retrieve a deprecated attribute
-            filepath.
+            This argument is not used in RSMTool and only added for 
+            backwards compatibility for the deprecated `filepath` attribute.
             Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
