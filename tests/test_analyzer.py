@@ -116,8 +116,8 @@ class TestAnalyzer:
 
     def test_that_correlation_helper_works_for_data_with_the_same_human_score(self):
         # this test should raise UserWarning because the determinant is very close to
-        # zero. It also raises Runtime warning because 
-        # variance of human scores is 0. 
+        # zero. It also raises Runtime warning because
+        # variance of human scores is 0.
         with warnings.catch_warnings(record=True) as w:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             retval = Analyzer.correlation_helper(self.df_features_same_score, 'sc1', 'group')

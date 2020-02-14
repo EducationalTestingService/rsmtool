@@ -657,9 +657,9 @@ class TestExpectedScores():
         cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
 
         # train some test SKLL learners that we will use in our tests
-        
+
         # we catch convergence warnings since the model doesn't converge
-        with warnings.catch_warnings() as w:
+        with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=ConvergenceWarning)
             cls.linearsvc = Learner('LinearSVC')
             _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
