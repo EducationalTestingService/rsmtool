@@ -1980,7 +1980,7 @@ class FeaturePreprocessor:
 
         new_config = Configuration(config_as_dict,
                                    configdir=config_obj.configdir,
-                                   filename=config_obj._filename)
+                                   filename=config_obj.filename)
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2336,7 +2336,7 @@ class FeaturePreprocessor:
         config_as_dict.update(new_config_dict)
 
         new_config = Configuration(config_as_dict,
-                                   filename=config_obj._filename,
+                                   filename=config_obj.filename,
                                    configdir=config_obj.configdir)
 
         # we need to make sure that `spkitemid` is the first column

@@ -39,43 +39,6 @@ class TestConfigurationParser:
     def setUp(self):
         self.parser = ConfigurationParser()
 
-    # this is a test for an attribute that will be
-    # deprecated
-    def test_get_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
-            filepath = '/path/to/file.json'
-            data = {'expID': 'test'}
-            self.parser.load_config_from_dict(data,
-                                              configdir='/path/to/')
-            self.parser._filename = 'file.json'
-
-
-            # this triggers deprecation warning
-            eq_(self.parser._filepath, abspath(filepath))
-            assert len(w) == 1  # we get one deprecation warnings here
-            assert issubclass(w[-1].category, DeprecationWarning)
-
-    # this is a test for an attribute that will be
-    # deprecated
-    def test_set_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
-            data = {'expID': 'test'}
-            self.parser.load_config_from_dict(data,
-                                              configdir='/path/to/file')
-            self._filename = 'file.json'
-            new_file_path = '/newpath/to/new.json'
-
-
-            # triggers first deprecation warning
-            self.parser._filepath = new_file_path
-            eq_(self.parser._filename, 'new.json')
-            eq_(self.parser._configdir, abspath('/newpath/to'))
-            eq_(self.parser._filepath, abspath(new_file_path))  # second deprecation warning
-            assert len(w) == 2  # we get two deprecation warnings here
-            assert issubclass(w[-2].category, DeprecationWarning)
-            assert issubclass(w[-1].category, DeprecationWarning)
-
-
     def test_normalize_config(self):
         data = {'expID': 'experiment_1',
                 'train': 'data/rsmtool_smTrain.csv',
@@ -905,6 +868,21 @@ class TestConfiguration:
         config = Configuration({"flag_column": "[advisories]"},
                                configdir=configdir)
         config.configdir = None
+
+
+    def test_get_filename(self):
+        filename = 'file.json'
+        config = Configuration({"flag_column": "[advisories]"},
+                               filename=filename)
+        eq_(config.filename, filename)
+
+    def test_set_filename(self):
+        filename = 'file.json'
+        new_filename = 'new_file.json'
+        config = Configuration({"flag_column": "[advisories]"},
+                               filename=filename)
+        config.filename = new_filename
+        eq_(config.filename, new_filename)
 
     def test_get_context(self):
         context = 'rsmtool'
