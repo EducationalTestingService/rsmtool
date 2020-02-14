@@ -1344,7 +1344,7 @@ class Modeler:
 
         configuration = Configuration(config_as_dict,
                                       configdir=configuration.configdir,
-                                      filename=configuration._filename)
+                                      filename=configuration.filename)
 
         return configuration, DataContainer(datasets=datasets)
 

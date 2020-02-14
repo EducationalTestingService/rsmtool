@@ -251,7 +251,7 @@ class Configuration:
                       "Use the `configdir` and `filename` attributes if you "
                       "need the full path to the "
                       "configuration file", DeprecationWarning)
-        filepath = join(self.configdir, self._filename)
+        filepath = join(self.configdir, self.filename)
         return filepath
 
     @filepath.setter
@@ -270,7 +270,7 @@ class Configuration:
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed in RSMTool 8.0 "
-                      "use `configdir` and `_filename` if you "
+                      "use `configdir` and `filename` if you "
                       "need to set a new path to the "
                       "configuration file", DeprecationWarning)
         new_filename = basename(new_path)
@@ -308,6 +308,32 @@ class Configuration:
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
         self._configdir = abspath(new_path)
+
+
+    @property
+    def filename(self):
+        """
+        Get the name of the configuration file.
+
+        Returns
+        -------
+        filename : str
+            The name of the configuration file
+        """
+        return self._filename
+
+    @filename.setter
+    def filename(self, new_path):
+        """
+        Set a new name of the configuration file
+
+        Parameters
+        ----------
+        new_name : str
+            New name of the configuration file
+        """
+        self._filename = new_path
+
 
     @property
     def context(self):
@@ -837,7 +863,7 @@ class ConfigurationParser:
         self._configdir = abspath(configdir)
         logging.info("Configuration directory will be set to {}".format(self._configdir))
 
-        # set _filename to none since there was no configuration file.
+        # set filename to none since there was no configuration file.
         # If the user for some reason wants
         # to set it, they can do so explicitly.
         self._filename = None

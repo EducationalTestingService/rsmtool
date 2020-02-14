@@ -869,6 +869,21 @@ class TestConfiguration:
                                configdir=configdir)
         config.configdir = None
 
+
+    def test_get_filename(self):
+        filename = 'file.json'
+        config = Configuration({"flag_column": "[advisories]"},
+                               filename=filename)
+        eq_(config.filename, filename)
+
+    def test_set_filename(self):
+        filename = 'file.json'
+        new_filename = 'new_file.json'
+        config = Configuration({"flag_column": "[advisories]"},
+                               filename=filename)
+        config.filename = new_filename
+        eq_(config.filename, new_filename)
+
     def test_get_context(self):
         context = 'rsmtool'
         config = Configuration({"flag_column": "[advisories]"},
