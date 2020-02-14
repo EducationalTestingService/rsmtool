@@ -464,7 +464,8 @@ def test_partial_correlations_with_singular_matrix():
 
 def test_partial_correlations_pinv():
 
-    msg = ('The inverse of the variance-covariance matrix was calculated '
+    msg = ('The inverse of the variance-covariance matrix when computing '
+           'partial correlations was calculated '
            'using the Moore-Penrose generalized matrix inversion, due to '
            'its determinant being at or very close to zero.')
     df_small_det = pd.DataFrame({'X1': [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],
