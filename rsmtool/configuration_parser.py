@@ -269,7 +269,7 @@ class Configuration:
             configuration object.
         """
         warnings.warn("The `filepath` attribute of the Configuration "
-                      "object will be removed n RSMTool 8.0 "
+                      "object will be removed in RSMTool 8.0 "
                       "use `configdir` and `_filename` if you "
                       "need to set a new path to the "
                       "configuration file", DeprecationWarning)
@@ -306,7 +306,7 @@ class Configuration:
         """
 
         if new_path is None:
-            raise ValueError("The `configdir` attribute cannot be set to `None` "
+            raise ValueError("The `configdir` attribute cannot be set to `None` ")
         self._configdir = abspath(new_path)
 
     @property
@@ -734,59 +734,6 @@ class ConfigurationParser:
                             'a file. You can use the `get_configparser` class '
                             'method to instantiate the appropriate sub-class '
                             'object for reading either `.json` or `.cfg` files.')
-
-    @property
-    def _filepath(self):
-        """
-        Get file path to the configuration file.
-        Added to maintain backwards compatibility
-        for API users.
-
-        .. deprecated:: 8.0
-        `_filepath` will be removed in RSMTool 8.0.0, it is replaced by
-        `configdir` and `filename`.
-
-        Returns
-        -------
-        filepath : str
-            The path for the config file.
-        """
-        warnings.warn("The `_filepath` attribute of the "
-                      "ConfigurationParser object "
-                      "will be removed n RSMTool 8.0 "
-                      "use `_configdir` and `_filename` if you "
-                      "need to retrieve a full path to the "
-                      "configuration file", DeprecationWarning)
-        filepath = join(self._configdir, self._filename)
-        return filepath
-
-    @_filepath.setter
-    def _filepath(self, new_path):
-        """
-        Set a new file path to configuration file.
-        Added to maintain backwards compatibility for
-        API users
-
-        .. deprecated:: 8.0
-        `_filepath` will be removed in RSMTool 8.0.0, it is replaced by
-        `_configdir` and `_filename`.
-
-        Parameters
-        ----------
-        new_path : str
-            A new file path for the
-            configuration object.
-        """
-        warnings.warn("The `_filepath` attribute of the "
-                      "ConfigurationParser object "
-                      "ill be removed n RSMTool 8.0 "
-                      "use `_configdir` and `_filename` if you "
-                      "need to set a new path to the "
-                      "configuration file", DeprecationWarning)
-        new_filename = basename(new_path)
-        new_configdir = dirname(abspath(new_path))
-        self._filename = new_filename
-        self._configdir = new_configdir
 
 
     @classmethod
