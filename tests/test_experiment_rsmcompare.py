@@ -23,6 +23,19 @@ else:
 _AUTO_UPDATE = False
 
 
+def setup_func():
+    global DIRS_TO_REMOVE
+    DIRS_TO_REMOVE = []
+
+
+def teardown_func():
+    for d in DIRS_TO_REMOVE:
+        if exists(d):
+            shutil.rmtree(d)
+
+
+DIRS_TO_REMOVE = []
+
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups_report'),
     param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores_report'),

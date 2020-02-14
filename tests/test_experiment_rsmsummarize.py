@@ -22,6 +22,18 @@ else:
     from rsmtool.test_utils import rsmtool_test_dir
 
 
+def setup_func():
+    global DIRS_TO_REMOVE
+    DIRS_TO_REMOVE = []
+
+
+def teardown_func():
+    for d in DIRS_TO_REMOVE:
+        if exists(d):
+            shutil.rmtree(d)
+
+
+
 @parameterized([
     param('lr-self-summary'),
     param('linearsvr-self-summary'),
