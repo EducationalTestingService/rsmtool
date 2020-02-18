@@ -7,9 +7,7 @@ import pandas as pd
 
 from io import StringIO
 from os import getcwd
-from os.path import (abspath,
-                     dirname,
-                     join)
+from os.path import abspath, dirname, join
 
 from shutil import rmtree
 

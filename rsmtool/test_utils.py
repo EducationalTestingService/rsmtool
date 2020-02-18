@@ -791,15 +791,13 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
 
 
 def copy_test_data_files(temp_dir_name,
-                    input_file_dict,
-                    given_test_dir=None):
+                         input_file_dict,
+                         given_test_dir=None):
     """
-    Copy input files from tests/data into
-    a temporary directory specified by the user.
-    This is a utility function for testing
-    situations where RSMTool is expected to use
-    current directory as a reference directory
-    for resolving paths in the configuration
+    A utility function to copy files from the ``tests/data`` directory into
+    a specified temporary directory. Useful for tests where the
+    current directory is to be used as the reference for resolving paths
+    in the configuration.
 
     Parameters
     ----------
@@ -825,15 +823,15 @@ def copy_test_data_files(temp_dir_name,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     temp_dir = Path(temp_dir_name)
-    temp_dir.mkdir()
+    if not temp_dir.exists():
+        temp_dir.mkdir()
 
     output_file_dict = {}
     for file in input_file_dict:
         filepath = Path(input_file_dict[file])
         filename = filepath.name
         new_filepath = temp_dir / filename
-        copyfile(test_dir / filepath,
-                 new_filepath)
+        copyfile(test_dir / filepath, new_filepath)
         output_file_dict[file] = str(new_filepath)
 
     return output_file_dict
