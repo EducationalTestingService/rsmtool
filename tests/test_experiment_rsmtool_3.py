@@ -16,7 +16,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_experiment,
-                                copy_data_files,
+                                copy_test_data_files,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
