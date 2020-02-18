@@ -1,11 +1,11 @@
 import os
-import shutil
+import tempfile
 import warnings
 
 from glob import glob
 from os.path import basename, exists, join
 
-from nose.tools import raises, with_setup
+from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool import run_experiment
@@ -16,7 +16,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_experiment,
-                                copy_data_files,
+                                copy_test_data_files,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
@@ -26,8 +26,6 @@ if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
     from rsmtool.test_utils import rsmtool_test_dir
-
-DIRS_TO_REMOVE = []
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
@@ -55,17 +53,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
-
-
-def setup_func():
-    global DIRS_TO_REMOVE
-    DIRS_TO_REMOVE = []
-
-
-def teardown_func():
-    for d in DIRS_TO_REMOVE:
-        if exists(d):
-            shutil.rmtree(d)
 
 
 def test_run_experiment_lr_with_cfg():
@@ -132,8 +119,6 @@ def test_run_experiment_lr_with_object_and_configdir():
                          config_obj_or_dict=config_obj)
 
 
-
-@with_setup(setup_func, teardown_func)
 def test_run_experiment_lr_with_object_no_configdir():
 
     # test rsmtool using the Configuration object, rather than a file;
@@ -146,15 +131,15 @@ def test_run_experiment_lr_with_object_no_configdir():
 
     # set up a temporary directory since
     # we will be using getcwd
-    temp_dir = 'temp_for_testing_lr_object_no_path'
-    DIRS_TO_REMOVE.append(temp_dir)
 
     old_file_dict = {'train': 'data/files/train.csv',
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
 
-    new_file_dict = copy_data_files(temp_dir,
-                                    old_file_dict)
+
+    temp_dir = tempfile.TemporaryDirectory()
+    new_file_dict = copy_test_data_files(temp_dir.name,
+                                         old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
@@ -178,30 +163,29 @@ def test_run_experiment_lr_with_object_no_configdir():
                          config_obj_or_dict=config_obj)
 
 
-
-@with_setup(setup_func, teardown_func)
 def test_run_experiment_lr_with_dictionary():
     # Passing a dictionary as input.
     source = 'lr-dictionary'
     experiment_id = 'lr_dictionary'
 
     temp_dir = 'temp_dir_for_experiment_lr_with_dictionary'
-    DIRS_TO_REMOVE.append(temp_dir)
 
-    input_file_dict = {'train': 'data/files/train.csv',
-                       'test': 'data/files/test.csv',
-                       'features': 'data/experiments/lr-dictionary/features.csv'}
+    old_file_dict = {'train': 'data/files/train.csv',
+                     'test': 'data/files/test.csv',
+                     'features': 'data/experiments/lr-dictionary/features.csv'}
 
-    file_dict = copy_data_files(temp_dir, input_file_dict)
+    temp_dir = tempfile.TemporaryDirectory()
+    new_file_dict = copy_test_data_files(temp_dir.name,
+                                         old_file_dict)
 
-    config_dict = {"train_file": file_dict['train'],
+    config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
                    "use_scaled_predictions": True,
                    "test_label_column": "score",
                    "train_label_column": "score",
-                   "test_file": file_dict['test'],
+                   "test_file": new_file_dict['test'],
                    "trim_max": 6,
-                   "features": file_dict['features'],
+                   "features": new_file_dict['features'],
                    "trim_min": 1,
                    "model": "LinearRegression",
                    "experiment_id": "lr_dictionary",
@@ -254,15 +238,12 @@ def test_run_experiment_lr_with_object_and_filepath():
                          config_obj_or_dict=config_obj)
 
 
-
-@with_setup(setup_func, teardown_func)
 @raises(ValueError)
 def test_run_experiment_wrong_input_format():
     config_list = [('experiment_id', 'AAAA'),
                    ('train_file', 'some_path')]
-    temp_dir = 'temp_dir_for_experiment_wrong_input'
-    DIRS_TO_REMOVE.append(temp_dir)
-    run_experiment(config_list, temp_dir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_experiment(config_list, temp_dir)
 
 
 @raises(ValueError)

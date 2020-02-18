@@ -76,7 +76,7 @@ def check_run_experiment(source,
     config_obj_or_dict: Configuration or dictionary
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`
+        using `source` and `experiment_id`.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -790,27 +790,25 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             ok_(length == partition_info.iloc[0][group])
 
 
-def copy_data_files(temp_dir_name,
-                   input_file_dict,
-                   given_test_dir=None):
+def copy_test_data_files(temp_dir_name,
+                         input_file_dict,
+                         given_test_dir=None):
     """
-    Copy input files from tests/data into
-    a temporary directory specified by the user.
-    This is a utility function for testing
-    situations where RSMTool is expected to use
-    current directory as a reference directory
-    for resolving paths in the configuration
+    A utility function to copy files from the ``tests/data`` directory into
+    a specified temporary directory. Useful for tests where the
+    current directory is to be used as the reference for resolving paths
+    in the configuration.
 
     Parameters
     ----------
     temp_dir_name : str
         Name of the temporary directory.
     input_file_dict : dict
-        A dictionary of files list of files to copy.
-        The keys show the type of file. The values should be
-        paths to the files relative to `tests` directory.
+        A dictionary of files to copy with keys as the file type
+        and the values are their paths relative to the `tests`
+        directory.
     given_test_dir : str, optional
-        Path where the test experiments are located. Unless specified, the
+        Directory where the the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
 
@@ -825,15 +823,15 @@ def copy_data_files(temp_dir_name,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     temp_dir = Path(temp_dir_name)
-    temp_dir.mkdir()
+    if not temp_dir.exists():
+        temp_dir.mkdir()
 
     output_file_dict = {}
     for file in input_file_dict:
         filepath = Path(input_file_dict[file])
         filename = filepath.name
         new_filepath = temp_dir / filename
-        copyfile(test_dir / filepath,
-                 new_filepath)
+        copyfile(test_dir / filepath, new_filepath)
         output_file_dict[file] = str(new_filepath)
 
     return output_file_dict
