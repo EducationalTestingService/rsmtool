@@ -3,6 +3,7 @@ import tempfile
 import warnings
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
@@ -137,8 +138,8 @@ def test_run_experiment_lr_with_object_no_configdir():
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
 
 
-    temp_dir = tempfile.TemporaryDirectory()
-    new_file_dict = copy_test_data_files(temp_dir.name,
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+    new_file_dict = copy_test_data_files(temp_dir,
                                          old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
@@ -168,14 +169,12 @@ def test_run_experiment_lr_with_dictionary():
     source = 'lr-dictionary'
     experiment_id = 'lr_dictionary'
 
-    temp_dir = 'temp_dir_for_experiment_lr_with_dictionary'
-
     old_file_dict = {'train': 'data/files/train.csv',
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-dictionary/features.csv'}
 
-    temp_dir = tempfile.TemporaryDirectory()
-    new_file_dict = copy_test_data_files(temp_dir.name,
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+    new_file_dict = copy_test_data_files(temp_dir,
                                          old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
