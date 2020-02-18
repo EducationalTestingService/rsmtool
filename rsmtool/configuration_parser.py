@@ -49,11 +49,17 @@ if HAS_RSMEXTRA:
 
 
 def deprecated_positional_argument():
-    """ This decorator allows for
-    backwards compatibility of the Configuration class
-    where filepath could be passed as a positional argument
-    and no configdir was set
-    Based on https://stackoverflow.com/a/49802489"""
+    """
+    This decorator allows the Configuration class to:
+    (a) accept the old method of specifying the now-deprecated 
+        `filepath` positional argument, 
+    (b) accept the new method of specifying `configdir` and `filename`
+        keyword arguments, but
+    (c) disallow using the old and the new methods in the same call
+
+    Adapted from: https://stackoverflow.com/a/49802489
+    """
+
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -62,18 +68,15 @@ def deprecated_positional_argument():
                 # if we also received a keyword argument for filepath
                 # or configdir, raise an error
                 if 'filename' in kwargs:
-                    raise ValueError("Configuration received both "
-                                     "positional argument for filepath "
-                                     "and keyword argument "
-                                     "for filename.")
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style filename keyword argument.")
                 if 'configdir' in kwargs:
-                    raise ValueError("Configuration received both "
-                                     "positional argument for filepath "
-                                     "and keyword argument for configdir")
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style configdir keyword argument.")
                 # raise deprecation warning
-                warnings.warn("Starting from RSMTool 8.0, you will need to "
-                              "specify configdir as a keyword-only argument "
-                              "when initializing a Configuration object ",
+                warnings.warn("The filepath positional argument is deprecated and will be "
+                              "removed in v8.0. Use the configdir and filename keyword "
+                              "arguments instead.",
                               DeprecationWarning)
 
                 # split filepath into
