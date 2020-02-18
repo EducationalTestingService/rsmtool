@@ -76,7 +76,7 @@ def check_run_experiment(source,
     config_obj_or_dict: Configuration or dictionary
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`
+        using `source` and `experiment_id`.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -790,9 +790,9 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             ok_(length == partition_info.iloc[0][group])
 
 
-def copy_data_files(temp_dir_name,
-                   input_file_dict,
-                   given_test_dir=None):
+def copy_test_data_files(temp_dir_name,
+                    input_file_dict,
+                    given_test_dir=None):
     """
     Copy input files from tests/data into
     a temporary directory specified by the user.
@@ -806,11 +806,11 @@ def copy_data_files(temp_dir_name,
     temp_dir_name : str
         Name of the temporary directory.
     input_file_dict : dict
-        A dictionary of files list of files to copy.
-        The keys show the type of file. The values should be
-        paths to the files relative to `tests` directory.
+        A dictionary of files to copy with keys as the file type
+        and the values are their paths relative to the `tests`
+        directory.
     given_test_dir : str, optional
-        Path where the test experiments are located. Unless specified, the
+        Directory where the the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
 
