@@ -10,7 +10,7 @@ from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
-                                copy_data_files,
+                                copy_test_data_files,
                                 do_run_evaluation)
 
 import shutil
@@ -141,8 +141,8 @@ def test_run_experiment_lr_eval_with_dictionary():
 
     old_file_dict = {'pred': 'data/files/predictions_scaled_with_subgroups.csv'}
 
-    new_file_dict = copy_data_files(temp_dir,
-                                    old_file_dict)
+    new_file_dict = copy_test_data_files(temp_dir,
+                                         old_file_dict)
 
     config_dict = {"predictions_file": new_file_dict['pred'],
                     "system_score_column": "score",
