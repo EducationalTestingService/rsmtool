@@ -51,8 +51,8 @@ if HAS_RSMEXTRA:
 def deprecated_positional_argument():
     """
     This decorator allows the Configuration class to:
-    (a) accept the old method of specifying the now-deprecated 
-        `filepath` positional argument, 
+    (a) accept the old method of specifying the now-deprecated
+        `filepath` positional argument,
     (b) accept the new method of specifying `configdir` and `filename`
         keyword arguments, but
     (c) disallow using the old and the new methods in the same call

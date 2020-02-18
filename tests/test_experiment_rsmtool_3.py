@@ -1,5 +1,4 @@
 import os
-import shutil
 import tempfile
 import warnings
 
@@ -137,7 +136,7 @@ def test_run_experiment_lr_with_object_no_configdir():
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
 
-    
+
     temp_dir = tempfile.TemporaryDirectory()
     new_file_dict = copy_test_data_files(temp_dir.name,
                                          old_file_dict)
@@ -160,8 +159,8 @@ def test_run_experiment_lr_with_object_no_configdir():
     config_obj = config_parser.normalize_validate_and_process_config()
 
     check_run_experiment(source,
-                             experiment_id,
-                             config_obj_or_dict=config_obj)
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
 
 
 def test_run_experiment_lr_with_dictionary():
