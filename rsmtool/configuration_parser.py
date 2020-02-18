@@ -129,7 +129,7 @@ class Configuration:
         filename : str, optional, keyword-only
             The name of the configuration file.
             The file must be stored in configdir.
-            This argument is not used in RSMTool and only added for 
+            This argument is not used in RSMTool and only added for
             backwards compatibility for the deprecated `filepath` attribute.
             Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
@@ -147,7 +147,7 @@ class Configuration:
             logging.info("Configuration directory will be set to {}".format(configdir))
         else:
             configdir = abspath(configdir)
-        
+
         self._configdir = configdir
         self._filename = filename
 
@@ -835,7 +835,7 @@ class ConfigurationParser:
             parameters to parse.
         configdir : str, optional
             Path to the reference directory used to resolve
-            any relative path in the dictionary. If not specified, 
+            any relative path in the dictionary. If not specified,
             the current working directory will be used.
         filename: str, optional
 
@@ -883,7 +883,7 @@ class ConfigurationParser:
             parameters to parse.
         configdir : str, optional
             Path to the reference directory used to resolve
-            any relative path in the dictionary. 
+            any relative path in the dictionary.
             Defaults to the current working directory.
         context : str, optional
             Context of the tool in which we are validating.
