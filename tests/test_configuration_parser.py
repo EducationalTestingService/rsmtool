@@ -7,9 +7,7 @@ import pandas as pd
 
 from io import StringIO
 from os import getcwd
-from os.path import (abspath,
-                     dirname,
-                     join)
+from os.path import abspath, dirname, join
 
 from shutil import rmtree
 
@@ -615,7 +613,7 @@ class TestConfiguration:
         eq_(config._configdir, abspath(configdir))
 
     @ raises(ValueError)
-    def test_init_with_filepath_as_positional_and_keyword(self):
+    def test_init_with_filepath_positional_and_filename_keyword(self):
         filepath = 'some/path/file.json'
         config_dict = {'exp_id': 'my_experiment'}
         _ = Configuration(config_dict,
@@ -623,7 +621,7 @@ class TestConfiguration:
                           filename=filepath)
 
     @ raises(ValueError)
-    def test_init_with_filepath_as_positional_and_configdir_keyword(self):
+    def test_init_with_filepath_positional_and_configdir_keyword(self):
         filepath = 'some/path/file.json'
         configdir = 'some/path'
         config_dict = {'exp_id': 'my_experiment'}
@@ -822,20 +820,20 @@ class TestConfiguration:
     # this is a test for an attribute that will be
     # deprecated
     def test_get_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warning_list:
             filepath = '/path/to/file.json'
             config = Configuration({"flag_column": "[advisories]"},
                                    configdir='/path/to/',
                                    filename='file.json')
             eq_(config.filepath, abspath(filepath))
-            assert len(w) == 1  # we get one deprecation warnings here
-            assert issubclass(w[-1].category, DeprecationWarning)
+            assert len(warning_list) == 1  # we get one deprecation warning here
+            assert issubclass(warning_list[0].category, DeprecationWarning)
 
 
     # this is a test for an attribute that will be
     # deprecated
     def test_set_filepath(self):
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warning_list:
             new_file_path = '/newpath/to/new.json'
             config = Configuration({"flag_column": "[advisories]"},
                                    configdir='/path/to/',
@@ -844,9 +842,9 @@ class TestConfiguration:
             eq_(config._filename, 'new.json')
             eq_(config.configdir, abspath('/newpath/to'))
             eq_(config.filepath, abspath(new_file_path))  # second deprecation warning
-            assert len(w) == 2  # we get two deprecation warnings here
-            assert issubclass(w[-2].category, DeprecationWarning)
-            assert issubclass(w[-1].category, DeprecationWarning)
+            assert len(warning_list) == 2  # we get two deprecation warnings here
+            assert issubclass(warning_list[0].category, DeprecationWarning)
+            assert issubclass(warning_list[1].category, DeprecationWarning)
 
     def test_get_configdir(self):
         configdir = '/path/to/dir/'

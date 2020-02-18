@@ -49,11 +49,17 @@ if HAS_RSMEXTRA:
 
 
 def deprecated_positional_argument():
-    """ This decorator allows for
-    backwards compatibility of the Configuration class
-    where filepath could be passed as a positional argument
-    and no configdir was set
-    Based on https://stackoverflow.com/a/49802489"""
+    """
+    This decorator allows the Configuration class to:
+    (a) accept the old method of specifying the now-deprecated
+        `filepath` positional argument,
+    (b) accept the new method of specifying `configdir` and `filename`
+        keyword arguments, but
+    (c) disallow using the old and the new methods in the same call
+
+    Adapted from: https://stackoverflow.com/a/49802489
+    """
+
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -62,18 +68,15 @@ def deprecated_positional_argument():
                 # if we also received a keyword argument for filepath
                 # or configdir, raise an error
                 if 'filename' in kwargs:
-                    raise ValueError("Configuration received both "
-                                     "positional argument for filepath "
-                                     "and keyword argument "
-                                     "for filename.")
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style filename keyword argument.")
                 if 'configdir' in kwargs:
-                    raise ValueError("Configuration received both "
-                                     "positional argument for filepath "
-                                     "and keyword argument for configdir")
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style configdir keyword argument.")
                 # raise deprecation warning
-                warnings.warn("Starting from RSMTool 8.0, you will need to "
-                              "specify configdir as a keyword-only argument "
-                              "when initializing a Configuration object ",
+                warnings.warn("The filepath positional argument is deprecated and will be "
+                              "removed in v8.0. Use the configdir and filename keyword "
+                              "arguments instead.",
                               DeprecationWarning)
 
                 # split filepath into
@@ -129,7 +132,7 @@ class Configuration:
         filename : str, optional, keyword-only
             The name of the configuration file.
             The file must be stored in configdir.
-            This argument is not used in RSMTool and only added for 
+            This argument is not used in RSMTool and only added for
             backwards compatibility for the deprecated `filepath` attribute.
             Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
@@ -147,7 +150,7 @@ class Configuration:
             logging.info("Configuration directory will be set to {}".format(configdir))
         else:
             configdir = abspath(configdir)
-        
+
         self._configdir = configdir
         self._filename = filename
 
@@ -835,7 +838,7 @@ class ConfigurationParser:
             parameters to parse.
         configdir : str, optional
             Path to the reference directory used to resolve
-            any relative path in the dictionary. If not specified, 
+            any relative path in the dictionary. If not specified,
             the current working directory will be used.
         filename: str, optional
 
@@ -883,7 +886,7 @@ class ConfigurationParser:
             parameters to parse.
         configdir : str, optional
             Path to the reference directory used to resolve
-            any relative path in the dictionary. 
+            any relative path in the dictionary.
             Defaults to the current working directory.
         context : str, optional
             Context of the tool in which we are validating.
