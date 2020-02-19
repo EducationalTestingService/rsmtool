@@ -295,15 +295,13 @@ def check_run_prediction(source,
                             'data',
                             'experiments',
                             source,
-                            '{}.json'.format(experiment_id))
+                            'rsmpredict.json')
     else:
         config_input = config_obj_or_dict
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_prediction(source,
-                         config_input,
-                         suppress_warnings_for=suppress_warnings_for)
+    do_run_prediction(source,
+                      config_input,
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -355,7 +353,7 @@ def check_run_summary(source,
                             'data',
                             'experiments',
                             source,
-                            '{}.json'.format(experiment_id))
+                            'rsmsummarize.json')
     else:
         config_input = config_obj_or_dict
 
@@ -589,7 +587,7 @@ def do_run_summary(source,
         for warning_type in suppress_warnings_for:
             warnings.filterwarnings('ignore', category=warning_type)
 
-    run_summary(config_input, experiment_dir)
+        run_summary(config_input, experiment_dir)
 
 
 def check_file_output(file1, file2, file_format='csv'):

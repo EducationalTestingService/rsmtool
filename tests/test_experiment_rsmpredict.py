@@ -8,11 +8,13 @@ from os.path import basename, exists, join
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_prediction,
+                                copy_data_files,
                                 do_run_experiment,
                                 do_run_prediction)
 
@@ -96,6 +98,61 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
         expected_output_file = join(expected_output_dir, csv_pair[1])
 
         yield check_file_output, output_file, expected_output_file
+
+
+def test_run_experiment_lr_predict_with_object():
+    # test rsmpredict using the Configuration object, rather than a file;
+
+    source = 'lr-predict-object'
+
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
+
+    config_dict = {"id_column": "ID",
+                   "input_features_file": "../../files/test.csv",
+                   "experiment_dir": "existing_experiment",
+                   "experiment_id": "lr"
+                   }
+
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict, 
+                                        configdir=configdir)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
+
+    check_run_prediction(source,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_predict_with_dictionary():
+    # test rsmpredict using the dictionary object, rather than a file;
+
+    source = 'lr-predict-dict'
+    experiment_id = 'lr_predict_dict'
+
+    # set up a temporary directory since
+    # we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+    old_file_dict = {'feature_file': 'data/files/test.csv',
+                     'experiment_dir': 'data/experiments/lr-predict-dict/existing_experiment'}
+
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict)
+
+    config_dict = {"id_column": "ID",
+                   "input_features_file": new_file_dict['feature_file'],
+                   "experiment_dir": new_file_dict['experiment_dir'],
+                   "experiment_id": "lr"}
+
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
+    check_run_prediction(source,
+                         config_obj_or_dict=config_obj)
 
 
 @raises(ValueError)
