@@ -413,7 +413,7 @@ def test_difference_of_standardized_means_with_no_population_info():
     with warnings.catch_warnings(record=True) as warning_list:
         diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
-    eq_(len(w), 2)
+    eq_(len(warning_list), 2)
     assert issubclass(warning_list[0].category, UserWarning)
     assert issubclass(warning_list[1].category, UserWarning)
 
