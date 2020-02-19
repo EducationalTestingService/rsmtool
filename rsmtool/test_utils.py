@@ -41,6 +41,7 @@ def check_run_experiment(source,
                          skll=False,
                          file_format='csv',
                          given_test_dir=None,
+                         config_obj_or_dict=None,
                          suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmtool experiment test.
@@ -72,6 +73,10 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dictionary
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using `source` and `experiment_id`.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -79,17 +84,20 @@ def check_run_experiment(source,
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            '{}.json'.format(experiment_id))
+    else:
+        config_input = config_obj_or_dict
 
     model_type = 'skll' if skll else 'rsmtool'
 
     do_run_experiment(source,
                       experiment_id,
-                      config_file,
+                      config_input,
                       suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
@@ -780,6 +788,53 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             length = len(composition_by_group.loc[composition_by_group['{} set'
                                                                        ''.format(partition)] != 0])
             ok_(length == partition_info.iloc[0][group])
+
+
+def copy_data_files(temp_dir_name,
+                    input_file_dict,
+                    given_test_dir=None):
+    """
+    A utility function to copy files from the ``tests/data`` directory into
+    a specified temporary directory. Useful for tests where the
+    current directory is to be used as the reference for resolving paths
+    in the configuration.
+
+    Parameters
+    ----------
+    temp_dir_name : str
+        Name of the temporary directory.
+    input_file_dict : dict
+        A dictionary of files to copy with keys as the file type
+        and the values are their paths relative to the `tests`
+        directory.
+    given_test_dir : str, optional
+        Directory where the the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+
+    Returns
+    -------
+    output_file_dict : dict
+        The dictionary with the same keys as
+        input_file_dict and values showing new paths.
+    """
+
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    temp_dir = Path(temp_dir_name)
+    if not temp_dir.exists():
+        temp_dir.mkdir()
+
+    output_file_dict = {}
+    for file in input_file_dict:
+        filepath = Path(input_file_dict[file])
+        filename = filepath.name
+        new_filepath = temp_dir / filename
+        copyfile(test_dir / filepath, new_filepath)
+        output_file_dict[file] = str(new_filepath)
+
+    return output_file_dict
 
 
 class FileUpdater(object):

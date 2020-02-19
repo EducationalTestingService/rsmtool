@@ -9,6 +9,7 @@ and creating configuration objects.
 :organization: ETS
 """
 
+import functools
 import json
 import logging
 import re
@@ -19,7 +20,9 @@ from collections import Counter
 from configparser import ConfigParser
 
 from os import getcwd, makedirs
-from os.path import (basename,
+from os.path import (abspath,
+                     basename,
+                     dirname,
                      join,
                      splitext)
 
@@ -44,6 +47,50 @@ if HAS_RSMEXTRA:
                                    default_feature_sign)
 
 
+
+def deprecated_positional_argument():
+    """
+    This decorator allows the Configuration class to:
+    (a) accept the old method of specifying the now-deprecated
+        `filepath` positional argument,
+    (b) accept the new method of specifying `configdir` and `filename`
+        keyword arguments, but
+    (c) disallow using the old and the new methods in the same call
+
+    Adapted from: https://stackoverflow.com/a/49802489
+    """
+
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            # if we received two positional arguments
+            if len(args) > 2:
+                # if we also received a keyword argument for filepath
+                # or configdir, raise an error
+                if 'filename' in kwargs:
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style filename keyword argument.")
+                if 'configdir' in kwargs:
+                    raise ValueError("Cannot specify both the deprecated filepath positional "
+                                     "argument and the new-style configdir keyword argument.")
+                # raise deprecation warning
+                warnings.warn("The filepath positional argument is deprecated and will be "
+                              "removed in v8.0. Use the configdir and filename keyword "
+                              "arguments instead.",
+                              DeprecationWarning)
+
+                # split filepath into
+                # configdir and filename
+                filepath = args[-1]
+                kwargs['filename'] = basename(filepath)
+                kwargs['configdir'] = dirname(abspath(filepath))
+                # remove filepath from positional arguments
+                args = args[:-1]
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 class Configuration:
     """
     Configuration class, which encapsulates all of the
@@ -51,25 +98,62 @@ class Configuration:
     parameters.
     """
 
-    def __init__(self, config_dict, filepath=None, context='rsmtool'):
+    @deprecated_positional_argument()
+    def __init__(self,
+                 config_dict,
+                 *,
+                 configdir=None,
+                 filename=None,
+                 context='rsmtool'):
         """
         Create an object of the `Configuration` class.
+
+        Note that usually the Configuration
+        object used for RSMTool experiments is created using
+        `ConfigurationParser.load_normalize_and_validate_config_from_dict()` or
+        `ConfigurationParser.read_normalize_validate_and_process_config()`.
+        You should directly instantiate a Configuration object only if
+        you already have a normalized configuration dictionary
+        (e.g., from previous RSMTool experiments).
+
 
         Parameters
         ----------
         config_dict : dict
             A dictionary of configuration parameters.
-        filepath : str, optional
-            The path to the configuration file.
+            The dictionary must be a valid configuration dictionary
+            with default values filled as necessary.
+        configdir : str, optional, keyword-only
+            The reference path used to
+            resolve any relative paths in the configuration
+            object. When None, will be set during
+            initialization to the current working directory.
+            Defaults to None
+        filename : str, optional, keyword-only
+            The name of the configuration file.
+            The file must be stored in configdir.
+            This argument is not used in RSMTool and only added for
+            backwards compatibility for the deprecated `filepath` attribute.
             Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
             The context of the tool.
             Defaults to 'rsmtool'.
         """
+
         self._config = config_dict
-        self._filepath = filepath
         self._context = context
+
+        # set configdir to `cwd` if not given and let the user know
+        if configdir is None:
+            configdir = getcwd()
+            logging.info("Configuration directory will be set to {}".format(configdir))
+        else:
+            configdir = abspath(configdir)
+
+        self._configdir = configdir
+        self._filename = filename
+
 
     def __contains__(self, key):
         """
@@ -155,19 +239,31 @@ class Configuration:
     @property
     def filepath(self):
         """
-        Get file path.
+        Get file path to the configuration file
+
+        .. deprecated:: 8.0
+        `filepath` will be removed in RSMTool v8.0. Use `configdir` and `filename` instead.
 
         Returns
         -------
         filepath : str
             The path for the config file.
         """
-        return self._filepath
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed in RSMTool v8.0."
+                      "Use the `configdir` and `filename` attributes if you "
+                      "need the full path to the "
+                      "configuration file", DeprecationWarning)
+        filepath = join(self.configdir, self.filename)
+        return filepath
 
     @filepath.setter
     def filepath(self, new_path):
         """
-        Set a new file path
+        Set a new file path to configuration file.
+
+        .. deprecated:: 8.0
+        `filepath` will be removed in RSMTool v8.0. Use `configdir` and `filename` instead.
 
         Parameters
         ----------
@@ -175,7 +271,72 @@ class Configuration:
             A new file path for the
             configuration object.
         """
-        self._filepath = new_path
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed in RSMTool 8.0 "
+                      "use `configdir` and `filename` if you "
+                      "need to set a new path to the "
+                      "configuration file", DeprecationWarning)
+        new_filename = basename(new_path)
+        new_configdir = dirname(abspath(new_path))
+        self._filename = new_filename
+        self._configdir = new_configdir
+
+    @property
+    def configdir(self):
+        """
+        Get the path to the configuration reference directory that
+        will be used to resolve any relative paths in
+        the configuration.
+
+        Returns
+        -------
+        configdir : str
+            The path to the configuration reference directory
+        """
+        return self._configdir
+
+    @configdir.setter
+    def configdir(self, new_path):
+        """
+        Set a new configuration reference directory
+
+        Parameters
+        ----------
+        new_path : str
+            Path to the new configuration reference
+            directory used to resolve any relative paths
+            in the configuration object.
+        """
+
+        if new_path is None:
+            raise ValueError("The `configdir` attribute cannot be set to `None` ")
+        self._configdir = abspath(new_path)
+
+
+    @property
+    def filename(self):
+        """
+        Get the name of the configuration file.
+
+        Returns
+        -------
+        filename : str
+            The name of the configuration file
+        """
+        return self._filename
+
+    @filename.setter
+    def filename(self, new_path):
+        """
+        Set a new name of the configuration file
+
+        Parameters
+        ----------
+        new_name : str
+            New name of the configuration file
+        """
+        self._filename = new_path
+
 
     @property
     def context(self):
@@ -579,7 +740,8 @@ class ConfigurationParser:
 
         # Set configuration object to None
         self._config = None
-        self._filepath = None
+        self._filename = None
+        self._configdir = None
 
     def _check_config_is_loaded(self):
         """
@@ -601,6 +763,7 @@ class ConfigurationParser:
                             'a file. You can use the `get_configparser` class '
                             'method to instantiate the appropriate sub-class '
                             'object for reading either `.json` or `.cfg` files.')
+
 
     @classmethod
     def get_configparser(cls, filepath, *args, **kwargs):
@@ -662,7 +825,9 @@ class ConfigurationParser:
                 raise ValueError("{} cannot contain any "
                                  "spaces".format(id_field))
 
-    def load_config_from_dict(self, config_dict):
+    def load_config_from_dict(self,
+                              config_dict,
+                              configdir=None):
         """
         Load configuration dictionary.
 
@@ -671,6 +836,12 @@ class ConfigurationParser:
         config_dict : dict
             A dictionary containing the configuration
             parameters to parse.
+        configdir : str, optional
+            Path to the reference directory used to resolve
+            any relative path in the dictionary. If not specified,
+            the current working directory will be used.
+        filename: str, optional
+
 
         Raises
         ------
@@ -688,6 +859,54 @@ class ConfigurationParser:
             raise AttributeError('A configuration dictionary has already'
                                  'been assigned. You cannot assign another'
                                  'dictionary.')
+
+        if configdir is None:
+            configdir = getcwd()
+
+        self._configdir = abspath(configdir)
+        logging.info("Configuration directory will be set to {}".format(self._configdir))
+
+        # set filename to none since there was no configuration file.
+        # If the user for some reason wants
+        # to set it, they can do so explicitly.
+        self._filename = None
+
+
+    def load_normalize_and_validate_config_from_dict(self,
+                                                     config_dict,
+                                                     configdir=getcwd(),
+                                                     context='rsmtool'):
+        """
+        Load configuration dictionary.
+
+        Parameters
+        ----------
+        config_dict : dict
+            A dictionary containing the configuration
+            parameters to parse.
+        configdir : str, optional
+            Path to the reference directory used to resolve
+            any relative path in the dictionary.
+            Defaults to the current working directory.
+        context : str, optional
+            Context of the tool in which we are validating.
+            Possible values are ::
+
+                {'rsmtool', 'rsmeval',
+                 'rsmpredict', 'rsmcompare', 'rsmsummarize'}
+
+            Defaults to 'rsmtool'.
+
+        Returns
+        -------
+        config_obj : Configuration
+            A configuration object
+        """
+        self.load_config_from_dict(config_dict, configdir)
+        return self.normalize_validate_and_process_config(context=context)
+
+
+
 
     def read_config_from_file(self, filepath):
         """
@@ -799,7 +1018,9 @@ class ConfigurationParser:
 
         if inplace:
             self._config = new_config
-        return Configuration(self._config, self._filepath)
+        return Configuration(self._config,
+                             configdir=self._configdir,
+                             filename=self._filename,)
 
     def validate_config(self, context='rsmtool', inplace=True):
         """
@@ -1009,7 +1230,9 @@ class ConfigurationParser:
 
         if inplace:
             self._config = new_config
-        return Configuration(self._config, self._filepath)
+        return Configuration(self._config,
+                             configdir=self._configdir,
+                             filename=self._filename,)
 
     def process_config(self, inplace=True):
         """
@@ -1069,7 +1292,9 @@ class ConfigurationParser:
 
         if inplace:
             self._config = new_config
-        return Configuration(self._config, self._filepath)
+        return Configuration(self._config,
+                             configdir=self._configdir,
+                             filename=self._filename,)
 
     def normalize_validate_and_process_config(self, context='rsmtool'):
         """
@@ -1105,7 +1330,10 @@ class ConfigurationParser:
         self.normalize_config()
         self.process_config()
         self.validate_config(context=context)
-        return Configuration(self._config, self._filepath, context=context)
+        return Configuration(self._config,
+                             configdir=self._configdir,
+                             filename=self._filename,
+                             context=context)
 
     def read_normalize_validate_and_process_config(self,
                                                    filepath,
@@ -1171,7 +1399,8 @@ class JSONConfigurationParser(ConfigurationParser):
                              'match.'.format(filepath))
 
         self._config = config
-        self._filepath = filepath
+        self._filename = basename(filepath)
+        self._configdir = dirname(abspath(filepath))
 
 
 class CFGConfigurationParser(ConfigurationParser):
@@ -1255,7 +1484,8 @@ class CFGConfigurationParser(ConfigurationParser):
                     config[name] = value
 
         self._config = config
-        self._filepath = filepath
+        self._filename = basename(filepath)
+        self._configdir = dirname(abspath(filepath))
 
 
 # Global config types

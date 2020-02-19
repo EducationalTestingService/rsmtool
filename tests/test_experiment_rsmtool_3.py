@@ -1,10 +1,15 @@
 import os
+import tempfile
+import warnings
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
 from parameterized import param, parameterized
+
+from rsmtool import run_experiment
 
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
@@ -12,6 +17,7 @@ from rsmtool.test_utils import (check_file_output,
                                 check_scaled_coefficients,
                                 check_generated_output,
                                 check_run_experiment,
+                                copy_data_files,
                                 do_run_experiment)
 
 # allow test directory to be set via an environment variable
@@ -21,7 +27,6 @@ if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
     from rsmtool.test_utils import rsmtool_test_dir
-
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
@@ -79,13 +84,121 @@ def test_run_experiment_lr_with_cfg():
     yield check_report, html_report
 
 
-def test_run_experiment_lr_with_object():
+
+def test_run_experiment_lr_with_object_and_configdir():
 
     # test rsmtool using the Configuration object, rather than a file;
-    # we pass the `filepath` attribute after constructing the Configuraiton object
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
+    # with specified `configdir` attribute
 
+    source = 'lr-object'
+    experiment_id = 'lr_object'
+
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
+
+    config_dict = {"train_file": "../../files/train.csv",
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": "../../files/test.csv",
+                   "trim_max": 6,
+                   "features": "features.csv",
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_object",
+                   "description": "Using all features with an LinearRegression model."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict, configdir=configdir)
+    config_obj = config_parser.normalize_validate_and_process_config()
+
+    check_run_experiment(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_with_object_no_configdir():
+
+    # test rsmtool using the Configuration object, rather than a file;
+    # without passing configdir attribute
+    # to test whether the default setting of os.getcwd() is working
+    # correctly
+
+    source = 'lr-object-no-path'
+    experiment_id = 'lr_object_no_path'
+
+    # set up a temporary directory since
+    # we will be using getcwd
+
+    old_file_dict = {'train': 'data/files/train.csv',
+                     'test': 'data/files/test.csv',
+                     'features': 'data/experiments/lr-object-no-path/features.csv'}
+
+
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict)
+
+    config_dict = {"train_file": new_file_dict['train'],
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": new_file_dict['test'],
+                   "trim_max": 6,
+                   "features": new_file_dict['features'],
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_object_no_path",
+                   "description": "Using all features with an LinearRegression model."}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config()
+
+    check_run_experiment(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_with_dictionary():
+    # Passing a dictionary as input.
+    source = 'lr-dictionary'
+    experiment_id = 'lr_dictionary'
+
+    old_file_dict = {'train': 'data/files/train.csv',
+                     'test': 'data/files/test.csv',
+                     'features': 'data/experiments/lr-dictionary/features.csv'}
+
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict)
+
+    config_dict = {"train_file": new_file_dict['train'],
+                   "id_column": "ID",
+                   "use_scaled_predictions": True,
+                   "test_label_column": "score",
+                   "train_label_column": "score",
+                   "test_file": new_file_dict['test'],
+                   "trim_max": 6,
+                   "features": new_file_dict['features'],
+                   "trim_min": 1,
+                   "model": "LinearRegression",
+                   "experiment_id": "lr_dictionary",
+                   "description": "Using all features with an LinearRegression model."}
+
+    check_run_experiment(source,
+                         experiment_id,
+                         config_obj_or_dict=config_dict)
+
+
+@raises(AttributeError)
+def test_run_experiment_lr_with_object_and_filepath():
+    # This test checks for a rare potential use case where a user
+    # is trying to pass an old Configuration object
     source = 'lr-object'
     experiment_id = 'lr_object'
 
@@ -111,24 +224,25 @@ def test_run_experiment_lr_with_object():
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)
     config_obj = config_parser.normalize_validate_and_process_config()
-    config_obj.filepath = config_file
+    # we catch the deprecation warning triggered by this line
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=DeprecationWarning)
+        config_obj.filepath = config_file
+    # we have to explicitly remove configdir attribute
+    # since it will always be assigned a value by the current code
+    del(config_obj.configdir)
 
-    do_run_experiment(source, experiment_id, config_obj)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    check_run_experiment(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
 
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
+@raises(ValueError)
+def test_run_experiment_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_experiment(config_list, temp_dir)
 
 
 @raises(ValueError)

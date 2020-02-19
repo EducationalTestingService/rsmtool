@@ -1654,7 +1654,7 @@ class FeaturePreprocessor:
         feature_specs = data_container_obj.get_frame('feature_specs')
         feature_subset = data_container_obj.get_frame('feature_subset_specs')
 
-        configdir = dirname(abspath(config_obj.filepath))
+        configdir = config_obj.configdir
 
         (test_file_location,
          train_file_location) = DataReader.locate_files([config_obj['test_file'],
@@ -1978,7 +1978,9 @@ class FeaturePreprocessor:
         config_as_dict = config_obj.to_dict()
         config_as_dict.update(new_config_dict)
 
-        new_config = Configuration(config_as_dict, config_obj.filepath)
+        new_config = Configuration(config_as_dict,
+                                   configdir=config_obj.configdir,
+                                   filename=config_obj.filename)
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2033,7 +2035,7 @@ class FeaturePreprocessor:
         # get the directory where the config file lives
         # if this is the 'expm' directory, then go
         # up one level.
-        configpath = dirname(abspath(config_obj.filepath))
+        configpath = config_obj.configdir
 
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
@@ -2325,7 +2327,6 @@ class FeaturePreprocessor:
                            'id_column': id_column,
                            'second_human_score_column': second_human_score_column,
                            'candidate_column': candidate_column,
-                           'subgroups': subgroups,
                            'use_scaled_predictions': use_scaled_predictions,
                            'exclude_zero_scores': exclude_zero_scores,
                            'exclude_listwise': exclude_listwise,
@@ -2334,7 +2335,9 @@ class FeaturePreprocessor:
         config_as_dict = config_obj.to_dict()
         config_as_dict.update(new_config_dict)
 
-        new_config = Configuration(config_as_dict, config_obj.filepath)
+        new_config = Configuration(config_as_dict,
+                                   filename=config_obj.filename,
+                                   configdir=config_obj.configdir)
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded

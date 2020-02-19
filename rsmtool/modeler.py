@@ -1342,7 +1342,9 @@ class Modeler:
         config_as_dict = configuration.to_dict()
         config_as_dict.update(new_config_dict)
 
-        configuration = Configuration(config_as_dict, configuration.filepath)
+        configuration = Configuration(config_as_dict,
+                                      configdir=configuration.configdir,
+                                      filename=configuration.filename)
 
         return configuration, DataContainer(datasets=datasets)
 
