@@ -790,9 +790,9 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             ok_(length == partition_info.iloc[0][group])
 
 
-def copy_test_data_files(temp_dir_name,
-                         input_file_dict,
-                         given_test_dir=None):
+def copy_data_files(temp_dir_name,
+                    input_file_dict,
+                    given_test_dir=None):
     """
     A utility function to copy files from the ``tests/data`` directory into
     a specified temporary directory. Useful for tests where the
