@@ -139,7 +139,7 @@ def test_run_experiment_lr_with_object_no_configdir():
 
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
-    new_file_dict = copy_test_data_files(temp_dir,
+    new_file_dict = copy_test_data_files(temp_dir.name,
                                          old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
@@ -162,6 +162,7 @@ def test_run_experiment_lr_with_object_no_configdir():
     check_run_experiment(source,
                          experiment_id,
                          config_obj_or_dict=config_obj)
+    temp_dir.cleanup()
 
 
 def test_run_experiment_lr_with_dictionary():
@@ -174,7 +175,7 @@ def test_run_experiment_lr_with_dictionary():
                      'features': 'data/experiments/lr-dictionary/features.csv'}
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
-    new_file_dict = copy_test_data_files(temp_dir,
+    new_file_dict = copy_test_data_files(temp_dir.name,
                                          old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
@@ -193,6 +194,7 @@ def test_run_experiment_lr_with_dictionary():
     check_run_experiment(source,
                          experiment_id,
                          config_obj_or_dict=config_dict)
+    temp_dir.cleanup()
 
 
 @raises(AttributeError)

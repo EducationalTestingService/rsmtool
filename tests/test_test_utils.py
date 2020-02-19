@@ -16,7 +16,7 @@ class TestCopyData():
         for d in self.dirs_to_remove:
             shutil.rmtree(d)
 
-    def test_copy_data_files(self):
+    def test_copy_test_data_files(self):
         file_dict = {'train': 'data/files/train.csv',
                      'features': 'data/experiments/lr/features.csv'}
         expected_dict = {'train': 'temp_test_copy_data_file/train.csv',
