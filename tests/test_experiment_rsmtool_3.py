@@ -30,25 +30,25 @@ else:
 
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
-    #param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
-    #param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
-    #param('lr-with-sas', 'lr_with_sas'),
-    #param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
-    #param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
-    #param('lr-with-thumbnails', 'lr_with_thumbnails'),
-    #param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
-    #param('lr-with-feature-list', 'lr_with_feature_list'),
-    #param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
-    #param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
-    #param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
-    #param('lr-subgroups-with-dictionary-threshold-and-empty-group',
-    #      'lr_subgroups_with_dictionary_threshold_and_empty_group',
-    #      subgroups=['L1', 'QUESTION']),
-    #param('lr-subgroups-with-numeric-threshold-and-empty-group',
-    #      'lr_subgroups_with_numeric_threshold_and_empty_group',
-    #      subgroups=['L1', 'QUESTION']),
-    #param('lr-subgroups-h2-long-feature-names',
-    #      'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
+    param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
+    param('lr-exclude-train-and-test-flags', 'lr_exclude_train_and_test_flags'),
+    param('lr-with-sas', 'lr_with_sas'),
+    param('lr-with-xlsx-output', 'lr_with_xlsx_output', file_format='xlsx'),
+    param('lr-with-tsv-output', 'lr_with_tsv_output', file_format='tsv'),
+    param('lr-with-thumbnails', 'lr_with_thumbnails'),
+    param('lr-with-thumbnails-subgroups', 'lr_with_thumbnails_subgroups', subgroups=['L1']),
+    param('lr-with-feature-list', 'lr_with_feature_list'),
+    param('lr-with-length-non-numeric', 'lr_with_length_non_numeric'),
+    param('lr-with-feature-list-and-transformation', 'lr_with_feature_list_and_transformation'),
+    param('lr-with-trim-tolerance', 'lr_with_trim_tolerance'),
+    param('lr-subgroups-with-dictionary-threshold-and-empty-group',
+          'lr_subgroups_with_dictionary_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-with-numeric-threshold-and-empty-group',
+          'lr_subgroups_with_numeric_threshold_and_empty_group',
+          subgroups=['L1', 'QUESTION']),
+    param('lr-subgroups-h2-long-feature-names',
+          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -140,7 +140,7 @@ def test_run_experiment_lr_with_object_no_configdir():
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                         old_file_dict)
+                                    old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
@@ -175,7 +175,7 @@ def test_run_experiment_lr_with_dictionary():
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                         old_file_dict)
+                                    old_file_dict)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
