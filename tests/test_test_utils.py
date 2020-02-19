@@ -27,3 +27,15 @@ class TestCopyData():
         for f in expected_dict:
             eq_(output_dict[f], expected_dict[f])
             ok_(Path(output_dict[f]).exists())
+
+
+    def test_copy_data_files_directory(self):
+        file_dict = {'exp_dir': 'data/experiments/lr-self-compare/lr-subgroups'}
+        expected_dict = {'exp_dir': 'temp_test_copy_dirs/lr-subgroups'}
+        self.dirs_to_remove.append('temp_test_copy_dirs')
+        output_dict = copy_data_files('temp_test_copy_dirs',
+                                      file_dict, copy_tree=True)
+        for f in expected_dict:
+            eq_(output_dict[f], expected_dict[f])
+            ok_(Path(output_dict[f]).exists())
+

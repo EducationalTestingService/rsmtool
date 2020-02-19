@@ -1,5 +1,7 @@
 import os
+import tempfile
 
+from os import getcwd
 from os.path import join
 
 from nose.tools import raises
@@ -23,17 +25,6 @@ else:
 _AUTO_UPDATE = False
 
 
-def setup_func():
-    global DIRS_TO_REMOVE
-    DIRS_TO_REMOVE = []
-
-
-def teardown_func():
-    for d in DIRS_TO_REMOVE:
-        if exists(d):
-            shutil.rmtree(d)
-
-
 DIRS_TO_REMOVE = []
 
 @parameterized([
@@ -55,6 +46,79 @@ def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_comparison(*args, **kwargs)
+
+
+def test_run_experiment_lr_compare_with_object():
+    # test rsmcompare using the Configuration object, rather than a file;
+
+    source = 'lr-self-compare-object'
+    experiment_id = 'lr_self_compare_object'
+
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
+
+    config_dict = {"comparison_id": "lr_self_compare_object",
+                   "experiment_dir_old": "lr-subgroups",
+                   "experiment_id_old": "lr_subgroups",
+                   "description_old": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_old": true,
+                   "experiment_dir_new": "lr-subgroups",
+                   "experiment_id_new": "lr_subgroups",
+                   "description_new": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_new": true,
+                   "subgroups": ["QUESTION"]
+                }
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict, 
+                                        configdir=configdir)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
+
+    check_run_evaluation(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_compare_with_dictionary():
+    # test rsmcompare using the dictionary object, rather than a file;
+
+    source = 'lr-self-compare-dict'
+    experiment_id = 'lr_self_compare_dict'
+
+    # set up a temporary directory since
+    # we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+    old_file_dict = {'experiment_dir': 'data/experiments/lr-self-compare-dict/lr-subgroups'}
+
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict,
+                                    copy_tree=True)
+
+    config_dict = {"comparison_id": "lr_self_compare_object",
+                   "experiment_dir_old": "lr-subgroups",
+                   "experiment_id_old": "lr_subgroups",
+                   "description_old": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_old": true,
+                   "experiment_dir_new": new_file_dict['experiment_dir'],
+                   "experiment_id_new": new_file_dict['experiment_dir'],
+                   "description_new": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_new": true,
+                   "subgroups": ["QUESTION"]
+                }
+
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
+
+    check_run_evaluation(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
 
 
 @raises(FileNotFoundError)

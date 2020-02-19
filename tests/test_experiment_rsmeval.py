@@ -1,19 +1,20 @@
 import os
+import tempfile
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
-from nose.tools import raises,with_setup
+from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
-                                copy_test_data_files,
+                                copy_data_files,
                                 do_run_evaluation)
 
-import shutil
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -22,17 +23,6 @@ if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
     from rsmtool.test_utils import rsmtool_test_dir
-
-
-def setup_func():
-    global DIRS_TO_REMOVE
-    DIRS_TO_REMOVE = []
-
-
-def teardown_func():
-    for d in DIRS_TO_REMOVE:
-        if exists(d):
-            shutil.rmtree(d)
 
 
 DIRS_TO_REMOVE = []
@@ -127,7 +117,6 @@ def test_run_experiment_lr_eval_with_object():
                          config_obj_or_dict=config_obj)
 
 
-@with_setup(setup_func, teardown_func)
 def test_run_experiment_lr_eval_with_dictionary():
     # test rsmeval using the dictionary object, rather than a file;
 
@@ -136,13 +125,12 @@ def test_run_experiment_lr_eval_with_dictionary():
 
     # set up a temporary directory since
     # we will be using getcwd
-    temp_dir = 'temp_for_testing_lr_eval_dict'
-    DIRS_TO_REMOVE.append(temp_dir)
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
 
     old_file_dict = {'pred': 'data/files/predictions_scaled_with_subgroups.csv'}
 
-    new_file_dict = copy_test_data_files(temp_dir,
-                                         old_file_dict)
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict)
 
     config_dict = {"predictions_file": new_file_dict['pred'],
                     "system_score_column": "score",

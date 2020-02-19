@@ -1,7 +1,8 @@
 import os
-import shutil
+import tempfile
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
@@ -22,17 +23,6 @@ if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
     from rsmtool.test_utils import rsmtool_test_dir
-
-
-def setup_func():
-    global DIRS_TO_REMOVE
-    DIRS_TO_REMOVE = []
-
-
-def teardown_func():
-    for d in DIRS_TO_REMOVE:
-        if exists(d):
-            shutil.rmtree(d)
 
 
 @parameterized([
