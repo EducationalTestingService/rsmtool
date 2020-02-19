@@ -1,5 +1,5 @@
 {
-    "predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
+    "predictions_file": "/Users/aloukina/Tools/rsmtool/rsmtoole6i3tica/predictions_scaled_with_subgroups.csv",
     "system_score_column": "score",
     "description": "An evaluation of LinearRegression predictions.",
     "human_score_column": "h1",
