@@ -123,7 +123,6 @@ class TestAnalyzer:
             retval = Analyzer.correlation_helper(self.df_features_same_score, 'sc1', 'group')
             assert_equal(retval[0].isnull().values.sum(), 3)
             assert_equal(retval[1].isnull().values.sum(), 3)
-            print([w2.message for w2 in w])
             assert issubclass(w[-1].category, UserWarning)
 
 
