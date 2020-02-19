@@ -75,11 +75,11 @@ class TestAnalyzer:
         # this should compute marginal correlations and return a unity
         # matrix for partial correlations
         # it should also raise a UserWarning
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warning_list:
             retval = Analyzer.correlation_helper(self.df_features[:4], 'sc1', 'group')
         assert_equal(retval[0].isnull().values.sum(), 0)
         assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
-        assert issubclass(w[-1].category, UserWarning)
+        assert issubclass(warning_list[-1].category, UserWarning)
 
 
 
@@ -118,12 +118,12 @@ class TestAnalyzer:
         # this test should raise UserWarning because the determinant is very close to
         # zero. It also raises Runtime warning because
         # variance of human scores is 0.
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as warning_list:
             warnings.filterwarnings('ignore', category=RuntimeWarning)
             retval = Analyzer.correlation_helper(self.df_features_same_score, 'sc1', 'group')
             assert_equal(retval[0].isnull().values.sum(), 3)
             assert_equal(retval[1].isnull().values.sum(), 3)
-            assert issubclass(w[-1].category, UserWarning)
+            assert issubclass(warning_list[-1].category, UserWarning)
 
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
