@@ -284,7 +284,7 @@ def test_standardized_mean_difference():
     eq_(smd, expected)
 
 
-def test_standardized_mean_difference_zero_denominator_jonson():
+def test_standardized_mean_difference_zero_denominator_johnson():
 
     # test SMD with zero denominator
     # we pass 0 as standard deviation of population
@@ -464,8 +464,9 @@ def test_partial_correlations_with_singular_matrix():
 
 def test_partial_correlations_pinv():
 
-    msg = ('The inverse of the variance-covariance matrix when computing '
-           'partial correlations was calculated '
+    msg = ('When computing partial correlations '
+           'the inverse of the variance-covariance matrix '
+           'was calculated '
            'using the Moore-Penrose generalized matrix inversion, due to '
            'its determinant being at or very close to zero.')
     df_small_det = pd.DataFrame({'X1': [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],
