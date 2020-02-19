@@ -237,7 +237,7 @@ def check_run_comparison(source,
                             'data',
                             'experiments',
                             source,
-                            '{}.json'.format(experiment_id))
+                            'rsmcompare.json')
     else:
         config_input = config_obj_or_dict
 
@@ -245,7 +245,7 @@ def check_run_comparison(source,
                       config_input,
                       suppress_warnings_for=suppress_warnings_for)
 
-    html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
+    html_report = join('test_outputs', source, '{}_report.html'.format(experiment_id))
     check_report(html_report, raise_warnings=False)
 
     # we want to ignore deprecation warnings for RSMCompare, so we remove
@@ -931,8 +931,7 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
 
 def copy_data_files(temp_dir_name,
                     input_file_dict,
-                    given_test_dir=None,
-                    copy_tree=False):
+                    given_test_dir=None):
     """
     A utility function to copy files from the ``tests/data`` directory into
     a specified temporary directory. Useful for tests where the
@@ -944,17 +943,13 @@ def copy_data_files(temp_dir_name,
     temp_dir_name : str
         Name of the temporary directory.
     input_file_dict : dict
-        A dictionary of files to copy with keys as the file type
-        and the values are their paths relative to the `tests`
+        A dictionary of files/directories to copy with keys as the
+        file type and the values are their paths relative to the `tests`
         directory.
     given_test_dir : str, optional
         Directory where the the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    copy_tree: Boolean, optional
-        When True, the paths in input_file_dict will be interpreted 
-        as directories and the function will copy entire tree.
-        Defaults to False
 
     Returns
     -------
@@ -974,11 +969,12 @@ def copy_data_files(temp_dir_name,
     for file in input_file_dict:
         filepath = Path(input_file_dict[file])
         filename = filepath.name
+        old_filepath = test_dir / filepath
         new_filepath = temp_dir / filename
-        if copy_tree:
-            copytree(test_dir / filepath, new_filepath)
+        if old_filepath.is_dir():
+            copytree(old_filepath, new_filepath)
         else:
-            copyfile(test_dir / filepath, new_filepath)
+            copyfile(old_filepath, new_filepath)
         output_file_dict[file] = str(new_filepath)
 
     return output_file_dict
