@@ -23,7 +23,7 @@ class TestCopyData():
                          'features': 'temp_test_copy_data_file/features.csv'}
         self.dirs_to_remove.append('temp_test_copy_data_file')
         output_dict = copy_data_files('temp_test_copy_data_file',
-                                     file_dict)
+                                      file_dict)
         for f in expected_dict:
             eq_(output_dict[f], expected_dict[f])
             ok_(Path(output_dict[f]).exists())
