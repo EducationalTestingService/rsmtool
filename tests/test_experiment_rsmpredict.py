@@ -8,6 +8,8 @@ from os.path import basename, exists, join
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool import compute_and_save_predictions
+
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
@@ -165,6 +167,14 @@ def test_run_experiment_lr_predict_with_repeated_ids():
                        source,
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
+
+
+@raises(ValueError)
+def test_compute_predictions_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        compute_and_save_predictions(config_list, temp_dir)
 
 
 @raises(FileNotFoundError)

@@ -7,6 +7,7 @@ from os.path import join
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool import run_comparison
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_run_comparison,
                                 copy_data_files,
@@ -121,6 +122,13 @@ def test_run_experiment_lr_compare_with_dictionary():
                          config_obj_or_dict=config_obj)
 
 
+
+@raises(ValueError)
+def test_run_comparison_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_comparison(config_list, temp_dir)
 
 
 @raises(FileNotFoundError)

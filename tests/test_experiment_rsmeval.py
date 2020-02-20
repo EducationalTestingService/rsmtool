@@ -8,6 +8,8 @@ from os.path import basename, exists, join
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool import run_evaluation
+
 from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
@@ -151,6 +153,13 @@ def test_run_experiment_lr_eval_with_dictionary():
                          experiment_id,
                          config_obj_or_dict=config_obj)
 
+
+@raises(ValueError)
+def test_run_evaluation_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_evaluation(config_list, temp_dir)
 
 
 @raises(ValueError)
