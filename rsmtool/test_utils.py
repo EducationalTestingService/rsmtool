@@ -159,10 +159,10 @@ def check_run_evaluation(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    config_obj_or_dict: Configuration or dictionary
+    config_obj_or_dict: Configuration or dict
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`
+        using ``source`` and ``experiment_id``.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -182,7 +182,7 @@ def check_run_evaluation(source,
     do_run_evaluation(source,
                       experiment_id,
                       config_input,
-                      suppress_warnings_for)
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -221,10 +221,10 @@ def check_run_comparison(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    config_obj_or_dict: Configuration or dictionary
+    config_obj_or_dict: Configuration or dict
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`
+        using ``source`` and ``experiment_id``.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -279,10 +279,10 @@ def check_run_prediction(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    config_obj_or_dict: Configuration or dictionary
+    config_obj_or_dict: Configuration or dict
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`.
+        using ``source`` and ``experiment_id``.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -337,10 +337,10 @@ def check_run_summary(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
-    config_obj_or_dict: Configuration or dictionary
+    config_obj_or_dict: Configuration or dict
         Configuration object or dictionary to use as an input.
         If None, the function will construct a path to the config file
-        using `source` and `experiment_id`.
+        using ``source`` and ``experiment_id``.
     suppress_warnings_for : list, optional
         Categories for which warnings should be suppressed when running the
         experiments.
@@ -358,8 +358,8 @@ def check_run_summary(source,
         config_input = config_obj_or_dict
 
     do_run_summary(source,
-                  config_input,
-                  suppress_warnings_for=suppress_warnings_for)
+                   config_input,
+                   suppress_warnings_for=suppress_warnings_for)
 
     html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
@@ -392,7 +392,7 @@ def do_run_experiment(source,
         Path to where the test is located on disk.
     experiment_id : str
         Experiment ID to use when running.
-    config_input : str or Configuration or Dictionary
+    config_input : str or Configuration or dict
         Path to the experiment configuration file,
         or a `Configuration` object
         or a Python dictionary with keys corresponding to fields in the
@@ -438,7 +438,7 @@ def do_run_evaluation(source,
         Path to where the test is located on disk.
     experiment_id : str
         Experiment ID to use when running.
-    config_input : str or Configuration or Dictionary
+    config_input : str or Configuration or dict
         Path to the experiment configuration file,
         or a `Configuration` object
         or a Python dictionary with keys corresponding to fields in the
@@ -480,7 +480,7 @@ def do_run_prediction(source,
     ----------
     source : str
         Path to where the test is located on disk.
-    config_input : str or Configuration or Dictionary
+    config_input : str or Configuration or dict
         Path to the experiment configuration file,
         or a `Configuration` object
         or a Python dictionary with keys corresponding to fields in the
@@ -524,7 +524,7 @@ def do_run_comparison(source,
     ----------
     source : str
         Path to where the test is located on disk.
-    config_input : str or Configuration or Dictionary
+    config_input : str or Configuration or dict
         Path to the experiment configuration file,
         or a `Configuration` object
         or a Python dictionary with keys corresponding to fields in the
@@ -560,7 +560,7 @@ def do_run_summary(source,
     ----------
     source : str
         Path to where the test is located on disk.
-    config_input : str or Configuration or Dictionary
+    config_input : str or Configuration or dict
         Path to the experiment configuration file,
         or a `Configuration` object
         or a Python dictionary with keys corresponding to fields in the
