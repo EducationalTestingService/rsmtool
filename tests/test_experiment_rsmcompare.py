@@ -28,8 +28,6 @@ else:
 _AUTO_UPDATE = False
 
 
-DIRS_TO_REMOVE = []
-
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
     param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores'),
@@ -53,7 +51,9 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_compare_with_object():
-    # test rsmcompare using the Configuration object, rather than a file;
+    '''
+    test rsmcompare using the Configuration object, rather than a file;
+    '''
 
     source = 'lr-self-compare-object'
     experiment_id = 'lr_self_compare_object'
@@ -86,7 +86,9 @@ def test_run_experiment_lr_compare_with_object():
 
 
 def test_run_experiment_lr_compare_with_dictionary():
-    # test rsmcompare using the dictionary object, rather than a file;
+    '''
+    test rsmcompare using the dictionary object, rather than a file
+    '''
 
     source = 'lr-self-compare-dict'
     experiment_id = 'lr_self_compare_dict'

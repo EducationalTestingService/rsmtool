@@ -47,12 +47,13 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_summary_with_object():
-
-    # test rsmsummarize using the Configuration object, rather than a file;
-    # we set the configuration directory to point to the
-    # test directory
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
+    '''
+    test rsmsummarize using the Configuration object, rather than a file;
+    we set the configuration directory to point to the
+    test directory
+    to ensure that the results are identical to what we would expect if we had
+    run this test with a configuration file instead.
+    '''
     source = 'lr-self-summary-object'
 
     configdir = join(rsmtool_test_dir,
@@ -73,9 +74,9 @@ def test_run_experiment_lr_summary_with_object():
 
 
 def test_run_experiment_lr_summary_dictionary():
-
-    # test rsmsummarize using the dictionary object, rather than a file;
-
+    '''
+    Test rsmsummarize using the dictionary object, rather than a file;
+    '''
     source = 'lr-self-summary-dictionary'
 
     # set up a temporary directory since
@@ -84,8 +85,7 @@ def test_run_experiment_lr_summary_dictionary():
 
     old_file_dict = {'experiment_dir': 'data/experiments/lr-self-summary-dict/lr-subgroups'}
 
-    new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+    new_file_dict = copy_data_files(temp_dir.name, old_file_dict)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": [new_file_dict['experiment_dir'],
@@ -98,9 +98,10 @@ def test_run_experiment_lr_summary_dictionary():
 
 
 def test_run_experiment_lr_summary_no_trim():
-
-    # experiment to check the condition where no trim values can be located
-    # also uses the `Configuration` object directly
+    '''
+    Experiment to check the condition where no trim values can be located
+    also uses the `Configuration` object directly
+    '''
     source = 'lr-self-summary-no-trim'
 
     config_dir = join(rsmtool_test_dir,
