@@ -116,6 +116,9 @@ elif for_dash:
     html_theme_options = {
         'nosidebar': True
     }
+
+html_static_path = ['assets']
+
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples

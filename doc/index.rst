@@ -6,14 +6,14 @@
 Rater Scoring Modeling Tool (RSMTool)
 =====================================
 
-.. image:: rsmtool.png
+.. image:: assets/rsmtool.png
    :alt: RSMTool logo
    :scale: 10 %
    :align: right
 
 .. container:: clear
 
-    .. image:: spacer.png
+    .. image:: assets/spacer.png
 
 Automated scoring of written and spoken responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `MI Write <https://measurementinc.com/miwrite>`_ for written responses and `SpeechRater <https://www.ets.org/research/topics/as_nlp/speech/>`_ for spoken responses.
 
