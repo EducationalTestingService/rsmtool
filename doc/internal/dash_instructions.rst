@@ -1,6 +1,5 @@
 .. _dash_docset:
 
-
 Generating Dash Docset
 =======================
 
