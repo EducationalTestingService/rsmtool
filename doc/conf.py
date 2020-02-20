@@ -117,6 +117,7 @@ elif for_dash:
         'nosidebar': True
     }
 
+# copy over any static assets
 html_static_path = ['assets']
 
 # -- Options for manual page output ---------------------------------------
