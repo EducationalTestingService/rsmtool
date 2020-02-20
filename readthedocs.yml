@@ -1,5 +1,5 @@
 conda:
-  file: environment.yml
+  file: rtdenv.yml
 
 python:
   version: 3
