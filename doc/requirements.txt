@@ -1,0 +1,4 @@
+skll
+ipython
+nbconvert
+statsmodels

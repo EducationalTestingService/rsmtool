@@ -26,6 +26,12 @@ To set up a local development environment, follow the steps below:
 
 8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
+Documentation
+-------------
+
+Note that the file ``doc/requirements.txt`` is meant specifically for the ReadTheDocs documentation build process and should not be used locally. To build the documentation locally, you *must* use the same conda environment created above.
+
+
 RSMTool tests
 -------------
 
