@@ -1,3 +1,4 @@
 skll
 ipython
 nbconvert
+statsmodels
