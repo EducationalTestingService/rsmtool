@@ -284,7 +284,7 @@ def test_standardized_mean_difference():
     eq_(smd, expected)
 
 
-def test_standardized_mean_difference_zero_denominator_jonson():
+def test_standardized_mean_difference_zero_denominator_johnson():
 
     # test SMD with zero denominator
     # we pass 0 as standard deviation of population
@@ -410,12 +410,12 @@ def test_difference_of_standardized_means_with_no_population_info():
     expected = -1.7446361815538174e-16
     y_true, y_pred = (np.array([98, 18, 47, 64, 32, 11, 100]),
                       np.array([94, 42, 54, 12, 92, 10, 77]))
-    with warnings.catch_warnings(record=True) as w:
+    with warnings.catch_warnings(record=True) as warning_list:
         diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
-    eq_(len(w), 2)
-    assert issubclass(w[0].category, UserWarning)
-    assert issubclass(w[1].category, UserWarning)
+    eq_(len(warning_list), 2)
+    assert issubclass(warning_list[0].category, UserWarning)
+    assert issubclass(warning_list[1].category, UserWarning)
 
 
 def test_quadratic_weighted_kappa():
@@ -456,16 +456,17 @@ def test_partial_correlations_with_singular_matrix():
     # of singularity
     expected = pd.DataFrame({0: [1.0, -1.0], 1: [-1.0, 1.0]})
     df_singular = pd.DataFrame(np.tile(np.random.randn(100), (2, 1))).T
-    with warnings.catch_warnings(record=True) as w:
+    with warnings.catch_warnings(record=True) as warning_list:
         assert_frame_equal(partial_correlations(df_singular), expected)
-    eq_(len(w), 1)
-    assert issubclass(w[-1].category, UserWarning)
+    eq_(len(warning_list), 1)
+    assert issubclass(warning_list[-1].category, UserWarning)
 
 
 def test_partial_correlations_pinv():
 
-    msg = ('The inverse of the variance-covariance matrix when computing '
-           'partial correlations was calculated '
+    msg = ('When computing partial correlations '
+           'the inverse of the variance-covariance matrix '
+           'was calculated '
            'using the Moore-Penrose generalized matrix inversion, due to '
            'its determinant being at or very close to zero.')
     df_small_det = pd.DataFrame({'X1': [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],

@@ -482,8 +482,8 @@ def partial_correlations(df):
             icvx = np.linalg.inv(df_cov)
         except AssertionError:
             icvx = np.linalg.pinv(df_cov)
-            warnings.warn('The inverse of the variance-covariance matrix '
-                          'when computing partial correlations '
+            warnings.warn('When computing partial correlations '
+                          'the inverse of the variance-covariance matrix '
                           'was calculated using the Moore-Penrose generalized '
                           'matrix inversion, due to its determinant being at '
                           'or very close to zero.')
