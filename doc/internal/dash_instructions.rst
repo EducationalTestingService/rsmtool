@@ -13,4 +13,4 @@ used for the macOS `Dash <https://kapeli.com/dash>`_ app.
 
 3. Clone the repository at https://github.com/Kapeli/Dash-User-Contributions.
 
-4. Follow the instructions in that repository's README. Note that we do not need add explicit icons for the docset since our icon is already included in the docset file created above.
+4. Follow the instructions in that repository's README. Note that we do not need add explicit icons for the docset since our icon is already included in the docset file created above. Make sure to submit a pull request to that repo in the end!
