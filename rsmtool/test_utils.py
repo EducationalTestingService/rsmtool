@@ -202,7 +202,7 @@ def check_run_evaluation(source,
     check_report(html_report)
 
 
-def check_run_comparison(source, 
+def check_run_comparison(source,
                          experiment_id,
                          given_test_dir=None,
                          config_obj_or_dict=None,
