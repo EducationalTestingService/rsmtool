@@ -47,19 +47,16 @@ if HAS_RSMEXTRA:
                                    default_feature_sign)
 
 
-
 def deprecated_positional_argument():
     """
     This decorator allows the Configuration class to:
-    (a) accept the old method of specifying the now-deprecated
-        `filepath` positional argument,
-    (b) accept the new method of specifying `configdir` and `filename`
-        keyword arguments, but
+
+    (a) accept the old method of specifying the now-deprecated ``filepath`` positional argument,
+    (b) accept the new method of specifying ``configdir`` and ``filename`` keyword arguments, but
     (c) disallow using the old and the new methods in the same call
 
     Adapted from: https://stackoverflow.com/a/49802489
     """
-
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -68,15 +65,17 @@ def deprecated_positional_argument():
                 # if we also received a keyword argument for filepath
                 # or configdir, raise an error
                 if 'filename' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath positional "
-                                     "argument and the new-style filename keyword argument.")
+                    raise ValueError("Cannot specify both the deprecated filepath "
+                                     "positional argument and the new-style filename "
+                                     "keyword argument.")
                 if 'configdir' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath positional "
-                                     "argument and the new-style configdir keyword argument.")
+                    raise ValueError("Cannot specify both the deprecated filepath "
+                                     "positional argument and the new-style configdir "
+                                     "keyword argument.")
                 # raise deprecation warning
-                warnings.warn("The filepath positional argument is deprecated and will be "
-                              "removed in v8.0. Use the configdir and filename keyword "
-                              "arguments instead.",
+                warnings.warn("The filepath positional argument is deprecated and "
+                              " will be removed in v8.0. Use the ``configdir`` and "
+                              "``filename`` keyword arguments instead.",
                               DeprecationWarning)
 
                 # split filepath into
@@ -153,7 +152,6 @@ class Configuration:
 
         self._configdir = configdir
         self._filename = filename
-
 
     def __contains__(self, key):
         """
@@ -239,10 +237,12 @@ class Configuration:
     @property
     def filepath(self):
         """
-        Get file path to the configuration file
+        Get file path to the configuration file.
 
         .. deprecated:: 8.0
-        `filepath` will be removed in RSMTool v8.0. Use `configdir` and `filename` instead.
+
+            ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
+            ``filename`` instead.
 
         Returns
         -------
@@ -263,13 +263,13 @@ class Configuration:
         Set a new file path to configuration file.
 
         .. deprecated:: 8.0
-        `filepath` will be removed in RSMTool v8.0. Use `configdir` and `filename` instead.
+        ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
+        ``filename`` instead.
 
         Parameters
         ----------
         new_path : str
-            A new file path for the
-            configuration object.
+            A new file path for the Configuration object.
         """
         warnings.warn("The `filepath` attribute of the Configuration "
                       "object will be removed in RSMTool 8.0 "
@@ -312,7 +312,6 @@ class Configuration:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
         self._configdir = abspath(new_path)
 
-
     @property
     def filename(self):
         """
@@ -336,7 +335,6 @@ class Configuration:
             New name of the configuration file
         """
         self._filename = new_path
-
 
     @property
     def context(self):
