@@ -27,6 +27,11 @@ The primary means of using RSMTool is via the :doc:`command-line <usage_rsmtool>
 Documentation
 =============
 
+.. note:: 
+
+   If you use the `Dash <https://kapeli.com/dash>`_ app on macOS, you can also download the complete RSMTool documentation for offline use in the "User Contributed" section under "Preferences -> Downloads".
+
+
 .. toctree::
    :maxdepth: 2
 
@@ -41,7 +46,7 @@ Documentation
    api
    utilities
    contributing
-   release_process
+   internal
 
 Indices and tables
 ==================
