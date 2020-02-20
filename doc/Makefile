@@ -23,4 +23,4 @@ dash: clean
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	python "$(SOURCEDIR)/add_dash_anchors.py" "$(BUILDDIR)/html"
 	doc2dash -n RSMTool -d "$(BUILDDIR)" -I index.html "$(BUILDDIR)/html"
-	cp dash_icon.png "$(BUILDDIR)/RSMTool.DocSet/icon.png"
+	cp assets/dash_icon.png "$(BUILDDIR)/RSMTool.DocSet/icon.png"
