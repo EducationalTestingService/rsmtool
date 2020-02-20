@@ -113,13 +113,9 @@ def test_run_experiment_lr_compare_with_dictionary():
                    }
 
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
-
     check_run_comparison(source,
                          experiment_id,
-                         config_obj_or_dict=config_obj)
+                         config_obj_or_dict=config_dict)
 
 
 

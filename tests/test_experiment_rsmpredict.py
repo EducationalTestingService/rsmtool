@@ -149,11 +149,8 @@ def test_run_experiment_lr_predict_with_dictionary():
                    "experiment_id": "lr"}
 
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
     check_run_prediction(source,
-                         config_obj_or_dict=config_obj)
+                         config_obj_or_dict=config_dict)
 
 
 @raises(ValueError)
