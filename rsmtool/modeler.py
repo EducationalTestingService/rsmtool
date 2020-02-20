@@ -958,7 +958,7 @@ class Modeler:
         Returns
         -------
         learner : `Learner` object
-            SKLL `LinearRegression` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner`_ object containing
+            SKLL `LinearRegression` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_ object containing
             the coefficients learned by training the built-in model.
         """
         # get the columns that actually contain the feature values
