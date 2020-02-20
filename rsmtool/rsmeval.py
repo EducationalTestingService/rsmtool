@@ -44,8 +44,9 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
         Relative paths in the configuration file will be interpreted relative
         to the location of the file. For configuration object
         `.configdir` needs to be set to indicate the reference path. If
-        the user passes a dictionary, the reference path will be set to the current directory and all relative paths will be resolved relative to this path.
-        to the current directory.
+        the user passes a dictionary, the reference path will be set to
+        the current directory and all relative paths will be resolved relative
+        to this path.
     output_dir : str
         Path to the experiment output directory.
 

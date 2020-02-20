@@ -47,8 +47,8 @@ def test_run_experiment_parameterized(*args, **kwargs):
 def test_run_experiment_lr_summary_with_object():
 
     # test rsmsummarize using the Configuration object, rather than a file;
-    # we set the configuration directory to point to the 
-    # test directory 
+    # we set the configuration directory to point to the
+    # test directory
     # to ensure that the results are identical to what we would expect if we had
     # run this test with a configuration file instead.
     source = 'lr-self-summary-object'
@@ -104,14 +104,14 @@ def test_run_experiment_lr_summary_no_trim():
     config_dir = join(rsmtool_test_dir,
                       'data',
                       'experiments',
-                       source)
+                      source)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
                    "description": "Comparison of rsmtool without trim values"}
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, configdir = config_dir)
+    config_parser.load_config_from_dict(config_dict, configdir=config_dir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
 
     check_run_summary(source, config_obj_or_dict=config_obj)

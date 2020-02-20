@@ -18,7 +18,6 @@ import os
 import sys
 
 from os.path import (abspath,
-                     dirname,
                      exists,
                      join,
                      normpath)
@@ -78,8 +77,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
         Relative paths in the configuration file will be interpreted relative
         to the location of the file. For configuration object
         `.configdir` needs to be set to indicate the reference path. If
-        the user passes a dictionary, the reference path will be set to the current directory and all relative paths will be resolved relative to this path.
-        to the current directory.
+        the user passes a dictionary, the reference path will be set to
+        the current directory and all relative paths will be resolved relative
+        to this path.
     output_dir : str
         Path to the experiment output directory.
 
@@ -128,18 +128,18 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     # get the information about the "old" experiment
     experiment_id_old = configuration['experiment_id_old']
-    experiment_dir_old = DataReader.locate_files(configuration['experiment_dir_old'], 
+    experiment_dir_old = DataReader.locate_files(configuration['experiment_dir_old'],
                                                  configuration.configdir)
     if not experiment_dir_old:
         raise FileNotFoundError("The directory {} "
                                 "does not exist.".format(configuration['experiment_dir_old']))
-    else:
-        csvdir_old = normpath(join(experiment_dir_old, 'output'))
-        figdir_old = normpath(join(experiment_dir_old, 'figure'))
-        if not exists(csvdir_old) or not exists(figdir_old):
-            raise FileNotFoundError("The directory {} does not contain "
-                                    "the output of an rsmtool "
-                                    "experiment.".format(experiment_dir_old))
+
+    csvdir_old = normpath(join(experiment_dir_old, 'output'))
+    figdir_old = normpath(join(experiment_dir_old, 'figure'))
+    if not exists(csvdir_old) or not exists(figdir_old):
+        raise FileNotFoundError("The directory {} does not contain "
+                                "the output of an rsmtool "
+                                "experiment.".format(experiment_dir_old))
 
     check_experiment_id(experiment_dir_old, experiment_id_old)
 
@@ -150,13 +150,13 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     if not experiment_dir_new:
         raise FileNotFoundError("The directory {} "
                                 "does not exist.".format(configuration['experiment_dir_new']))
-    else:
-        csvdir_new = normpath(join(experiment_dir_new, 'output'))
-        figdir_new = normpath(join(experiment_dir_new, 'figure'))
-        if not exists(csvdir_new) or not exists(figdir_new):
-            raise FileNotFoundError("The directory {} does not contain "
-                                    "the output of an rsmtool "
-                                    "experiment.".format(experiment_dir_new))
+
+    csvdir_new = normpath(join(experiment_dir_new, 'output'))
+    figdir_new = normpath(join(experiment_dir_new, 'figure'))
+    if not exists(csvdir_new) or not exists(figdir_new):
+        raise FileNotFoundError("The directory {} does not contain "
+                                "the output of an rsmtool "
+                                "experiment.".format(experiment_dir_new))
 
     check_experiment_id(experiment_dir_new, experiment_id_new)
 

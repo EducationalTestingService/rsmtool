@@ -231,7 +231,7 @@ def check_run_comparison(source,
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
-   
+
     if config_obj_or_dict is None:
         config_input = join(test_dir,
                             'data',
@@ -536,7 +536,7 @@ def do_run_comparison(source,
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
-    
+
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
@@ -545,7 +545,7 @@ def do_run_comparison(source,
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
             warnings.filterwarnings('ignore', category=warning_type)
-    
+
         run_comparison(config_input, experiment_dir)
 
 
@@ -577,7 +577,7 @@ def do_run_summary(source,
         files = glob(join(source_output_dir, source, output_subdir, '*'))
         for f in files:
             remove(f)
-    
+
     with warnings.catch_warnings():
 
         # always suppress runtime warnings

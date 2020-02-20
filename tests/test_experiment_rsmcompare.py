@@ -42,7 +42,8 @@ DIRS_TO_REMOVE = []
     param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2'),
     param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups'),
     param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2'),
-    param('lr-self-compare-with-subgroups-and-edge-cases', 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases')
+    param('lr-self-compare-with-subgroups-and-edge-cases',
+          'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -71,10 +72,10 @@ def test_run_experiment_lr_compare_with_object():
                    "description_new": "Using all features with a LinearRegression model.",
                    "use_scaled_predictions_new": True,
                    "subgroups": ["QUESTION"]
-                }
+                   }
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, 
+    config_parser.load_config_from_dict(config_dict,
                                         configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
 
@@ -108,7 +109,7 @@ def test_run_experiment_lr_compare_with_dictionary():
                    "description_new": "Using all features with a LinearRegression model.",
                    "use_scaled_predictions_new": True,
                    "subgroups": ["QUESTION"]
-                }
+                   }
 
 
     config_parser = ConfigurationParser()

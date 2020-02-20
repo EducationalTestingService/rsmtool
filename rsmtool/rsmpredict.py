@@ -46,6 +46,12 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     config_file_or_obj : str or configuration_parser.Configuration
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory.
+        Relative paths in the configuration file will be interpreted relative
+        to the location of the file. For configuration object
+        `.configdir` needs to be set to indicate the reference path. If
+        the user passes a dictionary, the reference path will be set to
+        the current directory and all relative paths will be resolved relative
+        to this path.
     output_dir : str
         Path to the output directory for saving files.
     feats_file (optional): str

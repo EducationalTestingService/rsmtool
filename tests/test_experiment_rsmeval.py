@@ -97,18 +97,18 @@ def test_run_experiment_lr_eval_with_object():
                      source)
 
     config_dict = {"predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
-                    "system_score_column": "score",
-                    "description": "An evaluation of LinearRegression predictions.",
-                    "human_score_column": "h1",
-                    "id_column": "id",
-                    "experiment_id": "lr_eval_object",
-                    "subgroups": "QUESTION",
-                    "scale_with": "asis",
-                    "trim_min": 1,
-                    "trim_max": 6}
+                   "system_score_column": "score",
+                   "description": "An evaluation of LinearRegression predictions.",
+                   "human_score_column": "h1",
+                   "id_column": "id",
+                   "experiment_id": "lr_eval_object",
+                   "subgroups": "QUESTION",
+                   "scale_with": "asis",
+                   "trim_min": 1,
+                   "trim_max": 6}
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, 
+    config_parser.load_config_from_dict(config_dict,
                                         configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmeval')
 
@@ -133,15 +133,15 @@ def test_run_experiment_lr_eval_with_dictionary():
                                     old_file_dict)
 
     config_dict = {"predictions_file": new_file_dict['pred'],
-                    "system_score_column": "score",
-                    "description": "An evaluation of LinearRegression predictions.",
-                    "human_score_column": "h1",
-                    "id_column": "id",
-                    "experiment_id": "lr_eval_dict",
-                    "subgroups": "QUESTION",
-                    "scale_with": "asis",
-                    "trim_min": 1,
-                    "trim_max": 6}
+                   "system_score_column": "score",
+                   "description": "An evaluation of LinearRegression predictions.",
+                   "human_score_column": "h1",
+                   "id_column": "id",
+                   "experiment_id": "lr_eval_dict",
+                   "subgroups": "QUESTION",
+                   "scale_with": "asis",
+                   "trim_min": 1,
+                   "trim_max": 6}
 
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict)

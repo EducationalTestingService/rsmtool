@@ -118,7 +118,7 @@ def test_run_experiment_lr_predict_with_object():
 
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, 
+    config_parser.load_config_from_dict(config_dict,
                                         configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
 
@@ -130,7 +130,6 @@ def test_run_experiment_lr_predict_with_dictionary():
     # test rsmpredict using the dictionary object, rather than a file;
 
     source = 'lr-predict-dict'
-    experiment_id = 'lr_predict_dict'
 
     # set up a temporary directory since
     # we will be using getcwd
