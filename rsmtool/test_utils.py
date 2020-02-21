@@ -1066,9 +1066,9 @@ class FileUpdater(object):
 
         # find the added/updated files that are model files
         overall_updated_model = [(source, updated_file) for (source, updated_file)
-                                  in self.updated_files if updated_file.endswith('.model') or
-                                  updated_file.endswith('ols') or
-                                  updated_file.endswith('.npy')]
+                                 in self.updated_files if updated_file.endswith('.model') or
+                                 updated_file.endswith('ols') or
+                                 updated_file.endswith('.npy')]
 
         # find updated .json files
         overall_updated_json = [(source, updated_file) for (source, updated_file)
