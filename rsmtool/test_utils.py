@@ -1071,10 +1071,10 @@ class FileUpdater(object):
                                   updated_file.endswith('.npy')]
 
         # find updated .json files
-        overall_updated_json =    [(source, updated_file) for (source, updated_file)
-                                  in self.updated_files if updated_file.endswith('.json')]
+        overall_updated_json = [(source, updated_file) for (source, updated_file)
+                                 in self.updated_files if updated_file.endswith('.json')]
 
-        # find updated
+        # find updated files that are not model and not json
         overall_updated_non_model = [(source, updated_file) for (source, updated_file)
                                      in self.updated_files if not (source, updated_file)
                                      in overall_updated_json and not (source, updated_file)
