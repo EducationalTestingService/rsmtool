@@ -26,11 +26,10 @@ class DataContainer:
         Parameters
         ----------
         datasets : list of dicts, optional
-            A list of dataset dicts. Each dict should be
-            in the following format:
-            {'name': 'name_of_dataset',
-             'frame' <pd.DataFrame object>,
-             'path': 'path_to_file'}
+            A list of dataset dicts. Each dict should have the following keys:
+            ``name`` containing the name of the dataset, ``frame`` containing
+            the dataframe object that contains the dataset, and ``path`` containing
+            the file from which the dataset was read.
         """
         self._names = []
         self._dataframes = {}

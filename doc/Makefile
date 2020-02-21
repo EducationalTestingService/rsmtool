@@ -18,3 +18,9 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+dash: export DASH=True
+dash: clean
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	python "$(SOURCEDIR)/add_dash_anchors.py" "$(BUILDDIR)/html"
+	doc2dash -n RSMTool -d "$(BUILDDIR)" -I index.html "$(BUILDDIR)/html"
+	cp assets/dash_icon.png "$(BUILDDIR)/RSMTool.DocSet/icon.png"
