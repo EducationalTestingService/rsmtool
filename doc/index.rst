@@ -6,14 +6,14 @@
 Rater Scoring Modeling Tool (RSMTool)
 =====================================
 
-.. image:: rsmtool.png
+.. image:: assets/rsmtool.png
    :alt: RSMTool logo
    :scale: 10 %
    :align: right
 
 .. container:: clear
 
-    .. image:: spacer.png
+    .. image:: assets/spacer.png
 
 Automated scoring of written and spoken responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `MI Write <https://measurementinc.com/miwrite>`_ for written responses and `SpeechRater <https://www.ets.org/research/topics/as_nlp/speech/>`_ for spoken responses.
 
@@ -26,6 +26,11 @@ The primary means of using RSMTool is via the :doc:`command-line <usage_rsmtool>
 
 Documentation
 =============
+
+.. note:: 
+
+   If you use the `Dash <https://kapeli.com/dash>`_ app on macOS, you can also download the complete RSMTool documentation for offline use. Go to the Dash preferences, click on "Downloads", then "User Contributed", and search for "RSMTool".
+
 
 .. toctree::
    :maxdepth: 2
@@ -41,7 +46,7 @@ Documentation
    api
    utilities
    contributing
-   release_process
+   internal
 
 Indices and tables
 ==================
