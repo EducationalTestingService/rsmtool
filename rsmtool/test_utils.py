@@ -1064,11 +1064,21 @@ class FileUpdater(object):
             print('{} {}'.format(source, deleted_file))
         print()
 
-        # find the added/updated files that are not model files
+        # find the added/updated files that are model files
+        overall_updated_model = [(source, updated_file) for (source, updated_file)
+                                  in self.updated_files if updated_file.endswith('.model') or
+                                  updated_file.endswith('ols') or
+                                  updated_file.endswith('.npy')]
+
+        # find updated .json files
+        overall_updated_json =    [(source, updated_file) for (source, updated_file)
+                                  in self.updated_files if updated_file.endswith('.json')]
+
+        # find updated
         overall_updated_non_model = [(source, updated_file) for (source, updated_file)
-                                     in self.updated_files if not updated_file.endswith('.model') and
-                                     not updated_file.endswith('ols') and
-                                     not updated_file.endswith('.npy')]
+                                     in self.updated_files if not (source, updated_file)
+                                     in overall_updated_json and not (source, updated_file)
+                                     in overall_updated_model]
 
         # print out the number and list of overall added/updated non-model files
         print('{} added/updated:'.format(len(overall_updated_non_model)))
@@ -1077,8 +1087,14 @@ class FileUpdater(object):
         print()
 
         # print out a summary statement for added/updated model files
-        num_updated_model_files = len(self.updated_files) - len(overall_updated_non_model)
+        num_updated_model_files = len(overall_updated_model)
         print('{} model files (*.ols/*.model/*.npy) added/updated.'.format(num_updated_model_files))
+        print()
+
+
+        # print out a summary statement for added/updated json files
+        num_updated_json_files = len(overall_updated_json)
+        print('{} *.json files added/updated.'.format(num_updated_json_files))
         print()
 
         # now print out missing and/or empty updated output directories

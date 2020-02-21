@@ -3,7 +3,7 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
+1. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model/non-json) files need to be changed this should be investigated before the branch is released. 
 
 2. Create a release branch on GitHub.
 
