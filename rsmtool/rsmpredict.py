@@ -34,7 +34,9 @@ from rsmtool.utils import LogFormatter
 from rsmtool.writer import DataWriter
 
 
-def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=None):
+def compute_and_save_predictions(config_file_or_obj_or_dict,
+                                 output_file,
+                                 feats_file=None):
     """
     Run ``rsmpredict`` with given configuration file and generate
     predictions (and, optionally, pre-processed feature values).
@@ -44,6 +46,12 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
     config_file_or_obj : str or configuration_parser.Configuration
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory.
+        Relative paths in the configuration file will be interpreted relative
+        to the location of the file. For configuration object
+        `.configdir` needs to be set to indicate the reference path. If
+        the user passes a dictionary, the reference path will be set to
+        the current directory and all relative paths will be resolved relative
+        to this path.
     output_dir : str
         Path to the output directory for saving files.
     feats_file (optional): str
@@ -57,46 +65,60 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
 
     logger = logging.getLogger(__name__)
 
-    # Allow users to pass Configuration object to the
-    # `config_file_or_obj` argument, rather than read file
-    if not isinstance(config_file_or_obj, Configuration):
+    # check what sort of input we got
+    # if we got a string we consider this to be path to config file
+    if isinstance(config_file_or_obj_or_dict, str):
 
         # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj)
-        config = parser.read_normalize_validate_and_process_config(config_file_or_obj,
-                                                                   context='rsmpredict')
+        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
+        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
+                                                                          context='rsmpredict')
 
-        # get the directory where the config file lives
-        configpath = dirname(config_file_or_obj)
+    elif isinstance(config_file_or_obj_or_dict, dict):
+
+        # initialize the parser from dict
+        parser = ConfigurationParser()
+        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
+                                                                            context='rsmpredict')
+
+    elif isinstance(config_file_or_obj_or_dict, Configuration):
+
+        configuration = config_file_or_obj_or_dict
+        # raise an error if we are passed a Configuration object
+        # without a configdir attribute. This can only
+        # happen if the object was constructed using an earlier version
+        # of RSMTool and stored
+        if configuration.configdir is None:
+            raise AttributeError("Configuration object must have configdir attribute.")
 
     else:
-
-        config = config_file_or_obj
-        if config.filepath is not None:
-            configpath = dirname(config.filepath)
-        else:
-            configpath = os.getcwd()
+        raise ValueError("The input to compute_and_save_predictions must be "
+                         "a path to the file (str), a dictionary, "
+                         "or a configuration object. You passed "
+                         "{}.".format(type(config_file_or_obj_or_dict)))
 
     # get the experiment ID
-    experiment_id = config['experiment_id']
+    experiment_id = configuration['experiment_id']
 
     # Get output format
-    file_format = config.get('file_format', 'csv')
+    file_format = configuration.get('file_format', 'csv')
 
     # Get DataWriter object
     writer = DataWriter(experiment_id)
 
     # get the input file containing the feature values
     # for which we want to generate the predictions
-    input_features_file = DataReader.locate_files(config['input_features_file'], configpath)
+    input_features_file = DataReader.locate_files(configuration['input_features_file'],
+                                                  configuration.configdir)
     if not input_features_file:
         raise FileNotFoundError('Input file {} does not exist'
-                                ''.format(config['input_features_file']))
+                                ''.format(configuration['input_features_file']))
 
-    experiment_dir = DataReader.locate_files(config['experiment_dir'], configpath)
+    experiment_dir = DataReader.locate_files(configuration['experiment_dir'],
+                                             configuration.configdir)
     if not experiment_dir:
         raise FileNotFoundError('The directory {} does not exist.'
-                                ''.format(config['experiment_dir']))
+                                ''.format(configuration['experiment_dir']))
     else:
         experiment_output_dir = normpath(join(experiment_dir, 'output'))
         if not exists(experiment_output_dir):
@@ -145,7 +167,7 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                   'feature_info',
                   'postprocessing_params']
 
-    converters = {'input_features': config.get_default_converter()}
+    converters = {'input_features': configuration.get_default_converter()}
 
     # Initialize the reader
     reader = DataReader(file_paths, file_names, converters)
@@ -156,13 +178,13 @@ def compute_and_save_predictions(config_file_or_obj, output_file, feats_file=Non
                                         '{}.model'.format(experiment_id)))
 
     # Add the model to the configuration object
-    config['model'] = model
+    configuration['model'] = model
 
     # Initialize the processor
     processor = FeaturePreprocessor()
 
     (processed_config,
-     processed_container) = processor.process_data(config,
+     processed_container) = processor.process_data(configuration,
                                                    data_container,
                                                    context='rsmpredict')
 
