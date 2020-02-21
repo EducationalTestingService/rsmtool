@@ -1,11 +1,16 @@
 import os
+import tempfile
 
+from os import getcwd
 from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool import run_comparison
+from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_run_comparison,
+                                copy_data_files,
                                 do_run_comparison)
 
 # allow test directory to be set via an environment variable
@@ -24,24 +29,104 @@ _AUTO_UPDATE = False
 
 
 @parameterized([
-    param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores_report'),
-    param('lr-self-compare-with-h2', 'lr_with_h2_vs_lr_with_h2_report'),
-    param('lr-self-compare-with-custom-order', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('lr-self-compare-with-chosen-sections', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('lr-self-compare-with-custom-sections-and-custom-order', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('lr-self-compare-with-thumbnails', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('linearsvr-self-compare', 'LinearSVR_vs_LinearSVR_report'),
-    param('lr-eval-self-compare', 'lr_eval_with_h2_vs_lr_eval_with_h2_report'),
-    param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2_report'),
-    param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups_report'),
-    param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2_report'),
-    param('lr-self-compare-with-subgroups-and-edge-cases', 'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases_report')
+    param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores'),
+    param('lr-self-compare-with-h2', 'lr_with_h2_vs_lr_with_h2'),
+    param('lr-self-compare-with-custom-order', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-with-chosen-sections', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-with-custom-sections-and-custom-order', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-with-thumbnails', 'lr_subgroups_vs_lr_subgroups'),
+    param('linearsvr-self-compare', 'LinearSVR_vs_LinearSVR'),
+    param('lr-eval-self-compare', 'lr_eval_with_h2_vs_lr_eval_with_h2'),
+    param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2'),
+    param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2'),
+    param('lr-self-compare-with-subgroups-and-edge-cases',
+          'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_comparison(*args, **kwargs)
+
+
+def test_run_experiment_lr_compare_with_object():
+    '''
+    test rsmcompare using the Configuration object, rather than a file;
+    '''
+
+    source = 'lr-self-compare-object'
+    experiment_id = 'lr_self_compare_object'
+
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
+
+    config_dict = {"comparison_id": "lr_self_compare_object",
+                   "experiment_dir_old": "lr-subgroups",
+                   "experiment_id_old": "lr_subgroups",
+                   "description_old": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_old": True,
+                   "experiment_dir_new": "lr-subgroups",
+                   "experiment_id_new": "lr_subgroups",
+                   "description_new": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_new": True,
+                   "subgroups": ["QUESTION"]
+                   }
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict,
+                                        configdir=configdir)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
+
+    check_run_comparison(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_compare_with_dictionary():
+    '''
+    test rsmcompare using the dictionary object, rather than a file
+    '''
+
+    source = 'lr-self-compare-dict'
+    experiment_id = 'lr_self_compare_dict'
+
+    # set up a temporary directory since
+    # we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+    old_file_dict = {'experiment_dir': 'data/experiments/lr-self-compare-dict/lr-subgroups'}
+
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict)
+
+    config_dict = {"comparison_id": "lr_self_compare_dict",
+                   "experiment_dir_old": new_file_dict['experiment_dir'],
+                   "experiment_id_old": "lr_subgroups",
+                   "description_old": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_old": True,
+                   "experiment_dir_new": new_file_dict['experiment_dir'],
+                   "experiment_id_new": "lr_subgroups",
+                   "description_new": "Using all features with a LinearRegression model.",
+                   "use_scaled_predictions_new": True,
+                   "subgroups": ["QUESTION"]
+                   }
+
+
+    check_run_comparison(source,
+                         experiment_id,
+                         config_obj_or_dict=config_dict)
+
+
+
+@raises(ValueError)
+def test_run_comparison_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_comparison(config_list, temp_dir)
 
 
 @raises(FileNotFoundError)

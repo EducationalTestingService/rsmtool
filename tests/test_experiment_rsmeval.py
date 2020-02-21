@@ -1,15 +1,22 @@
 import os
+import tempfile
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
 from parameterized import param, parameterized
 
+from rsmtool import run_evaluation
+
+from rsmtool.configuration_parser import ConfigurationParser
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
+                                copy_data_files,
                                 do_run_evaluation)
+
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -76,6 +83,80 @@ def test_run_experiment_lr_eval_with_cfg():
             yield check_file_output, csv_file, expected_csv_file
 
     yield check_report, html_report
+
+
+def test_run_experiment_lr_eval_with_object():
+    '''
+    test rsmeval using the Configuration object, rather than a file
+    '''
+
+    source = 'lr-eval-object'
+    experiment_id = 'lr_eval_object'
+
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
+
+    config_dict = {"predictions_file": "../../files/predictions_scaled_with_subgroups.csv",
+                   "system_score_column": "score",
+                   "description": "An evaluation of LinearRegression predictions.",
+                   "human_score_column": "h1",
+                   "id_column": "id",
+                   "experiment_id": "lr_eval_object",
+                   "subgroups": "QUESTION",
+                   "scale_with": "asis",
+                   "trim_min": 1,
+                   "trim_max": 6}
+
+    config_parser = ConfigurationParser()
+    config_parser.load_config_from_dict(config_dict,
+                                        configdir=configdir)
+    config_obj = config_parser.normalize_validate_and_process_config(context='rsmeval')
+
+    check_run_evaluation(source,
+                         experiment_id,
+                         config_obj_or_dict=config_obj)
+
+
+def test_run_experiment_lr_eval_with_dictionary():
+    '''
+    test rsmeval using the dictionary object, rather than a file
+    '''
+
+    source = 'lr-eval-dict'
+    experiment_id = 'lr_eval_dict'
+
+    # set up a temporary directory since
+    # we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+    old_file_dict = {'pred': 'data/files/predictions_scaled_with_subgroups.csv'}
+
+    new_file_dict = copy_data_files(temp_dir.name, old_file_dict)
+
+    config_dict = {"predictions_file": new_file_dict['pred'],
+                   "system_score_column": "score",
+                   "description": "An evaluation of LinearRegression predictions.",
+                   "human_score_column": "h1",
+                   "id_column": "id",
+                   "experiment_id": "lr_eval_dict",
+                   "subgroups": "QUESTION",
+                   "scale_with": "asis",
+                   "trim_min": 1,
+                   "trim_max": 6}
+
+    check_run_evaluation(source,
+                         experiment_id,
+                         config_obj_or_dict=config_dict)
+
+
+@raises(ValueError)
+def test_run_evaluation_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_evaluation(config_list, temp_dir)
 
 
 @raises(ValueError)
