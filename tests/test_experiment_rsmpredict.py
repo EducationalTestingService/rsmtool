@@ -121,13 +121,13 @@ def test_run_experiment_lr_predict_with_object():
                    "experiment_id": "lr"
                    }
 
-
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict,
                                         configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
 
     check_run_prediction(source,
+                         given_test_dir=rsmtool_test_dir,
                          config_obj_or_dict=config_obj)
 
 
@@ -155,6 +155,7 @@ def test_run_experiment_lr_predict_with_dictionary():
                    "experiment_id": "lr"}
 
     check_run_prediction(source,
+                         given_test_dir=rsmtool_test_dir,
                          config_obj_or_dict=config_dict)
 
 

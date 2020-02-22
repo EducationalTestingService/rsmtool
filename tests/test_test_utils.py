@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from os.path import join
 from pathlib import Path
 
 from nose.tools import ok_, eq_
@@ -28,8 +29,8 @@ class TestCopyData():
     def test_copy_data_files(self):
         file_dict = {'train': 'data/files/train.csv',
                      'features': 'data/experiments/lr/features.csv'}
-        expected_dict = {'train': os.path.sep.join(['temp_test_copy_data_file', 'train.csv']),
-                         'features': os.path.sep.join(['temp_test_copy_data_file', 'features.csv'])}
+        expected_dict = {'train': join('temp_test_copy_data_file', 'train.csv'),
+                         'features': join('temp_test_copy_data_file', 'features.csv')}
         self.dirs_to_remove.append('temp_test_copy_data_file')
         output_dict = copy_data_files('temp_test_copy_data_file',
                                       file_dict,
@@ -41,7 +42,7 @@ class TestCopyData():
 
     def test_copy_data_files_directory(self):
         file_dict = {'exp_dir': 'data/experiments/lr-self-compare/lr-subgroups'}
-        expected_dict = {'exp_dir': os.path.sep.join(['temp_test_copy_dirs', 'lr-subgroups'])}
+        expected_dict = {'exp_dir': join('temp_test_copy_dirs', 'lr-subgroups')}
         self.dirs_to_remove.append('temp_test_copy_dirs')
         output_dict = copy_data_files('temp_test_copy_dirs',
                                       file_dict,
@@ -54,8 +55,8 @@ class TestCopyData():
     def test_copy_data_files_files_and_directories(self):
         file_dict = {'exp_dir': 'data/experiments/lr-self-compare/lr-subgroups',
                      'test': 'data/files/test.csv'}
-        expected_dict = {'exp_dir': os.path.sep.join(['temp_test_copy_mixed', 'lr-subgroups']),
-                         'test': os.path.sep.join(['temp_test_copy_mixed', 'test.csv'])}
+        expected_dict = {'exp_dir': join('temp_test_copy_mixed', 'lr-subgroups'),
+                         'test': join('temp_test_copy_mixed', 'test.csv')}
         self.dirs_to_remove.append('temp_test_copy_mixed')
         output_dict = copy_data_files('temp_test_copy_mixed',
                                       file_dict,
