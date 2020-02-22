@@ -147,7 +147,7 @@ def test_run_experiment_lr_predict_with_dictionary():
 
     new_file_dict = copy_data_files(temp_dir.name,
                                     old_file_dict,
-                                    given_test_dir=TEST_DIR)
+                                    rsmtool_test_dir)
 
     config_dict = {"id_column": "ID",
                    "input_features_file": new_file_dict['feature_file'],

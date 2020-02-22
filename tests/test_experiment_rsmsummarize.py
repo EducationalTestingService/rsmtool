@@ -87,7 +87,7 @@ def test_run_experiment_lr_summary_dictionary():
 
     new_file_dict = copy_data_files(temp_dir.name,
                                     old_file_dict,
-                                    given_test_dir=TEST_DIR)
+                                    rsmtool_test_dir)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": [new_file_dict['experiment_dir'],
