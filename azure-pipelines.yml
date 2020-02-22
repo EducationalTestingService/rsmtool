@@ -5,7 +5,6 @@
 
 variables:
   MPLBACKEND: Agg
-  PYTHON_VERSION: "3.6"
 
 trigger:
   branches:
