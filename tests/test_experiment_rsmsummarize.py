@@ -85,7 +85,9 @@ def test_run_experiment_lr_summary_dictionary():
 
     old_file_dict = {'experiment_dir': 'data/experiments/lr-self-summary-dict/lr-subgroups'}
 
-    new_file_dict = copy_data_files(temp_dir.name, old_file_dict)
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict,
+                                    given_test_dir=TEST_DIR)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": [new_file_dict['experiment_dir'],
@@ -94,7 +96,6 @@ def test_run_experiment_lr_summary_dictionary():
                    "description": "Comparison of rsmtool experiment with itself."}
 
     check_run_summary(source, config_obj_or_dict=config_dict)
-
 
 
 def test_run_experiment_lr_summary_no_trim():

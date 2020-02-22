@@ -945,9 +945,9 @@ def copy_data_files(temp_dir_name,
         file type and the values are their paths relative to the `tests`
         directory.
     given_test_dir : str, optional
-        Directory where the the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        Directory where the the test experiments are located. Unless
+        specified, the rsmtool test directory is used. This can be
+        useful when using these experiments to run tests for RSMExtra.
 
     Returns
     -------

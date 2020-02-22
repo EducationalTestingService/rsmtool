@@ -137,10 +137,10 @@ def test_run_experiment_lr_with_object_no_configdir():
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
 
-
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    given_test_dir=TEST_DIR)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
@@ -175,7 +175,8 @@ def test_run_experiment_lr_with_dictionary():
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    given_test_dir=TEST_DIR)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",

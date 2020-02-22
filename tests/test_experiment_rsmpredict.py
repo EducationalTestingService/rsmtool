@@ -146,13 +146,13 @@ def test_run_experiment_lr_predict_with_dictionary():
                      'experiment_dir': 'data/experiments/lr-predict-dict/existing_experiment'}
 
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    given_test_dir=TEST_DIR)
 
     config_dict = {"id_column": "ID",
                    "input_features_file": new_file_dict['feature_file'],
                    "experiment_dir": new_file_dict['experiment_dir'],
                    "experiment_id": "lr"}
-
 
     check_run_prediction(source,
                          config_obj_or_dict=config_dict)
