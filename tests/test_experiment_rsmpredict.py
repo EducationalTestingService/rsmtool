@@ -121,13 +121,13 @@ def test_run_experiment_lr_predict_with_object():
                    "experiment_id": "lr"
                    }
 
-
     config_parser = ConfigurationParser()
     config_parser.load_config_from_dict(config_dict,
                                         configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
 
     check_run_prediction(source,
+                         given_test_dir=rsmtool_test_dir,
                          config_obj_or_dict=config_obj)
 
 
@@ -146,15 +146,16 @@ def test_run_experiment_lr_predict_with_dictionary():
                      'experiment_dir': 'data/experiments/lr-predict-dict/existing_experiment'}
 
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    rsmtool_test_dir)
 
     config_dict = {"id_column": "ID",
                    "input_features_file": new_file_dict['feature_file'],
                    "experiment_dir": new_file_dict['experiment_dir'],
                    "experiment_id": "lr"}
 
-
     check_run_prediction(source,
+                         given_test_dir=rsmtool_test_dir,
                          config_obj_or_dict=config_dict)
 
 
