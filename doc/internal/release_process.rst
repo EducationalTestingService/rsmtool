@@ -45,7 +45,7 @@ This process is only meant for the project administrators, not users and develop
 
 14. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-15. Make sure that the ReadTheDocs build for ``master`` passes.
+15. Make sure that the ReadTheDocs build for ``master`` passes by examining the badge at this `URL <https://skll.readthedocs.io/en/latest/getting_started.html>`_ - this should say "passing" in green.
 
 16. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
 
