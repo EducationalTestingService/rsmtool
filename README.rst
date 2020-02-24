@@ -9,7 +9,7 @@ Rater Scoring Modeling Tool
    :target: https://coveralls.io/r/EducationalTestingService/rsmtool
    :alt: Coverage status
 
-.. image:: https://img.shields.io/conda/v/desilinguist/rsmtool.svg
+.. image:: https://img.shields.io/conda/v/ets/rsmtool.svg
    :target: https://anaconda.org/desilinguist/rsmtool
    :alt: Conda package for SKLL
 
