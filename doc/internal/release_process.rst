@@ -49,7 +49,7 @@ This process is only meant for the project administrators, not users and develop
 
 16. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
 
-17. Make another PR to merge ``master`` branch into ``stable`` so that the ``stable`` ReadTheDocs build always points to the latest release.
+17. Make another PR to merge ``master`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
 
 18. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
