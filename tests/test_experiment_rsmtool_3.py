@@ -28,6 +28,7 @@ if TEST_DIR:
 else:
     from rsmtool.test_utils import rsmtool_test_dir
 
+
 @parameterized([
     param('lr-no-standardization', 'lr_no_standardization'),
     param('lr-exclude-test-flags', 'lr_exclude_test_flags'),
@@ -137,10 +138,10 @@ def test_run_experiment_lr_with_object_no_configdir():
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
 
-
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    rsmtool_test_dir)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",
@@ -175,7 +176,8 @@ def test_run_experiment_lr_with_dictionary():
 
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    rsmtool_test_dir)
 
     config_dict = {"train_file": new_file_dict['train'],
                    "id_column": "ID",

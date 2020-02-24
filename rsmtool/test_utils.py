@@ -929,9 +929,9 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
 
 def copy_data_files(temp_dir_name,
                     input_file_dict,
-                    given_test_dir=None):
+                    given_test_dir):
     """
-    A utility function to copy files from the ``tests/data`` directory into
+    A utility function to copy files from the given test directory into
     a specified temporary directory. Useful for tests where the
     current directory is to be used as the reference for resolving paths
     in the configuration.
@@ -944,10 +944,9 @@ def copy_data_files(temp_dir_name,
         A dictionary of files/directories to copy with keys as the
         file type and the values are their paths relative to the `tests`
         directory.
-    given_test_dir : str, optional
-        Directory where the the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+    given_test_dir : str
+        Directory where the the test experiments are located. This can be
+        useful when using these experiments to run tests for RSMExtra.
 
     Returns
     -------
@@ -955,9 +954,6 @@ def copy_data_files(temp_dir_name,
         The dictionary with the same keys as
         input_file_dict and values showing new paths.
     """
-
-    # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     temp_dir = Path(temp_dir_name)
     if not temp_dir.exists():
@@ -967,7 +963,7 @@ def copy_data_files(temp_dir_name,
     for file in input_file_dict:
         filepath = Path(input_file_dict[file])
         filename = filepath.name
-        old_filepath = test_dir / filepath
+        old_filepath = given_test_dir / filepath
         new_filepath = temp_dir / filename
         if old_filepath.is_dir():
             copytree(old_filepath, new_filepath)

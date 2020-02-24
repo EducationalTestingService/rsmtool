@@ -100,7 +100,8 @@ def test_run_experiment_lr_compare_with_dictionary():
     old_file_dict = {'experiment_dir': 'data/experiments/lr-self-compare-dict/lr-subgroups'}
 
     new_file_dict = copy_data_files(temp_dir.name,
-                                    old_file_dict)
+                                    old_file_dict,
+                                    rsmtool_test_dir)
 
     config_dict = {"comparison_id": "lr_self_compare_dict",
                    "experiment_dir_old": new_file_dict['experiment_dir'],
@@ -114,11 +115,9 @@ def test_run_experiment_lr_compare_with_dictionary():
                    "subgroups": ["QUESTION"]
                    }
 
-
     check_run_comparison(source,
                          experiment_id,
                          config_obj_or_dict=config_dict)
-
 
 
 @raises(ValueError)

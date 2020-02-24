@@ -582,7 +582,7 @@ class TestConfiguration:
             config_dict = {'exp_id': 'my_experiment'}
             config = Configuration(config_dict, filepath)
             eq_(config._filename, 'file.json')
-            eq_(config._configdir, abspath('some/path/'))
+            eq_(config._configdir, abspath('some/path'))
             assert len(w) == 1
             assert issubclass(w[-1].category, DeprecationWarning)
 
