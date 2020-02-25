@@ -14,7 +14,7 @@ To set up a local development environment, follow the steps below:
 
 3. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
 
-    conda create -n rsmdev -c conda-forge -c desilinguist --file requirements.txt
+    conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
 
 4. Activate the environment using ``conda activate rsmdev``. [#]_
 
@@ -25,6 +25,13 @@ To set up a local development environment, follow the steps below:
 7. Make your changes and add tests. See the next section for more on writing new tests. 
 
 8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+
+Documentation
+-------------
+
+Note that the file ``doc/requirements.txt`` is meant specifically for the ReadTheDocs documentation build process and should not be used locally. To build the documentation locally, you *must* use the same conda environment created above.
+
+If you are on macOS and use the `Dash <https://kapeli.com/dash>`_ app, follow steps 1 and 2 :ref:`here <dash_docset>` to build the RSMTool Dash docset locally.
 
 RSMTool tests
 -------------

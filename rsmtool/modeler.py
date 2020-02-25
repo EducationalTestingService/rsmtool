@@ -958,7 +958,7 @@ class Modeler:
         Returns
         -------
         learner : `Learner` object
-            SKLL `LinearRegression` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner`_ object containing
+            SKLL `LinearRegression` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_ object containing
             the coefficients learned by training the built-in model.
         """
         # get the columns that actually contain the feature values
@@ -1342,7 +1342,9 @@ class Modeler:
         config_as_dict = configuration.to_dict()
         config_as_dict.update(new_config_dict)
 
-        configuration = Configuration(config_as_dict, configuration.filepath)
+        configuration = Configuration(config_as_dict,
+                                      configdir=configuration.configdir,
+                                      filename=configuration.filename)
 
         return configuration, DataContainer(datasets=datasets)
 

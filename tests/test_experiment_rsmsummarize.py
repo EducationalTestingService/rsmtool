@@ -1,16 +1,21 @@
 import os
+import tempfile
 
 from glob import glob
+from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
 from parameterized import param, parameterized
+
+from rsmtool import run_summary
 
 from rsmtool.configuration_parser import ConfigurationParser
 
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_summary,
+                                copy_data_files,
                                 do_run_summary)
 
 # allow test directory to be set via an environment variable
@@ -42,83 +47,86 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_summary_with_object():
-
-    # test rsmsummarize using the Configuration object, rather than a file;
-    # we pass the `filepath` attribute after constructing the Configuraiton object
-    # to ensure that the results are identical to what we would expect if we had
-    # run this test with a configuration file instead.
+    '''
+    test rsmsummarize using the Configuration object, rather than a file;
+    we set the configuration directory to point to the
+    test directory
+    to ensure that the results are identical to what we would expect if we had
+    run this test with a configuration file instead.
+    '''
     source = 'lr-self-summary-object'
 
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmsummarize.json')
+    configdir = join(rsmtool_test_dir,
+                     'data',
+                     'experiments',
+                     source)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
                    "description": "Comparison of rsmtool experiment with itself."}
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
+    config_parser.load_config_from_dict(config_dict,
+                                        configdir=configdir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
-    config_obj.filepath = config_file
 
-    do_run_summary(source, config_obj)
+    check_run_summary(source, config_obj_or_dict=config_obj)
 
-    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
+def test_run_experiment_lr_summary_dictionary():
+    '''
+    Test rsmsummarize using the dictionary object, rather than a file;
+    '''
+    source = 'lr-self-summary-dictionary'
 
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
+    # set up a temporary directory since
+    # we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
 
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
+    old_file_dict = {'experiment_dir': 'data/experiments/lr-self-summary-dict/lr-subgroups'}
 
-    yield check_report, html_report
+    new_file_dict = copy_data_files(temp_dir.name,
+                                    old_file_dict,
+                                    rsmtool_test_dir)
+
+    config_dict = {"summary_id": "model_comparison",
+                   "experiment_dirs": [new_file_dict['experiment_dir'],
+                                       new_file_dict['experiment_dir'],
+                                       new_file_dict['experiment_dir']],
+                   "description": "Comparison of rsmtool experiment with itself."}
+
+    check_run_summary(source, config_obj_or_dict=config_dict)
 
 
 def test_run_experiment_lr_summary_no_trim():
-
-    # experiment to check the condition where no trim values can be located
-    # also uses the `Configuration` object directly
+    '''
+    Experiment to check the condition where no trim values can be located
+    also uses the `Configuration` object directly
+    '''
     source = 'lr-self-summary-no-trim'
 
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmsummarize.json')
+    config_dir = join(rsmtool_test_dir,
+                      'data',
+                      'experiments',
+                      source)
 
     config_dict = {"summary_id": "model_comparison",
                    "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
                    "description": "Comparison of rsmtool without trim values"}
 
     config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
+    config_parser.load_config_from_dict(config_dict, configdir=config_dir)
     config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
-    config_obj.filepath = config_file
 
-    do_run_summary(source, config_obj)
+    check_run_summary(source, config_obj_or_dict=config_obj)
 
-    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_report, html_report
+@raises(ValueError)
+def test_run_summary_wrong_input_format():
+    config_list = [('experiment_id', 'AAAA'),
+                   ('train_file', 'some_path')]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        run_summary(config_list, temp_dir)
 
 
 @raises(FileNotFoundError)

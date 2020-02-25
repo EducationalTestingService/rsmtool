@@ -91,16 +91,25 @@ def check_experiment_dir(experiment_dir,
         return list(zip(jsons, [experiment_name] * len(jsons)))
 
 
-def run_summary(config_file_or_obj, output_dir):
+def run_summary(config_file_or_obj_or_dict,
+                output_dir):
     """
     Run rsmsummarize experiment using the given configuration
     file and generate all outputs in the given directory.
 
     Parameters
     ----------
-    config_file_or_obj : str or configuration_parser.Configuration
+    config_file_or_obj_or_dict : str or Configuration or dict
         Path to the experiment configuration file.
-        Users can also pass a `Configuration` object that is in memory.
+        Users can also pass a `Configuration` object that is in memory
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file.
+        Relative paths in the configuration file will be interpreted relative
+        to the location of the file. For configuration object
+        `.configdir` needs to be set to indicate the reference path. If
+        the user passes a dictionary, the reference path will be set
+        to the current directory and all relative paths will be resolved
+        relative to this path.
     output_dir : str
         Path to the experiment output directory.
 
@@ -122,26 +131,37 @@ def run_summary(config_file_or_obj, output_dir):
     os.makedirs(figdir, exist_ok=True)
     os.makedirs(reportdir, exist_ok=True)
 
-    # Allow users to pass Configuration object to the
-    # `config_file_or_obj` argument, rather than read file
-    if not isinstance(config_file_or_obj, Configuration):
+    # check what sort of input we got
+    # if we got a string we consider this to be path to config file
+    if isinstance(config_file_or_obj_or_dict, str):
 
         # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj)
-        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj,
+        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
+        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
                                                                           context='rsmsummarize')
 
-        # get the directory where the configuration file lives
-        configpath = dirname(config_file_or_obj)
+    elif isinstance(config_file_or_obj_or_dict, dict):
+
+        # initialize the parser from dict
+        parser = ConfigurationParser()
+        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
+                                                                            context='rsmsummarize')
+
+    elif isinstance(config_file_or_obj_or_dict, Configuration):
+
+        configuration = config_file_or_obj_or_dict
+        # raise an error if we are passed a Configuration object
+        # without a configdir attribute. This can only
+        # happen if the object was constructed using an earlier version
+        # of RSMTool and stored
+        if configuration.configdir is None:
+            raise AttributeError("Configuration object must have configdir attribute.")
 
     else:
-
-        configuration = config_file_or_obj
-        if configuration.filepath is not None:
-            configpath = dirname(configuration.filepath)
-        else:
-            configpath = os.getcwd()
-
+        raise ValueError("The input to run_summary must be "
+                         "a path to the file (str), a dictionary, "
+                         "or a configuration object. You passed "
+                         "{}.".format(type(config_file_or_obj_or_dict)))
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
 
@@ -158,7 +178,7 @@ def run_summary(config_file_or_obj, output_dir):
     for (experiment_dir, experiment_name) in dirs_with_names:
         experiments = check_experiment_dir(experiment_dir,
                                            experiment_name,
-                                           configpath)
+                                           configuration.configdir)
         all_experiments.extend(experiments)
 
     # get the subgroups if any
@@ -178,7 +198,7 @@ def run_summary(config_file_or_obj, output_dir):
     if custom_report_section_paths:
         logger.info('Locating custom report sections')
         custom_report_sections = Reporter.locate_custom_sections(custom_report_section_paths,
-                                                                 configpath)
+                                                                 configuration.configdir)
     else:
         custom_report_sections = []
 

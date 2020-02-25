@@ -28,7 +28,10 @@ else:
     param('lr-subgroups', 'lr_subgroups', subgroups=['L1']),
     param('lr-with-numeric-subgroup', 'lr_with_numeric_subgroup', subgroups=['ITEM', 'QUESTION']),
     param('lr-with-id-with-leading-zeros', 'lr_with_id_with_leading_zeros', subgroups=['ITEM', 'QUESTION']),
-    param('lr-subgroups-with-edge-cases', 'lr_subgroups_with_edge_cases', subgroups=['group_edge_cases']),
+    # we suppress UserWarnings for this test since we expect to get a warning in partial correlations
+    # due to edge cases
+    param('lr-subgroups-with-edge-cases', 'lr_subgroups_with_edge_cases',
+          subgroups=['group_edge_cases'], suppress_warnings_for=[UserWarning]),
     param('lr-missing-values', 'lr_missing_values'),
     param('lr-include-zeros', 'lr_include_zeros'),
     param('lr-with-length', 'lr_with_length'),

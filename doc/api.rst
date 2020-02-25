@@ -61,6 +61,7 @@ From :py:mod:`~rsmtool.configuration_parser` Module
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: deprecated_positional_argument
 
 From :py:mod:`~rsmtool.container` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

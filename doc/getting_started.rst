@@ -13,7 +13,7 @@ Currently, the recommended way to install RSMTool is by using the ``conda`` pack
 
 2. Create a new conda environment (say, ``rsmtool``) and install the RSMTool conda package by running::
 
-    conda create -n rsmtool -c conda-forge -c desilinguist python=3.6 rsmtool
+    conda create -n rsmtool -c conda-forge -c ets python=3.6 rsmtool
 
 3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path. [#]_
 

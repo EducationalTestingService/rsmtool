@@ -271,7 +271,7 @@ class DataReader:
         return df
 
     @staticmethod
-    def locate_files(filepaths, config_dir):
+    def locate_files(filepaths, configdir):
         """
         Try to locate an experiment file, or a list of experiment files.
         If the given path doesn't exist, then maybe the path is relative
@@ -281,8 +281,9 @@ class DataReader:
         ----------
         filepath_or_paths : str or list
             Name of the experiment file we want to locate.
-        config_dir : str
-            Path to the experiment configuration file.
+        configdir : str
+            Path to the reference configuration directory
+            (usually the directory of the config file)
 
         Returns
         --------
@@ -317,7 +318,7 @@ class DataReader:
         for filepath in filepaths:
 
             retval = None
-            alternate_path = abspath(join(config_dir, filepath))
+            alternate_path = abspath(join(configdir, filepath))
 
             # if the given path exists as is, convert
             # that to an absolute path and return
@@ -325,7 +326,7 @@ class DataReader:
                 retval = abspath(filepath)
 
             # otherwise check if it exists relative
-            # to the directory that contains the main config file
+            # to the reference directory
             elif exists(alternate_path):
                 retval = alternate_path
 

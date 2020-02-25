@@ -13,7 +13,7 @@ from inspect import getmembers, getsourcelines, isfunction
 from os import remove
 from os.path import basename, exists, join
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, copytree
 
 from nose.tools import assert_equal, ok_
 from pandas.util.testing import assert_frame_equal
@@ -40,7 +40,9 @@ def check_run_experiment(source,
                          consistency=False,
                          skll=False,
                          file_format='csv',
-                         given_test_dir=None):
+                         given_test_dir=None,
+                         config_obj_or_dict=None,
+                         suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmtool experiment test.
 
@@ -71,21 +73,32 @@ def check_run_experiment(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dictionary
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using `source` and `experiment_id`.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            '{}.json'.format(experiment_id))
+    else:
+        config_input = config_obj_or_dict
 
     model_type = 'skll' if skll else 'rsmtool'
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_experiment(source, experiment_id, config_file)
+    do_run_experiment(source,
+                      experiment_id,
+                      config_input,
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -118,7 +131,9 @@ def check_run_evaluation(source,
                          subgroups=None,
                          consistency=False,
                          file_format='csv',
-                         given_test_dir=None):
+                         config_obj_or_dict=None,
+                         given_test_dir=None,
+                         suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmeval experiment test.
 
@@ -144,19 +159,30 @@ def check_run_evaluation(source,
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dict
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            '{}.json'.format(experiment_id))
+    else:
+        config_input = config_obj_or_dict
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_evaluation(source, experiment_id, config_file)
+    do_run_evaluation(source,
+                      experiment_id,
+                      config_input,
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -176,7 +202,11 @@ def check_run_evaluation(source,
     check_report(html_report)
 
 
-def check_run_comparison(source, experiment_id, given_test_dir=None):
+def check_run_comparison(source,
+                         experiment_id,
+                         given_test_dir=None,
+                         config_obj_or_dict=None,
+                         suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmcompare experiment test.
 
@@ -191,20 +221,31 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dict
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmcompare.json')
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_comparison(source, config_file)
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            'rsmcompare.json')
+    else:
+        config_input = config_obj_or_dict
 
-    html_report = join('test_outputs', source, '{}.html'.format(experiment_id))
+    do_run_comparison(source,
+                      config_input,
+                      suppress_warnings_for=suppress_warnings_for)
+
+    html_report = join('test_outputs', source, '{}_report.html'.format(experiment_id))
     check_report(html_report, raise_warnings=False)
 
     # we want to ignore deprecation warnings for RSMCompare, so we remove
@@ -214,7 +255,12 @@ def check_run_comparison(source, experiment_id, given_test_dir=None):
     assert_equal(len(warning_msgs), 0)
 
 
-def check_run_prediction(source, excluded=False, file_format='csv', given_test_dir=None):
+def check_run_prediction(source,
+                         excluded=False,
+                         file_format='csv',
+                         given_test_dir=None,
+                         config_obj_or_dict=None,
+                         suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmpredict experiment test.
 
@@ -233,19 +279,29 @@ def check_run_prediction(source, excluded=False, file_format='csv', given_test_d
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dict
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmpredict.json')
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            'rsmpredict.json')
+    else:
+        config_input = config_obj_or_dict
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
-        do_run_prediction(source, config_file)
+    do_run_prediction(source,
+                      config_input,
+                      suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
@@ -261,7 +317,11 @@ def check_run_prediction(source, excluded=False, file_format='csv', given_test_d
         check_file_output(generated_output_file, expected_output_file)
 
 
-def check_run_summary(source, file_format='csv', given_test_dir=None):
+def check_run_summary(source,
+                      file_format='csv',
+                      given_test_dir=None,
+                      config_obj_or_dict=None,
+                      suppress_warnings_for=[]):
     """
     Function to run for a parameterized rsmsummarize experiment test.
 
@@ -277,16 +337,29 @@ def check_run_summary(source, file_format='csv', given_test_dir=None):
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used. This can be useful when using these
         experiments to run tests for RSMExtra.
+    config_obj_or_dict: Configuration or dict
+        Configuration object or dictionary to use as an input.
+        If None, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     # use the test directory from this file unless it's been overridden
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
-    config_file = join(test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       'rsmsummarize.json')
-    do_run_summary(source, config_file)
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            'rsmsummarize.json')
+    else:
+        config_input = config_obj_or_dict
+
+    do_run_summary(source,
+                   config_input,
+                   suppress_warnings_for=suppress_warnings_for)
 
     html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
 
@@ -304,7 +377,10 @@ def check_run_summary(source, file_format='csv', given_test_dir=None):
     check_report(html_report)
 
 
-def do_run_experiment(source, experiment_id, config_file):
+def do_run_experiment(source,
+                      experiment_id,
+                      config_input,
+                      suppress_warnings_for=[]):
     """
     Run RSMTool experiment using the given experiment
     configuration file located in the given source directory
@@ -316,8 +392,15 @@ def do_run_experiment(source, experiment_id, config_file):
         Path to where the test is located on disk.
     experiment_id : str
         Experiment ID to use when running.
-    config_file : str
-        Path to the experiment configuration file.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a `Configuration` object
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed
+        when running the experiments. Note that ``RuntimeWarning``s
+        are always suppressed.
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
@@ -327,10 +410,23 @@ def do_run_experiment(source, experiment_id, config_file):
         files = glob(join(source_output_dir, source, output_subdir, '*'))
         for f in files:
             remove(f)
-    run_experiment(config_file, experiment_dir)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        run_experiment(config_input, experiment_dir)
 
 
-def do_run_evaluation(source, experiment_id, config_file):
+def do_run_evaluation(source,
+                      experiment_id,
+                      config_input,
+                      suppress_warnings_for=[]):
     """
     Run RSMEval experiment using the given experiment
     configuration file located in the given source directory
@@ -342,8 +438,15 @@ def do_run_evaluation(source, experiment_id, config_file):
         Path to where the test is located on disk.
     experiment_id : str
         Experiment ID to use when running.
-    config_file : str
-        Path to the experiment configuration file.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a `Configuration` object
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed
+        when running the experiments. Note that ``RuntimeWarning``s
+        are always suppressed.
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
@@ -353,10 +456,22 @@ def do_run_evaluation(source, experiment_id, config_file):
         files = glob(join(source_output_dir, source, output_subdir, '*'))
         for f in files:
             remove(f)
-    run_evaluation(config_file, experiment_dir)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        run_evaluation(config_input, experiment_dir)
 
 
-def do_run_prediction(source, config_file):
+def do_run_prediction(source,
+                      config_input,
+                      suppress_warnings_for=[]):
     """
     Run RSMPredict experiment using the given experiment
     configuration file located in the given source directory.
@@ -365,8 +480,14 @@ def do_run_prediction(source, config_file):
     ----------
     source : str
         Path to where the test is located on disk.
-    config_file : str
-        Path to the experiment configuration file.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a `Configuration` object
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     source_output_dir = 'test_outputs'
 
@@ -380,10 +501,21 @@ def do_run_prediction(source, config_file):
     for f in files:
         remove(f)
 
-    compute_and_save_predictions(config_file, output_file, feats_file)
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        compute_and_save_predictions(config_input, output_file, feats_file)
 
 
-def do_run_comparison(source, config_file):
+def do_run_comparison(source,
+                      config_input,
+                      suppress_warnings_for=[]):
     """
     Run RSMCompare experiment using the given experiment
     configuration file located in the given source directory.
@@ -392,15 +524,34 @@ def do_run_comparison(source, config_file):
     ----------
     source : str
         Path to where the test is located on disk.
-    config_file : str
-        Path to the experiment configuration file.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a `Configuration` object
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed
+        when running the experiments. Note that ``RuntimeWarning``s
+        are always suppressed.
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
-    run_comparison(config_file, experiment_dir)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        run_comparison(config_input, experiment_dir)
 
 
-def do_run_summary(source, config_file):
+def do_run_summary(source,
+                   config_input,
+                   suppress_warnings_for=[]):
     """
     Run rsmsummarizeary experiment using the given experiment
     configuration file located in the given source directory.
@@ -409,8 +560,14 @@ def do_run_summary(source, config_file):
     ----------
     source : str
         Path to where the test is located on disk.
-    config_file : str
-        Path to the experiment configuration file.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a `Configuration` object
+        or a Python dictionary with keys corresponding to fields in the
+        configuration file
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
     """
     source_output_dir = 'test_outputs'
     experiment_dir = join(source_output_dir, source)
@@ -420,7 +577,17 @@ def do_run_summary(source, config_file):
         files = glob(join(source_output_dir, source, output_subdir, '*'))
         for f in files:
             remove(f)
-    run_summary(config_file, experiment_dir)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        run_summary(config_input, experiment_dir)
 
 
 def check_file_output(file1, file2, file_format='csv'):
@@ -758,6 +925,53 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             length = len(composition_by_group.loc[composition_by_group['{} set'
                                                                        ''.format(partition)] != 0])
             ok_(length == partition_info.iloc[0][group])
+
+
+def copy_data_files(temp_dir_name,
+                    input_file_dict,
+                    given_test_dir):
+    """
+    A utility function to copy files from the given test directory into
+    a specified temporary directory. Useful for tests where the
+    current directory is to be used as the reference for resolving paths
+    in the configuration.
+
+    Parameters
+    ----------
+    temp_dir_name : str
+        Name of the temporary directory.
+    input_file_dict : dict
+        A dictionary of files/directories to copy with keys as the
+        file type and the values are their paths relative to the `tests`
+        directory.
+    given_test_dir : str
+        Directory where the the test experiments are located. This can be
+        useful when using these experiments to run tests for RSMExtra.
+
+    Returns
+    -------
+    output_file_dict : dict
+        The dictionary with the same keys as
+        input_file_dict and values showing new paths.
+    """
+
+    temp_dir = Path(temp_dir_name)
+    if not temp_dir.exists():
+        temp_dir.mkdir()
+
+    output_file_dict = {}
+    for file in input_file_dict:
+        filepath = Path(input_file_dict[file])
+        filename = filepath.name
+        old_filepath = given_test_dir / filepath
+        new_filepath = temp_dir / filename
+        if old_filepath.is_dir():
+            copytree(old_filepath, new_filepath)
+        else:
+            copyfile(old_filepath, new_filepath)
+        output_file_dict[file] = str(new_filepath)
+
+    return output_file_dict
 
 
 class FileUpdater(object):

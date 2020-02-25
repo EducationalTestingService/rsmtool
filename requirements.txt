@@ -1,13 +1,14 @@
+doc2dash
 jupyter
-jupyter_console==6.0.0
 nose
 notebook
 numpy==1.14.6
 pandas==0.23.4
 seaborn
-skll==1.5.2
+skll==2.0.0
 statsmodels
 coverage
+coveralls
 openpyxl
 parameterized
 sphinx
