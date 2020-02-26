@@ -237,6 +237,12 @@ ID_FIELDS = {'rsmtool': 'experiment_id',
 
 _skll_module = import_module('skll.learner')
 
+CONTEXT_TO_FUNCTION = {'rsmtool': 'run_experiment',
+                       'rsmeval': 'run_evaluation',
+                       'rsmsummarize': 'run_summary',
+                       'rsmcompare': 'run_comparison',
+                       'rsmpredict': 'compute_and_save_predictions'}
+
 
 def is_skll_model(model_name):
     """

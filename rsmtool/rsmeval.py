@@ -67,37 +67,11 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
     os.makedirs(figdir, exist_ok=True)
     os.makedirs(reportdir, exist_ok=True)
 
-    # check what sort of input we got
-    # if we got a string we consider this to be path to config file
-    if isinstance(config_file_or_obj_or_dict, str):
-
-        # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                          context='rsmeval')
-
-    elif isinstance(config_file_or_obj_or_dict, dict):
-
-        # initialize the parser from dict
-        parser = ConfigurationParser()
-        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                            context='rsmeval')
-
-    elif isinstance(config_file_or_obj_or_dict, Configuration):
-
-        configuration = config_file_or_obj_or_dict
-        # raise an error if we are passed a Configuration object
-        # without a configdir attribute. This can only
-        # happen if the object was constructed using an earlier version
-        # of RSMTool and stored
-        if configuration.configdir is None:
-            raise AttributeError("Configuration object must have configdir attribute.")
-
-    else:
-        raise ValueError("The input to run_evaluation must be "
-                         "a path to the file (str), a dictionary, "
-                         "or a configuration object. You passed "
-                         "{}.".format(type(config_file_or_obj_or_dict)))
+    # initialize a correct configparser
+    parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
+    # create a configuration object from input
+    configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict,
+                                                                   context='rsmeval')
 
     logger.info('Saving configuration file.')
     configuration.save(output_dir)

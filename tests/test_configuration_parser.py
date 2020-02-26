@@ -9,6 +9,8 @@ from io import StringIO
 from os import getcwd
 from os.path import abspath, dirname, join
 
+from pathlib import Path
+
 from shutil import rmtree
 
 from numpy.testing import assert_array_equal
@@ -565,6 +567,18 @@ class TestConfigurationParser:
     def test_get_correct_configparser_json(self):
         config_parser = ConfigurationParser.get_configparser('config.json')
         assert isinstance(config_parser, JSONConfigurationParser)
+
+    def test_get_correct_configparser_dict(self):
+        config_parser = ConfigurationParser.get_configparser({'config': 'value'})
+        assert isinstance(config_parser, ConfigurationParser)
+
+    def test_get_correct_configparser_path(self):
+        config_parser = ConfigurationParser.get_configparser(Path('config.json'))
+        assert isinstance(config_parser, JSONConfigurationParser)
+
+    @raises(ValueError)
+    def test_get_correct_configparser_wrong_extension(self):
+        config_parser = ConfigurationParser.get_configparser('config.txt')
 
 
 class TestConfiguration:

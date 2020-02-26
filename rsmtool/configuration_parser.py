@@ -26,12 +26,14 @@ from os.path import (abspath,
                      join,
                      splitext)
 
+from pathlib import Path
 from ruamel import yaml
 
 from rsmtool import HAS_RSMEXTRA
 from rsmtool.utils import parse_json_with_comments
 from rsmtool.utils import (DEFAULTS,
                            CHECK_FIELDS,
+                           CONTEXT_TO_FUNCTION,
                            LIST_FIELDS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
@@ -764,15 +766,15 @@ class ConfigurationParser:
 
 
     @classmethod
-    def get_configparser(cls, filepath, *args, **kwargs):
+    def get_configparser(cls, config_file_or_obj_or_dict, *args, **kwargs):
         """
         Get the correct `ConfigurationParser` object,
-        based on the file extension.
+        based on the input.
 
         Parameters
         ----------
-        filepath : str
-            The path to the configuration file.
+        config_file_or_obj_or_dict: str or pathlib.Path or dict or Configuration
+            Input object used to construct the configuration parser
 
         Returns
         -------
@@ -784,13 +786,24 @@ class ConfigurationParser:
         ValueError
             If config file is not .json or .cfg.
         """
-        _, extension = splitext(filepath)
+        if isinstance(config_file_or_obj_or_dict, Path):
+            filepath = config_file_or_obj_or_dict
+        elif isinstance(config_file_or_obj_or_dict, str):
+            filepath = Path(config_file_or_obj_or_dict)
+        # if we got anything else, we initialize the base ConfigurationParser
+        else:
+            return ConfigurationParser(*args, **kwargs)
+
+        # Get the file extension
+        extension = filepath.suffix
         if extension.lower() not in CONFIG_TYPE:
             raise ValueError('Configuration file must be '
                              'in either `.json` or `.cfg`'
                              'format. You specified: {}.'.format(extension))
 
         return CONFIG_TYPE[extension.lower()](*args, **kwargs)
+
+
 
     @staticmethod
     def check_id_fields(id_field_values):
@@ -1361,6 +1374,72 @@ class ConfigurationParser:
         logging.info('Reading and preprocessing configuration file: {}'.format(filepath))
         self.read_config_from_file(filepath)
         return self.normalize_validate_and_process_config(context=context)
+
+
+    def get_configuration_from_file_obj_or_dict(self,
+                                                config_file_or_obj_or_dict,
+                                                context='rsmtool'):
+        '''
+        Construct Configuration object from file, object or dictionary
+        Parameters
+        ----------
+        config_file_or_obj_or_dict : str or Pathlib.Path or
+            Configuration or Dictionary
+            Path to the experiment configuration file.
+            Users can also pass a `Configuration` object that is in memory
+            or a Python dictionary with keys corresponding to fields in the
+            configuration file.
+            For configuration object `.configdir` needs to be set to indicate the reference path. If
+            the user passes a dictionary, the reference path will be set to
+            the current directory and all relative paths will be resolved relative
+            to this path.
+            to the current directory.
+        context : str
+            context used to validate configuration object
+            Defaults to `rsmtool`
+
+        Returns
+        -------
+        configuration : Configuration
+            Configuration object constructed from the input
+        '''
+
+        # check what sort of input we got
+        # if we got a string we consider this to be path to config file
+        if isinstance(config_file_or_obj_or_dict, str) or \
+           isinstance(config_file_or_obj_or_dict, Path):
+
+            # read configuration from file
+            configuration = self.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
+                                                                              context=context)
+
+        elif isinstance(config_file_or_obj_or_dict, dict):
+
+            # read configuration from dictionary
+            configuration = self.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
+                                                                                context=context)
+
+        elif isinstance(config_file_or_obj_or_dict, Configuration):
+
+            configuration = config_file_or_obj_or_dict
+            # raise an error if we are passed a Configuration object
+            # without a configdir attribute. This can only
+            # happen if the object was constructed using an earlier version
+            # of RSMTool and stored
+            if configuration.configdir is None:
+                raise AttributeError("Configuration object must have configdir attribute.")
+
+        else:
+            raise ValueError("The input to {} must be "
+                             "a path to the file (str or pathlib.Path), a dictionary, "
+                             "or a configuration object. You passed "
+                             "{}.".format(CONTEXT_TO_FUNCTION[context],
+                                          type(config_file_or_obj_or_dict)))
+
+        return configuration
+
+
+
 
 
 class JSONConfigurationParser(ConfigurationParser):
