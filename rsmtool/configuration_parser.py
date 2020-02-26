@@ -786,6 +786,8 @@ class ConfigurationParser:
         ValueError
             If config file is not .json or .cfg.
         """
+        # If we received a path to a file,
+        # let's convert it to Path
         if isinstance(config_file_or_obj_or_dict, Path):
             filepath = config_file_or_obj_or_dict
         elif isinstance(config_file_or_obj_or_dict, str):
@@ -794,7 +796,8 @@ class ConfigurationParser:
         else:
             return ConfigurationParser(*args, **kwargs)
 
-        # Get the file extension
+        # For files we initialize one of the subclasses.
+        # Get the file extension to determine which.
         extension = filepath.suffix
         if extension.lower() not in CONFIG_TYPE:
             raise ValueError('Configuration file must be '

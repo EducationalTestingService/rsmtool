@@ -91,7 +91,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     logger = logging.getLogger(__name__)
 
-        # initialize a correct configparser
+    # initialize a correct configparser
     parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
     # create a configuration object from input
     configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict,

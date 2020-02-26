@@ -578,7 +578,7 @@ class TestConfigurationParser:
 
     @raises(ValueError)
     def test_get_correct_configparser_wrong_extension(self):
-        config_parser = ConfigurationParser.get_configparser('config.txt')
+        ConfigurationParser.get_configparser('config.txt')
 
 
 class TestConfiguration:
