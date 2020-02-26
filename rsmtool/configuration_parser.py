@@ -1411,13 +1411,13 @@ class ConfigurationParser:
 
             # read configuration from file
             configuration = self.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                              context=context)
+                                                                            context=context)
 
         elif isinstance(config_file_or_obj_or_dict, dict):
 
             # read configuration from dictionary
             configuration = self.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                                context=context)
+                                                                              context=context)
 
         elif isinstance(config_file_or_obj_or_dict, Configuration):
 
