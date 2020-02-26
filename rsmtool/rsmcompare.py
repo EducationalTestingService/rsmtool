@@ -69,7 +69,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or Configuration or Dictionary
+    config_file_or_obj_or_dict : str or pathlib.Path or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory
         or a Python dictionary with keys corresponding to fields in the
@@ -91,38 +91,11 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     logger = logging.getLogger(__name__)
 
-    # check what sort of input we got
-    # if we got a string we consider this to be path to config file
-    if isinstance(config_file_or_obj_or_dict, str):
-
-        # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                          context='rsmcompare')
-
-    elif isinstance(config_file_or_obj_or_dict, dict):
-
-        # initialize the parser from dict
-        parser = ConfigurationParser()
-        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                            context='rsmcompare')
-
-    elif isinstance(config_file_or_obj_or_dict, Configuration):
-
-        configuration = config_file_or_obj_or_dict
-        # raise an error if we are passed a Configuration object
-        # without a configdir attribute. This can only
-        # happen if the object was constructed using an earlier version
-        # of RSMTool and stored
-        if configuration.configdir is None:
-            raise AttributeError("Configuration object must have configdir attribute.")
-
-    else:
-        raise ValueError("The input to run_comparison must be "
-                         "a path to the file (str), a dictionary, "
-                         "or a configuration object. You passed "
-                         "{}.".format(type(config_file_or_obj_or_dict)))
-
+        # initialize a correct configparser
+    parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
+    # create a configuration object from input
+    configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict,
+                                                                   context='rsmcompare')
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
 

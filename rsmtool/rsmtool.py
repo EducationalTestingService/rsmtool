@@ -36,7 +36,7 @@ def run_experiment(config_file_or_obj_or_dict,
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or Configuration or Dictionary
+    config_file_or_obj_or_dict : str or pathlib.Path or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory
         or a Python dictionary with keys corresponding to fields in the
@@ -74,8 +74,9 @@ def run_experiment(config_file_or_obj_or_dict,
     makedirs(figdir, exist_ok=True)
     makedirs(reportdir, exist_ok=True)
 
-    parser = ConfigurationParser()
-
+    # initialize a correct configparser
+    parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
+    # create a configuration object from input
     configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict)
 
     logger.info('Saving configuration file.')

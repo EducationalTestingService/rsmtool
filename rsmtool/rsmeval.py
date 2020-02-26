@@ -36,7 +36,7 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or Configuration or Dictionary
+    config_file_or_obj_or_dict : str or pathlib.Path or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory
         or a Python dictionary with keys corresponding to fields in the

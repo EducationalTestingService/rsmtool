@@ -43,7 +43,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     Parameters
     ----------
-    config_file_or_obj : str or configuration_parser.Configuration
+    config_file_or_obj : str or pathlib.Path or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory.
         Relative paths in the configuration file will be interpreted relative
