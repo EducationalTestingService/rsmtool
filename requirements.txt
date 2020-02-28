@@ -2,8 +2,8 @@ doc2dash
 jupyter
 nose
 notebook
-numpy>=1.14,<2
-pandas>=1.0,<2
+numpy
+pandas
 seaborn
 skll==2.0.0
 statsmodels
