@@ -308,7 +308,6 @@ class TestJsonLines:
         fname = self.create_jsonlines_file(jsondict)
         self.filepaths.append(fname)
         df = read_jsonlines(fname, converters={'id': str})
-        print(df)
         assert_frame_equal(df.sort_index(axis=1), self.expected.sort_index(axis=1))
 
     def test_read_jsonlines(self):
@@ -401,11 +400,10 @@ class TestJsonLines:
         self.expected.loc[2, 'feature2'] = np.nan
         self.check_jsonlines_output(all_nested_jsonlines)
 
-    @raises(ValueError)
     def test_read_json_with_NaNs(self):
-        '''np.nan by default is written as NaN
-        This is not correct json and will raise an
-        exception'''
+        '''This test is no longer failing
+        because Pandas can now parse NaNs:
+        https://github.com/pandas-dev/pandas/issues/12213'''
         all_nested_jsonlines = [{'values': {'id': '001',
                                             'feature1': np.nan,
                                             'feature2': 1.5}},
@@ -415,6 +413,9 @@ class TestJsonLines:
                                 {'values': {'id': '003',
                                             'feature1': 3,
                                             'feature2': np.nan}}]
+        self.expected.loc[0, 'feature1'] = np.nan
+        self.expected.loc[1, 'feature2'] = np.nan
+        self.expected.loc[2, 'feature2'] = np.nan
         self.check_jsonlines_output(all_nested_jsonlines)
 
     @raises(ValueError)

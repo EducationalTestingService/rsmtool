@@ -51,8 +51,7 @@ def read_jsonlines(filename, converters=None):
         raise ValueError("The jsonlines file is not formatted correctly. "
                          "Please check that each line ends with a comma, "
                          "there is no comma at the end of the last line, "
-                         "and that all quotes match. Please also check that"
-                         "any undefined values are written out as `null` and not `NaN`.")
+                         "and that all quotes match.")
 
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:

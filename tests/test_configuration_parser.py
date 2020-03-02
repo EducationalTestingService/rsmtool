@@ -12,7 +12,7 @@ from os.path import abspath, dirname, join
 from shutil import rmtree
 
 from numpy.testing import assert_array_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
                         assert_not_equal,
