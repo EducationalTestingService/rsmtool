@@ -8,7 +8,7 @@ from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool import run_comparison
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_run_comparison,
                                 copy_data_files,
                                 do_run_comparison)
@@ -75,10 +75,9 @@ def test_run_experiment_lr_compare_with_object():
                    "subgroups": ["QUESTION"]
                    }
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
+    config_obj = Configuration(config_dict,
+                               context='rsmcompare',
+                               configdir=configdir)
 
     check_run_comparison(source,
                          experiment_id,
