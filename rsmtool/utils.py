@@ -16,9 +16,9 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from math import ceil
 from glob import glob
 from importlib import import_module
+from math import ceil
 from os.path import exists, isabs, join, relpath
 from pathlib import Path
 from string import Template
@@ -73,7 +73,6 @@ DEFAULTS = {'id_column': 'spkitemid',
             'custom_sections': None,
             'feature_subset_file': None,
             'feature_subset': None,
-            'feature_prefix': None,
             'trim_min': None,
             'trim_max': None,
             'trim_tolerance': 0.4998,
@@ -86,8 +85,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'min_items_per_candidate': None,
             'experiment_names': None}
 
-LIST_FIELDS = ['feature_prefix',
-               'general_sections',
+LIST_FIELDS = ['general_sections',
                'special_sections',
                'custom_sections',
                'subgroups',
