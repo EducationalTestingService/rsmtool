@@ -120,13 +120,22 @@ class FeatureSubsetProcessor:
                                  "file can only contain 0 or 1")
 
         if sign:
-            if ('sign_{}'.format(sign) not in df_feature_specs and
-                    'Sign_{}'.format(sign) not in df_feature_specs):
+            possible_sign_columns = ['sign_{}'.format(sign),
+                                     'Sign_{}'.format(sign)]
+            existing_sign_columns = [c for c in possible_sign_columns
+                                     if c in df_feature_specs]
+            if len(existing_sign_columns) > 1:
+                raise ValueError("The feature_subset_file contains "
+                                 "multiple columns for sign: "
+                                 "{}".format(' ,'.join(existing_sign_columns)))
+            elif len(existing_sign_columns) == 0:
                 raise ValueError("The feature_subset_file must "
                                  "contain the requested "
                                  "sign column 'sign_{}'".format(sign))
+            else:
+                sign_column = existing_sign_columns[0]
 
-            if not df_feature_specs[subset].isin(['-', '+']).all():
+            if not df_feature_specs[sign_column].isin(['-', '+']).all():
                 raise ValueError("The sign columns in feature "
                                  "file can only contain - or +")
 
