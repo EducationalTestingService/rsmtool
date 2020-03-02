@@ -984,7 +984,7 @@ class ConfigurationParser:
         configdict = ConfigurationParser.process_config(configdict)
         configdict = ConfigurationParser.validate_config(configdict, context=context)
 
-        return Configuration(self._config,
+        return Configuration(configdict,
                              configdir=self._configdir,
                              filename=self._filename,
                              context=context)
