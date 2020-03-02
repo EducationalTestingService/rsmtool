@@ -136,7 +136,8 @@ def configure(tool_name, config_file_or_obj_or_dict):
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # directly instantiate the Configuration from the dictionary
-        configuration = Configuration(dict)
+        configuration = Configuration(config_file_or_obj_or_dict,
+                                      context=tool_name)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
