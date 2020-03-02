@@ -616,6 +616,16 @@ def check_file_output(file1, file2, file_format='csv'):
     df1 = DataReader.read_from_file(file1, converters=converter_dict)
     df2 = DataReader.read_from_file(file2, converters=converter_dict)
 
+    # convert all column names to strings
+    # we do this to avoid any errors during sorting.
+    for df in [df1, df2]:
+        df.columns = df.columns.map(str)
+
+    # sort all columns alphabetically
+    df1.sort_index(axis=1, inplace=True)
+    df2.sort_index(axis=1, inplace=True)
+
+
     # if the first column is numeric, just force the index to string;
     # however, if it is non-numeric, set it as the index and then
     # force it to string. We do this to ensure string indices are
@@ -631,14 +641,6 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(inplace=True)
     df2.sort_index(inplace=True)
 
-    # convert all column names to strings
-    # we do this to avoid any errors during sorting.
-    for df in [df1, df2]:
-        df.columns = df.columns.map(str)
-
-    # sort all olumns alphabetically
-    df1.sort_index(axis=1, inplace=True)
-    df2.sort_index(axis=1, inplace=True)
 
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
