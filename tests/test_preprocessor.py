@@ -797,9 +797,12 @@ class TestFeaturePreprocessor:
          test_processed,
          info_processed) = self.fpp.preprocess_features(train, test, specs)
 
-        assert_frame_equal(train_processed, train_expected)
-        assert_frame_equal(test_processed, test_expected)
-        assert_frame_equal(info_processed, info_expected)
+        assert_frame_equal(train_processed.sort_index(axis=1),
+                           train_expected.sort_index(axis=1))
+        assert_frame_equal(test_processed.sort_index(axis=1),
+                           test_expected.sort_index(axis=1))
+        assert_frame_equal(info_processed.sort_index(axis=1),
+                           info_expected.sort_index(axis=1))
 
     def test_filter_data_features(self):
 
