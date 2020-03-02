@@ -838,7 +838,6 @@ class ConfigurationParser:
                              'format. You specified: {}.'.format(extension))
 
         # set the various attributes to None
-        self._config = None
         self._filename = pathlike.name
         self._configdir = pathlike.resolve().parent
 
@@ -984,8 +983,6 @@ class ConfigurationParser:
         configdict = ConfigurationParser.normalize_config(configdict)
         configdict = ConfigurationParser.process_config(configdict)
         configdict = ConfigurationParser.validate_config(configdict, context=context)
-
-        self._config = configdict
 
         return Configuration(self._config,
                              configdir=self._configdir,
