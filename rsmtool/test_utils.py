@@ -631,6 +631,15 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(inplace=True)
     df2.sort_index(inplace=True)
 
+    # convert all column names to strings
+    # we do this to avoid any errors during sorting.
+    for df in [df1, df2]:
+        df.columns = df.columns.map(str)
+
+    # sort all olumns alphabetically
+    df1.sort_index(axis=1, inplace=True)
+    df2.sort_index(axis=1, inplace=True)
+
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
@@ -651,8 +660,8 @@ def check_file_output(file1, file2, file_format='csv'):
             df.loc[:, msk] = df.loc[:, msk].abs()
 
     try:
-        assert_frame_equal(df1.sort_index(axis=1),
-                           df2.sort_index(axis=1),
+        assert_frame_equal(df1,
+                           df2,
                            check_exact=False,
                            check_less_precise=False)
     except AssertionError as e:
