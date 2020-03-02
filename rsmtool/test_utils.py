@@ -16,7 +16,7 @@ from pathlib import Path
 from shutil import copyfile, copytree
 
 from nose.tools import assert_equal, ok_
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from rsmtool.reader import DataReader
 from rsmtool.modeler import Modeler
