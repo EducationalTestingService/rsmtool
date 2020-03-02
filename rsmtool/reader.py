@@ -63,7 +63,7 @@ def read_jsonlines(filename, converters=None):
     dfs = []
     for column in df:
         try:
-            df_column = pd.io.json.json_normalize(df[column])
+            df_column = pd.json_normalize(df[column])
         except AttributeError:
             df_column = df[column].copy()
 

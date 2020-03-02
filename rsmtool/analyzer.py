@@ -550,9 +550,12 @@ class Analyzer:
 
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
-                df_target_cors[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr_no_length[group] = pd.Series(index=df_group.columns)
+                df_target_cors[group] = pd.Series(data=np.nan,
+                                                  index=df_group.columns)
+                df_target_pcorr[group] = pd.Series(data=np.nan,
+                                                   index=df_group.columns)
+                df_target_pcorr_no_length[group] = pd.Series(data=np.nan,
+                                                             index=df_group.columns)
             else:
                 # if we are asked to include length, that means 'length' is
                 # in the data frame which means that we want to exclude that
