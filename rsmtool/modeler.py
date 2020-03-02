@@ -28,7 +28,6 @@ from rsmtool.analyzer import Analyzer
 from rsmtool.utils import compute_expected_scores_from_model, is_skll_model
 from rsmtool.preprocessor import FeaturePreprocessor
 
-from rsmtool.configuration_parser import Configuration
 from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
 
@@ -1334,19 +1333,16 @@ class Modeler:
                     {'name': 'pred_test', 'frame': df_test_predictions},
                     {'name': 'postprocessing_params', 'frame': df_postproc_params}]
 
-        new_config_dict = {'train_predictions_mean': train_predictions_mean,
-                           'train_predictions_sd': train_predictions_sd,
-                           'human_labels_mean': human_labels_mean,
-                           'human_labels_sd': human_labels_sd}
+        internal_options_dict = {'train_predictions_mean': train_predictions_mean,
+                                 'train_predictions_sd': train_predictions_sd,
+                                 'human_labels_mean': human_labels_mean,
+                                 'human_labels_sd': human_labels_sd}
 
-        config_as_dict = configuration.to_dict()
-        config_as_dict.update(new_config_dict)
+        new_configuration = configuration.copy()
+        for key, value in internal_options_dict.items():
+            new_configuration[key] = value
 
-        configuration = Configuration(config_as_dict,
-                                      configdir=configuration.configdir,
-                                      filename=configuration.filename)
-
-        return configuration, DataContainer(datasets=datasets)
+        return new_configuration, DataContainer(datasets=datasets)
 
     def get_feature_names(self):
         """

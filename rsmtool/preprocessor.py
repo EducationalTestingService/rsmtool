@@ -1950,37 +1950,18 @@ class FeaturePreprocessor:
                                                      standardize_features,
                                                      use_truncations)
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'train_file_location': train_file_location,
-                           'test_file_location': test_file_location,
-                           'model_name': model_name,
-                           'model_type': model_type,
-                           'train_label_column': train_label_column,
-                           'test_label_column': test_label_column,
-                           'id_column': id_column,
-                           'length_column': length_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'subgroups': subgroups,
-                           'feature_subset_file': feature_subset_file,
-                           'trim_min': used_trim_min,
-                           'trim_max': used_trim_max,
-                           'trim_tolerance': spec_trim_tolerance,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'standardize_features': standardize_features,
-                           'min_items': min_items,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # add internal configuration options that we need
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'chosen_notebook_files': chosen_notebook_files,
+                                 'exclude_listwise': exclude_listwise,
+                                 'model_name': model_name,
+                                 'model_type': model_type,
+                                 'test_file_location': test_file_location,
+                                 'train_file_location': train_file_location,
+                                 }
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   configdir=config_obj.configdir,
-                                   filename=config_obj.filename)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2005,7 +1986,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmeval(self, config_obj, data_container_obj):
         """
