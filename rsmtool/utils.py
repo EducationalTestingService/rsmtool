@@ -1277,7 +1277,53 @@ def setup_rsmcmd_parser(name,
                         uses_output_directory=True,
                         allows_overwriting_directory=False,
                         extra_options=[]):
+    """
+    A helper function to create argument parsers for RSM command-line utilities.
 
+    Since the various RSM command-line utilities (``rsmtool``, ``rsmeval``,
+    ``rsmcompare``, etc.) have very similar argument parsers, refactoring that
+    shared code out into this helper function makes it easier to extend
+    and modify the command-line interface to all utilities at the same time.
+    In addition, it also improves the consistency among the tools.
+
+    By default, this function adds the following options to the parser:
+      - ``config_file`` : a positional argument for the tool's configuration file
+      - ``-V``/``--version`` : an optional argument to print out the package version
+
+    If ``uses_output_directory`` is ``True``, an ``output_dir`` positional
+    argument will be added to the parser.
+
+    If ``allows_overwriting_directory`` is ``True``, an ``-f``/``--force``
+    optional argument will be added to the parser.
+
+    The ``extra_options`` list should contain a list of ``CmdOption``
+    instances which are added to the parser one by one.
+
+    Parameters
+    ----------
+    name : str
+        The name of the command-line tool for which we need the parser.
+    uses_output_directory : bool, optional
+        Does this tool need a directory to store its outputs?
+    allows_overwriting_directory : bool, optional
+        Does this tool allow the user to overwrite any existing output
+        in the output directory?
+    extra_options : list, optional
+        Any additional options to be added to the parser, each specified
+        as a ``CmdOption`` instance.
+
+    Returns
+    -------
+    parser : arpgarse.ArgumentParser
+        A fully instantiated argument parser.
+
+    Raises
+    ------
+    RuntimeError
+        If any of the ``CmdOption`` instances specified in
+        ``extra_options`` do not contain the ``dest`` and
+        ``help`` attributes.
+    """
     # initialize an argument parser
     parser = argparse.ArgumentParser(prog=f"{name}")
 
