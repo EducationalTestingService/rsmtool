@@ -277,7 +277,7 @@ def run_experiment(config_file_or_obj_or_dict,
 
     # generate the report
     logger.info('Starting report generation.')
-    reporter.create_report(processed_config,
+    reporter.create_report(pred_analysis_config,
                            csvdir,
                            figdir)
 

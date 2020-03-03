@@ -180,7 +180,7 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
 
     # generate the report
     logger.info('Starting report generation.')
-    reporter.create_report(processed_config,
+    reporter.create_report(pred_analysis_config,
                            csvdir,
                            figdir,
                            context='rsmeval')
