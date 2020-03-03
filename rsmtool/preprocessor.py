@@ -1745,9 +1745,6 @@ class FeaturePreprocessor:
         use_fake_train_labels = train_label_column == 'fake'
         use_fake_test_labels = test_label_column == 'fake'
 
-        # are we analyzing scaled or raw prediction values
-        use_scaled_predictions = config_obj['use_scaled_predictions']
-
         # are we using truncations from the feature specs?
         use_truncations = config_obj['use_truncation_thresholds']
 
@@ -2020,12 +2017,6 @@ class FeaturePreprocessor:
 
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
-
-        # get the experiment ID
-        experiment_id = config_obj['experiment_id']
-
-        # get the description
-        description = config_obj['description']
 
         # get the column name for the labels for the training and testing data
         human_score_column = config_obj['human_score_column']
@@ -2301,24 +2292,15 @@ class FeaturePreprocessor:
 
         df_pred_other_columns = df_filtered_pred[other_columns]
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'pred_file_location': pred_file_location,
-                           'id_column': id_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # add internal configuration options that we need
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'pred_file_location': pred_file_location,
+                                 'exclude_listwise': exclude_listwise,
+                                 'use_scaled_predictions': use_scaled_predictions,
+                                 'chosen_notebook_files': chosen_notebook_files}
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   filename=config_obj.filename,
-                                   configdir=config_obj.configdir)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
@@ -2343,7 +2325,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmpredict(self, config_obj, data_container_obj):
         """

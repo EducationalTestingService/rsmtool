@@ -1278,9 +1278,9 @@ class Modeler:
                                                    'trim_min',
                                                    'trim_tolerance'])
 
-        trim_max = configuration['trim_max']
-        trim_min = configuration['trim_min']
-        trim_tolerance = configuration['trim_tolerance']
+        (trim_min,
+         trim_max,
+         trim_tolerance) = configuration.get_trim_min_max_tolerance()
 
         predict_expected_scores = configuration['predict_expected_scores']
 
