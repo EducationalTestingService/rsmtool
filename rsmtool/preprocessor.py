@@ -16,11 +16,9 @@ import numpy as np
 import pandas as pd
 
 from collections import defaultdict
-from os.path import dirname, abspath
 
 from numpy.random import RandomState
 
-from rsmtool.configuration_parser import Configuration
 from rsmtool.reader import DataReader
 from rsmtool.container import DataContainer
 from rsmtool.reporter import Reporter
