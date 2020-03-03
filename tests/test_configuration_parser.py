@@ -894,6 +894,22 @@ class TestConfiguration:
             assert len(warning_list) == 1  # we get one deprecation warning here
             assert issubclass(warning_list[0].category, DeprecationWarning)
 
+    # make sure that accessing filepath attribute when filename
+    # is not defined raises an exception
+    @raises(AttributeError)
+    def test_get_filepath_no_filename(self):
+        with warnings.catch_warnings():
+            config = Configuration({"experiment_id": '001',
+                                    "train_file": "/foo/train.csv",
+                                    "test_file": "/foo/test.csv",
+                                    "trim_min": 1,
+                                    "trim_max": 6,
+                                    "flag_column": "[advisories]",
+                                    "model": 'LinearRegression'},
+                                   configdir='/path/to')
+
+            _ = config.filepath
+
     # this is a test for an attribute that will be
     # deprecated
     def test_set_filepath(self):
