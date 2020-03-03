@@ -8,14 +8,17 @@ Utility classes and functions.
 :organization: ETS
 """
 
+import argparse
 import json
 import logging
+import os
 import re
 import warnings
 
 import numpy as np
 import pandas as pd
 
+from collections import namedtuple
 from glob import glob
 from importlib import import_module
 from math import ceil
@@ -28,9 +31,29 @@ from IPython.display import (display,
 
 from skll.data import safe_float as string_to_number
 
+from . import VERSION_STRING
+
+# a named tuple for use with the `setup_rsmcmd_parser` function below
+# to specify additional options for the argument parser. An example
+# can be found in `rsmpredict.py`. The `dest` and `help` options are
+# required but the rest can be left unspecified and will default to `None`.
+CmdOption = namedtuple('CmdOption',
+                       ['dest',
+                        'help',
+                        'shortname',
+                        'longname',
+                        'action',
+                        'default',
+                        'required',
+                        'nargs'],
+                       defaults=[None,
+                                 None,
+                                 None,
+                                 None,
+                                 None,
+                                 None])
 
 HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
-
 
 BUILTIN_MODELS = ['LinearRegression',
                   'EqualWeightsLR',
@@ -1248,6 +1271,80 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
                                     file_format,
                                     replace_dict)
     display(HTML(html_string))
+
+
+def setup_rsmcmd_parser(name,
+                        uses_output_directory=True,
+                        allows_overwriting_directory=False,
+                        extra_options=[]):
+
+    # initialize an argument parser
+    parser = argparse.ArgumentParser(prog=f"{name}")
+
+    # since this is an RSMTool command-line utility, we will
+    # always need a configuration file
+    parser.add_argument('config_file', help="The JSON configuration file for "
+                                            "this experiment")
+
+    # and we always want to have a version flag
+    parser.add_argument('-V', '--version', action='version', version=VERSION_STRING)
+
+    # if it uses an output directory, let's add that
+    if uses_output_directory:
+        parser.add_argument('output_dir',
+                            nargs='?',
+                            default=os.getcwd(),
+                            help="The output directory where all the files "
+                                 "for this experiment will be stored")
+
+    # if it allows overwrting the output directory, let's add that
+    if allows_overwriting_directory:
+        parser.add_argument('-f',
+                            '--force',
+                            dest='force_write',
+                            action='store_true',
+                            default=False,
+                            help=f"If true, {name} will not check if the "
+                                 "output directory already contains the "
+                                 "output of another {name} experiment. ")
+
+    # add any extra options passed in - we must have a name and a help string
+    for parser_option in extra_options:
+        try:
+            assert hasattr(parser_option, 'dest')
+            assert hasattr(parser_option, 'help')
+        except AssertionError:
+            # this exception should _never_ be encountered by a user
+            # this function is really only meant for RSMTool developers
+            raise RuntimeError(f"Invalid option {parser_option} for {name} parser.")
+        else:
+            # construct the arguments and keyword arguments needed for the
+            # `add_argument()` call to the parser
+            argparse_option_args = []
+            argparse_option_kwargs = {}
+
+            # first add the destination and the help string
+            argparse_option_kwargs["dest"] = f"{parser_option.dest}"
+            argparse_option_kwargs["help"] = f"{parser_option.help}"
+
+            # now add any optional information
+            if parser_option.shortname is not None:
+                argparse_option_args.append(f"-{parser_option.shortname}")
+            if parser_option.longname is not None:
+                argparse_option_args.append(f"--{parser_option.longname}")
+            if parser_option.action is not None:
+                argparse_option_kwargs['action'] = f"'{parser_option.action}'"
+            if parser_option.default is not None:
+                argparse_option_kwargs["default"] = f"{parser_option.default}"
+            if parser_option.required is not None:
+                argparse_option_kwargs["required"] = f"{parser_option.required}"
+            if parser_option.nargs is not None:
+                argparse_option_kwargs['nargs'] = f"'{parser_option.nargs}'"
+
+            # add this argument to the parser
+            parser.add_argument(*argparse_option_args, **argparse_option_kwargs)
+
+    return parser
 
 
 class LogFormatter(logging.Formatter):
