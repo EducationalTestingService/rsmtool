@@ -623,7 +623,7 @@ def check_file_output(file1, file2, file_format='csv'):
 
 
     # if the first column is numeric, just force the index to string;
-    # however, if it is non-numeric, set it as the index and then
+    # however, if it is non-numeric, assume that it is an index and
     # force it to string. We do this to ensure string indices are
     # preserved as such
     for df in [df1, df2]:
@@ -647,11 +647,6 @@ def check_file_output(file1, file2, file_format='csv'):
         for c in df.columns:
             if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
-
-    # do the same for indices
-    for df in [df1, df2]:
-        if df.index.dtype == np.int64:
-            df.index = df.index.astype(np.float64)
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same

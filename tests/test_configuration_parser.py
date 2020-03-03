@@ -1089,7 +1089,8 @@ class TestJSONFeatureConversion:
         # get rid of the file now that have read it into memory
         os.unlink(tempf.name)
 
-        assert_frame_equal(df_expected, df_converted)
+        assert_frame_equal(df_expected.sort_index(axis=1),
+                           df_converted.sort_index(axis=1))
 
     @raises(RuntimeError)
     def test_json_feature_conversion_bad_json(self):
