@@ -10,8 +10,6 @@ The script to create a summary report for experiment
 :organization: ETS
 """
 
-
-import argparse
 import glob
 import logging
 import os
@@ -23,12 +21,11 @@ from os.path import (abspath,
                      join,
                      normpath)
 
-from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import configure
 from rsmtool.reader import DataReader
 from rsmtool.reporter import Reporter
 
-from rsmtool.utils import LogFormatter
+from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
 
 
 def check_experiment_dir(experiment_dir,
@@ -209,24 +206,10 @@ def main():
     # get the logger
     logger = logging.getLogger(__name__)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmsummarize')
-
-    parser.add_argument('-f', '--force', dest='force_write',
-                        action='store_true', default=False,
-                        help="If true, rsmsummarize will not check if the"
-                             " output directory already contains the "
-                             "output of another rsmsummarize experiment. ")
-
-    parser.add_argument('config_file',
-                        help="The JSON configuration file for this experiment")
-
-    parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
-                        help="The output directory where all the files "
-                             "for this experiment will be stored")
-
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmsummarize',
+                                 uses_output_directory=True,
+                                 allows_overwriting_directory=True)
 
     # parse given command line arguments
     args = parser.parse_args()

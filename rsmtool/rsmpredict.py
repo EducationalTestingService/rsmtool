@@ -11,7 +11,6 @@ from existing RSMTool models.
 :organization: ETS
 """
 
-import argparse
 import glob
 import logging
 import os
@@ -25,12 +24,11 @@ from os.path import (basename,
                      splitext,
                      split)
 
-from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import configure
 from rsmtool.modeler import Modeler
 from rsmtool.preprocessor import FeaturePreprocessor
 from rsmtool.reader import DataReader
-from rsmtool.utils import LogFormatter
+from rsmtool.utils import LogFormatter, CmdOption, setup_rsmcmd_parser
 from rsmtool.writer import DataWriter
 
 
@@ -236,23 +234,20 @@ def main():
     logging.root.addHandler(handler)
     logging.root.setLevel(logging.INFO)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmpredict')
+    # to set up the argument parser, we first need to instantiate options
+    # specific to rsmpredictso we use the `CmdOption` namedtuples
+    non_standard_options = [CmdOption(dest='output_file',
+                                      help="Output file where predictions will be saved"),
+                            CmdOption(dest='preproc_feats_file',
+                                      help="Output file to save the pre-processed "
+                                           "version of the features",
+                                      longname='features',
+                                      required=False)]
 
-    parser.add_argument('config_file', help="The JSON config file "
-                                            "needed to run rsmpredict")
-
-    parser.add_argument('output_file', help="Output file where "
-                                            "predictions will be saved")
-
-    parser.add_argument('--features', dest='preproc_feats_file',
-                        help="Output file to save the pre-processed "
-                             "version of the features",
-                        required=False,
-                        default=None)
-
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+    # now call the helper function to instantiate the parser for us
+    parser = setup_rsmcmd_parser('rsmpredict',
+                                 uses_output_directory=False,
+                                 extra_options=non_standard_options)
 
     # parse given command line arguments
     args = parser.parse_args()

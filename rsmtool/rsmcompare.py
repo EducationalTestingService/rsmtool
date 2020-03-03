@@ -10,23 +10,16 @@ Script to compare two RSMTool experiments.
 :organization: ETS
 """
 
-
-import argparse
 import glob
 import logging
-import os
 import sys
 
-from os.path import (abspath,
-                     exists,
-                     join,
-                     normpath)
+from os.path import abspath, exists, join, normpath
 
-from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import configure
 from rsmtool.reader import DataReader
 from rsmtool.reporter import Reporter
-from rsmtool.utils import LogFormatter
+from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
 
 
 def check_experiment_id(experiment_dir, experiment_id):
@@ -189,18 +182,8 @@ def main():
     # get a logger
     logger = logging.getLogger(__name__)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmcompare')
-
-    parser.add_argument('config_file', help="The JSON configuration file for "
-                                            "this comparison")
-
-    parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
-                        help="The output directory where the report "
-                             "files for this comparison will be stored")
-
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmcompare', uses_output_directory=True)
 
     # parse given command line arguments
     args = parser.parse_args()
