@@ -621,10 +621,6 @@ def check_file_output(file1, file2, file_format='csv'):
     for df in [df1, df2]:
         df.columns = df.columns.map(str)
 
-    # sort all columns alphabetically
-    df1.sort_index(axis=1, inplace=True)
-    df2.sort_index(axis=1, inplace=True)
-
 
     # if the first column is numeric, just force the index to string;
     # however, if it is non-numeric, set it as the index and then
@@ -640,6 +636,10 @@ def check_file_output(file1, file2, file_format='csv'):
     # sort all the indices alphabetically
     df1.sort_index(inplace=True)
     df2.sort_index(inplace=True)
+
+    # sort all columns alphabetically
+    df1.sort_index(axis=1, inplace=True)
+    df2.sort_index(axis=1, inplace=True)
 
 
     # convert any integer columns to floats in either data frame
