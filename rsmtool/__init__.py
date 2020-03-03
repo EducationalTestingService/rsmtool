@@ -13,7 +13,7 @@ import re
 import warnings
 
 try:
-    import rsmextra
+    import rsmextra # noqa
 except ImportError:
     HAS_RSMEXTRA = False
 else:
@@ -22,46 +22,45 @@ else:
 from .version import __version__
 
 if HAS_RSMEXTRA:
-    from rsmextra.version import __version__ as rsmextra_version
+    from rsmextra.version import __version__ as rsmextra_version # noqa
     VERSION_STRING = '%(prog)s {}; rsmextra {}'.format(__version__,
                                                        rsmextra_version)
 else:
     VERSION_STRING = '%(prog)s {}'.format(__version__)
 
-from .analyzer import Analyzer
+from .analyzer import Analyzer # noqa
 
-from .convert_feature_json import convert_feature_json_file
+from .convert_feature_json import convert_feature_json_file # noqa
 
-from .comparer import Comparer
+from .comparer import Comparer # noqa
 
-from .container import DataContainer
+from .container import DataContainer # noqa
 
-from .modeler import Modeler
+from .modeler import Modeler # noqa
 
-from .preprocessor import FeaturePreprocessor
+from .preprocessor import FeaturePreprocessor # noqa
 
-from .reader import DataReader
+from .reader import DataReader # noqa
 
-from .reporter import Reporter
+from .reporter import Reporter # noqa
 
-from .writer import DataWriter
+from .writer import DataWriter # noqa
+
+from .rsmcompare import run_comparison # noqa
+
+from .rsmeval import run_evaluation # noqa
+
+from .rsmtool import run_experiment # noqa
+
+from .rsmpredict import compute_and_save_predictions # noqa
+
+from .rsmsummarize import run_summary # noqa
 
 from .utils import (agreement,
                     compute_expected_scores_from_model,
                     get_thumbnail_as_html,
                     partial_correlations,
-                    show_thumbnail)
-
-from .rsmcompare import run_comparison
-
-from .rsmeval import run_evaluation
-
-from .rsmtool import run_experiment
-
-from .rsmpredict import compute_and_save_predictions
-
-from .rsmsummarize import run_summary
-
+                    show_thumbnail) 
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in
