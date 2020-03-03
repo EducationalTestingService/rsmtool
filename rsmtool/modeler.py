@@ -1333,6 +1333,7 @@ class Modeler:
                     {'name': 'pred_test', 'frame': df_test_predictions},
                     {'name': 'postprocessing_params', 'frame': df_postproc_params}]
 
+        # configuration options that are entirely for internal use
         internal_options_dict = {'train_predictions_mean': train_predictions_mean,
                                  'train_predictions_sd': train_predictions_sd,
                                  'human_labels_mean': human_labels_mean,

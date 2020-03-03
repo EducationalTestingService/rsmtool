@@ -1947,15 +1947,18 @@ class FeaturePreprocessor:
                                                      standardize_features,
                                                      use_truncations)
 
-        # add internal configuration options that we need
+        # configuration options that either override previous values or are
+        # entirely for internal use
         new_config_obj = config_obj.copy()
         internal_options_dict = {'chosen_notebook_files': chosen_notebook_files,
                                  'exclude_listwise': exclude_listwise,
+                                 'feature_subset_file': feature_subset_file,
                                  'model_name': model_name,
                                  'model_type': model_type,
                                  'test_file_location': test_file_location,
                                  'train_file_location': train_file_location,
-                                 }
+                                 'trim_min': used_trim_min,
+                                 'trim_max': used_trim_max}
 
         for key, value in internal_options_dict.items():
             new_config_obj[key] = value
