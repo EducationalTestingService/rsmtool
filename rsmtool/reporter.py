@@ -626,8 +626,11 @@ class Reporter:
                      else config['min_items_per_candidate'])
 
         # determine minimum and maximum scores for trimming
-        min_score = config['trim_min'] - config['trim_tolerance']
-        max_score = config['trim_max'] + config['trim_tolerance']
+        (used_trim_min,
+         used_trim_max,
+         trim_tolerance) = config.get_trim_min_max_tolerance()
+        min_score = used_trim_min - trim_tolerance
+        max_score = used_trim_max + trim_tolerance
 
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'DESCRIPTION': config['description'],

@@ -16,11 +16,9 @@ import numpy as np
 import pandas as pd
 
 from collections import defaultdict
-from os.path import dirname, abspath
 
 from numpy.random import RandomState
 
-from rsmtool.configuration_parser import Configuration
 from rsmtool.reader import DataReader
 from rsmtool.container import DataContainer
 from rsmtool.reporter import Reporter
@@ -1754,9 +1752,6 @@ class FeaturePreprocessor:
         use_fake_train_labels = train_label_column == 'fake'
         use_fake_test_labels = test_label_column == 'fake'
 
-        # are we analyzing scaled or raw prediction values
-        use_scaled_predictions = config_obj['use_scaled_predictions']
-
         # are we using truncations from the feature specs?
         use_truncations = config_obj['use_truncation_thresholds']
 
@@ -1959,37 +1954,21 @@ class FeaturePreprocessor:
                                                      standardize_features,
                                                      use_truncations)
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'train_file_location': train_file_location,
-                           'test_file_location': test_file_location,
-                           'model_name': model_name,
-                           'model_type': model_type,
-                           'train_label_column': train_label_column,
-                           'test_label_column': test_label_column,
-                           'id_column': id_column,
-                           'length_column': length_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'subgroups': subgroups,
-                           'feature_subset_file': feature_subset_file,
-                           'trim_min': used_trim_min,
-                           'trim_max': used_trim_max,
-                           'trim_tolerance': spec_trim_tolerance,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'standardize_features': standardize_features,
-                           'min_items': min_items,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # configuration options that either override previous values or are
+        # entirely for internal use
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'chosen_notebook_files': chosen_notebook_files,
+                                 'exclude_listwise': exclude_listwise,
+                                 'feature_subset_file': feature_subset_file,
+                                 'model_name': model_name,
+                                 'model_type': model_type,
+                                 'test_file_location': test_file_location,
+                                 'train_file_location': train_file_location,
+                                 'trim_min': used_trim_min,
+                                 'trim_max': used_trim_max}
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   configdir=config_obj.configdir,
-                                   filename=config_obj.filename)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2014,7 +1993,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmeval(self, config_obj, data_container_obj):
         """
@@ -2048,12 +2027,6 @@ class FeaturePreprocessor:
 
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
-
-        # get the experiment ID
-        experiment_id = config_obj['experiment_id']
-
-        # get the description
-        description = config_obj['description']
 
         # get the column name for the labels for the training and testing data
         human_score_column = config_obj['human_score_column']
@@ -2329,24 +2302,15 @@ class FeaturePreprocessor:
 
         df_pred_other_columns = df_filtered_pred[other_columns]
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'pred_file_location': pred_file_location,
-                           'id_column': id_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # add internal configuration options that we need
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'pred_file_location': pred_file_location,
+                                 'exclude_listwise': exclude_listwise,
+                                 'use_scaled_predictions': use_scaled_predictions,
+                                 'chosen_notebook_files': chosen_notebook_files}
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   filename=config_obj.filename,
-                                   configdir=config_obj.configdir)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
@@ -2371,7 +2335,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmpredict(self, config_obj, data_container_obj):
         """
