@@ -90,15 +90,15 @@ def deprecated_positional_argument():
     return decorator
 
 
-def configure(tool_name, config_file_or_obj_or_dict):
+def configure(context, config_file_or_obj_or_dict):
     """
-    Get the configuration for ``tool_name`` from the input
+    Get the configuration for ``context`` from the input
     ``config_file_or_obj_or_dict``.
 
     Parameters
     ----------
-    tool_name : str
-        The name of the tool that is being configured. Must be one of
+    context : str
+        The context that is being configured. Must be one of
         ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmsummarize``, or
         ``rsmpredict``.
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
@@ -131,13 +131,13 @@ def configure(tool_name, config_file_or_obj_or_dict):
 
         # Instantiate configuration parser object
         parser = ConfigurationParser(config_file_or_obj_or_dict)
-        configuration = parser.parse(context=tool_name)
+        configuration = parser.parse(context=context)
 
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # directly instantiate the Configuration from the dictionary
         configuration = Configuration(config_file_or_obj_or_dict,
-                                      context=tool_name)
+                                      context=context)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
@@ -322,15 +322,19 @@ class Configuration:
         filepath : str
             The path for the config file.
         """
+
+        # raise a deprecation warning first
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed in RSMTool v8.0."
+                      "Use the `configdir` and `filename` attributes "
+                      "if you need the full path to the "
+                      "configuration file", DeprecationWarning)
+
+        # then compute the deprecated attribute if we can
         if not self.filename:
             raise AttributeError('The `filepath` attribute is not defined '
                                  'for this Configuration object.')
         else:
-            warnings.warn("The `filepath` attribute of the Configuration "
-                          "object will be removed in RSMTool v8.0."
-                          "Use the `configdir` and `filename` attributes "
-                          "if you need the full path to the "
-                          "configuration file", DeprecationWarning)
             filepath = join(self.configdir, self.filename)
             return filepath
 
@@ -973,7 +977,7 @@ class ConfigurationParser:
             A Configuration object containing the parameters in the
             file that we instantiated the parser for.
         """
-        _, extension = splitext(self._filename)
+        extension = Path(self._filename).suffix.lower()
         filepath = join(self._configdir, self._filename)
         if extension == '.json':
             configdict = self._parse_json_file(filepath)
