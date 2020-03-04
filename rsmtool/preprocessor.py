@@ -1664,12 +1664,6 @@ class FeaturePreprocessor:
         if feature_subset_file is not None:
             feature_subset_file = DataReader.locate_files(feature_subset_file, configdir)
 
-        # get the experiment ID
-        experiment_id = config_obj['experiment_id']
-
-        # get the description
-        description = config_obj['description']
-
         # get the column name for the labels for the training and testing data
         train_label_column = config_obj['train_label_column']
         test_label_column = config_obj['test_label_column']
