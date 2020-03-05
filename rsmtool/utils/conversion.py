@@ -1,5 +1,5 @@
 """
-Utility classes and functions for converting various types.
+Utility classes and functions for type conversion.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)

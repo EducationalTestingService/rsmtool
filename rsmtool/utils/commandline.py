@@ -1,5 +1,5 @@
 """
-Utility functions specific for command-line tools.
+Utility functions used in RSMTool command-line tools.
 
 :author: Nitin Madnani (nmadnani@ets.org)
 :author: Jeremy Biggs (jbiggs@ets.org)

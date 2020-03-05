@@ -1,5 +1,5 @@
 """
-Utility classes and functions for logging.
+Utility classes and functions for RSMTool logging.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)

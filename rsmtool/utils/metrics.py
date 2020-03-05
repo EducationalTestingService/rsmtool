@@ -1,5 +1,5 @@
 """
-Utility functions to compute various metrics.
+Utility functions for computing various RSMTool metrics.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
