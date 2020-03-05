@@ -1,22 +1,26 @@
 import numpy as np
 import pandas as pd
 
+from numpy.testing import assert_array_equal
+
 from nose.tools import (eq_,
                         raises,
                         assert_almost_equal)
 
-from os.path import dirname
+from pathlib import Path
 
 from rsmtool.prmse_utils import (compute_variance_of_errors,
                                  compute_true_score_var_subset_double_scored,
                                  compute_true_score_var_all_double_scored,
                                  compute_mse_subset_double_scored,
                                  compute_mse_all_double_scored,
-                                 compute_prmse)
+                                 compute_prmse,
+                                 compute_variance_of_errors_generalized,
+                                 get_n_human_scores)
 
 
 # get the directory containing the tests
-test_dir = dirname(__file__)
+test_dir = Path(__file__).parent
 
 
 def test_compute_variance_of_errors_zero():
@@ -133,3 +137,44 @@ def test_compute_prmse_zero():
     eq_(prmse.loc['system_correct', 'N'], 6)
     eq_(prmse.loc['system_correct', 'N_single'], 3)
     eq_(prmse.loc['system_correct', 'N_double'], 3)
+
+def test_compute_n_human_scores():
+    df = pd.DataFrame({'h1': [1, 2, 3, 4],
+                       'h2': [1, None, 2, None],
+                       'h3': [None, None, 1, None]})
+    expected_n = pd.Series([2, 1, 3, 1])
+    n_scores = get_n_human_scores(df)
+    assert_array_equal(expected_n, n_scores)
+
+
+def test_compute_n_human_scores_zeros():
+    df = pd.DataFrame({'h1': [1, 2, 3, None],
+                       'h2': [1, None, 2, None],
+                       'h3': [None, None, 1, None]})
+    expected_n = pd.Series([2, 1, 3, 0])
+    n_scores = get_n_human_scores(df)
+    assert_array_equal(expected_n, n_scores)
+
+class TestPrmseJohnsonData():
+
+    '''
+    This class tests the PRMSE functions against the benchmarks
+    provided by Matt Johnson who did the original derivation and
+    implemented the function in R. This test ensures that Python
+    implementation results in the same values
+    '''
+
+    def setUp(self):
+        prmse_data_file = test_dir / 'data' / 'files' / 'prmse_data.csv'
+        self.data = pd.read_csv(prmse_data_file)
+        self.data['spkitemid'] = self.data.index
+        self.human_score_columns = ['h1', 'h2', 'h3', 'h4']
+        self.system_score_columns = ['system']
+
+
+    def test_variance_of_errors(self):
+        human_scores = self.human_score_columns
+        df_humans = self.data[human_scores]
+        variance_of_errors = compute_variance_of_errors_generalized(df_humans)
+        expected_v_e = 0.509375
+        eq_(variance_of_errors, expected_v_e)

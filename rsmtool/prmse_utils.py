@@ -11,7 +11,29 @@ theory based evaluations
 
 import pandas as pd
 
+import numpy as np
+
 from scipy.special import comb
+
+
+def get_n_human_scores(df_human_scores):
+    """
+    Compute number of human scores for each response
+    Parameters
+    ----------
+    df_human_scores : pandas DataFrame
+        DataFrame containing columns with human scores only
+
+    Returns
+    -------
+    n_scores : pandas Series
+        Pandas series with total number of not None human scores
+        for each row in df_human_scores
+    """
+    score_mask = ~df_human_scores.isnull()
+    n_scores = score_mask.sum(axis=1)
+    return n_scores
+
 
 
 def compute_variance_of_errors(df,
@@ -54,33 +76,48 @@ def compute_variance_of_errors(df,
 
     return variance_errors_human
 
-def compute_variance_of_errors_generalized(df,
-                                           human_score_columns):
-    # try to derive variance of errors
-    #total n pairs
-    ### THIS IS BASED ON MY DERIVATION
-    # use only responses with more than 1 score
-    df_multiple = df[df['n_human_scores']>1]
-    # compute total number of possible rater pairs of each response
-    pairs = df_multiple.apply(lambda x: comb(x['n_human_scores'], 2), axis=1)
-    # now we need to compute the sum of (a-b)**2 for each possible pair of raters.
-    # this equals sum(a^2-2ab+b^2 + a^2-2ac+c^2) etc. which can be re-written
-    # as (a^2+...+d^2)*(n_raters-1) - 2*(ab+ac... cd).
-    # We can also note that
-    # (a+..+c)^2 = (a^2+b^2+...c^2) + 2*(ab+ac+...cd)
-    # In other words, the second term is  equal
-    # (a+...+d)^2 - (a^2+b^2...+c^2)
-    # Therefore, we are computing
-    # (a^2+...+d^2)*(n_raters_1) - (a+..d)^2*(a^2+..c^2)
-    # or n_raters*(a^2+....+d^2) - (a+...d)^2
-    df = df[df['n_human_scores']>1]
-    sum_squares = (df_multiple[human_score_columns]**2).sum(axis=1)
-    square_sum = df_multiple[human_score_columns].sum(axis=1)**2
-    sum_of_square_differences = sum_squares*df_multiple['n_human_scores'] - square_sum
-    # we then divide this by total number of ratings available for each response
-    mean_square_difference = sum_of_square_differences/df_multiple['n_human_scores']
-    # the variance of errors is the mean of this value
-    variance_of_errors = mean_square_difference.sum()/len(df_multiple)
+def compute_variance_of_errors_generalized(df_human_scores):
+    '''Compute variance of human errors.
+
+    Parameters
+    ----------
+    df_human_scores : pandas DataFrame
+        DataFrame containing columns with human scores only
+
+    Returns
+    variance_of_errors : float
+        Estimated variance of human errors
+    '''
+
+    # we only use responses with more than 1 score
+
+    n_scores = get_n_human_scores(df_human_scores)
+
+    df_multiple = df_human_scores[n_scores>1]
+
+
+    # we convert the dataframe to an array since we
+    # in these computations having column names
+    # interfere with the computation
+
+    score_matrix = df_multiple.to_numpy()
+
+    # we next calculate orthonormal contrast D_ij for each rating
+    # which defines how it is different from other ratings
+
+    def compute_contrast(ratings):
+        ratings = ratings[~np.isnan(ratings)]
+        n = len(ratings)
+        difference = ratings[1:] - ratings[:-1].cumsum()/(np.arange(1, n))
+        factor = np.arange(1, n)/np.arange(2, n+1)
+        contrast = np.sqrt(factor)*difference
+        return contrast
+
+    contrasts = np.apply_along_axis(compute_contrast, 1, score_matrix)
+
+    # variance of errors is the mean of squared contrasts
+    variance_of_errors = (contrasts**2).mean()
+
     return variance_of_errors
 
 
