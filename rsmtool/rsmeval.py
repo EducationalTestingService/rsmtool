@@ -26,10 +26,15 @@ from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
 from rsmtool.writer import DataWriter
 
 
-def run_evaluation(config_file_or_obj_or_dict, output_dir):
+def run_evaluation(config_file_or_obj_or_dict,
+                   output_dir,
+                   overwrite_output=False):
     """
     Run an ``rsmeval`` experiment using the given configuration
     file and generate all outputs in the given directory.
+
+    If ``overwrite_output`` is ``True``, overwrite any existing
+    output in the given ``output_dir``.
 
     Parameters
     ----------
@@ -45,11 +50,18 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
+    overwrite_output : bool, optional
+        If ``True``, overwrite any existing output under ``output_dir``.
+        Defaults to ``False``.
 
     Raises
     ------
-    ValueError
-        If any of the required fields are missing or ill-specified.
+    FileNotFoundError
+        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
+        be located.
+    IOError
+        If ``output_dir`` already contains the output of a previous experiment
+        and ``overwrite_output`` is ``False``.
     """
     logger = logging.getLogger(__name__)
 
@@ -62,6 +74,24 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir):
     os.makedirs(csvdir, exist_ok=True)
     os.makedirs(figdir, exist_ok=True)
     os.makedirs(reportdir, exist_ok=True)
+
+    # Raise an error if the specified output directory
+    # already contains a non-empty `output` directory, unless
+    # ``overwrite_output`` was specified, in which case we assume
+    # that the user knows what she is doing and simply
+    # output a warning saying that the report might
+    # not be correct.
+    csvdir = join(output_dir, 'output')
+    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
+    if non_empty_csvdir:
+        if not overwrite_output:
+            raise IOError("'{}' already contains a non-empty 'output' "
+                          "directory.".format(output_dir))
+        else:
+            logger.warning("{} already contains a non-empty 'output' directory. "
+                           "The generated report might contain "
+                           "unexpected information from a previous "
+                           "experiment.".format(output_dir))
 
     configuration = configure('rsmeval', config_file_or_obj_or_dict)
 
@@ -202,40 +232,30 @@ def main():
                                  uses_output_directory=True,
                                  allows_overwriting_directory=True)
 
-    # parse given command line arguments
-    args = parser.parse_args()
-    logger.info('Output directory: {}'.format(args.output_dir))
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in ['run',
+                           'quickstart'
+                           '-h', '--help',
+                           '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    # Raise an error if the specified output directory
-    # already contains a non-empty `output` directory, unless
-    # `--force` was specified, in which case we assume
-    # that the user knows what she is doing and simply
-    # output a warning saying that the report might
-    # not be correct.
-    csvdir = join(args.output_dir, 'output')
-    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
-    if non_empty_csvdir:
-        if not args.force_write:
-            raise IOError("'{}' already contains a non-empty 'output' "
-                          "directory.".format(args.output_dir))
-        else:
-            logger.warning("{} already contains a non-empty 'output' directory. "
-                           "The generated report might contain "
-                           "unexpected information from a previous "
-                           "experiment.".format(args.output_dir))
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = os.path.abspath(args.config_file)
-    output_dir = os.path.abspath(args.output_dir)
+        # run the experiment
+        logger.info('Output directory: {}'.format(args.output_dir))
+        run_evaluation(abspath(args.config_file),
+                       abspath(args.output_dir),
+                       overwrite_output=args.force_write)
 
-    # make sure that the given configuration file exists
-    if not exists(config_file):
-        raise FileNotFoundError("Main configuration file {} not "
-                                "found.".format(config_file))
-
-    # run the evaluation experiment
-    run_evaluation(config_file, output_dir)
+    else:
+        pass
 
 
 if __name__ == '__main__':

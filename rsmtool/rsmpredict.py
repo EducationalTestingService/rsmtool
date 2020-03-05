@@ -16,7 +16,8 @@ import logging
 import os
 import sys
 
-from os.path import (basename,
+from os.path import (abspath,
+                     basename,
                      dirname,
                      exists,
                      join,
@@ -51,15 +52,17 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         ``Configuration`` object, relative paths will be interpreted
         relative to the ``configdir`` attribute, that _must_ be set. Given
         a dictionary, the reference path is set to the current directory.
-    output_dir : str
-        Path to the output directory for saving files.
-    feats_file (optional): str
+    output_file : str
+        The output file containing the predictions.
+    feats_file : str, optional
         Path to the output file for saving preprocessed feature values.
 
     Raises
     ------
-    ValueError
-        If any of the required fields are missing or ill-specified.
+    FileNotFoundError
+        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
+        be located, or if ``experiment_dir`` does not exist, or if ``experiment_dir``
+        does not contain the required output needed from an rsmtool experiment.
     """
 
     logger = logging.getLogger(__name__)
@@ -117,11 +120,6 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                     '{} that was generated during the '
                                     'original model training'.format(experiment_output_dir,
                                                                      expected_file_name))
-
-    # model_files = glob.glob(join(experiment_output_dir, '*.model'))
-    # if not model_files:
-    #     raise FileNotFoundError('The directory {} does not contain any rsmtool models. '
-    #                             ''.format(experiment_output_dir))
 
     logger.info('Reading input files.')
 
@@ -247,25 +245,35 @@ def main():
     # now call the helper function to instantiate the parser for us
     parser = setup_rsmcmd_parser('rsmpredict',
                                  uses_output_directory=False,
-                                 extra_options=non_standard_options)
+                                 extra_run_options=non_standard_options)
 
-    # parse given command line arguments
-    args = parser.parse_args()
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in ['run',
+                           'quickstart'
+                           '-h', '--help',
+                           '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = os.path.abspath(args.config_file)
-    output_file = os.path.abspath(args.output_file)
-    preproc_feats_file = None
-    if args.preproc_feats_file:
-        preproc_feats_file = os.path.abspath(args.preproc_feats_file)
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    # generate and save the predictions
-    compute_and_save_predictions(config_file,
-                                 output_file,
-                                 preproc_feats_file)
+        # run the experiment
+        preproc_feats_file = None
+        if args.preproc_feats_file:
+            preproc_feats_file = abspath(args.preproc_feats_file)
+        compute_and_save_predictions(abspath(args.config_file),
+                                     abspath(args.output_file),
+                                     feats_file=preproc_feats_file)
+
+    else:
+        pass
 
 
 if __name__ == '__main__':
-
     main()

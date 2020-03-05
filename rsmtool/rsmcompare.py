@@ -77,8 +77,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Raises
     ------
-    ValueError
-        If any of the required fields are missing or ill-specified.
+    FileNotFoundError
+        If either of the two input directories in ``config_file_or_obj_or_dict``
+        do not exist, or if the directories do not contain rsmtool outputs at all.
     """
 
     logger = logging.getLogger(__name__)
@@ -185,22 +186,29 @@ def main():
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmcompare', uses_output_directory=True)
 
-    # parse given command line arguments
-    args = parser.parse_args()
-    logger.info('Output directory: {}'.format(args.output_dir))
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in ['run',
+                           'quickstart'
+                           '-h', '--help',
+                           '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = abspath(args.config_file)
-    output_dir = abspath(args.output_dir)
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    # make sure that the given configuration file exists
-    if not exists(config_file):
-        raise FileNotFoundError("Main configuration file {} not "
-                                "found.".format(config_file))
+        # run the experiment
+        logger.info('Output directory: {}'.format(args.output_dir))
+        run_comparison(abspath(args.config_file),
+                       abspath(args.output_dir))
 
-    # generate a comparison report
-    run_comparison(config_file, output_dir)
+    else:
+        pass
 
 
 if __name__ == '__main__':
