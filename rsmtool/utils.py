@@ -1268,8 +1268,8 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
 def setup_rsmcmd_parser(name,
                         uses_output_directory=True,
                         allows_overwriting_directory=False,
-                        with_subgroup_sections=False,
-                        extra_run_options=[]):
+                        extra_run_options=[],
+                        with_subgroup_sections=False):
     """
     A helper function to create argument parsers for RSM command-line utilities.
 
@@ -1284,42 +1284,46 @@ def setup_rsmcmd_parser(name,
       - ``-V``/``--version`` : an optional argument to print out the package version
 
     If ``uses_output_directory`` is ``True``, an ``output_dir`` positional
-    argument will be added to the "run" command parser.
+    argument will be added to the "run" subcommand parser.
 
     If ``allows_overwriting_directory`` is ``True``, an ``-f``/``--force``
-    optional argument will be added to the "run" command parser.
-
-    If ``with_subgroup_sections`` is ``True``, a ``--groups`` optional
-    argument will be added to the "quickstart" subcommand parser.
+    optional argument will be added to the "run" subcommand parser.
 
     The ``extra_run_options`` list should contain a list of ``CmdOption``
     instances which are added to the "run" subcommand parser one by one.
+
+    If ``with_subgroup_sections`` is ``True``, a ``--groups`` optional
+    argument will be added to the "quickstart" subcommand parser.
 
     Parameters
     ----------
     name : str
         The name of the command-line tool for which we need the parser.
     uses_output_directory : bool, optional
-        Does this tool need a directory to store its outputs?
+        Add the ``output_dir`` positional argument to the "run" subcommand
+        parser. This argument means that the respective tool uses an output
+        directory to store its various outputs.
     allows_overwriting_directory : bool, optional
-        Does this tool allow the user to overwrite any existing output
-        in the output directory?
-    include_subgroup_sections : bool, optional
-        Description
+        Add the ``-f``/``-force_write`` optional argument to the "run" subcommand
+        parser. This argument allows the output directory for the respective
+        tool to be overwritten even if it already contains some output.
     extra_run_options : list, optional
-        Any additional options to be added to the parser for the "run"
-        subcommand, each specified as a ``CmdOption`` instance.
+        Any additional options to be added to the "run" subcommand parser,
+        each specified as a ``CmdOption`` instance.
+    with_subgroup_sections : bool, optional
+        Add the ``--groups`` optional argument to the "quickstart" subcommand
+        parser.
 
     Returns
     -------
     parser : arpgarse.ArgumentParser
-        A fully instantiated argument parser.
+        A fully instantiated argument parser for the respective tool.
 
     Raises
     ------
     RuntimeError
         If any of the ``CmdOption`` instances specified in
-        ``extra_options`` do not contain the ``dest`` and
+        ``extra_run_options`` do not contain the ``dest`` and
         ``help`` attributes.
 
     Note
@@ -1343,11 +1347,11 @@ def setup_rsmcmd_parser(name,
     # we always want to have a version flag for the main parser
     parser.add_argument('-V', '--version', action='version', version=VERSION_STRING)
 
-    # each RSM command-line utility has two sub-commands
+    # each RSM command-line utility has two subcommands
     # - quickstart : used to auto-generate configuration files
     # - run : used to run experiments
 
-    # let's set up the sub-parsers corresponding to these sub-commands
+    # let's set up the sub-parsers corresponding to these subcommands
     subparsers = parser.add_subparsers(dest='subcommand')
     parser_quickstart = subparsers.add_parser('quickstart',
                                               help=f"Automatically generate an {name} configuration file")
@@ -1396,8 +1400,9 @@ def setup_rsmcmd_parser(name,
                                      "output directory already contains the "
                                      "output of another {name} experiment. ")
 
-    # add any extra options passed in - we must have a name and a help string
-    for parser_option in extra_options:
+    # add any extra options passed in for the rub subcommand; each of them must
+    # have a destination name and a help string
+    for parser_option in extra_run_options:
         try:
             assert hasattr(parser_option, 'dest')
             assert hasattr(parser_option, 'help')
