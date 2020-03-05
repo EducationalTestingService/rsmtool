@@ -65,7 +65,7 @@ def test_compute_true_score_var_subset():
 
 
 def test_compute_true_score_compare():
-    single = pd.Series([])
+    single = pd.Series([], dtype='float64')
     double = pd.Series([2, 1, 3, 2, 3, 4, 6])
 
     v_e = 0.3
@@ -106,9 +106,9 @@ def test_compute_mse_compare():
     human_double = pd.Series([1, 1, 1, 1, 1, 1])
     system_double = pd.Series([2, 2, 0, 0, 1, 1])
     v_e = 0.3
-    mse_subset = compute_mse_subset_double_scored(pd.Series([]),
+    mse_subset = compute_mse_subset_double_scored(pd.Series([], dtype='float64'),
                                                   human_double,
-                                                  pd.Series([]),
+                                                  pd.Series([], dtype='float64'),
                                                   system_double,
                                                   v_e)
     mse_all = compute_mse_all_double_scored(human_double,

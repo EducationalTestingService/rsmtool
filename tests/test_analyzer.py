@@ -9,7 +9,7 @@ from nose.tools import (assert_almost_equal,
                         assert_equal)
 
 from numpy.random import RandomState
-from pandas.util.testing import assert_series_equal
+from pandas.testing import assert_series_equal
 from numpy.testing import assert_array_equal
 
 from rsmtool.analyzer import Analyzer
