@@ -551,7 +551,7 @@ class Configuration:
 
         # Create output directory, if it does not exist
         output_dir = Path(output_dir).resolve() / 'output'
-        output_dir.mkdir(exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
         experiment_id = self._config[id_field]
