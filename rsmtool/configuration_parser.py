@@ -43,7 +43,7 @@ from skll import Learner
 from skll.metrics import SCORERS
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file,
+    from rsmextra.settings import (default_feature_subset_file, # noqa
                                    default_feature_sign)
 
 
