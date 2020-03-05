@@ -23,8 +23,7 @@ from os import getcwd, makedirs
 from os.path import (abspath,
                      basename,
                      dirname,
-                     join,
-                     splitext)
+                     join)
 from pathlib import Path
 from ruamel import yaml
 
@@ -874,8 +873,8 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        filepath : str
-            Path to the JSON configuration file.
+        filepath : pathlib.Path
+            A ``pathlib.Path`` object containing the JSON configuration filepath.
 
         Returns
         -------
@@ -902,12 +901,12 @@ class ConfigurationParser:
     def _parse_cfg_file(self, filepath):
         """
         A private method to parse INI-style configuration files and
-        return a Python dictionary
+        return a Python dictionary.
 
         Parameters
         ----------
-        filepath : str
-            Path to the CFG configuration file.
+        filepath : pathlib.Path
+            A ``pathlib.Path`` object containing the CFG configuration filepath.
 
         Returns
         -------
@@ -978,7 +977,7 @@ class ConfigurationParser:
             file that we instantiated the parser for.
         """
         extension = Path(self._filename).suffix.lower()
-        filepath = join(self._configdir, self._filename)
+        filepath = self._configdir / self._filename
         if extension == '.json':
             configdict = self._parse_json_file(filepath)
         else:
