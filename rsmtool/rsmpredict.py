@@ -26,7 +26,7 @@ from os.path import (basename,
                      split)
 
 from rsmtool import VERSION_STRING
-from rsmtool.configuration_parser import ConfigurationParser, Configuration
+from rsmtool.configuration_parser import configure
 from rsmtool.modeler import Modeler
 from rsmtool.preprocessor import FeaturePreprocessor
 from rsmtool.reader import DataReader
@@ -43,15 +43,16 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     Parameters
     ----------
-    config_file_or_obj : str or configuration_parser.Configuration
-        Path to the experiment configuration file.
-        Users can also pass a `Configuration` object that is in memory.
-        Relative paths in the configuration file will be interpreted relative
-        to the location of the file. For configuration object
-        `.configdir` needs to be set to indicate the reference path. If
-        the user passes a dictionary, the reference path will be set to
-        the current directory and all relative paths will be resolved relative
-        to this path.
+    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+        Path to the experiment configuration file either a a string
+        or as a ``pathlib.Path`` object. Users can also pass a
+        ``Configuration`` object that is in memory or a Python dictionary
+        with keys corresponding to fields in the configuration file. Given a
+        configuration file, any relative paths in the configuration file
+        will be interpreted relative to the location of the file. Given a
+        ``Configuration`` object, relative paths will be interpreted
+        relative to the ``configdir`` attribute, that _must_ be set. Given
+        a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the output directory for saving files.
     feats_file (optional): str
@@ -65,37 +66,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     logger = logging.getLogger(__name__)
 
-    # check what sort of input we got
-    # if we got a string we consider this to be path to config file
-    if isinstance(config_file_or_obj_or_dict, str):
-
-        # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                          context='rsmpredict')
-
-    elif isinstance(config_file_or_obj_or_dict, dict):
-
-        # initialize the parser from dict
-        parser = ConfigurationParser()
-        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                            context='rsmpredict')
-
-    elif isinstance(config_file_or_obj_or_dict, Configuration):
-
-        configuration = config_file_or_obj_or_dict
-        # raise an error if we are passed a Configuration object
-        # without a configdir attribute. This can only
-        # happen if the object was constructed using an earlier version
-        # of RSMTool and stored
-        if configuration.configdir is None:
-            raise AttributeError("Configuration object must have configdir attribute.")
-
-    else:
-        raise ValueError("The input to compute_and_save_predictions must be "
-                         "a path to the file (str), a dictionary, "
-                         "or a configuration object. You passed "
-                         "{}.".format(type(config_file_or_obj_or_dict)))
+    configuration = configure('rsmpredict', config_file_or_obj_or_dict)
 
     # get the experiment ID
     experiment_id = configuration['experiment_id']

@@ -1,20 +1,17 @@
 import os
 import tempfile
 
-from glob import glob
 from os import getcwd
-from os.path import basename, exists, join
+from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool import run_summary
 
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 
-from rsmtool.test_utils import (check_file_output,
-                                check_report,
-                                check_run_summary,
+from rsmtool.test_utils import (check_run_summary,
                                 copy_data_files,
                                 do_run_summary)
 
@@ -49,13 +46,13 @@ def test_run_experiment_parameterized(*args, **kwargs):
 def test_run_experiment_lr_summary_with_object():
     '''
     test rsmsummarize using the Configuration object, rather than a file;
-    we set the configuration directory to point to the
-    test directory
-    to ensure that the results are identical to what we would expect if we had
-    run this test with a configuration file instead.
     '''
+
     source = 'lr-self-summary-object'
 
+    # we set the configuration directory to point to the test directory
+    # to ensure that the results are identical to what we would expect
+    # if we had run this test with a configuration file instead
     configdir = join(rsmtool_test_dir,
                      'data',
                      'experiments',
@@ -65,10 +62,9 @@ def test_run_experiment_lr_summary_with_object():
                    "experiment_dirs": ["lr-subgroups", "lr-subgroups", "lr-subgroups"],
                    "description": "Comparison of rsmtool experiment with itself."}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
+    config_obj = Configuration(config_dict,
+                               context='rsmsummarize',
+                               configdir=configdir)
 
     check_run_summary(source, config_obj_or_dict=config_obj)
 
@@ -114,9 +110,9 @@ def test_run_experiment_lr_summary_no_trim():
                    "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
                    "description": "Comparison of rsmtool without trim values"}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, configdir=config_dir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmsummarize')
+    config_obj = Configuration(config_dict,
+                               context='rsmsummarize',
+                               configdir=config_dir)
 
     check_run_summary(source, config_obj_or_dict=config_obj)
 

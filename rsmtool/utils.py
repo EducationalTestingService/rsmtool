@@ -16,9 +16,9 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from math import ceil
 from glob import glob
 from importlib import import_module
+from math import ceil
 from os.path import exists, isabs, join, relpath
 from pathlib import Path
 from string import Template
@@ -73,7 +73,6 @@ DEFAULTS = {'id_column': 'spkitemid',
             'custom_sections': None,
             'feature_subset_file': None,
             'feature_subset': None,
-            'feature_prefix': None,
             'trim_min': None,
             'trim_max': None,
             'trim_tolerance': 0.4998,
@@ -86,8 +85,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'min_items_per_candidate': None,
             'experiment_names': None}
 
-LIST_FIELDS = ['feature_prefix',
-               'general_sections',
+LIST_FIELDS = ['general_sections',
                'special_sections',
                'custom_sections',
                'subgroups',
@@ -310,16 +308,19 @@ def convert_to_float(value):
     return int_to_float(string_to_number(value))
 
 
-def parse_json_with_comments(filename):
+def parse_json_with_comments(pathlike):
     """
     Parse a JSON file after removing any comments.
+
     Comments can use either ``//`` for single-line
     comments or or ``/* ... */`` for multi-line comments.
+    The input filepath can be a string or ``pathlib.Path``.
 
     Parameters
     ----------
-    filename : str
-        Path to the input JSON file.
+    filename : str or os.PathLike
+        Path to the input JSON file either as a string
+        or as a ``pathlib.Path`` object.
 
     Returns
     -------
@@ -336,7 +337,11 @@ def parse_json_with_comments(filename):
     comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
                             re.DOTALL | re.MULTILINE)
 
-    with open(filename) as file_buff:
+    # if we passed in a string, convert it to a Path
+    if isinstance(pathlike, str):
+        pathlike = Path(pathlike)
+
+    with open(pathlike, 'r') as file_buff:
         content = ''.join(file_buff.readlines())
 
         # Looking for comments
