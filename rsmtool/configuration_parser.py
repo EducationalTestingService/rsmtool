@@ -19,6 +19,7 @@ from copy import copy, deepcopy
 from collections import Counter
 from configparser import ConfigParser
 from os import getcwd
+from os.path import abspath
 
 from pathlib import Path
 from ruamel import yaml
@@ -386,7 +387,10 @@ class Configuration:
 
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
-        self._configdir = Path(new_path).resolve()
+
+        # TODO: replace `Path(abspath(new_path))` with `Path(new_path).resolve()
+        # once this Windows bug is fixed: https://bugs.python.org/issue38671
+        self._configdir = Path(abspath(new_path))
 
     @property
     def filename(self):
