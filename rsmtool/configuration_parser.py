@@ -18,13 +18,9 @@ import warnings
 from copy import copy, deepcopy
 from collections import Counter
 from configparser import ConfigParser
+from os import getcwd
+from os.path import abspath
 
-from os import getcwd, makedirs
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join,
-                     splitext)
 from pathlib import Path
 from ruamel import yaml
 
@@ -43,7 +39,7 @@ from skll import Learner
 from skll.metrics import SCORERS
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file,
+    from rsmextra.settings import (default_feature_subset_file, # noqa
                                    default_feature_sign)
 
 
@@ -81,8 +77,8 @@ def deprecated_positional_argument():
                 # split filepath into
                 # configdir and filename
                 filepath = args[-1]
-                kwargs['filename'] = basename(filepath)
-                kwargs['configdir'] = dirname(abspath(filepath))
+                kwargs['filename'] = Path(filepath).name
+                kwargs['configdir'] = Path(filepath).resolve().parent
                 # remove filepath from positional arguments
                 args = args[:-1]
             return f(*args, **kwargs)
@@ -90,15 +86,15 @@ def deprecated_positional_argument():
     return decorator
 
 
-def configure(tool_name, config_file_or_obj_or_dict):
+def configure(context, config_file_or_obj_or_dict):
     """
-    Get the configuration for ``tool_name`` from the input
+    Get the configuration for ``context`` from the input
     ``config_file_or_obj_or_dict``.
 
     Parameters
     ----------
-    tool_name : str
-        The name of the tool that is being configured. Must be one of
+    context : str
+        The context that is being configured. Must be one of
         ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmsummarize``, or
         ``rsmpredict``.
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
@@ -131,13 +127,13 @@ def configure(tool_name, config_file_or_obj_or_dict):
 
         # Instantiate configuration parser object
         parser = ConfigurationParser(config_file_or_obj_or_dict)
-        configuration = parser.parse(context=tool_name)
+        configuration = parser.parse(context=context)
 
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # directly instantiate the Configuration from the dictionary
         configuration = Configuration(config_file_or_obj_or_dict,
-                                      context=tool_name)
+                                      context=context)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
@@ -216,10 +212,10 @@ class Configuration:
 
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
-            configdir = getcwd()
+            configdir = Path(getcwd())
             logging.info("Configuration directory will be set to {}".format(configdir))
         else:
-            configdir = abspath(configdir)
+            configdir = Path(configdir).resolve()
 
         self._config = configdict
         self._configdir = configdir
@@ -322,17 +318,21 @@ class Configuration:
         filepath : str
             The path for the config file.
         """
-        if not self.filename:
+
+        # raise a deprecation warning first
+        warnings.warn("The `filepath` attribute of the Configuration "
+                      "object will be removed in RSMTool v8.0."
+                      "Use the `configdir` and `filename` attributes "
+                      "if you need the full path to the "
+                      "configuration file", DeprecationWarning)
+
+        # then compute the deprecated attribute if we can
+        if not self._filename:
             raise AttributeError('The `filepath` attribute is not defined '
                                  'for this Configuration object.')
         else:
-            warnings.warn("The `filepath` attribute of the Configuration "
-                          "object will be removed in RSMTool v8.0."
-                          "Use the `configdir` and `filename` attributes "
-                          "if you need the full path to the "
-                          "configuration file", DeprecationWarning)
-            filepath = join(self.configdir, self.filename)
-            return filepath
+            filepath = self._configdir / self._filename
+            return str(filepath)
 
     @filepath.setter
     def filepath(self, new_path):
@@ -353,8 +353,8 @@ class Configuration:
                       "use `configdir` and `filename` if you "
                       "need to set a new path to the "
                       "configuration file", DeprecationWarning)
-        new_filename = basename(new_path)
-        new_configdir = dirname(abspath(new_path))
+        new_filename = Path(new_path).name
+        new_configdir = Path(new_path).resolve().parent
         self._filename = new_filename
         self._configdir = new_configdir
 
@@ -370,7 +370,7 @@ class Configuration:
         configdir : str
             The path to the configuration reference directory
         """
-        return self._configdir
+        return str(self._configdir)
 
     @configdir.setter
     def configdir(self, new_path):
@@ -387,7 +387,10 @@ class Configuration:
 
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
-        self._configdir = abspath(new_path)
+
+        # TODO: replace `Path(abspath(new_path))` with `Path(new_path).resolve()
+        # once this Windows bug is fixed: https://bugs.python.org/issue38671
+        self._configdir = Path(abspath(new_path))
 
     @property
     def filename(self):
@@ -402,7 +405,7 @@ class Configuration:
         return self._filename
 
     @filename.setter
-    def filename(self, new_path):
+    def filename(self, new_name):
         """
         Set a new name of the configuration file
 
@@ -411,7 +414,7 @@ class Configuration:
         new_name : str
             New name of the configuration file
         """
-        self._filename = new_path
+        self._filename = new_name
 
     @property
     def context(self):
@@ -548,22 +551,22 @@ class Configuration:
 
         # save a copy of the main config into the output directory
         if output_dir is None:
-            output_dir = getcwd()
+            output_dir = Path(getcwd())
 
         # Create output directory, if it does not exist
-        output_dir = join(output_dir, 'output')
-        makedirs(output_dir, exist_ok=True)
+        output_dir = Path(output_dir).resolve() / 'output'
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
-        outjson = join(output_dir,
-                       '{}_{}.json'.format(self._config[id_field],
-                                           self._context))
+        experiment_id = self._config[id_field]
+        context = self._context
+        outjson = output_dir / f"{experiment_id}_{context}.json"
 
         expected_fields = (CHECK_FIELDS[self._context]['required'] +
                            CHECK_FIELDS[self._context]['optional'])
 
         output_config = {k: v for k, v in self._config.items() if k in expected_fields}
-        with open(outjson, 'w') as outfile:
+        with outjson.open(mode='w') as outfile:
             json.dump(output_config, outfile, indent=4, separators=(',', ': '))
 
     def check_exclude_listwise(self):
@@ -870,8 +873,8 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        filepath : str
-            Path to the JSON configuration file.
+        filepath : pathlib.Path
+            A ``pathlib.Path`` object containing the JSON configuration filepath.
 
         Returns
         -------
@@ -898,12 +901,12 @@ class ConfigurationParser:
     def _parse_cfg_file(self, filepath):
         """
         A private method to parse INI-style configuration files and
-        return a Python dictionary
+        return a Python dictionary.
 
         Parameters
         ----------
-        filepath : str
-            Path to the CFG configuration file.
+        filepath : pathlib.Path
+            A ``pathlib.Path`` object containing the CFG configuration filepath.
 
         Returns
         -------
@@ -973,8 +976,8 @@ class ConfigurationParser:
             A Configuration object containing the parameters in the
             file that we instantiated the parser for.
         """
-        _, extension = splitext(self._filename)
-        filepath = join(self._configdir, self._filename)
+        extension = Path(self._filename).suffix.lower()
+        filepath = self._configdir / self._filename
         if extension == '.json':
             configdict = self._parse_json_file(filepath)
         else:
@@ -1163,7 +1166,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You requested feature subsets but did not "
                                 "specify any feature file. "
@@ -1178,7 +1181,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You specified the expected sign of "
                                 "correlation but did not specify a feature "
