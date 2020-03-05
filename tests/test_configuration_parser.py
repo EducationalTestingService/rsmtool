@@ -8,7 +8,7 @@ import pandas as pd
 from io import StringIO
 from os import getcwd
 from os.path import abspath, dirname, join
-
+from pathlib import Path
 from shutil import rmtree
 
 from numpy.testing import assert_array_equal
@@ -92,7 +92,7 @@ class TestConfigurationParser:
                 "flag_column": "abc",
                 "model": 'LinearRegression'}
 
-        configdir = abspath('/path/to/configdir')
+        configdir = Path('/path/to/configdir').resolve()
         configuration = Configuration(data, configdir=configdir)
         eq_(configuration._configdir, configdir)
 
@@ -103,7 +103,7 @@ class TestConfigurationParser:
                 "flag_column": "abc",
                 "model": 'LinearRegression'}
 
-        configdir = getcwd()
+        configdir = Path(getcwd())
         configuration = Configuration(data)
         eq_(configuration._configdir, configdir)
 
@@ -513,7 +513,7 @@ class TestConfiguration:
 
             config = Configuration(config_dict, filepath)
             eq_(config._filename, 'file.json')
-            eq_(config._configdir, abspath('some/path'))
+            eq_(config._configdir, Path('some/path').resolve())
             assert len(w) == 1
             assert issubclass(w[-1].category, DeprecationWarning)
 
@@ -526,7 +526,7 @@ class TestConfiguration:
 
         config = Configuration(config_dict, filename=filename)
         eq_(config._filename, filename)
-        eq_(config.configdir, abspath(getcwd()))
+        eq_(config.configdir, getcwd())
 
     def test_init_with_filename_and_configdir_as_kword_argument(self):
         filename = 'file.json'
@@ -540,7 +540,7 @@ class TestConfiguration:
                                filename=filename,
                                configdir=configdir)
         eq_(config._filename, filename)
-        eq_(config._configdir, abspath(configdir))
+        eq_(config._configdir, Path(configdir).resolve())
 
     def test_init_with_configdir_only_as_kword_argument(self):
         configdir = 'some/path'
@@ -552,7 +552,7 @@ class TestConfiguration:
         config = Configuration(config_dict,
                                configdir=configdir)
         eq_(config._filename, None)
-        eq_(config._configdir, abspath(configdir))
+        eq_(config._configdir, Path(configdir).resolve())
 
     @ raises(ValueError)
     def test_init_with_filepath_positional_and_filename_keyword(self):
