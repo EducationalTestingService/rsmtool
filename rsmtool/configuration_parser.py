@@ -18,12 +18,8 @@ import warnings
 from copy import copy, deepcopy
 from collections import Counter
 from configparser import ConfigParser
+from os import getcwd
 
-from os import getcwd, makedirs
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join)
 from pathlib import Path
 from ruamel import yaml
 
@@ -42,7 +38,7 @@ from skll import Learner
 from skll.metrics import SCORERS
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file,
+    from rsmextra.settings import (default_feature_subset_file, # noqa
                                    default_feature_sign)
 
 
@@ -80,8 +76,8 @@ def deprecated_positional_argument():
                 # split filepath into
                 # configdir and filename
                 filepath = args[-1]
-                kwargs['filename'] = basename(filepath)
-                kwargs['configdir'] = dirname(abspath(filepath))
+                kwargs['filename'] = Path(filepath).name
+                kwargs['configdir'] = Path(filepath).resolve().parent
                 # remove filepath from positional arguments
                 args = args[:-1]
             return f(*args, **kwargs)
@@ -215,10 +211,10 @@ class Configuration:
 
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
-            configdir = getcwd()
+            configdir = Path(getcwd())
             logging.info("Configuration directory will be set to {}".format(configdir))
         else:
-            configdir = abspath(configdir)
+            configdir = Path(configdir).resolve()
 
         self._config = configdict
         self._configdir = configdir
@@ -330,12 +326,12 @@ class Configuration:
                       "configuration file", DeprecationWarning)
 
         # then compute the deprecated attribute if we can
-        if not self.filename:
+        if not self._filename:
             raise AttributeError('The `filepath` attribute is not defined '
                                  'for this Configuration object.')
         else:
-            filepath = join(self.configdir, self.filename)
-            return filepath
+            filepath = self._configdir / self._filename
+            return str(filepath)
 
     @filepath.setter
     def filepath(self, new_path):
@@ -356,8 +352,8 @@ class Configuration:
                       "use `configdir` and `filename` if you "
                       "need to set a new path to the "
                       "configuration file", DeprecationWarning)
-        new_filename = basename(new_path)
-        new_configdir = dirname(abspath(new_path))
+        new_filename = Path(new_path).name
+        new_configdir = Path(new_path).resolve().parent
         self._filename = new_filename
         self._configdir = new_configdir
 
@@ -373,7 +369,7 @@ class Configuration:
         configdir : str
             The path to the configuration reference directory
         """
-        return self._configdir
+        return str(self._configdir)
 
     @configdir.setter
     def configdir(self, new_path):
@@ -390,7 +386,7 @@ class Configuration:
 
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
-        self._configdir = abspath(new_path)
+        self._configdir = Path(new_path).resolve()
 
     @property
     def filename(self):
@@ -405,7 +401,7 @@ class Configuration:
         return self._filename
 
     @filename.setter
-    def filename(self, new_path):
+    def filename(self, new_name):
         """
         Set a new name of the configuration file
 
@@ -414,7 +410,7 @@ class Configuration:
         new_name : str
             New name of the configuration file
         """
-        self._filename = new_path
+        self._filename = new_name
 
     @property
     def context(self):
@@ -551,22 +547,22 @@ class Configuration:
 
         # save a copy of the main config into the output directory
         if output_dir is None:
-            output_dir = getcwd()
+            output_dir = Path(getcwd())
 
         # Create output directory, if it does not exist
-        output_dir = join(output_dir, 'output')
-        makedirs(output_dir, exist_ok=True)
+        output_dir = output_dir / 'output'
+        output_dir.mkdir(exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
-        outjson = join(output_dir,
-                       '{}_{}.json'.format(self._config[id_field],
-                                           self._context))
+        experiment_id = self._config[id_field]
+        context = self._context
+        outjson = output_dir / f"{experiment_id}_{context}.json"
 
         expected_fields = (CHECK_FIELDS[self._context]['required'] +
                            CHECK_FIELDS[self._context]['optional'])
 
         output_config = {k: v for k, v in self._config.items() if k in expected_fields}
-        with open(outjson, 'w') as outfile:
+        with outjson.open(mode='w') as outfile:
             json.dump(output_config, outfile, indent=4, separators=(',', ': '))
 
     def check_exclude_listwise(self):
@@ -1166,7 +1162,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You requested feature subsets but did not "
                                 "specify any feature file. "
@@ -1181,7 +1177,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You specified the expected sign of "
                                 "correlation but did not specify a feature "
