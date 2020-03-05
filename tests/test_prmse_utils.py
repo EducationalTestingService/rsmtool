@@ -12,6 +12,7 @@ from pathlib import Path
 from rsmtool.prmse_utils import (compute_variance_of_errors,
                                  compute_true_score_var_subset_double_scored,
                                  compute_true_score_var_all_double_scored,
+                                 compute_true_score_var_generalized,
                                  compute_mse_subset_double_scored,
                                  compute_mse_all_double_scored,
                                  compute_prmse,
@@ -165,16 +166,44 @@ class TestPrmseJohnsonData():
     '''
 
     def setUp(self):
-        prmse_data_file = test_dir / 'data' / 'files' / 'prmse_data.csv'
-        self.data = pd.read_csv(prmse_data_file)
-        self.data['spkitemid'] = self.data.index
+        full_matrix_file = test_dir / 'data' / 'files' / 'prmse_data.csv'
+        sparse_matrix_file = test_dir / 'data' / 'files' / 'prmse_data_sparse_matrix.csv'
+        self.data_full = pd.read_csv(full_matrix_file)
+        self.data_sparse = pd.read_csv(sparse_matrix_file)
         self.human_score_columns = ['h1', 'h2', 'h3', 'h4']
         self.system_score_columns = ['system']
 
 
-    def test_variance_of_errors(self):
+    def test_variance_of_errors_full_matrix(self):
         human_scores = self.human_score_columns
-        df_humans = self.data[human_scores]
+        df_humans = self.data_full[human_scores]
         variance_of_errors = compute_variance_of_errors_generalized(df_humans)
         expected_v_e = 0.509375
         eq_(variance_of_errors, expected_v_e)
+
+
+    def test_variance_of_errors_sparse_matrix(self):
+        human_scores = self.human_score_columns
+        df_humans = self.data_sparse[human_scores]
+        variance_of_errors = compute_variance_of_errors_generalized(df_humans)
+        # we need to get these values from Matt
+        expected_v_e = 0.5150882
+        assert_almost_equal(variance_of_errors, expected_v_e, 7)
+
+    def test_variance_of_true_scores_full_matrix(self):
+        human_scores = self.human_score_columns
+        df_humans = self.data_full[human_scores]
+        variance_of_errors = 0.509375
+        expected_var_true = 0.7765515
+        var_true = compute_true_score_var_generalized(df_humans,
+                                                      variance_of_errors)
+        assert_almost_equal(var_true, expected_var_true, 7)
+
+    def test_variance_of_true_scores_sparse_matrix(self):
+        human_scores = self.human_score_columns
+        df_humans = self.data_sparse[human_scores]
+        variance_of_errors = 0.5150882
+        expected_var_true = 0.769816
+        var_true = compute_true_score_var_generalized(df_humans,
+                                                      variance_of_errors)
+        assert_almost_equal(var_true, expected_var_true, 7)

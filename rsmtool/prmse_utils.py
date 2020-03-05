@@ -96,27 +96,38 @@ def compute_variance_of_errors_generalized(df_human_scores):
     df_multiple = df_human_scores[n_scores>1]
 
 
-    # we convert the dataframe to an array since we
+    # we convert the dataframe to an array since
     # in these computations having column names
-    # interfere with the computation
+    # interferes with the computation
 
     score_matrix = df_multiple.to_numpy()
 
-    # we next calculate orthonormal contrast D_ij for each rating
-    # which defines how it is different from other ratings
+    # we next calculate the difference between ratings
+    # for each response
 
-    def compute_contrast(ratings):
+    def compute_difference(ratings):
+        total_ratings = len(ratings)
         ratings = ratings[~np.isnan(ratings)]
         n = len(ratings)
+        # Difference has dimensions (n-1,)
         difference = ratings[1:] - ratings[:-1].cumsum()/(np.arange(1, n))
+        # Compute multiplication factor.
+        # This also has dimension (n-1,)
         factor = np.arange(1, n)/np.arange(2, n+1)
+        # Compute contrast. This also has dimensions n-1
         contrast = np.sqrt(factor)*difference
+        # now we need to pad it back to the total number of
+        # original ratings
+        pad_width = total_ratings - n
+        contrast = np.pad(contrast,
+                          (0, pad_width),
+                          constant_values=np.nan)
         return contrast
 
-    contrasts = np.apply_along_axis(compute_contrast, 1, score_matrix)
+    differences = np.apply_along_axis(compute_difference, 1, score_matrix)
 
-    # variance of errors is the mean of squared contrasts
-    variance_of_errors = (contrasts**2).mean()
+    # variance of errors is the mean of squared differences
+    variance_of_errors = np.nanmean((differences**2))
 
     return variance_of_errors
 
@@ -284,16 +295,27 @@ def compute_true_score_var_generalized(df_human_scores,
     variance_true_scores : float
         Variance of true scores
     """
-    mean_human_score = df_human_scores['mean_h'].mean()
-    N = len(df_human_scores)
-    M = df_human_scores['n_human_scores'].sum()
 
-    errors = (df_human_scores['mean_h'] - mean_human_score)**2
-    adjusted_errors = df_human_scores['n_human_scores']*errors
+    # compute mean human score and total number of scores
+    # for each response
+    mean_scores = df_human_scores.mean(axis=1)
+    n_scores = get_n_human_scores(df_human_scores)
+
+    # compute overall mean
+    mean_human_score = mean_scores.mean()
+
+    # let N be total number of responses
+    N = len(df_human_scores)
+
+    # let M be total number of human ratings
+    M = n_scores.sum()
+
+    errors = (mean_scores - mean_human_score)**2
+    adjusted_errors = n_scores * errors
     sum_of_errors = adjusted_errors.sum()
     numerator = sum_of_errors - (N-1)*variance_errors_human
 
-    denominator = M - ((df_human_scores['n_human_scores']**2).sum()/M)
+    denominator = M - ((n_scores**2).sum()/M)
 
     variance_true_scores = numerator/denominator
     return variance_true_scores
