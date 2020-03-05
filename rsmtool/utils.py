@@ -34,24 +34,16 @@ from skll.data import safe_float as string_to_number
 from . import VERSION_STRING
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
-# to specify additional options for the argument parser. An example
-# can be found in `rsmpredict.py`. The `dest` and `help` options are
-# required but the rest can be left unspecified and will default to `None`.
+# to specify additional options for either of the subcommand parsers.
+# An example can be found in `rsmpredict.py`. All of the attributes
+# are directly named for the arguments that are used with
+# the `ArgParser.add_argument()` method. The `dest` and `help`
+# options are required but the rest can be left unspecified and
+# will default to `None`.
 CmdOption = namedtuple('CmdOption',
-                       ['dest',
-                        'help',
-                        'shortname',
-                        'longname',
-                        'action',
-                        'default',
-                        'required',
-                        'nargs'],
-                       defaults=[None,
-                                 None,
-                                 None,
-                                 None,
-                                 None,
-                                 None])
+                       ['dest', 'help', 'shortname', 'longname', 'action',
+                        'default', 'required', 'nargs'],
+                       defaults=[None, None, None, None, None])
 
 HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
 
@@ -1276,7 +1268,8 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
 def setup_rsmcmd_parser(name,
                         uses_output_directory=True,
                         allows_overwriting_directory=False,
-                        extra_options=[]):
+                        with_subgroup_sections=False,
+                        extra_run_options=[]):
     """
     A helper function to create argument parsers for RSM command-line utilities.
 
@@ -1291,13 +1284,16 @@ def setup_rsmcmd_parser(name,
       - ``-V``/``--version`` : an optional argument to print out the package version
 
     If ``uses_output_directory`` is ``True``, an ``output_dir`` positional
-    argument will be added to the parser.
+    argument will be added to the "run" command parser.
 
     If ``allows_overwriting_directory`` is ``True``, an ``-f``/``--force``
-    optional argument will be added to the parser.
+    optional argument will be added to the "run" command parser.
 
-    The ``extra_options`` list should contain a list of ``CmdOption``
-    instances which are added to the parser one by one.
+    If ``with_subgroup_sections`` is ``True``, a ``--groups`` optional
+    argument will be added to the "quickstart" subcommand parser.
+
+    The ``extra_run_options`` list should contain a list of ``CmdOption``
+    instances which are added to the "run" subcommand parser one by one.
 
     Parameters
     ----------
@@ -1308,9 +1304,11 @@ def setup_rsmcmd_parser(name,
     allows_overwriting_directory : bool, optional
         Does this tool allow the user to overwrite any existing output
         in the output directory?
-    extra_options : list, optional
-        Any additional options to be added to the parser, each specified
-        as a ``CmdOption`` instance.
+    include_subgroup_sections : bool, optional
+        Description
+    extra_run_options : list, optional
+        Any additional options to be added to the parser for the "run"
+        subcommand, each specified as a ``CmdOption`` instance.
 
     Returns
     -------
@@ -1323,36 +1321,80 @@ def setup_rsmcmd_parser(name,
         If any of the ``CmdOption`` instances specified in
         ``extra_options`` do not contain the ``dest`` and
         ``help`` attributes.
+
+    Note
+    ----
+    This function is only meant to be used by RSMTool developers.
     """
+
+    # a special callable to test whether configuration files exist
+    # or not; this is nested because it is only used within this function
+    # and should never be used externally
+    def existing_configuration_file(string):
+        if Path(string).exists():
+            return string
+        else:
+            msg = 'The configuration file %r does not exist.' % string
+            raise argparse.ArgumentTypeError(msg)
+
     # initialize an argument parser
     parser = argparse.ArgumentParser(prog=f"{name}")
 
+    # we always want to have a version flag for the main parser
+    parser.add_argument('-V', '--version', action='version', version=VERSION_STRING)
+
+    # each RSM command-line utility has two sub-commands
+    # - quickstart : used to auto-generate configuration files
+    # - run : used to run experiments
+
+    # let's set up the sub-parsers corresponding to these sub-commands
+    subparsers = parser.add_subparsers(dest='subcommand')
+    parser_quickstart = subparsers.add_parser('quickstart',
+                                              help=f"Automatically generate an {name} configuration file")
+    parser_run = subparsers.add_parser('run',
+                                       help=f"Run an {name} experiment")
+
+    #####################################################
+    # Setting up options for the "quickstart" subparser #
+    #####################################################
+    if with_subgroup_sections:
+        parser_quickstart.add_argument('--groups',
+                                       dest='subgroups',
+                                       action='store_true',
+                                       default=False,
+                                       help=f"If true, the generated {name} "
+                                            "configuration file will include the "
+                                            "subgroup sections in the general "
+                                            "sections list.")
+
+    ##############################################
+    # Setting up options for the "run" subparser #
+    ##############################################
+
     # since this is an RSMTool command-line utility, we will
     # always need a configuration file
-    parser.add_argument('config_file', help="The JSON configuration file for "
-                                            "this experiment")
-
-    # and we always want to have a version flag
-    parser.add_argument('-V', '--version', action='version', version=VERSION_STRING)
+    parser_run.add_argument('config_file',
+                            type=existing_configuration_file,
+                            help="The JSON configuration file for this experiment")
 
     # if it uses an output directory, let's add that
     if uses_output_directory:
-        parser.add_argument('output_dir',
-                            nargs='?',
-                            default=os.getcwd(),
-                            help="The output directory where all the files "
-                                 "for this experiment will be stored")
+        parser_run.add_argument('output_dir',
+                                nargs='?',
+                                default=os.getcwd(),
+                                help="The output directory where all the files "
+                                     "for this experiment will be stored")
 
     # if it allows overwrting the output directory, let's add that
     if allows_overwriting_directory:
-        parser.add_argument('-f',
-                            '--force',
-                            dest='force_write',
-                            action='store_true',
-                            default=False,
-                            help=f"If true, {name} will not check if the "
-                                 "output directory already contains the "
-                                 "output of another {name} experiment. ")
+        parser_run.add_argument('-f',
+                                '--force',
+                                dest='force_write',
+                                action='store_true',
+                                default=False,
+                                help=f"If true, {name} will not check if the "
+                                     "output directory already contains the "
+                                     "output of another {name} experiment. ")
 
     # add any extra options passed in - we must have a name and a help string
     for parser_option in extra_options:
@@ -1388,7 +1430,7 @@ def setup_rsmcmd_parser(name,
                 argparse_option_kwargs['nargs'] = f"'{parser_option.nargs}'"
 
             # add this argument to the parser
-            parser.add_argument(*argparse_option_args, **argparse_option_kwargs)
+            parser_run.add_argument(*argparse_option_args, **argparse_option_kwargs)
 
     return parser
 
