@@ -282,21 +282,15 @@ class Configuration:
 
     def __str__(self):
         """
-        Return a string representation of the underlying configuration
-        dictionary.
+        Return string representation of the object keys
+        as comma-separated list.
 
         Returns
         -------
-        config_string : str
-            A string representation of the underlying configuration
-            dictionary as encoded by ``json.dumps()``. Configuration
-            options meant for internal use are not included.
+        config_names : str
+            A comma-separated list of names from the config dictionary.
         """
-        expected_fields = (CHECK_FIELDS[self._context]['required'] +
-                           CHECK_FIELDS[self._context]['optional'])
-
-        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
-        return json.dumps(output_config, indent=4, separators=(',', ': '))
+        return ', '.join(self._config)
 
     def __iter__(self):
         """
@@ -569,8 +563,12 @@ class Configuration:
         context = self._context
         outjson = output_dir / f"{experiment_id}_{context}.json"
 
+        expected_fields = (CHECK_FIELDS[self._context]['required'] +
+                           CHECK_FIELDS[self._context]['optional'])
+
+        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
         with outjson.open(mode='w') as outfile:
-            outfile.write(str(self))
+            json.dump(output_config, outfile, indent=4, separators=(',', ': '))
 
     def check_exclude_listwise(self):
         """
