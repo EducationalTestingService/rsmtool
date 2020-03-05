@@ -14,7 +14,7 @@ from pathlib import Path
 from shutil import rmtree
 
 from numpy.testing import assert_array_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
                         assert_not_equal,
@@ -26,9 +26,7 @@ from nose.tools import (assert_equal,
 from rsmtool.convert_feature_json import convert_feature_json_file
 
 from rsmtool.configuration_parser import (Configuration,
-                                          ConfigurationParser,
-                                          CFGConfigurationParser,
-                                          JSONConfigurationParser)
+                                          ConfigurationParser)
 
 
 _MY_DIR = dirname(__file__)
@@ -37,7 +35,7 @@ _MY_DIR = dirname(__file__)
 class TestConfigurationParser:
 
     def setUp(self):
-        self.parser = ConfigurationParser()
+        pass
 
     def test_normalize_config(self):
         data = {'expID': 'experiment_1',
@@ -55,10 +53,7 @@ class TestConfigurationParser:
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-            # Add data to `ConfigurationParser` object
-            self.parser.load_config_from_dict(data)
-
-            newdata = self.parser.normalize_config()
+            newdata = ConfigurationParser.normalize_config(data)
             ok_('experiment_id' in newdata.keys())
             assert_equal(newdata['experiment_id'], 'experiment_1')
             assert_equal(newdata['use_scaled_predictions'], True)
@@ -70,11 +65,8 @@ class TestConfigurationParser:
                 'scale': 'Yes'}
         with warnings.catch_warnings():
 
-            # Add data to `ConfigurationParser` object
-            self.parser._config = data
-
             warnings.filterwarnings('ignore', category=DeprecationWarning)
-            assert_raises(ValueError, self.parser.normalize_config)
+            assert_raises(ValueError, ConfigurationParser.normalize_config, data)
 
         # test when no scaling is specified
         data = {'expID': 'experiment_1',
@@ -92,46 +84,45 @@ class TestConfigurationParser:
             warnings.filterwarnings('ignore', category=DeprecationWarning)
 
             # Add data to `ConfigurationParser` object
-            self.parser._config = data
-            newdata = self.parser.normalize_config()
+            newdata = ConfigurationParser.normalize_config(data)
             ok_('use_scaled_predictions' not in newdata.keys())
 
     def test_load_config_from_dict(self):
-        data = {'expID': 'test'}
-        configdir = abspath('/path/to/configdir')
-        self.parser.load_config_from_dict(data,
-                                          configdir=configdir)
-        eq_(self.parser._configdir, configdir)
+        data = {'expID': '001',
+                'train_file': 'path/to/train.tsv',
+                'test_file': 'path/to/test.tsv',
+                "flag_column": "abc",
+                "model": 'LinearRegression'}
 
+        configdir = Path('/path/to/configdir').resolve()
+        configuration = Configuration(data, configdir=configdir)
+        eq_(configuration._configdir, configdir)
 
     def test_load_config_from_dict_no_configdir(self):
-        data = {'expID': 'test'}
-        configdir = getcwd()
-        self.parser.load_config_from_dict(data)
-        eq_(self.parser._configdir, configdir)
+        data = {'expID': 'test',
+                'train_file': 'path/to/train.tsv',
+                'test_file': 'path/to/test.tsv',
+                "flag_column": "abc",
+                "model": 'LinearRegression'}
 
-
-    @raises(AttributeError)
-    def test_load_config_from_dict_dict_already_assigned(self):
-        data = {'expID': 'test'}
-        configdir = 'some/config/dir'
-        self.parser._config = data
-        self.parser.load_config_from_dict(data, configdir)
+        configdir = Path(getcwd())
+        configuration = Configuration(data)
+        eq_(configuration._configdir, configdir)
 
     @raises(TypeError)
     def test_load_config_from_dict_wrong_type(self):
         data = [('expID', 'test')]
         configdir = 'some/config/dir'
-        self.parser.load_config_from_dict(data, configdir)
+        Configuration(data, configdir)
 
-    def test_load_and_normalize_config_from_dict_rsmtool(self):
+    def test_parse_config_from_dict_rsmtool(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
                 'model': 'LinearRegression'}
 
-        # Add data to `ConfigurationParser` object
-        newdata = self.parser.load_normalize_and_validate_config_from_dict(data)
+        # Add data to `Configuration` object
+        newdata = Configuration(data)
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_equal(newdata['use_scaled_predictions'], False)
         assert_equal(newdata['select_transformations'], False)
@@ -139,30 +130,25 @@ class TestConfigurationParser:
         assert_equal(newdata['description'], '')
         assert_equal(newdata.configdir, getcwd())
 
-
-    def test_load_and_normalize_config_from_dict_rsmeval(self):
+    def test_parse_config_from_dict_rsmeval(self):
         data = {'experiment_id': 'experiment_1',
                 'predictions_file': 'data/rsmtool_smTrain.csv',
                 'system_score_column': 'system',
                 'trim_min': 1,
                 'trim_max': 5}
 
-        # Add data to `ConfigurationParser` object
-        newdata = self.parser.load_normalize_and_validate_config_from_dict(data,
-                                                                         context='rsmeval')
+        # Add data to `Configuration` object
+        newdata = Configuration(data, context='rsmeval')
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
         assert_equal(newdata.configdir, getcwd())
 
-
     @raises(ValueError)
     def test_validate_config_missing_fields(self):
         data = {'expID': 'test'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_min_responses_but_no_candidate(self):
@@ -172,9 +158,7 @@ class TestConfigurationParser:
                 'model': 'LinearRegression',
                 'min_responses_per_candidate': 5}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     def test_validate_config_unspecified_fields(self):
         data = {'experiment_id': 'experiment_1',
@@ -182,9 +166,7 @@ class TestConfigurationParser:
                 'test_file': 'data/rsmtool_smEval.csv',
                 'model': 'LinearRegression'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser._config = data
-        newdata = self.parser.validate_config()
+        newdata = ConfigurationParser.validate_config(data)
         assert_equal(newdata['id_column'], 'spkitemid')
         assert_equal(newdata['use_scaled_predictions'], False)
         assert_equal(newdata['select_transformations'], False)
@@ -200,9 +182,7 @@ class TestConfigurationParser:
                 'model': 'LinearRegression',
                 'output': 'foobar'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_experiment_id_1(self):
@@ -211,9 +191,7 @@ class TestConfigurationParser:
                 'test_file': 'data/rsmtool_smEval.csv',
                 'model': 'LinearRegression'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_experiment_id_2(self):
@@ -223,9 +201,7 @@ class TestConfigurationParser:
                 'trim_min': 1,
                 'trim_max': 5}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmeval')
+        _ = ConfigurationParser.validate_config(data, context='rsmeval')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_3(self):
@@ -235,9 +211,7 @@ class TestConfigurationParser:
                 'experiment_id_new': 'new_experiment',
                 'experiment_dir_new': 'data/new'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmcompare')
+        _ = ConfigurationParser.validate_config(data, context='rsmcompare')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_4(self):
@@ -247,9 +221,7 @@ class TestConfigurationParser:
                 'experiment_id_new': 'new_experiment',
                 'experiment_dir_new': 'data/new'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmcompare')
+        _ = ConfigurationParser.validate_config(data, context='rsmcompare')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_5(self):
@@ -262,9 +234,7 @@ class TestConfigurationParser:
                 'test_file': 'data/rsmtool_smEval.csv',
                 'model': 'LinearRegression'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_experiment_id_6(self):
@@ -278,9 +248,7 @@ class TestConfigurationParser:
                 'trim_min': 1,
                 'trim_max': 5}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmeval')
+        _ = ConfigurationParser.validate_config(data, context='rsmeval')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_7(self):
@@ -294,18 +262,14 @@ class TestConfigurationParser:
                 'experiment_id_new': 'new_experiment',
                 'experiment_dir_new': 'data/new'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmcompare')
+        _ = ConfigurationParser.validate_config(data, context='rsmcompare')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_8(self):
         data = {'summary_id': 'model summary',
                 'experiment_dirs': []}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmsummarize')
+        _ = ConfigurationParser.validate_config(data, context='rsmsummarize')
 
     @raises(ValueError)
     def test_validate_config_experiment_id_9(self):
@@ -316,9 +280,7 @@ class TestConfigurationParser:
                 'really_really_really_long_id',
                 'experiment_dirs': []}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmsummarize')
+        _ = ConfigurationParser.validate_config(data, context='rsmsummarize')
 
     @raises(ValueError)
     def test_validate_config_too_many_experiment_names(self):
@@ -326,9 +288,7 @@ class TestConfigurationParser:
                 'experiment_dirs': ["dir1", "dir2", "dir3"],
                 'experiment_names': ['exp1', 'exp2', 'exp3', 'exp4']}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmsummarize')
+        _ = ConfigurationParser.validate_config(data, context='rsmsummarize')
 
     @raises(ValueError)
     def test_validate_config_too_few_experiment_names(self):
@@ -336,9 +296,7 @@ class TestConfigurationParser:
                 'experiment_dirs': ["dir1", "dir2", "dir3"],
                 'experiment_names': ['exp1', 'exp2']}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config(context='rsmsummarize')
+        _ = ConfigurationParser.validate_config(data, context='rsmsummarize')
 
     def test_validate_config_numeric_subgroup_threshold(self):
         data = {'experiment_id': 'experiment_1',
@@ -347,8 +305,8 @@ class TestConfigurationParser:
                 'model': 'LinearRegression',
                 'subgroups': ['L2', 'L1'],
                 'min_n_per_group': 100}
-        self.parser._config = data
-        newdata = self.parser.validate_config()
+
+        newdata = ConfigurationParser.validate_config(data)
         eq_(type(newdata['min_n_per_group']), dict)
         assert_equal(newdata['min_n_per_group']['L1'], 100)
         assert_equal(newdata['min_n_per_group']['L2'], 100)
@@ -361,8 +319,8 @@ class TestConfigurationParser:
                 'subgroups': ['L2', 'L1'],
                 'min_n_per_group': {"L1": 100,
                                     "L2": 200}}
-        self.parser._config = data
-        newdata = self.parser.validate_config()
+
+        newdata = ConfigurationParser.validate_config(data)
         eq_(type(newdata['min_n_per_group']), dict)
         assert_equal(newdata['min_n_per_group']['L1'], 100)
         assert_equal(newdata['min_n_per_group']['L2'], 200)
@@ -375,8 +333,8 @@ class TestConfigurationParser:
                 'model': 'LinearRegression',
                 'subgroups': ['L1', 'L2'],
                 'min_n_per_group': {"L1": 100}}
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_valdiate_config_too_many_subgroup_keys(self):
@@ -388,8 +346,8 @@ class TestConfigurationParser:
                 'min_n_per_group': {"L1": 100,
                                     "L2": 100,
                                     "L4": 50}}
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_mismatched_subgroup_keys(self):
@@ -400,8 +358,8 @@ class TestConfigurationParser:
                 'subgroups': ['L1', 'L2'],
                 'min_n_per_group': {"L1": 100,
                                     "L4": 50}}
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_validate_config_min_n_without_subgroups(self):
@@ -411,8 +369,8 @@ class TestConfigurationParser:
                 'model': 'LinearRegression',
                 'min_n_per_group': {"L1": 100,
                                     "L2": 50}}
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+
+        _ = ConfigurationParser.validate_config(data)
 
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',
@@ -421,18 +379,10 @@ class TestConfigurationParser:
                 'description': 'Test',
                 'model': 'empWt',
                 'use_scaled_predictions': 'True',
-                'feature_prefix': '1gram, 2gram',
                 'subgroups': 'native language, GPA_range',
                 'exclude_zero_scores': 'false'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.validate_config(inplace=False)
-
-        # Add data to `ConfigurationParser` object
-        self.parser._config = newdata
-        newdata = self.parser.process_config(inplace=False)
-        assert_array_equal(newdata['feature_prefix'], ['1gram', '2gram'])
+        newdata = ConfigurationParser.process_config(data)
         assert_array_equal(newdata['subgroups'], ['native language', 'GPA_range'])
         eq_(type(newdata['use_scaled_predictions']), bool)
         eq_(newdata['use_scaled_predictions'], True)
@@ -450,12 +400,7 @@ class TestConfigurationParser:
                 'subgroups': 'native language, GPA_range',
                 'exclude_zero_scores': 'Yes'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.validate_config()
-        # Add data to `ConfigurationParser` object
-        self.parser._config = newdata
-        newdata = self.parser.process_config()
+        _ = ConfigurationParser.process_config(data)
 
     @raises(ValueError)
     def test_process_fields_with_integer(self):
@@ -469,21 +414,14 @@ class TestConfigurationParser:
                 'subgroups': 'native language, GPA_range',
                 'exclude_zero_scores': 1}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.validate_config()
-        # Add data to `ConfigurationParser` object
-        self.parser._config = newdata
-        newdata = self.parser.process_config()
+        _ = ConfigurationParser.process_config(data)
 
     def test_process_fields_rsmsummarize(self):
         data = {'summary_id': 'summary',
                 'experiment_dirs': 'home/dir1, home/dir2, home/dir3',
                 'experiment_names': 'exp1, exp2, exp3'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.process_config(inplace=False)
+        newdata = ConfigurationParser.process_config(data)
 
         assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
                                                         'home/dir2',
@@ -501,9 +439,7 @@ class TestConfigurationParser:
                 'model': 'LinearSVR',
                 'skll_objective': 'squared_error'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_wrong_skll_model_for_expected_scores(self):
@@ -514,9 +450,7 @@ class TestConfigurationParser:
                 'model': 'LinearSVR',
                 'predict_expected_scores': 'true'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
     @raises(ValueError)
     def test_builtin_model_for_expected_scores(self):
@@ -527,11 +461,9 @@ class TestConfigurationParser:
                 'model': 'NNLR',
                 'predict_expected_scores': 'true'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        self.parser.validate_config()
+        _ = ConfigurationParser.validate_config(data)
 
-    def test_proces_validate_correct_order_boolean(self):
+    def test_process_validate_correct_order_boolean(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
@@ -539,10 +471,8 @@ class TestConfigurationParser:
                 'model': 'NNLR',
                 'predict_expected_scores': 'false'}
 
-        # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.normalize_validate_and_process_config()
-        eq_(newdata['predict_expected_scores'], False)
+        configuration = Configuration(data)
+        eq_(configuration['predict_expected_scores'], False)
 
     def test_process_validate_correct_order_list(self):
         data = {'summary_id': 'summary',
@@ -550,23 +480,12 @@ class TestConfigurationParser:
                 'experiment_names': 'exp1, exp2, exp3'}
 
         # Add data to `ConfigurationParser` object
-        self.parser.load_config_from_dict(data)
-        newdata = self.parser.normalize_validate_and_process_config(context='rsmsummarize')
-
-        assert_array_equal(newdata['experiment_dirs'], ['home/dir1',
-                                                        'home/dir2',
-                                                        'home/dir3'])
-        assert_array_equal(newdata['experiment_names'], ['exp1',
-                                                         'exp2',
-                                                         'exp3'])
-
-    def test_get_correct_configparser_cfg(self):
-        config_parser = ConfigurationParser.get_configparser('config.cfg')
-        assert isinstance(config_parser, CFGConfigurationParser)
-
-    def test_get_correct_configparser_json(self):
-        config_parser = ConfigurationParser.get_configparser('config.json')
-        assert isinstance(config_parser, JSONConfigurationParser)
+        configuration = Configuration(data, context='rsmsummarize')
+        assert_array_equal(configuration['experiment_dirs'], ['home/dir1',
+                                                              'home/dir2',
+                                                              'home/dir3'])
+        assert_array_equal(configuration['experiment_names'],
+                           ['exp1', 'exp2', 'exp3'])
 
     def test_get_correct_configparser_dict(self):
         config_parser = ConfigurationParser.get_configparser({'config': 'value'})
@@ -584,52 +503,79 @@ class TestConfigurationParser:
 class TestConfiguration:
 
     def test_init_default_values(self):
-        config_dict = {'exp_id': 'my_experiment'}
+        config_dict = {"expID": 'my_experiment',
+                       "train_file": 'path/to/train.tsv',
+                       "test_file": 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
+
         config = Configuration(config_dict)
-        eq_(config._config, config_dict)
+        for key in config_dict:
+            if key == 'expID':
+                continue
+            eq_(config._config[key], config_dict[key])
+        eq_(config._config['experiment_id'], config_dict['expID'])
         eq_(config._filename, None)
         eq_(config.configdir, abspath(getcwd()))
 
     def test_init_with_filepath_as_positional_argument(self):
         with warnings.catch_warnings(record=True) as w:
             filepath = 'some/path/file.json'
-            config_dict = {'exp_id': 'my_experiment'}
+            config_dict = {'experiment_id': 'my_experiment',
+                           'train_file': 'path/to/train.tsv',
+                           'test_file': 'path/to/test.tsv',
+                           "model": 'LinearRegression'}
+
             config = Configuration(config_dict, filepath)
             eq_(config._filename, 'file.json')
-            eq_(config._configdir, abspath('some/path'))
+            eq_(config._configdir, Path('some/path').resolve())
             assert len(w) == 1
             assert issubclass(w[-1].category, DeprecationWarning)
 
     def test_init_with_filename_as_kword_argument(self):
         filename = 'file.json'
-        config_dict = {'exp_id': 'my_experiment'}
+        config_dict = {'experiment_id': 'my_experiment',
+                       'train_file': 'path/to/train.tsv',
+                       'test_file': 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
+
         config = Configuration(config_dict, filename=filename)
         eq_(config._filename, filename)
-        eq_(config.configdir, abspath(getcwd()))
+        eq_(config.configdir, getcwd())
 
     def test_init_with_filename_and_configdir_as_kword_argument(self):
         filename = 'file.json'
         configdir = 'some/path'
-        config_dict = {'exp_id': 'my_experiment'}
+        config_dict = {'experiment_id': 'my_experiment',
+                       'train_file': 'path/to/train.tsv',
+                       'test_file': 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
+
         config = Configuration(config_dict,
                                filename=filename,
                                configdir=configdir)
         eq_(config._filename, filename)
-        eq_(config._configdir, abspath(configdir))
-
+        eq_(config._configdir, Path(configdir).resolve())
 
     def test_init_with_configdir_only_as_kword_argument(self):
         configdir = 'some/path'
-        config_dict = {'exp_id': 'my_experiment'}
+        config_dict = {'experiment_id': 'my_experiment',
+                       'train_file': 'path/to/train.tsv',
+                       'test_file': 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
+
         config = Configuration(config_dict,
                                configdir=configdir)
         eq_(config._filename, None)
-        eq_(config._configdir, abspath(configdir))
+        eq_(config._configdir, Path(configdir).resolve())
 
     @ raises(ValueError)
     def test_init_with_filepath_positional_and_filename_keyword(self):
         filepath = 'some/path/file.json'
-        config_dict = {'exp_id': 'my_experiment'}
+        config_dict = {'experiment_id': 'my_experiment',
+                       'train_file': 'path/to/train.tsv',
+                       'test_file': 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
+
         _ = Configuration(config_dict,
                           filepath,
                           filename=filepath)
@@ -638,11 +584,14 @@ class TestConfiguration:
     def test_init_with_filepath_positional_and_configdir_keyword(self):
         filepath = 'some/path/file.json'
         configdir = 'some/path'
-        config_dict = {'exp_id': 'my_experiment'}
+
+        config_dict = {'experiment_id': 'my_experiment',
+                       'train_file': 'path/to/train.tsv',
+                       'test_file': 'path/to/test.tsv',
+                       "model": 'LinearRegression'}
         _ = Configuration(config_dict,
                           filepath,
                           configdir=configdir)
-
 
     def check_logging_output(self, expected, function, *args, **kwargs):
 
@@ -672,73 +621,119 @@ class TestConfiguration:
         return result
 
     def test_pop_value(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        dictionary = {'experiment_id': '001',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         value = config.pop("experiment_id")
         eq_(value, '001')
 
     def test_pop_value_default(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        dictionary = {'experiment_id': '001',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         value = config.pop("foo", "bar")
         eq_(value, 'bar')
 
     def test_copy(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
-                      "object": [1, 2, 3]}
-        config = Configuration(dictionary)
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": [1, 2, 3],
+                                "model": 'LinearRegression'})
+
         config_copy = config.copy()
         assert_not_equal(id(config), id(config_copy))
         for key in config.keys():
 
             # check to make sure this is a deep copy
-            if key == "object":
+            if key == "flag_column":
                 assert_not_equal(id(config[key]), id(config_copy[key]))
             assert_equal(config[key], config_copy[key])
 
     def test_copy_not_deep(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6,
-                      "object": [1, 2, 3]}
-        config = Configuration(dictionary)
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": [1, 2, 3],
+                                "model": 'LinearRegression'})
+
         config_copy = config.copy(deep=False)
         assert_not_equal(id(config), id(config_copy))
         for key in config.keys():
 
             # check to make sure this is a shallow copy
-            if key == "object":
+            if key == "flag_column":
                 assert_equal(id(config[key]), id(config_copy[key]))
             assert_equal(config[key], config_copy[key])
 
     def test_check_flag_column(self):
         input_dict = {"advisory flag": ['0']}
-        config = Configuration({"flag_column": input_dict})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": input_dict,
+                                "model": 'LinearRegression'})
+
         output_dict = config.check_flag_column()
         eq_(input_dict, output_dict)
 
     def test_check_flag_column_flag_column_test(self):
         input_dict = {"advisory flag": ['0']}
-        config = Configuration({"flag_column_test": input_dict})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column_test": input_dict,
+                                "flag_column": input_dict,
+                                "model": 'LinearRegression'})
+
         output_dict = config.check_flag_column("flag_column_test")
         eq_(input_dict, output_dict)
 
     def test_check_flag_column_keep_numeric(self):
         input_dict = {"advisory flag": [1, 2, 3]}
-        config = Configuration({"flag_column": input_dict})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": input_dict,
+                                "model": 'LinearRegression'})
+
         output_dict = config.check_flag_column()
         eq_(output_dict, {"advisory flag": [1, 2, 3]})
 
     def test_check_flag_column_no_values(self):
-        config = Configuration({"flag_column": None})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": None,
+                                "model": 'LinearRegression'})
+
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {})
 
     def test_check_flag_column_convert_to_list(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
+
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": ['0']})
 
     def test_check_flag_column_convert_to_list_test(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
 
         flag_dict = self.check_logging_output('evaluating',
                                               config.check_flag_column,
@@ -746,21 +741,36 @@ class TestConfiguration:
         eq_(flag_dict, {"advisories": ['0']})
 
     def test_check_flag_column_convert_to_list_train(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
+
         flag_dict = self.check_logging_output('training',
                                               config.check_flag_column,
                                               partition='train')
         eq_(flag_dict, {"advisories": ['0']})
 
     def test_check_flag_column_convert_to_list_both(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
+
         flag_dict = self.check_logging_output('training and evaluating',
                                               config.check_flag_column,
                                               partition='both')
         eq_(flag_dict, {"advisories": ['0']})
 
     def test_check_flag_column_convert_to_list_unknown(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
+
         flag_dict = self.check_logging_output('training and/or evaluating',
                                               config.check_flag_column,
                                               partition='unknown')
@@ -768,90 +778,167 @@ class TestConfiguration:
 
     @raises(AssertionError)
     def test_check_flag_column_convert_to_list_test_error(self):
-        config = Configuration({"flag_column": {"advisories": "0"}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": "0"},
+                                "model": 'LinearRegression'})
+
         self.check_logging_output('training',
                                   config.check_flag_column,
                                   partition='test')
 
     def test_check_flag_column_convert_to_list_keep_numeric(self):
-        config = Configuration({"flag_column": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         flag_dict = config.check_flag_column()
         eq_(flag_dict, {"advisories": [123]})
 
     def test_contains_key(self):
-        config = Configuration({"flag_column": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         ok_('flag_column' in config, msg="Test 'flag_column' in config.")
 
     def test_does_not_contain_nested_key(self):
-        config = Configuration({"flag_column": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         eq_('advisories' in config, False)
 
     def test_get_item(self):
         expected_item = {"advisories": 123}
-        config = Configuration({"flag_column": expected_item})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": expected_item,
+                                "model": 'LinearRegression'})
+
         item = config['flag_column']
         eq_(item, expected_item)
 
     def test_set_item(self):
         expected_item = ["45", 34]
-        config = Configuration({"flag_column": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         config['other_column'] = expected_item
         eq_(config['other_column'], expected_item)
 
-    def test_check_len(self):
-        expected_len = 2
-        config = Configuration({"flag_column": {"advisories": 123}, 'other_column': 5})
-        eq_(len(config), expected_len)
-
     @raises(ValueError)
     def test_check_flag_column_wrong_format(self):
-        config = Configuration({"flag_column": "[advisories]"})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'})
+
         config.check_flag_column()
 
     @raises(ValueError)
     def test_check_flag_column_wrong_partition(self):
-        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column_test": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         config.check_flag_column(partition='eval')
 
     @raises(ValueError)
     def test_check_flag_column_mismatched_partition(self):
-        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column_test": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         config.check_flag_column(flag_column='flag_column_test',
                                  partition='train')
 
     @raises(ValueError)
     def test_check_flag_column_mismatched_partition_both(self):
-        config = Configuration({"flag_column_test": {"advisories": 123}})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column_test": {"advisories": 123},
+                                "model": 'LinearRegression'})
+
         config.check_flag_column(flag_column='flag_column_test',
                                  partition='both')
 
     def test_str_correct(self):
-        config_dict = {'flag_column': '[advisories]'}
-        config = Configuration(config_dict)
-        print(config)
-        eq_(config.__str__(), 'flag_column')
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'})
+
+        eq_(config['flag_column'], '[advisories]')
 
     # this is a test for an attribute that will be
     # deprecated
     def test_get_filepath(self):
         with warnings.catch_warnings(record=True) as warning_list:
             filepath = '/path/to/file.json'
-            config = Configuration({"flag_column": "[advisories]"},
-                                   configdir='/path/to/',
-                                   filename='file.json')
+            config = Configuration({"experiment_id": '001',
+                                    "train_file": "/foo/train.csv",
+                                    "test_file": "/foo/test.csv",
+                                    "trim_min": 1,
+                                    "trim_max": 6,
+                                    "flag_column": "[advisories]",
+                                    "model": 'LinearRegression'},
+                                   configdir='/path/to',
+                                   filename="file.json")
+
             eq_(config.filepath, abspath(filepath))
             assert len(warning_list) == 1  # we get one deprecation warning here
             assert issubclass(warning_list[0].category, DeprecationWarning)
 
+    # make sure that accessing filepath attribute when filename
+    # is not defined raises an exception
+    @raises(AttributeError)
+    def test_get_filepath_no_filename(self):
+        with warnings.catch_warnings():
+            config = Configuration({"experiment_id": '001',
+                                    "train_file": "/foo/train.csv",
+                                    "test_file": "/foo/test.csv",
+                                    "trim_min": 1,
+                                    "trim_max": 6,
+                                    "flag_column": "[advisories]",
+                                    "model": 'LinearRegression'},
+                                   configdir='/path/to')
+
+            _ = config.filepath
 
     # this is a test for an attribute that will be
     # deprecated
     def test_set_filepath(self):
         with warnings.catch_warnings(record=True) as warning_list:
             new_file_path = '/newpath/to/new.json'
-            config = Configuration({"flag_column": "[advisories]"},
-                                   configdir='/path/to/',
-                                   filename='file.json',)
+            config = Configuration({"experiment_id": '001',
+                                    "train_file": "/foo/train.csv",
+                                    "test_file": "/foo/test.csv",
+                                    "trim_min": 1,
+                                    "trim_max": 6,
+                                    "flag_column": "[advisories]",
+                                    "model": 'LinearRegression'},
+                                   configdir='/path/to',
+                                   filename="file.json")
+
             config.filepath = new_file_path  # first deprecation warning
             eq_(config._filename, 'new.json')
             eq_(config.configdir, abspath('/newpath/to'))
@@ -862,15 +949,30 @@ class TestConfiguration:
 
     def test_get_configdir(self):
         configdir = '/path/to/dir/'
-        config = Configuration({"flag_column": "[advisories]"},
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                configdir=configdir)
+
         eq_(config.configdir, abspath(configdir))
 
     def test_set_configdir(self):
         configdir = '/path/to/dir/'
         new_configdir = 'path/that/is/new/'
-        config = Configuration({"flag_column": "[advisories]"},
+
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                configdir=configdir)
+
         config.configdir = new_configdir
         eq_(config.configdir, abspath(new_configdir))
 
@@ -881,76 +983,153 @@ class TestConfiguration:
                                configdir=configdir)
         config.configdir = None
 
-
     def test_get_filename(self):
         filename = 'file.json'
-        config = Configuration({"flag_column": "[advisories]"},
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                filename=filename)
+
         eq_(config.filename, filename)
 
     def test_set_filename(self):
         filename = 'file.json'
         new_filename = 'new_file.json'
-        config = Configuration({"flag_column": "[advisories]"},
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                filename=filename)
+
         config.filename = new_filename
         eq_(config.filename, new_filename)
 
     def test_get_context(self):
         context = 'rsmtool'
-        config = Configuration({"flag_column": "[advisories]"},
+
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                context=context)
         eq_(config.context, context)
 
     def test_set_context(self):
         context = 'rsmtool'
         new_context = 'rsmcompare'
-        config = Configuration({"flag_column": "[advisories]"},
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'},
                                context=context)
         config.context = new_context
         eq_(config.context, new_context)
 
     def test_get(self):
-        config = Configuration({"flag_column": "[advisories]"})
+        config = Configuration({"experiment_id": '001',
+                                "train_file": "/foo/train.csv",
+                                "test_file": "/foo/test.csv",
+                                "trim_min": 1,
+                                "trim_max": 6,
+                                "flag_column": "[advisories]",
+                                "model": 'LinearRegression'})
+
         eq_(config.get('flag_column'), "[advisories]")
         eq_(config.get('fasdfasfasdfa', 'hi'), 'hi')
 
     def test_to_dict(self):
-        dictionary = {"flag_column": "abc", "other_column": 'xyz'}
-        config = Configuration(dictionary)
-        eq_(config.to_dict(), dictionary)
+        configdict = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "flag_column": "abc",
+                      "model": 'LinearRegression'}
+
+        config = Configuration(configdict)
+        for key in configdict:
+            eq_(config[key], configdict[key])
 
     def test_keys(self):
-        dictionary = {"flag_column": "abc", "other_column": 'xyz'}
-        keys = ['flag_column', 'other_column']
-        config = Configuration(dictionary)
-        eq_(sorted(config.keys()), sorted(keys))
+        configdict = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "flag_column": "abc",
+                      "model": 'LinearRegression'}
+
+        config = Configuration(configdict)
+        given_keys = configdict.keys()
+        computed_keys = config.keys()
+        assert all([given_key in computed_keys for given_key in given_keys])
 
     def test_values(self):
-        dictionary = {"flag_column": "abc", "other_column": 'xyz'}
-        values = ['abc', 'xyz']
-        config = Configuration(dictionary)
-        eq_(sorted(config.values()), sorted(values))
+        configdict = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "flag_column": "abc",
+                      "model": 'LinearRegression'}
+
+        config = Configuration(configdict)
+        given_values = configdict.values()
+        computed_values = config.values()
+        assert all([given_value in computed_values for given_value in given_values])
 
     def test_items(self):
-        dictionary = {"flag_column": "abc", "other_column": 'xyz'}
-        items = [('flag_column', 'abc'), ('other_column', 'xyz')]
-        config = Configuration(dictionary)
-        eq_(sorted(config.items()), sorted(items))
+        configdict = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "flag_column": "abc",
+                      "model": 'LinearRegression'}
+
+        config = Configuration(configdict)
+        given_items = configdict.items()
+        computed_items = config.items()
+        assert all([given_item in computed_items for given_item in given_items])
 
     def test_save(self):
-        dictionary = {"experiment_id": '001', "flag_column": "abc"}
+        dictionary = {'experiment_id': '001',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      "flag_column": "abc",
+                      "model": 'LinearRegression'}
+
         config = Configuration(dictionary)
         config.save()
 
-        out_path = 'output/001_rsmtool.json'
-        with open(out_path) as buff:
+        with open('output/001_rsmtool.json', 'r') as buff:
             config_new = json.loads(buff.read())
+
         rmtree('output')
-        eq_(config_new, dictionary)
+        for key in dictionary:
+            eq_(config_new[key], dictionary[key])
 
     def test_save_rsmcompare(self):
-        dictionary = {"comparison_id": '001'}
+        dictionary = {"comparison_id": '001',
+                      "experiment_id_old": 'foo',
+                      "experiment_dir_old": 'foo',
+                      "experiment_id_new": 'bar',
+                      "experiment_dir_new": 'bar',
+                      "description_old": "foo",
+                      "description_new": "bar"}
         config = Configuration(dictionary,
                                context='rsmcompare')
         config.save()
@@ -959,10 +1138,11 @@ class TestConfiguration:
         with open(out_path) as buff:
             config_new = json.loads(buff.read())
         rmtree('output')
-        eq_(config_new, dictionary)
+        for key in dictionary:
+            eq_(config_new[key], dictionary[key])
 
     def test_save_rsmsummarize(self):
-        dictionary = {"summary_id": '001'}
+        dictionary = {"summary_id": '001', 'experiment_dirs': ['a', 'b', 'c']}
         config = Configuration(dictionary,
                                context='rsmsummarize')
         config.save()
@@ -971,50 +1151,83 @@ class TestConfiguration:
         with open(out_path) as buff:
             config_new = json.loads(buff.read())
         rmtree('output')
-        eq_(config_new, dictionary)
+        for key in dictionary:
+            eq_(config_new[key], dictionary[key])
 
     def test_check_exclude_listwise_true(self):
-        dictionary = {"experiment_id": '001', "min_items_per_candidate": 4}
+        dictionary = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "min_items_per_candidate": 4,
+                      "candidate_column": "candidate",
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         exclude_list_wise = config.check_exclude_listwise()
         eq_(exclude_list_wise, True)
 
     def test_check_exclude_listwise_false(self):
-        dictionary = {"experiment_id": '001'}
+        dictionary = {"experiment_id": '001',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         exclude_list_wise = config.check_exclude_listwise()
         eq_(exclude_list_wise, False)
 
     def test_get_trim_min_max_tolerance_none(self):
-        dictionary = {"experiment_id": '001'}
+        dictionary = {'experiment_id': '001',
+                      'id_column': 'A',
+                      'candidate_column': 'B',
+                      'train_file': 'path/to/train.tsv',
+                      'test_file': 'path/to/test.tsv',
+                      'features': 'path/to/features.csv',
+                      "model": 'LinearRegression',
+                      'subgroups': ['C']}
+
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
-        eq_(trim_min_max_tolerance, (None, None, None))
+        eq_(trim_min_max_tolerance, (None, None, 0.4998))
 
     def test_get_trim_min_max_no_tolerance(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        dictionary = {"experiment_id": '001',
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
-        eq_(trim_min_max_tolerance, (1.0, 6.0, None))
+        eq_(trim_min_max_tolerance, (1.0, 6.0, 0.4998))
 
     def test_get_trim_min_max_values_tolerance(self):
         dictionary = {"experiment_id": '001',
-                      'trim_min': 1,
-                      'trim_max': 6,
-                      'trim_tolerance': 0.49}
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "trim_tolerance": 0.51,
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
-        eq_(trim_min_max_tolerance, (1.0, 6.0, 0.49))
+        eq_(trim_min_max_tolerance, (1.0, 6.0, 0.51))
 
     def test_get_trim_min_max_deprecated(self):
-        dictionary = {"experiment_id": '001', 'trim_min': 1, 'trim_max': 6}
+        dictionary = {"experiment_id": '001',
+                      "train_file": '/foo/train.csv',
+                      "test_file": '/foo/test.csv',
+                      "trim_min": 1,
+                      "trim_max": 6,
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         trim_min_max = config.get_trim_min_max()
         eq_(trim_min_max, (1.0, 6.0))
 
     def test_get_trim_tolerance_no_min_max(self):
         dictionary = {"experiment_id": '001',
-                      'trim_tolerance': 0.49}
+                      "trim_tolerance": 0.49,
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",
+                      "model": 'LinearRegression'}
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
         eq_(trim_min_max_tolerance, (None, None, 0.49))
@@ -1027,11 +1240,13 @@ class TestConfiguration:
 
         expected = (filenames, filepaths)
 
-        dictionary = {'id_column': 'A',
+        dictionary = {'experiment_id': '001',
+                      'id_column': 'A',
                       'candidate_column': 'B',
                       'train_file': 'path/to/train.tsv',
                       'test_file': 'path/to/test.tsv',
                       'features': 'path/to/features.csv',
+                      "model": 'LinearRegression',
                       'subgroups': ['C']}
         config = Configuration(dictionary)
         values_for_reader = config.get_names_and_paths(['train_file', 'test_file',
@@ -1049,11 +1264,13 @@ class TestConfiguration:
 
         expected = (filenames, filepaths)
 
-        dictionary = {'id_column': 'A',
+        dictionary = {'experiment_id': '001',
+                      'id_column': 'A',
                       'candidate_column': 'B',
                       'train_file': 'path/to/train.tsv',
                       'test_file': 'path/to/test.tsv',
                       'feature_subset_file': 'path/to/feature_subset.csv',
+                      'model': 'LinearRegression',
                       'subgroups': ['C']}
         config = Configuration(dictionary)
         values_for_reader = config.get_names_and_paths(['train_file', 'test_file',
@@ -1070,11 +1287,13 @@ class TestConfiguration:
 
         expected = (filenames, filepaths)
 
-        dictionary = {'id_column': 'A',
+        dictionary = {'experiment_id': '001',
+                      'id_column': 'A',
                       'candidate_column': 'B',
                       'train_file': 'path/to/train.tsv',
                       'test_file': 'path/to/test.tsv',
                       'features': ['FEATURE1', 'FEATURE2'],
+                      'model': 'LinearRegression',
                       'subgroups': ['C']}
         config = Configuration(dictionary)
         values_for_reader = config.get_names_and_paths(['train_file', 'test_file',
@@ -1103,7 +1322,8 @@ class TestJSONFeatureConversion:
         # get rid of the file now that have read it into memory
         os.unlink(tempf.name)
 
-        assert_frame_equal(df_expected, df_converted)
+        assert_frame_equal(df_expected.sort_index(axis=1),
+                           df_converted.sort_index(axis=1))
 
     @raises(RuntimeError)
     def test_json_feature_conversion_bad_json(self):

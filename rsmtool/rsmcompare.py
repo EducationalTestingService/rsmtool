@@ -23,7 +23,7 @@ from os.path import (abspath,
                      normpath)
 
 from rsmtool import VERSION_STRING
-from rsmtool.configuration_parser import ConfigurationParser, Configuration
+from rsmtool.configuration_parser import configure
 from rsmtool.reader import DataReader
 from rsmtool.reporter import Reporter
 from rsmtool.utils import LogFormatter
@@ -69,6 +69,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
+<<<<<<< HEAD
     config_file_or_obj_or_dict : str or pathlib.Path or Configuration or Dictionary
         Path to the experiment configuration file.
         Users can also pass a `Configuration` object that is in memory
@@ -80,6 +81,18 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
         the user passes a dictionary, the reference path will be set to
         the current directory and all relative paths will be resolved relative
         to this path.
+=======
+    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+        Path to the experiment configuration file either a a string
+        or as a ``pathlib.Path`` object. Users can also pass a
+        ``Configuration`` object that is in memory or a Python dictionary
+        with keys corresponding to fields in the configuration file. Given a
+        configuration file, any relative paths in the configuration file
+        will be interpreted relative to the location of the file. Given a
+        ``Configuration`` object, relative paths will be interpreted
+        relative to the ``configdir`` attribute, that _must_ be set. Given
+        a dictionary, the reference path is set to the current directory.
+>>>>>>> unpin-pandas-and-numpy
     output_dir : str
         Path to the experiment output directory.
 
@@ -91,11 +104,8 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     logger = logging.getLogger(__name__)
 
-    # initialize a correct configparser
-    parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-    # create a configuration object from input
-    configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict,
-                                                                   context='rsmcompare')
+    configuration = configure('rsmcompare', config_file_or_obj_or_dict)
+
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
 

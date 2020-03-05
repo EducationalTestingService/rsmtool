@@ -10,7 +10,7 @@ from parameterized import param, parameterized
 
 from rsmtool import run_evaluation
 
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
@@ -58,8 +58,9 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_eval_with_cfg():
-
-    # basic evaluation experiment using rsmeval
+    '''
+    test rsmeval using a configuration file
+    '''
 
     source = 'lr-eval-cfg'
     experiment_id = 'lr_eval_cfg'
@@ -87,7 +88,7 @@ def test_run_experiment_lr_eval_with_cfg():
 
 def test_run_experiment_lr_eval_with_object():
     '''
-    test rsmeval using the Configuration object, rather than a file
+    test rsmeval using a Configuration object, rather than a file
     '''
 
     source = 'lr-eval-object'
@@ -109,10 +110,7 @@ def test_run_experiment_lr_eval_with_object():
                    "trim_min": 1,
                    "trim_max": 6}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmeval')
+    config_obj = Configuration(config_dict, context='rsmeval', configdir=configdir)
 
     check_run_evaluation(source,
                          experiment_id,

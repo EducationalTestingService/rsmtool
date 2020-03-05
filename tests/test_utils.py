@@ -9,7 +9,7 @@ from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
 from os.path import abspath, dirname, join, relpath
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from rsmtool.utils import (difference_of_standardized_means,
                            float_format_func,

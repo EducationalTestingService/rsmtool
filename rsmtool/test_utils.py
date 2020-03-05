@@ -16,7 +16,7 @@ from pathlib import Path
 from shutil import copyfile, copytree
 
 from nose.tools import assert_equal, ok_
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from rsmtool.reader import DataReader
 from rsmtool.modeler import Modeler
@@ -616,8 +616,14 @@ def check_file_output(file1, file2, file_format='csv'):
     df1 = DataReader.read_from_file(file1, converters=converter_dict)
     df2 = DataReader.read_from_file(file2, converters=converter_dict)
 
+    # convert all column names to strings
+    # we do this to avoid any errors during sorting.
+    for df in [df1, df2]:
+        df.columns = df.columns.map(str)
+
+
     # if the first column is numeric, just force the index to string;
-    # however, if it is non-numeric, set it as the index and then
+    # however, if it is non-numeric, assume that it is an index and
     # force it to string. We do this to ensure string indices are
     # preserved as such
     for df in [df1, df2]:
@@ -631,16 +637,16 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(inplace=True)
     df2.sort_index(inplace=True)
 
+    # sort all columns alphabetically
+    df1.sort_index(axis=1, inplace=True)
+    df2.sort_index(axis=1, inplace=True)
+
+
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
             if df[c].dtype == np.int64:
                 df[c] = df[c].astype(np.float64)
-
-    # do the same for indices
-    for df in [df1, df2]:
-        if df.index.dtype == np.int64:
-            df.index = df.index.astype(np.float64)
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
@@ -651,8 +657,8 @@ def check_file_output(file1, file2, file_format='csv'):
             df.loc[:, msk] = df.loc[:, msk].abs()
 
     try:
-        assert_frame_equal(df1.sort_index(axis=1),
-                           df2.sort_index(axis=1),
+        assert_frame_equal(df1,
+                           df2,
                            check_exact=False,
                            check_less_precise=False)
     except AssertionError as e:

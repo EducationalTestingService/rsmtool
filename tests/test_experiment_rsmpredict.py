@@ -10,7 +10,7 @@ from parameterized import param, parameterized
 
 from rsmtool import compute_and_save_predictions
 
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_scaled_coefficients,
@@ -121,10 +121,9 @@ def test_run_experiment_lr_predict_with_object():
                    "experiment_id": "lr"
                    }
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmpredict')
+    config_obj = Configuration(config_dict,
+                               context='rsmpredict',
+                               configdir=configdir)
 
     check_run_prediction(source,
                          given_test_dir=rsmtool_test_dir,

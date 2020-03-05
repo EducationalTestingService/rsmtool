@@ -8,7 +8,7 @@ import pandas as pd
 from nose.tools import (assert_equal,
                         assert_almost_equal,
                         raises)
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
 from rsmtool.test_utils import do_run_experiment
