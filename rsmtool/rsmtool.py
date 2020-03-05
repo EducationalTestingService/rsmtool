@@ -36,7 +36,6 @@ def run_experiment(config_file_or_obj_or_dict,
 
     Parameters
     ----------
-
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
@@ -73,14 +72,7 @@ def run_experiment(config_file_or_obj_or_dict,
     makedirs(figdir, exist_ok=True)
     makedirs(reportdir, exist_ok=True)
 
-<<<<<<< HEAD
-    # initialize a correct configparser
-    parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-    # create a configuration object from input
-    configuration = parser.get_configuration_from_file_obj_or_dict(config_file_or_obj_or_dict)
-=======
     configuration = configure('rsmtool', config_file_or_obj_or_dict)
->>>>>>> unpin-pandas-and-numpy
 
     logger.info('Saving configuration file.')
     configuration.save(output_dir)

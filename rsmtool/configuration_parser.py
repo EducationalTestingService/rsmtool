@@ -21,16 +21,6 @@ from configparser import ConfigParser
 from os import getcwd
 from os.path import abspath
 
-<<<<<<< HEAD
-from os import getcwd, makedirs
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join,
-                     splitext)
-
-=======
->>>>>>> unpin-pandas-and-numpy
 from pathlib import Path
 from ruamel import yaml
 
@@ -38,7 +28,6 @@ from rsmtool import HAS_RSMEXTRA
 from rsmtool.utils import parse_json_with_comments
 from rsmtool.utils import (DEFAULTS,
                            CHECK_FIELDS,
-                           CONTEXT_TO_FUNCTION,
                            LIST_FIELDS,
                            BOOLEAN_FIELDS,
                            MODEL_NAME_MAPPING,
@@ -824,52 +813,6 @@ class ConfigurationParser:
     A `ConfigurationParser` class to create a `Configuration` object.
     """
 
-<<<<<<< HEAD
-    def __init__(self):
-
-        # Set configuration object to None
-        self._config = None
-        self._filename = None
-        self._configdir = None
-
-    def _check_config_is_loaded(self):
-        """
-        Check to make sure a configuration file
-        or dictionary was loaded; otherwise,
-        raise ``NameError``.
-
-        Raises
-        ------
-        NameError
-            If no configuration file or dictionary was loaded.
-        """
-        if self._config is None:
-            raise NameError('No configuration file was loaded '
-                            'Make sure to load a configuration file '
-                            'from a dict using the `load_config_from_dict()` '
-                            'method or use the `read_config_from_file()` method '
-                            'with the appropriate sub-class object to read from '
-                            'a file. You can use the `get_configparser` class '
-                            'method to instantiate the appropriate sub-class '
-                            'object for reading either `.json` or `.cfg` files.')
-
-
-    @classmethod
-    def get_configparser(cls, config_file_or_obj_or_dict, *args, **kwargs):
-        """
-        Get the correct `ConfigurationParser` object,
-        based on the input.
-
-        Parameters
-        ----------
-        config_file_or_obj_or_dict: str or pathlib.Path or dict or Configuration
-            Input object used to construct the configuration parser
-
-        Returns
-        -------
-        config : ConfigurationParser
-            The configuration parser object.
-=======
     def __init__(self, pathlike):
         """
         Instantiate a ConfigurationParser for a given config file path.
@@ -880,7 +823,6 @@ class ConfigurationParser:
             A string containing the path to the configuration file
             that is to be parsed. A ``pathlib.Path`` instance is also
             acceptable.
->>>>>>> unpin-pandas-and-numpy
 
         Raises
         ------
@@ -888,22 +830,6 @@ class ConfigurationParser:
             If the configuration file does not have a valid extension.
             Valid extensions are ``.json`` and ``.cfg``.
         """
-<<<<<<< HEAD
-        # If we received a path to a file,
-        # let's convert it to Path
-        if isinstance(config_file_or_obj_or_dict, Path):
-            filepath = config_file_or_obj_or_dict
-        elif isinstance(config_file_or_obj_or_dict, str):
-            filepath = Path(config_file_or_obj_or_dict)
-        # if we got anything else, we initialize the base ConfigurationParser
-        else:
-            return ConfigurationParser(*args, **kwargs)
-
-        # For files we initialize one of the subclasses.
-        # Get the file extension to determine which.
-        extension = filepath.suffix
-        if extension.lower() not in CONFIG_TYPE:
-=======
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
             pathlike = Path(pathlike)
@@ -911,7 +837,6 @@ class ConfigurationParser:
         # make sure have either a JSON or CFG configuration file
         extension = pathlike.suffix.lower()
         if extension not in ['.json', '.cfg']:
->>>>>>> unpin-pandas-and-numpy
             raise ValueError('Configuration file must be '
                              'in either `.json` or `.cfg`'
                              'format. You specified: {}.'.format(extension))
@@ -919,8 +844,6 @@ class ConfigurationParser:
         # set the various attributes to None
         self._filename = pathlike.name
         self._configdir = pathlike.resolve().parent
-
-
 
     @staticmethod
     def _fix_json(json_string):
@@ -1417,274 +1340,4 @@ class ConfigurationParser:
                         bool_value = json.loads(m.group().lower())
                         new_config[field] = bool_value
 
-<<<<<<< HEAD
-        if inplace:
-            self._config = new_config
-        return Configuration(self._config,
-                             configdir=self._configdir,
-                             filename=self._filename,)
-
-    def normalize_validate_and_process_config(self, context='rsmtool'):
-        """
-        Normalize, validate, and process data from a config file.
-
-        Parameters
-        ----------
-        context : str, optional
-            Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare',
-                 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
-
-        Returns
-        -------
-        config_obj : Configuration
-            A configuration object
-
-        Raises
-        -------
-        NameError
-            If config does not exist, or no config read.
-        """
-
-        # Check to make sure a configuration file
-        # or dictionary has been loaded.
-        self._check_config_is_loaded()
-
-        self.normalize_config()
-        self.process_config()
-        self.validate_config(context=context)
-        return Configuration(self._config,
-                             configdir=self._configdir,
-                             filename=self._filename,
-                             context=context)
-
-    def read_normalize_validate_and_process_config(self,
-                                                   filepath,
-                                                   context='rsmtool'):
-        """
-        Read, normalize, validate, and process data from a config file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-        context : str, optional
-            Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare', 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
-
-        Returns
-        -------
-        config_obj : Configuration
-            A configuration object
-        """
-
-        logging.info('Reading and preprocessing configuration file: {}'.format(filepath))
-        self.read_config_from_file(filepath)
-        return self.normalize_validate_and_process_config(context=context)
-
-
-    def get_configuration_from_file_obj_or_dict(self,
-                                                config_file_or_obj_or_dict,
-                                                context='rsmtool'):
-        '''
-        Construct Configuration object from file, object or dictionary
-        Parameters
-        ----------
-        config_file_or_obj_or_dict : str or Pathlib.Path or
-            Configuration or Dictionary
-            Path to the experiment configuration file.
-            Users can also pass a `Configuration` object that is in memory
-            or a Python dictionary with keys corresponding to fields in the
-            configuration file.
-            For configuration object `.configdir` needs to be set to indicate the reference path. If
-            the user passes a dictionary, the reference path will be set to
-            the current directory and all relative paths will be resolved relative
-            to this path.
-            to the current directory.
-        context : str
-            context used to validate configuration object
-            Defaults to `rsmtool`
-
-        Returns
-        -------
-        configuration : Configuration
-            Configuration object constructed from the input
-        '''
-
-        # check what sort of input we got
-        # if we got a string we consider this to be path to config file
-        if isinstance(config_file_or_obj_or_dict, str) or \
-           isinstance(config_file_or_obj_or_dict, Path):
-
-            # read configuration from file
-            configuration = self.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                            context=context)
-
-        elif isinstance(config_file_or_obj_or_dict, dict):
-
-            # read configuration from dictionary
-            configuration = self.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                              context=context)
-
-        elif isinstance(config_file_or_obj_or_dict, Configuration):
-
-            configuration = config_file_or_obj_or_dict
-            # raise an error if we are passed a Configuration object
-            # without a configdir attribute. This can only
-            # happen if the object was constructed using an earlier version
-            # of RSMTool and stored
-            if configuration.configdir is None:
-                raise AttributeError("Configuration object must have configdir attribute.")
-
-        else:
-            raise ValueError("The input to {} must be "
-                             "a path to the file (str or pathlib.Path), a dictionary, "
-                             "or a configuration object. You passed "
-                             "{}.".format(CONTEXT_TO_FUNCTION[context],
-                                          type(config_file_or_obj_or_dict)))
-
-        return configuration
-
-
-
-
-
-class JSONConfigurationParser(ConfigurationParser):
-    """
-    A subclass of `ConfigurationParser` for parsing
-    JSON-style config files.
-    """
-
-    def __init__(self):
-
-        super().__init__()
-
-    def read_config_from_file(self, filepath):
-        """
-        Read the configuration file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-
-        Raises
-        ------
-        ValueError
-            If main configuration file is improperly formatted.
-        """
-        try:
-            config = parse_json_with_comments(filepath)
-        except ValueError:
-            raise ValueError('The main configuration file `{}` exists but '
-                             'is formatted incorrectly. Please check that '
-                             'each line ends with a comma, there is no comma '
-                             'at the end of the last line, and that all quotes '
-                             'match.'.format(filepath))
-
-        self._config = config
-        self._filename = basename(filepath)
-        self._configdir = dirname(abspath(filepath))
-
-
-class CFGConfigurationParser(ConfigurationParser):
-    """
-    A subclass of `ConfiguraitonParser` for parsing
-    Microsoft INI-style config files.
-    """
-
-    def __init__(self):
-
-        super().__init__()
-
-    @staticmethod
-    def _fix_json(json_string):
-        """
-        Takes a bit of JSON that might have bad quotes
-        or capitalized booleans and fixes that stuff.
-
-        Parameters
-        ----------
-        json_string : str
-            A string to be reformatted for JSON parsing.
-
-        Return
-        ------
-        json_string : str
-            The updated string.
-        """
-        json_string = json_string.replace('True', 'true')
-        json_string = json_string.replace('False', 'false')
-        json_string = json_string.replace("'", '"')
-        return json_string
-
-    def read_config_from_file(self, filepath):
-        """
-        Read the configuration file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-
-        Raises
-        ------
-        ValueError
-            If main configuration file is improperly formatted.
-        """
-
-        # Get the `ConfigParser` object
-        py_config_parser = ConfigParser()
-
-        # Try to read main configuration file.
-        try:
-            py_config_parser.read(filepath)
-        except Exception as error:
-            raise ValueError('Main configuration file '
-                             'could not be read: {}'.format(error))
-
-        config = {}
-
-        # Loop through all sections of the ConfigParser
-        # object and add items to the dictionary
-        for section in py_config_parser.sections():
-            for name, value in py_config_parser.items(section):
-
-                # Check if the key already exists in the config dictionary.
-                # If it does, skip it and log a warning.
-                if name in config:
-                    logging.warning('There are duplicate keys for `{}`'
-                                    'in the configuration file. Only '
-                                    'the first instance will be '
-                                    'included.'.format(name))
-                    continue
-
-                # Otherwise, safe convert the value
-                # and add it to the dictionary.
-                else:
-
-                    value = self._fix_json(value)
-                    value = yaml.safe_load(value)
-                    config[name] = value
-
-        self._config = config
-        self._filename = basename(filepath)
-        self._configdir = dirname(abspath(filepath))
-
-
-# Global config types
-CONFIG_TYPE = {'.cfg': CFGConfigurationParser,
-               '.json': JSONConfigurationParser}
-=======
         return new_config
->>>>>>> unpin-pandas-and-numpy
