@@ -18,7 +18,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from glob import glob
 from importlib import import_module
 from math import ceil
@@ -32,6 +32,7 @@ from IPython.display import (display,
 from skll.data import safe_float as string_to_number
 
 from . import VERSION_STRING
+from .reporter import Reporter
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
 # to specify additional options for either of the subcommand parsers.
@@ -1438,6 +1439,72 @@ def setup_rsmcmd_parser(name,
             parser_run.add_argument(*argparse_option_args, **argparse_option_kwargs)
 
     return parser
+
+
+def generate_configuration(name, interactive=False, use_subgroups=False):
+
+    # get a logger for this function
+    logger = logging.getLogger(__name__)
+
+    # get the fields we are going ot put in the config file
+    required_fields = CHECK_FIELDS[name]['required']
+    optional_fields = CHECK_FIELDS[name]['optional']
+
+    # instantiate a dictionary that remembers key insertion order
+    configdict = OrderedDict()
+
+    # add a dummy field that will be replaced with a comment about required fields
+    configdict['comment1'] = 'REQUIRED_FIELDS_COMMENT'
+
+    # insert the required fields first and give them a dummy value
+    for required_field in required_fields:
+        configdict[required_field] = 'ENTER_VALUE_HERE'
+
+    # add a dummy field that will be replaced with a comment about optional fields
+    configdict['comment2'] = 'OPTIONAL_FIELDS_COMMENT'
+
+    # insert the optional fields in alphabetical order
+    for optional_field in sorted(optional_fields):
+
+        # to make it easy for users to add/remove sections, we should
+        # populate the `general_sections` field with an explicit list
+        # instead of the default value which is simply ``['all']``. To
+        # do this, we can use the reporter class.
+        if optional_field == 'general_sections':
+            reporter = Reporter()
+            default_general_sections_value = DEFAULTS.get('general_sections', '')
+            default_special_sections_value = DEFAULTS.get('special_sections', '')
+            default_custom_sections_value = DEFAULTS.get('custom_sections', '')
+
+            # if we are told ot use subgroups then just make up a dummy subgroup
+            # value so that the subgroup-based sections will be included in the
+            # section list. This value is not actually used in configuration file.
+            subgroups_value = ['GROUP'] if use_subgroups else DEFAULTS.get('subgroups', '')
+            configdict['general_sections'] = reporter.determine_chosen_sections(
+                default_general_sections_value,
+                default_special_sections_value,
+                default_custom_sections_value,
+                subgroups_value,
+                context=name)
+        else:
+            configdict[optional_field] = DEFAULTS.get(optional_field, '')
+
+    # create a string version of the JSON object
+    json_string = json.dumps(configdict, indent=4)
+
+    # replace the two dummy fields with actual comments
+    json_string = json_string.replace('"comment1": "REQUIRED_FIELDS_COMMENT",',
+                                      '// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!')
+    json_string = json_string.replace('"comment2": "OPTIONAL_FIELDS_COMMENT",',
+                                      '// OPTIONAL: replace default values below based on your data.')
+
+    # print out a warning to make it clear that it cannot be used as is
+    logger.warning("Automatically generated configuration files MUST "
+                   "be edited to add values for required fields and "
+                   "even for optional ones depending on your data.")
+
+    # return the JSON string
+    return json_string
 
 
 class LogFormatter(logging.Formatter):
