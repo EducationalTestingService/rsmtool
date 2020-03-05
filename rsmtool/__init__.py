@@ -61,7 +61,11 @@ from .rsmtool import run_experiment
 from .rsmpredict import compute_and_save_predictions
 
 from .rsmsummarize import run_summary
+from .utils.metrics import (agreement, # noqa
+                            compute_expected_scores_from_model,
+                            partial_correlations)
 
+from .utils.notebook import get_thumbnail_as_html, show_thumbnail # noqa
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

@@ -24,19 +24,20 @@ from os.path import abspath
 from pathlib import Path
 from ruamel import yaml
 
-from rsmtool import HAS_RSMEXTRA
-from rsmtool.utils import parse_json_with_comments
-from rsmtool.utils import (DEFAULTS,
-                           CHECK_FIELDS,
-                           LIST_FIELDS,
-                           BOOLEAN_FIELDS,
-                           MODEL_NAME_MAPPING,
-                           FIELD_NAME_MAPPING,
-                           ID_FIELDS,
-                           is_skll_model)
-
 from skll import Learner
 from skll.metrics import SCORERS
+
+from . import HAS_RSMEXTRA
+from .utils.constants import (DEFAULTS,
+                              CHECK_FIELDS,
+                              LIST_FIELDS,
+                              BOOLEAN_FIELDS,
+                              MODEL_NAME_MAPPING,
+                              FIELD_NAME_MAPPING,
+                              ID_FIELDS)
+
+from .utils.files import is_skll_model, parse_json_with_comments
+
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file, # noqa
@@ -281,15 +282,21 @@ class Configuration:
 
     def __str__(self):
         """
-        Return string representation of the object keys
-        as comma-separated list.
+        Return a string representation of the underlying configuration
+        dictionary.
 
         Returns
         -------
-        config_names : str
-            A comma-separated list of names from the config dictionary.
+        config_string : str
+            A string representation of the underlying configuration
+            dictionary as encoded by ``json.dumps()``. Configuration
+            options meant for internal use are not included.
         """
-        return ', '.join(self._config)
+        expected_fields = (CHECK_FIELDS[self._context]['required'] +
+                           CHECK_FIELDS[self._context]['optional'])
+
+        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
+        return json.dumps(output_config, indent=4, separators=(',', ': '))
 
     def __iter__(self):
         """
@@ -562,12 +569,8 @@ class Configuration:
         context = self._context
         outjson = output_dir / f"{experiment_id}_{context}.json"
 
-        expected_fields = (CHECK_FIELDS[self._context]['required'] +
-                           CHECK_FIELDS[self._context]['optional'])
-
-        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
         with outjson.open(mode='w') as outfile:
-            json.dump(output_config, outfile, indent=4, separators=(',', ': '))
+            outfile.write(str(self))
 
     def check_exclude_listwise(self):
         """
