@@ -324,16 +324,19 @@ def convert_to_float(value):
     return int_to_float(string_to_number(value))
 
 
-def parse_json_with_comments(filename):
+def parse_json_with_comments(pathlike):
     """
     Parse a JSON file after removing any comments.
+
     Comments can use either ``//`` for single-line
     comments or or ``/* ... */`` for multi-line comments.
+    The input filepath can be a string or ``pathlib.Path``.
 
     Parameters
     ----------
-    filename : str
-        Path to the input JSON file.
+    filename : str or os.PathLike
+        Path to the input JSON file either as a string
+        or as a ``pathlib.Path`` object.
 
     Returns
     -------
@@ -350,7 +353,11 @@ def parse_json_with_comments(filename):
     comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
                             re.DOTALL | re.MULTILINE)
 
-    with open(filename) as file_buff:
+    # if we passed in a string, convert it to a Path
+    if isinstance(pathlike, str):
+        pathlike = Path(pathlike)
+
+    with open(pathlike, 'r') as file_buff:
         content = ''.join(file_buff.readlines())
 
         # Looking for comments
