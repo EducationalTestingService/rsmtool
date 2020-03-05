@@ -550,7 +550,7 @@ class Configuration:
             output_dir = Path(getcwd())
 
         # Create output directory, if it does not exist
-        output_dir = output_dir / 'output'
+        output_dir = Path(output_dir) / 'output'
         output_dir.mkdir(exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
