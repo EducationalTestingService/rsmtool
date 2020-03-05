@@ -823,6 +823,8 @@ class ConfigurationParser:
 
         Raises
         ------
+        FileNotFoundError
+            If the given config file path does not exist.
         ValueError
             If the configuration file does not have a valid extension.
             Valid extensions are ``.json`` and ``.cfg``.
@@ -830,6 +832,11 @@ class ConfigurationParser:
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
             pathlike = Path(pathlike)
+
+        # raise an exception if the file does not exist
+        if not pathlike.exists():
+            raise FileNotFoundError(f"The configuration file {pathlike} "
+                                    "was not found.")
 
         # make sure have either a JSON or CFG configuration file
         extension = pathlike.suffix.lower()
