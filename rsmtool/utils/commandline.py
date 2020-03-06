@@ -220,7 +220,33 @@ def generate_configuration(name,
                            interactive=False,
                            use_subgroups=False,
                            as_string=False):
+    """
+    Automatically generate an example configuration file for a given
+    command-line tool.
 
+    Parameters
+    ----------
+    name : str
+        Name of the command-line tool for which we are generating the
+        configuration file.
+    interactive : bool, optional
+        If ``True``, use an interactive mode to generate the configuration line
+        step-by-step.
+        Defaults to ``False``.
+    use_subgroups : bool, optional
+        If ``True``, include subgroup-related sections in the list of general sections
+        in the configuration file.
+        Defaults to ``False``.
+    as_string : bool, optional
+        If ``True``, return a formatted and indented string representation
+        of the configuration, rather than a ``Configuration`` object.
+
+    Returns
+    -------
+    configuration : configuration_parser.Configuration or str
+        The generated configuration either as a ``Configuration`` object or
+        a formatted string, depending on the value of ``as_string``.
+    """
     # get a logger for this function
     logger = logging.getLogger(__name__)
 
