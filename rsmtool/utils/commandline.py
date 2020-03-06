@@ -9,15 +9,17 @@ Utility functions used in RSMTool command-line tools.
 """
 
 import argparse
-import json
 import logging
 import os
+import re
+
 from collections import namedtuple, OrderedDict
 from pathlib import Path
 
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
+from .constants import CHECK_FIELDS, DEFAULTS
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
 # to specify additional options for either of the subcommand parsers.
@@ -29,14 +31,14 @@ from rsmtool.reporter import Reporter
 CmdOption = namedtuple('CmdOption',
                        ['dest', 'help', 'shortname', 'longname', 'action',
                         'default', 'required', 'nargs'],
-                       defaults=[None, None, None, None, None])
+                       defaults=[None, None, None, None, None, None])
 
 
 def setup_rsmcmd_parser(name,
                         uses_output_directory=True,
                         allows_overwriting_directory=False,
                         extra_run_options=[],
-                        with_subgroup_sections=False):
+                        uses_subgroups=False):
     """
     A helper function to create argument parsers for RSM command-line utilities.
 
@@ -59,8 +61,8 @@ def setup_rsmcmd_parser(name,
     The ``extra_run_options`` list should contain a list of ``CmdOption``
     instances which are added to the "run" subcommand parser one by one.
 
-    If ``with_subgroup_sections`` is ``True``, a ``--groups`` optional
-    argument will be added to the "quickstart" subcommand parser.
+    If ``uses_subgroups`` is ``True``, a ``--groups`` optional
+    argument will be added to the "generate" subcommand parser.
 
     Parameters
     ----------
@@ -77,9 +79,11 @@ def setup_rsmcmd_parser(name,
     extra_run_options : list, optional
         Any additional options to be added to the "run" subcommand parser,
         each specified as a ``CmdOption`` instance.
-    with_subgroup_sections : bool, optional
-        Add the ``--groups`` optional argument to the "quickstart" subcommand
-        parser.
+    uses_subgroups : bool, optional
+        Add the ``--groups`` optional argument to the "generate" subcommand
+        parser. This argument means that the tool for which we are automatically
+        generating a configuration file includes additional information when
+        subgroup information is available.
 
     Returns
     -------
@@ -112,31 +116,36 @@ def setup_rsmcmd_parser(name,
     parser = argparse.ArgumentParser(prog=f"{name}")
 
     # we always want to have a version flag for the main parser
-    parser.add_argument('-V', '--version', action='version', version=VERSION_STRING)
+    parser.add_argument('-V',
+                        '--version',
+                        action='version',
+                        version=VERSION_STRING,
+                        help=f"show the {name} version number and exit")
 
     # each RSM command-line utility has two subcommands
-    # - quickstart : used to auto-generate configuration files
+    # - generate : used to auto-generate configuration files
     # - run : used to run experiments
 
     # let's set up the sub-parsers corresponding to these subcommands
-    subparsers = parser.add_subparsers(dest='subcommand')
-    parser_quickstart = subparsers.add_parser('quickstart',
-                                              help=f"Automatically generate an {name} configuration file")
+    subparsers = parser.add_subparsers(dest='subcommand', title='subcommands')
+    parser_generate = subparsers.add_parser('generate',
+                                            help=f"automatically generate an "
+                                                 f"{name} configuration file")
     parser_run = subparsers.add_parser('run',
-                                       help=f"Run an {name} experiment")
+                                       help=f"run an {name} experiment")
 
-    #####################################################
-    # Setting up options for the "quickstart" subparser #
-    #####################################################
-    if with_subgroup_sections:
-        parser_quickstart.add_argument('--groups',
-                                       dest='subgroups',
-                                       action='store_true',
-                                       default=False,
-                                       help=f"If true, the generated {name} "
-                                            "configuration file will include the "
-                                            "subgroup sections in the general "
-                                            "sections list.")
+    ###################################################
+    # Setting up options for the "generate" subparser #
+    ###################################################
+    if uses_subgroups:
+        parser_generate.add_argument('--groups',
+                                     dest='subgroups',
+                                     action='store_true',
+                                     default=False,
+                                     help=f"if specified, the generated {name} "
+                                          f"configuration file will include the "
+                                          f"subgroup sections in the general "
+                                          f"sections list")
 
     ##############################################
     # Setting up options for the "run" subparser #
@@ -146,15 +155,15 @@ def setup_rsmcmd_parser(name,
     # always need a configuration file
     parser_run.add_argument('config_file',
                             type=existing_configuration_file,
-                            help="The JSON configuration file for this experiment")
+                            help=f"the {name} JSON configuration file to run")
 
     # if it uses an output directory, let's add that
     if uses_output_directory:
         parser_run.add_argument('output_dir',
                                 nargs='?',
                                 default=os.getcwd(),
-                                help="The output directory where all the files "
-                                     "for this experiment will be stored")
+                                help="the output directory where all the files "
+                                     "for this run will be stored")
 
     # if it allows overwrting the output directory, let's add that
     if allows_overwriting_directory:
@@ -163,9 +172,9 @@ def setup_rsmcmd_parser(name,
                                 dest='force_write',
                                 action='store_true',
                                 default=False,
-                                help=f"If true, {name} will not check if the "
-                                     "output directory already contains the "
-                                     "output of another {name} experiment. ")
+                                help=f"if specified, {name} will overwrite the "
+                                     f"contents of the output directory even if "
+                                     f"it contains the output of a previous run ")
 
     # add any extra options passed in for the rub subcommand; each of them must
     # have a destination name and a help string
@@ -219,21 +228,23 @@ def generate_configuration(name,
     required_fields = CHECK_FIELDS[name]['required']
     optional_fields = CHECK_FIELDS[name]['optional']
 
+    # the optional fields will be inserted in alphabetical order
+    sorted_optional_fields = sorted(optional_fields)
+
+    # we need to save the first required and first optional field we will
+    # insert since we will use them as sign posts to insert comments later
+    first_required_field = required_fields[0]
+    first_optional_field = sorted_optional_fields[0]
+
     # instantiate a dictionary that remembers key insertion order
     configdict = OrderedDict()
-
-    # add a dummy field that will be replaced with a comment about required fields
-    configdict['comment1'] = 'REQUIRED_FIELDS_COMMENT'
 
     # insert the required fields first and give them a dummy value
     for required_field in required_fields:
         configdict[required_field] = 'ENTER_VALUE_HERE'
 
-    # add a dummy field that will be replaced with a comment about optional fields
-    configdict['comment2'] = 'OPTIONAL_FIELDS_COMMENT'
-
     # insert the optional fields in alphabetical order
-    for optional_field in sorted(optional_fields):
+    for optional_field in sorted_optional_fields:
 
         # to make it easy for users to add/remove sections, we should
         # populate the `general_sections` field with an explicit list
@@ -261,20 +272,28 @@ def generate_configuration(name,
     # create a Configuration object
     configuration = Configuration(configdict,
                                   filename=f"example_{name}.json",
+                                  configdir=os.getcwd(),
                                   context=f"{name}")
 
-    json_string = json.dumps(configdict, indent=4)
+    # if we were asked for string output, then convert the Configuration
+    # object to a string and also insert some useful comments to print out
+    if as_string:
+        configuration = str(configuration)
 
-    # replace the two dummy fields with actual comments
-    json_string = json_string.replace('"comment1": "REQUIRED_FIELDS_COMMENT",',
-                                      '// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!')
-    json_string = json_string.replace('"comment2": "OPTIONAL_FIELDS_COMMENT",',
-                                      '// OPTIONAL: replace default values below based on your data.')
+        # insert first comment right above the first required field
+        configuration = re.sub(fr'([ ]+)("{first_required_field}": [^,]+,\n)',
+                               r'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
+                               configuration)
+
+        # insert second comment right above the first optional field
+        configuration = re.sub(fr'([ ]+)("{first_optional_field}": [^,]+,\n)',
+                               r'\1// OPTIONAL: replace default values below based on your data.\n\1\2',
+                               configuration)
 
     # print out a warning to make it clear that it cannot be used as is
     logger.warning("Automatically generated configuration files MUST "
                    "be edited to add values for required fields and "
                    "even for optional ones depending on your data.")
 
-    # return the JSON string
-    return json_string
+    # return either the Configuration object or the string
+    return configuration
