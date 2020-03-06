@@ -3,13 +3,16 @@ import pandas as pd
 
 from numpy.testing import assert_array_equal
 
+from pandas.testing import assert_frame_equal
+
 from nose.tools import (eq_,
                         raises,
                         assert_almost_equal)
 
 from pathlib import Path
 
-from rsmtool.utils.prmse import (true_score_variance,
+from rsmtool.utils.prmse import (get_true_score_evaluations,
+                                 true_score_variance,
                                  variance_of_errors,
                                  mse_true,
                                  prmse_true,
@@ -19,14 +22,6 @@ from rsmtool.utils.prmse import (true_score_variance,
 # get the directory containing the tests
 test_dir = Path(__file__).parent
 
-
-@raises(ValueError)
-def test_variance_of_errors_all_single_scored():
-    sc1 = [1, 2, 3, None, None]
-    sc2 = [None, None, None, 2, 3]
-    df = pd.DataFrame({'sc1': sc1,
-                       'sc2': sc2})
-    variance_of_errors(df)
 
 
 def test_compute_n_human_scores():
@@ -55,6 +50,22 @@ def test_compute_n_human_scores_array():
     expected_n = pd.Series([2, 1, 3, 0])
     n_scores = get_n_human_scores(arr)
     assert_array_equal(expected_n, n_scores)
+
+@raises(ValueError)
+def test_variance_of_errors_all_single_scored():
+    sc1 = [1, 2, 3, None, None]
+    sc2 = [None, None, None, 2, 3]
+    df = pd.DataFrame({'sc1': sc1,
+                       'sc2': sc2})
+    variance_of_errors(df)
+
+
+@raises(ValueError)
+def test_get_true_score_evaluations_single_human_no_ve():
+    df = pd.DataFrame({'system': [1, 2, 5],
+                       'sc1': [2, 3, 5]})
+    get_true_score_evaluations(df, 'system', 'sc1')
+
 
 
 
@@ -198,6 +209,54 @@ class TestPrmseJohnsonData():
         prmse = prmse_true(system,
                            df_humans)
         assert_almost_equal(prmse, expected_prmse_true, 7)
+
+    def test_compute_true_score_evaluations_full(self):
+        expected_df = pd.DataFrame({'N': 10000 ,
+                                    "N raters": 4,
+                                    "N single": 0,
+                                    "N multiple": 10000,
+                                    "Variance of errors": 0.509375,
+                                    "True score var": 0.7765515,
+                                    'MSE true': 0.3564625,
+                                    'PRMSE true': 0.5409673},
+                                    index=['system'])
+        df_prmse = get_true_score_evaluations(self.data_full,
+                                              self.system_score_columns,
+                                              self.human_score_columns)
+        assert_frame_equal(df_prmse, expected_df, check_dtype=False)
+
+
+    def test_compute_true_score_evaluations_sparse(self):
+        expected_df = pd.DataFrame({'N': 10000 ,
+                                    "N raters": 4,
+                                    "N single": 3421,
+                                    "N multiple": 6579,
+                                    "Variance of errors": 0.5150882,
+                                    "True score var": 0.769816,
+                                    'MSE true': 0.3550792,
+                                    'PRMSE true': 0.538748},
+                                    index=['system'])
+        df_prmse = get_true_score_evaluations(self.data_sparse,
+                                              self.system_score_columns,
+                                              self.human_score_columns)
+        assert_frame_equal(df_prmse, expected_df, check_dtype=False)
+
+
+    def test_compute_true_score_evaluations_given_ve(self):
+        expected_df = pd.DataFrame({'N': 10000 ,
+                                    "N raters": 4,
+                                    "N single": 3421,
+                                    "N multiple": 6579,
+                                    "Variance of errors": 0.5150882,
+                                    "True score var": 0.769816,
+                                    'MSE true': 0.3550792,
+                                    'PRMSE true': 0.538748},
+                                    index=['system'])
+        df_prmse = get_true_score_evaluations(self.data_sparse,
+                                              self.system_score_columns,
+                                              self.human_score_columns,
+                                              variance_errors_human=0.5150882)
+        assert_frame_equal(df_prmse, expected_df, check_dtype=False)
 
 
 

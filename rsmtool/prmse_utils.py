@@ -13,6 +13,8 @@ import pandas as pd
 
 import numpy as np
 
+from rsmtool.utils.prmse import prmse_true
+
 
 def compute_variance_of_errors(df,
                                h1_column='sc1',

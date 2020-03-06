@@ -245,3 +245,90 @@ def prmse_true(system,
     return prmse
 
 
+def get_true_score_evaluations(df,
+                               system_score_columns,
+                               human_score_columns,
+                               variance_errors_human=None):
+    """
+    Get true score evaluations for reporting
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        Input data frame. Must contain columns listed in
+        `system_score_columns` and `human_score_columns`
+    system_score_columns: str or list
+        System score column name or list of columns containing system scores
+    human_score_columns: str or list
+        Human score column or list of columns containing human scores.
+        True score evaluations require estimating variance of human errors,
+        which can only be computed when a subset of responses has
+        two or more human ratings. If a single human_score_column
+        is supplied, one must also specify variance_errors_human
+    variance_errors_human : float
+        Estimated variance of errors in human scores
+        When no value is supplied, the variance will
+        be estimated from the data. In this case
+        at least some responses must have more than
+        one human score.
+
+
+
+    Returns
+    -------
+    prmse_metrics: pandas DataFrame
+        DataFrame containing different evaluation metrics related to the evaluation
+        of system scores against true scores:
+        - `N`: total number of responses
+        - `N raters`: maximum number of ratings available for a single response
+        - `N_single`: total number of responses with a single human score
+        - `N_multiple`: total number of responses with more than one human score
+        - `variance_of_errors`: estimated variance of human errors
+        - `tru_var`: estimated true score variance
+        - `mse_true`: mean squared error when predicting true score from machine score
+        - `prmse`: proportional reduction in mean squared error when predicting true score
+    """
+
+    # check that if we only have one human column, we were also given
+    # variance of errors
+    if isinstance(human_score_columns, str):
+        if variance_errors_human is None:
+            raise(ValueError("True score evaluations require estimating "
+                            "variance of human errors, "
+                            "which can only be computed when a subset "
+                            "of responses has two or more human ratings. "
+                            "If a single human_score_column "
+                            "is supplied, one must also specify variance_errors_human"))
+
+    if isinstance(system_score_columns, str):
+        system_score_columns = [system_score_columns]
+
+    # compute variance of errors if it wasn't specified
+    if variance_errors_human is None:
+        variance_errors_human = variance_of_errors(df[human_score_columns])
+
+    # compute prmse
+    prmse_all = []
+    for system in system_score_columns:
+        mse = mse_true(df[system], df[human_score_columns], variance_errors_human)
+        prmse = prmse_true(df[system], df[human_score_columns], variance_errors_human)
+        prmse_metrics = pd.Series({'MSE true': mse,
+                                   'PRMSE true': prmse}, name=system)
+        prmse_all.append(prmse_metrics)
+
+    df_prmse = pd.concat(prmse_all, axis=1, sort=True).transpose()
+
+    score_counts = get_n_human_scores(df[human_score_columns])
+
+
+    # compute values that are the same for all scores
+    df_prmse.insert(0, 'N', len(df))
+    df_prmse.insert(1, 'N raters', score_counts.max())
+    df_prmse.insert(2, 'N single', (score_counts == 1).sum()),
+    df_prmse.insert(3, 'N multiple', (score_counts > 1).sum()),
+    df_prmse.insert(4, 'Variance of errors', variance_errors_human)
+    df_prmse.insert(5, 'True score var', true_score_variance(df[human_score_columns], variance_errors_human))
+    return df_prmse
+
+
+
