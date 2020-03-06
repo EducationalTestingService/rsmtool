@@ -6,7 +6,7 @@ import pandas as pd
 import warnings
 
 from nose.tools import assert_false, assert_equal, assert_not_equal, eq_, raises
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from rsmtool.container import DataContainer
 
 

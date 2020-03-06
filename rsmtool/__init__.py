@@ -28,39 +28,39 @@ if HAS_RSMEXTRA:
 else:
     VERSION_STRING = '%(prog)s {}'.format(__version__)
 
-from .analyzer import Analyzer # noqa
+from .analyzer import Analyzer  # noqa
 
-from .convert_feature_json import convert_feature_json_file # noqa
+from .convert_feature_json import convert_feature_json_file  # noqa
 
-from .comparer import Comparer # noqa
+from .comparer import Comparer  # noqa
 
-from .container import DataContainer # noqa
+from .container import DataContainer  # noqa
 
-from .modeler import Modeler # noqa
+from .modeler import Modeler  # noqa
 
-from .preprocessor import FeaturePreprocessor # noqa
+from .preprocessor import FeaturePreprocessor  # noqa
 
-from .reader import DataReader # noqa
+from .reader import DataReader  # noqa
 
-from .reporter import Reporter # noqa
+from .reporter import Reporter  # noqa
 
-from .writer import DataWriter # noqa
+from .writer import DataWriter  # noqa
 
-from .rsmcompare import run_comparison # noqa
+from .rsmcompare import run_comparison  # noqa
 
-from .rsmeval import run_evaluation # noqa
+from .rsmeval import run_evaluation  # noqa
 
-from .rsmtool import run_experiment # noqa
+from .rsmtool import run_experiment  # noqa
 
-from .rsmpredict import compute_and_save_predictions # noqa
+from .rsmpredict import compute_and_save_predictions  # noqa
 
-from .rsmsummarize import run_summary # noqa
+from .rsmsummarize import run_summary  # noqa
 
-from .utils import (agreement,
-                    compute_expected_scores_from_model,
-                    get_thumbnail_as_html,
-                    partial_correlations,
-                    show_thumbnail) 
+from .utils.metrics import (agreement,  # noqa
+                            compute_expected_scores_from_model,
+                            partial_correlations)
+
+from .utils.notebook import get_thumbnail_as_html, show_thumbnail  # noqa
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

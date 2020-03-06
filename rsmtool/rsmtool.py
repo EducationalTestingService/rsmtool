@@ -16,14 +16,15 @@ import sys
 from os import listdir, makedirs
 from os.path import abspath, exists, join
 
-from rsmtool.analyzer import Analyzer
-from rsmtool.configuration_parser import configure
-from rsmtool.modeler import Modeler
-from rsmtool.preprocessor import FeaturePreprocessor
-from rsmtool.reader import DataReader
-from rsmtool.reporter import Reporter
-from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
-from rsmtool.writer import DataWriter
+from .analyzer import Analyzer
+from .configuration_parser import configure
+from .modeler import Modeler
+from .preprocessor import FeaturePreprocessor
+from .reader import DataReader
+from .reporter import Reporter
+from .utils.commandline import setup_rsmcmd_parser
+from .utils.logging import LogFormatter
+from .writer import DataWriter
 
 
 def run_experiment(config_file_or_obj_or_dict,

@@ -20,13 +20,13 @@ from skll.metrics import kappa
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
-from rsmtool.container import DataContainer
-from rsmtool.prmse_utils import compute_prmse
-from rsmtool.utils import (agreement,
-                           difference_of_standardized_means,
-                           partial_correlations,
-                           quadratic_weighted_kappa,
-                           standardized_mean_difference)
+from .container import DataContainer
+from .prmse_utils import compute_prmse
+from .utils.metrics import (agreement,
+                            difference_of_standardized_means,
+                            partial_correlations,
+                            quadratic_weighted_kappa,
+                            standardized_mean_difference)
 
 
 class Analyzer:
@@ -550,9 +550,12 @@ class Analyzer:
 
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
-                df_target_cors[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr_no_length[group] = pd.Series(index=df_group.columns)
+                df_target_cors[group] = pd.Series(data=np.nan,
+                                                  index=df_group.columns)
+                df_target_pcorr[group] = pd.Series(data=np.nan,
+                                                   index=df_group.columns)
+                df_target_pcorr_no_length[group] = pd.Series(data=np.nan,
+                                                             index=df_group.columns)
             else:
                 # if we are asked to include length, that means 'length' is
                 # in the data frame which means that we want to exclude that

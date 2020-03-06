@@ -25,12 +25,13 @@ from os.path import (abspath,
                      splitext,
                      split)
 
-from rsmtool.configuration_parser import configure
-from rsmtool.modeler import Modeler
-from rsmtool.preprocessor import FeaturePreprocessor
-from rsmtool.reader import DataReader
-from rsmtool.utils import LogFormatter, CmdOption, setup_rsmcmd_parser
-from rsmtool.writer import DataWriter
+from .configuration_parser import configure
+from .modeler import Modeler
+from .preprocessor import FeaturePreprocessor
+from .reader import DataReader
+from .utils.commandline import setup_rsmcmd_parser, CmdOption
+from .utils.logging import LogFormatter
+from .writer import DataWriter
 
 
 def compute_and_save_predictions(config_file_or_obj_or_dict,

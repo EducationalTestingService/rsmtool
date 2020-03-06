@@ -24,19 +24,20 @@ from os.path import abspath
 from pathlib import Path
 from ruamel import yaml
 
-from rsmtool import HAS_RSMEXTRA
-from rsmtool.utils import parse_json_with_comments
-from rsmtool.utils import (DEFAULTS,
-                           CHECK_FIELDS,
-                           LIST_FIELDS,
-                           BOOLEAN_FIELDS,
-                           MODEL_NAME_MAPPING,
-                           FIELD_NAME_MAPPING,
-                           ID_FIELDS,
-                           is_skll_model)
-
 from skll import Learner
 from skll.metrics import SCORERS
+
+from . import HAS_RSMEXTRA
+from .utils.constants import (DEFAULTS,
+                              CHECK_FIELDS,
+                              LIST_FIELDS,
+                              BOOLEAN_FIELDS,
+                              MODEL_NAME_MAPPING,
+                              FIELD_NAME_MAPPING,
+                              ID_FIELDS)
+
+from .utils.files import is_skll_model, parse_json_with_comments
+
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file, # noqa

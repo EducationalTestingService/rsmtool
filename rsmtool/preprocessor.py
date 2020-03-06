@@ -19,12 +19,12 @@ from collections import defaultdict
 
 from numpy.random import RandomState
 
-from rsmtool.reader import DataReader
-from rsmtool.container import DataContainer
-from rsmtool.reporter import Reporter
-from rsmtool.transformer import FeatureTransformer
-from rsmtool.utils import convert_to_float
-from rsmtool.utils import is_built_in_model, is_skll_model
+from .container import DataContainer
+from .reader import DataReader
+from .reporter import Reporter
+from .transformer import FeatureTransformer
+from .utils.conversion import convert_to_float
+from .utils.files import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
@@ -118,13 +118,22 @@ class FeatureSubsetProcessor:
                                  "file can only contain 0 or 1")
 
         if sign:
-            if ('sign_{}'.format(sign) not in df_feature_specs and
-                    'Sign_{}'.format(sign) not in df_feature_specs):
+            possible_sign_columns = ['sign_{}'.format(sign),
+                                     'Sign_{}'.format(sign)]
+            existing_sign_columns = [c for c in possible_sign_columns
+                                     if c in df_feature_specs]
+            if len(existing_sign_columns) > 1:
+                raise ValueError("The feature_subset_file contains "
+                                 "multiple columns for sign: "
+                                 "{}".format(' ,'.join(existing_sign_columns)))
+            elif len(existing_sign_columns) == 0:
                 raise ValueError("The feature_subset_file must "
                                  "contain the requested "
                                  "sign column 'sign_{}'".format(sign))
+            else:
+                sign_column = existing_sign_columns[0]
 
-            if not df_feature_specs[subset].isin(['-', '+']).all():
+            if not df_feature_specs[sign_column].isin(['-', '+']).all():
                 raise ValueError("The sign columns in feature "
                                  "file can only contain - or +")
 

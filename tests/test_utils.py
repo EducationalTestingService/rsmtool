@@ -9,33 +9,32 @@ from itertools import count
 from nose.tools import assert_equal, eq_, raises
 from os import unlink, listdir
 from os.path import abspath, dirname, join, relpath
-from pandas.util.testing import assert_frame_equal
-
-from rsmtool.utils import (difference_of_standardized_means,
-                           float_format_func,
-                           int_or_float_format_func,
-                           custom_highlighter,
-                           bold_highlighter,
-                           color_highlighter,
-                           int_to_float,
-                           convert_to_float,
-                           compute_subgroup_plot_params,
-                           partial_correlations,
-                           parse_json_with_comments,
-                           has_files_with_extension,
-                           get_output_directory_extension,
-                           get_thumbnail_as_html,
-                           get_files_as_html,
-                           compute_expected_scores_from_model,
-                           standardized_mean_difference,
-                           quadratic_weighted_kappa)
+from pandas.testing import assert_frame_equal
 
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
-
 from skll.metrics import kappa
+
+from rsmtool.utils.conversion import int_to_float, convert_to_float
+from rsmtool.utils.files import (parse_json_with_comments,
+                                 has_files_with_extension,
+                                 get_output_directory_extension)
+from rsmtool.utils.metrics import (difference_of_standardized_means,
+                                   partial_correlations,
+                                   compute_expected_scores_from_model,
+                                   standardized_mean_difference,
+                                   quadratic_weighted_kappa)
+from rsmtool.utils.notebook import (float_format_func,
+                                    int_or_float_format_func,
+                                    custom_highlighter,
+                                    bold_highlighter,
+                                    color_highlighter,
+                                    compute_subgroup_plot_params,
+                                    get_thumbnail_as_html,
+                                    get_files_as_html)
+
 
 # get the directory containing the tests
 test_dir = dirname(__file__)

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from numpy.testing import assert_array_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
                         assert_almost_equal,
@@ -797,9 +797,12 @@ class TestFeaturePreprocessor:
          test_processed,
          info_processed) = self.fpp.preprocess_features(train, test, specs)
 
-        assert_frame_equal(train_processed, train_expected)
-        assert_frame_equal(test_processed, test_expected)
-        assert_frame_equal(info_processed, info_expected)
+        assert_frame_equal(train_processed.sort_index(axis=1),
+                           train_expected.sort_index(axis=1))
+        assert_frame_equal(test_processed.sort_index(axis=1),
+                           test_expected.sort_index(axis=1))
+        assert_frame_equal(info_processed.sort_index(axis=1),
+                           info_expected.sort_index(axis=1))
 
     def test_filter_data_features(self):
 
@@ -1293,6 +1296,54 @@ class TestFeatureSubsetProcessor:
                                                                    feature_subset_specs,
                                                                    'high_entropy'),
                            ['Grammar', 'Vocabulary'])
+
+    def test_check_feature_subset_file_subset_only(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'subset1': [0, 1, 0]})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
+
+
+    def test_check_feature_subset_file_sign_only(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+
+    def test_check_feature_subset_file_sign_and_subset(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+'],
+                                      'subset1': [0, 1, 0]})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         subset='subset1',
+                                                         sign='SYS')
+
+    def test_check_feature_subset_file_sign_named_with_sign(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    def test_check_feature_subset_file_sign_named_with_Sign(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'Sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    @raises(ValueError)
+    def test_check_feature_subset_file_sign_named_something_else(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'SYS_sign': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    @raises(ValueError)
+    def test_check_feature_subset_file_multiple_sign_columns(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+'],
+                                      'Sign_SYS': ['-', '+', '-']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_feature_column(self):

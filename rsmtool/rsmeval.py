@@ -17,13 +17,14 @@ import sys
 from os import listdir
 from os.path import abspath, exists, join
 
-from rsmtool.analyzer import Analyzer
-from rsmtool.configuration_parser import configure
-from rsmtool.preprocessor import FeaturePreprocessor
-from rsmtool.reader import DataReader
-from rsmtool.reporter import Reporter
-from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
-from rsmtool.writer import DataWriter
+from .analyzer import Analyzer
+from .configuration_parser import configure
+from .preprocessor import FeaturePreprocessor
+from .reader import DataReader
+from .reporter import Reporter
+from .utils.commandline import setup_rsmcmd_parser
+from .utils.logging import LogFormatter
+from .writer import DataWriter
 
 
 def run_evaluation(config_file_or_obj_or_dict,

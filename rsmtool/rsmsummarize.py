@@ -21,11 +21,11 @@ from os.path import (abspath,
                      join,
                      normpath)
 
-from rsmtool.configuration_parser import configure
-from rsmtool.reader import DataReader
-from rsmtool.reporter import Reporter
-
-from rsmtool.utils import LogFormatter, setup_rsmcmd_parser
+from .configuration_parser import configure
+from .reader import DataReader
+from .reporter import Reporter
+from .utils.commandline import setup_rsmcmd_parser
+from .utils.logging import LogFormatter
 
 
 def check_experiment_dir(experiment_dir,

@@ -17,8 +17,8 @@ from collections import defaultdict
 from scipy.stats import pearsonr
 from os.path import exists, join
 
-from rsmtool.reader import DataReader
-from rsmtool.utils import get_output_directory_extension
+from .reader import DataReader
+from .utils.files import get_output_directory_extension
 
 
 _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
