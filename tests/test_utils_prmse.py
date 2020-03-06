@@ -47,6 +47,16 @@ def test_compute_n_human_scores_zeros():
     assert_array_equal(expected_n, n_scores)
 
 
+def test_compute_n_human_scores_array():
+    df = pd.DataFrame({'h1': [1, 2, 3, None],
+                       'h2': [1, None, 2, None],
+                       'h3': [None, None, 1, None]})
+    arr = df.to_numpy()
+    expected_n = pd.Series([2, 1, 3, 0])
+    n_scores = get_n_human_scores(arr)
+    assert_array_equal(expected_n, n_scores)
+
+
 
 class TestPrmseJohnsonData():
 
