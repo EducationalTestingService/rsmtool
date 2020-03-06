@@ -82,7 +82,6 @@ def run_evaluation(config_file_or_obj_or_dict,
     # that the user knows what she is doing and simply
     # output a warning saying that the report might
     # not be correct.
-    csvdir = join(output_dir, 'output')
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
