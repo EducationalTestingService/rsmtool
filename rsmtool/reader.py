@@ -19,7 +19,7 @@ from os.path import (abspath,
 
 import pandas as pd
 
-from rsmtool.container import DataContainer
+from .container import DataContainer
 
 
 def read_jsonlines(filename, converters=None):

@@ -22,11 +22,11 @@ from os.path import (abspath,
                      join,
                      normpath)
 
-from rsmtool import VERSION_STRING
-from rsmtool.configuration_parser import configure
-from rsmtool.reader import DataReader
-from rsmtool.reporter import Reporter
-from rsmtool.utils import LogFormatter
+from . import VERSION_STRING
+from .configuration_parser import configure
+from .reader import DataReader
+from .reporter import Reporter
+from .utils.logging import LogFormatter
 
 
 def check_experiment_id(experiment_dir, experiment_id):

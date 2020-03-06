@@ -19,12 +19,12 @@ from collections import defaultdict
 
 from numpy.random import RandomState
 
-from rsmtool.reader import DataReader
-from rsmtool.container import DataContainer
-from rsmtool.reporter import Reporter
-from rsmtool.transformer import FeatureTransformer
-from rsmtool.utils import convert_to_float
-from rsmtool.utils import is_built_in_model, is_skll_model
+from .container import DataContainer
+from .reader import DataReader
+from .reporter import Reporter
+from .transformer import FeatureTransformer
+from .utils.conversion import convert_to_float
+from .utils.files import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:

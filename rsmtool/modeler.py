@@ -24,12 +24,12 @@ from scipy.optimize import nnls
 from sklearn.linear_model import LassoCV
 from skll import FeatureSet, Learner
 
-from rsmtool.analyzer import Analyzer
-from rsmtool.utils import compute_expected_scores_from_model, is_skll_model
-from rsmtool.preprocessor import FeaturePreprocessor
-
-from rsmtool.container import DataContainer
-from rsmtool.writer import DataWriter
+from .analyzer import Analyzer
+from .container import DataContainer
+from .utils.files import is_skll_model
+from .utils.metrics import compute_expected_scores_from_model
+from .preprocessor import FeaturePreprocessor
+from .writer import DataWriter
 
 with warnings.catch_warnings():
     warnings.filterwarnings('ignore', category=FutureWarning)
