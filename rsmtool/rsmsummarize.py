@@ -24,7 +24,7 @@ from os.path import (abspath,
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandline import setup_rsmcmd_parser
+from .utils.commandline import generate_configuration, setup_rsmcmd_parser
 from .utils.logging import LogFormatter
 
 
@@ -246,7 +246,7 @@ def main():
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
     if sys.argv[1] not in ['run',
-                           'quickstart'
+                           'generate',
                            '-h', '--help',
                            '-V', '--version']:
         args_to_pass = ['run'] + sys.argv[1:]
@@ -264,7 +264,11 @@ def main():
                     overwrite_output=args.force_write)
 
     else:
-        pass
+
+        # auto-generate an example configuration and print it to STDOUT
+        configuration = generate_configuration(name='rsmsummarize',
+                                               as_string=True)
+        print(configuration)
 
 
 if __name__ == '__main__':

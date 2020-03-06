@@ -22,7 +22,7 @@ from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandline import setup_rsmcmd_parser
+from .utils.commandline import generate_configuration, setup_rsmcmd_parser
 from .utils.logging import LogFormatter
 from .writer import DataWriter
 
@@ -327,14 +327,15 @@ def main():
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmtool',
                                  uses_output_directory=True,
-                                 allows_overwriting_directory=True)
+                                 allows_overwriting_directory=True,
+                                 uses_subgroups=True)
 
     # if the first argument is not one of the valid sub-commands
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
     if sys.argv[1] not in ['run',
-                           'quickstart'
+                           'generate',
                            '-h', '--help',
                            '-V', '--version']:
         args_to_pass = ['run'] + sys.argv[1:]
@@ -352,7 +353,12 @@ def main():
                        overwrite_output=args.force_write)
 
     else:
-        pass
+
+        # auto-generate an example configuration and print it to STDOUT
+        configuration = generate_configuration(name='rsmtool',
+                                               use_subgroups=args.subgroups,
+                                               as_string=True)
+        print(configuration)
 
 
 if __name__ == '__main__':

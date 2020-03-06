@@ -29,7 +29,9 @@ from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
-from .utils.commandline import setup_rsmcmd_parser, CmdOption
+from .utils.commandline import (generate_configuration,
+                                setup_rsmcmd_parser,
+                                CmdOption)
 from .utils.logging import LogFormatter
 from .writer import DataWriter
 
@@ -236,10 +238,11 @@ def main():
     # to set up the argument parser, we first need to instantiate options
     # specific to rsmpredictso we use the `CmdOption` namedtuples
     non_standard_options = [CmdOption(dest='output_file',
-                                      help="Output file where predictions will be saved"),
+                                      help="output file where predictions will "
+                                           "be saved"),
                             CmdOption(dest='preproc_feats_file',
-                                      help="Output file to save the pre-processed "
-                                           "version of the features",
+                                      help="if specified, the preprocessed features "
+                                           "will be saved in this file",
                                       longname='features',
                                       required=False)]
 
@@ -253,7 +256,7 @@ def main():
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
     if sys.argv[1] not in ['run',
-                           'quickstart'
+                           'generate',
                            '-h', '--help',
                            '-V', '--version']:
         args_to_pass = ['run'] + sys.argv[1:]
@@ -273,7 +276,10 @@ def main():
                                      feats_file=preproc_feats_file)
 
     else:
-        pass
+
+        # auto-generate an example configuration and print it to STDOUT
+        configuration = generate_configuration(name='rsmpredict', as_string=True)
+        print(configuration)
 
 
 if __name__ == '__main__':
