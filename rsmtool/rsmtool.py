@@ -327,7 +327,7 @@ def main():
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmtool',
                                  uses_output_directory=True,
-                                 allows_overwriting_directory=True,
+                                 allows_overwriting=True,
                                  uses_subgroups=True)
 
     # if the first argument is not one of the valid sub-commands

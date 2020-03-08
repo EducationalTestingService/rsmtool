@@ -239,7 +239,7 @@ def main():
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmsummarize',
                                  uses_output_directory=True,
-                                 allows_overwriting_directory=True)
+                                 allows_overwriting=True)
 
     # if the first argument is not one of the valid sub-commands
     # or one of the valid optional arguments, then assume that they
