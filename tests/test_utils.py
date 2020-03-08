@@ -1,13 +1,16 @@
-
+import argparse
 import tempfile
 import warnings
 
+from unittest.mock import patch
+
 import numpy as np
 import pandas as pd
+
 from numpy.testing import assert_almost_equal
 from itertools import count
-from nose.tools import assert_equal, eq_, raises
-from os import unlink, listdir
+from nose.tools import assert_equal, eq_, ok_, raises
+from os import getcwd, unlink, listdir
 from os.path import abspath, dirname, join, relpath
 from pandas.testing import assert_frame_equal
 
@@ -17,6 +20,9 @@ from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 from skll.metrics import kappa
 
+from rsmtool.test_utils import rsmtool_test_dir
+
+from rsmtool.utils.commandline import CmdOption, setup_rsmcmd_parser
 from rsmtool.utils.conversion import int_to_float, convert_to_float
 from rsmtool.utils.files import (parse_json_with_comments,
                                  has_files_with_extension,
@@ -421,7 +427,7 @@ def test_quadratic_weighted_kappa():
 
     expected_qwk = -0.09210526315789469
     computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
-                                   np.array([9, 4, 5, 12]))
+                                            np.array([9, 4, 5, 12]))
     assert_almost_equal(computed_qwk, expected_qwk)
 
 
@@ -635,7 +641,7 @@ class TestThumbnail:
         _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
-class TestExpectedScores():
+class TestExpectedScores:
 
     @classmethod
     def setUpClass(cls):
@@ -686,3 +692,171 @@ class TestExpectedScores():
         computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
         assert len(computed_predictions) == len(self.test_fs)
         assert np.all([((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions])
+
+
+class TestCmdOption:
+
+    @raises(TypeError)
+    def test_cmd_option_no_help(self):
+        """
+        test that CmdOption with no help raises exception
+        """
+        _ = CmdOption(longname='foo', dest='blah')
+
+    @raises(TypeError)
+    def test_cmd_option_no_dest(self):
+        """
+        test that CmdOption with no dest raises exception
+        """
+        _ = CmdOption(longname='foo', help='this option has no dest')
+
+    def test_cmd_option_attributes(self):
+        """
+        test CmdOption attributes
+        """
+        co = CmdOption(dest='good', help='this option has only dest and help')
+        eq_(co.dest, 'good')
+        eq_(co.help, 'this option has only dest and help')
+        ok_(co.action is None)
+        ok_(co.longname is None)
+        ok_(co.shortname is None)
+        ok_(co.required is None)
+        ok_(co.nargs is None)
+        ok_(co.default is None)
+
+
+class TestSetupRsmCmdParser:
+
+    def test_run_subparser_no_args(self):
+        """
+        test run subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        # we need to patch sys.exit since --help just exists otherwise
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args('run --help'.split())
+        expected_namespace = argparse.Namespace(config_file=None,
+                                                output_dir=getcwd(),
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    @raises(SystemExit)
+    def test_run_subparser_non_existent_config_file(self):
+        """
+        test run subparser with a non-existent config file
+        """
+        parser = setup_rsmcmd_parser('test')
+        _ = parser.parse_args('run fake.json'.split())
+
+    def test_run_subparser_with_output_directory(self):
+        """
+        test run subparser with a specified output directory
+        """
+        parser = setup_rsmcmd_parser('test')
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir".split())
+
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                output_dir='/path/to/output/dir',
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_no_output_directory(self):
+        """
+        test run subparser where no output directory is required
+        """
+        parser = setup_rsmcmd_parser('test', uses_output_directory=False)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file}".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run')
+        ok_(not hasattr(parsed_namespace, 'output_dir'))
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_with_overwrite_enabled(self):
+        """
+        test run subparser with overwriting enabled
+        """
+        parser = setup_rsmcmd_parser('test', allows_overwriting=True)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir -f".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                output_dir='/path/to/output/dir',
+                                                force_write=True,
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_with_extra_options(self):
+        """
+        test run subparser with extra options
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(shortname='t',
+                                   longname='test',
+                                   dest='test_kwarg',
+                                   help='a test optional argument'),
+                         CmdOption(shortname='x',
+                                   dest='extra_kwarg',
+                                   action='store_true',
+                                   default=False,
+                                   help='a boolean optional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='extra_kwargs2',
+                                   nargs='+',
+                                   required=False,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     allows_overwriting=True,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir foo --test bar -x --zeta 1 2".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                extra_kwarg=True,
+                                                extra_kwargs2=['1', '2'],
+                                                force_write=False,
+                                                output_dir='/path/to/output/dir',
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwarg='bar')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_no_args(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        # we need to patch sys.exit since --help just exists otherwise
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args('generate --help'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate')
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    def test_generate_subparser(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_and_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate --groups'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate', subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_but_no_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate', subgroups=False)
+        eq_(parsed_namespace, expected_namespace)
