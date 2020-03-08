@@ -36,7 +36,7 @@ CmdOption = namedtuple('CmdOption',
 
 def setup_rsmcmd_parser(name,
                         uses_output_directory=True,
-                        allows_overwriting_directory=False,
+                        allows_overwriting=False,
                         extra_run_options=[],
                         uses_subgroups=False):
     """
@@ -55,7 +55,7 @@ def setup_rsmcmd_parser(name,
     If ``uses_output_directory`` is ``True``, an ``output_dir`` positional
     argument will be added to the "run" subcommand parser.
 
-    If ``allows_overwriting_directory`` is ``True``, an ``-f``/``--force``
+    If ``allows_overwriting`` is ``True``, an ``-f``/``--force``
     optional argument will be added to the "run" subcommand parser.
 
     The ``extra_run_options`` list should contain a list of ``CmdOption``
@@ -72,10 +72,11 @@ def setup_rsmcmd_parser(name,
         Add the ``output_dir`` positional argument to the "run" subcommand
         parser. This argument means that the respective tool uses an output
         directory to store its various outputs.
-    allows_overwriting_directory : bool, optional
+    allows_overwriting : bool, optional
         Add the ``-f``/``-force_write`` optional argument to the "run" subcommand
-        parser. This argument allows the output directory for the respective
-        tool to be overwritten even if it already contains some output.
+        parser. This argument allows the output for the respective
+        tool to be overwritten even if it already exists (file) or contains
+        output (directory).
     extra_run_options : list, optional
         Any additional options to be added to the "run" subcommand parser,
         each specified as a ``CmdOption`` instance.
@@ -166,15 +167,16 @@ def setup_rsmcmd_parser(name,
                                      "for this run will be stored")
 
     # if it allows overwrting the output directory, let's add that
-    if allows_overwriting_directory:
+    if allows_overwriting:
         parser_run.add_argument('-f',
                                 '--force',
                                 dest='force_write',
                                 action='store_true',
                                 default=False,
                                 help=f"if specified, {name} will overwrite the "
-                                     f"contents of the output directory even if "
-                                     f"it contains the output of a previous run ")
+                                     f"contents of the output file or directory "
+                                     f"even if it contains the output of a "
+                                     f"previous run ")
 
     # add any extra options passed in for the rub subcommand; each of them must
     # have a destination name and a help string
