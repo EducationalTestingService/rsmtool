@@ -2,6 +2,7 @@ import argparse
 import tempfile
 import warnings
 
+from itertools import product
 from unittest.mock import patch
 
 import numpy as np
@@ -9,7 +10,7 @@ import pandas as pd
 
 from numpy.testing import assert_almost_equal
 from itertools import count
-from nose.tools import assert_equal, eq_, ok_, raises
+from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
 from os import getcwd, unlink, listdir
 from os.path import abspath, dirname, join, relpath
 from pandas.testing import assert_frame_equal
@@ -20,9 +21,12 @@ from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 from skll.metrics import kappa
 
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import rsmtool_test_dir
 
-from rsmtool.utils.commandline import CmdOption, setup_rsmcmd_parser
+from rsmtool.utils.commandline import (CmdOption,
+                                       generate_configuration,
+                                       setup_rsmcmd_parser)
 from rsmtool.utils.conversion import int_to_float, convert_to_float
 from rsmtool.utils.files import (parse_json_with_comments,
                                  has_files_with_extension,
@@ -860,3 +864,147 @@ class TestSetupRsmCmdParser:
         parsed_namespace = parser.parse_args('generate'.split())
         expected_namespace = argparse.Namespace(subcommand='generate', subgroups=False)
         eq_(parsed_namespace, expected_namespace)
+
+
+class TestGenerateConfiguration:
+
+    # a helper method to check that the automatically generated configuration
+    # matches what we expect for each tool
+    def check_generated_configuration(self, name, use_subgroups=False, as_string=False):
+
+        if name == 'rsmtool':
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'train_file': 'ENTER_VALUE_HERE',
+                          'test_file': 'ENTER_VALUE_HERE',
+                          'model': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'dff_by_group',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
+            else:
+                section_list = ['data_description',
+                                'feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
+
+        elif name == 'rsmeval':
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'predictions_file': 'ENTER_VALUE_HERE',
+                          'system_score_column': 'ENTER_VALUE_HERE',
+                          'trim_min': 'ENTER_VALUE_HERE',
+                          'trim_max': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'intermediate_file_paths',
+                                'sysinfo']
+            else:
+                section_list = ['data_description',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'intermediate_file_paths',
+                                'sysinfo']
+
+        elif name == "rsmcompare":
+
+            configdict = {'comparison_id': 'ENTER_VALUE_HERE',
+                          'experiment_id_old': 'ENTER_VALUE_HERE',
+                          'experiment_dir_old': 'ENTER_VALUE_HERE',
+                          'experiment_id_new': 'ENTER_VALUE_HERE',
+                          'experiment_dir_new': 'ENTER_VALUE_HERE',
+                          'description_old': 'ENTER_VALUE_HERE',
+                          'description_new': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'preprocessed_features_by_group',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
+            else:
+                section_list = ['feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
+
+        elif name == "rsmsummarize":
+
+            configdict = {'summary_id': 'ENTER_VALUE_HERE',
+                          'experiment_dirs': ['ENTER_VALUE_HERE']}
+
+            section_list = ['preprocessed_features',
+                            'model',
+                            'evaluation',
+                            'true_score_evaluation',
+                            'intermediate_file_paths',
+                            'sysinfo']
+
+        elif name == "rsmpredict":
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'experiment_dir': 'ENTER_VALUE_HERE',
+                          'input_features_file': 'ENTER_VALUE_HERE'}
+
+        expected_configuration = Configuration(configdict, context=name)
+        if 'general_sections' in expected_configuration:
+            expected_configuration['general_sections'] = section_list
+
+        generated_configuration = generate_configuration(name,
+                                                         use_subgroups=use_subgroups)
+
+        if as_string:
+            assert_equal(str(generated_configuration), str(expected_configuration))
+        else:
+            assert_dict_equal(expected_configuration._config,
+                              generated_configuration._config)
+
+    def test_generate_configuration(self):
+        for name, use_subgroups, as_string in product(['rsmtool',
+                                                       'rsmeval',
+                                                       'rsmcompare',
+                                                       'rsmsummarize',
+                                                       'rsmpredict'],
+                                                      [True, False],
+                                                      [True, False]):
+            yield self.check_generated_configuration, name, use_subgroups, as_string
