@@ -211,7 +211,6 @@ def setup_rsmcmd_parser(name,
 
 
 def generate_configuration(name,
-                           interactive=False,
                            use_subgroups=False,
                            as_string=False):
     """
@@ -223,10 +222,6 @@ def generate_configuration(name,
     name : str
         Name of the command-line tool for which we are generating the
         configuration file.
-    interactive : bool, optional
-        If ``True``, use an interactive mode to generate the configuration line
-        step-by-step.
-        Defaults to ``False``.
     use_subgroups : bool, optional
         If ``True``, include subgroup-related sections in the list of general sections
         in the configuration file.
@@ -234,6 +229,7 @@ def generate_configuration(name,
     as_string : bool, optional
         If ``True``, return a formatted and indented string representation
         of the configuration, rather than a ``Configuration`` object.
+        Defaults to ``False``.
 
     Returns
     -------
