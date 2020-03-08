@@ -178,42 +178,34 @@ def setup_rsmcmd_parser(name,
                                      f"even if it contains the output of a "
                                      f"previous run ")
 
-    # add any extra options passed in for the rub subcommand; each of them must
-    # have a destination name and a help string
+    # add any extra options passed in for the rub subcommand;
     for parser_option in extra_run_options:
-        try:
-            assert hasattr(parser_option, 'dest')
-            assert hasattr(parser_option, 'help')
-        except AssertionError:
-            # this exception should _never_ be encountered by a user
-            # this function is really only meant for RSMTool developers
-            raise RuntimeError(f"Invalid option {parser_option} for {name} parser.")
-        else:
-            # construct the arguments and keyword arguments needed for the
-            # `add_argument()` call to the parser
-            argparse_option_args = []
-            argparse_option_kwargs = {}
 
-            # first add the destination and the help string
-            argparse_option_kwargs["dest"] = f"{parser_option.dest}"
-            argparse_option_kwargs["help"] = f"{parser_option.help}"
+        # construct the arguments and keyword arguments needed for the
+        # `add_argument()` call to the parser
+        argparse_option_args = []
+        argparse_option_kwargs = {}
 
-            # now add any optional information
-            if parser_option.shortname is not None:
-                argparse_option_args.append(f"-{parser_option.shortname}")
-            if parser_option.longname is not None:
-                argparse_option_args.append(f"--{parser_option.longname}")
-            if parser_option.action is not None:
-                argparse_option_kwargs['action'] = f"'{parser_option.action}'"
-            if parser_option.default is not None:
-                argparse_option_kwargs["default"] = f"{parser_option.default}"
-            if parser_option.required is not None:
-                argparse_option_kwargs["required"] = f"{parser_option.required}"
-            if parser_option.nargs is not None:
-                argparse_option_kwargs['nargs'] = f"'{parser_option.nargs}'"
+        # first add the destination and the help string
+        argparse_option_kwargs["dest"] = f"{parser_option.dest}"
+        argparse_option_kwargs["help"] = f"{parser_option.help}"
 
-            # add this argument to the parser
-            parser_run.add_argument(*argparse_option_args, **argparse_option_kwargs)
+        # now add any optional information
+        if parser_option.shortname is not None:
+            argparse_option_args.append(f"-{parser_option.shortname}")
+        if parser_option.longname is not None:
+            argparse_option_args.append(f"--{parser_option.longname}")
+        if parser_option.action is not None:
+            argparse_option_kwargs['action'] = f"{parser_option.action}"
+        if parser_option.default is not None:
+            argparse_option_kwargs["default"] = f"{parser_option.default}"
+        if parser_option.required is not None:
+            argparse_option_kwargs["required"] = f"{parser_option.required}"
+        if parser_option.nargs is not None:
+            argparse_option_kwargs['nargs'] = f"{parser_option.nargs}"
+
+        # add this argument to the parser
+        parser_run.add_argument(*argparse_option_args, **argparse_option_kwargs)
 
     return parser
 
