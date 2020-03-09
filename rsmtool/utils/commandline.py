@@ -200,7 +200,13 @@ def setup_rsmcmd_parser(name,
         if parser_option.default is not None:
             argparse_option_kwargs["default"] = f"{parser_option.default}"
         if parser_option.required is not None:
-            argparse_option_kwargs["required"] = f"{parser_option.required}"
+            try:
+                assert type(parser_option.required) == bool
+            except AssertionError:
+                raise TypeError(f"the 'required' field for CmdOption must be "
+                                f"boolean, you specified '{parser_option.required}'")
+            else:
+                argparse_option_kwargs["required"] = parser_option.required
         if parser_option.nargs is not None:
             argparse_option_kwargs['nargs'] = f"{parser_option.nargs}"
 
