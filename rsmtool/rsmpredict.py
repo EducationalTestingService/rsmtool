@@ -56,8 +56,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         relative to the ``configdir`` attribute, that _must_ be set. Given
         a dictionary, the reference path is set to the current directory.
     output_file : str
-        The path to the output file. The name of the file must end in '.csv',
-        '.tsv', or '.xlsx'.
+        The path to the output file.
     feats_file : str, optional
         Path to the output file for saving preprocessed feature values.
 
@@ -182,13 +181,16 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                                        feats_filename},
                                        file_format=file_format)
 
-    output_file_prefix, output_file_extension = splitext(output_file)[1].lower()
-    if output_file_extension not in ['.csv', '.tsv', '.xlsx']:
-        raise RuntimeError("the output filename must end in '.csv', "
-                           "'.tsv', or '.xlsx'")
+    if (output_file.lower().endswith('.csv') or
+            output_file.lower().endswith('.xlsx')):
+
+        output_dir = dirname(output_file)
+        _, filename = split(output_file)
+        filename, _ = splitext(filename)
+
     else:
-        output_dir = dirname(output_file_prefix)
-        filename = basename(output_file)
+        output_dir = output_file
+        filename = 'predictions_with_metadata'
 
     # create any directories needed for the output file
     os.makedirs(output_dir, exist_ok=True)
