@@ -226,20 +226,24 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
 def main():
 
-    # set up the basic logging config
+    # set up the basic logging configuration
     formatter = LogFormatter()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is important
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
 
-    logging.root.addHandler(handler)
-    logging.root.setLevel(logging.INFO)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
 
     # to set up the argument parser, we first need to instantiate options
     # specific to rsmpredictso we use the `CmdOption` namedtuples
-    non_standard_options = [CmdOption(dest='output_dir_or_file',
-                                      help="output directory or file where "
-                                           "predictions will be saved. If the value ends in '.csv.', '.tsv', or '.xlsx', it will be interpreted as a path to the output file. It the value doesn't end in those suffixes, it will be interpreted as the path to the output directory. "),
+    non_standard_options = [CmdOption(dest='output_file',
+                                      help="output file where predictions will be saved."),
                             CmdOption(dest='preproc_feats_file',
                                       help="if specified, the preprocessed features "
                                            "will be saved in this file",
@@ -267,6 +271,9 @@ def main():
     # call the appropriate function based on which sub-command was run
     if args.subcommand == 'run':
 
+        # when running, log to stdout
+        logging.root.addHandler(stdout_handler)
+
         # run the experiment
         preproc_feats_file = None
         if args.preproc_feats_file:
@@ -276,6 +283,9 @@ def main():
                                      feats_file=preproc_feats_file)
 
     else:
+
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
         configuration = generate_configuration(name='rsmpredict', as_string=True)

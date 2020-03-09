@@ -224,16 +224,22 @@ def run_summary(config_file_or_obj_or_dict,
 
 
 def main():
+
     # set up the basic logging configuration
     formatter = LogFormatter()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is important
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
 
-    logging.root.addHandler(handler)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
     logging.root.setLevel(logging.INFO)
-
-    # get the logger
     logger = logging.getLogger(__name__)
 
     # set up an argument parser via our helper function
@@ -257,6 +263,9 @@ def main():
     # call the appropriate function based on which sub-command was run
     if args.subcommand == 'run':
 
+        # when running, log to stdout
+        logging.root.addHandler(stdout_handler)
+
         # run the experiment
         logger.info('Output directory: {}'.format(args.output_dir))
         run_summary(abspath(args.config_file),
@@ -265,6 +274,9 @@ def main():
 
     else:
 
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
+
         # auto-generate an example configuration and print it to STDOUT
         configuration = generate_configuration(name='rsmsummarize',
                                                as_string=True)
@@ -272,5 +284,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
