@@ -826,6 +826,68 @@ class TestSetupRsmCmdParser:
                                                 test_kwarg='bar')
         eq_(parsed_namespace, expected_namespace)
 
+    def test_run_subparser_with_extra_options_required_true_not_specified(self):
+        """
+        test run subparser with an unspecified required optional
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required=True,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     uses_output_directory=False,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args(f"run {config_file} foo".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwargs=None)
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    def test_run_subparser_with_extra_options_required_true_and_specified(self):
+        """
+        test run subparser with a specified required optional
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required=True,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     uses_output_directory=False,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} foo --zeta 1 2".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwargs=['1', '2'])
+        eq_(parsed_namespace, expected_namespace)
+
+    @raises(TypeError)
+    def test_run_subparser_with_extra_options_bad_required_value(self):
+        """
+        test run subparser with a non-boolean value for required
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required='true',
+                                   help='a multiply specified optional argument')]
+        _ = setup_rsmcmd_parser('test',
+                                uses_output_directory=False,
+                                extra_run_options=extra_options)
+
     def test_generate_subparser_no_args(self):
         """
         test generate subparser with no arguments
