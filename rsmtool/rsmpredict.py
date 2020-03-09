@@ -30,6 +30,7 @@ from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
+from .utils.logging import LogFormatter
 from .writer import DataWriter
 
 
