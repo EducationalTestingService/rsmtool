@@ -46,10 +46,6 @@ from rsmtool.utils.notebook import (float_format_func,
                                     get_files_as_html)
 
 
-# get the directory containing the tests
-test_dir = dirname(__file__)
-
-
 def test_int_to_float():
 
     eq_(int_to_float(5), 5.0)
@@ -262,26 +258,26 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
 
 
 def test_has_files_with_extension_true():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'csv')
     eq_(result, True)
 
 
 def test_has_files_with_extension_false():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'ppt')
     eq_(result, False)
 
 
 def test_get_output_directory_extension():
-    directory = join(test_dir, 'data', 'experiments', 'lr', 'output')
+    directory = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'output')
     result = get_output_directory_extension(directory, 'id_1')
     eq_(result, 'csv')
 
 
 @raises(ValueError)
 def test_get_output_directory_extension_error():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     get_output_directory_extension(directory, 'id_1')
 
 
@@ -490,7 +486,7 @@ def test_partial_correlations_pinv():
 class TestIntermediateFiles:
 
     def get_files(self, file_format='csv'):
-        directory = join(test_dir, 'data', 'output')
+        directory = join(rsmtool_test_dir, 'data', 'output')
         files = sorted([f for f in listdir(directory)
                         if f.endswith(file_format)])
         return files, directory
@@ -562,7 +558,7 @@ class TestThumbnail:
 
         # simple test of HTML thumbnail conversion
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -575,7 +571,7 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure3.png'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure3.png'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -587,8 +583,8 @@ class TestThumbnail:
 
         # test converting two images to HTML thumbnails
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
 
         counter = count(1)
         image = get_thumbnail_as_html(path1, next(counter))
@@ -603,7 +599,7 @@ class TestThumbnail:
 
         # test converting image to HTML with absolute path
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         path_absolute = abspath(path)
 
         image = get_thumbnail_as_html(path_absolute, 1)
@@ -625,8 +621,8 @@ class TestThumbnail:
 
         # test converting image to HTML with different thumbnail
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
 
         image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
@@ -640,7 +636,7 @@ class TestThumbnail:
 
         # test FileNotFound error properly raised for thumbnail
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         path2 = 'random/path/asftesfa/to/figure1.svg'
         _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
