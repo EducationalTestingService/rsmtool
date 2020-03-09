@@ -1,0 +1,271 @@
+import shlex
+import subprocess
+
+from glob import glob
+from os import makedirs
+from os.path import basename, exists, join
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from nose.tools import assert_raises, eq_, ok_
+
+from rsmtool.test_utils import (check_file_output,
+                                check_generated_output,
+                                check_report,
+                                collect_warning_messages_from_report,
+                                rsmtool_test_dir)
+
+
+class TestToolCLI:
+
+    @classmethod
+    def setUpClass(cls):
+        cls.temporary_directories = []
+        cls.expected_json_dir = join(rsmtool_test_dir, 'data', 'output')
+
+        common_dir = join(rsmtool_test_dir, 'data', 'experiments')
+        cls.rsmtool_config_file = join(common_dir, 'lr', 'lr.json')
+        cls.rsmeval_config_file = join(common_dir, 'lr-eval', 'lr_evaluation.json')
+        cls.rsmcompare_config_file = join(common_dir, 'lr-self-compare', 'rsmcompare.json')
+        cls.rsmpredict_config_file = join(common_dir, 'lr-predict', 'rsmpredict.json')
+        cls.rsmsummarize_config_file = join(common_dir, 'lr-self-summary', 'rsmsummarize.json')
+        cls.expected_rsmtool_output_dir = join(common_dir, 'lr', 'output')
+        cls.expected_rsmeval_output_dir = join(common_dir, 'lr-eval', 'output')
+        cls.expected_rsmcompare_output_dir = join(common_dir, 'lr-self-compare', 'output')
+        cls.expected_rsmpredict_output_dir = join(common_dir, 'lr-predict', 'output')
+        cls.expected_rsmsummarize_output_dir = join(common_dir, 'lr-self-summary', 'output')
+
+    @classmethod
+    def tearDownClass(cls):
+        for tempdir in cls.temporary_directories:
+            tempdir.cleanup()
+
+    def validate_run_output(self, name, experiment_dir):
+        """
+        A helper method that validates that the output of the "run"
+        subcommand for the ``name`` tool as stored in ``experiment_dir``
+        is as expected.
+
+        This is heavily inspired by ``rsmtool.test_utils.check_run_*()``
+        functions.
+
+        Parameters
+        ----------
+        name : str
+            The name of the tool being tested.
+        experiment_dir : str
+            Path to rsmtool output directory.
+        """
+        expected_output_dir = getattr(self, f"expected_{name}_output_dir")
+
+        # all tools except rsmcompare need to have their output files validated
+        if name in ['rsmtool', 'rsmeval', 'rsmsummarize', 'rsmpredict']:
+
+            # rsmpredict has its own set of files and it puts them right at the root
+            # of the output directory rather than under the "output" subdirectory
+            if name == 'rsmpredict':
+                output_dir = experiment_dir
+                output_files = [join(output_dir, 'predictions_with_metadata.csv')]
+            else:
+                output_dir = join(experiment_dir, 'output')
+                output_files = glob(join(output_dir, '*.csv'))
+
+            for output_file in output_files:
+                output_filename = basename(output_file)
+                expected_output_file = join(expected_output_dir, output_filename)
+
+                if exists(expected_output_file):
+                    check_file_output(output_file, expected_output_file)
+
+            # we need to do an extra check for rsmtool
+            if name == 'rsmtool':
+                check_generated_output(output_files, 'lr', 'rsmtool')
+
+            # there's no report for rsmpredict
+            if name != 'rsmpredict':
+                html_report = glob(join(experiment_dir, 'report', '*_report.html'))[0]
+                check_report(html_report)
+
+        # rsmcompare only has a report and we want it to be warning-free
+        else:
+            html_report = glob(join(experiment_dir, '*_report.html'))[0]
+            check_report(html_report, raise_warnings=False)
+
+            warning_msgs = collect_warning_messages_from_report(html_report)
+            warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+            eq_(len(warning_msgs), 0)
+
+    def validate_generate_output(self, name, output, subgroups=False):
+        """
+        A helper method that validates that the ``output`` of the ``name`` tool
+        as output by the "generate" subcommand is as expected.
+
+        Parameters
+        ----------
+        name : str
+            The name of the tool being tested.
+        output : str
+            The output of the "generate" subcommand from ``name`` tool
+        subgroups : bool, optional
+            If ``True``, the ``--groups`` was added to the "generate" command
+            for ``name``.
+            Defaults to ``False``.
+        """
+        # load the appropriate expected json file and check that its contents
+        # match what was printed to stdout with our generate command
+        if subgroups:
+            expected_json_file = join(self.expected_json_dir,
+                                      f"autogenerated_{name}_config_groups.json")
+        else:
+            expected_json_file = join(self.expected_json_dir,
+                                      f"autogenerated_{name}_config.json")
+        expected_output = open(expected_json_file, 'r').read().strip()
+        eq_(output, expected_output)
+
+    def check_tool_cmd(self, name, subcmd, output_dir=None, working_dir=None):
+        """
+        A helper method to test that the ``cmd`` invocation for ``name`` works
+        as expected.
+
+        Parameters
+        ----------
+        name : str
+            Name of the tool being tested.
+        subcmd : str
+            The tool command-line invocation that is being tested.
+        output_dir : None, optional
+            Directory containing the output for "run" subcommands.
+            Will be ``None`` for "generate" subcommands.
+        working_dir : None, optional
+            If we want the "run" subcommand to be run in a specific
+            working directory.
+        """
+        # run different checks depending on the given command type
+        cmd = f"{name} {subcmd}"
+        cmd_type = 'generate' if ' generate' in cmd else 'run'
+        if cmd_type == 'run':
+            # for run subcommands, we can ignore the messages printed to stdout
+            proc = subprocess.run(shlex.split(cmd),
+                                  check=True,
+                                  cwd=working_dir,
+                                  stdout=subprocess.DEVNULL)
+            # then check that the commmand ran successfully
+            ok_(proc.returncode == 0)
+            # and, finally, that the output was as expected
+            self.validate_run_output(name, output_dir)
+        else:
+            # for generate subcommands, we ignore the warnings printed to staderr
+            subgroups = "--groups" in cmd
+            proc = subprocess.run(shlex.split(cmd), check=True, capture_output=True)
+            ok_(proc.returncode == 0)
+            self.validate_generate_output(name,
+                                          proc.stdout.decode('utf-8').strip(),
+                                          subgroups=subgroups)
+
+    def test_default_subcommand_is_run(self):
+        # test that the default subcommand for all tools is "run"
+
+        # this applies to all tools
+        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+
+            # create a temporary dirextory
+            tempdir = TemporaryDirectory()
+            self.temporary_directories.append(tempdir)
+
+            # and test the default subcommand
+            config_file = getattr(self, f"{name}_config_file")
+            subcmd = f"{config_file} {tempdir.name}"
+            yield self.check_tool_cmd, name, subcmd, tempdir.name, None
+
+    def test_run_without_output_directory(self):
+        # test that "run" subcommand works without an output directory
+
+        # this applies to all tools except rsmpredict
+        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
+
+            # create a temporary dirextory
+            tempdir = TemporaryDirectory()
+            self.temporary_directories.append(tempdir)
+
+            # and test the run subcommand without an output directory
+            config_file = getattr(self, f"{name}_config_file")
+            subcmd = f"run {config_file}"
+            # we call check_tool_cmd with a working directory here to simulate
+            # the usage of the current working directory when the output directory
+            # is not specified
+            yield self.check_tool_cmd, name, subcmd, tempdir.name, tempdir.name
+
+    def check_run_bad_overwrite(self, cmd):
+        """
+        A helper method that checks that the overwriting error is raised properly.
+        """
+        with assert_raises(subprocess.CalledProcessError) as e:
+            _ = subprocess.run(shlex.split(cmd), check=True, stdout=subprocess.DEVNULL)
+            ok_('already contains' in e.msg)
+            ok_('OSError' in e.msg)
+
+    def test_run_bad_overwrite(self):
+        # test that the "run" command fails to overwrite when "-f" is not specified
+
+        # this applies to all tools except rsmpredict and rsmcompare
+        for name in ['rsmtool', 'rsmeval', 'rsmsummarize']:
+
+            tempdir = TemporaryDirectory()
+            self.temporary_directories.append(tempdir)
+
+            # make it look like we ran the tool in this directory already
+            makedirs(f"{tempdir.name}/output")
+            fake_file = Path(tempdir.name) / "output" / "foo.csv"
+            fake_file.touch()
+
+            config_file = getattr(self, f"{name}_config_file")
+            cmd = f"{name} {config_file} {tempdir.name}"
+            yield self.check_run_bad_overwrite, cmd
+
+    def test_run_good_overwrite(self):
+        #  test that the "run" command does overwrite when "-f" is specified
+
+        # this applies to all tools except rsmpredict and rsmcompare
+        for name in ['rsmtool', 'rsmeval', 'rsmsummarize']:
+
+            tempdir = TemporaryDirectory()
+            self.temporary_directories.append(tempdir)
+
+            # make it look like we ran rsmtool in this directory already
+            makedirs(f"{tempdir.name}/output")
+            fake_file = Path(tempdir.name) / "output" / "foo.csv"
+            fake_file.touch()
+
+            config_file = getattr(self, f"{name}_config_file")
+            subcmd = f"{config_file} {tempdir.name} -f"
+            yield self.check_tool_cmd, name, subcmd, tempdir.name, None
+
+    def test_rsmpredict_run_features_file(self):
+        """
+        test that rsmpredict "run" command works with ``--features``.
+        """
+
+        tempdir = TemporaryDirectory()
+        self.temporary_directories.append(tempdir)
+
+        subcmd = (f"{self.rsmpredict_config_file} {tempdir.name} "
+                  f"--features {tempdir.name}/preprocessed_features.csv")
+
+        self.check_tool_cmd("rsmpredict", subcmd, tempdir.name)
+
+        # check the features file separately
+        check_file_output(join(tempdir.name, "preprocessed_features.csv"),
+                          join(self.expected_rsmpredict_output_dir, "preprocessed_features.csv"))
+
+    def test_generate(self):
+        # test that the "generate" subcommand for all tools works as expected
+
+        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+            yield self.check_tool_cmd, name, "generate", None, None
+
+    def test_generate_with_groups(self):
+        # test that the "generate --groups" subcommand for all tools works as expected
+
+        # this applies to all tools except rsmpredict and rsmsummarize
+        for name in ['rsmtool', 'rsmeval', 'rsmcompare']:
+            yield self.check_tool_cmd, name, "generate --groups", None, None
