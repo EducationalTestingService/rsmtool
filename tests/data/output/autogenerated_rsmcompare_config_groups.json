@@ -1,0 +1,32 @@
+{
+    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
+    "comparison_id": "ENTER_VALUE_HERE",
+    "experiment_id_old": "ENTER_VALUE_HERE",
+    "experiment_dir_old": "ENTER_VALUE_HERE",
+    "experiment_id_new": "ENTER_VALUE_HERE",
+    "experiment_dir_new": "ENTER_VALUE_HERE",
+    "description_old": "ENTER_VALUE_HERE",
+    "description_new": "ENTER_VALUE_HERE",
+    // OPTIONAL: replace default values below based on your data.
+    "custom_sections": null,
+    "general_sections": [
+        "feature_descriptives",
+        "features_by_group",
+        "preprocessed_features",
+        "preprocessed_features_by_group",
+        "consistency",
+        "score_distributions",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "pca",
+        "notes",
+        "sysinfo"
+    ],
+    "section_order": null,
+    "special_sections": null,
+    "subgroups": [],
+    "use_scaled_predictions_new": false,
+    "use_scaled_predictions_old": false,
+    "use_thumbnails": false
+}
