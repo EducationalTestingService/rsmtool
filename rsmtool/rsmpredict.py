@@ -56,7 +56,8 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         relative to the ``configdir`` attribute, that _must_ be set. Given
         a dictionary, the reference path is set to the current directory.
     output_file : str
-        The output file containing the predictions.
+        The path to the output file. The name of the file must end in '.csv',
+        '.tsv', or '.xlsx'.
     feats_file : str, optional
         Path to the output file for saving preprocessed feature values.
 
@@ -66,6 +67,8 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         If any of the files contained in ``config_file_or_obj_or_dict`` cannot
         be located, or if ``experiment_dir`` does not exist, or if ``experiment_dir``
         does not contain the required output needed from an rsmtool experiment.
+    RuntimeError
+        If the name of the output file does not end in '.csv', '.tsv', or '.xlsx'.
     """
 
     logger = logging.getLogger(__name__)
@@ -179,16 +182,13 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                                        feats_filename},
                                        file_format=file_format)
 
-    if (output_file.lower().endswith('.csv') or
-            output_file.lower().endswith('.xlsx')):
-
-        output_dir = dirname(output_file)
-        _, filename = split(output_file)
-        filename, _ = splitext(filename)
-
+    output_file_prefix, output_file_extension = splitext(output_file)[1].lower()
+    if output_file_extension not in ['.csv', '.tsv', '.xlsx']:
+        raise RuntimeError("the output filename must end in '.csv', "
+                           "'.tsv', or '.xlsx'")
     else:
-        output_dir = output_file
-        filename = 'predictions_with_metadata'
+        output_dir = dirname(output_file_prefix)
+        filename = basename(output_file)
 
     # create any directories needed for the output file
     os.makedirs(output_dir, exist_ok=True)
@@ -237,9 +237,9 @@ def main():
 
     # to set up the argument parser, we first need to instantiate options
     # specific to rsmpredictso we use the `CmdOption` namedtuples
-    non_standard_options = [CmdOption(dest='output_file',
-                                      help="output file where predictions will "
-                                           "be saved"),
+    non_standard_options = [CmdOption(dest='output_dir_or_file',
+                                      help="output directory or file where "
+                                           "predictions will be saved. If the value ends in '.csv.', '.tsv', or '.xlsx', it will be interpreted as a path to the output file. It the value doesn't end in those suffixes, it will be interpreted as the path to the output directory. "),
                             CmdOption(dest='preproc_feats_file',
                                       help="if specified, the preprocessed features "
                                            "will be saved in this file",
