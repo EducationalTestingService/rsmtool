@@ -2,7 +2,7 @@ import shlex
 import subprocess
 
 from glob import glob
-from os import makedirs
+from os import environ, makedirs
 from os.path import basename, exists, join
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -140,8 +140,18 @@ class TestToolCLI:
             If we want the "run" subcommand to be run in a specific
             working directory.
         """
+
+        # if the BINPATH environment variable is defined
+        # use that to construct the command instead of just
+        # the name; this is needed for the CI builds where
+        # we do not always activate the conda environment
+        binpath = environ.get('BINPATH', None)
+        if binpath is not None:
+            cmd = f"{binpath}/{name} {subcmd}"
+        else:
+            cmd = f"{name} {subcmd}"
+
         # run different checks depending on the given command type
-        cmd = f"{name} {subcmd}"
         cmd_type = 'generate' if ' generate' in cmd else 'run'
         if cmd_type == 'run':
             # for run subcommands, we can ignore the messages printed to stdout

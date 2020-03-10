@@ -9,6 +9,7 @@ notifications:
 env:
   global:
   - COVERALLS_PARALLEL=true
+  - BINPATH=${HOME}/miniconda3/envs/rsmenv/bin
   matrix:
   - TESTFILES="tests/test_experiment_rsmtool_1.py"
   - TESTFILES="tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
