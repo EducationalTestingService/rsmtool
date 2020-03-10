@@ -1,6 +1,7 @@
 import os
 import shlex
 import subprocess
+import sys
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -156,7 +157,7 @@ class TestToolCLI:
         cmd_type = 'generate' if ' generate' in cmd else 'run'
         if cmd_type == 'run':
             # for run subcommands, we can ignore the messages printed to stdout
-            proc = subprocess.run(shlex.split(cmd),
+            proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
                                   cwd=working_dir,
                                   stdout=subprocess.DEVNULL,
@@ -168,7 +169,7 @@ class TestToolCLI:
         else:
             # for generate subcommands, we ignore the warnings printed to staderr
             subgroups = "--groups" in cmd
-            proc = subprocess.run(shlex.split(cmd),
+            proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
                                   capture_output=True,
                                   encoding='utf-8')
@@ -215,7 +216,9 @@ class TestToolCLI:
         A helper method that checks that the overwriting error is raised properly.
         """
         with assert_raises(subprocess.CalledProcessError) as e:
-            _ = subprocess.run(shlex.split(cmd), check=True, stdout=subprocess.DEVNULL)
+            _ = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
+                               check=True,
+                               stdout=subprocess.DEVNULL)
             ok_('already contains' in e.msg)
             ok_('OSError' in e.msg)
 
