@@ -3,7 +3,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_ for ``rsmeval``. To make it easy to get started with  ``rsmeval``, we provide a way to automatically generate a configuration file that you can then just edit based on your data and your needs. To do so, simply run ``rsmeval generate`` at the commmand line. If you know you have :ref:`subgroups <subgroups_eval>` in your data that you want to include in your analyses, run ``rsmeval generate --groups`` instead. Next, we describe all of the ``rsmeval`` configuration fields in detail.
 
 There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 

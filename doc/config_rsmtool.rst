@@ -3,7 +3,7 @@
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an example configuration file for `rsmtool <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmtool/config_rsmtool.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmtool/config_rsmtool.json>`_ for ``rsmtool``. To make it easy to get started with  ``rsmtool``, we provide a way to automatically generate a configuration file that you can then just edit based on your data and your needs. To do so, simply run ``rsmtool generate`` at the commmand line. If you know you have :ref:`subgroups <subgroups_rsmtool>` in your data that you want to include in your analyses, run ``rsmtool generate --groups`` instead. Next, we describe all of the ``rsmtool`` configuration fields in detail.
 
 There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
