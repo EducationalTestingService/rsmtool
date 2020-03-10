@@ -177,6 +177,7 @@ From :py:mod:`~rsmtool.transformer` Module
 From :py:mod:`~rsmtool.utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. autofunction:: rsmtool.utils.commandline.generate_configuration
 .. _agreement_api:
 .. autofunction:: rsmtool.utils.metrics.agreement
 .. _dsm_api:
