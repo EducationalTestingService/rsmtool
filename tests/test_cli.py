@@ -2,8 +2,6 @@ import os
 import shlex
 import subprocess
 
-from glob import glob
-from os.path import basename, exists, join
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -21,19 +19,19 @@ class TestToolCLI:
     @classmethod
     def setUpClass(cls):
         cls.temporary_directories = []
-        cls.expected_json_dir = join(rsmtool_test_dir, 'data', 'output')
+        cls.expected_json_dir = Path(rsmtool_test_dir) / 'data' / 'output'
 
-        common_dir = join(rsmtool_test_dir, 'data', 'experiments')
-        cls.rsmtool_config_file = join(common_dir, 'lr', 'lr.json')
-        cls.rsmeval_config_file = join(common_dir, 'lr-eval', 'lr_evaluation.json')
-        cls.rsmcompare_config_file = join(common_dir, 'lr-self-compare', 'rsmcompare.json')
-        cls.rsmpredict_config_file = join(common_dir, 'lr-predict', 'rsmpredict.json')
-        cls.rsmsummarize_config_file = join(common_dir, 'lr-self-summary', 'rsmsummarize.json')
-        cls.expected_rsmtool_output_dir = join(common_dir, 'lr', 'output')
-        cls.expected_rsmeval_output_dir = join(common_dir, 'lr-eval', 'output')
-        cls.expected_rsmcompare_output_dir = join(common_dir, 'lr-self-compare', 'output')
-        cls.expected_rsmpredict_output_dir = join(common_dir, 'lr-predict', 'output')
-        cls.expected_rsmsummarize_output_dir = join(common_dir, 'lr-self-summary', 'output')
+        common_dir = Path(rsmtool_test_dir) / 'data' / 'experiments'
+        cls.rsmtool_config_file = common_dir / 'lr' / 'lr.json'
+        cls.rsmeval_config_file = common_dir / 'lr-eval' / 'lr_evaluation.json'
+        cls.rsmcompare_config_file = common_dir / 'lr-self-compare' / 'rsmcompare.json'
+        cls.rsmpredict_config_file = common_dir / 'lr-predict' / 'rsmpredict.json'
+        cls.rsmsummarize_config_file = common_dir / 'lr-self-summary' / 'rsmsummarize.json'
+        cls.expected_rsmtool_output_dir = common_dir / 'lr' / 'output'
+        cls.expected_rsmeval_output_dir = common_dir / 'lr-eval' / 'output'
+        cls.expected_rsmcompare_output_dir = common_dir / 'lr-self-compare' / 'output'
+        cls.expected_rsmpredict_output_dir = common_dir / 'lr-predict' / 'output'
+        cls.expected_rsmsummarize_output_dir = common_dir / 'lr-self-summary' / 'output'
 
     @classmethod
     def tearDownClass(cls):
@@ -64,32 +62,34 @@ class TestToolCLI:
             # rsmpredict has its own set of files and it puts them right at the root
             # of the output directory rather than under the "output" subdirectory
             if name == 'rsmpredict':
-                output_dir = experiment_dir
-                output_files = [join(output_dir, 'predictions_with_metadata.csv')]
+                output_dir = Path(experiment_dir)
+                output_files = [output_dir / 'predictions_with_metadata.csv']
             else:
-                output_dir = join(experiment_dir, 'output')
-                output_files = glob(join(output_dir, '*.csv'))
+                output_dir = Path(experiment_dir) / 'output'
+                output_files = list(output_dir.glob('*.csv'))
 
             for output_file in output_files:
-                output_filename = basename(output_file)
-                expected_output_file = join(expected_output_dir, output_filename)
+                output_filename = output_file.name
+                expected_output_file = expected_output_dir / output_filename
 
-                if exists(expected_output_file):
-                    check_file_output(output_file, expected_output_file)
+                if expected_output_file.exists():
+                    check_file_output(str(output_file), str(expected_output_file))
 
             # we need to do an extra check for rsmtool
             if name == 'rsmtool':
-                check_generated_output(output_files, 'lr', 'rsmtool')
+                check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
 
             # there's no report for rsmpredict
             if name != 'rsmpredict':
-                html_report = glob(join(experiment_dir, 'report', '*_report.html'))[0]
-                check_report(html_report)
+                report_dir = Path(experiment_dir) / 'report'
+                html_report = list(report_dir.glob('*_report.html'))[0]
+                check_report(str(html_report))
 
         # rsmcompare only has a report and we want it to be warning-free
         else:
-            html_report = glob(join(experiment_dir, '*_report.html'))[0]
-            check_report(html_report, raise_warnings=False)
+            report_dir = Path(experiment_dir)
+            html_report = list(report_dir.glob('*_report.html'))[0]
+            check_report(str(html_report), raise_warnings=False)
 
             warning_msgs = collect_warning_messages_from_report(html_report)
             warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
@@ -114,12 +114,12 @@ class TestToolCLI:
         # load the appropriate expected json file and check that its contents
         # match what was printed to stdout with our generate command
         if subgroups:
-            expected_json_file = join(self.expected_json_dir,
-                                      f"autogenerated_{name}_config_groups.json")
+            expected_json_file = (self.expected_json_dir /
+                                  f"autogenerated_{name}_config_groups.json")
         else:
-            expected_json_file = join(self.expected_json_dir,
-                                      f"autogenerated_{name}_config.json")
-        with open(expected_json_file, 'r') as expectedfh:
+            expected_json_file = (self.expected_json_dir /
+                                  f"autogenerated_{name}_config.json")
+        with expected_json_file.open('r', encoding='utf-8') as expectedfh:
             expected_output = expectedfh.read().strip()
             eq_(output, expected_output)
 
@@ -277,8 +277,9 @@ class TestToolCLI:
         self.check_tool_cmd("rsmpredict", subcmd, tempdir.name)
 
         # check the features file separately
-        check_file_output(join(tempdir.name, "preprocessed_features.csv"),
-                          join(self.expected_rsmpredict_output_dir, "preprocessed_features.csv"))
+        file1 = Path(tempdir.name) / "preprocessed_features.csv"
+        file2 = self.expected_rsmpredict_output_dir / "preprocessed_features.csv"
+        check_file_output(str(file1), str(file2))
 
     def test_generate(self):
         # test that the "generate" subcommand for all tools works as expected
