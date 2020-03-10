@@ -8,9 +8,9 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
     
     RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. 
 
-    In addition, with RSMTool v8.0 onwards, the functions ``agreement``, ``difference_of_standardized_means``, ``get_thumbnail_as_html``,  ``parse_json_with_comments``, ``partial_correlations``,  ``quadratic_weighted_kappa``, ``show_thumbnail``,  ``standardized_mean_difference`` that``utils.py`` have been moved to new locations.
+    In addition, with RSMTool v8.0 onwards, the functions ``agreement``, ``difference_of_standardized_means``, ``get_thumbnail_as_html``,  ``parse_json_with_comments``, ``partial_correlations``,  ``quadratic_weighted_kappa``, ``show_thumbnail``,  and ``standardized_mean_difference`` that ``utils.py`` had previously provided have been moved to new locations.
 
-    If you are using the above functions in your code and want to migrate to the new API, you should replace the follwing statements in your code:
+    If you are using the above functions in your code and want to migrate to the new API, you should replace the following statements in your code:
 
     .. code-block:: python
 
@@ -197,4 +197,3 @@ From :py:mod:`~rsmtool.writer` Module
     :members:
     :undoc-members:
     :show-inheritance:
-
