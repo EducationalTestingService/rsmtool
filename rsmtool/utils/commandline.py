@@ -61,7 +61,7 @@ def setup_rsmcmd_parser(name,
     The ``extra_run_options`` list should contain a list of ``CmdOption``
     instances which are added to the "run" subcommand parser one by one.
 
-    If ``uses_subgroups`` is ``True``, a ``--groups`` optional
+    If ``uses_subgroups`` is ``True``, a ``--subgroups`` optional
     argument will be added to the "generate" subcommand parser.
 
     Parameters
@@ -81,7 +81,7 @@ def setup_rsmcmd_parser(name,
         Any additional options to be added to the "run" subcommand parser,
         each specified as a ``CmdOption`` instance.
     uses_subgroups : bool, optional
-        Add the ``--groups`` optional argument to the "generate" subcommand
+        Add the ``--subgroups`` optional argument to the "generate" subcommand
         parser. This argument means that the tool for which we are automatically
         generating a configuration file includes additional information when
         subgroup information is available.
@@ -139,7 +139,7 @@ def setup_rsmcmd_parser(name,
     # Setting up options for the "generate" subparser #
     ###################################################
     if uses_subgroups:
-        parser_generate.add_argument('--groups',
+        parser_generate.add_argument('--subgroups',
                                      dest='subgroups',
                                      action='store_true',
                                      default=False,
