@@ -108,7 +108,7 @@ class TestToolCLI:
         output : str
             The output of the "generate" subcommand from ``name`` tool
         subgroups : bool, optional
-            If ``True``, the ``--groups`` was added to the "generate" command
+            If ``True``, the ``--subgroups`` was added to the "generate" command
             for ``name``.
             Defaults to ``False``.
         """
@@ -168,7 +168,7 @@ class TestToolCLI:
             self.validate_run_output(name, output_dir)
         else:
             # for generate subcommands, we ignore the warnings printed to staderr
-            subgroups = "--groups" in cmd
+            subgroups = "--subgroups" in cmd
             proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
                                   capture_output=True,
@@ -291,8 +291,8 @@ class TestToolCLI:
             yield self.check_tool_cmd, name, "generate", None, None
 
     def test_generate_with_groups(self):
-        # test that the "generate --groups" subcommand for all tools works as expected
+        # test that the "generate --suvgroups" subcommand for all tools works as expected
 
         # this applies to all tools except rsmpredict and rsmsummarize
         for name in ['rsmtool', 'rsmeval', 'rsmcompare']:
-            yield self.check_tool_cmd, name, "generate --groups", None, None
+            yield self.check_tool_cmd, name, "generate --subgroups", None, None

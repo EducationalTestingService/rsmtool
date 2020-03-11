@@ -910,7 +910,7 @@ class TestSetupRsmCmdParser:
         test generate subparser with no arguments
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate --groups'.split())
+        parsed_namespace = parser.parse_args('generate --subgroups'.split())
         expected_namespace = argparse.Namespace(subcommand='generate', subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
