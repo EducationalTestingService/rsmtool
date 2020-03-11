@@ -22,11 +22,11 @@ from os.path import (abspath,
 from traitlets.config import Config
 from nbconvert.exporters import HTMLExporter
 
-from rsmtool import HAS_RSMEXTRA
-from rsmtool.reader import DataReader
+from . import HAS_RSMEXTRA
+from .reader import DataReader
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (special_section_list_rsmtool,
+    from rsmextra.settings import (special_section_list_rsmtool, # noqa
                                    special_section_list_rsmeval,
                                    special_section_list_rsmcompare,
                                    special_section_list_rsmsummarize,

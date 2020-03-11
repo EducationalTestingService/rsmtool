@@ -6,31 +6,84 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 
 .. note::
     
-     RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. If you are using these functions in your code and want to migrate to the new API, you should replace the follwing statements in your code:
+    RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. 
+
+    In addition, with RSMTool v8.0 onwards, the functions ``agreement``, ``difference_of_standardized_means``, ``get_thumbnail_as_html``,  ``parse_json_with_comments``, ``partial_correlations``,  ``quadratic_weighted_kappa``, ``show_thumbnail``,  and ``standardized_mean_difference`` that ``utils.py`` had previously provided have been moved to new locations.
+
+    If you are using the above functions in your code and want to migrate to the new API, you should replace the following statements in your code:
 
     .. code-block:: python
 
-        from rsmtool.analysis import metrics_helper
-        metrics_helper(...)
+     from rsmtool.analysis import metrics_helper
+     metrics_helper(...)
 
-        from rsmtool.report import convert_ipynb_to_html
-        convert_ipynb_to_html(...)
+     from rsmtool.report import convert_ipynb_to_html
+     convert_ipynb_to_html(...)
         
-        from rsmtool.preprocess import remove_outliers
-        remove_outliers(...)
+     from rsmtool.preprocess import remove_outliers
+     remove_outliers(...)
+
+     from rsmtool.utils import agreement
+     agreement(...)
+        
+     from rsmtool.utils import difference_of_standardized_means
+     difference_of_standardized_means(...)
+        
+     from rsmtool.utils import partial_correlations
+     partial_correlations(...)
+        
+     from rsmtool.utils import quadratic_weighted_kappa
+     quadratic_weighted_kappa(...)
+        
+     from rsmtool.utils import standardized_mean_difference
+     standardized_mean_difference(...)
+        
+     from rsmtool.utils import parse_json_with_comments
+     parse_json_with_comments(...)
+
+     from rsmtool.utils import get_thumbnail_as_html
+     get_thumbnail_as_html(...)
+
+     from rsmtool.utils import show_thumbnail
+     show_thumbnail(...)
 
     with the following, respectively:
 
     .. code-block:: python
 
-        from rsmtool.analyzer import Analyzer
-        Analyzer.metrics_helper(...)
+     from rsmtool.analyzer import Analyzer
+     Analyzer.metrics_helper(...)
 
-        from rsmtool.reporter import Reporter
-        Reporter.convert_ipynb_to_html(...)
-        
-        from rsmtool.preprocessor import FeaturePreprocessor
-        FeaturePreprocessor.remove_outliers(...)
+     from rsmtool.reporter import Reporter
+     Reporter.convert_ipynb_to_html(...)
+    
+     from rsmtool.preprocessor import FeaturePreprocessor
+     FeaturePreprocessor.remove_outliers(...)
+
+     from rsmtool.utils.metrics import agreement
+     agreement(...)
+    
+     from rsmtool.utils.metrics import difference_of_standardized_means
+     difference_of_standardized_means(...)
+    
+     from rsmtool.utils.metrics import partial_correlations
+     partial_correlations(...)
+    
+     from rsmtool.utils.metrics import quadratic_weighted_kappa
+     quadratic_weighted_kappa(...)
+    
+     from rsmtool.utils.metrics import standardized_mean_difference
+     standardized_mean_difference(...)
+    
+     from rsmtool.utils.files import parse_json_with_comments
+     parse_json_with_comments(...)
+
+     from rsmtool.utils.notebook import get_thumbnail_as_html
+     get_thumbnail_as_html(...)
+
+     from rsmtool.utils.notebook import show_thumbnail
+     show_thumbnail(...)
+
 
 :mod:`rsmtool` Package
 ======================
@@ -125,18 +178,18 @@ From :py:mod:`~rsmtool.utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _agreement_api:
-.. autofunction:: rsmtool.utils.agreement
-.. autofunction:: rsmtool.utils.partial_correlations
-.. autofunction:: rsmtool.utils.get_thumbnail_as_html
-.. autofunction:: rsmtool.utils.show_thumbnail
-.. autofunction:: rsmtool.utils.compute_expected_scores_from_model
-.. autofunction:: rsmtool.utils.parse_json_with_comments
-.. _qwk_api:
-.. autofunction:: rsmtool.utils.quadratic_weighted_kappa
-.. _smd_api:
-.. autofunction:: rsmtool.utils.standardized_mean_difference
+.. autofunction:: rsmtool.utils.metrics.agreement
 .. _dsm_api:
-.. autofunction:: rsmtool.utils.difference_of_standardized_means
+.. autofunction:: rsmtool.utils.metrics.difference_of_standardized_means
+.. autofunction:: rsmtool.utils.metrics.partial_correlations
+.. _qwk_api:
+.. autofunction:: rsmtool.utils.metrics.quadratic_weighted_kappa
+.. _smd_api:
+.. autofunction:: rsmtool.utils.metrics.standardized_mean_difference
+.. autofunction:: rsmtool.utils.metrics.compute_expected_scores_from_model
+.. autofunction:: rsmtool.utils.notebook.get_thumbnail_as_html
+.. autofunction:: rsmtool.utils.notebook.show_thumbnail
+.. autofunction:: rsmtool.utils.files.parse_json_with_comments
 
 From :py:mod:`~rsmtool.writer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,4 +197,3 @@ From :py:mod:`~rsmtool.writer` Module
     :members:
     :undoc-members:
     :show-inheritance:
-
