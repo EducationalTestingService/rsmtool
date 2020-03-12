@@ -193,3 +193,5 @@ ID_FIELDS = {'rsmtool': 'experiment_id',
              'rsmcompare': 'comparison_id',
              'rsmsummarize': 'summary_id',
              'rsmpredict': 'experiment_id'}
+
+VALID_PARSER_SUBCOMMANDS = ['generate', 'run']

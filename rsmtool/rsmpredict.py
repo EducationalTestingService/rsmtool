@@ -32,6 +32,7 @@ from .reader import DataReader
 from .utils.commandline import (generate_configuration,
                                 setup_rsmcmd_parser,
                                 CmdOption)
+from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
 
@@ -261,10 +262,8 @@ def main():
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
-    if sys.argv[1] not in ['run',
-                           'generate',
-                           '-h', '--help',
-                           '-V', '--version']:
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ['-h', '--help',
+                                                      '-V', '--version']:
         args_to_pass = ['run'] + sys.argv[1:]
     else:
         args_to_pass = sys.argv[1:]
