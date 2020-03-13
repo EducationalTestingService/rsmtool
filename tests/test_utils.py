@@ -1077,7 +1077,7 @@ class TestGenerateConfiguration:
                           'experiment_dir': 'ENTER_VALUE_HERE',
                           'input_features_file': 'ENTER_VALUE_HERE'}
 
-        # get the generated Configuration object
+        # get the generated configuration dictionary
         generated_configuration = generate_configuration(context,
                                                          use_subgroups=use_subgroups,
                                                          as_string=as_string,
@@ -1096,12 +1096,12 @@ class TestGenerateConfiguration:
             expected_json_string = open(expected_json_file, 'r').read().strip()
             eq_(generated_configuration, expected_json_string)
         else:
-            expected_configuration = Configuration(configdict, context=context)
-            if 'general_sections' in expected_configuration:
-                expected_configuration['general_sections'] = section_list
+            expected_configuration_object = Configuration(configdict, context=context)
+            if 'general_sections' in expected_configuration_object:
+                expected_configuration_object['general_sections'] = section_list
 
-            assert_dict_equal(expected_configuration._config,
-                              generated_configuration._config)
+            assert_dict_equal(expected_configuration_object._config,
+                              generated_configuration)
 
     def test_generate_configuration(self):
         for (context,

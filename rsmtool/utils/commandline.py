@@ -230,7 +230,7 @@ def generate_configuration(context,
                            as_string=False,
                            suppress_warnings=False):
     """
-    Automatically generate an example configuration file for a given
+    Automatically generate an example configuration for a given
     command-line tool.
 
     Parameters
@@ -244,15 +244,15 @@ def generate_configuration(context,
         Defaults to ``False``.
     as_string : bool, optional
         If ``True``, return a formatted and indented string representation
-        of the configuration, rather than a ``Configuration`` object.
+        of the configuration, rather than a dictionary.
         Defaults to ``False``.
     suppress_warnings : bool, optional
         If ``True``, do not generate any warnings.
 
     Returns
     -------
-    configuration : configuration_parser.Configuration or str
-        The generated configuration either as a ``Configuration`` object or
+    configuration : dict or str
+        The generated configuration either as a dictionary or
         a formatted string, depending on the value of ``as_string``.
     """
     # get a logger for this function
@@ -304,7 +304,7 @@ def generate_configuration(context,
             configdict[optional_field] = DEFAULTS.get(optional_field, '')
 
     # create a Configuration object
-    configuration = Configuration(configdict,
+    config_object = Configuration(configdict,
                                   filename=f"example_{context}.json",
                                   configdir=os.getcwd(),
                                   context=f"{context}")
@@ -312,7 +312,8 @@ def generate_configuration(context,
     # if we were asked for string output, then convert the Configuration
     # object to a string and also insert some useful comments to print out
     if as_string:
-        configuration = str(configuration)
+
+        configuration = str(config_object)
 
         # insert first comment right above the first required field
         base_url = 'https://rsmtool.readthedocs.io/en/stable'
@@ -326,6 +327,9 @@ def generate_configuration(context,
         configuration = re.sub(fr'([ ]+)("{first_optional_field}": [^,]+,\n)',
                                r'\1// OPTIONAL: replace default values below based on your data.\n\1\2',
                                configuration)
+    # otherwise we just return the dictionary underlying the Configuration object
+    else:
+        configuration = config_object._config
 
     # print out a warning to make it clear that it cannot be used as is
     if not suppress_warnings:
