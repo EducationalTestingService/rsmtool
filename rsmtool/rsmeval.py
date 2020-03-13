@@ -270,7 +270,8 @@ def main():
         # auto-generate an example configuration and print it to STDOUT
         configuration = generate_configuration('rsmeval',
                                                use_subgroups=args.subgroups,
-                                               as_string=True)
+                                               as_string=True,
+                                               suppress_warnings=args.quiet)
         print(configuration)
 
 
