@@ -19,7 +19,7 @@ from pathlib import Path
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
-from .constants import CHECK_FIELDS, DEFAULTS
+from .constants import CHECK_FIELDS, CONFIGURATION_DOCUMENTATION_SLUGS, DEFAULTS
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
 # to specify additional options for either of the subcommand parsers.
@@ -303,8 +303,11 @@ def generate_configuration(context,
         configuration = str(configuration)
 
         # insert first comment right above the first required field
+        base_url = 'https://rsmtool.readthedocs.io/en/stable'
+        doc_slug = CONFIGURATION_DOCUMENTATION_SLUGS[context]
+        doc_url = f"{base_url}/{doc_slug}"
         configuration = re.sub(fr'([ ]+)("{first_required_field}": [^,]+,\n)',
-                               r'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
+                               fr'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1// {doc_url}\n\1\2',
                                configuration)
 
         # insert second comment right above the first optional field
