@@ -1,5 +1,6 @@
 {
     // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
+    // https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmcompare
     "comparison_id": "ENTER_VALUE_HERE",
     "experiment_id_old": "ENTER_VALUE_HERE",
     "experiment_dir_old": "ENTER_VALUE_HERE",
