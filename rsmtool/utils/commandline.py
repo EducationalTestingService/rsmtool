@@ -216,7 +216,7 @@ def setup_rsmcmd_parser(name,
     return parser
 
 
-def generate_configuration(name,
+def generate_configuration(context,
                            use_subgroups=False,
                            as_string=False):
     """
@@ -225,7 +225,7 @@ def generate_configuration(name,
 
     Parameters
     ----------
-    name : str
+    context : str
         Name of the command-line tool for which we are generating the
         configuration file.
     use_subgroups : bool, optional
@@ -246,9 +246,9 @@ def generate_configuration(name,
     # get a logger for this function
     logger = logging.getLogger(__name__)
 
-    # get the fields we are going ot put in the config file
-    required_fields = CHECK_FIELDS[name]['required']
-    optional_fields = CHECK_FIELDS[name]['optional']
+    # get the fields we are going to put in the config file
+    required_fields = CHECK_FIELDS[context]['required']
+    optional_fields = CHECK_FIELDS[context]['optional']
 
     # the optional fields will be inserted in alphabetical order
     sorted_optional_fields = sorted(optional_fields)
@@ -287,15 +287,15 @@ def generate_configuration(name,
                 default_special_sections_value,
                 default_custom_sections_value,
                 subgroups_value,
-                context=name)
+                context=context)
         else:
             configdict[optional_field] = DEFAULTS.get(optional_field, '')
 
     # create a Configuration object
     configuration = Configuration(configdict,
-                                  filename=f"example_{name}.json",
+                                  filename=f"example_{context}.json",
                                   configdir=os.getcwd(),
-                                  context=f"{name}")
+                                  context=f"{context}")
 
     # if we were asked for string output, then convert the Configuration
     # object to a string and also insert some useful comments to print out

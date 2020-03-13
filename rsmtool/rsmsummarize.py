@@ -277,8 +277,7 @@ def main():
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        configuration = generate_configuration(name='rsmsummarize',
-                                               as_string=True)
+        configuration = generate_configuration('rsmsummarize', as_string=True)
         print(configuration)
 
 
