@@ -227,7 +227,7 @@ class DataReader:
         ------
         ValueError
             If the file has an extension that we do not support
-        pd.parser.CParserError
+        pandas.errors.ParserError
             If the file is badly formatted or corrupt.
 
         Note
@@ -263,10 +263,10 @@ class DataReader:
             warnings.filterwarnings('ignore', category=pd.io.common.DtypeWarning)
             try:
                 df = do_read(filename, **kwargs)
-            except pd.parser.CParserError:
-                raise pd.parser.CParserError('Cannot read {}. Please check that it is '
-                                             'not corrupt or in an incompatible format. '
-                                             '(Try running dos2unix?)'.format(filename))
+            except pd.errors.ParserError:
+                raise pd.errors.ParserError('Cannot read {}. Please check that it is '
+                                            'not corrupt or in an incompatible format. '
+                                            '(Try running dos2unix?)'.format(filename))
         return df
 
     @staticmethod

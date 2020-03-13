@@ -10,22 +10,17 @@ Script to compare two RSMTool experiments.
 :organization: ETS
 """
 
-
-import argparse
 import glob
 import logging
-import os
 import sys
 
-from os.path import (abspath,
-                     exists,
-                     join,
-                     normpath)
+from os.path import abspath, exists, join, normpath
 
-from . import VERSION_STRING
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
+from .utils.commandline import generate_configuration, setup_rsmcmd_parser
+from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 
 
@@ -84,8 +79,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Raises
     ------
-    ValueError
-        If any of the required fields are missing or ill-specified.
+    FileNotFoundError
+        If either of the two input directories in ``config_file_or_obj_or_dict``
+        do not exist, or if the directories do not contain rsmtool outputs at all.
     """
 
     logger = logging.getLogger(__name__)
@@ -180,44 +176,58 @@ def main():
     # set up the basic logging configuration
     formatter = LogFormatter()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is necessary
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
 
-    logging.root.addHandler(handler)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
     logging.root.setLevel(logging.INFO)
-
-    # get a logger
     logger = logging.getLogger(__name__)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmcompare')
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmcompare',
+                                 uses_output_directory=True,
+                                 uses_subgroups=True)
 
-    parser.add_argument('config_file', help="The JSON configuration file for "
-                                            "this comparison")
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ['-h', '--help',
+                                                      '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
-                        help="The output directory where the report "
-                             "files for this comparison will be stored")
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+        # when running, log to stdout
+        logging.root.addHandler(stdout_handler)
 
-    # parse given command line arguments
-    args = parser.parse_args()
-    logger.info('Output directory: {}'.format(args.output_dir))
+        # run the experiment
+        logger.info('Output directory: {}'.format(args.output_dir))
+        run_comparison(abspath(args.config_file),
+                       abspath(args.output_dir))
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = abspath(args.config_file)
-    output_dir = abspath(args.output_dir)
+    else:
 
-    # make sure that the given configuration file exists
-    if not exists(config_file):
-        raise FileNotFoundError("Main configuration file {} not "
-                                "found.".format(config_file))
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
 
-    # generate a comparison report
-    run_comparison(config_file, output_dir)
+        # auto-generate an example configuration and print it to STDOUT
+        configuration = generate_configuration('rsmcompare',
+                                               use_subgroups=args.subgroups,
+                                               as_string=True,
+                                               suppress_warnings=args.quiet)
+        print(configuration)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
 
 Experiment configuration file
 """""""""""""""""""""""""""""
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmpredict`` experiment. Here's an example configuration file for `rsmpredict <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmpredict/config_rsmpredict.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmpredict`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmpredict/config_rsmpredict.json>`_ for ``rsmpredict``. To make it easy to get started with  ``rsmpredict``, we provide a way to automatically generate a configuration file that you can then edit based on your data and your needs. To do so, simply run ``rsmpredict generate`` at the commmand line. Next, we describe all of the ``rsmpredict`` configuration fields in detail.
 
 There are three required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 

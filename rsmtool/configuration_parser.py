@@ -282,15 +282,22 @@ class Configuration:
 
     def __str__(self):
         """
-        Return string representation of the object keys
-        as comma-separated list.
+        Return a string representation of the underlying configuration
+        dictionary.
 
         Returns
         -------
-        config_names : str
-            A comma-separated list of names from the config dictionary.
+        config_string : str
+            A string representation of the underlying configuration
+            dictionary as encoded by ``json.dumps()``. It only
+            includes the configuration options that can be set by
+            the user.
         """
-        return ', '.join(self._config)
+        expected_fields = (CHECK_FIELDS[self._context]['required'] +
+                           CHECK_FIELDS[self._context]['optional'])
+
+        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
+        return json.dumps(output_config, indent=4, separators=(',', ': '))
 
     def __iter__(self):
         """
@@ -563,12 +570,8 @@ class Configuration:
         context = self._context
         outjson = output_dir / f"{experiment_id}_{context}.json"
 
-        expected_fields = (CHECK_FIELDS[self._context]['required'] +
-                           CHECK_FIELDS[self._context]['optional'])
-
-        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
         with outjson.open(mode='w') as outfile:
-            json.dump(output_config, outfile, indent=4, separators=(',', ': '))
+            outfile.write(str(self))
 
     def check_exclude_listwise(self):
         """
@@ -827,6 +830,8 @@ class ConfigurationParser:
 
         Raises
         ------
+        FileNotFoundError
+            If the given config file path does not exist.
         ValueError
             If the configuration file does not have a valid extension.
             Valid extensions are ``.json`` and ``.cfg``.
@@ -834,6 +839,11 @@ class ConfigurationParser:
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
             pathlike = Path(pathlike)
+
+        # raise an exception if the file does not exist
+        if not pathlike.exists():
+            raise FileNotFoundError(f"The configuration file {pathlike} "
+                                    "was not found.")
 
         # make sure have either a JSON or CFG configuration file
         extension = pathlike.suffix.lower()

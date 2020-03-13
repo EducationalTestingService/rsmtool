@@ -193,3 +193,11 @@ ID_FIELDS = {'rsmtool': 'experiment_id',
              'rsmcompare': 'comparison_id',
              'rsmsummarize': 'summary_id',
              'rsmpredict': 'experiment_id'}
+
+CONFIGURATION_DOCUMENTATION_SLUGS = {'rsmtool': 'usage_rsmtool.html#experiment-configuration-file',
+                                     'rsmeval': 'advanced_usage.html#experiment-configuration-file',
+                                     'rsmcompare': 'advanced_usage.html#config-file-rsmcompare',
+                                     'rsmpredict': 'advanced_usage.html#config-file-rsmpredict',
+                                     'rsmsummarize': 'advanced_usage.html#config-file-rsmsummarize'}
+
+VALID_PARSER_SUBCOMMANDS = ['generate', 'run']
