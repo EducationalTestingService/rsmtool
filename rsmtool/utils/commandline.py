@@ -148,6 +148,15 @@ def setup_rsmcmd_parser(name,
                                           f"subgroup sections in the general "
                                           f"sections list")
 
+    parser_generate.add_argument('-q',
+                                 '--quiet',
+                                 dest='quiet',
+                                 action='store_true',
+                                 default=False,
+                                 help="if specified, the warning about not "
+                                      "using the generated configuration "
+                                      "as-is will be suppressed.")
+
     ##############################################
     # Setting up options for the "run" subparser #
     ##############################################
@@ -218,7 +227,8 @@ def setup_rsmcmd_parser(name,
 
 def generate_configuration(context,
                            use_subgroups=False,
-                           as_string=False):
+                           as_string=False,
+                           suppress_warnings=False):
     """
     Automatically generate an example configuration file for a given
     command-line tool.
@@ -236,6 +246,8 @@ def generate_configuration(context,
         If ``True``, return a formatted and indented string representation
         of the configuration, rather than a ``Configuration`` object.
         Defaults to ``False``.
+    suppress_warnings : bool, optional
+        If ``True``, do not generate any warnings.
 
     Returns
     -------
@@ -316,9 +328,10 @@ def generate_configuration(context,
                                configuration)
 
     # print out a warning to make it clear that it cannot be used as is
-    logger.warning("Automatically generated configuration files MUST "
-                   "be edited to add values for required fields and "
-                   "even for optional ones depending on your data.")
+    if not suppress_warnings:
+        logger.warning("Automatically generated configuration files MUST "
+                       "be edited to add values for required fields and "
+                       "even for optional ones depending on your data.")
 
     # return either the Configuration object or the string
     return configuration

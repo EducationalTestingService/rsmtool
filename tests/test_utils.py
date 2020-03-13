@@ -884,15 +884,15 @@ class TestSetupRsmCmdParser:
                                 uses_output_directory=False,
                                 extra_run_options=extra_options)
 
-    def test_generate_subparser_no_args(self):
+    def test_generate_subparser_help_flag(self):
         """
-        test generate subparser with no arguments
+        test generate subparser with --help specified
         """
         parser = setup_rsmcmd_parser('test')
         # we need to patch sys.exit since --help just exists otherwise
         with patch('sys.exit') as exit_mock:
             parsed_namespace = parser.parse_args('generate --help'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate')
+        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
         eq_(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
@@ -902,7 +902,7 @@ class TestSetupRsmCmdParser:
         """
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate')
+        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_flag(self):
@@ -911,7 +911,9 @@ class TestSetupRsmCmdParser:
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --subgroups'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate', subgroups=True)
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_but_no_flag(self):
@@ -920,7 +922,30 @@ class TestSetupRsmCmdParser:
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate', subgroups=False)
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                subgroups=False)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_only_quiet_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate --quiet'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=True)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_and_quiet_flags(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate --subgroups -q'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=True,
+                                                subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
 
@@ -932,9 +957,13 @@ class TestGenerateConfiguration:
 
     # a helper method to check that the automatically generated configuration
     # matches what we expect for each tool
-    def check_generated_configuration(self, name, use_subgroups=False, as_string=False):
+    def check_generated_configuration(self,
+                                      context,
+                                      use_subgroups=False,
+                                      as_string=False,
+                                      suppress_warnings=False):
 
-        if name == 'rsmtool':
+        if context == 'rsmtool':
 
             configdict = {'experiment_id': 'ENTER_VALUE_HERE',
                           'model': 'ENTER_VALUE_HERE',
@@ -969,7 +998,7 @@ class TestGenerateConfiguration:
                                 'intermediate_file_paths',
                                 'sysinfo']
 
-        elif name == 'rsmeval':
+        elif context == 'rsmeval':
 
             configdict = {'experiment_id': 'ENTER_VALUE_HERE',
                           'predictions_file': 'ENTER_VALUE_HERE',
@@ -995,7 +1024,7 @@ class TestGenerateConfiguration:
                                 'intermediate_file_paths',
                                 'sysinfo']
 
-        elif name == "rsmcompare":
+        elif context == "rsmcompare":
 
             configdict = {'comparison_id': 'ENTER_VALUE_HERE',
                           'experiment_id_old': 'ENTER_VALUE_HERE',
@@ -1030,7 +1059,7 @@ class TestGenerateConfiguration:
                                 'notes',
                                 'sysinfo']
 
-        elif name == "rsmsummarize":
+        elif context == "rsmsummarize":
 
             configdict = {'summary_id': 'ENTER_VALUE_HERE',
                           'experiment_dirs': ['ENTER_VALUE_HERE']}
@@ -1042,16 +1071,17 @@ class TestGenerateConfiguration:
                             'intermediate_file_paths',
                             'sysinfo']
 
-        elif name == "rsmpredict":
+        elif context == "rsmpredict":
 
             configdict = {'experiment_id': 'ENTER_VALUE_HERE',
                           'experiment_dir': 'ENTER_VALUE_HERE',
                           'input_features_file': 'ENTER_VALUE_HERE'}
 
         # get the generated Configuration object
-        generated_configuration = generate_configuration(name,
+        generated_configuration = generate_configuration(context,
                                                          use_subgroups=use_subgroups,
-                                                         as_string=as_string)
+                                                         as_string=as_string,
+                                                         suppress_warnings=suppress_warnings)
 
         # if we are testing string output, then load the expected json file
         # and compare its contents directly to the returned string, otherwise
@@ -1059,14 +1089,14 @@ class TestGenerateConfiguration:
         if as_string:
             if use_subgroups:
                 expected_json_file = join(self.expected_json_dir,
-                                          f"autogenerated_{name}_config_groups.json")
+                                          f"autogenerated_{context}_config_groups.json")
             else:
                 expected_json_file = join(self.expected_json_dir,
-                                          f"autogenerated_{name}_config.json")
+                                          f"autogenerated_{context}_config.json")
             expected_json_string = open(expected_json_file, 'r').read().strip()
             eq_(generated_configuration, expected_json_string)
         else:
-            expected_configuration = Configuration(configdict, context=name)
+            expected_configuration = Configuration(configdict, context=context)
             if 'general_sections' in expected_configuration:
                 expected_configuration['general_sections'] = section_list
 
@@ -1074,16 +1104,24 @@ class TestGenerateConfiguration:
                               generated_configuration._config)
 
     def test_generate_configuration(self):
-        for name, use_subgroups, as_string in product(['rsmtool',
-                                                       'rsmeval',
-                                                       'rsmcompare',
-                                                       'rsmsummarize',
-                                                       'rsmpredict'],
-                                                      [True, False],
-                                                      [True, False]):
+        for (context,
+             use_subgroups,
+             as_string,
+             suppress_warnings) in product(['rsmtool',
+                                            'rsmeval',
+                                            'rsmcompare',
+                                            'rsmsummarize',
+                                            'rsmpredict'],
+                                           [True, False],
+                                           [True, False],
+                                           [True, False]):
 
             # rsmpredict and rsmsummarize do not use subgroups
-            if name in ['rsmpredict', 'rsmsummarize'] and use_subgroups:
+            if context in ['rsmpredict', 'rsmsummarize'] and use_subgroups:
                 continue
 
-            yield self.check_generated_configuration, name, use_subgroups, as_string
+            yield (self.check_generated_configuration,
+                   context,
+                   use_subgroups,
+                   as_string,
+                   suppress_warnings)
