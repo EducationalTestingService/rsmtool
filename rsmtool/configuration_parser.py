@@ -289,8 +289,9 @@ class Configuration:
         -------
         config_string : str
             A string representation of the underlying configuration
-            dictionary as encoded by ``json.dumps()``. Configuration
-            options meant for internal use are not included.
+            dictionary as encoded by ``json.dumps()``. It only
+            includes the configuration options that can be set by
+            the user.
         """
         expected_fields = (CHECK_FIELDS[self._context]['required'] +
                            CHECK_FIELDS[self._context]['optional'])
