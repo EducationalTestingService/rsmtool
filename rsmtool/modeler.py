@@ -26,8 +26,8 @@ from skll import FeatureSet, Learner
 
 from .analyzer import Analyzer
 from .container import DataContainer
-from .utils.files import is_skll_model
 from .utils.metrics import compute_expected_scores_from_model
+from .utils.models import is_skll_model
 from .preprocessor import FeaturePreprocessor
 from .writer import DataWriter
 

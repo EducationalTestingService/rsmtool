@@ -8,6 +8,8 @@ Various RSMTool constants used across the codebase.
 :organization: ETS
 """
 
+from .models import BUILTIN_MODELS, VALID_SKLL_MODELS
+
 DEFAULTS = {'id_column': 'spkitemid',
             'description': '',
             'description_old': '',
@@ -187,6 +189,8 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                               'special_sections',
                                               'subgroups',
                                               'section_order']}}
+
+POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
 
 ID_FIELDS = {'rsmtool': 'experiment_id',
              'rsmeval': 'experiment_id',
