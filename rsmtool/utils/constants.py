@@ -231,7 +231,7 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'prompt': 'Experiment ID', 'type'
                              'experiment_dir_new': {'prompt': 'Path to new RSMTool experiment',
                                                     'type': 'dir'},
                              'description_new': {'prompt': 'Description of new RSMTool experiment'},
-                             'experiment_dirs': {'prompt': 'Paths to directories containing RSMTool experiments', 'type': 'dirs'},
+                             'experiment_dirs': {'prompt': 'Paths to directories containing RSMTool experiments', 'type': 'dir', 'count': 'multiple'},
                              'description': {'prompt': 'Description of experiment'},
                              'file_format': {'prompt': 'Format for intermediate files (<u>csv</u>/tsv/xlsx)', 'type': 'format'},
                              'id_column': {'prompt': 'Name of column that contains response IDs (<u>spkitemid</u>)'},
@@ -244,8 +244,5 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'prompt': 'Experiment ID', 'type'
                              'exclude_zero_scores': {'prompt': 'Keep responses with scores of 0 in training/evaluation data (true/<u>false</u>)', 'type': 'boolean'},
                              'use_scaled_predictions': {'prompt': 'Use scaled predictions instead of raw in report analyses (true/<u>false</u>)', 'type': 'boolean'},
                              'standardize_features': {'prompt': 'Standardize all features (<u>true</u>/false)', 'type': 'boolean'},
-                             # 'subgroups',
-                             # 'general_sections',
-                             # 'custom_sections',
-                             # 'special_sections',
+                             'subgroups': {'prompt': 'List of column names containing subgroup variables', 'count': 'multiple'}
                              }

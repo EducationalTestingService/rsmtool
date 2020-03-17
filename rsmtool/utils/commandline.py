@@ -22,7 +22,10 @@ from prompt_toolkit.completion import (FuzzyWordCompleter,
                                        PathCompleter,
                                        WordCompleter)
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit.shortcuts import clear, prompt, CompleteStyle
+from prompt_toolkit.shortcuts import (clear,
+                                      print_formatted_text,
+                                      prompt,
+                                      CompleteStyle)
 from prompt_toolkit.validation import Validator
 
 from rsmtool import VERSION_STRING
@@ -381,10 +384,25 @@ class ConfigurationGenerator:
                                             error_message='invalid integer')
         return validator
 
+    def _get_multiple_field_inputs(self, prompt_text, **kwargs):
+        values = []
+
+        print_formatted_text(HTML(f" <b>{prompt_text}</b>"))
+        num_entries = prompt("  How many do you want to specify: ",
+                             validator=self._make_integer_validator())
+        num_entries = int(num_entries)
+
+        for i in range(num_entries):
+            value = prompt(f"   Enter #{i+1}: ", **kwargs)
+            values.append(value)
+
+        return values
+
     def _interactive_loop_for_field(self, field_name, field_type):
         field_metadata = INTERACTIVE_MODE_METADATA[field_name]
         prompt_label = field_metadata['prompt']
         field_data_type = field_metadata.get('type', 'text')
+        field_count = field_metadata.get('count', 'single')
         possible_choices = field_metadata.get('choices', [])
 
         # instantiate all completers, validators, and styles as None
@@ -426,8 +444,10 @@ class ConfigurationGenerator:
         while True:
             try:
                 sys.stderr.write("\n")
-                if field_data_type == 'dirs':
-                    pass
+                if field_count == 'multiple':
+                    text = self._get_multiple_field_inputs(prompt_label,
+                                                           completer=field_completer,
+                                                           validator=field_validator)
                 else:
                     text = prompt(HTML(f" <b>{prompt_label}</b>: "),
                                   completer=field_completer,
