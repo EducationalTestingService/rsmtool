@@ -167,11 +167,12 @@ class TestToolCLI:
             # and, finally, that the output was as expected
             self.validate_run_output(name, output_dir)
         else:
-            # for generate subcommands, we ignore the warnings printed to staderr
+            # for generate subcommands, we ignore the warnings printed to stderr
             subgroups = "--subgroups" in cmd
             proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
-                                  capture_output=True,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.DEVNULL,
                                   encoding='utf-8')
             ok_(proc.returncode == 0)
             self.validate_generate_output(name,
