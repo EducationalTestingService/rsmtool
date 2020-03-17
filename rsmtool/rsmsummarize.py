@@ -24,7 +24,7 @@ from os.path import (abspath,
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandline import generate_configuration, setup_rsmcmd_parser
+from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 
@@ -277,9 +277,10 @@ def main():
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        configuration = generate_configuration('rsmsummarize',
-                                               as_string=True,
-                                               suppress_warnings=args.quiet)
+        generator = ConfigurationGenerator('rsmsummarize',
+                                           as_string=True,
+                                           suppress_warnings=args.quiet)
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 
