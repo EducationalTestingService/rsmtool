@@ -292,16 +292,9 @@ class InteractiveField:
         as they are entered by the user. Just like ``completer``, the
         type of ``Validator`` used depends on the ``data_type`` of the field.
         For example,
-
-    Note
-    ----
-    The various attributes for the configuration fields for all of the RSMTool
-    command-line tools are pre-defined in the following dictionary:
-    ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
-
     """
 
-    def __init__(self, field_name, field_type):
+    def __init__(self, field_name, field_type, field_metadata):
         """
         Create a new InteractiveField instance for the given field name
         and with the given field type (required/optional).
@@ -314,18 +307,21 @@ class InteractiveField:
         field_type : str
             One of "required" or "optional", depending on whether the
             field is required or optional in the configuration.
+        field_metadata : dict
+            A dictionary containing the pre-defined metadata attributes
+            for the given field. This dictionary is required to have
+            the "label" key and can have the following optional
+            keys: "choices", "count", and "type". For descriptions of what
+            these keys mean, see the docstring for the ``InteractiveField``
+            class. Examples of such dictionaries can be found in ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
         """
-
-        # get the pre-defined field metadata attributes, if available
-        field_metadata = INTERACTIVE_MODE_METADATA[field_name]
-
         # assign metadata attributes to class attributes
         self.field_name = field_name
         self.field_type = field_type
+        self.label = field_metadata['label']
         self.choices = field_metadata.get('choices', [])
         self.count = field_metadata.get('count', 'single')
         self.data_type = field_metadata.get('type', 'text')
-        self.label = field_metadata['prompt']
 
         # instantiate the interaction-related attributes to their default values
         self.completer = None
@@ -660,10 +656,13 @@ class ConfigurationGenerator:
         configuration file.
     as_string : bool, optional
         If ``True``, return a formatted and indented string representation
-        of the configuration, rather than a dictionary.
+        of the configuration, rather than a dictionary. Note that this only
+        affects the batch-mode generation. Interactive generation always
+        returns a string.
         Defaults to ``False``.
     suppress_warnings : bool, optional
-        If ``True``, do not generate any warnings.
+        If ``True``, do not generate any warnings for batch-mode generation.
+        Defaults to ``False``.
     use_subgroups : bool, optional
         If ``True``, include subgroup-related sections in the list of general sections
         in the configuration file.
@@ -760,6 +759,7 @@ class ConfigurationGenerator:
         sys.stderr.write(" - press tab or start typing when choosing files/directories/models\n")
         sys.stderr.write(" - press enter to accept the default value for a field (underlined)\n")
         sys.stderr.write(" - press ctrl-c to cancel current entry for a field and enter again\n")
+        sys.stderr.write(" - you may still need to edit the generated configuration\n")
         sys.stderr.write("\n")
 
         # instantiate a blank dictionary
@@ -786,7 +786,9 @@ class ConfigurationGenerator:
             else:
                 # instantiate the interactive field first
                 try:
-                    interactive_field = InteractiveField(field_name, field_type)
+                    interactive_field = InteractiveField(field_name,
+                                                         field_type,
+                                                         INTERACTIVE_MODE_METADATA[field_name])
                 # if the user pressed Ctrl-D, then exit out of interactive mode
                 # without generating anything and return an empty string
                 except EOFError:
