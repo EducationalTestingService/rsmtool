@@ -378,8 +378,10 @@ class ConfigurationGenerator:
                                             error_message='invalid answer')
         return validator
 
-    def _make_integer_validator(self, allow_empty=False):
-        integer_regex = r'^[0-9]+|^$' if allow_empty else r'^[0-9]$'
+    def _make_integer_validator(self, allow_empty=False, non_zero=False):
+        integer_regex = r'^[1-9]([0-9]+)?' if non_zero else r'^[0-9]+$'
+        if allow_empty:
+            integer_regex += r'|^$'
         validator = Validator.from_callable(lambda answer: re.match(integer_regex, answer),
                                             error_message='invalid integer')
         return validator
@@ -389,7 +391,7 @@ class ConfigurationGenerator:
 
         print_formatted_text(HTML(f" <b>{prompt_text}</b>"))
         num_entries = prompt("  How many do you want to specify: ",
-                             validator=self._make_integer_validator())
+                             validator=self._make_integer_validator(non_zero=True))
         num_entries = int(num_entries)
 
         for i in range(num_entries):
@@ -398,9 +400,31 @@ class ConfigurationGenerator:
 
         return values
 
-    def _interactive_loop_for_field(self, field_name, field_type):
+    def _get_single_field_input(self, prompt_text, **kwargs):
+
+        text = prompt(HTML(f" <b>{prompt_text}</b>: "), **kwargs)
+        return text
+
+    def _field_value_handler(self, field_name, field_type, field_data_type, field_value):
+
+        if field_value == '' and field_type == 'optional':
+            new_field_value = DEFAULTS.get(field_name)
+        else:
+            # boolean fields need to be converted to actual booleans
+            if field_data_type == 'boolean':
+                new_field_value = False if field_value == 'false' else True
+            # and integer fields to integers/None
+            elif field_data_type == 'integer':
+                new_field_value = int(field_value)
+            else:
+                new_field_value = field_value
+
+        return new_field_value
+
+    def _setup_interactive_loop_for_field(self, field_name, field_type):
+
         field_metadata = INTERACTIVE_MODE_METADATA[field_name]
-        prompt_label = field_metadata['prompt']
+        field_label = field_metadata['prompt']
         field_data_type = field_metadata.get('type', 'text')
         field_count = field_metadata.get('count', 'single')
         possible_choices = field_metadata.get('choices', [])
@@ -408,7 +432,10 @@ class ConfigurationGenerator:
         # instantiate all completers, validators, and styles as None
         field_completer = None
         field_validator = None
-        complete_style = None
+        field_complete_style = None
+
+        field_prompt_function = (self._get_multiple_field_inputs if field_count == 'multiple'
+                                 else self._get_single_field_input)
 
         # override completers, validators, and styles as necessary
         # depending on the data type of the field
@@ -418,7 +445,7 @@ class ConfigurationGenerator:
             else:
                 field_completer = FuzzyWordCompleter(possible_choices)
                 field_validator = self._make_choice_validator(possible_choices)
-                complete_style = CompleteStyle.MULTI_COLUMN
+                field_complete_style = CompleteStyle.MULTI_COLUMN
         elif field_data_type == 'file':
             field_completer = self._make_file_completer()
             field_validator = self._make_file_validator()
@@ -440,29 +467,38 @@ class ConfigurationGenerator:
             field_completer = WordCompleter(['true', 'false'])
             field_validator = self._make_boolean_validator(allow_empty=allow_empty)
 
+        return (field_label,
+                field_data_type,
+                field_prompt_function,
+                field_completer,
+                field_validator,
+                field_complete_style)
+
+    def _run_interactive_loop_for_field(self, field_name, field_type):
+
+        (field_label,
+         field_data_type,
+         field_prompt_function,
+         field_completer,
+         field_validator,
+         field_complete_style) = self._setup_interactive_loop_for_field(field_name, field_type)
+
         # start the main event loop for the field
         while True:
             try:
                 sys.stderr.write("\n")
-                if field_count == 'multiple':
-                    text = self._get_multiple_field_inputs(prompt_label,
-                                                           completer=field_completer,
-                                                           validator=field_validator)
-                else:
-                    text = prompt(HTML(f" <b>{prompt_label}</b>: "),
-                                  completer=field_completer,
-                                  validator=field_validator,
-                                  complete_style=complete_style)
-                # boolean fields need to be converted to actual booleans
-                if field_data_type == 'boolean':
-                    text = False if text in ['false', ''] else True
-                # and integer fields to integers/None
-                elif field_data_type == 'integer':
-                    text = int(text) if text else None
+                field_value = field_prompt_function(field_label,
+                                                    completer=field_completer,
+                                                    validator=field_validator,
+                                                    complete_style=field_complete_style)
+                field_value = self._field_value_handler(field_name,
+                                                        field_type,
+                                                        field_data_type,
+                                                        field_value)
             except KeyboardInterrupt:
                 continue
             else:
-                return text
+                return field_value
 
     def interact(self):
 
@@ -486,17 +522,23 @@ class ConfigurationGenerator:
         for field_type, field_name in chain(product(['required'], self._required_fields),
                                             product(['optional'], self._optional_fields)):
 
+            # skip the subgroups field unless we were told to use subgroups
+            if field_name == 'subgroups' and not self.use_subgroups:
+                configdict['subgroups'] = DEFAULTS.get('subgroups')
+                continue
+
             # set up an interactive loop for the field if appropriate
             try:
-                configdict[field_name] = self._interactive_loop_for_field(field_name, field_type)
+                field_value = self._run_interactive_loop_for_field(field_name, field_type)
+                configdict[field_name] = field_value
             # if the field is not one that is meant to be filled interactively,
             # then just use its default value; for "general_sections", expand it
             # so that it is easy for the user to remove sections
             except KeyError:
+                default_non_interactive_field_value = DEFAULTS.get(field_name, '')
                 if field_name == 'general_sections':
-                    configdict[field_name] = self._expand_general_sections_list()
-                else:
-                    configdict[field_name] = DEFAULTS.get(field_name, '')
+                    default_non_interactive_field_value = self._expand_general_sections_list()
+                configdict[field_name] = default_non_interactive_field_value
             # if the user pressed Ctrl-D, then exit out of interactive mode
             # without generating anything
             except EOFError:
