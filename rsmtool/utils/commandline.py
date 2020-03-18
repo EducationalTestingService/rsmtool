@@ -248,6 +248,406 @@ def setup_rsmcmd_parser(name,
     return parser
 
 
+class InteractiveField:
+    """
+    Class that encapsulates a configuration field that is computed interactively.
+
+    Attributes
+    ----------
+    choices : list
+        List of possible choices for the field value if ``data_type`` is "choice".
+        An empty list for all other types of fields.
+    complete_style : prompt_toolkit.shortcuts.prompt.CompleteStyle
+        A CompleteStyle that defines how to style the completions.
+        Set to ``CompleteStyle.MULTI_COLUMN`` for fields that have ``data_type``
+        of "choice". Set to ``None`` for all other field types.
+    completer : prompt_toolkit.completions.base.Completer
+        A ``Completer`` object used to provide auto-completion for the field.
+        The actual completer used depends on the ``data_type`` of the field.
+        For example, for fields of type "choice", we use a ``FuzzyWordCompleter``,
+        and for fields of type ``dir`` and ``file``, we use a ``PathCompleter``.
+    count : str
+        An attribute indicating whether the field accepts a "single" value
+        or "multiple" values. For fields that require multiple values, e.g.
+        subgroups, a different strategy is used for interactive display.
+    data_type : str
+        The string indicating the data type of the field.
+        One of the following:
+        - "boolean" : a field that only accepts True/False
+        - "choice" : a field that accepts one out of a fixed list of values.
+        - "dir" : a field that accepts a path to a directory.
+        - "file" : a field that accepts a path to a file
+        - "format" : a field that accepts possible file formats (csv/tsv/xlsx)
+        - "id" : a field that accepts experiment/comarison/summary IDs
+        - "integer" : a field that accepts integer values
+        - "text" : a field that accepts open-ended text
+    label : str
+        The label for the field that will be displayed to the user.
+    prompt_method : callable
+        The function that will be used to compute the value for the field.
+        The main difference arises between field that accept only a single
+        value vs. multiple values.
+    validator : prompt_toolkit.validation.Validator
+        A ``Validator`` object used to validate the values for the field
+        as they are entered by the user. Just like ``completer``, the
+        type of ``Validator`` used depends on the ``data_type`` of the field.
+        For example,
+
+    Note
+    ----
+    The various attributes for the configuration fields for all of the RSMTool
+    command-line tools are pre-defined in the following dictionary:
+    ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
+
+    """
+
+    def __init__(self, field_name, field_type):
+        """
+        Create a new InteractiveField instance for the given field name
+        and with the given field type (required/optional).
+
+        Parameters
+        ----------
+        field_name : str
+            The internal name of the field as used in the configuration
+            dictionary.
+        field_type : str
+            One of "required" or "optional", depending on whether the
+            field is required or optional in the configuration.
+        """
+
+        # get the pre-defined field metadata attributes, if available
+        field_metadata = INTERACTIVE_MODE_METADATA[field_name]
+
+        # assign metadata attributes to class attributes
+        self.field_name = field_name
+        self.field_type = field_type
+        self.choices = field_metadata.get('choices', [])
+        self.count = field_metadata.get('count', 'single')
+        self.data_type = field_metadata.get('type', 'text')
+        self.label = field_metadata['prompt']
+
+        # instantiate the interaction-related attributes to their default values
+        self.completer = None
+        self.complete_style = None
+        self.validator = None
+
+        # now override these attributes as necessary depending on field data types
+        if self.data_type == 'choice':
+            if not self.choices:
+                raise(ValueError, f"invalid list of choices for {field_name}")
+            else:
+                self.completer = FuzzyWordCompleter(self.choices)
+                self.validator = self._make_choice_validator(self.choices)
+                self.complete_style = CompleteStyle.MULTI_COLUMN
+        elif self.data_type == 'file':
+            self.completer = self._make_file_completer()
+            self.validator = self._make_file_validator()
+        elif self.data_type == 'format':
+            self.completer = WordCompleter(POSSIBLE_EXTENSIONS)
+            self.validator = self._make_file_format_validator()
+        elif self.data_type == 'dir':
+            self.completer = self._make_directory_completer()
+            self.validator = self._make_directory_validator()
+        elif self.data_type == 'id':
+            self.completer = None
+            self.validator = self._make_id_validator()
+        elif self.data_type == 'integer':
+            self.completer = None
+            allow_empty = field_type == 'optional'
+            self.validator = self._make_integer_validator(allow_empty=allow_empty)
+        elif self.data_type == 'boolean':
+            allow_empty = field_type == 'optional'
+            self.completer = WordCompleter(['true', 'false'])
+            self.validator = self._make_boolean_validator(allow_empty=allow_empty)
+
+    def _make_boolean_validator(self, allow_empty=False):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "boolean".
+
+        Parameters
+        ----------
+        allow_empty : bool, optional
+            If ``True``, it will allow the user to also just press
+            enter (i.e., input a blank string), in addition to "true"
+            or "false".
+            Defaults to ``False``.
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that ensures that the user
+            input for the field is "true" / "false", or possibly
+            the empty string, if ``allow_empty`` is ``True``.
+        """
+        correct_choices = ["true", "false"]
+        if allow_empty:
+            correct_choices.append("")
+        validator = Validator.from_callable(lambda answer: answer in correct_choices,
+                                            error_message="invalid answer")
+        return validator
+
+    def _make_choice_validator(self, choices):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "choice".
+
+        Parameters
+        ----------
+        choices : list
+            List of possible values for the field.
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that ensures that the user
+            input for the field is one of the possible choices.
+        """
+        validator = Validator.from_callable(lambda choice: choice in choices,
+                                            error_message="invalid choice")
+        return validator
+
+    def _make_directory_completer(self):
+        """
+        Private method that creates a completer for a field
+        with ``data_type`` of "dir".
+
+        Returns
+        -------
+        completer : prompt_toolkit.completion.base.Completer
+            A ``Completer`` instance that suggests directory names
+            as potential completions for user input.
+        """
+        return PathCompleter(expanduser=False, only_directories=True)
+
+    def _make_directory_validator(self):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "dir".
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that makes sure that only
+            directory names are chosen as the final user input.
+        """
+        validator = Validator.from_callable(lambda filepath: Path(filepath).is_dir(),
+                                            error_message="invalid directory")
+        return validator
+
+    def _make_file_completer(self):
+        """
+        Private method that creates a completer for a field
+        with ``data_type`` of "file".
+
+        Returns
+        -------
+        completer : prompt_toolkit.completion.base.Completer
+            A ``Completer`` instance that suggests directory names
+            and files with csv/tsv/xlsx extensions as potential
+            completions for user input. We need directory names
+            so that users can look into sub-directories etc.
+        """
+        def valid_file(filename):
+            return (Path(filename).is_dir() or
+                    Path(filename).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
+        return PathCompleter(expanduser=False, file_filter=valid_file)
+
+    def _make_file_validator(self):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "file".
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that makes sure that only
+            actually existing files with csv/tsv/xlsx extensions
+            are chosen as the final user input.
+        """
+        def is_valid(filepath):
+            return (Path(filepath).is_file() and
+                    Path(filepath).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
+        validator = Validator.from_callable(is_valid, error_message="invalid file")
+        return validator
+
+    def _make_file_format_validator(self):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "format".
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that makes sure that only
+            valid RSMTool extensions (csv/tsv/xlsx) and the
+            empty string are allowed as final user input. We
+            want to allow empty string because file formats
+            are optional to specify.
+        """
+        validator = Validator.from_callable(lambda ext: ext in POSSIBLE_EXTENSIONS or ext == '', error_message="invalid format")
+        return validator
+
+    def _make_id_validator(self):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "id".
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that makes sure that IDs
+            specified by the user are not blank and do not
+            contain spaces. We do not allow blanks since IDs
+            are always required.
+        """
+        validator = Validator.from_callable(lambda text: text and ' ' not in text,
+                                            error_message="blanks/spaces not allowed")
+        return validator
+
+    def _make_integer_validator(self, allow_empty=False, non_zero=False):
+        """
+        Private method that creates a validator for a field
+        with ``data_type`` of "integers".
+
+        Parameters
+        ----------
+        allow_empty : bool, optional
+            If ``True``, it will allow the user to also just press
+            enter (i.e., input a blank string)
+            Defaults to ``False``.
+
+        non_zero : bool, optional
+            If ``True``, it will prevent the user from inputting
+            a value of "0" for this field.
+
+        Returns
+        -------
+        validator : prompt_toolkit.validation.Validator
+            A ``Validator`` instance that makes sure that the
+            final user input is a string representation of a
+            fixed-point number or integer. Zeros may or may not
+            be allowed depending on the value of ``non_zero``.
+            Similarly, blank strings may also be allowed if
+            ``allow_empty`` is ``True``.
+        """
+        integer_regex = r'^[1-9]([0-9]+)?' if non_zero else r'^[0-9]+$'
+        if allow_empty:
+            integer_regex += r'|^$'
+        validator = Validator.from_callable(lambda answer: re.match(integer_regex, answer),
+                                            error_message="invalid integer")
+        return validator
+
+    def _get_user_input(self):
+        """
+        Private method to display the appropriate prompt label
+        for the field using the appropriate display function
+        and collect the user input.
+
+        Returns
+        -------
+        user_input : list or str
+            A string for fields that accepts a single input
+            or a list of strings for fields that accept multiple
+            inputs, e.g., subgroups.
+        """
+
+        # if we are dealing with a field that accepts multiple inputs
+        if self.count == 'multiple':
+
+            # instantiate a blank list to hold the multiple values
+            values = []
+
+            # show the name of the field as a heading but do not
+            # ask for input yet
+            print_formatted_text(HTML(f" <b>{self.label}</b>"))
+
+            # ask the user how many of the multiple inputs they
+            # intend to provide; this must be non-zero
+            num_entries = prompt("  How many do you want to specify: ",
+                                 validator=self._make_integer_validator(non_zero=True))
+            num_entries = int(num_entries)
+
+            # display secondary prompts, one for each of the inputs
+            # with the appropriate completer, validator, and style
+            for i in range(num_entries):
+                value = prompt(f"   Enter #{i+1}: ",
+                               completer=self.completer,
+                               validator=self.validator,
+                               complete_style=self.complete_style)
+                # save the value in the list
+                values.append(value)
+
+            # this is what we will return
+            user_input = values
+        # if we are dealing with a simple single-input field
+        else:
+            # nothing fancy, just display the label, attach
+            # the appropriate completer, validator, and style,
+            # and get the user input
+            user_input = prompt(HTML(f" <b>{self.label}</b>: "),
+                                completer=self.completer,
+                                validator=self.validator,
+                                complete_style=self.complete_style)
+
+        return user_input
+
+    def _finalize(self, user_input):
+        """
+        Private method that takes the provided user input
+        and converts it to the appropriate type.
+
+        Parameters
+        ----------
+        user_input : TYPE
+            Description
+
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        if user_input == '' and self.field_type == 'optional':
+            final_value = DEFAULTS.get(self.field_name)
+        else:
+            # boolean fields need to be converted to actual booleans
+            if self.data_type == 'boolean':
+                final_value = False if user_input == 'false' else True
+            # and integer fields to integers/None
+            elif self.data_type == 'integer':
+                final_value = int(user_input)
+            else:
+                final_value = user_input
+
+        return final_value
+
+    def get_value(self):
+        """
+        The main public method for this class to get the value
+        of an instantiated interactive field.
+
+        Returns
+        -------
+        final_value : list or str
+            The final value of the field which may be a list of
+            strings or a string.
+        """
+        # use a while loop to keep asking for the user input
+        # until the user either enters it or uses ctrl-D
+        # to indicate that they do not want to; ctrl-c
+        # just cancels the current entry and asks again
+        while True:
+            try:
+                sys.stderr.write("\n")
+                user_input = self._get_user_input()
+                final_value = self._finalize(user_input)
+            except KeyboardInterrupt:
+                continue
+            else:
+                return final_value
+
+
 class ConfigurationGenerator:
     """
     Class that encapsulates automated batch-mode and interactive
@@ -318,7 +718,7 @@ class ConfigurationGenerator:
 
         return configuration
 
-    def _expand_general_sections_list(self):
+    def _get_all_general_section_names(self):
 
         reporter = Reporter()
         default_general_sections_value = DEFAULTS.get('general_sections', '')
@@ -335,174 +735,22 @@ class ConfigurationGenerator:
                                                   subgroups_value,
                                                   context=self.context)
 
-    def _make_choice_validator(self, choices):
-        validator = Validator.from_callable(lambda choice: choice in choices,
-                                            error_message='invalid choice')
-        return validator
-
-    def _make_file_completer(self):
-        def valid_file(filename):
-            return (Path(filename).is_dir() or
-                    Path(filename).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
-        return PathCompleter(expanduser=False, file_filter=valid_file)
-
-    def _make_file_validator(self):
-        def is_valid(filepath):
-            return (Path(filepath).is_file() and
-                    Path(filepath).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
-        validator = Validator.from_callable(is_valid, error_message='invalid file')
-        return validator
-
-    def _make_file_format_validator(self):
-        validator = Validator.from_callable(lambda ext: ext in POSSIBLE_EXTENSIONS or ext == '', error_message='invalid format')
-        return validator
-
-    def _make_directory_completer(self):
-        return PathCompleter(expanduser=False, only_directories=True)
-
-    def _make_directory_validator(self):
-        validator = Validator.from_callable(lambda filepath: Path(filepath).is_dir(),
-                                            error_message='invalid directory')
-        return validator
-
-    def _make_id_validator(self):
-        validator = Validator.from_callable(lambda text: text and ' ' not in text,
-                                            error_message='blanks/spaces not allowed')
-        return validator
-
-    def _make_boolean_validator(self, allow_empty=False):
-        correct_choices = ['true', 'false']
-        if allow_empty:
-            correct_choices.append('')
-        validator = Validator.from_callable(lambda answer: answer in correct_choices,
-                                            error_message='invalid answer')
-        return validator
-
-    def _make_integer_validator(self, allow_empty=False, non_zero=False):
-        integer_regex = r'^[1-9]([0-9]+)?' if non_zero else r'^[0-9]+$'
-        if allow_empty:
-            integer_regex += r'|^$'
-        validator = Validator.from_callable(lambda answer: re.match(integer_regex, answer),
-                                            error_message='invalid integer')
-        return validator
-
-    def _get_multiple_field_inputs(self, prompt_text, **kwargs):
-        values = []
-
-        print_formatted_text(HTML(f" <b>{prompt_text}</b>"))
-        num_entries = prompt("  How many do you want to specify: ",
-                             validator=self._make_integer_validator(non_zero=True))
-        num_entries = int(num_entries)
-
-        for i in range(num_entries):
-            value = prompt(f"   Enter #{i+1}: ", **kwargs)
-            values.append(value)
-
-        return values
-
-    def _get_single_field_input(self, prompt_text, **kwargs):
-
-        text = prompt(HTML(f" <b>{prompt_text}</b>: "), **kwargs)
-        return text
-
-    def _field_value_handler(self, field_name, field_type, field_data_type, field_value):
-
-        if field_value == '' and field_type == 'optional':
-            new_field_value = DEFAULTS.get(field_name)
-        else:
-            # boolean fields need to be converted to actual booleans
-            if field_data_type == 'boolean':
-                new_field_value = False if field_value == 'false' else True
-            # and integer fields to integers/None
-            elif field_data_type == 'integer':
-                new_field_value = int(field_value)
-            else:
-                new_field_value = field_value
-
-        return new_field_value
-
-    def _setup_interactive_loop_for_field(self, field_name, field_type):
-
-        field_metadata = INTERACTIVE_MODE_METADATA[field_name]
-        field_label = field_metadata['prompt']
-        field_data_type = field_metadata.get('type', 'text')
-        field_count = field_metadata.get('count', 'single')
-        possible_choices = field_metadata.get('choices', [])
-
-        # instantiate all completers, validators, and styles as None
-        field_completer = None
-        field_validator = None
-        field_complete_style = None
-
-        field_prompt_function = (self._get_multiple_field_inputs if field_count == 'multiple'
-                                 else self._get_single_field_input)
-
-        # override completers, validators, and styles as necessary
-        # depending on the data type of the field
-        if field_data_type == 'choice':
-            if not possible_choices:
-                raise(ValueError, f"invalid list of choices for {field_name}")
-            else:
-                field_completer = FuzzyWordCompleter(possible_choices)
-                field_validator = self._make_choice_validator(possible_choices)
-                field_complete_style = CompleteStyle.MULTI_COLUMN
-        elif field_data_type == 'file':
-            field_completer = self._make_file_completer()
-            field_validator = self._make_file_validator()
-        elif field_data_type == 'format':
-            field_completer = WordCompleter(POSSIBLE_EXTENSIONS)
-            field_validator = self._make_file_format_validator()
-        elif field_data_type == 'dir':
-            field_completer = self._make_directory_completer()
-            field_validator = self._make_directory_validator()
-        elif field_data_type == 'id':
-            field_completer = None
-            field_validator = self._make_id_validator()
-        elif field_data_type == 'integer':
-            field_completer = None
-            allow_empty = field_type == 'optional'
-            field_validator = self._make_integer_validator(allow_empty=allow_empty)
-        elif field_data_type == 'boolean':
-            allow_empty = field_type == 'optional'
-            field_completer = WordCompleter(['true', 'false'])
-            field_validator = self._make_boolean_validator(allow_empty=allow_empty)
-
-        return (field_label,
-                field_data_type,
-                field_prompt_function,
-                field_completer,
-                field_validator,
-                field_complete_style)
-
-    def _run_interactive_loop_for_field(self, field_name, field_type):
-
-        (field_label,
-         field_data_type,
-         field_prompt_function,
-         field_completer,
-         field_validator,
-         field_complete_style) = self._setup_interactive_loop_for_field(field_name, field_type)
-
-        # start the main event loop for the field
-        while True:
-            try:
-                sys.stderr.write("\n")
-                field_value = field_prompt_function(field_label,
-                                                    completer=field_completer,
-                                                    validator=field_validator,
-                                                    complete_style=field_complete_style)
-                field_value = self._field_value_handler(field_name,
-                                                        field_type,
-                                                        field_data_type,
-                                                        field_value)
-            except KeyboardInterrupt:
-                continue
-            else:
-                return field_value
-
     def interact(self):
+        """
+        Automatically generate an example configuration in interactive mode.
 
-        # clear the screen
+        Returns
+        -------
+        configuration : str
+            The generated configuration as a formatted string.
+
+        Note
+        ----
+        This method should *only* be used in terminals, and not in
+        Jupyter notebooks.
+
+        """
+        # clear the screen first
         clear()
 
         # print the preamble and some instructions
@@ -527,31 +775,37 @@ class ConfigurationGenerator:
                 configdict['subgroups'] = DEFAULTS.get('subgroups')
                 continue
 
-            # set up an interactive loop for the field if appropriate
-            try:
-                field_value = self._run_interactive_loop_for_field(field_name, field_type)
-                configdict[field_name] = field_value
             # if the field is not one that is meant to be filled interactively,
             # then just use its default value; for "general_sections", expand it
             # so that it is easy for the user to remove sections
-            except KeyError:
-                default_non_interactive_field_value = DEFAULTS.get(field_name, '')
+            if field_name not in INTERACTIVE_MODE_METADATA:
+                non_interactive_field_value = DEFAULTS.get(field_name, '')
                 if field_name == 'general_sections':
-                    default_non_interactive_field_value = self._expand_general_sections_list()
-                configdict[field_name] = default_non_interactive_field_value
-            # if the user pressed Ctrl-D, then exit out of interactive mode
-            # without generating anything
-            except EOFError:
-                sys.stderr.write("\n")
-                sys.stderr.write("You exited interactive mode without a configuration.")
-                sys.stderr.write("\n")
-                return ''
+                    non_interactive_field_value = self._get_all_general_section_names()
+                configdict[field_name] = non_interactive_field_value
+            else:
+                # instantiate the interactive field first
+                try:
+                    interactive_field = InteractiveField(field_name, field_type)
+                # if the user pressed Ctrl-D, then exit out of interactive mode
+                # without generating anything and return an empty string
+                except EOFError:
+                    sys.stderr.write("\n")
+                    sys.stderr.write("You exited interactive mode without a configuration.")
+                    sys.stderr.write("\n")
+                    return ''
+                # otherwise get the field value and save it
+                else:
+                    configdict[field_name] = interactive_field.get_value()
 
+        # create a Configuration instance from the dictionary we just generated
         sys.stderr.write("\n")
         config_object = Configuration(configdict,
                                       filename=f"example_{self.context}.json",
                                       configdir=os.getcwd(),
                                       context=self.context)
+        # convert the Configuration object to a string - we are using
+        # a special wrapper method since we also want to insert comments
         return self._convert_to_string(config_object, insert_required_comment=False)
 
     def generate(self):
@@ -579,7 +833,7 @@ class ConfigurationGenerator:
             # instead of the default value which is simply ``['all']``. To
             # do this, we can use the reporter class.
             if optional_field == 'general_sections':
-                configdict['general_sections'] = self._expand_general_sections_list()
+                configdict['general_sections'] = self._get_all_general_section_names()
             else:
                 configdict[optional_field] = DEFAULTS.get(optional_field, '')
 
