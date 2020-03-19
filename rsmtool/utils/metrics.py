@@ -370,14 +370,16 @@ def difference_of_standardized_means(y_true_observed,
                    'thus, the calculated z-scores will be zero.')
 
     # if the population means and standard deviations were not provided, calculate from the data
-    if not population_y_true_observed_mn or not population_y_true_observed_sd:
+    # We only check for mean since the function requires
+    # both of these to be set of both to be None
+    if population_y_true_observed_mn is None:
 
         warnings.warn(warning_msg.format('y_true_observed'))
         (population_y_true_observed_sd,
          population_y_true_observed_mn) = (np.std(y_true_observed, ddof=ddof),
                                            np.mean(y_true_observed))
 
-    if not population_y_pred_mn or not population_y_pred_sd:
+    if population_y_pred_mn is None:
 
         warnings.warn(warning_msg.format('y_pred'))
         (population_y_pred_sd,
@@ -387,7 +389,7 @@ def difference_of_standardized_means(y_true_observed,
     # if any of the standard deviations raise a warning and return None
     if population_y_pred_sd == 0 or population_y_true_observed_sd == 0:
         warnings.warn("Population standard deviations for the computation of "
-                      "DSM are zero. No value will be computed")
+                      "DSM is zero. No value will be computed.")
         return None
 
 
