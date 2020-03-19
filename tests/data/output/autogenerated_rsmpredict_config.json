@@ -1,6 +1,6 @@
 {
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmpredict
     // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    // https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmpredict
     "experiment_id": "ENTER_VALUE_HERE",
     "experiment_dir": "ENTER_VALUE_HERE",
     "input_features_file": "ENTER_VALUE_HERE",

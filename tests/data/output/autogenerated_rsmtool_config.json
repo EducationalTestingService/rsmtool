@@ -1,6 +1,6 @@
 {
+    // Reference: https://rsmtool.readthedocs.io/en/stable/usage_rsmtool.html#experiment-configuration-file
     // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    // https://rsmtool.readthedocs.io/en/stable/usage_rsmtool.html#experiment-configuration-file
     "experiment_id": "ENTER_VALUE_HERE",
     "model": "ENTER_VALUE_HERE",
     "train_file": "ENTER_VALUE_HERE",
