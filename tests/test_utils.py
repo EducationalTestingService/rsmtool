@@ -25,7 +25,7 @@ from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import rsmtool_test_dir
 
 from rsmtool.utils.commandline import (CmdOption,
-                                       generate_configuration,
+                                       ConfigurationGenerator,
                                        setup_rsmcmd_parser)
 from rsmtool.utils.conversion import int_to_float, convert_to_float
 from rsmtool.utils.files import (parse_json_with_comments,
@@ -44,10 +44,6 @@ from rsmtool.utils.notebook import (float_format_func,
                                     compute_subgroup_plot_params,
                                     get_thumbnail_as_html,
                                     get_files_as_html)
-
-
-import unittest
-unittest.TestCase.MaxDiff = 5000
 
 
 def test_int_to_float():
@@ -896,7 +892,9 @@ class TestSetupRsmCmdParser:
         # we need to patch sys.exit since --help just exists otherwise
         with patch('sys.exit') as exit_mock:
             parsed_namespace = parser.parse_args('generate --help'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
+                                                quiet=False)
         eq_(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
@@ -906,54 +904,83 @@ class TestSetupRsmCmdParser:
         """
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
+                                                quiet=False)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_flag(self):
         """
-        test generate subparser with no arguments
+        test generate subparser with subgroups option and flag
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --subgroups'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
                                                 quiet=False,
                                                 subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_but_no_flag(self):
         """
-        test generate subparser with no arguments
+        test generate subparser with subgroups option but no flag
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
                                                 quiet=False,
                                                 subgroups=False)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_quiet_flag(self):
         """
-        test generate subparser with no arguments
+        test generate subparser with only the quiet flag
         """
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate --quiet'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
                                                 quiet=True)
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_quiet_flags(self):
         """
-        test generate subparser with no arguments
+        test generate subparser with subgroups and quiet flags
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --subgroups -q'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
                                                 quiet=True,
                                                 subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
+    def test_generate_subparser_with_only_interactive_flag(self):
+        """
+        test generate subparser with only the interactive flag
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate --interactive'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=True,
+                                                quiet=False)
+        eq_(parsed_namespace, expected_namespace)
 
-class TestGenerateConfiguration:
+    def test_generate_subparser_with_subgroups_and_interactive_flags(self):
+        """
+        test generate subparser with subgroups and interactive flags
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate --interactive --subgroups'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                interactive=True,
+                                                subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
+
+class TestBatchGenerateConfiguration:
 
     @classmethod
     def setUpClass(cls):
@@ -967,132 +994,127 @@ class TestGenerateConfiguration:
                                       as_string=False,
                                       suppress_warnings=False):
 
+        generator = ConfigurationGenerator(context,
+                                           use_subgroups=use_subgroups,
+                                           as_string=as_string,
+                                           suppress_warnings=suppress_warnings)
+
         if context == 'rsmtool':
 
-            expected_configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                                   'model': 'ENTER_VALUE_HERE',
-                                   'train_file': 'ENTER_VALUE_HERE',
-                                   'test_file': 'ENTER_VALUE_HERE'}
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'model': 'ENTER_VALUE_HERE',
+                          'train_file': 'ENTER_VALUE_HERE',
+                          'test_file': 'ENTER_VALUE_HERE'}
 
             if use_subgroups:
-                expected_section_list = ['data_description',
-                                         'data_description_by_group',
-                                         'feature_descriptives',
-                                         'features_by_group',
-                                         'preprocessed_features',
-                                         'dff_by_group',
-                                         'consistency',
-                                         'model',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'evaluation_by_group',
-                                         'fairness_analyses',
-                                         'pca',
-                                         'intermediate_file_paths',
-                                         'sysinfo']
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'dff_by_group',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
             else:
-                expected_section_list = ['data_description',
-                                         'feature_descriptives',
-                                         'preprocessed_features',
-                                         'consistency',
-                                         'model',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'pca',
-                                         'intermediate_file_paths',
-                                         'sysinfo']
+                section_list = ['data_description',
+                                'feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
 
         elif context == 'rsmeval':
 
-            expected_configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                                   'predictions_file': 'ENTER_VALUE_HERE',
-                                   'system_score_column': 'ENTER_VALUE_HERE',
-                                   'trim_min': 'ENTER_VALUE_HERE',
-                                   'trim_max': 'ENTER_VALUE_HERE'}
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'predictions_file': 'ENTER_VALUE_HERE',
+                          'system_score_column': 'ENTER_VALUE_HERE',
+                          'trim_min': 'ENTER_VALUE_HERE',
+                          'trim_max': 'ENTER_VALUE_HERE'}
 
             if use_subgroups:
-                expected_section_list = ['data_description',
-                                         'data_description_by_group',
-                                         'consistency',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'evaluation_by_group',
-                                         'fairness_analyses',
-                                         'intermediate_file_paths',
-                                         'sysinfo']
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'intermediate_file_paths',
+                                'sysinfo']
             else:
-                expected_section_list = ['data_description',
-                                         'consistency',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'intermediate_file_paths',
-                                         'sysinfo']
+                section_list = ['data_description',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'intermediate_file_paths',
+                                'sysinfo']
 
         elif context == "rsmcompare":
 
-            expected_configdict = {'comparison_id': 'ENTER_VALUE_HERE',
-                                   'experiment_id_old': 'ENTER_VALUE_HERE',
-                                   'experiment_dir_old': 'ENTER_VALUE_HERE',
-                                   'experiment_id_new': 'ENTER_VALUE_HERE',
-                                   'experiment_dir_new': 'ENTER_VALUE_HERE',
-                                   'description_old': 'ENTER_VALUE_HERE',
-                                   'description_new': 'ENTER_VALUE_HERE'}
+            configdict = {'comparison_id': 'ENTER_VALUE_HERE',
+                          'experiment_id_old': 'ENTER_VALUE_HERE',
+                          'experiment_dir_old': 'ENTER_VALUE_HERE',
+                          'experiment_id_new': 'ENTER_VALUE_HERE',
+                          'experiment_dir_new': 'ENTER_VALUE_HERE',
+                          'description_old': 'ENTER_VALUE_HERE',
+                          'description_new': 'ENTER_VALUE_HERE'}
 
             if use_subgroups:
-                expected_section_list = ['feature_descriptives',
-                                         'features_by_group',
-                                         'preprocessed_features',
-                                         'preprocessed_features_by_group',
-                                         'consistency',
-                                         'score_distributions',
-                                         'model',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'pca',
-                                         'notes',
-                                         'sysinfo']
+                section_list = ['feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'preprocessed_features_by_group',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
             else:
-                expected_section_list = ['feature_descriptives',
-                                         'preprocessed_features',
-                                         'consistency',
-                                         'score_distributions',
-                                         'model',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'pca',
-                                         'notes',
-                                         'sysinfo']
+                section_list = ['feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
 
         elif context == "rsmsummarize":
 
-            expected_configdict = {'summary_id': 'ENTER_VALUE_HERE',
-                                   'experiment_dirs': ['ENTER_VALUE_HERE']}
+            configdict = {'summary_id': 'ENTER_VALUE_HERE',
+                          'experiment_dirs': ['ENTER_VALUE_HERE']}
 
-            expected_section_list = ['preprocessed_features',
-                                     'model',
-                                     'evaluation',
-                                     'true_score_evaluation',
-                                     'intermediate_file_paths',
-                                     'sysinfo']
+            section_list = ['preprocessed_features',
+                            'model',
+                            'evaluation',
+                            'true_score_evaluation',
+                            'intermediate_file_paths',
+                            'sysinfo']
 
         elif context == "rsmpredict":
 
-            expected_configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                                   'experiment_dir': 'ENTER_VALUE_HERE',
-                                   'input_features_file': 'ENTER_VALUE_HERE'}
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'experiment_dir': 'ENTER_VALUE_HERE',
+                          'input_features_file': 'ENTER_VALUE_HERE'}
 
         # get the generated configuration dictionary
-<<<<<<< Updated upstream
-        generated_configuration = generate_configuration(context,
-                                                         use_subgroups=use_subgroups,
-                                                         as_string=as_string,
-                                                         suppress_warnings=suppress_warnings)
-=======
-        generated_configdict = generate_configuration(context,
-                                                      use_subgroups=use_subgroups,
-                                                      as_string=as_string,
-                                                      suppress_warnings=suppress_warnings)
->>>>>>> Stashed changes
+        generated_configuration = generator.generate()
 
         # if we are testing string output, then load the expected json file
         # and compare its contents directly to the returned string, otherwise
@@ -1105,21 +1127,14 @@ class TestGenerateConfiguration:
                 expected_json_file = join(self.expected_json_dir,
                                           f"autogenerated_{context}_config.json")
             expected_json_string = open(expected_json_file, 'r').read().strip()
-            generated_configuration = Configuration(generated_configdict, context=context)
             eq_(generated_configuration, expected_json_string)
         else:
-<<<<<<< Updated upstream
             expected_configuration_object = Configuration(configdict, context=context)
             if 'general_sections' in expected_configuration_object:
                 expected_configuration_object['general_sections'] = section_list
 
             assert_dict_equal(expected_configuration_object._config,
                               generated_configuration)
-=======
-            if 'general_sections' in expected_configdict:
-                expected_configdict['general_sections'] = expected_section_list
-            assert_dict_equal(generated_configdict, expected_configdict)
->>>>>>> Stashed changes
 
     def test_generate_configuration(self):
         for (context,
