@@ -10,6 +10,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 
 import numpy as np
 import pandas as pd
+import warnings
 
 from functools import partial
 
@@ -1197,6 +1198,17 @@ class Analyzer:
         population_mn_dict = {col: df_test[col].mean()
                               for col in df_test.columns if col not in ['spkitemid',
                                                                         grouping_variable]}
+
+        # check if any of the standard deviations is zero and
+        # tell user to expect to see many warnings.
+        zero_sd_scores = [score for (score, sd) in population_sd_dict.items() if
+                          np.isclose(sd, 0, atol=1e-07)]
+        if len(zero_sd_scores) > 0:
+            warnings.warn("The standard deviation for {} scores "
+                          "is zero (all scores are the same). You "
+                          "will see multiple warnings about DSM computation "
+                          "since this metrics is computed separately for "
+                          "each subgroup.".format(', '.join(zero_sd_scores)))
 
         # create a duplicate data frame to compute evaluations
         # over the whole data, i.e., across groups
