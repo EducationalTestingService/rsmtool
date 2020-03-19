@@ -206,19 +206,26 @@ CONFIGURATION_DOCUMENTATION_SLUGS = {'rsmtool': 'usage_rsmtool.html#experiment-c
 
 VALID_PARSER_SUBCOMMANDS = ['generate', 'run']
 
-INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID', 'type': 'id'},
-                             'comparison_id': {'label': 'Comparison ID', 'type': 'id'},
-                             'summary_id': {'label': 'Summary ID', 'type': 'id'},
+INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID',
+                                               'type': 'id'},
+                             'comparison_id': {'label': 'Comparison ID',
+                                               'type': 'id'},
+                             'summary_id': {'label': 'Summary ID',
+                                            'type': 'id'},
                              'model': {'label': 'Model to use',
                                        'type': 'choice',
                                        'choices': sorted(set(BUILTIN_MODELS + VALID_SKLL_MODELS))},
-                             'train_file': {'label': 'Path to training data file', 'type': 'file'},
-                             'test_file': {'label': 'Path to evaluation data file', 'type': 'file'},
+                             'train_file': {'label': 'Path to training data file',
+                                            'type': 'file'},
+                             'test_file': {'label': 'Path to evaluation data file',
+                                           'type': 'file'},
                              'predictions_file': {'label': 'Path to file containing predictions',
                                                   'type': 'file'},
                              'system_score_column': {'label': 'Name of column containing predictions'},
-                             'trim_min': {'label': 'The lowest possible score', 'type': 'integer'},
-                             'trim_max': {'label': 'The highest possible score', 'type': 'integer'},
+                             'trim_min': {'label': 'The lowest possible score',
+                                          'type': 'integer'},
+                             'trim_max': {'label': 'The highest possible score',
+                                          'type': 'integer'},
                              'experiment_dir': {'label': 'Path to directory containing RSMTool experiment',
                                                 'type': 'dir'},
                              'input_features_file': {'label': 'Path to input file containing features',
@@ -233,16 +240,34 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID', 'type':
                              'description_new': {'label': 'Description of new RSMTool experiment'},
                              'experiment_dirs': {'label': 'Paths to directories containing RSMTool experiments', 'type': 'dir', 'count': 'multiple'},
                              'description': {'label': 'Description of experiment'},
-                             'file_format': {'label': 'Format for intermediate files (<u>csv</u>/tsv/xlsx)', 'type': 'format'},
+                             'file_format': {'label': 'Format for intermediate files (<u>csv</u>/tsv/xlsx)',
+                                             'type': 'format'},
                              'id_column': {'label': 'Name of column that contains response IDs (<u>spkitemid</u>)'},
-                             'use_thumbnails': {'label': 'Use clickable thumbnails in report instead of full-sized images? (true/<u>false</u>)', 'type': 'boolean'},
-                             'train_label_column': {'label': 'Name of column in training data that contains human scores (<u>sc1</u>)'},
-                             'test_label_column': {'label': 'Name of column in evaluation data that contains human scores (<u>sc1</u>)'},
-                             'length_column': {'label': 'Name of column in training/evaluation data that contains repsonse lengths, if any'},
-                             'human_score_column': {'label': 'Name of column in evaluation data that contains human scores, if any'},
-                             'second_human_score_column': {'label': 'Name of column in evaluation data that contains scores from a second human, if any'},
-                             'exclude_zero_scores': {'label': 'Keep responses with scores of 0 in training/evaluation data (true/<u>false</u>)', 'type': 'boolean'},
-                             'use_scaled_predictions': {'label': 'Use scaled predictions instead of raw in report analyses (true/<u>false</u>)', 'type': 'boolean'},
-                             'standardize_features': {'label': 'Standardize all features (<u>true</u>/false)', 'type': 'boolean'},
-                             'subgroups': {'label': 'List of column names containing subgroup variables', 'count': 'multiple'}
+                             'use_thumbnails': {'label': 'Use clickable thumbnails in report instead '
+                                                         'of full-sized images? (true/<u>false</u>)',
+                                                'type': 'boolean'},
+                             'train_label_column': {'label': 'Name of column in training data that '
+                                                             'contains human scores (<u>sc1</u>)'},
+                             'test_label_column': {'label': 'Name of column in evaluation data that '
+                                                            'contains human scores (<u>sc1</u>)'},
+                             'length_column': {'label': 'Name of column in training/evaluation data '
+                                                        'that contains repsonse lengths, if any'},
+                             'human_score_column': {'label': 'Name of column in evaluation data '
+                                                             'that contains human scores, if any'},
+                             'second_human_score_column': {'label': 'Name of column in evaluation '
+                                                                    'data that contains scores from '
+                                                                    'a second human, if any'},
+                             'exclude_zero_scores': {'label': 'Keep responses with scores of 0 in '
+                                                              'training/evaluation data '
+                                                              '(true/<u>false</u>)',
+                                                     'type': 'boolean'},
+                             'use_scaled_predictions': {'label': 'Use scaled predictions instead of '
+                                                                 'raw in report analyses '
+                                                                 '(true/<u>false</u>)',
+                                                        'type': 'boolean'},
+                             'standardize_features': {'label': 'Standardize all features '
+                                                               '(<u>true</u>/false)',
+                                                      'type': 'boolean'},
+                             'subgroups': {'label': 'List of column names containing subgroup variables',
+                                           'count': 'multiple'}
                              }
