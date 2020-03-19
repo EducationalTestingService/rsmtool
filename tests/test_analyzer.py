@@ -185,13 +185,13 @@ class TestAnalyzer:
 
     def test_metrics_helper_zero_system_sd(self):
         human_scores = [1, 3, 4, 2, 3, 1, 3, 4, 2, 1]
-        system_score = [2.54]*10
+        system_score = [2.54] * 10
         computed_metrics1 = Analyzer.metrics_helper(human_scores,
                                                     system_score)
         expected_metrics1 = pd.Series({'N': 10,
                                        'R2': -0.015806451612903283,
                                        'RMSE': 1.122319027727856,
-                                       'SMD':0.11927198519188371,
+                                       'SMD': 0.11927198519188371,
                                        'adj_agr': 50.0,
                                        'corr': None,
                                        'exact_agr': 0,
