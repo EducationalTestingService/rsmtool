@@ -371,7 +371,7 @@ def difference_of_standardized_means(y_true_observed,
 
     # if the population means and standard deviations were not provided, calculate from the data
     # We only check for mean since the function requires
-    # both of these to be set of both to be None
+    # both of these to be set or both to be None
     if population_y_true_observed_mn is None:
 
         warnings.warn(warning_msg.format('y_true_observed'))

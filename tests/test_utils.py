@@ -428,10 +428,10 @@ def test_difference_of_standardized_means_zero_population_sd_pred():
                       np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
     expected = None
     diff_std_means = difference_of_standardized_means(y_true, y_pred,
-                                                     population_y_true_observed_mn=2.44,
-                                                     population_y_true_observed_sd=0.54,
-                                                     population_y_pred_mn=2.44,
-                                                     population_y_pred_sd=0)
+                                                      population_y_true_observed_mn=2.44,
+                                                      population_y_true_observed_sd=0.54,
+                                                      population_y_pred_mn=2.44,
+                                                      population_y_pred_sd=0)
     eq_(diff_std_means, expected)
 
 
@@ -440,10 +440,10 @@ def test_difference_of_standardized_means_zero_population_sd_human():
                       np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
     expected = None
     diff_std_means = difference_of_standardized_means(y_true, y_pred,
-                                                     population_y_pred_mn=2.44,
-                                                     population_y_pred_sd=0.54,
-                                                     population_y_true_observed_mn=2.44,
-                                                     population_y_true_observed_sd=0)
+                                                      population_y_pred_mn=2.44,
+                                                      population_y_pred_sd=0.54,
+                                                      population_y_true_observed_mn=2.44,
+                                                      population_y_true_observed_sd=0)
     eq_(diff_std_means, expected)
 
 
