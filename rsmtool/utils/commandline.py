@@ -46,8 +46,13 @@ from .constants import (CHECK_FIELDS,
 # will default to `None`.
 CmdOption = namedtuple('CmdOption',
                        ['dest', 'help', 'shortname', 'longname', 'action',
-                        'default', 'required', 'nargs'],
-                       defaults=[None, None, None, None, None, None])
+                        'default', 'required', 'nargs'])
+# if rsmtool were python 3.7+ only, we could just use the `defaults`
+# keyword argument to specify the default values; but to support python
+# 3.6, we need to mess with the `__new__` constructor.
+# Adapted from: https://stackoverflow.com/a/18348004
+# TODO: replace this with `defaults` when we drop support for python 3.6
+CmdOption.__new__.__defaults__ = (None,) * 6
 
 
 def setup_rsmcmd_parser(name,
