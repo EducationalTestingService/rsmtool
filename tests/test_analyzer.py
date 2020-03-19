@@ -182,6 +182,46 @@ class TestAnalyzer:
         assert_series_equal(computed_metrics1.sort_index(), expected_metrics1.sort_index())
         assert_series_equal(computed_metrics2.sort_index(), expected_metrics2.sort_index())
 
+
+    def test_metrics_helper_zero_system_sd(self):
+        human_scores = [1, 3, 4, 2, 3, 1, 3, 4, 2, 1]
+        system_score = [2.54]*10
+        computed_metrics1 = Analyzer.metrics_helper(human_scores,
+                                                    system_score)
+        expected_metrics1 = pd.Series({'N': 10,
+                                       'R2': -0.015806451612903283,
+                                       'RMSE': 1.122319027727856,
+                                       'SMD':0.11927198519188371,
+                                       'adj_agr': 50.0,
+                                       'corr': None,
+                                       'exact_agr': 0,
+                                       'h_max': 4,
+                                       'h_mean': 2.4,
+                                       'h_min': 1.0,
+                                       'h_sd': 1.1737877907772674,
+                                       'kappa': 0,
+                                       'sys_max': 2.54,
+                                       'sys_mean': 2.54,
+                                       'sys_min': 2.54,
+                                       'sys_sd': 0,
+                                       'wtkappa': 0})
+        # now compute DSM
+        computed_metrics2 = Analyzer.metrics_helper(human_scores,
+                                                    system_score,
+                                                    use_diff_std_means=True)
+
+        # the only number that should change is the SMD
+        expected_metrics2 = expected_metrics1.copy()
+        expected_metrics2.drop("SMD", inplace=True)
+        expected_metrics2['DSM'] = None
+        assert_series_equal(computed_metrics1.sort_index(),
+                            expected_metrics1.sort_index(),
+                            check_dtype=False)
+        assert_series_equal(computed_metrics2.sort_index(),
+                            expected_metrics2.sort_index(),
+                            check_dtype=False)
+
+
     def test_compute_pca_less_samples_than_features(self):
         # test pca when we have less samples than
         # features. In this case the number of components

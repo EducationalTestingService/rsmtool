@@ -356,11 +356,13 @@ def difference_of_standardized_means(y_true_observed,
     y_pred_population_params = [population_y_pred_mn,
                                 population_y_pred_sd]
 
-    if any(y_true_observed_population_params) and not all(y_true_observed_population_params):
+    if len([param for param in y_true_observed_population_params
+            if param is None]) == 1:
         raise ValueError('You must pass both `population_y_true_observed_mn` and '
                          '`population_y_true_observed_sd` or neither.')
 
-    if any(y_pred_population_params) and not all(y_pred_population_params):
+    if len([param for param in y_pred_population_params
+            if param is None]) == 1:
         raise ValueError('You must pass both `population_y_pred_mn` and '
                          '`population_y_pred_sd` or neither.')
 
@@ -381,6 +383,13 @@ def difference_of_standardized_means(y_true_observed,
         (population_y_pred_sd,
          population_y_pred_mn) = (np.std(y_pred, ddof=ddof),
                                   np.mean(y_pred))
+
+    # if any of the standard deviations raise a warning and return None
+    if population_y_pred_sd == 0 or population_y_true_observed_sd == 0:
+        warnings.warn("Population standard deviations for the computation of "
+                      "DSM are zero. No value will be computed")
+        return None
+
 
     # calculate the z-scores for observed and predicted
     y_true_observed_subgroup_z = ((y_true_observed - population_y_true_observed_mn) /
