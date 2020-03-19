@@ -423,7 +423,7 @@ def test_difference_of_standardized_means_with_no_population_info():
     assert issubclass(warning_list[1].category, UserWarning)
 
 
-def test_difference_of_standardized_means_zero_population_sd():
+def test_difference_of_standardized_means_zero_population_sd_pred():
     y_true, y_pred = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
                       np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2]))
     expected = None
@@ -432,6 +432,18 @@ def test_difference_of_standardized_means_zero_population_sd():
                                                      population_y_true_observed_sd=0.54,
                                                      population_y_pred_mn=2.44,
                                                      population_y_pred_sd=0)
+    eq_(diff_std_means, expected)
+
+
+def test_difference_of_standardized_means_zero_population_sd_human():
+    y_pred, y_true = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+                      np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2]))
+    expected = None
+    diff_std_means = difference_of_standardized_means(y_true, y_pred,
+                                                     population_y_pred_observed_mn=2.44,
+                                                     population_y_pred_observed_sd=0.54,
+                                                     population_y_true_mn=2.44,
+                                                     population_y_true_sd=0)
     eq_(diff_std_means, expected)
 
 
