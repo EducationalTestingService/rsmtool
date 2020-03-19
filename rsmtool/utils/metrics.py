@@ -387,8 +387,14 @@ def difference_of_standardized_means(y_true_observed,
                                   np.mean(y_pred))
 
     # if any of the standard deviations equal zero
-    # raise a warning and return None
-    if population_y_pred_sd == 0 or population_y_true_observed_sd == 0:
+    # raise a warning and return None.
+    # We use np.isclose since sometimes sd for float
+    # values is a value very close to 0.
+    # We use the same tolerance as used for identifying
+    # features with zero standard deviation
+
+    if np.isclose(population_y_pred_sd, 0, atol=1e-07) \
+        or np.isclose(population_y_true_observed_sd, 0, atol=1e-07):
         warnings.warn("Population standard deviations for the computation of "
                       "DSM is zero. No value will be computed.")
         return None

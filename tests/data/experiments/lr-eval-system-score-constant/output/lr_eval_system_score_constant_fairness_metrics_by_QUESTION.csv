@@ -1,0 +1,3 @@
+,Overall score accuracy,Overall score difference,Conditional score difference,base_category
+R2,-0.01177664867159045,-0.01262654058967505,0.0,QUESTION_1
+sig,0.6494154859715568,0.6977724389286026,1.5088907880804768e-22,QUESTION_1
