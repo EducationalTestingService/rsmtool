@@ -601,8 +601,8 @@ class Analyzer:
                        smd_method='unpooled',
                        use_diff_std_means=False):
         """
-        This is a helper function that computes some basic agreement
-        and association metrics between the system scores and the
+        This is a helper function that computes several basic
+        association metrics between the system scores and the
         human scores.
 
         Parameters
@@ -620,16 +620,16 @@ class Analyzer:
         population_system_score_sd : float, optional
             Reference standard deviation for system scores. If `smd_method='williamson'`, this is
             used to compute SMD and should be the standard deviation for the whole population.If
-            `use_diff_std_means=True`, this must be used with `population_human_score_mn`.
+            `use_diff_std_means=True`, this must be used with `population_system_score_mn`.
             Otherwise, it is ignored.
             Defaults to None.
         population_human_score_mn : float, optional
             Reference mean for human scores. If `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_human_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         population_system_score_mn : float, optional
             Reference mean for system scores. If  `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_system_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
             The SMD method to use, only used if `use_diff_std_means=False`.
