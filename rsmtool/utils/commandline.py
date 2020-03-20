@@ -799,6 +799,7 @@ class ConfigurationGenerator:
                     interactive_field = InteractiveField(field_name,
                                                          field_type,
                                                          INTERACTIVE_MODE_METADATA[field_name])
+                    configdict[field_name] = interactive_field.get_value()
                 # if the user pressed Ctrl-D, then exit out of interactive mode
                 # without generating anything and return an empty string
                 except EOFError:
@@ -807,8 +808,6 @@ class ConfigurationGenerator:
                     sys.stderr.write("\n")
                     return ''
                 # otherwise get the field value and save it
-                else:
-                    configdict[field_name] = interactive_field.get_value()
 
         # create a Configuration instance from the dictionary we just generated
         sys.stderr.write("\n")
