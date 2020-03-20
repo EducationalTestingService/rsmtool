@@ -513,7 +513,7 @@ class InteractiveField:
             contain spaces. We do not allow blanks since IDs
             are always required.
         """
-        validator = Validator.from_callable(lambda text: text and ' ' not in text,
+        validator = Validator.from_callable(lambda text: len(text) > 0 and ' ' not in text,
                                             error_message="blanks/spaces not allowed")
         return validator
 
