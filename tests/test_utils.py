@@ -3,6 +3,7 @@ import tempfile
 import warnings
 
 from itertools import product
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import patch
 
 import numpy as np
@@ -14,6 +15,8 @@ from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
 from os import getcwd, unlink, listdir
 from os.path import abspath, join, relpath
 from pandas.testing import assert_frame_equal
+from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.shortcuts import CompleteStyle
 
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
@@ -26,7 +29,11 @@ from rsmtool.test_utils import rsmtool_test_dir
 
 from rsmtool.utils.commandline import (CmdOption,
                                        ConfigurationGenerator,
+                                       InteractiveField,
                                        setup_rsmcmd_parser)
+from rsmtool.utils.constants import (CHECK_FIELDS,
+                                     DEFAULTS,
+                                     INTERACTIVE_MODE_METADATA)
 from rsmtool.utils.conversion import int_to_float, convert_to_float
 from rsmtool.utils.files import (parse_json_with_comments,
                                  has_files_with_extension,
@@ -448,6 +455,7 @@ def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
                                     labels=[3, 4, 5, 6, 7,
                                             8, 9, 10, 11, 12])
     assert_almost_equal(qwk_rsmtool, qwk_sklearn)
+
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
@@ -1158,3 +1166,414 @@ class TestBatchGenerateConfiguration:
                    use_subgroups,
                    as_string,
                    suppress_warnings)
+
+
+class TestInteractiveField:
+
+    # class to test the InteractiveField class; note that we
+    # are mocking the prompt_toolkit functionality
+    # as per unit test best practices that recommend
+    # not testing third-party libraries that are already
+    # tested externally
+
+    def check_boolean_field(self, field_type, user_input, final_value):
+        """
+        Check that boolean fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_bool',
+                                      field_type,
+                                      {'label': 'answer the question', 'type': 'boolean'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>answer the question</b>: ").value)
+
+            # make sure the completer is set up correctly
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer.words, ["true", "false"])
+
+            # make sure the validator validates the right things
+            validator = mock_prompt.call_args[1]["validator"]
+            eq_(validator.func("true"), True)
+            eq_(validator.func("false"), True)
+            eq_(validator.func(""), field_type == 'optional')
+
+            # boolean fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_boolean_field(self):
+        for field_type, (user_input, final_value) in product(['required', 'optional'],
+                                                             [('true', True), ('false', False)]):
+            yield self.check_boolean_field, field_type, user_input, final_value
+
+    def check_choice_field(self, user_input, final_value):
+        """
+        Check that choice fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_choice',
+                                      'required',
+                                      {'label': 'pick a choice',
+                                       'choices': ["one", "two", "three"],
+                                       'type': 'choice'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>pick a choice</b>: ").value)
+
+            # make sure the completer is set up correctly
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer.words, ["one", "two", "three"])
+            ok_(hasattr(completer, 'fuzzy_completer'))
+
+            # make sure the validator validates the right things
+            validator = mock_prompt.call_args[1]["validator"]
+            eq_(validator.func("one"), True)
+            eq_(validator.func("two"), True)
+            eq_(validator.func("three"), True)
+            eq_(validator.func("four"), False)
+            eq_(validator.func(""), False)
+
+            # choice fields use multi-column completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, CompleteStyle.MULTI_COLUMN)
+
+    def test_choice_field(self):
+        for (user_input, final_value) in [('one', 'one'), ('three', 'three')]:
+            yield self.check_choice_field, user_input, final_value
+
+    def check_dir_field(self, user_input, final_value):
+        """
+        Check that dir fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_file',
+                                      'required',
+                                      {'label': 'enter directory', 'type': 'dir'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter directory</b>: ").value)
+
+            # test that the path completer for files works as expected
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer.only_directories, True)
+            eq_(completer.expanduser, False)
+
+            # directories are okay
+            eq_(completer.file_filter(rsmtool_test_dir), True)
+
+            # make sure the validator validates the right things
+
+            # create a temporary directory - it should work
+            validator = mock_prompt.call_args[1]["validator"]
+            tempdir = TemporaryDirectory()
+            eq_(validator.func(tempdir.name), True)
+            tempdir.cleanup()
+
+            # other existing directories should also be accepted
+            eq_(validator.func(rsmtool_test_dir), True)
+
+            # but existing files should be rejected
+            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
+                existing_file = join(rsmtool_test_dir,
+                                     'data',
+                                     'files',
+                                     f'train.{extension}')
+                eq_(validator.func(existing_file), False)
+
+            # file fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_dir_field(self):
+        for (user_input, final_value) in [('/foo/bar', '/foo/bar'), ('foo', 'foo')]:
+            yield self.check_dir_field, user_input, final_value
+
+    def check_file_field(self, user_input, final_value):
+        """
+        Check that file fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_file',
+                                      'required',
+                                      {'label': 'enter file', 'type': 'file'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter file</b>: ").value)
+
+            # test that the path completer for files works as expected
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer.only_directories, False)
+            eq_(completer.expanduser, False)
+
+            # directories are okay
+            eq_(completer.file_filter(rsmtool_test_dir), True)
+
+            # valid file formats are okay
+            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
+                valid_file = join(rsmtool_test_dir,
+                                  'data',
+                                  'files',
+                                  f'train.{extension}')
+                eq_(completer.file_filter(valid_file), True)
+
+            eq_(completer.file_filter(join(rsmtool_test_dir,
+                                           'data',
+                                           'experiments'
+                                           'lr',
+                                           'lr.json')), False)
+            eq_(completer.file_filter(join(rsmtool_test_dir, 'test_cli.py')), False)
+
+            # make sure the validator validates the right things
+
+            # create a temporary CSV file and close it right away
+            # so that we know that it doesn't exist but has
+            # the right extension
+            validator = mock_prompt.call_args[1]["validator"]
+            non_existing_csv_file = NamedTemporaryFile(suffix='.csv')
+            non_existing_csv_file.close()
+            eq_(validator.func(non_existing_csv_file.name), False)
+
+            # directories should be rejected
+            eq_(validator.func(rsmtool_test_dir), False)
+
+            # existing files should be okay
+            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
+                existing_file = join(rsmtool_test_dir,
+                                     'data',
+                                     'files',
+                                     f'train.{extension}')
+                eq_(validator.func(existing_file), True)
+
+            # file fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_file_field(self):
+        for (user_input, final_value) in [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]:
+            yield self.check_file_field, user_input, final_value
+
+    def check_format_field(self, user_input, final_value):
+        """
+        Check that file format fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_file_format',
+                                      'optional',
+                                      {'label': 'enter file format', 'type': 'format'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter file format</b>: ").value)
+
+            # test that the path completer for files works as expected
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(sorted(completer.words), ['csv', 'tsv', 'xlsx'])
+
+            # make sure the validator validates the right things
+            validator = mock_prompt.call_args[1]["validator"]
+            eq_(validator.func("csv"), True)
+            eq_(validator.func("CSV"), False)
+            eq_(validator.func("tsv"), True)
+            eq_(validator.func("TSV"), False)
+            eq_(validator.func("xlsx"), True)
+            eq_(validator.func("XLSX"), False)
+            eq_(validator.func("xls"), False)
+            eq_(validator.func(""), True)
+
+            # file fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_format_field(self):
+        for (user_input, final_value) in [('csv', 'csv'),
+                                          ('tsv', 'tsv'),
+                                          ('xlsx', 'xlsx')]:
+            yield self.check_format_field, user_input, final_value
+
+    def check_id_field(self, user_input, final_value):
+        """
+        Check that ID fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_int',
+                                      'required',
+                                      {'label': 'enter experiment ID', 'type': 'id'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter experiment ID</b>: ").value)
+
+            # there is no completer for integer field
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer, None)
+
+            # make sure the validator validates the right things
+            validator = mock_prompt.call_args[1]["validator"]
+            eq_(validator.func("test"), True)
+            eq_(validator.func("foo_bar"), True)
+            eq_(validator.func("foo bar"), False)
+            eq_(validator.func(""), False)
+
+            # integer fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_id_field(self):
+        for (user_input, final_value) in [('test', 'test'), ('another_id', 'another_id')]:
+            yield self.check_id_field, user_input, final_value
+
+    def check_integer_field(self, field_type, user_input, final_value):
+        """
+        Check that integer fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_int',
+                                      field_type,
+                                      {'label': 'enter a number', 'type': 'integer'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter a number</b>: ").value)
+
+            # there is no completer for integer field
+            completer = mock_prompt.call_args[1]["completer"]
+            eq_(completer, None)
+
+            # make sure the validator validates the right things;
+            # recall the vaidator function for integer uses
+            # regular expression matching
+            validator = mock_prompt.call_args[1]["validator"]
+            eq_(validator.func("5") is not None, True)
+            eq_(validator.func("10") is not None, True)
+            eq_(validator.func("9.5") is None, True)
+            eq_(validator.func("abc") is None, True)
+            eq_(validator.func("0") is not None, True)
+            eq_(validator.func("") is not None, field_type == "optional")
+
+            # integer fields do not use a completion style
+            complete_style = mock_prompt.call_args[1]["complete_style"]
+            eq_(complete_style, None)
+
+    def test_integer_field(self):
+        for field_type, (user_input, final_value), in product(['required', 'optional'],
+                                                              [('1', 1), ('10', 10), ('0', 0)]):
+            yield self.check_integer_field, field_type, user_input, final_value
+
+    def check_text_field(self, field_type, user_input, final_value):
+        """
+        Check that text fields are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
+            ifield = InteractiveField('test_text', field_type, {'label': 'description', 'type': 'text'})
+            eq_(ifield.get_value(), final_value)
+            eq_(mock_prompt.call_count, 1)
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>description</b>: ").value)
+            eq_(mock_prompt.call_args[1], {'completer': None,
+                                           'complete_style': None,
+                                           'validator': None})
+
+    def test_text_field(self):
+        for field_type, (user_input, final_value) in product(['required', 'optional'],
+                                                             [('test', 'test'),
+                                                              ('test value', 'test value')]):
+            yield self.check_text_field, field_type, user_input, final_value
+
+    def check_multiple_count_field(self, user_input, final_value, num_entries, field_type):
+        """
+        Check that fields that accept multiple values are handled correctly
+        """
+        with patch('rsmtool.utils.commandline.prompt', return_value=num_entries) as mock_prompt:
+            ifield = InteractiveField('test_multiple',
+                                      'optional',
+                                      {'label': 'label for field',
+                                       'count': 'multiple',
+                                       'type': field_type})
+            _ = ifield.get_value()
+            # there are N + 1 calls to `prompt()`, one to get the number of entries
+            # and one for each entry
+            eq_(mock_prompt.call_count, int(num_entries) + 1)
+
+            # check the first call to prompt that asks for the number of entries
+            call_args = mock_prompt.call_args_list[0]
+            eq_(call_args[0][0], "  How many do you want to specify: ")
+
+            # this first prompt call has no completer and completion style
+            # but it has a validator that only accepts integers including 0
+            # but no blanks
+            validator = call_args[1]["validator"]
+            eq_(validator.func("5") is not None, True)
+            eq_(validator.func("10") is not None, True)
+            eq_(validator.func("9.5") is None, True)
+            eq_(validator.func("abc") is None, True)
+            eq_(validator.func("0") is not None, True)
+            eq_(validator.func("") is None, True)
+
+            # now let's check the subsequent calls to `prompt()`
+            if num_entries != 0:
+                for entry in range(1, int(num_entries) + 1):
+                    call_args = mock_prompt.call_args_list[entry]
+                    # check the label
+                    eq_(call_args[0][0], f"   Enter #{entry}: ")
+
+                    # now check the completers etc. depending on field type
+                    if field_type == 'text':
+                        # for text fields, everythign is None
+                        eq_(call_args[1], {'completer': None,
+                                           'complete_style': None,
+                                           'validator': None})
+                    else:
+                        # for the dir type, the completer only accepts directories
+                        completer = call_args[1]["completer"]
+                        eq_(completer.only_directories, True)
+                        eq_(completer.expanduser, False)
+
+                        # and the validator only accepts real directories
+                        validator = call_args[1]["validator"]
+                        tempdir = TemporaryDirectory()
+                        eq_(validator.func(tempdir.name), True)
+                        tempdir.cleanup()
+
+                        eq_(validator.func(rsmtool_test_dir), True)
+
+                        # but existing files should be rejected
+                        for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
+                            existing_file = join(rsmtool_test_dir,
+                                                 'data',
+                                                 'files',
+                                                 f'train.{extension}')
+                            eq_(validator.func(existing_file), False)
+
+                        complete_style = call_args[1]["complete_style"]
+                        eq_(complete_style, None)
+
+    def test_multiple_count_field(self):
+        for ((user_input, final_value),
+             num_entries,
+             field_type) in product([('test', 'test'), ('test value', 'test value')],
+                                    ['0', '3'],
+                                    ['dir', 'text']):
+            yield (self.check_multiple_count_field,
+                   user_input,
+                   final_value,
+                   num_entries,
+                   field_type)
+
+    def check_optional_interactive_fields(self, field_name, field_count):
+        """
+        Check that blank user input for an optional field is handled correctly
+        """
+        default_value = DEFAULTS.get(field_name)
+        blank_return_value = '' if field_count == 'single' else []
+        with patch('rsmtool.utils.commandline.prompt', return_value=blank_return_value):
+            ifield = InteractiveField(field_name,
+                                      'optional',
+                                      {'label': 'optional field label'})
+            eq_(ifield.get_value(), default_value)
+
+    def test_optional_interactive_fields(self):
+        ALL_REQUIRED_FIELDS = set()
+        for context in ['rsmtool', 'rsmeval', 'rsmpredict', 'rsmsummarize', 'rsmcompare']:
+            ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]['required'])
+        OPTIONAL_INTERACTIVE_FIELDS = [field for field in INTERACTIVE_MODE_METADATA
+                                       if field not in ALL_REQUIRED_FIELDS]
+        for field_name in OPTIONAL_INTERACTIVE_FIELDS:
+            field_count = INTERACTIVE_MODE_METADATA[field_name].get('count', 'single')
+            yield self.check_optional_interactive_fields, field_name, field_count
