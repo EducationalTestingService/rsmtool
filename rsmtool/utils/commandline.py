@@ -452,7 +452,12 @@ class InteractiveField:
         """
         def valid_file(filename):
             return (Path(filename).is_dir() or
-                    Path(filename).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
+                    Path(filename).suffix.lower().lstrip('.') in ['csv',
+                                                                  'jsonlines',
+                                                                  'sas7bdat',
+                                                                  'tsv',
+                                                                  'xls',
+                                                                  'xlsx'])
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
     def _make_file_validator(self):
@@ -469,7 +474,12 @@ class InteractiveField:
         """
         def is_valid(filepath):
             return (Path(filepath).is_file() and
-                    Path(filepath).suffix.lower().lstrip('.') in POSSIBLE_EXTENSIONS)
+                    Path(filepath).suffix.lower().lstrip('.') in ['csv',
+                                                                  'jsonlines',
+                                                                  'sas7bdat',
+                                                                  'tsv',
+                                                                  'xls',
+                                                                  'xlsx'])
         validator = Validator.from_callable(is_valid, error_message="invalid file")
         return validator
 
@@ -482,10 +492,10 @@ class InteractiveField:
         -------
         validator : prompt_toolkit.validation.Validator
             A ``Validator`` instance that makes sure that only
-            valid RSMTool extensions (csv/tsv/xlsx) and the
+            valid RSMTool extensions (csv/tsv/xlsx) and
             empty string are allowed as final user input. We
-            want to allow empty string because file formats
-            are optional to specify.
+            want to allow empty string because intermediate file
+            formats are optional to specify.
         """
         validator = Validator.from_callable(lambda ext: ext in POSSIBLE_EXTENSIONS or ext == '', error_message="invalid format")
         return validator
