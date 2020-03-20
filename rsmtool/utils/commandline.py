@@ -334,22 +334,26 @@ class InteractiveField:
         self.validator = None
 
         # now override these attributes as necessary depending on field data types
-        if self.data_type == 'choice':
+        if self.data_type == 'boolean':
+            allow_empty = field_type == 'optional'
+            self.completer = WordCompleter(['true', 'false'])
+            self.validator = self._make_boolean_validator(allow_empty=allow_empty)
+        elif self.data_type == 'choice':
             if not self.choices:
                 raise(ValueError, f"invalid list of choices for {field_name}")
             else:
                 self.completer = FuzzyWordCompleter(self.choices)
                 self.validator = self._make_choice_validator(self.choices)
                 self.complete_style = CompleteStyle.MULTI_COLUMN
+        elif self.data_type == 'dir':
+            self.completer = self._make_directory_completer()
+            self.validator = self._make_directory_validator()
         elif self.data_type == 'file':
             self.completer = self._make_file_completer()
             self.validator = self._make_file_validator()
         elif self.data_type == 'format':
             self.completer = WordCompleter(POSSIBLE_EXTENSIONS)
             self.validator = self._make_file_format_validator()
-        elif self.data_type == 'dir':
-            self.completer = self._make_directory_completer()
-            self.validator = self._make_directory_validator()
         elif self.data_type == 'id':
             self.completer = None
             self.validator = self._make_id_validator()
@@ -357,10 +361,6 @@ class InteractiveField:
             self.completer = None
             allow_empty = field_type == 'optional'
             self.validator = self._make_integer_validator(allow_empty=allow_empty)
-        elif self.data_type == 'boolean':
-            allow_empty = field_type == 'optional'
-            self.completer = WordCompleter(['true', 'false'])
-            self.validator = self._make_boolean_validator(allow_empty=allow_empty)
 
     def _make_boolean_validator(self, allow_empty=False):
         """
