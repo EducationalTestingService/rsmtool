@@ -1205,9 +1205,9 @@ class Analyzer:
                           np.isclose(sd, 0, atol=1e-07)]
         if len(zero_sd_scores) > 0:
             warnings.warn("The standard deviation for {} scores "
-                          "is zero (all scores are the same). You "
+                          "is zero (all values are the same). You "
                           "will see multiple warnings about DSM computation "
-                          "since this metrics is computed separately for "
+                          "since this metric is computed separately for "
                           "each subgroup.".format(', '.join(zero_sd_scores)))
 
         # create a duplicate data frame to compute evaluations
