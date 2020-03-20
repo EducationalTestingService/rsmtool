@@ -517,7 +517,7 @@ class InteractiveField:
                                             error_message="blanks/spaces not allowed")
         return validator
 
-    def _make_integer_validator(self, allow_empty=False, non_zero=False):
+    def _make_integer_validator(self, allow_empty=False):
         """
         Private method that creates a validator for a field
         with ``data_type`` of "integers".
@@ -529,21 +529,15 @@ class InteractiveField:
             enter (i.e., input a blank string)
             Defaults to ``False``.
 
-        non_zero : bool, optional
-            If ``True``, it will prevent the user from inputting
-            a value of "0" for this field.
-
         Returns
         -------
         validator : prompt_toolkit.validation.Validator
             A ``Validator`` instance that makes sure that the
             final user input is a string representation of a
-            fixed-point number or integer. Zeros may or may not
-            be allowed depending on the value of ``non_zero``.
-            Similarly, blank strings may also be allowed if
-            ``allow_empty`` is ``True``.
+            fixed-point number or integer. Blank strings may
+            also be allowed if ``allow_empty`` is ``True``.
         """
-        integer_regex = r'^[1-9]([0-9]+)?' if non_zero else r'^[0-9]+$'
+        integer_regex = r'^[0-9]+$'
         if allow_empty:
             integer_regex += r'|^$'
         validator = Validator.from_callable(lambda answer: re.match(integer_regex, answer),
@@ -577,7 +571,7 @@ class InteractiveField:
             # ask the user how many of the multiple inputs they
             # intend to provide; this must be non-zero
             num_entries = prompt("  How many do you want to specify: ",
-                                 validator=self._make_integer_validator(non_zero=True))
+                                 validator=self._make_integer_validator())
             num_entries = int(num_entries)
 
             # display secondary prompts, one for each of the inputs
@@ -592,6 +586,7 @@ class InteractiveField:
 
             # this is what we will return
             user_input = values
+
         # if we are dealing with a simple single-input field
         else:
             # nothing fancy, just display the label, attach
@@ -619,7 +614,7 @@ class InteractiveField:
         TYPE
             Description
         """
-        if user_input == '' and self.field_type == 'optional':
+        if (user_input == '' or user_input == []) and self.field_type == 'optional':
             final_value = DEFAULTS.get(self.field_name)
         else:
             # boolean fields need to be converted to actual booleans
