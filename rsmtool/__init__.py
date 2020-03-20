@@ -13,7 +13,7 @@ import re
 import warnings
 
 try:
-    import rsmextra
+    import rsmextra # noqa
 except ImportError:
     HAS_RSMEXTRA = False
 else:
@@ -22,13 +22,13 @@ else:
 from .version import __version__
 
 if HAS_RSMEXTRA:
-    from rsmextra.version import __version__ as rsmextra_version
+    from rsmextra.version import __version__ as rsmextra_version # noqa
     VERSION_STRING = '%(prog)s {}; rsmextra {}'.format(__version__,
                                                        rsmextra_version)
 else:
     VERSION_STRING = '%(prog)s {}'.format(__version__)
 
-from .analyzer import Analyzer
+from .analyzer import Analyzer  # noqa
 
 from .convert_feature_json import convert_feature_json_file  # noqa
 

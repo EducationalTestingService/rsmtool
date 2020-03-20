@@ -1,0 +1,12 @@
+{
+    "predictions_file": "../../files/predictions_same_system_score_with_subgroups_subset_double_scored.csv",
+    "system_score_column": "score",
+    "description": "An evaluation of LinearRegression predictions.",
+    "human_score_column": "h1",
+    "second_human_score_column": "h2",
+    "id_column": "id",
+    "experiment_id": "lr_eval_system_score_constant",
+    "subgroups": "QUESTION, L1",
+    "trim_min": 1,
+    "trim_max": 6
+}

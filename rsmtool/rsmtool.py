@@ -10,11 +10,10 @@ The main RSMTool script.
 :organization: ETS
 """
 
-import argparse
 import logging
 import sys
 
-from os import listdir, getcwd, makedirs
+from os import listdir, makedirs
 from os.path import abspath, exists, join
 
 from .analyzer import Analyzer
@@ -23,15 +22,21 @@ from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
 from .reporter import Reporter
+from .utils.commandline import generate_configuration, setup_rsmcmd_parser
+from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
 
 
 def run_experiment(config_file_or_obj_or_dict,
-                   output_dir):
+                   output_dir,
+                   overwrite_output=False):
     """
     Run an ``rsmtool`` experiment using the given configuration
     file and generate all outputs in the given directory.
+
+    If ``overwrite_output`` is ``True``, overwrite any existing
+    output in the given ``output_dir``.
 
     Parameters
     ----------
@@ -47,11 +52,21 @@ def run_experiment(config_file_or_obj_or_dict,
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
+    overwrite_output : bool, optional
+        If ``True``, overwrite any existing output under ``output_dir``.
+        Defaults to ``False``.
 
     Raises
     ------
+    FileNotFoundError
+        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
+        be located.
+    IOError
+        If ``output_dir`` already contains the output of a previous experiment
+        and ``overwrite_output`` is ``False``.
     ValueError
-        If any of the required fields are missing or ill-specified.
+        If ``output_dir`` was previously used to store the output of a linear
+        model running on the same data with the same experiment ID.
     """
 
     logger = logging.getLogger(__name__)
@@ -70,6 +85,23 @@ def run_experiment(config_file_or_obj_or_dict,
     makedirs(csvdir, exist_ok=True)
     makedirs(figdir, exist_ok=True)
     makedirs(reportdir, exist_ok=True)
+
+    # Raise an error if the specified output directory
+    # already contains a non-empty `output` directory, unless
+    # `overwrite_output` was specified, in which case we assume
+    # that the user knows what she is doing and simply
+    # output a warning saying that the report might
+    # not be correct.
+    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
+    if non_empty_csvdir:
+        if not overwrite_output:
+            raise IOError("'{}' already contains a non-empty 'output' "
+                          "directory.".format(output_dir))
+        else:
+            logger.warning("{} already contains a non-empty 'output' directory. "
+                           "The generated report might contain "
+                           "unexpected information from a previous "
+                           "experiment.".format(output_dir))
 
     configuration = configure('rsmtool', config_file_or_obj_or_dict)
 
@@ -283,70 +315,64 @@ def run_experiment(config_file_or_obj_or_dict,
 
 def main():
 
+    # set up the basic logging configuration
     formatter = LogFormatter()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is important
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
 
-    logging.root.addHandler(handler)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
     logging.root.setLevel(logging.INFO)
-
     logger = logging.getLogger(__name__)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmtool')
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmtool',
+                                 uses_output_directory=True,
+                                 allows_overwriting=True,
+                                 uses_subgroups=True)
 
-    parser.add_argument('-f', '--force', dest='force_write',
-                        action='store_true', default=False,
-                        help="If true, rsmtool will not check if the "
-                             "output directory already contains the "
-                             "output of another rsmtool experiment. ")
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ['-h', '--help',
+                                                      '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    parser.add_argument('config_file', help="The JSON configuration file for "
-                                            "this experiment")
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    parser.add_argument('output_dir', nargs='?', default=getcwd(),
-                        help="The output directory where all the files "
-                             "for this experiment will be stored")
+        # when running, log to stdout
+        logging.root.addHandler(stdout_handler)
 
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+        # run the experiment
+        logger.info('Output directory: {}'.format(args.output_dir))
+        run_experiment(abspath(args.config_file),
+                       abspath(args.output_dir),
+                       overwrite_output=args.force_write)
 
-    args = parser.parse_args()
-    logger.info('Output directory: {}'.format(args.output_dir))
+    else:
 
-    # Raise an error if the specified output directory
-    # already contains a non-empty `output` directory, unless
-    # `--force` was specified, in which case we assume
-    # that the user knows what she is doing and simply
-    # output a warning saying that the report might
-    # not be correct.
-    csvdir = join(args.output_dir, 'output')
-    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
-    if non_empty_csvdir:
-        if not args.force_write:
-            raise IOError("'{}' already contains a non-empty 'output' "
-                          "directory.".format(args.output_dir))
-        else:
-            logger.warning("{} already contains a non-empty 'output' directory. "
-                           "The generated report might contain "
-                           "unexpected information from a previous "
-                           "experiment.".format(args.output_dir))
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = abspath(args.config_file)
-    output_dir = abspath(args.output_dir)
-
-    # make sure that the given configuration file exists
-    if not exists(config_file):
-        raise FileNotFoundError('Main configuration file {} '
-                                'not found.'.format(config_file))
-
-    # run the experiment
-    run_experiment(config_file, output_dir)
+        # auto-generate an example configuration and print it to STDOUT
+        configuration = generate_configuration('rsmtool',
+                                               use_subgroups=args.subgroups,
+                                               as_string=True,
+                                               suppress_warnings=args.quiet)
+        print(configuration)
 
 
 if __name__ == '__main__':
-
     main()

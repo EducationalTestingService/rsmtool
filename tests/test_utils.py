@@ -1,14 +1,18 @@
-
+import argparse
 import tempfile
 import warnings
 
+from itertools import product
+from unittest.mock import patch
+
 import numpy as np
 import pandas as pd
+
 from numpy.testing import assert_almost_equal
 from itertools import count
-from nose.tools import assert_equal, eq_, raises
-from os import unlink, listdir
-from os.path import abspath, dirname, join, relpath
+from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
+from os import getcwd, unlink, listdir
+from os.path import abspath, join, relpath
 from pandas.testing import assert_frame_equal
 
 from sklearn.datasets import make_classification
@@ -17,6 +21,12 @@ from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 from skll.metrics import kappa
 
+from rsmtool.configuration_parser import Configuration
+from rsmtool.test_utils import rsmtool_test_dir
+
+from rsmtool.utils.commandline import (CmdOption,
+                                       generate_configuration,
+                                       setup_rsmcmd_parser)
 from rsmtool.utils.conversion import int_to_float, convert_to_float
 from rsmtool.utils.files import (parse_json_with_comments,
                                  has_files_with_extension,
@@ -34,10 +44,6 @@ from rsmtool.utils.notebook import (float_format_func,
                                     compute_subgroup_plot_params,
                                     get_thumbnail_as_html,
                                     get_files_as_html)
-
-
-# get the directory containing the tests
-test_dir = dirname(__file__)
 
 
 def test_int_to_float():
@@ -252,26 +258,26 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
 
 
 def test_has_files_with_extension_true():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'csv')
     eq_(result, True)
 
 
 def test_has_files_with_extension_false():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     result = has_files_with_extension(directory, 'ppt')
     eq_(result, False)
 
 
 def test_get_output_directory_extension():
-    directory = join(test_dir, 'data', 'experiments', 'lr', 'output')
+    directory = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'output')
     result = get_output_directory_extension(directory, 'id_1')
     eq_(result, 'csv')
 
 
 @raises(ValueError)
 def test_get_output_directory_extension_error():
-    directory = join(test_dir, 'data', 'files')
+    directory = join(rsmtool_test_dir, 'data', 'files')
     get_output_directory_extension(directory, 'id_1')
 
 
@@ -417,11 +423,44 @@ def test_difference_of_standardized_means_with_no_population_info():
     assert issubclass(warning_list[1].category, UserWarning)
 
 
+def test_difference_of_standardized_means_zero_population_sd_pred():
+    y_true, y_pred = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+                      np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
+    expected = None
+    diff_std_means = difference_of_standardized_means(y_true, y_pred,
+                                                      population_y_true_observed_mn=2.44,
+                                                      population_y_true_observed_sd=0.54,
+                                                      population_y_pred_mn=2.44,
+                                                      population_y_pred_sd=0)
+    eq_(diff_std_means, expected)
+
+
+def test_difference_of_standardized_means_zero_population_sd_human():
+    y_true, y_pred = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+                      np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
+    expected = None
+    diff_std_means = difference_of_standardized_means(y_true, y_pred,
+                                                      population_y_pred_mn=2.44,
+                                                      population_y_pred_sd=0.54,
+                                                      population_y_true_observed_mn=2.44,
+                                                      population_y_true_observed_sd=0)
+    eq_(diff_std_means, expected)
+
+
+def test_difference_of_standardized_means_zero_population_computed():
+    # sd is computed from the data and is zero
+    y_pred, y_true = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+                      np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2]))
+    expected = None
+    diff_std_means = difference_of_standardized_means(y_true, y_pred)
+    eq_(diff_std_means, expected)
+
+
 def test_quadratic_weighted_kappa():
 
     expected_qwk = -0.09210526315789469
     computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
-                                   np.array([9, 4, 5, 12]))
+                                            np.array([9, 4, 5, 12]))
     assert_almost_equal(computed_qwk, expected_qwk)
 
 
@@ -480,7 +519,7 @@ def test_partial_correlations_pinv():
 class TestIntermediateFiles:
 
     def get_files(self, file_format='csv'):
-        directory = join(test_dir, 'data', 'output')
+        directory = join(rsmtool_test_dir, 'data', 'output')
         files = sorted([f for f in listdir(directory)
                         if f.endswith(file_format)])
         return files, directory
@@ -552,7 +591,7 @@ class TestThumbnail:
 
         # simple test of HTML thumbnail conversion
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -565,7 +604,7 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure3.png'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure3.png'))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -577,8 +616,8 @@ class TestThumbnail:
 
         # test converting two images to HTML thumbnails
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
 
         counter = count(1)
         image = get_thumbnail_as_html(path1, next(counter))
@@ -593,7 +632,7 @@ class TestThumbnail:
 
         # test converting image to HTML with absolute path
 
-        path = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         path_absolute = abspath(path)
 
         image = get_thumbnail_as_html(path_absolute, 1)
@@ -615,8 +654,8 @@ class TestThumbnail:
 
         # test converting image to HTML with different thumbnail
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
 
         image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
@@ -630,12 +669,12 @@ class TestThumbnail:
 
         # test FileNotFound error properly raised for thumbnail
 
-        path1 = relpath(join(test_dir, 'data', 'figures', 'figure1.svg'))
+        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
         path2 = 'random/path/asftesfa/to/figure1.svg'
         _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
-class TestExpectedScores():
+class TestExpectedScores:
 
     @classmethod
     def setUpClass(cls):
@@ -686,3 +725,436 @@ class TestExpectedScores():
         computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
         assert len(computed_predictions) == len(self.test_fs)
         assert np.all([((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions])
+
+
+class TestCmdOption:
+
+    @raises(TypeError)
+    def test_cmd_option_no_help(self):
+        """
+        test that CmdOption with no help raises exception
+        """
+        _ = CmdOption(longname='foo', dest='blah')
+
+    @raises(TypeError)
+    def test_cmd_option_no_dest(self):
+        """
+        test that CmdOption with no dest raises exception
+        """
+        _ = CmdOption(longname='foo', help='this option has no dest')
+
+    def test_cmd_option_attributes(self):
+        """
+        test CmdOption attributes
+        """
+        co = CmdOption(dest='good', help='this option has only dest and help')
+        eq_(co.dest, 'good')
+        eq_(co.help, 'this option has only dest and help')
+        ok_(co.action is None)
+        ok_(co.longname is None)
+        ok_(co.shortname is None)
+        ok_(co.required is None)
+        ok_(co.nargs is None)
+        ok_(co.default is None)
+
+
+class TestSetupRsmCmdParser:
+
+    def test_run_subparser_no_args(self):
+        """
+        test run subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        # we need to patch sys.exit since --help just exists otherwise
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args('run --help'.split())
+        expected_namespace = argparse.Namespace(config_file=None,
+                                                output_dir=getcwd(),
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    @raises(SystemExit)
+    def test_run_subparser_non_existent_config_file(self):
+        """
+        test run subparser with a non-existent config file
+        """
+        parser = setup_rsmcmd_parser('test')
+        _ = parser.parse_args('run fake.json'.split())
+
+    def test_run_subparser_with_output_directory(self):
+        """
+        test run subparser with a specified output directory
+        """
+        parser = setup_rsmcmd_parser('test')
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir".split())
+
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                output_dir='/path/to/output/dir',
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_no_output_directory(self):
+        """
+        test run subparser where no output directory is required
+        """
+        parser = setup_rsmcmd_parser('test', uses_output_directory=False)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file}".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run')
+        ok_(not hasattr(parsed_namespace, 'output_dir'))
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_with_overwrite_enabled(self):
+        """
+        test run subparser with overwriting enabled
+        """
+        parser = setup_rsmcmd_parser('test', allows_overwriting=True)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir -f".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                output_dir='/path/to/output/dir',
+                                                force_write=True,
+                                                subcommand='run')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_with_extra_options(self):
+        """
+        test run subparser with extra options
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(shortname='t',
+                                   longname='test',
+                                   dest='test_kwarg',
+                                   help='a test optional argument'),
+                         CmdOption(shortname='x',
+                                   dest='extra_kwarg',
+                                   action='store_true',
+                                   default=False,
+                                   help='a boolean optional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='extra_kwargs2',
+                                   nargs='+',
+                                   required=False,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     allows_overwriting=True,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir foo --test bar -x --zeta 1 2".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                extra_kwarg=True,
+                                                extra_kwargs2=['1', '2'],
+                                                force_write=False,
+                                                output_dir='/path/to/output/dir',
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwarg='bar')
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_run_subparser_with_extra_options_required_true_not_specified(self):
+        """
+        test run subparser with an unspecified required optional
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required=True,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     uses_output_directory=False,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args(f"run {config_file} foo".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwargs=None)
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    def test_run_subparser_with_extra_options_required_true_and_specified(self):
+        """
+        test run subparser with a specified required optional
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required=True,
+                                   help='a multiply specified optional argument')]
+        parser = setup_rsmcmd_parser('test',
+                                     uses_output_directory=False,
+                                     extra_run_options=extra_options)
+        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parsed_namespace = parser.parse_args(f"run {config_file} foo --zeta 1 2".split())
+        expected_namespace = argparse.Namespace(config_file=config_file,
+                                                subcommand='run',
+                                                test_arg='foo',
+                                                test_kwargs=['1', '2'])
+        eq_(parsed_namespace, expected_namespace)
+
+    @raises(TypeError)
+    def test_run_subparser_with_extra_options_bad_required_value(self):
+        """
+        test run subparser with a non-boolean value for required
+        """
+        extra_options = [CmdOption(dest='test_arg',
+                                   help='a test positional argument'),
+                         CmdOption(longname='zeta',
+                                   dest='test_kwargs',
+                                   nargs='+',
+                                   required='true',
+                                   help='a multiply specified optional argument')]
+        _ = setup_rsmcmd_parser('test',
+                                uses_output_directory=False,
+                                extra_run_options=extra_options)
+
+    def test_generate_subparser_help_flag(self):
+        """
+        test generate subparser with --help specified
+        """
+        parser = setup_rsmcmd_parser('test')
+        # we need to patch sys.exit since --help just exists otherwise
+        with patch('sys.exit') as exit_mock:
+            parsed_namespace = parser.parse_args('generate --help'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
+        eq_(parsed_namespace, expected_namespace)
+        assert exit_mock.called
+
+    def test_generate_subparser(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate', quiet=False)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_and_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate --subgroups'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_but_no_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                subgroups=False)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_only_quiet_flag(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate --quiet'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=True)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_and_quiet_flags(self):
+        """
+        test generate subparser with no arguments
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate --subgroups -q'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=True,
+                                                subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
+
+class TestGenerateConfiguration:
+
+    @classmethod
+    def setUpClass(cls):
+        cls.expected_json_dir = join(rsmtool_test_dir, 'data', 'output')
+
+    # a helper method to check that the automatically generated configuration
+    # matches what we expect for each tool
+    def check_generated_configuration(self,
+                                      context,
+                                      use_subgroups=False,
+                                      as_string=False,
+                                      suppress_warnings=False):
+
+        if context == 'rsmtool':
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'model': 'ENTER_VALUE_HERE',
+                          'train_file': 'ENTER_VALUE_HERE',
+                          'test_file': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'dff_by_group',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
+            else:
+                section_list = ['data_description',
+                                'feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'intermediate_file_paths',
+                                'sysinfo']
+
+        elif context == 'rsmeval':
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'predictions_file': 'ENTER_VALUE_HERE',
+                          'system_score_column': 'ENTER_VALUE_HERE',
+                          'trim_min': 'ENTER_VALUE_HERE',
+                          'trim_max': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['data_description',
+                                'data_description_by_group',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'evaluation_by_group',
+                                'fairness_analyses',
+                                'intermediate_file_paths',
+                                'sysinfo']
+            else:
+                section_list = ['data_description',
+                                'consistency',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'intermediate_file_paths',
+                                'sysinfo']
+
+        elif context == "rsmcompare":
+
+            configdict = {'comparison_id': 'ENTER_VALUE_HERE',
+                          'experiment_id_old': 'ENTER_VALUE_HERE',
+                          'experiment_dir_old': 'ENTER_VALUE_HERE',
+                          'experiment_id_new': 'ENTER_VALUE_HERE',
+                          'experiment_dir_new': 'ENTER_VALUE_HERE',
+                          'description_old': 'ENTER_VALUE_HERE',
+                          'description_new': 'ENTER_VALUE_HERE'}
+
+            if use_subgroups:
+                section_list = ['feature_descriptives',
+                                'features_by_group',
+                                'preprocessed_features',
+                                'preprocessed_features_by_group',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
+            else:
+                section_list = ['feature_descriptives',
+                                'preprocessed_features',
+                                'consistency',
+                                'score_distributions',
+                                'model',
+                                'evaluation',
+                                'true_score_evaluation',
+                                'pca',
+                                'notes',
+                                'sysinfo']
+
+        elif context == "rsmsummarize":
+
+            configdict = {'summary_id': 'ENTER_VALUE_HERE',
+                          'experiment_dirs': ['ENTER_VALUE_HERE']}
+
+            section_list = ['preprocessed_features',
+                            'model',
+                            'evaluation',
+                            'true_score_evaluation',
+                            'intermediate_file_paths',
+                            'sysinfo']
+
+        elif context == "rsmpredict":
+
+            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
+                          'experiment_dir': 'ENTER_VALUE_HERE',
+                          'input_features_file': 'ENTER_VALUE_HERE'}
+
+        # get the generated configuration dictionary
+        generated_configuration = generate_configuration(context,
+                                                         use_subgroups=use_subgroups,
+                                                         as_string=as_string,
+                                                         suppress_warnings=suppress_warnings)
+
+        # if we are testing string output, then load the expected json file
+        # and compare its contents directly to the returned string, otherwise
+        # compare the `_config` dictionaries of the two Configuration objects
+        if as_string:
+            if use_subgroups:
+                expected_json_file = join(self.expected_json_dir,
+                                          f"autogenerated_{context}_config_groups.json")
+            else:
+                expected_json_file = join(self.expected_json_dir,
+                                          f"autogenerated_{context}_config.json")
+            expected_json_string = open(expected_json_file, 'r').read().strip()
+            eq_(generated_configuration, expected_json_string)
+        else:
+            expected_configuration_object = Configuration(configdict, context=context)
+            if 'general_sections' in expected_configuration_object:
+                expected_configuration_object['general_sections'] = section_list
+
+            assert_dict_equal(expected_configuration_object._config,
+                              generated_configuration)
+
+    def test_generate_configuration(self):
+        for (context,
+             use_subgroups,
+             as_string,
+             suppress_warnings) in product(['rsmtool',
+                                            'rsmeval',
+                                            'rsmcompare',
+                                            'rsmsummarize',
+                                            'rsmpredict'],
+                                           [True, False],
+                                           [True, False],
+                                           [True, False]):
+
+            # rsmpredict and rsmsummarize do not use subgroups
+            if context in ['rsmpredict', 'rsmsummarize'] and use_subgroups:
+                continue
+
+            yield (self.check_generated_configuration,
+                   context,
+                   use_subgroups,
+                   as_string,
+                   suppress_warnings)
