@@ -356,11 +356,13 @@ def difference_of_standardized_means(y_true_observed,
     y_pred_population_params = [population_y_pred_mn,
                                 population_y_pred_sd]
 
-    if any(y_true_observed_population_params) and not all(y_true_observed_population_params):
+    if len([param for param in y_true_observed_population_params
+            if param is None]) == 1:
         raise ValueError('You must pass both `population_y_true_observed_mn` and '
                          '`population_y_true_observed_sd` or neither.')
 
-    if any(y_pred_population_params) and not all(y_pred_population_params):
+    if len([param for param in y_pred_population_params
+            if param is None]) == 1:
         raise ValueError('You must pass both `population_y_pred_mn` and '
                          '`population_y_pred_sd` or neither.')
 
@@ -368,19 +370,35 @@ def difference_of_standardized_means(y_true_observed,
                    'thus, the calculated z-scores will be zero.')
 
     # if the population means and standard deviations were not provided, calculate from the data
-    if not population_y_true_observed_mn or not population_y_true_observed_sd:
+    # We only check for mean since the function requires
+    # both of these to be set or both to be None
+    if population_y_true_observed_mn is None:
 
         warnings.warn(warning_msg.format('y_true_observed'))
         (population_y_true_observed_sd,
          population_y_true_observed_mn) = (np.std(y_true_observed, ddof=ddof),
                                            np.mean(y_true_observed))
 
-    if not population_y_pred_mn or not population_y_pred_sd:
+    if population_y_pred_mn is None:
 
         warnings.warn(warning_msg.format('y_pred'))
         (population_y_pred_sd,
          population_y_pred_mn) = (np.std(y_pred, ddof=ddof),
                                   np.mean(y_pred))
+
+    # if any of the standard deviations equal zero
+    # raise a warning and return None.
+    # We use np.isclose since sometimes sd for float
+    # values is a value very close to 0.
+    # We use the same tolerance as used for identifying
+    # features with zero standard deviation
+
+    if np.isclose(population_y_pred_sd, 0, atol=1e-07) \
+        or np.isclose(population_y_true_observed_sd, 0, atol=1e-07):
+        warnings.warn("Population standard deviations for the computation of "
+                      "DSM is zero. No value will be computed.")
+        return None
+
 
     # calculate the z-scores for observed and predicted
     y_true_observed_subgroup_z = ((y_true_observed - population_y_true_observed_mn) /

@@ -50,6 +50,8 @@ else:
     param('lr-eval-with-subset-double-scored', 'lr_eval_with_subset_double_scored', consistency=True),
     param('lr-eval-with-trim-tolerance', 'lr_evaluation_with_trim_tolerance'),
     param('lr-eval-with-numeric-threshold', 'lr_evaluation_with_numeric_threshold', subgroups=['QUESTION']),
+    param('lr-eval-system-score-constant', 'lr_eval_system_score_constant',
+          subgroups=['QUESTION', 'L1'], consistency=True, suppress_warnings_for=[UserWarning])
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:

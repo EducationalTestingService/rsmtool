@@ -10,6 +10,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 
 import numpy as np
 import pandas as pd
+import warnings
 
 from functools import partial
 
@@ -601,8 +602,8 @@ class Analyzer:
                        smd_method='unpooled',
                        use_diff_std_means=False):
         """
-        This is a helper function that computes some basic agreement
-        and association metrics between the system scores and the
+        This is a helper function that computes several basic
+        association metrics between the system scores and the
         human scores.
 
         Parameters
@@ -620,16 +621,16 @@ class Analyzer:
         population_system_score_sd : float, optional
             Reference standard deviation for system scores. If `smd_method='williamson'`, this is
             used to compute SMD and should be the standard deviation for the whole population.If
-            `use_diff_std_means=True`, this must be used with `population_human_score_mn`.
+            `use_diff_std_means=True`, this must be used with `population_system_score_mn`.
             Otherwise, it is ignored.
             Defaults to None.
         population_human_score_mn : float, optional
             Reference mean for human scores. If `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_human_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         population_system_score_mn : float, optional
             Reference mean for system scores. If  `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_system_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
             The SMD method to use, only used if `use_diff_std_means=False`.
@@ -1197,6 +1198,17 @@ class Analyzer:
         population_mn_dict = {col: df_test[col].mean()
                               for col in df_test.columns if col not in ['spkitemid',
                                                                         grouping_variable]}
+
+        # check if any of the standard deviations is zero and
+        # tell user to expect to see many warnings.
+        zero_sd_scores = [score for (score, sd) in population_sd_dict.items() if
+                          np.isclose(sd, 0, atol=1e-07)]
+        if len(zero_sd_scores) > 0:
+            warnings.warn("The standard deviation for {} scores "
+                          "is zero (all values are the same). You "
+                          "will see multiple warnings about DSM computation "
+                          "since this metric is computed separately for "
+                          "each subgroup.".format(', '.join(zero_sd_scores)))
 
         # create a duplicate data frame to compute evaluations
         # over the whole data, i.e., across groups
