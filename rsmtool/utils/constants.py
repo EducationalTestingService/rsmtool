@@ -222,11 +222,11 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID',
                              'predictions_file': {'label': 'Path to file containing predictions',
                                                   'type': 'file'},
                              'system_score_column': {'label': 'Name of column containing predictions'},
-                             'trim_min': {'label': 'The lowest possible score',
+                             'trim_min': {'label': 'The lowest possible human score',
                                           'type': 'integer'},
-                             'trim_max': {'label': 'The highest possible score',
+                             'trim_max': {'label': 'The highest possible human score',
                                           'type': 'integer'},
-                             'experiment_dir': {'label': 'Path to directory containing RSMTool experiment',
+                             'experiment_dir': {'label': 'Path to the directory containing RSMTool experiment',
                                                 'type': 'dir'},
                              'input_features_file': {'label': 'Path to input file containing features',
                                                      'type': 'file'},
@@ -253,11 +253,11 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID',
                              'length_column': {'label': 'Name of column in training/evaluation data '
                                                         'that contains repsonse lengths, if any'},
                              'human_score_column': {'label': 'Name of column in evaluation data '
-                                                             'that contains human scores, if any'},
+                                                             'that contains human scores (<u>sc1</u>)'},
                              'second_human_score_column': {'label': 'Name of column in evaluation '
                                                                     'data that contains scores from '
                                                                     'a second human, if any'},
-                             'exclude_zero_scores': {'label': 'Keep responses with scores of 0 in '
+                             'exclude_zero_scores': {'label': 'Keep responses with human scores of 0 in '
                                                               'training/evaluation data '
                                                               '(true/<u>false</u>)',
                                                      'type': 'boolean'},
