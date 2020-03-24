@@ -88,3 +88,45 @@ Note the two comments demarcating where the required and the optional fields. No
 Just like interactive generation, non-interactive generation is supported by all 5 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, and ``rsmsummarize``. 
 
 Similarly, to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, just add ``--subgroups`` to the command. Note that unlike in interactive mode, this would *only* add subgroup-based sections to the ``general_sections`` list in the output file. You will need to manually edit the ``subgroups`` option in the configuration file to enter the subgroup column names.
+
+Generation API
+~~~~~~~~~~~~~~
+Interactive generation is only meant for end users and can only be used via the 5 command-line tools ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict`` and ``rsmsummarize``. It cannot be used via the RSMTool API.
+
+However, the non-interactive generation can indeed by used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
+
+.. code-block:: python
+
+    # import the ConfigurationGenerator class
+    from rsmtool.utils.commandline import ConfigurationGenerator
+
+    # instantiate it with the options as needed
+    #   we want a dictionary, not a string
+    #   we do not want to see any warnings
+    #   we want to include subgroup-based sections in the report
+    generator = ConfigurationGenerator('rsmtool',
+                                       as_string=False,
+                                       suppress_warnings=True,
+                                       use_subgroups=True)
+
+    # generate the configuration dictionary
+    configdict = generator.generate()
+
+    # remember we still need to replace the dummy values
+    # for the required fields
+    configdict["experiment_id"] = "test_experiment"
+    configdict["model"] = "LinearRegression"
+    configdict["train_file"] = "train.csv"
+    configdict["test_file"] = "test.csv"
+
+    # and don't forget about adding the subgroups
+    configdict["subgroups"] = ["GROUP1", "GROUP2"]
+
+    # make other changes to optional fields based on your data
+    ...
+
+    # now we can use this dictionary to run an rsmtool experiment via the API
+    from rsmtool import run_experiment
+    run_experiment(configdict, "/tmp/output")
+
+For more details, refer to the API documentation for the :ref:`ConfigurationGenerator <generation_api>` class.
