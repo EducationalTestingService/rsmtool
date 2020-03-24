@@ -293,7 +293,7 @@ class TestToolCLI:
             yield self.check_tool_cmd, context, "generate", None, None
 
     def test_generate_with_groups(self):
-        # test that the "generate --suvgroups" subcommand for all tools works
+        # test that the "generate --subgroups" subcommand for all tools works
         # as expected in batch mode
 
         # this applies to all tools except rsmpredict and rsmsummarize
