@@ -48,6 +48,9 @@ Let's take a look at the options in our configuration file.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmsummarize>`.
 
+.. note:: You can also use our nifty capability to :ref:`automatically generate <autogen_configuration>` ``rsmsummarize`` configuration files rather than creating them manually.
+
+
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
 Now that we have the list of the experiments we want to compare and our configuration file in ``.json`` format, we can use the :ref:`rsmsummarize <usage_rsmsummarize>` command-line script to run our comparison experiment.

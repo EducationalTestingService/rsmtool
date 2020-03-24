@@ -49,6 +49,9 @@ Let's take a look at the options in our configuration file.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmeval>`.
 
+.. note:: You can also use our nifty capability to :ref:`automatically generate <autogen_configuration>` ``rsmeval`` configuration files rather than creating them manually.
+
+
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
 Now that we have our scores in the right format and our configuration file in ``.json`` format, we can use the :ref:`rsmeval <usage_rsmeval>` command-line script to run our evaluation experiment.
