@@ -124,14 +124,14 @@ class TestToolCLI:
             expected_output = expectedfh.read().strip()
             eq_(output, expected_output)
 
-    def check_tool_cmd(self, name, subcmd, output_dir=None, working_dir=None):
+    def check_tool_cmd(self, context, subcmd, output_dir=None, working_dir=None):
         """
-        A helper method to test that the ``cmd`` invocation for ``name`` works
+        A helper method to test that the ``cmd`` invocation for ``context`` works
         as expected.
 
         Parameters
         ----------
-        name : str
+        context : str
             Name of the tool being tested.
         subcmd : str
             The tool command-line invocation that is being tested.
@@ -149,9 +149,9 @@ class TestToolCLI:
         # we do not always activate the conda environment
         binpath = os.environ.get('BINPATH', None)
         if binpath is not None:
-            cmd = f"{binpath}/{name} {subcmd}"
+            cmd = f"{binpath}/{context} {subcmd}"
         else:
-            cmd = f"{name} {subcmd}"
+            cmd = f"{context} {subcmd}"
 
         # run different checks depending on the given command type
         cmd_type = 'generate' if ' generate' in cmd else 'run'
@@ -165,7 +165,7 @@ class TestToolCLI:
             # then check that the commmand ran successfully
             ok_(proc.returncode == 0)
             # and, finally, that the output was as expected
-            self.validate_run_output(name, output_dir)
+            self.validate_run_output(context, output_dir)
         else:
             # for generate subcommands, we ignore the warnings printed to stderr
             subgroups = "--subgroups" in cmd
@@ -175,42 +175,42 @@ class TestToolCLI:
                                   stderr=subprocess.DEVNULL,
                                   encoding='utf-8')
             ok_(proc.returncode == 0)
-            self.validate_generate_output(name,
+            self.validate_generate_output(context,
                                           proc.stdout.strip(),
                                           subgroups=subgroups)
 
     def test_default_subcommand_is_run(self):
-        # test that the default subcommand for all tools is "run"
+        # test that the default subcommand for all contexts is "run"
 
         # this applies to all tools
-        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
 
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
 
             # and test the default subcommand
-            config_file = getattr(self, f"{name}_config_file")
+            config_file = getattr(self, f"{context}_config_file")
             subcmd = f"{config_file} {tempdir.name}"
-            yield self.check_tool_cmd, name, subcmd, tempdir.name, None
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, None
 
     def test_run_without_output_directory(self):
         # test that "run" subcommand works without an output directory
 
         # this applies to all tools except rsmpredict
-        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
+        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
 
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
 
             # and test the run subcommand without an output directory
-            config_file = getattr(self, f"{name}_config_file")
+            config_file = getattr(self, f"{context}_config_file")
             subcmd = f"run {config_file}"
             # we call check_tool_cmd with a working directory here to simulate
             # the usage of the current working directory when the output directory
             # is not specified
-            yield self.check_tool_cmd, name, subcmd, tempdir.name, tempdir.name
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, tempdir.name
 
     def check_run_bad_overwrite(self, cmd):
         """
@@ -227,7 +227,7 @@ class TestToolCLI:
         # test that the "run" command fails to overwrite when "-f" is not specified
 
         # this applies to all tools except rsmpredict and rsmcompare
-        for name in ['rsmtool', 'rsmeval', 'rsmsummarize']:
+        for context in ['rsmtool', 'rsmeval', 'rsmsummarize']:
 
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
@@ -237,23 +237,23 @@ class TestToolCLI:
             fake_file = Path(tempdir.name) / "output" / "foo.csv"
             fake_file.touch()
 
-            config_file = getattr(self, f"{name}_config_file")
+            config_file = getattr(self, f"{context}_config_file")
             # if the BINPATH environment variable is defined
             # use that to construct the command instead of just
             # the name; this is needed for the CI builds where
             # we do not always activate the conda environment
             binpath = os.environ.get('BINPATH', None)
             if binpath is not None:
-                cmd = f"{binpath}/{name} {config_file} {tempdir.name}"
+                cmd = f"{binpath}/{context} {config_file} {tempdir.name}"
             else:
-                cmd = f"{name} {config_file} {tempdir.name}"
+                cmd = f"{context} {config_file} {tempdir.name}"
             yield self.check_run_bad_overwrite, cmd
 
     def test_run_good_overwrite(self):
         #  test that the "run" command does overwrite when "-f" is specified
 
         # this applies to all tools except rsmpredict and rsmcompare
-        for name in ['rsmtool', 'rsmeval', 'rsmsummarize']:
+        for context in ['rsmtool', 'rsmeval', 'rsmsummarize']:
 
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
@@ -263,9 +263,9 @@ class TestToolCLI:
             fake_file = Path(tempdir.name) / "output" / "foo.csv"
             fake_file.touch()
 
-            config_file = getattr(self, f"{name}_config_file")
+            config_file = getattr(self, f"{context}_config_file")
             subcmd = f"{config_file} {tempdir.name} -f"
-            yield self.check_tool_cmd, name, subcmd, tempdir.name, None
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, None
 
     def test_rsmpredict_run_features_file(self):
         """
@@ -287,13 +287,15 @@ class TestToolCLI:
 
     def test_generate(self):
         # test that the "generate" subcommand for all tools works as expected
+        # in batch mode
 
-        for name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
-            yield self.check_tool_cmd, name, "generate", None, None
+        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+            yield self.check_tool_cmd, context, "generate", None, None
 
     def test_generate_with_groups(self):
-        # test that the "generate --suvgroups" subcommand for all tools works as expected
+        # test that the "generate --suvgroups" subcommand for all tools works
+        # as expected in batch mode
 
         # this applies to all tools except rsmpredict and rsmsummarize
-        for name in ['rsmtool', 'rsmeval', 'rsmcompare']:
-            yield self.check_tool_cmd, name, "generate --subgroups", None, None
+        for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
+            yield self.check_tool_cmd, context, "generate --subgroups", None, None
