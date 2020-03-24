@@ -1589,7 +1589,7 @@ class TestInteractiveField:
                                        if field not in ALL_REQUIRED_FIELDS]
         for field_name in OPTIONAL_INTERACTIVE_FIELDS:
             field_count = INTERACTIVE_MODE_METADATA[field_name].get('count', 'single')
-            yield self.check_optional_interactive_fields, field_name, field_count
+            yield self.check_optional_interactive_fields_blanks, field_name, field_count
 
 
 class TestInteractiveGenerate:
