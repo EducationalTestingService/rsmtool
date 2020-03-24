@@ -2,9 +2,10 @@ import argparse
 import tempfile
 import warnings
 
-from itertools import product
+from io import StringIO
+from itertools import chain, product, repeat
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import DEFAULT, patch
 
 import numpy as np
 import pandas as pd
@@ -1480,6 +1481,13 @@ class TestInteractiveField:
         """
         Check that fields that accept multiple values are handled correctly
         """
+        # int this particular case, we also need to patch the
+        # `print_formatted_text()` function since we use that
+        # for multiple count fields to print out the label, instead
+        # of the `prompt()` function
+        patcher = patch('rsmtool.utils.commandline.print_formatted_text')
+        mock_print_formatted_text = patcher.start()
+
         with patch('rsmtool.utils.commandline.prompt', return_value=num_entries) as mock_prompt:
             ifield = InteractiveField('test_multiple',
                                       'optional',
@@ -1544,6 +1552,9 @@ class TestInteractiveField:
                         complete_style = call_args[1]["complete_style"]
                         eq_(complete_style, None)
 
+        # stop the `print_formatted_text()` patcher since we are done
+        mock_print_formatted_text.stop()
+
     def test_multiple_count_field(self):
         for ((user_input, final_value),
              num_entries,
@@ -1556,7 +1567,7 @@ class TestInteractiveField:
                    num_entries,
                    field_type)
 
-    def check_optional_interactive_fields(self, field_name, field_count):
+    def check_optional_interactive_fields_blanks(self, field_name, field_count):
         """
         Check that blank user input for an optional field is handled correctly
         """
@@ -1568,7 +1579,7 @@ class TestInteractiveField:
                                       {'label': 'optional field label'})
             eq_(ifield.get_value(), default_value)
 
-    def test_optional_interactive_fields(self):
+    def test_optional_interactive_fields_blanks(self):
         ALL_REQUIRED_FIELDS = set()
         for context in ['rsmtool', 'rsmeval', 'rsmpredict', 'rsmsummarize', 'rsmcompare']:
             ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]['required'])
@@ -1577,3 +1588,166 @@ class TestInteractiveField:
         for field_name in OPTIONAL_INTERACTIVE_FIELDS:
             field_count = INTERACTIVE_MODE_METADATA[field_name].get('count', 'single')
             yield self.check_optional_interactive_fields, field_name, field_count
+
+
+class TestInteractiveGenerate:
+
+    # class to test the interactive generation ; note that we
+    # are mocking the prompt_toolkit functionality
+    # as per unit test best practices that recommend
+    # not testing third-party libraries that are already
+    # tested externally
+
+    # this class works by having a list of mocked up values
+    # for each tool for the set of interactive fields that would
+    # have been displayed (note that order matters) - this is
+    # accomplished by using the `side_effect` functionality of
+    # `patch()` that automatically iterates over the list of values
+
+    # the actual test calls `ConfigurationGenerator.interact()` with
+    # these mocked up values, generates a configuration and then
+    # compares that configuration to the configuration we expect
+    # given those values - that are stored in pre-computed JSON files
+
+    # note that we are testing the interactive mode here rather than
+    # in `test_cli.py` since it is not possible to mock things over
+    # subprocess calls which is what `test_cli.py` uses for the `run`
+    # subcommand and the non-interactive `generate` subcommand.
+
+    @classmethod
+    def setUpClass(cls):
+
+        # define lists of mocked up values for each tool in the same order
+        # that the interactive fields would have been displayed
+        cls.mocked_rsmtool_interactive_values = ["testtool",          # experiment_id
+                                                 "Lasso",             # model
+                                                 "train.csv",         # train_file
+                                                 "test.csv",          # test_file
+                                                 'an rsmtool test',   # description
+                                                 False,               # exclude_zero_scores
+                                                 "csv",               # file_format
+                                                 "ID",                # id_column
+                                                 None,                # length_column
+                                                 "score2",            # second_human_score_column
+                                                 False,               # standardize_features
+                                                 ["L1", "QUESTION"],  # subgroups
+                                                 "score",             # test_label_column
+                                                 "score",             # train_label_column
+                                                 1,                   # trim_min
+                                                 5,                   # trim_max,
+                                                 True,                # use_scaled_predictions
+                                                 False                # use_thumbnails
+                                                 ]
+
+        cls.mocked_rsmeval_interactive_values = ["testeval",          # experiment_id
+                                                 "preds.csv",         # predictions_file
+                                                 "pred",              # system_score_column
+                                                 1,                   # trim_min
+                                                 6,                   # trim_max
+                                                 "an rsmeval test",   # description
+                                                 True,                # exclude_zeros
+                                                 "xlsx",              # file_format
+                                                 "score",             # human_score_column
+                                                 "ID",                # id_column
+                                                 "score2",            # second_human_score_column
+                                                 ["L1"],              # subgroups
+                                                 True                 # use_thumbnails
+                                                 ]
+
+        cls.mocked_rsmcompare_interactive_values = ["testcompare",       # comparison_id
+                                                    "rsmtool1",          # experiment_id_old
+                                                    "/a/b/c",            # experiment_dir_old
+                                                    "rsmtool2",          # experiment_id_new
+                                                    '/d/e',              # experiment_dir_new
+                                                    "rsmtool expt 1",    # description_old
+                                                    "rsmtool expt 2",    # description_new
+                                                    [],                  # subgroups
+                                                    True                 # use_thumbnails
+                                                    ]
+
+        cls.mocked_rsmpredict_interactive_values = ["testpred",          # experiment_id
+                                                    "/a/b",              # experiment_dir_new
+                                                    "features.csv",      # input_features_file
+                                                    "csv",               # file_format
+                                                    "score",             # human_score_column
+                                                    "spkitemid",         # id_column
+                                                    None,                # second_human_score_column
+                                                    True,                # standardize_features
+                                                    ]
+
+        cls.mocked_rsmsummarize_interactive_values = ["testsumm",          # summary_id
+                                                      ["/a/b",
+                                                       "/d",
+                                                       "/e/f/g"],          # experiment_dirs
+                                                      'summary test',      # description
+                                                      "tsv",               # file_format
+                                                      True,                # use_thumbnails
+                                                      ]
+
+    def check_tool_interact(self, context, subgroups=False):
+        """
+        A helper method that runs `ConfigurationGenerator.interact()`
+        and compares its output to expected output.
+
+        Parameters
+        ----------
+        context : str
+            Name of the tool being tested.
+            One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize"}.
+        subgroups : bool, optional
+            Whether to include subgroup information in the generated configuration.
+        """
+        # if we are using subgroups, then define a suffix for the expected file
+        groups_suffix = '_groups' if subgroups else ''
+
+        # get the appropriate list of mocked values for this tool but make
+        # a copy since we may need to modify it below
+        mocked_values = getattr(self, f"mocked_{context}_interactive_values")[:]
+
+        # if we are not using subgroups, delete the subgroup entry
+        # from the list of mocked values
+        if not subgroups:
+            if context in ['rsmtool', 'rsmeval']:
+                del mocked_values[11]
+            elif context == 'rsmcompare':
+                del mocked_values[7]
+
+        # point to the right file holding the expected configuration
+        expected_file = rsmtool_test_dir / 'data' / 'output' / f"interactive_{context}_config{groups_suffix}.json"
+
+        # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
+        # that calling 'interact()' doesn't actually print out anything
+        # to stderr and doesn't clear the screen
+        sys_stderr_patcher = patch('sys.stderr', new_callable=StringIO)
+        clear_patcher = patch('rsmtool.utils.commandline.clear')
+        _ = clear_patcher.start()
+        _ = sys_stderr_patcher.start()
+
+        # mock the `InteractiveField.get_value()` method to return the
+        # pre-determined mocked values in order and check that the
+        # configuration generated by `interact()` is what we expect it to be
+        with patch.object(InteractiveField, 'get_value', side_effect=mocked_values):
+            generator = ConfigurationGenerator(context, use_subgroups=subgroups)
+            configuration_string = generator.interact()
+            with open(expected_file, 'r') as expectedfh:
+                eq_(expectedfh.read().strip(), configuration_string)
+
+        # stop the stderr and clear patchers now that the test is finished
+        sys_stderr_patcher.stop()
+        clear_patcher.stop()
+
+    def test_interactive_generate(self):
+
+        # all tools except rsmpredict and rsmsummarize explicitly support subgroups
+        yield self.check_tool_interact, 'rsmtool', False
+        yield self.check_tool_interact, 'rsmtool', True
+
+        yield self.check_tool_interact, 'rsmeval', False
+        yield self.check_tool_interact, 'rsmeval', True
+
+        yield self.check_tool_interact, 'rsmcompare', False
+        yield self.check_tool_interact, 'rsmcompare', True
+
+        yield self.check_tool_interact, 'rsmpredict', False
+
+        yield self.check_tool_interact, 'rsmsummarize', False
