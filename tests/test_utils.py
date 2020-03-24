@@ -3,9 +3,9 @@ import tempfile
 import warnings
 
 from io import StringIO
-from itertools import chain, product, repeat
+from itertools import product
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from unittest.mock import DEFAULT, patch
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -1463,7 +1463,9 @@ class TestInteractiveField:
         Check that text fields are handled correctly
         """
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_text', field_type, {'label': 'description', 'type': 'text'})
+            ifield = InteractiveField('test_text',
+                                      field_type,
+                                      {'label': 'description', 'type': 'text'})
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
             eq_(mock_prompt.call_args[0][0].value, HTML(" <b>description</b>: ").value)
@@ -1713,7 +1715,8 @@ class TestInteractiveGenerate:
                 del mocked_values[7]
 
         # point to the right file holding the expected configuration
-        expected_file = rsmtool_test_dir / 'data' / 'output' / f"interactive_{context}_config{groups_suffix}.json"
+        expected_file = f"interactive_{context}_config{groups_suffix}.json"
+        expected_path = rsmtool_test_dir / 'data' / 'output' / expected_file
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
         # that calling 'interact()' doesn't actually print out anything
@@ -1729,7 +1732,7 @@ class TestInteractiveGenerate:
         with patch.object(InteractiveField, 'get_value', side_effect=mocked_values):
             generator = ConfigurationGenerator(context, use_subgroups=subgroups)
             configuration_string = generator.interact()
-            with open(expected_file, 'r') as expectedfh:
+            with open(expected_path, 'r') as expectedfh:
                 eq_(expectedfh.read().strip(), configuration_string)
 
         # stop the stderr and clear patchers now that the test is finished
