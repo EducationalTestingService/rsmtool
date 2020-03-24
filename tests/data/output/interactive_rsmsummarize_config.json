@@ -1,0 +1,26 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmsummarize
+    "summary_id": "testsumm",
+    "experiment_dirs": [
+        "/a/b",
+        "/d",
+        "/e/f/g"
+    ],
+    // OPTIONAL: replace default values below based on your data.
+    "custom_sections": null,
+    "description": "summary test",
+    "experiment_names": null,
+    "file_format": "tsv",
+    "general_sections": [
+        "preprocessed_features",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "intermediate_file_paths",
+        "sysinfo"
+    ],
+    "section_order": null,
+    "special_sections": null,
+    "subgroups": [],
+    "use_thumbnails": true
+}

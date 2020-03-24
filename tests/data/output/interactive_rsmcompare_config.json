@@ -1,0 +1,30 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmcompare
+    "comparison_id": "testcompare",
+    "experiment_id_old": "rsmtool1",
+    "experiment_dir_old": "/a/b/c",
+    "experiment_id_new": "rsmtool2",
+    "experiment_dir_new": "/d/e",
+    "description_old": "rsmtool expt 1",
+    "description_new": "rsmtool expt 2",
+    // OPTIONAL: replace default values below based on your data.
+    "custom_sections": null,
+    "general_sections": [
+        "feature_descriptives",
+        "preprocessed_features",
+        "consistency",
+        "score_distributions",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "pca",
+        "notes",
+        "sysinfo"
+    ],
+    "section_order": null,
+    "special_sections": null,
+    "subgroups": [],
+    "use_scaled_predictions_new": false,
+    "use_scaled_predictions_old": false,
+    "use_thumbnails": true
+}
