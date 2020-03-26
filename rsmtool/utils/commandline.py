@@ -260,23 +260,23 @@ class InteractiveField:
     Attributes
     ----------
     choices : list
-        List of possible choices for the field value if ``data_type`` is "choice".
+        List of possible choices for the field value if ``data_type`` is ``choice``.
         An empty list for all other types of fields.
     complete_style : prompt_toolkit.shortcuts.prompt.CompleteStyle
         A CompleteStyle that defines how to style the completions.
         Set to ``CompleteStyle.MULTI_COLUMN`` for fields that have ``data_type``
-        of "choice". Set to ``None`` for all other field types.
+        of ``choice``. Set to ``None`` for all other field types.
     completer : prompt_toolkit.completions.base.Completer
         A ``Completer`` object used to provide auto-completion for the field.
         The actual completer used depends on the ``data_type`` of the field.
-        For example, for fields of type "choice", we use a ``FuzzyWordCompleter``,
+        For example, for fields of type ``choice``, we use a ``FuzzyWordCompleter``,
         and for fields of type ``dir`` and ``file``, we use a ``PathCompleter``.
     count : str
         An attribute indicating whether the field accepts a "single" value
         or "multiple" values. For fields that require multiple values, e.g.
         subgroups, a different strategy is used for interactive display.
     data_type : str
-        The string indicating the data type of the field.
+        A string indicating the data type of the field.
         One of the following:
         - "boolean" : a field that only accepts True/False
         - "choice" : a field that accepts one out of a fixed list of values.
@@ -290,7 +290,7 @@ class InteractiveField:
         The label for the field that will be displayed to the user.
     prompt_method : callable
         The function that will be used to compute the value for the field.
-        The main difference arises between field that accept only a single
+        The main difference arises between fields that accept only a single
         value vs. multiple values.
     validator : prompt_toolkit.validation.Validator
         A ``Validator`` object used to validate the values for the field
@@ -340,7 +340,7 @@ class InteractiveField:
             self.validator = self._make_boolean_validator(allow_empty=allow_empty)
         elif self.data_type == 'choice':
             if not self.choices:
-                raise(ValueError, f"invalid list of choices for {field_name}")
+                raise ValueError(f"invalid list of choices for {field_name}")
             else:
                 self.completer = FuzzyWordCompleter(self.choices)
                 self.validator = self._make_choice_validator(self.choices)

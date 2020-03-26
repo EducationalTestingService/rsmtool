@@ -27,7 +27,7 @@ The configuration file ``example_rsmtool.json`` generated via the session is sho
 
 .. note:: Although we use ``rsmtool`` in the example above, the same instructions apply to all 5 tools; simply replace ``rsmtool`` with ``rsmeval``, ``rsmcompare``, etc.
 
-There are some configuration options that can accept multiple inputs. For example, the ``experiment_dirs`` option for ``rsmsummrize`` takes a list of ``rsmtool`` experiment directories for a summary report. These options are handled differently in interactive mode. To illusrate this, let's generate a configuration file for ``rsmsummrize`` by using the following command:
+There are some configuration options that can accept multiple inputs. For example, the ``experiment_dirs`` option for ``rsmsummarize`` takes a list of ``rsmtool`` experiment directories for a summary report. These options are handled differently in interactive mode. To illustrate this, let's generate a configuration file for ``rsmsummarize`` by using the following command:
 
 .. code-block:: bash
 
@@ -39,7 +39,7 @@ The following screencast shows the interactive session (click to play):
     
    <script id="asciicast-313149" src="https://asciinema.org/a/313149.js" data-autoplay="false" async></script>
 
-And here is the generated configuration file for ``rsmsummrize``:
+And here is the generated configuration file for ``rsmsummarize``:
 
 .. literalinclude:: assets/example_rsmsummarize.json
     :language: javascript
@@ -54,9 +54,9 @@ We end with a list of important things to note about interactive generation:
 
 - If you do not redirect the output of the command to a file, the generated configuration file will simply be printed out.
 
-- You may see messages like "invalid option", "invalid file" on the bottom left while you are entering the value for a field. This is an artifact of real-time validation. For example, when choosing a training file for ``rsmtool``, the message "invalid file" may be displayed while you navigate to the actual file. Once you get to a valid file, this message should disappear.
+- You may see messages like "invalid option" and "invalid file" on the bottom left while you are entering the value for a field. This is an artifact of real-time validation. For example, when choosing a training file for ``rsmtool``, the message "invalid file" may be displayed while you navigate to the actual file. Once you get to a valid file, this message should disappear.
 
-- Required fields will *not* accept a blank input (just pressing enter) and show an error message in the bottom left until a valid input is provided.
+- Required fields will *not* accept a blank input (just pressing enter) and will show an error message in the bottom left until a valid input is provided.
 
 - Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses. 
 
@@ -83,7 +83,7 @@ This warning explains that the generated file *cannot* be used directly as input
 .. literalinclude:: assets/dummy_rsmtool.json
     :language: javascript
 
-Note the two comments demarcating where the required and the optional fields. Note also that the required fields are filled with the dummy value "ENTER_VALUE_HERE" that *must* be manually edited by the user. The optional fields are filled with default values that may also need to be further edited depending on the data being used.
+Note the two comments demarcating the locations of the required and optional fields. Note also that the required fields are filled with the dummy value "ENTER_VALUE_HERE" that *must* be manually edited by the user. The optional fields are filled with default values that may also need to be further edited depending on the data being used.
 
 Just like interactive generation, non-interactive generation is supported by all 5 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, and ``rsmsummarize``. 
 
@@ -93,7 +93,7 @@ Generation API
 ~~~~~~~~~~~~~~
 Interactive generation is only meant for end users and can only be used via the 5 command-line tools ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict`` and ``rsmsummarize``. It cannot be used via the RSMTool API.
 
-However, the non-interactive generation can indeed by used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
+However, the non-interactive generation can indeed be used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
 
 .. code-block:: python
 
