@@ -93,7 +93,7 @@ Generation API
 ~~~~~~~~~~~~~~
 Interactive generation is only meant for end users and can only be used via the 5 command-line tools ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict`` and ``rsmsummarize``. It cannot be used via the RSMTool API.
 
-However, the non-interactive generation can indeed be used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
+However, the non-interactive generation can be used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
 
 .. code-block:: python
 
