@@ -1276,6 +1276,12 @@ class TestInteractiveField:
         for (user_input, final_value) in [('one', 'one'), ('three', 'three')]:
             yield self.check_choice_field, user_input, final_value
 
+    @raises(ValueError)
+    def test_choice_field_no_choices(self):
+        _ = InteractiveField('test_choice_no_choices',
+                             'required',
+                             {'label': 'choose one', 'type': 'choice'})
+
     def check_dir_field(self, user_input, final_value):
         """
         Check that dir fields are handled correctly

@@ -319,6 +319,12 @@ class InteractiveField:
             keys: "choices", "count", and "type". For descriptions of what
             these keys mean, see the docstring for the ``InteractiveField``
             class. Examples of such dictionaries can be found in ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
+
+        Raises
+        ------
+        ValueError
+            If the list of choices is not available for a field
+            of type "choice".
         """
         # assign metadata attributes to class attributes
         self.field_name = field_name
@@ -340,7 +346,7 @@ class InteractiveField:
             self.validator = self._make_boolean_validator(allow_empty=allow_empty)
         elif self.data_type == 'choice':
             if not self.choices:
-                raise ValueError(f"invalid list of choices for {field_name}")
+                raise ValueError(f"invalid list of choices for field '{field_name}'")
             else:
                 self.completer = FuzzyWordCompleter(self.choices)
                 self.validator = self._make_choice_validator(self.choices)
