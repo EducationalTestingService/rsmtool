@@ -3,9 +3,11 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmsummarize`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmsummarize/config_rsmsummarize.json>`_ for ``rsmsummarize``. To make it easy to get started with  ``rsmsummarize``, we provide a way to automatically generate a configuration file that you can then edit based on your data and your needs. To do so, simply run ``rsmsummarize generate`` at the commmand line. Next, we describe all of the ``rsmsummarize`` configuration fields in detail.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmsummarize`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmsummarize/config_rsmsummarize.json>`_ for ``rsmsummarize``. 
 
-There are two required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
+.. note:: To make it easy to get started with  ``rsmsummarize``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
+
+Next, we describe all of the ``rsmsummarize`` configuration fields in detail. There are two required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 summary_id
 ~~~~~~~~~~~~~~~~~~~~~~~

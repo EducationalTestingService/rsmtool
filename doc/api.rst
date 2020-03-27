@@ -125,7 +125,7 @@ From :py:mod:`~rsmtool.container` Module
 
 From :py:mod:`~rsmtool.convert_feature_json` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: rsmtool.convert_feature_json_file
+.. autofunction:: rsmtool.convert_feature_json.convert_feature_json_file
 
 
 From :py:mod:`~rsmtool.fairness_utils` Module
@@ -177,7 +177,9 @@ From :py:mod:`~rsmtool.transformer` Module
 From :py:mod:`~rsmtool.utils` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: rsmtool.utils.commandline.generate_configuration
+.. _generation_api:
+.. autoclass:: rsmtool.utils.commandline.ConfigurationGenerator
+.. automethod:: rsmtool.utils.commandline.ConfigurationGenerator.generate
 .. _agreement_api:
 .. autofunction:: rsmtool.utils.metrics.agreement
 .. _dsm_api:

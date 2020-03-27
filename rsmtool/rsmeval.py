@@ -22,7 +22,7 @@ from .configuration_parser import configure
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandline import generate_configuration, setup_rsmcmd_parser
+from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
@@ -268,10 +268,11 @@ def main():
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        configuration = generate_configuration('rsmeval',
-                                               use_subgroups=args.subgroups,
-                                               as_string=True,
-                                               suppress_warnings=args.quiet)
+        generator = ConfigurationGenerator('rsmeval',
+                                           as_string=True,
+                                           suppress_warnings=args.quiet,
+                                           use_subgroups=args.subgroups)
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

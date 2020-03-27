@@ -1,19 +1,18 @@
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/usage_rsmtool.html#experiment-configuration-file
-    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    "experiment_id": "ENTER_VALUE_HERE",
-    "model": "ENTER_VALUE_HERE",
-    "train_file": "ENTER_VALUE_HERE",
-    "test_file": "ENTER_VALUE_HERE",
+    "experiment_id": "test_rsmtool",
+    "model": "LinearRegression",
+    "train_file": "/Users/nmadnani/train.csv",
+    "test_file": "/Users/nmadnani/test.csv",
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
     "custom_sections": null,
-    "description": "",
+    "description": "Test experiment.",
     "exclude_zero_scores": true,
     "feature_subset": null,
     "feature_subset_file": null,
     "features": null,
-    "file_format": "csv",
+    "file_format": "xlsx",
     "flag_column": null,
     "flag_column_test": null,
     "general_sections": [
@@ -28,8 +27,8 @@
         "intermediate_file_paths",
         "sysinfo"
     ],
-    "id_column": "spkitemid",
-    "length_column": null,
+    "id_column": "ID",
+    "length_column": "length",
     "min_items_per_candidate": null,
     "min_n_per_group": null,
     "predict_expected_scores": false,
@@ -41,12 +40,12 @@
     "special_sections": null,
     "standardize_features": true,
     "subgroups": [],
-    "test_label_column": "sc1",
-    "train_label_column": "sc1",
-    "trim_max": null,
-    "trim_min": null,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "trim_max": 1,
+    "trim_min": 6,
     "trim_tolerance": 0.4998,
-    "use_scaled_predictions": false,
+    "use_scaled_predictions": true,
     "use_thumbnails": false,
     "use_truncation_thresholds": false
 }

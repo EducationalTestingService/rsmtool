@@ -1,20 +1,17 @@
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmcompare
-    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    "comparison_id": "ENTER_VALUE_HERE",
-    "experiment_id_old": "ENTER_VALUE_HERE",
-    "experiment_dir_old": "ENTER_VALUE_HERE",
-    "experiment_id_new": "ENTER_VALUE_HERE",
-    "experiment_dir_new": "ENTER_VALUE_HERE",
-    "description_old": "ENTER_VALUE_HERE",
-    "description_new": "ENTER_VALUE_HERE",
+    "comparison_id": "testcompare",
+    "experiment_id_old": "rsmtool1",
+    "experiment_dir_old": "/a/b/c",
+    "experiment_id_new": "rsmtool2",
+    "experiment_dir_new": "/d/e",
+    "description_old": "rsmtool expt 1",
+    "description_new": "rsmtool expt 2",
     // OPTIONAL: replace default values below based on your data.
     "custom_sections": null,
     "general_sections": [
         "feature_descriptives",
-        "features_by_group",
         "preprocessed_features",
-        "preprocessed_features_by_group",
         "consistency",
         "score_distributions",
         "model",
@@ -29,5 +26,5 @@
     "subgroups": [],
     "use_scaled_predictions_new": false,
     "use_scaled_predictions_old": false,
-    "use_thumbnails": false
+    "use_thumbnails": true
 }

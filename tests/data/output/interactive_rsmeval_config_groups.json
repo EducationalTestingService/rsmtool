@@ -1,17 +1,16 @@
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#experiment-configuration-file
-    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    "experiment_id": "ENTER_VALUE_HERE",
-    "predictions_file": "ENTER_VALUE_HERE",
-    "system_score_column": "ENTER_VALUE_HERE",
-    "trim_min": "ENTER_VALUE_HERE",
-    "trim_max": "ENTER_VALUE_HERE",
+    "experiment_id": "testeval",
+    "predictions_file": "preds.csv",
+    "system_score_column": "pred",
+    "trim_min": 1,
+    "trim_max": 6,
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
     "custom_sections": null,
-    "description": "",
+    "description": "an rsmeval test",
     "exclude_zero_scores": true,
-    "file_format": "csv",
+    "file_format": "xlsx",
     "flag_column": null,
     "general_sections": [
         "data_description",
@@ -24,15 +23,17 @@
         "intermediate_file_paths",
         "sysinfo"
     ],
-    "human_score_column": "sc1",
-    "id_column": "spkitemid",
+    "human_score_column": "score",
+    "id_column": "ID",
     "min_items_per_candidate": null,
     "min_n_per_group": null,
     "scale_with": null,
-    "second_human_score_column": null,
+    "second_human_score_column": "score2",
     "section_order": null,
     "special_sections": null,
-    "subgroups": [],
+    "subgroups": [
+        "L1"
+    ],
     "trim_tolerance": 0.4998,
-    "use_thumbnails": false
+    "use_thumbnails": true
 }

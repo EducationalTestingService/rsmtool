@@ -76,7 +76,9 @@ Documentation for all of the available configuration options is available :ref:`
 
 .. note::
 
-    For this example, we are using *all* of the non-metadata columns in the training and evaluation ``.csv`` files as features in the model. However, it is also possible to :ref:`choose specific columns <column_selection_rsmtool>` to be used for training the model.
+    1. For this example, we are using *all* of the non-metadata columns in the training and evaluation ``.csv`` files as features in the model. However, it is also possible to :ref:`choose specific columns <column_selection_rsmtool>` to be used for training the model.
+
+    2. You can also use our nifty capability to :ref:`automatically generate <autogen_configuration>` ``rsmtool`` configuration files rather than creating them manually.
 
 Run the experiment
 ^^^^^^^^^^^^^^^^^^

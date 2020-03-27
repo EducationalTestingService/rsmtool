@@ -29,9 +29,9 @@ from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
-from .utils.commandline import (generate_configuration,
-                                setup_rsmcmd_parser,
-                                CmdOption)
+from .utils.commandline import (ConfigurationGenerator,
+                                CmdOption,
+                                setup_rsmcmd_parser)
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
@@ -289,9 +289,10 @@ def main():
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        configuration = generate_configuration('rsmpredict',
-                                               as_string=True,
-                                               suppress_warnings=args.quiet)
+        generator = ConfigurationGenerator('rsmpredict',
+                                           as_string=True,
+                                           suppress_warnings=args.quiet)
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

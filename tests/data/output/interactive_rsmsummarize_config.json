@@ -1,15 +1,16 @@
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmsummarize
-    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
-    "summary_id": "ENTER_VALUE_HERE",
+    "summary_id": "testsumm",
     "experiment_dirs": [
-        "ENTER_VALUE_HERE"
+        "/a/b",
+        "/d",
+        "/e/f/g"
     ],
     // OPTIONAL: replace default values below based on your data.
     "custom_sections": null,
-    "description": "",
+    "description": "summary test",
     "experiment_names": null,
-    "file_format": "csv",
+    "file_format": "tsv",
     "general_sections": [
         "preprocessed_features",
         "model",
@@ -21,5 +22,5 @@
     "section_order": null,
     "special_sections": null,
     "subgroups": [],
-    "use_thumbnails": false
+    "use_thumbnails": true
 }
