@@ -260,17 +260,17 @@ class InteractiveField:
     Attributes
     ----------
     choices : list
-        List of possible choices for the field value if ``data_type`` is ``choice``.
+        List of possible choices for the field value if ``data_type`` is "choice".
         An empty list for all other types of fields.
     complete_style : prompt_toolkit.shortcuts.prompt.CompleteStyle
         A CompleteStyle that defines how to style the completions.
         Set to ``CompleteStyle.MULTI_COLUMN`` for fields that have ``data_type``
-        of ``choice``. Set to ``None`` for all other field types.
+        of "choice". Set to ``None`` for all other field types.
     completer : prompt_toolkit.completions.base.Completer
         A ``Completer`` object used to provide auto-completion for the field.
         The actual completer used depends on the ``data_type`` of the field.
-        For example, for fields of type ``choice``, we use a ``FuzzyWordCompleter``,
-        and for fields of type ``dir`` and ``file``, we use a ``PathCompleter``.
+        For example, for fields of type "choice", we use a ``FuzzyWordCompleter``,
+        and for fields of type "dir" and "file, we use a ``PathCompleter``.
     count : str
         An attribute indicating whether the field accepts a "single" value
         or "multiple" values. For fields that require multiple values, e.g.
@@ -282,7 +282,8 @@ class InteractiveField:
         - "choice" : a field that accepts one out of a fixed list of values.
         - "dir" : a field that accepts a path to a directory.
         - "file" : a field that accepts a path to a file
-        - "format" : a field that accepts possible file formats (csv/tsv/xlsx)
+        - "format" : a field that accepts possible intermediate file
+          formats ("csv", "tsv", and "xlsx")
         - "id" : a field that accepts experiment/comarison/summary IDs
         - "integer" : a field that accepts integer values
         - "text" : a field that accepts open-ended text
@@ -452,9 +453,11 @@ class InteractiveField:
         -------
         completer : prompt_toolkit.completion.base.Completer
             A ``Completer`` instance that suggests directory names
-            and files with csv/tsv/xlsx extensions as potential
-            completions for user input. We need directory names
-            so that users can look into sub-directories etc.
+            and files with valid input file extensions as potential
+            completions for user input. Valid input file
+            extensions are "csv", "jsonlines", "sas7bdat", "tsv",
+            "xlsx", and "xlsx". We need directory names so that
+            users can look into sub-directories etc.
         """
         def valid_file(filename):
             return (Path(filename).is_dir() or
@@ -475,8 +478,10 @@ class InteractiveField:
         -------
         validator : prompt_toolkit.validation.Validator
             A ``Validator`` instance that makes sure that only
-            actually existing files with csv/tsv/xlsx extensions
-            are chosen as the final user input.
+            actually existing files with valid input file extensions
+            are chosen as the final user input. Valid input file
+            extensions are "csv", "jsonlines", "sas7bdat", "tsv",
+            "xlsx", and "xlsx".
         """
         def is_valid(filepath):
             return (Path(filepath).is_file() and
@@ -498,10 +503,10 @@ class InteractiveField:
         -------
         validator : prompt_toolkit.validation.Validator
             A ``Validator`` instance that makes sure that only
-            valid RSMTool extensions (csv/tsv/xlsx) and
-            empty string are allowed as final user input. We
-            want to allow empty string because intermediate file
-            formats are optional to specify.
+            valid intermediate file extensions ("csv", "tsv",
+            and "xlsx") and empty string are allowed as final
+            user input. We want to allow empty string because
+            intermediate file formats are optional to specify.
         """
         validator = Validator.from_callable(lambda ext: ext in POSSIBLE_EXTENSIONS or ext == '', error_message="invalid format")
         return validator
