@@ -73,7 +73,7 @@ that they feel comfortable editing manually, RSMTool also provides the capabilit
 
 When running this command, the following warning would be printed out to stderr:
 
-.. code-block:: bash
+.. code-block:: text
 
     WARNING: Automatically generated configuration files MUST be edited to add values
     for required fields and even for optional ones depending on your data
