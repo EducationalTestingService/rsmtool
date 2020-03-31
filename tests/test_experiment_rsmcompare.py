@@ -39,7 +39,7 @@ _AUTO_UPDATE = False
     param('linearsvr-self-compare', 'LinearSVR_vs_LinearSVR'),
     param('lr-eval-self-compare', 'lr_eval_with_h2_vs_lr_eval_with_h2'),
     param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2'),
-    param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-different-format', 'lr_with_tsv_output_vs_lr_with_tsv_output'),
     param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2'),
     param('lr-self-compare-with-subgroups-and-edge-cases',
           'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases')
