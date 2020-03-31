@@ -1197,17 +1197,6 @@ class TestConfiguration:
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
         eq_(trim_min_max_tolerance, (1.0, 6.0, 0.51))
 
-    def test_get_trim_min_max_deprecated(self):
-        dictionary = {"experiment_id": '001',
-                      "train_file": '/foo/train.csv',
-                      "test_file": '/foo/test.csv',
-                      "trim_min": 1,
-                      "trim_max": 6,
-                      "model": 'LinearRegression'}
-        config = Configuration(dictionary)
-        trim_min_max = config.get_trim_min_max()
-        eq_(trim_min_max, (1.0, 6.0))
-
     def test_get_trim_tolerance_no_min_max(self):
         dictionary = {"experiment_id": '001',
                       "trim_tolerance": 0.49,

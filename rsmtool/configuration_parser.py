@@ -687,24 +687,6 @@ class Configuration:
                                               model_eval))
         return new_filter_dict
 
-    def get_trim_min_max(self):
-        """
-        This function is kept for backwards compatibility.
-        It is now replaced by get_trim_min_max_tolerance
-        and will be deprecated in future versions.
-
-        Returns
-        -------
-        spec_trim_min : float
-            Specified trim min value
-        spec_trim_max : float
-            Specified trim max value
-        """
-        logging.warning("get_trim_min_max method has been replaced by  "
-                        "get_trim_min_max_tolerance() and will "
-                        "not be supported in future releases.")
-        (trim_min, trim_max, tolerance) = self.get_trim_min_max_tolerance()
-        return (trim_min, trim_max)
 
     def get_trim_min_max_tolerance(self):
         """
