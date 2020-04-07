@@ -4,7 +4,7 @@
 Update SKLL models in tests.
 
 This script updates the SKLL model files to ensure they are compatible with the
-current version. It simply through all the rsmprednt tests under the
+current version. It simply iterates through all rsmpredict tests under the
 `data/experiments` directory, finds the model files, loads them, and saves
 them again.
 
