@@ -22,7 +22,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from .container import DataContainer
-from .prmse_utils import compute_prmse
+from .utils.prmse import get_true_score_evaluations
 from .utils.metrics import (agreement,
                             difference_of_standardized_means,
                             partial_correlations,
@@ -1670,8 +1670,9 @@ class Analyzer:
         if include_second_score:
             system_score_columns = [col for col in prediction_columns
                                     if col not in ['sc1', 'sc2']]
-            df_prmse = compute_prmse(df_preds_second_score,
-                                     system_score_columns)
+            df_prmse = get_true_score_evaluations(df_preds_second_score,
+                                                  system_score_columns,
+                                                  ['sc1', 'sc2'])
 
             datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 
