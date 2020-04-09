@@ -264,11 +264,11 @@ skll_fixed_parameters *(Optional)*
 Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model. 
 This should be a dictionary with the names of the hyperparameters as the keys. To determine
 what hyperparameters are available for the SKLL learner you chose, consult the scikit-learn
-documentation for the learner with the same name. This is because hyperparameter names are
-defined for scikit-learn estimators and SKLL just passes them through. The values for a key
-can be string, integer, float, or boolean depending on what the hyperparameter expects. Note
-that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`,
-it will simply be ignored. 
+documentation for the learner with the same name as well as the `SKLL documentation <https://skll.readthedocs.io/en/latest/run_experiment.html#fixed-parameters-optional>`_.
+Any values you specify here will override both the scikit-learn and SKLL defaults. 
+The values for a key can be string, integer, float, or boolean depending on what the
+hyperparameter expects. Note that if this option is specified with the
+:ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _skll_objective:
 
