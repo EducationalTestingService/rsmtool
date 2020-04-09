@@ -84,6 +84,10 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
      from rsmtool.utils.notebook import show_thumbnail
      show_thumbnail(...)
 
+.. note ::
+    In RSMTool v8.0 the API for computing ``PRMSE`` has changed. 
+    See :ref:`rsmtool.utils.prmse<prmse_api>`.
+
 
 :mod:`rsmtool` Package
 ======================
