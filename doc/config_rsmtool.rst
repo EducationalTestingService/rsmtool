@@ -257,6 +257,19 @@ sign *(Optional)*
 """""""""""""""""
 Name of the column containing expected correlation sign between each feature and human score if using :ref:`subset-based column selection <subset_column_selection>`.
 
+.. _skll_fixed_parameters:
+
+skll_fixed_parameters *(Optional)*
+""""""""""""""""""""""""""""""""""
+Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model. 
+This should be a dictionary with the names of the hyperparameters as the keys. To determine
+what hyperparameters are available for the SKLL learner you chose, consult the scikit-learn
+documentation for the learner with the same name. This is because hyperparameter names are
+defined for scikit-learn estimators and SKLL just passes them through. The values for a key
+can be string, integer, float, or boolean depending on what the hyperparameter expects. Note
+that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`,
+it will simply be ignored. 
+
 .. _skll_objective:
 
 skll_objective *(Optional)*
