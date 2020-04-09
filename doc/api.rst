@@ -148,10 +148,12 @@ From :py:mod:`~rsmtool.preprocessor` Module
     :show-inheritance:
 
 
-From :py:mod:`~rsmtool.prmse_utils` Module
+From :py:mod:`~rsmtool.utils.prmse` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. _prmse_api:
-.. autofunction:: rsmtool.prmse_utils.compute_prmse
+.. autofunction:: rsmtool.utils.prmse.prmse_true
+.. _ve_api:
+.. autofunction:: rsmtool.utils.prmse.variance_of_errors
 
 From :py:mod:`~rsmtool.reader` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

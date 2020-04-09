@@ -17,6 +17,7 @@ import numpy as np
 def get_n_human_scores(human_scores):
     """
     Compute number of human scores for each response
+
     Parameters
     ----------
     human_scores : array-like of shape (n_samples, n_ratings)
@@ -40,6 +41,7 @@ def variance_of_errors(human_scores):
         Human ratings for each response
 
     Returns
+    -------
     variance_of_errors : float
         Estimated variance of human errors
     '''

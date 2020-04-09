@@ -206,21 +206,50 @@ and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and can also handle the case where **only a subset** of responses are double-scored. The formula in this case uses the same computation for :math:`\sigma_{e}^2` but more complex formulas for :math:`MSE(T|M)` and :math:`\sigma_T^2`. The formulas are derived to ensure consistent results regardless of what percentage of data was double-scored and are as follows:
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where there are **more than two raters** and the number of available ratings varies across the responses (e.g. for two raters only a subset of responses is double-scored). 
 
-   :math:`MSE(T|M) = \displaystyle\frac{\sum_{i=1}^{N}{c_i(\hat{H_i} - M_i)^2} - N\sigma_{e}^2}{N_1+2N_2}`
+In this case we use orthonormal contrasts to estimate **error variance** :math:`\sigma_{e}^2`: if response :math:`i` has :math:`c_i` human ratings, we create the :math:`c_i-1` orthonormal contrasts :math:`D_{ij}` for each rating :math:`j` for response :math:`i` defined as follows:
 
-   :math:`\sigma_T^2=\displaystyle\frac{\sum_{i=1}^{N}{c_i(\hat{H}_i - \bar{\hat{H}})^2}-(N-1)\sigma_{e}^2}{(N-1) + \displaystyle\frac{N_2(N_1+2N_2-2)}{N_1+2N_2}}`
+:math:`D_{ij} = \sqrt{ \frac{j}{j+1}} \left (H_{i,j+1} - \frac{1}{j}
+\sum_{k=1}^j H_{ij} \right )` for :math:`j=1 \ldots c_j-1`
 
-   where 
+where 
 
-   * :math:`C_i=1` or 2 depending on the number of human scores observed for individual 𝑖.
+* :math:`H_{i,j}` is human score assigned by rater :math:`j` to response :math:`i`
 
-   * :math:`\hat{H}` is the average of two human scores :math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}` when two scores are available or :math:`\hat{H_i} = H_i` when only one score is available. 
+* :math:`c_i` is the total number of human scores available for response :math:`i`. For double-scored responses this equals 2. 
 
-   * :math:`N_1` is the number of responses with only one human score available (:math:`N_1+N_2=N`)
 
-PRMSE is computed using :ref:`rsmtool.prmse_utils.compute_prmse <prmse_api>`.
+We then use these to estimate the eror variance as:
+
+:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N \sum_{j=1}^{c_i-1} D_{ij}^2 } { \sum_{i=1}^N (c_i-1) }`
+
+The **true score variance** :math:`\sigma_T^2` is then estimated as 
+
+:math:`\sigma_T^2 = \frac{\sum_{i=1}^N c_i (\bar{H}_i - \bar{H})^2 -
+(N-1) \sigma_{e}^2}{c_\cdot - \frac{\sum_{i=1}^N
+c_i^2}{c_\cdot}}`
+
+where 
+
+* :math:`c_\cdot = \sum_{i=1}^N c_i` is the total number of observed human scores. 
+
+* :math:`\bar{H}_i` is the average human rating for response :math:`i`. For responses with only one rating this will be the single human score `H`.
+
+**Mean squared error** :math:`MSE(T|M)` is estimated as: 
+
+:math:`MSE(T|M) = \frac{1}{c_\cdot} \left (\sum_{i=1}^N c_i (\bar{H}_i - M_i)^2  -
+N\sigma_{e}^2 \right )`
+
+
+The formulas are derived to ensure consistent results regardless of the number of raters and the number of ratings availvable for each response. 
+
+PRMSE is computed using :ref:`rsmtool.utils.prmse_true <prmse_api>`.
+
+
+In some cases, it may be appropriate to compute variance of human errors using a different sample. This can be accomplished using :ref:`rsmtool.utils.variance_of_errors <ve_api>`
+
+
 
 .. note::
 
