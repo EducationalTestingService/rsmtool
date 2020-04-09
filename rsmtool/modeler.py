@@ -1060,6 +1060,7 @@ class Modeler:
                          filedir,
                          figdir,
                          file_format='csv',
+                         custom_fixed_parameters={},
                          custom_objective=None,
                          predict_expected_scores=False):
         """
@@ -1083,6 +1084,10 @@ class Modeler:
             this argument does not actually change the format of
             the output files at this time, as no betas are computed.
             Defaults to 'csv'.
+        custom_fixed_parameters : dict, optional
+            A dictionary containing any fixed parameters for the SKLL
+            model.
+            Defaults to an empty dictionary.
         custom_objective : str, optional
             Name of custom user-specified objective. If not specified
             or `None`, `neg_mean_squared_error` is used as the objective.
@@ -1097,8 +1102,10 @@ class Modeler:
         and the chosen tuning objective.
         """
         # Instantiate the given SKLL learner and set its probability value
-        # appropriately.
-        learner = Learner(model_name, probability=predict_expected_scores)
+        # and fixed parameters appropriately,
+        learner = Learner(model_name,
+                          model_kwargs=custom_fixed_parameters,
+                          probability=predict_expected_scores)
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -1175,7 +1182,8 @@ class Modeler:
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if is_skll_model(model_name):
-            kwargs.update({'custom_objective': configuration['skll_objective'],
+            kwargs.update({'custom_fixed_parameters': configuration['skll_fixed_parameters'],
+                           'custom_objective': configuration['skll_objective'],
                            'predict_expected_scores': configuration['predict_expected_scores']})
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration['skll_objective'] = chosen_objective
