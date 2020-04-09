@@ -36,7 +36,8 @@ from .utils.constants import (DEFAULTS,
                               FIELD_NAME_MAPPING,
                               ID_FIELDS)
 
-from .utils.files import is_skll_model, parse_json_with_comments
+from .utils.files import parse_json_with_comments
+from .utils.models import is_skll_model
 
 
 if HAS_RSMEXTRA:

@@ -43,6 +43,7 @@ Documentation
    usage_rsmtool
    advanced_usage
    custom_notebooks
+   automated_configuration
    api
    utilities
    contributing

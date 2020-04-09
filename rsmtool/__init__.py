@@ -28,24 +28,6 @@ if HAS_RSMEXTRA:
 else:
     VERSION_STRING = '%(prog)s {}'.format(__version__)
 
-from .analyzer import Analyzer  # noqa
-
-from .convert_feature_json import convert_feature_json_file  # noqa
-
-from .comparer import Comparer  # noqa
-
-from .container import DataContainer  # noqa
-
-from .modeler import Modeler  # noqa
-
-from .preprocessor import FeaturePreprocessor  # noqa
-
-from .reader import DataReader  # noqa
-
-from .reporter import Reporter  # noqa
-
-from .writer import DataWriter  # noqa
-
 from .rsmcompare import run_comparison  # noqa
 
 from .rsmeval import run_evaluation  # noqa
@@ -56,11 +38,8 @@ from .rsmpredict import compute_and_save_predictions  # noqa
 
 from .rsmsummarize import run_summary  # noqa
 
-from .utils.metrics import (agreement,  # noqa
-                            compute_expected_scores_from_model,
-                            partial_correlations)
-
-from .utils.notebook import get_thumbnail_as_html, show_thumbnail  # noqa
+__all__ = ['run_experiment', 'run_evaluation', 'run_comparison',
+           'compute_and_save_predictions', 'run_summary']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in

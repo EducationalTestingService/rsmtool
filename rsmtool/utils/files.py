@@ -12,63 +12,10 @@ import json
 import re
 
 from glob import glob
-from importlib import import_module
 from pathlib import Path
 from os.path import join
 
-BUILTIN_MODELS = ['LinearRegression',
-                  'EqualWeightsLR',
-                  'ScoreWeightedLR',
-                  'RebalancedLR',
-                  'NNLR',
-                  'NNLRIterative',
-                  'LassoFixedLambdaThenNNLR',
-                  'LassoFixedLambdaThenLR',
-                  'PositiveLassoCVThenLR',
-                  'LassoFixedLambda',
-                  'PositiveLassoCV']
-
-POSSIBLE_EXTENSIONS = ['csv', 'xlsx', 'tsv']
-
-_skll_module = import_module('skll.learner')
-
-
-def is_skll_model(model_name):
-    """
-    Check whether the given model is a valid learner name in SKLL.
-    Note that the `LinearRegression` model is also available in
-    SKLL but we always want to use the built-in model with that name.
-
-    Parameters
-    ----------
-    model_name : str
-        The name of the model to check
-
-    Returns
-    -------
-    valid: bool
-        `True` if the given model name is a valid SKLL learner,
-        `False` otherwise
-    """
-    return hasattr(_skll_module, model_name) and model_name != 'LinearRegression'
-
-
-def is_built_in_model(model_name):
-    """
-    Check whether the given model is a valid built-in model.
-
-    Parameters
-    ----------
-    model_name : str
-        The name of the model to check
-
-    Returns
-    -------
-    valid: bool
-        `True` if the given model name is a valid built-in model,
-        `False` otherwise
-    """
-    return model_name in BUILTIN_MODELS
+from .constants import POSSIBLE_EXTENSIONS
 
 
 def parse_json_with_comments(pathlike):

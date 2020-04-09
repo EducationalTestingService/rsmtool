@@ -24,7 +24,7 @@ from .reader import DataReader
 from .reporter import Reporter
 from .transformer import FeatureTransformer
 from .utils.conversion import convert_to_float
-from .utils.files import is_built_in_model, is_skll_model
+from .utils.models import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
