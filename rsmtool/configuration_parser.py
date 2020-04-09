@@ -995,11 +995,9 @@ class ConfigurationParser:
         else:
             configdict = self._parse_cfg_file(filepath)
 
-        # normalize, process and validate the configuration dictionary
-        configdict = ConfigurationParser.normalize_config(configdict)
-        configdict = ConfigurationParser.process_config(configdict)
-        configdict = ConfigurationParser.validate_config(configdict, context=context)
-
+        # create a new Configuration object which will automatically
+        # normalize, process, as well as validate the configuration
+        # dictionary being passed in
         return Configuration(configdict,
                              configdir=self._configdir,
                              filename=self._filename,
