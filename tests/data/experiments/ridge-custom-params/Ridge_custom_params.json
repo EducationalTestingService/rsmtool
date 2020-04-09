@@ -6,7 +6,7 @@
     "test_label_column": "score",
     "train_label_column": "score",
     "model": "Ridge",
-    "experiment_id": "Ridge_custom_objective",
+    "experiment_id": "Ridge_custom_params",
     "test_file": "../../files/test_spkitemid.csv",
     "description": "Using all features with a Ridge model.",
     "features": "features.csv",
