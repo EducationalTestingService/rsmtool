@@ -136,6 +136,13 @@ A single numeric value or a dictionary with keys as the group names listed in th
 
     If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
+.. _rater_error_variance:
+
+rater_error_variance *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. While by default ``rsmeval`` will compute this from double-scored responses in the data, in some cases it may be necessary to compute rater error variance on a different sample. In this case this field can be used to set rater error variance to a precomputed amount which will be used for all computations. You can use :ref:`rsmtool.utils.variance_of_errors <ve_api>` to compute rater error variance outside the main evaluation pipeline. 
+
 .. _scale_with_eval:
 
 scale_with *(Optional)*

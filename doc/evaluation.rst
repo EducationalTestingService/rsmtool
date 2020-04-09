@@ -247,8 +247,7 @@ The formulas are derived to ensure consistent results regardless of the number o
 PRMSE is computed using :ref:`rsmtool.utils.prmse_true <prmse_api>`.
 
 
-In some cases, it may be appropriate to compute variance of human errors using a different sample. This can be accomplished using :ref:`rsmtool.utils.variance_of_errors <ve_api>`
-
+In some cases, it may be appropriate to compute variance of human errors using a different sample than the one used for main evaluations. This can be accomplished using :ref:`rsmtool.utils.variance_of_errors <ve_api>` and using an optional configuration field `rater_error_variance` in :ref:`rsmtool<rater_error_variance_rsmtool>` or :ref:`rsmtool<rater_error_variance_rsmeval>`
 
 
 .. note::

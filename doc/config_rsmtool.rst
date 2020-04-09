@@ -210,6 +210,12 @@ If a probabilistic SKLL classifier is chosen to build the scoring model, then *e
 
     You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
 
+.. _rater_error_variance_rsmtool:
+
+rater_error_variance *(Optional)*
+"""""""""""""""""""""""""""""""""
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. While by default ``rsmtool`` will compute this from double-scored responses in the evaluation set, in some cases it may be necessary to compute rater error variance on a different sample. In this case this field can be used to set rater error variance to a precomputed amount which will be used for all computations. You can use :ref:`rsmtool.utils.variance_of_errors <ve_api>` to compute rater error variance outside the main evaluation pipeline. 
+
 .. _second_human_score_column_rsmtool:
 
 second_human_score_column *(Optional)*
