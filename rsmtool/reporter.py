@@ -655,6 +655,7 @@ class Reporter:
                           'USE_THUMBNAILS': config.get('use_thumbnails', False),
                           'SKLL_OBJECTIVE': config.get('skll_objective', ''),
                           'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
+                          'RATER_ERROR_VARIANCE': config.get('rater_error_variance', None),
                           'CONTEXT': context,
                           'JAVASCRIPT_PATH': javascript_path,
                           'OUTPUT_DIR': csvdir,

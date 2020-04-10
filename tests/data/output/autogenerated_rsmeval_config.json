@@ -31,5 +31,6 @@
     "special_sections": null,
     "subgroups": [],
     "trim_tolerance": 0.4998,
-    "use_thumbnails": false
+    "use_thumbnails": false,
+    "rater_error_variance": null
 }

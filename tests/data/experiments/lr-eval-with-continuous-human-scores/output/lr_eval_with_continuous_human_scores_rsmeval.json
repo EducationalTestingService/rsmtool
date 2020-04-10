@@ -18,6 +18,7 @@
     ],
     "special_sections": null,
     "custom_sections": null,
+    "rater_error_variance": null,
     "trim_tolerance": 0.4998,
     "subgroups": [],
     "min_n_per_group": null,
