@@ -184,13 +184,13 @@ The true score evaluations computed by RSMTool are available in the :ref:`interm
 Proportional reduction in mean squared error for true scores (PRMSE)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-PRMSE shows how well system scores can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (suggesting a very bad fit) or exceed 1 (suggesting very low human-human agreement). 
+PRMSE shows how well system scores can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (suggesting a very bad fit) or exceed 1 (suggesting that the sample size is too small to reliably estimate rater error variance). 
 
 PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2>`, but with the true score :math:`T` used instead of the observed score :math:`H`, that is, as the percentage of variance in the true scores explained by the system scores. 
 
 :math:`PRMSE=1-\displaystyle\frac{MSE(T|M)}{\sigma_T^2}`
 
-:math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
+In a simple cases where all responses have two human scores, :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
 
 - :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
 
@@ -206,7 +206,7 @@ and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and can also handle the case where there are **more than two raters** and the number of available ratings varies across the responses (e.g. for two raters only a subset of responses is double-scored). 
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of PRMSE formula available via :ref:`API<prmse_api>` can also be extended to cases where some of the responses have **more than two** ratings available. 
 
 In this case we use orthonormal contrasts to estimate **error variance** :math:`\sigma_{e}^2`: if response :math:`i` has :math:`c_i` human ratings, we create the :math:`c_i-1` orthonormal contrasts :math:`D_{ij}` for each rating :math:`j` for response :math:`i` defined as follows:
 
@@ -252,7 +252,7 @@ In some cases, it may be appropriate to compute variance of human errors using a
 
 .. note::
 
-	The PRMSE formula assigns higher weight to discrepancies between system scores and human scores when human score is the average of two human scores than when the human score is based on a single score.
+	The PRMSE formula assigns higher weight to discrepancies between system scores and human scores when human score is the average of two or more human scores than when the human score is based on a single score.
 
 
 Fairness

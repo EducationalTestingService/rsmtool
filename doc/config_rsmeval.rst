@@ -136,7 +136,7 @@ A single numeric value or a dictionary with keys as the group names listed in th
 
     If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
 
-.. _rater_error_variance:
+.. _rater_error_variance_rsmeval:
 
 rater_error_variance *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

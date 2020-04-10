@@ -54,5 +54,5 @@
     "trim_tolerance": 0.4998,
     "use_scaled_predictions": false,
     "use_thumbnails": false,
-    "use_truncation_thresholds": false,
+    "use_truncation_thresholds": false
 }
