@@ -1223,7 +1223,7 @@ class TestConfiguration:
                       "rater_error_variance": "2.2525",
                       "model": 'LinearRegression',
                       "train_file": "/foo/train.csv",
-                      "test_file": "/foo/test.csv",}
+                      "test_file": "/foo/test.csv"}
         config = Configuration(dictionary)
         rater_error_variance = config.get_rater_error_variance()
         eq_(rater_error_variance, 2.2525)
@@ -1232,7 +1232,7 @@ class TestConfiguration:
         dictionary = {"experiment_id": 'abs',
                       "model": 'LinearRegression',
                       "train_file": "/foo/train.csv",
-                      "test_file": "/foo/test.csv",}
+                      "test_file": "/foo/test.csv"}
         config = Configuration(dictionary)
         rater_error_variance = config.get_rater_error_variance()
         eq_(rater_error_variance, None)

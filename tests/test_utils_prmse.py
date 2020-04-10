@@ -113,7 +113,7 @@ class TestPrmseJohnsonData():
     def test_variance_of_errors_sparse_matrix(self):
         human_scores = self.human_score_columns
         df_humans = self.data_sparse[human_scores]
-        variance_errors_human= variance_of_errors(df_humans)
+        variance_errors_human = variance_of_errors(df_humans)
         expected_v_e = 0.5150882
         assert_almost_equal(variance_errors_human, expected_v_e, 7)
 
@@ -226,7 +226,7 @@ class TestPrmseJohnsonData():
         assert_almost_equal(prmse, expected_prmse_true, 7)
 
     def test_compute_true_score_evaluations_full(self):
-        expected_df = pd.DataFrame({'N': 10000 ,
+        expected_df = pd.DataFrame({'N': 10000,
                                     "N raters": 4,
                                     "N single": 0,
                                     "N multiple": 10000,
@@ -234,7 +234,7 @@ class TestPrmseJohnsonData():
                                     "True score var": 0.7765515,
                                     'MSE true': 0.3564625,
                                     'PRMSE true': 0.5409673},
-                                    index=['system'])
+                                   index=['system'])
         df_prmse = get_true_score_evaluations(self.data_full,
                                               self.system_score_columns,
                                               self.human_score_columns)
@@ -242,7 +242,7 @@ class TestPrmseJohnsonData():
 
 
     def test_compute_true_score_evaluations_sparse(self):
-        expected_df = pd.DataFrame({'N': 10000 ,
+        expected_df = pd.DataFrame({'N': 10000,
                                     "N raters": 4,
                                     "N single": 3421,
                                     "N multiple": 6579,
@@ -250,7 +250,7 @@ class TestPrmseJohnsonData():
                                     "True score var": 0.769816,
                                     'MSE true': 0.3550792,
                                     'PRMSE true': 0.538748},
-                                    index=['system'])
+                                   index=['system'])
         df_prmse = get_true_score_evaluations(self.data_sparse,
                                               self.system_score_columns,
                                               self.human_score_columns)
@@ -258,7 +258,7 @@ class TestPrmseJohnsonData():
 
 
     def test_compute_true_score_evaluations_given_ve(self):
-        expected_df = pd.DataFrame({'N': 10000 ,
+        expected_df = pd.DataFrame({'N': 10000,
                                     "N raters": 4,
                                     "N single": 3421,
                                     "N multiple": 6579,
@@ -266,12 +266,9 @@ class TestPrmseJohnsonData():
                                     "True score var": 0.769816,
                                     'MSE true': 0.3550792,
                                     'PRMSE true': 0.538748},
-                                    index=['system'])
+                                   index=['system'])
         df_prmse = get_true_score_evaluations(self.data_sparse,
                                               self.system_score_columns,
                                               self.human_score_columns,
                                               variance_errors_human=0.5150882)
         assert_frame_equal(df_prmse, expected_df, check_dtype=False)
-
-
-

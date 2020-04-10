@@ -58,7 +58,7 @@ def variance_of_errors(human_scores):
 
     n_scores = get_n_human_scores(human_scores)
 
-    multiple_scores = human_scores[n_scores>1]
+    multiple_scores = human_scores[n_scores > 1]
 
     # raise an error if we don't have any such responses
     if len(multiple_scores) == 0:
@@ -77,12 +77,12 @@ def variance_of_errors(human_scores):
         ratings = ratings[~np.isnan(ratings)]
         n = len(ratings)
         # Difference has dimensions (n-1,)
-        difference = ratings[1:] - ratings[:-1].cumsum()/(np.arange(1, n))
+        difference = ratings[1:] - ratings[:-1].cumsum() / (np.arange(1, n))
         # Compute multiplication factor.
         # This also has dimension (n-1,)
-        factor = np.arange(1, n)/np.arange(2, n+1)
+        factor = np.arange(1, n) / np.arange(2, n+1)
         # Compute contrast. This also has dimensions n-1
-        contrast = np.sqrt(factor)*difference
+        contrast = np.sqrt(factor) * difference
         # now we need to pad it back to the total number of
         # original ratings
         pad_width = total_ratings - n
@@ -152,11 +152,11 @@ def true_score_variance(human_scores,
 
     sum_of_squares = adjusted_squared_devs.sum()
 
-    numerator = sum_of_squares - (N-1)*variance_errors_human
+    numerator = sum_of_squares - (N-1) * variance_errors_human
 
-    denominator = M - ((n_scores**2).sum()/M)
+    denominator = M - ((n_scores**2).sum() / M)
 
-    variance_true_scores = numerator/denominator
+    variance_true_scores = numerator / denominator
 
     return variance_true_scores
 
@@ -341,8 +341,7 @@ def get_true_score_evaluations(df,
     df_prmse.insert(2, 'N single', (score_counts == 1).sum()),
     df_prmse.insert(3, 'N multiple', (score_counts > 1).sum()),
     df_prmse.insert(4, 'Variance of errors', variance_errors_human)
-    df_prmse.insert(5, 'True score var', true_score_variance(df[human_score_columns], variance_errors_human))
+    df_prmse.insert(5, 'True score var',
+                    true_score_variance(df[human_score_columns],
+                                        variance_errors_human))
     return df_prmse
-
-
-

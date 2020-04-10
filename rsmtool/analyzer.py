@@ -1674,7 +1674,7 @@ class Analyzer:
                                     if col not in ['sc1', 'sc2']]
 
             human_score_columns = [col for col in prediction_columns
-                                    if col in ['sc1', 'sc2']]
+                                   if col in ['sc1', 'sc2']]
 
             df_prmse = get_true_score_evaluations(df_preds_second_score,
                                                   system_score_columns,

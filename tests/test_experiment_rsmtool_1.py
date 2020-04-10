@@ -42,7 +42,8 @@ else:
     param('lr-with-h2', 'lr_with_h2', consistency=True),
     param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True),
     param('lr-with-continuous-human-scores', 'lr_with_continuous_human_scores', consistency=True),
-    param('lr-with-continuous-human-scores-in-test', 'lr_with_continuous_human_scores_in_test', consistency=True),
+    param('lr-with-continuous-human-scores-in-test', 'lr_with_continuous_human_scores_in_test',
+          consistency=True),
     param('lr-no-h2-and-rater-error-variance', 'lr_no_h2_and_rater_error_variance')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
