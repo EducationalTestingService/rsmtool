@@ -80,7 +80,7 @@ def variance_of_errors(human_scores):
         difference = ratings[1:] - ratings[:-1].cumsum() / (np.arange(1, n))
         # Compute multiplication factor.
         # This also has dimension (n-1,)
-        factor = np.arange(1, n) / np.arange(2, n+1)
+        factor = np.arange(1, n) / np.arange(2, n + 1)
         # Compute contrast. This also has dimensions n-1
         contrast = np.sqrt(factor) * difference
         # now we need to pad it back to the total number of
