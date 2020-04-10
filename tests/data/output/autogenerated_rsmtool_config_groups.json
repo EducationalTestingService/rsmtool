@@ -43,6 +43,7 @@
     "section_order": null,
     "select_transformations": false,
     "sign": null,
+    "skll_fixed_parameters": {},
     "skll_objective": null,
     "special_sections": null,
     "standardize_features": true,
