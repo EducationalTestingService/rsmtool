@@ -22,27 +22,27 @@ else:
 
 
 @parameterized([
-    #param('lr', 'lr'),
-    #param('lr-subset-features', 'lr_subset'),
-    #param('lr-with-feature-subset-file', 'lr_with_feature_subset_file'),
-    #param('lr-subgroups', 'lr_subgroups', subgroups=['L1']),
-    #param('lr-with-numeric-subgroup', 'lr_with_numeric_subgroup', subgroups=['ITEM', 'QUESTION']),
-    #param('lr-with-id-with-leading-zeros', 'lr_with_id_with_leading_zeros', subgroups=['ITEM', 'QUESTION']),
+    param('lr', 'lr'),
+    param('lr-subset-features', 'lr_subset'),
+    param('lr-with-feature-subset-file', 'lr_with_feature_subset_file'),
+    param('lr-subgroups', 'lr_subgroups', subgroups=['L1']),
+    param('lr-with-numeric-subgroup', 'lr_with_numeric_subgroup', subgroups=['ITEM', 'QUESTION']),
+    param('lr-with-id-with-leading-zeros', 'lr_with_id_with_leading_zeros', subgroups=['ITEM', 'QUESTION']),
     # we suppress UserWarnings for this test since we expect to get a warning in partial correlations
     # due to edge cases
-    #param('lr-subgroups-with-edge-cases', 'lr_subgroups_with_edge_cases',
-    #      subgroups=['group_edge_cases'], suppress_warnings_for=[UserWarning]),
-    #param('lr-missing-values', 'lr_missing_values'),
-    #param('lr-include-zeros', 'lr_include_zeros'),
-    #param('lr-with-length', 'lr_with_length'),
-    #param('lr-subgroups-with-length', 'lr_subgroups_with_length', subgroups=['L1', 'QUESTION']),
-    #param('lr-with-large-integer-value', 'lr_with_large_integer_value'),
-    #param('lr-with-missing-length-values', 'lr_with_missing_length_values'),
-    #param('lr-with-length-zero-sd', 'lr_with_length_zero_sd'),
-    #param('lr-with-h2', 'lr_with_h2', consistency=True),
-    #param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True),
-    #param('lr-with-continuous-human-scores', 'lr_with_continuous_human_scores', consistency=True),
-    #param('lr-with-continuous-human-scores-in-test', 'lr_with_continuous_human_scores_in_test', consistency=True),
+    param('lr-subgroups-with-edge-cases', 'lr_subgroups_with_edge_cases',
+          subgroups=['group_edge_cases'], suppress_warnings_for=[UserWarning]),
+    param('lr-missing-values', 'lr_missing_values'),
+    param('lr-include-zeros', 'lr_include_zeros'),
+    param('lr-with-length', 'lr_with_length'),
+    param('lr-subgroups-with-length', 'lr_subgroups_with_length', subgroups=['L1', 'QUESTION']),
+    param('lr-with-large-integer-value', 'lr_with_large_integer_value'),
+    param('lr-with-missing-length-values', 'lr_with_missing_length_values'),
+    param('lr-with-length-zero-sd', 'lr_with_length_zero_sd'),
+    param('lr-with-h2', 'lr_with_h2', consistency=True),
+    param('lr-subgroups-with-h2', 'lr_subgroups_with_h2', subgroups=['L1', 'QUESTION'], consistency=True),
+    param('lr-with-continuous-human-scores', 'lr_with_continuous_human_scores', consistency=True),
+    param('lr-with-continuous-human-scores-in-test', 'lr_with_continuous_human_scores_in_test', consistency=True),
     param('lr-no-h2-and-rater-error-variance', 'lr_no_h2_and_rater_error_variance')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
