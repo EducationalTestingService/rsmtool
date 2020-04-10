@@ -51,6 +51,21 @@ def test_compute_n_human_scores_array():
     n_scores = get_n_human_scores(arr)
     assert_array_equal(expected_n, n_scores)
 
+
+def test_prmse_single_human_ve():
+    df = pd.DataFrame({'system': [1, 2, 5],
+                       'sc1': [2, 3, 5]})
+    prmse = prmse_true(df['system'], df['sc1'], 0.5)
+    eq_(prmse, 0.9090909090909091)
+
+
+def test_prmse_single_human_ve_array_as_input():
+    system_scores = np.array([1, 2, 5])
+    human_scores = np.array([2, 3, 5])
+    prmse = prmse_true(system_scores, human_scores, 0.5)
+    eq_(prmse, 0.9090909090909091)
+
+
 @raises(ValueError)
 def test_variance_of_errors_all_single_scored():
     sc1 = [1, 2, 3, None, None]

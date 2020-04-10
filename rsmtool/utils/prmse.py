@@ -235,6 +235,18 @@ def prmse_true(system,
         Proportional reduction in mean square error
     """
 
+    # check that human_scors is a two dimensional array
+    # and reshape if necessary
+    if len(human_scores.shape) == 1:
+        current_length = human_scores.shape[0]
+        # first assume we have a pandas series
+        try:
+            human_scores = human_scores.values.reshape(current_length, 1)
+        # if not, treat this as an array
+        except AttributeError:
+            human_scores = human_scores.reshape(current_length, 1)
+
+
     if not variance_errors_human:
         variance_errors_human = variance_of_errors(human_scores)
 

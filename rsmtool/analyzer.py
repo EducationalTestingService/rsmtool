@@ -1667,12 +1667,17 @@ class Analyzer:
                     {'name': 'score_dist', 'frame': df_score_dist}]
 
         # compute true-score analyses if we have second score
-        if include_second_score:
+        # or have been given rater error variance
+        rater_error_variance = configuration.rater_error_variance
+        if include_second_score or rater_error_variance:
             system_score_columns = [col for col in prediction_columns
                                     if col not in ['sc1', 'sc2']]
+            human_score_columns = [col for col in prediction_columns
+                                    if col in ['sc1', 'sc2']]
             df_prmse = get_true_score_evaluations(df_preds_second_score,
                                                   system_score_columns,
-                                                  ['sc1', 'sc2'])
+                                                  human_score_columns,
+                                                  rater_error_variance)
 
             datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 

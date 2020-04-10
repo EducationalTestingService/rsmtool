@@ -1218,6 +1218,26 @@ class TestConfiguration:
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
         eq_(trim_min_max_tolerance, (None, None, 0.49))
 
+    def test_get_rater_error_variance(self):
+        dictionary = {"experiment_id": 'abs',
+                      "rater_error_variance": "2.2525",
+                      "model": 'LinearRegression',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",}
+        config = Configuration(dictionary)
+        rater_error_variance = config.get_rater_error_variance()
+        eq_(rater_error_variance, 2.2525)
+
+    def test_get_rater_error_variance_none(self):
+        dictionary = {"experiment_id": 'abs',
+                      "model": 'LinearRegression',
+                      "train_file": "/foo/train.csv",
+                      "test_file": "/foo/test.csv",}
+        config = Configuration(dictionary)
+        rater_error_variance = config.get_rater_error_variance()
+        eq_(rater_error_variance, None)
+
+
     def test_get_names_and_paths_with_feature_file(self):
         filepaths = ['path/to/train.tsv',
                      'path/to/test.tsv',
