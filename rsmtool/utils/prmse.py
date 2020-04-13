@@ -58,10 +58,10 @@ def variance_of_errors(human_scores):
 
     n_scores = get_n_human_scores(human_scores)
 
-    multiple_scores = human_scores[n_scores > 1]
+    multiple_mask = n_scores > 1
 
     # raise an error if we don't have any such responses
-    if len(multiple_scores) == 0:
+    if multiple_mask.sum() == 0:
         raise ValueError("Variance of human errors "
                          "necessary for true score "
                          "evaluations requires "
@@ -69,32 +69,13 @@ def variance_of_errors(human_scores):
                          "to be scored by 2 or more "
                          "raters.")
 
-    # we next calculate the difference between ratings
-    # for each response
+    multiple_scores = human_scores[multiple_mask]
 
-    def compute_difference(ratings):
-        total_ratings = len(ratings)
-        ratings = ratings[~np.isnan(ratings)]
-        n = len(ratings)
-        # Difference has dimensions (n-1,)
-        difference = ratings[1:] - ratings[:-1].cumsum() / (np.arange(1, n))
-        # Compute multiplication factor.
-        # This also has dimension (n-1,)
-        factor = np.arange(1, n) / np.arange(2, n + 1)
-        # Compute contrast. This also has dimensions n-1
-        contrast = np.sqrt(factor) * difference
-        # now we need to pad it back to the total number of
-        # original ratings
-        pad_width = total_ratings - n
-        contrast = np.pad(contrast,
-                          (0, pad_width),
-                          constant_values=np.nan)
-        return contrast
+    n_scores = n_scores[multiple_mask]
 
-    differences = np.apply_along_axis(compute_difference, 1, multiple_scores)
+    variances = np.nanvar(multiple_scores, ddof=1, axis=1)
 
-    # variance of errors is the mean of squared differences
-    variance_of_errors = np.nanmean((differences**2))
+    variance_of_errors = np.average(variances, weights=n_scores - 1)
 
     return variance_of_errors
 
