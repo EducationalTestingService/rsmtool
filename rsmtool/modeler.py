@@ -1060,7 +1060,7 @@ class Modeler:
                          filedir,
                          figdir,
                          file_format='csv',
-                         custom_fixed_parameters={},
+                         custom_fixed_parameters=None,
                          custom_objective=None,
                          predict_expected_scores=False):
         """
@@ -1087,7 +1087,7 @@ class Modeler:
         custom_fixed_parameters : dict, optional
             A dictionary containing any fixed parameters for the SKLL
             model.
-            Defaults to an empty dictionary.
+            Defaults to ``None``.
         custom_objective : str, optional
             Name of custom user-specified objective. If not specified
             or `None`, `neg_mean_squared_error` is used as the objective.
@@ -1102,9 +1102,10 @@ class Modeler:
         and the chosen tuning objective.
         """
         # Instantiate the given SKLL learner and set its probability value
-        # and fixed parameters appropriately,
+        # and fixed parameters appropriately
+        model_kwargs = custom_fixed_parameters if custom_fixed_parameters is not None else {}
         learner = Learner(model_name,
-                          model_kwargs=custom_fixed_parameters,
+                          model_kwargs=model_kwargs,
                           probability=predict_expected_scores)
 
         # get the features, IDs, and labels from the given data frame
