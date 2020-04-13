@@ -653,6 +653,7 @@ class Reporter:
                           'STANDARDIZE_FEATURES': config.get('standardize_features', True),
                           'FILE_FORMAT': config.get('file_format', 'csv'),
                           'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'SKLL_FIXED_PARAMETERS': config.get('skll_fixed_parameters', {}),
                           'SKLL_OBJECTIVE': config.get('skll_objective', ''),
                           'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
                           'CONTEXT': context,

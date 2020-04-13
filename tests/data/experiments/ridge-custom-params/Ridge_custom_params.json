@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train_spkitemid.csv",
+    "trim_max": 6,
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "model": "Ridge",
+    "experiment_id": "Ridge_custom_params",
+    "test_file": "../../files/test_spkitemid.csv",
+    "description": "Using all features with a Ridge model.",
+    "features": "features.csv",
+    "skll_fixed_parameters": {"solver": "sag", "tol": 0.01, "max_iter": 5000}
+}
