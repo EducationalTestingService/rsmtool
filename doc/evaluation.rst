@@ -208,21 +208,23 @@ and :math:`\sigma_T^2` is estimated as:
 
 The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of PRMSE formula available via :ref:`API<prmse_api>` can also be extended to cases where some of the responses have **more than two** ratings available. 
 
-In this case we use orthonormal contrasts to estimate **error variance** :math:`\sigma_{e}^2`: if response :math:`i` has :math:`c_i` human ratings, we create the :math:`c_i-1` orthonormal contrasts :math:`D_{ij}` for each rating :math:`j` for response :math:`i` defined as follows:
+In this case variance of errors is computed as pooled variance estimator.
 
-:math:`D_{ij} = \sqrt{ \frac{j}{j+1}} \left (H_{i,j+1} - \frac{1}{j}
-\sum_{k=1}^j H_{ij} \right )` for :math:`j=1 \ldots c_j-1`
+We first calculate the within within-subject variance of human ratings for each response, :math:`V_i`, using denominator N-1:
 
-where 
+:math:`V_{i} = \frac{\sum_{j=1}^c H_{i,j} - \bar{H}_i}{c_i-1}`
+
+where
 
 * :math:`H_{i,j}` is human score assigned by rater :math:`j` to response :math:`i`
 
 * :math:`c_i` is the total number of human scores available for response :math:`i`. For double-scored responses this equals 2. 
 
+* :math:`\bar{H}_i` is the average human rating for response :math:`i`. 
 
-We then use these to estimate the eror variance as:
+We then take a weighted average of those within-responses variances:
 
-:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N \sum_{j=1}^{c_i-1} D_{ij}^2 } { \sum_{i=1}^N (c_i-1) }`
+:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{N}`
 
 The **true score variance** :math:`\sigma_T^2` is then estimated as 
 
