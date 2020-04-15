@@ -22,12 +22,12 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from .container import DataContainer
-from .utils.prmse import get_true_score_evaluations
 from .utils.metrics import (agreement,
                             difference_of_standardized_means,
                             partial_correlations,
                             quadratic_weighted_kappa,
                             standardized_mean_difference)
+from .utils.prmse import get_true_score_evaluations
 
 
 class Analyzer:
@@ -1669,7 +1669,8 @@ class Analyzer:
         # compute true-score analyses if we have second score
         # or have been given rater error variance
         rater_error_variance = configuration.get_rater_error_variance()
-        if include_second_score or rater_error_variance:
+
+        if include_second_score or rater_error_variance is not None:
             system_score_columns = [col for col in prediction_columns
                                     if col not in ['sc1', 'sc2']]
 

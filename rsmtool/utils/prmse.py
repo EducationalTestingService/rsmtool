@@ -51,8 +51,8 @@ def variance_of_errors(human_scores):
     # in these computations having column names
     # interferes with the computation
 
-    if isinstance(human_scores, pd.DataFrame):
-        human_scores = human_scores.to_numpy()
+    #if isinstance(human_scores, pd.DataFrame):
+    #    human_scores = human_scores.to_numpy()
 
     # we only use responses with more than 1 score
 
@@ -109,7 +109,7 @@ def true_score_variance(human_scores,
     # if we don't have variance of errors, compute it
     # from the data
 
-    if not variance_errors_human:
+    if variance_errors_human is None:
         variance_errors_human = variance_of_errors(human_scores)
 
     # compute mean human score and total number of scores
@@ -173,7 +173,7 @@ def mse_true(system,
     # if we don't have variance of errors, compute it
     # from the data
 
-    if not variance_errors_human:
+    if variance_errors_human is None:
         variance_errors_human = variance_of_errors(human_scores)
 
 
@@ -228,7 +228,7 @@ def prmse_true(system,
             human_scores = human_scores.reshape(current_length, 1)
 
 
-    if not variance_errors_human:
+    if variance_errors_human is None:
         variance_errors_human = variance_of_errors(human_scores)
 
     variance_true = true_score_variance(human_scores, variance_errors_human)

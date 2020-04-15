@@ -9,7 +9,7 @@
     "features": "features.csv",
     "trim_min": 1,
     "model": "LinearRegression",
-    "rater_error_variance": 0.135,
+    "rater_error_variance": 0,
     "experiment_id": "lr_no_h2_and_rater_error_variance",
     "description": "Using all features with a LinearRegression model."
 }
