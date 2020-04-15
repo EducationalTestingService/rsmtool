@@ -46,18 +46,13 @@ def variance_of_errors(human_scores):
         Estimated variance of human errors
     '''
 
-    # if the user passsed pandas Dataframe,
-    # we convert it to an array since
-    # in these computations having column names
-    # interferes with the computation
-
-    #if isinstance(human_scores, pd.DataFrame):
-    #    human_scores = human_scores.to_numpy()
-
-    # we only use responses with more than 1 score
+    # we first compute the total number of scores
+    # available for each response
 
     n_scores = get_n_human_scores(human_scores)
 
+    # we will only be using responses with more
+    # than one score
     multiple_mask = n_scores > 1
 
     # raise an error if we don't have any such responses
@@ -69,13 +64,19 @@ def variance_of_errors(human_scores):
                          "to be scored by 2 or more "
                          "raters.")
 
+    # only select the responses with multiple scores
     multiple_scores = human_scores[multiple_mask]
 
     n_scores = n_scores[multiple_mask]
 
-    variances = np.nanvar(multiple_scores, ddof=1, axis=1)
+    # now let's compute the rater error variance for each
+    # response
+    response_variances = np.nanvar(multiple_scores, ddof=1, axis=1)
 
-    variance_of_errors = np.average(variances, weights=n_scores - 1)
+    # finally, let's compute the variance of errors as a weighted average
+    # of response variances
+
+    variance_of_errors = np.average(response_variances, weights=n_scores - 1)
 
     return variance_of_errors
 
@@ -129,14 +130,22 @@ def true_score_variance(human_scores,
     # compute squared deviations
     squared_devs = (mean_scores - mean_human_score)**2
 
+    # adjust them by the number of human scores available
+    # for each responses: deviations with higher number of
+    # human scores are assigned a greater weight
     adjusted_squared_devs = n_scores * squared_devs
 
+    # compute sum of squares
     sum_of_squares = adjusted_squared_devs.sum()
 
+    # now compute the numerator as sum of squares
+    # adjusted for the variance of human errors
     numerator = sum_of_squares - (N-1) * variance_errors_human
 
+    # compute the denominator as the adjusted total number of scores
     denominator = M - ((n_scores**2).sum() / M)
 
+    # finally compute variance of true scores
     variance_true_scores = numerator / denominator
 
     return variance_true_scores
@@ -147,7 +156,7 @@ def mse_true(system,
              variance_errors_human=None):
 
     """
-    Compute mean square error (MSE) when predicting true score
+    Compute mean squared error (MSE) when predicting true score
     from system score.
 
     Parameters
@@ -213,7 +222,7 @@ def prmse_true(system,
     Returns
     -------
     prmse : float
-        Proportional reduction in mean square error
+        Proportional reduction in mean squared error
     """
 
     # check that human_scors is a two dimensional array
@@ -274,14 +283,14 @@ def get_true_score_evaluations(df,
     prmse_metrics: pandas DataFrame
         DataFrame containing different evaluation metrics related to the evaluation
         of system scores against true scores:
-        - `N`: total number of responses
-        - `N raters`: maximum number of ratings available for a single response
-        - `N_single`: total number of responses with a single human score
-        - `N_multiple`: total number of responses with more than one human score
-        - `variance_of_errors`: estimated variance of human errors
-        - `tru_var`: estimated true score variance
-        - `mse_true`: mean squared error when predicting true score from machine score
-        - `prmse`: proportional reduction in mean squared error when predicting true score
+        - ``N``: total number of responses
+        - ``N raters``: maximum number of ratings available for a single response
+        - ``N_single``: total number of responses with a single human score
+        - ``N_multiple``: total number of responses with more than one human score
+        - ``variance_of_errors``: estimated variance of human errors
+        - ``tru_var``: estimated true score variance
+        - ``mse_true``: mean squared error when predicting true score from machine score
+        - ``prmse``: proportional reduction in mean squared error when predicting true score
     """
 
     # check that if we only have one human column, we were also given
