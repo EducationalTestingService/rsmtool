@@ -141,7 +141,7 @@ A single numeric value or a dictionary with keys as the group names listed in th
 rater_error_variance *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. While by default ``rsmeval`` will compute this from double-scored responses in the data, in some cases it may be necessary to compute rater error variance on a different sample. In this case this field can be used to set rater error variance to a precomputed amount which will be used for all computations. You can use :ref:`rsmtool.utils.variance_of_errors <ve_api>` to compute rater error variance outside the main evaluation pipeline. 
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmeval`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmeval``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
 
 .. _scale_with_eval:
 

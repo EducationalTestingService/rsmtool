@@ -737,8 +737,7 @@ class Configuration:
 
     def get_rater_error_variance(self):
         """
-        Get the specified rater error variance
-        if any and make sure it's numeric
+        Get specified rater error variance, if any, and make sure it's numeric.
 
         Returns:
         --------
@@ -1252,10 +1251,10 @@ class ConfigurationParser:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
                                      "documentation and choose a valid tuning objective.")
 
-        # 9. Check if that if "skll_fixed_parameters" is specified,
+        # 9. Check that if "skll_fixed_parameters" is specified,
         # it's specified for SKLL model and _not_ a built-in linear
         # regression model; we cannot check whether the parameters
-        # are valid at parse time but SKLL will raise an error#
+        # are valid at parse time but SKLL will raise an error
         # at run time for any invalid parameters
         if new_config['skll_fixed_parameters']:
             if not is_skll_model(new_config['model']):

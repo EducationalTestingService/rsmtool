@@ -64,7 +64,6 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
-
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
