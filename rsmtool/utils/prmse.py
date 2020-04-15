@@ -16,16 +16,16 @@ import numpy as np
 
 def get_n_human_scores(human_scores):
     """
-    Compute number of human scores for each response
+    Get the number of available human scores for each response.
 
     Parameters
     ----------
     human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response
+        Human ratings for each response.
 
     Returns
     -------
-    n_scores : array-like of shape (n-samples)
+    n_scores : array-like of shape (n_samples, )
         Total number of not None human scores
     """
     n_scores = (~np.isnan(human_scores)).sum(axis=1)
@@ -33,23 +33,22 @@ def get_n_human_scores(human_scores):
 
 
 def variance_of_errors(human_scores):
-    '''Compute variance of human errors.
+    """
+    Estimate the variance of errors in human scores.
 
     Parameters
     ----------
     human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response
+        Human ratings for each response.
 
     Returns
     -------
     variance_of_errors : float
-        Estimated variance of human errors
+        Estimated variance of errors in human scores.
     '''
 
-    # if the user passsed pandas Dataframe,
-    # we convert it to an array since
-    # in these computations having column names
-    # interferes with the computation
+    # if the user passed a pandas data frame, convert it to a numpy array since
+    #  having column names interferes with the following computations
 
     if isinstance(human_scores, pd.DataFrame):
         human_scores = human_scores.to_numpy()
@@ -84,13 +83,12 @@ def true_score_variance(human_scores,
                         variance_errors_human=None):
 
     """
-    Compute variance of true scores
-    for multiple raters
+    Compute variance of true scores for multiple raters.
 
     Parameters
     ----------
     human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response
+        Human ratings for each response.
 
     variance_errors_human : float
         Estimated variance of errors in human scores
@@ -103,7 +101,7 @@ def true_score_variance(human_scores,
     Returns
     -------
     variance_true_scores : float
-        Variance of true scores
+        Variance of true scores.
     """
 
     # if we don't have variance of errors, compute it
@@ -153,9 +151,9 @@ def mse_true(system,
     Parameters
     ----------
     system : array-like of shape (n_samples,)
-        System scores
+        System scores for each response.
     human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response
+        Human ratings for each response.
     variance_errors_human : float
         Estimated variance of errors in human scores
         When no value is supplied, the variance will
@@ -167,7 +165,7 @@ def mse_true(system,
     Returns
     -------
     variance_true_scores : float
-        Variance of true scores
+        Variance of true scores.
     """
 
     # if we don't have variance of errors, compute it
@@ -200,9 +198,9 @@ def prmse_true(system,
     Parameters
     ----------
     system : array-like of shape (n_samples,)
-        System scores
+        System scores for each response.
     human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response
+        Human ratings for each response.
     variance_errors_human : float
         Estimated variance of errors in human scores
         When no value is supplied, the variance will
@@ -251,21 +249,22 @@ def get_true_score_evaluations(df,
     ----------
     df: pandas DataFrame
         Input data frame. Must contain columns listed in
-        `system_score_columns` and `human_score_columns`
+        ``system_score_columns`` and ``human_score_columns``.
     system_score_columns: str or list
-        System score column name or list of columns containing system scores
+        System score column name or list of columns containing system scores.
     human_score_columns: str or list
         Human score column or list of columns containing human scores.
         True score evaluations require estimating variance of human errors,
         which can only be computed when a subset of responses has
-        two or more human ratings. If a single human_score_column
-        is supplied, one must also specify variance_errors_human
+        two or more human ratings. If  ``human_score_columns`` is
+        a single column name,  ``variance_errors_human`` must also
+        be specified.
     variance_errors_human : float
-        Estimated variance of errors in human scores
-        When no value is supplied, the variance will
-        be estimated from the data. In this case
-        at least some responses must have more than
-        one human score.
+        Estimated variance of errors in human scores.
+        If no value is supplied, the variance will
+        be estimated from the data in which case
+        some responses must have more than one
+        human rating.
 
 
 

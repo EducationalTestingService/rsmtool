@@ -190,7 +190,7 @@ PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2
 
 :math:`PRMSE=1-\displaystyle\frac{MSE(T|M)}{\sigma_T^2}`
 
-In a simple case, where all responses have two human scores, :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
+In the simple case where all responses have two human scores, :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
 
 - :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
 
@@ -206,17 +206,17 @@ and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of PRMSE formula available via :ref:`API<prmse_api>` can also be extended to cases where some of the responses have **more than two** ratings available. 
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of the PRMSE formula available via the :ref:`API<prmse_api>` supports cases where some of the responses have **more than two** ratings available. 
 
-In this case variance of errors is computed as pooled variance estimator.
+In this case, the variance of rater errors is computed as a pooled variance estimator.
 
-We first calculate the within within-subject variance of human ratings for each response, :math:`V_i`, using denominator N-1:
+We first calculate the within within-subject variance of human ratings for each response, :math:`V_i`, using denominator :math:`c_i - 1`:
 
-:math:`V_{i} = \frac{\sum_{j=1}^c H_{i,j} - \bar{H}_i}{c_i-1}`
+:math:`V_{i} = \displaystyle\frac{\sum_{j=1}^c H_{i,j} - \bar{H}_i}{c_i-1}`
 
 where
 
-* :math:`H_{i,j}` is human score assigned by rater :math:`j` to response :math:`i`
+* :math:`H_{i,j}` is the human score assigned by rater :math:`j` to response :math:`i`
 
 * :math:`c_i` is the total number of human scores available for response :math:`i`. For double-scored responses this equals 2. 
 
@@ -228,7 +228,7 @@ We then take a weighted average of those within-responses variances:
 
 The **true score variance** :math:`\sigma_T^2` is then estimated as 
 
-:math:`\sigma_T^2 = \frac{\sum_{i=1}^N c_i (\bar{H}_i - \bar{H})^2 -
+:math:`\sigma_T^2 = \displaystyle\frac{\sum_{i=1}^N c_i (\bar{H}_i - \bar{H})^2 -
 (N-1) \sigma_{e}^2}{c_\cdot - \frac{\sum_{i=1}^N
 c_i^2}{c_\cdot}}`
 
@@ -240,13 +240,13 @@ where
 
 **Mean squared error** :math:`MSE(T|M)` is estimated as: 
 
-:math:`MSE(T|M) = \frac{1}{c_\cdot} \left (\sum_{i=1}^N c_i (\bar{H}_i - M_i)^2  -
+:math:`MSE(T|M) = \displaystyle\frac{1}{c_\cdot} \left (\sum_{i=1}^N c_i (\bar{H}_i - M_i)^2  -
 N\sigma_{e}^2 \right )`
 
 
-The formulas are derived to ensure consistent results regardless of the number of raters and the number of ratings availvable for each response. 
+The formulas are derived to ensure consistent results regardless of the number of raters and of the number of ratings availvable for each response. 
 
-PRMSE is computed using :ref:`rsmtool.utils.prmse_true <prmse_api>`.
+PRMSE is computed using the :ref:`rsmtool.utils.prmse_true <prmse_api>` function.
 
 
 In some cases, it may be appropriate to compute variance of human errors using a different sample than the one used for main evaluations. This can be accomplished using :ref:`rsmtool.utils.variance_of_errors <ve_api>` and using an optional configuration field `rater_error_variance` in :ref:`rsmtool<rater_error_variance_rsmtool>` or :ref:`rsmtool<rater_error_variance_rsmeval>`
@@ -371,5 +371,4 @@ Therefore, SMD between two human scores is computed using :ref:`rsmtool.utils.st
 .. note::
 
 	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.
-
 

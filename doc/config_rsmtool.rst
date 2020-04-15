@@ -214,7 +214,8 @@ If a probabilistic SKLL classifier is chosen to build the scoring model, then *e
 
 rater_error_variance *(Optional)*
 """""""""""""""""""""""""""""""""
-:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. While by default ``rsmtool`` will compute this from double-scored responses in the evaluation set, in some cases it may be necessary to compute rater error variance on a different sample. In this case this field can be used to set rater error variance to a precomputed amount which will be used for all computations. You can use :ref:`rsmtool.utils.variance_of_errors <ve_api>` to compute rater error variance outside the main evaluation pipeline. 
+```suggestion
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmtool`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmtool``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
 
 .. _second_human_score_column_rsmtool:
 

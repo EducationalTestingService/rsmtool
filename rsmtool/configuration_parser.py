@@ -737,8 +737,7 @@ class Configuration:
 
     def get_rater_error_variance(self):
         """
-        Get the specified rater error variance
-        if any and make sure it's numeric
+        Get specified rater error variance, if any, and make sure it's numeric.
 
         Returns:
         --------
