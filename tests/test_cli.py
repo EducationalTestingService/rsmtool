@@ -219,6 +219,7 @@ class TestToolCLI:
         with assert_raises(subprocess.CalledProcessError) as e:
             _ = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                check=True,
+                               stderr=subprocess.DEVNULL,
                                stdout=subprocess.DEVNULL)
             ok_('already contains' in e.msg)
             ok_('OSError' in e.msg)

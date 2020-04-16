@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
 """
-This script is designed to update the sci-kit learn model files to ensure they
-are compatible with the current version.
-The script goes through all tests in the data/experiments directory, finds the model files and
-saves them again.
-Note that this will overwrite the original test data.
-Before running this script, make sure that the outputs work as expected
+Update SKLL models in tests.
+
+This script updates the SKLL model files to ensure they are compatible with the
+current version. It simply iterates through all rsmpredict tests under the
+`data/experiments` directory, finds the model files, loads them, and saves
+them again.
+
+IMPORTANT:
+- You must run this from the `tests/` directory.
+- Running this script will overwrite the original test data.
+- Before running this script, make sure that the outputs work as expected.
 
 :author: Anastassia Loukina
 :author: Nitin Madnani
@@ -15,17 +20,16 @@ Before running this script, make sure that the outputs work as expected
 """
 
 import glob
-
 from os import getcwd, remove
-from os.path import join, dirname
+from os.path import dirname, join
+
 from skll import Learner
 
 TEST_DIR = getcwd()
 
 
 def update_model(model_file):
-    ''' Read in the model file and save it again'''
-
+    """Read in the model file and save it again."""
     model_dir = dirname(model_file)
 
     # get the list of current files so that we can

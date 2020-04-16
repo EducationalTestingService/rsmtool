@@ -24,6 +24,7 @@
     "id_column": "ID",
     "min_items_per_candidate": null,
     "min_n_per_group": null,
+    "rater_error_variance": null,
     "scale_with": null,
     "second_human_score_column": "score2",
     "section_order": null,

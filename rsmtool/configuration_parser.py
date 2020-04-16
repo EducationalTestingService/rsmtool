@@ -717,6 +717,24 @@ class Configuration:
             spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
+    def get_rater_error_variance(self):
+        """
+        Get specified rater error variance, if any, and make sure it's numeric.
+
+        Returns:
+        --------
+        rater_error_variance : float
+            specified rater error variance
+        """
+        config = self._config
+
+        rater_error_variance = config.get('rater_error_variance', None)
+
+        if rater_error_variance:
+            rater_error_variance = float(rater_error_variance)
+
+        return rater_error_variance
+
     def get_default_converter(self):
         """
         Get the default converter dictionary for reader.
@@ -977,11 +995,9 @@ class ConfigurationParser:
         else:
             configdict = self._parse_cfg_file(filepath)
 
-        # normalize, process and validate the configuration dictionary
-        configdict = ConfigurationParser.normalize_config(configdict)
-        configdict = ConfigurationParser.process_config(configdict)
-        configdict = ConfigurationParser.validate_config(configdict, context=context)
-
+        # create a new Configuration object which will automatically
+        # normalize, process, as well as validate the configuration
+        # dictionary being passed in
         return Configuration(configdict,
                              configdir=self._configdir,
                              filename=self._filename,
@@ -1217,7 +1233,18 @@ class ConfigurationParser:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
                                      "documentation and choose a valid tuning objective.")
 
-        # 9. Check that if we are running rsmtool to ask for
+        # 9. Check that if "skll_fixed_parameters" is specified,
+        # it's specified for SKLL model and _not_ a built-in linear
+        # regression model; we cannot check whether the parameters
+        # are valid at parse time but SKLL will raise an error
+        # at run time for any invalid parameters
+        if new_config['skll_fixed_parameters']:
+            if not is_skll_model(new_config['model']):
+                logging.warning("You specified custom SKLL fixed parameters but "
+                                "also chose a non-SKLL model. The parameters will "
+                                "be ignored.")
+
+        # 10. Check that if we are running rsmtool to ask for
         # expected scores then the SKLL model type must actually
         # support probabilistic classification. If it's not a SKLL
         # model at all, we just treat it as a LinearRegression model
@@ -1230,13 +1257,13 @@ class ConfigurationParser:
                                  "since it is not a probablistic classifier.".format(model_name))
             del dummy_learner
 
-        # 10. Check the fields that requires rsmextra
+        # 11. Check the fields that requires rsmextra
         if not HAS_RSMEXTRA:
             if new_config['special_sections']:
                 raise ValueError("Special sections are only available to ETS"
                                  " users by installing the rsmextra package.")
 
-        # 11. Raise a warning if we are specifiying a feature file but also
+        # 12. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
             logging.warning("You specified a feature file but also set "
@@ -1246,14 +1273,14 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 12. If we have `experiment_names`, check that the length of the list
+        # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
         if context == 'rsmsummarize' and new_config['experiment_names']:
             if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
                 raise ValueError("The number of specified experiment names should be the same"
                                  " as the number of specified experiment directories.")
 
-        # 13. Check that if the user specified min_n_per_group, they also
+        # 14. Check that if the user specified min_n_per_group, they also
         # specified subgroups. If they supplied a dictionary, make
         # sure the keys match
         if new_config['min_n_per_group']:
@@ -1272,7 +1299,7 @@ class ConfigurationParser:
                 new_config['min_n_per_group'] = {group: new_config['min_n_per_group']
                                                  for group in new_config['subgroups']}
 
-        # 14. Clean up config dict to keep only context-specific fields
+        # 15. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
