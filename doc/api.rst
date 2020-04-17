@@ -84,6 +84,10 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
      from rsmtool.utils.notebook import show_thumbnail
      show_thumbnail(...)
 
+.. note ::
+    In RSMTool v8.0 the API for computing ``PRMSE`` has changed. 
+    See :ref:`rsmtool.utils.prmse<prmse_api>`.
+
 
 :mod:`rsmtool` Package
 ======================
@@ -148,10 +152,12 @@ From :py:mod:`~rsmtool.preprocessor` Module
     :show-inheritance:
 
 
-From :py:mod:`~rsmtool.prmse_utils` Module
+From :py:mod:`~rsmtool.utils.prmse` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. _prmse_api:
-.. autofunction:: rsmtool.prmse_utils.compute_prmse
+.. autofunction:: rsmtool.utils.prmse.prmse_true
+.. _ve_api:
+.. autofunction:: rsmtool.utils.prmse.variance_of_errors
 
 From :py:mod:`~rsmtool.reader` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

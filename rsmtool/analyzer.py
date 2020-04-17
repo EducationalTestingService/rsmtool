@@ -22,12 +22,12 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 from .container import DataContainer
-from .prmse_utils import compute_prmse
 from .utils.metrics import (agreement,
                             difference_of_standardized_means,
                             partial_correlations,
                             quadratic_weighted_kappa,
                             standardized_mean_difference)
+from .utils.prmse import get_true_score_evaluations
 
 
 class Analyzer:
@@ -1667,11 +1667,20 @@ class Analyzer:
                     {'name': 'score_dist', 'frame': df_score_dist}]
 
         # compute true-score analyses if we have second score
-        if include_second_score:
+        # or have been given rater error variance
+        rater_error_variance = configuration.get_rater_error_variance()
+
+        if include_second_score or rater_error_variance is not None:
             system_score_columns = [col for col in prediction_columns
                                     if col not in ['sc1', 'sc2']]
-            df_prmse = compute_prmse(df_preds_second_score,
-                                     system_score_columns)
+
+            human_score_columns = [col for col in prediction_columns
+                                   if col in ['sc1', 'sc2']]
+
+            df_prmse = get_true_score_evaluations(df_preds_second_score,
+                                                  system_score_columns,
+                                                  human_score_columns,
+                                                  rater_error_variance)
 
             datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 

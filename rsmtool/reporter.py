@@ -656,6 +656,7 @@ class Reporter:
                           'SKLL_FIXED_PARAMETERS': config.get('skll_fixed_parameters', {}),
                           'SKLL_OBJECTIVE': config.get('skll_objective', ''),
                           'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
+                          'RATER_ERROR_VARIANCE': config.get('rater_error_variance', None),
                           'CONTEXT': context,
                           'JAVASCRIPT_PATH': javascript_path,
                           'OUTPUT_DIR': csvdir,

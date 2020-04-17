@@ -735,6 +735,24 @@ class Configuration:
             spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
+    def get_rater_error_variance(self):
+        """
+        Get specified rater error variance, if any, and make sure it's numeric.
+
+        Returns:
+        --------
+        rater_error_variance : float
+            specified rater error variance
+        """
+        config = self._config
+
+        rater_error_variance = config.get('rater_error_variance', None)
+
+        if rater_error_variance:
+            rater_error_variance = float(rater_error_variance)
+
+        return rater_error_variance
+
     def get_default_converter(self):
         """
         Get the default converter dictionary for reader.
