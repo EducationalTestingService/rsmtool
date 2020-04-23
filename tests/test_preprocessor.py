@@ -1161,38 +1161,6 @@ class TestFeatureSpecsProcessor:
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
         assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
 
-    def test_normalize_and_validate_json_feature_file(self):
-        feature_json = {'features': [{'feature': 'f1',
-                                      'transform': 'raw',
-                                      'sign': 1},
-                                     {'feature': 'f2',
-                                      'transform': 'inv',
-                                      'sign': -1}]}
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
-        assert_equal(new_feature_json, feature_json)
-
-    def test_normalize_json_feature_file_old_file(self):
-        old_feature_json = {'feats': [{'featN': 'f1', 'trans': 'raw', 'wt': 1},
-                                      {'featN': 'f2', 'trans': 'inv', 'wt': -1}]}
-        expected_feature_json = {'features': [{'feature': 'f1', 'transform': 'raw', 'sign': 1},
-                                              {'feature': 'f2', 'transform': 'inv', 'sign': -1}]}
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(old_feature_json)
-        assert_equal(new_feature_json, expected_feature_json)
-
-    @raises(KeyError)
-    def test_normalize_and_validate_json_feature_file_missing_fields(self):
-        feature_json = {'features': [{'feature': 'f1',
-                                      'sign': 1},
-                                     {'feature': 'f2',
-                                      'transform': 'inv'}]}
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
 
     def test_validate_feature_specs(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],

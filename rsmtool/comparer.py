@@ -458,16 +458,6 @@ class Comparer:
                                                                               short_metrics_list,
                                                                               raise_warnings=False)
 
-                # if `SMD` is being used, rather than `DSM`, we
-                # raise an error
-                if smd_name == 'SMD':
-                    raise ValueError("The subgroup evaluations in `{}` use 'SMD'. Please note "
-                                     "that newer versions of RSMTool (7.0 or greater) use 'DSM' with subgroup "
-                                     "evaluations. Please rerun the experiment using recent version of "
-                                     "RSMTool. For additional details on how these metrics "
-                                     "differ, see the RSMTool documentation.".format(group_eval_file),
-                                     category=DeprecationWarning)
-
                 df_eval = df_eval[existing_eval_cols_new]
                 df_eval = df_eval.rename(columns=rename_dict_new)
                 files['df_eval_by_{}'.format(group)] = df_eval[short_metrics_list_new]

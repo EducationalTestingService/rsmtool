@@ -144,66 +144,6 @@ class FeatureSpecsProcessor:
     """
 
     @classmethod
-    def normalize_and_validate_json(cls, feature_json):
-        """
-        Normalize the field names in `feature_json` in order to maintain
-        backwards compatibility with old config files.
-
-        Parameters
-        ----------
-        feature_json : dict
-            JSON object containing the information
-            specified in the feature file, possibly
-            containing the old-style names for feature
-            fields.
-
-        Returns
-        -------
-        new_feature_json : dict
-            JSON object with all old style names normalized to
-            new style names.
-
-        Raises
-        ------
-        KeyError
-            If required fields are missing in the feature JSON file.
-        """
-
-        warnings.warn("""The ``normalize_and_validate_json`` method is deprecated """
-                      """and will be removed in the next release. Users can no longer """
-                      """specify JSON feature files for the RSMTool experiments.""",
-                      category=DeprecationWarning)
-
-        field_mapping = {'wt': 'sign',
-                         'featN': 'feature',
-                         'trans': 'transform'}
-
-        required_fields = ['feature', 'sign', 'transform']
-
-        new_feature_json = defaultdict(list)
-
-        feature_list = (feature_json['features'] if 'features' in feature_json
-                        else feature_json['feats'])
-
-        for feature_dict in feature_list:
-            new_feature_dict = {}
-            for field in feature_dict:
-                norm_field = (field_mapping[field] if field in field_mapping
-                              else field)
-                new_feature_dict[norm_field] = feature_dict[field]
-
-            new_feature_keys = new_feature_dict.keys()
-            missing_fields = set(required_fields).difference(new_feature_keys)
-            if missing_fields:
-                raise KeyError("The feature file does not "
-                               "contain the following fields: "
-                               "{}".format(','.join(missing_fields)))
-
-            new_feature_json['features'].append(new_feature_dict)
-
-        return new_feature_json
-
-    @classmethod
     def generate_default_specs(cls, feature_names):
         """
         Generate default feature "specifications" for the features
@@ -2446,7 +2386,7 @@ class FeaturePreprocessor:
 
         # if we are using a newly trained model, use trim_tolerance from the
         # df_postproc_params. If not, set it to the default value and show
-        # deprecation warning
+        # warning
         if 'trim_tolerance' in df_postproc_params:
             trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
         else:
