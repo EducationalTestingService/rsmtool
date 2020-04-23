@@ -32,8 +32,6 @@ from .utils.constants import (DEFAULTS,
                               CHECK_FIELDS,
                               LIST_FIELDS,
                               BOOLEAN_FIELDS,
-                              MODEL_NAME_MAPPING,
-                              FIELD_NAME_MAPPING,
                               ID_FIELDS)
 
 from .utils.files import parse_json_with_comments
@@ -43,49 +41,6 @@ from .utils.models import is_skll_model
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file, # noqa
                                    default_feature_sign)
-
-
-def deprecated_positional_argument():
-    """
-    This decorator allows the Configuration class to:
-
-    (a) accept the old method of specifying the now-deprecated ``filepath`` positional argument,
-    (b) accept the new method of specifying ``configdir`` and ``filename`` keyword arguments, but
-    (c) disallow using the old and the new methods in the same call
-
-    Adapted from: https://stackoverflow.com/a/49802489
-    """
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args, **kwargs):
-            # if we received two positional arguments
-            if len(args) > 2:
-                # if we also received a keyword argument for filepath
-                # or configdir, raise an error
-                if 'filename' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath "
-                                     "positional argument and the new-style filename "
-                                     "keyword argument.")
-                if 'configdir' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath "
-                                     "positional argument and the new-style configdir "
-                                     "keyword argument.")
-                # raise deprecation warning
-                warnings.warn("The filepath positional argument is deprecated and "
-                              " will be removed in v8.0. Use the ``configdir`` and "
-                              "``filename`` keyword arguments instead.",
-                              DeprecationWarning)
-
-                # split filepath into
-                # configdir and filename
-                filepath = args[-1]
-                kwargs['filename'] = Path(filepath).name
-                kwargs['configdir'] = Path(filepath).resolve().parent
-                # remove filepath from positional arguments
-                args = args[:-1]
-            return f(*args, **kwargs)
-        return wrapper
-    return decorator
 
 
 def configure(context, config_file_or_obj_or_dict):
@@ -166,7 +121,6 @@ class Configuration:
     parameters.
     """
 
-    @deprecated_positional_argument()
     def __init__(self,
                  configdict,
                  *,
@@ -195,8 +149,7 @@ class Configuration:
         filename : str, optional, keyword-only
             The name of the configuration file.
             The file must be stored in configdir.
-            This argument is not used in RSMTool and only added for
-            backwards compatibility for the deprecated `filepath` attribute.
+            This argument is currently not used in RSMTool.
             Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
@@ -311,61 +264,6 @@ class Configuration:
         """
         for key in self.keys():
             yield key
-
-    @property
-    def filepath(self):
-        """
-        Get file path to the configuration file.
-
-        .. deprecated:: 8.0
-
-            ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
-            ``filename`` instead.
-
-        Returns
-        -------
-        filepath : str
-            The path for the config file.
-        """
-
-        # raise a deprecation warning first
-        warnings.warn("The `filepath` attribute of the Configuration "
-                      "object will be removed in RSMTool v8.0."
-                      "Use the `configdir` and `filename` attributes "
-                      "if you need the full path to the "
-                      "configuration file", DeprecationWarning)
-
-        # then compute the deprecated attribute if we can
-        if not self._filename:
-            raise AttributeError('The `filepath` attribute is not defined '
-                                 'for this Configuration object.')
-        else:
-            filepath = self._configdir / self._filename
-            return str(filepath)
-
-    @filepath.setter
-    def filepath(self, new_path):
-        """
-        Set a new file path to configuration file.
-
-        .. deprecated:: 8.0
-        ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
-        ``filename`` instead.
-
-        Parameters
-        ----------
-        new_path : str
-            A new file path for the Configuration object.
-        """
-        warnings.warn("The `filepath` attribute of the Configuration "
-                      "object will be removed in RSMTool 8.0 "
-                      "use `configdir` and `filename` if you "
-                      "need to set a new path to the "
-                      "configuration file", DeprecationWarning)
-        new_filename = Path(new_path).name
-        new_configdir = Path(new_path).resolve().parent
-        self._filename = new_filename
-        self._configdir = new_configdir
 
     @property
     def configdir(self):
@@ -1033,19 +931,7 @@ class ConfigurationParser:
 
         for field_name in config:
 
-            if field_name in FIELD_NAME_MAPPING:
-                norm_field_name = FIELD_NAME_MAPPING[field_name]
-                warnings.warn("""The field name "{}" is deprecated """
-                              """and will be removed  in a future """
-                              """release, please use the """
-                              """new field name "{}" """
-                              """instead.""".format(field_name,
-                                                    norm_field_name),
-                              category=DeprecationWarning)
-            else:
-                norm_field_name = field_name
-
-            new_config[norm_field_name] = config[field_name]
+            new_config[field_name] = config[field_name]
 
         # Convert old values for prediction scaling:
         if 'use_scaled_predictions' in new_config:
@@ -1057,30 +943,6 @@ class ConfigurationParser:
                 raise ValueError("Please use the new format "
                                  "to specify prediction scaling:\n "
                                  "'use_scaled_predictions': true/false")
-
-        # Convert old model names to new ones, if we have them
-        if 'model' in new_config:
-            model_name = new_config['model']
-
-            if model_name == 'empWtDropNeg':
-
-                # If someone is using `empWtDropNeg`, we tell them that it is
-                # no longer available and they should be using NNLR instead.
-                logging.error("""The model name "empWtDropNeg" is """
-                              """no longer available, please use the """
-                              """equivalent model "NNLR" instead.""")
-
-            # Otherwise, just raise a deprecation warning if they are using
-            # an old model name
-            elif model_name in MODEL_NAME_MAPPING:
-                norm_model_name = MODEL_NAME_MAPPING[model_name]
-                warnings.warn("""The model name "{}" is deprecated """
-                              """and will be removed  in a future """
-                              """release, please use the new model """
-                              """name "{}" instead.""".format(model_name,
-                                                              norm_model_name),
-                              category=DeprecationWarning)
-                new_config['model'] = norm_model_name
 
         return new_config
 
