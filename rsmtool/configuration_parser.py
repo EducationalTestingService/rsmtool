@@ -808,61 +808,6 @@ class ConfigurationParser:
 
         return configdict
 
-    def _parse_cfg_file(self, filepath):
-        """
-        A private method to parse INI-style configuration files and
-        return a Python dictionary.
-
-        Parameters
-        ----------
-        filepath : pathlib.Path
-            A ``pathlib.Path`` object containing the CFG configuration filepath.
-
-        Returns
-        -------
-        configdict : dict
-            A Python dictionary containing the parameters from the
-            CFG configuration file.
-
-        Raises
-        ------
-        ValueError
-            If the configuration file could not be read or parsed.
-        """
-        # Get the `ConfigParser` object
-        py_config_parser = ConfigParser()
-
-        # Try to read main configuration file.
-        try:
-            py_config_parser.read(filepath)
-        except Exception as error:
-            raise ValueError('Main configuration file '
-                             'could not be read: {}'.format(error))
-
-        configdict = {}
-
-        # Loop through all sections of the ConfigParser
-        # object and add items to the dictionary
-        for section in py_config_parser.sections():
-            for name, value in py_config_parser.items(section):
-
-                # Check if the key already exists in the config dictionary.
-                # If it does, skip it and log a warning.
-                if name in configdict:
-                    logging.warning('There are duplicate keys for `{}`'
-                                    'in the configuration file. Only '
-                                    'the first instance will be '
-                                    'included.'.format(name))
-                    continue
-
-                # Otherwise, safe convert the value
-                # and add it to the dictionary.
-                else:
-                    value = self._fix_json(value)
-                    value = yaml.safe_load(value)
-                    configdict[name] = value
-
-        return configdict
 
     def parse(self, context='rsmtool'):
         """

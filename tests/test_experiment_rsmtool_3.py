@@ -57,33 +57,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 
-def test_run_experiment_lr_with_cfg():
-    # basic experiment with a LinearRegression model
-
-    source = 'lr-cfg'
-    experiment_id = 'lr_cfg'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.cfg'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
-
 
 def test_run_experiment_lr_with_object_and_configdir():
     '''
@@ -250,26 +223,6 @@ def test_run_experiment_duplicate_feature_names():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
-
-
-@raises(ValueError)
-def test_run_experiment_lr_old_config():
-    # basic experiment with a LinearRegression model but using an
-    # old style configuration file
-
-    source = 'lr-old-config'
-    experiment_id = 'empWt'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
-
-    # run this experiment but suppress the expected deprecation warnings
-    do_run_experiment(source,
-                      experiment_id,
-                      config_file,
-                      suppress_warnings_for=[DeprecationWarning])
 
 
 @raises(ValueError)
