@@ -823,7 +823,6 @@ class ConfigurationGenerator:
         # create a Configuration instance from the dictionary we just generated
         sys.stderr.write("\n")
         config_object = Configuration(configdict,
-                                      filename=f"example_{self.context}.json",
                                       configdir=os.getcwd(),
                                       context=self.context)
         # convert the Configuration object to a string - we are using
@@ -861,7 +860,6 @@ class ConfigurationGenerator:
 
         # create a Configuration object
         config_object = Configuration(configdict,
-                                      filename=f"example_{self.context}.json",
                                       configdir=os.getcwd(),
                                       context=self.context)
 

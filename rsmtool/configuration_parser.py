@@ -799,7 +799,7 @@ class ConfigurationParser:
             A Configuration object containing the parameters in the
             file that we instantiated the parser for.
         """
-        extension = Path(self._filename).suffix.lower()
+
         filepath = self._configdir / self._filename
         configdict = self._parse_json_file(filepath)
 

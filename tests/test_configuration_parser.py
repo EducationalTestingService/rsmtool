@@ -51,6 +51,7 @@ class TestConfigurationParser:
         assert_equal(newdata['description'], '')
         assert_equal(newdata.configdir, getcwd())
 
+
     def test_parse_config_from_dict_rsmeval(self):
         data = {'experiment_id': 'experiment_1',
                 'predictions_file': 'data/rsmtool_smTrain.csv',
@@ -247,7 +248,7 @@ class TestConfigurationParser:
         assert_equal(newdata['min_n_per_group']['L2'], 200)
 
     @raises(ValueError)
-    def test_valdiate_config_too_few_subgroup_keys(self):
+    def test_validate_config_too_few_subgroup_keys(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
@@ -436,6 +437,13 @@ class TestConfiguration:
         config = Configuration(config_dict,
                                configdir=configdir)
         eq_(config._configdir, Path(configdir).resolve())
+
+
+    @raises(TypeError)
+    def test_init_wrong_input_type(self):
+        config_input = [('experiment_id', "XXX"),
+                        ('train_file', 'path/to/train.tsv')]
+        config = Configuration(config_input)
 
 
     def check_logging_output(self, expected, function, *args, **kwargs):
