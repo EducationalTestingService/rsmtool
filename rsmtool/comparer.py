@@ -122,6 +122,17 @@ class Comparer:
         short_metrics_list_new = deepcopy(short_metrics_list)
         smd_name = 'SMD'
 
+        # previously, the QWK metric used `trim_round` scores; now, we use just `trim` scores;
+        # We check whether `trim_round` scores were used and
+        # raise an error if this is the case
+        if any(col.endswith('trim_round') for col in df if col.startswith('wtkappa')):
+            raise ValueError("RSMTool (7.0 or greater) uses "
+                             "unrounded scores for weighted kappa calculations. At least one "
+                             "of your experiments was run "
+                             "using an older version of RSMTool that used  "
+                             "rounded scores instead. Please re-run "
+                             "the experiment with the latest version of RSMTool.")
+
         # we check if DSM was calculated (which is what we expect for subgroup evals),
         # and if so, we update the rename dictionary and column lists accordingly; we
         # also set `smd_name` equal to 'DSM'
