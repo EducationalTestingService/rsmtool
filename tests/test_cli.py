@@ -160,6 +160,7 @@ class TestToolCLI:
             proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
                                   cwd=working_dir,
+                                  stderr=subprocess.PIPE,
                                   stdout=subprocess.DEVNULL,
                                   encoding='utf-8')
             # then check that the commmand ran successfully
@@ -172,7 +173,7 @@ class TestToolCLI:
             proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                   check=True,
                                   stdout=subprocess.PIPE,
-                                  stderr=subprocess.DEVNULL,
+                                  stderr=subprocess.PIPE,
                                   encoding='utf-8')
             ok_(proc.returncode == 0)
             self.validate_generate_output(context,
@@ -299,4 +300,4 @@ class TestToolCLI:
 
         # this applies to all tools except rsmpredict and rsmsummarize
         for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
-            yield self.check_tool_cmd, context, "generate --subgroups", None, None
+            yield self.check_tool_cmd, context, "generate --sugroups", None, None
