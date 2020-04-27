@@ -701,7 +701,7 @@ class ConfigurationParser:
             If the given config file path does not exist.
         ValueError
             If the configuration file does not have a valid extension.
-            Valid extensions is ``.json``.
+            The only valid extension is ``.json``.
         """
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
