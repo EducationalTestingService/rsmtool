@@ -126,12 +126,12 @@ class Comparer:
         # We check whether `trim_round` scores were used and
         # raise an error if this is the case
         if any(col.endswith('trim_round') for col in df if col.startswith('wtkappa')):
-            raise ValueError("Please note that newer versions of RSMTool (7.0 or greater) use only "
-                             " the trimmed scores for weighted kappa calculations. At least one "
-                             "of your experiments was created "
-                             "using an older version of RSMTool and uses trim_round for  "
-                             "`trim_round` for weighted kappa calculations. Please re-run "
-                             "the experiments with the recent version of RSMTool.")
+            raise ValueError("RSMTool (7.0 or greater) uses "
+                             "unrounded scores for weighted kappa calculations. At least one "
+                             "of your experiments was run "
+                             "using an older version of RSMTool that used  "
+                             "rounded scores instead. Please re-run "
+                             "the experiment with the latest version of RSMTool.")
 
         # we check if DSM was calculated (which is what we expect for subgroup evals),
         # and if so, we update the rename dictionary and column lists accordingly; we
