@@ -130,9 +130,8 @@ class Configuration:
         """
         Create an object of the `Configuration` class.
 
-        This method should be used to directly instantiate a Configuration
-        object only if you already have a normalized configuration dictionary
-        (e.g., from previous RSMTool experiments).
+        This method can be used to directly instantiate a Configuration
+        object.
 
         Parameters
         ----------
@@ -160,8 +159,7 @@ class Configuration:
         if not isinstance(configdict, dict):
             raise TypeError('The input must be a dictionary.')
 
-        # normalize, process and validate the configuration dictionary
-        configdict = ConfigurationParser.normalize_config(configdict)
+        # process and validate the configuration dictionary
         configdict = ConfigurationParser.process_config(configdict)
         configdict = ConfigurationParser.validate_config(configdict, context=context)
 
@@ -733,7 +731,7 @@ class ConfigurationParser:
             If the given config file path does not exist.
         ValueError
             If the configuration file does not have a valid extension.
-            Valid extensions are ``.json`` and ``.cfg``.
+            Valid extensions is ``.json``.
         """
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
@@ -744,11 +742,11 @@ class ConfigurationParser:
             raise FileNotFoundError(f"The configuration file {pathlike} "
                                     "was not found.")
 
-        # make sure have either a JSON or CFG configuration file
+        # make sure we have a JSON configuration file
         extension = pathlike.suffix.lower()
-        if extension not in ['.json', '.cfg']:
+        if extension != '.json':
             raise ValueError('Configuration file must be '
-                             'in either `.json` or `.cfg`'
+                             'in `.json` '
                              'format. You specified: {}.'.format(extension))
 
         # set the various attributes to None
@@ -833,63 +831,15 @@ class ConfigurationParser:
         """
         extension = Path(self._filename).suffix.lower()
         filepath = self._configdir / self._filename
-        if extension == '.json':
-            configdict = self._parse_json_file(filepath)
-        else:
-            configdict = self._parse_cfg_file(filepath)
+        configdict = self._parse_json_file(filepath)
 
         # create a new Configuration object which will automatically
-        # normalize, process, as well as validate the configuration
+        # process and validate the configuration
         # dictionary being passed in
         return Configuration(configdict,
                              configdir=self._configdir,
                              filename=self._filename,
                              context=context)
-
-    @classmethod
-    def normalize_config(cls, config):
-        """
-        Normalize the field names in `config` in order to
-        maintain backwards compatibility with old configuration files.
-
-        Parameters
-        ----------
-        inplace : bool
-            Maintain the state of the config object produced by
-            this method.
-            Defaults to True.
-
-        Returns
-        -------
-        new_config : Configuration
-            A normalized configuration object
-
-        Raises
-        ------
-        ValueError
-            If no JSON configuration object exists, or if value passed for
-            `use_scaled_predictions` is in the wrong format.
-        """
-
-        # Create a new JSON object with the normalized field names
-        new_config = {}
-
-        for field_name in config:
-
-            new_config[field_name] = config[field_name]
-
-        # Convert old values for prediction scaling:
-        if 'use_scaled_predictions' in new_config:
-            if new_config['use_scaled_predictions'] in ['scale', True]:
-                new_config['use_scaled_predictions'] = True
-            elif new_config['use_scaled_predictions'] in ['raw', False]:
-                new_config['use_scaled_predictions'] = False
-            else:
-                raise ValueError("Please use the new format "
-                                 "to specify prediction scaling:\n "
-                                 "'use_scaled_predictions': true/false")
-
-        return new_config
 
     @classmethod
     def validate_config(cls, config, context='rsmtool'):
