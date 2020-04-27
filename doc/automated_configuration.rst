@@ -60,6 +60,8 @@ We end with a list of important things to note about interactive generation:
 
 - Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses. 
 
+- To reduce typing, use ``-i`` as an alias for ``--interactive`` and ``-g`` as an alias for ``--subgroups``. So, for example, if you want to interactively generate a configuration file with subgroups for ``rsmtool``, just run ``rsmtool generate -ig`` instead of ``rsmtool generate --interactive --subgroups``.
+
 - The configuration files generated interactively contain comments (as indicated by ``// ...``). While RSMTool handles JSON files with comments just fine, you may need to remove the comments manually if you wish to use these files outside of RSMTool.
 
 Non-interactive Generation
@@ -87,7 +89,7 @@ Note the two comments demarcating the locations of the required and optional fie
 
 Just like interactive generation, non-interactive generation is supported by all 5 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, and ``rsmsummarize``. 
 
-Similarly, to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, just add ``--subgroups`` to the command. Note that unlike in interactive mode, this would *only* add subgroup-based sections to the ``general_sections`` list in the output file. You will need to manually edit the ``subgroups`` option in the configuration file to enter the subgroup column names.
+Similarly, to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, just add ``--subgroups`` (or ``-g``) to the command. Note that unlike in interactive mode, this would *only* add subgroup-based sections to the ``general_sections`` list in the output file. You will need to manually edit the ``subgroups`` option in the configuration file to enter the subgroup column names.
 
 Generation API
 ~~~~~~~~~~~~~~
