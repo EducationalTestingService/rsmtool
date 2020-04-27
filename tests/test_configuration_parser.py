@@ -35,83 +35,6 @@ class TestConfigurationParser:
     def setUp(self):
         pass
 
-    def test_normalize_config(self):
-        data = {'expID': 'experiment_1',
-                'train': 'data/rsmtool_smTrain.csv',
-                'LRmodel': 'empWt',
-                'feature': 'feature/feature_list.json',
-                'description': 'A sample model with 9 features '
-                               'trained using average score and tested using r1.',
-                'test': 'data/rsmtool_smEval.csv',
-                'train.lab': 'sc1',
-                'crossvalidate': 'yes',
-                'test.lab': 'r1',
-                'scale': 'scale'}
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-            newdata = ConfigurationParser.normalize_config(data)
-            ok_('experiment_id' in newdata.keys())
-            assert_equal(newdata['experiment_id'], 'experiment_1')
-            assert_equal(newdata['use_scaled_predictions'], True)
-
-        # test for non-standard scaling value
-        data = {'expID': 'experiment_1',
-                'train': 'data/rsmtool_smTrain.csv',
-                'LRmodel': 'LinearRegression',
-                'scale': 'Yes'}
-        with warnings.catch_warnings():
-
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            assert_raises(ValueError, ConfigurationParser.normalize_config, data)
-
-        # test when no scaling is specified
-        data = {'expID': 'experiment_1',
-                'train': 'data/rsmtool_smTrain.csv',
-                'LRmodel': 'LinearRegression',
-                'feature': 'feature/feature_list.json',
-                'description': 'A sample model with 9 features '
-                               'trained using average score and tested using r1.',
-                'test': 'data/rsmtool_smEval.csv',
-                'train.lab': 'sc1',
-                'crossvalidate': 'yes',
-                'test.lab': 'r1'}
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-            # Add data to `ConfigurationParser` object
-            newdata = ConfigurationParser.normalize_config(data)
-            ok_('use_scaled_predictions' not in newdata.keys())
-
-    def test_load_config_from_dict(self):
-        data = {'expID': '001',
-                'train_file': 'path/to/train.tsv',
-                'test_file': 'path/to/test.tsv',
-                "flag_column": "abc",
-                "model": 'LinearRegression'}
-
-        configdir = Path('/path/to/configdir').resolve()
-        configuration = Configuration(data, configdir=configdir)
-        eq_(configuration._configdir, configdir)
-
-    def test_load_config_from_dict_no_configdir(self):
-        data = {'expID': 'test',
-                'train_file': 'path/to/train.tsv',
-                'test_file': 'path/to/test.tsv',
-                "flag_column": "abc",
-                "model": 'LinearRegression'}
-
-        configdir = Path(getcwd())
-        configuration = Configuration(data)
-        eq_(configuration._configdir, configdir)
-
-    @raises(TypeError)
-    def test_load_config_from_dict_wrong_type(self):
-        data = [('expID', 'test')]
-        configdir = 'some/config/dir'
-        Configuration(data, configdir)
 
     def test_parse_config_from_dict_rsmtool(self):
         data = {'experiment_id': 'experiment_1',
@@ -127,6 +50,7 @@ class TestConfigurationParser:
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
         assert_equal(newdata.configdir, getcwd())
+
 
     def test_parse_config_from_dict_rsmeval(self):
         data = {'experiment_id': 'experiment_1',
@@ -144,7 +68,7 @@ class TestConfigurationParser:
 
     @raises(ValueError)
     def test_validate_config_missing_fields(self):
-        data = {'expID': 'test'}
+        data = {'experiment_id': 'test'}
 
         _ = ConfigurationParser.validate_config(data)
 
@@ -324,7 +248,7 @@ class TestConfigurationParser:
         assert_equal(newdata['min_n_per_group']['L2'], 200)
 
     @raises(ValueError)
-    def test_valdiate_config_too_few_subgroup_keys(self):
+    def test_validate_config_too_few_subgroup_keys(self):
         data = {'experiment_id': 'experiment_1',
                 'train_file': 'data/rsmtool_smTrain.csv',
                 'test_file': 'data/rsmtool_smEval.csv',
@@ -489,58 +413,19 @@ class TestConfigurationParser:
 class TestConfiguration:
 
     def test_init_default_values(self):
-        config_dict = {"expID": 'my_experiment',
+        config_dict = {"experiment_id": 'my_experiment',
                        "train_file": 'path/to/train.tsv',
                        "test_file": 'path/to/test.tsv',
                        "model": 'LinearRegression'}
 
         config = Configuration(config_dict)
         for key in config_dict:
-            if key == 'expID':
+            if key == 'experiment_id':
                 continue
             eq_(config._config[key], config_dict[key])
-        eq_(config._config['experiment_id'], config_dict['expID'])
-        eq_(config._filename, None)
+        eq_(config._config['experiment_id'], config_dict['experiment_id'])
         eq_(config.configdir, abspath(getcwd()))
 
-    def test_init_with_filepath_as_positional_argument(self):
-        with warnings.catch_warnings(record=True) as w:
-            filepath = 'some/path/file.json'
-            config_dict = {'experiment_id': 'my_experiment',
-                           'train_file': 'path/to/train.tsv',
-                           'test_file': 'path/to/test.tsv',
-                           "model": 'LinearRegression'}
-
-            config = Configuration(config_dict, filepath)
-            eq_(config._filename, 'file.json')
-            eq_(config._configdir, Path('some/path').resolve())
-            assert len(w) == 1
-            assert issubclass(w[-1].category, DeprecationWarning)
-
-    def test_init_with_filename_as_kword_argument(self):
-        filename = 'file.json'
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
-
-        config = Configuration(config_dict, filename=filename)
-        eq_(config._filename, filename)
-        eq_(config.configdir, getcwd())
-
-    def test_init_with_filename_and_configdir_as_kword_argument(self):
-        filename = 'file.json'
-        configdir = 'some/path'
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
-
-        config = Configuration(config_dict,
-                               filename=filename,
-                               configdir=configdir)
-        eq_(config._filename, filename)
-        eq_(config._configdir, Path(configdir).resolve())
 
     def test_init_with_configdir_only_as_kword_argument(self):
         configdir = 'some/path'
@@ -551,33 +436,15 @@ class TestConfiguration:
 
         config = Configuration(config_dict,
                                configdir=configdir)
-        eq_(config._filename, None)
         eq_(config._configdir, Path(configdir).resolve())
 
-    @ raises(ValueError)
-    def test_init_with_filepath_positional_and_filename_keyword(self):
-        filepath = 'some/path/file.json'
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
 
-        _ = Configuration(config_dict,
-                          filepath,
-                          filename=filepath)
+    @raises(TypeError)
+    def test_init_wrong_input_type(self):
+        config_input = [('experiment_id', "XXX"),
+                        ('train_file', 'path/to/train.tsv')]
+        config = Configuration(config_input)
 
-    @ raises(ValueError)
-    def test_init_with_filepath_positional_and_configdir_keyword(self):
-        filepath = 'some/path/file.json'
-        configdir = 'some/path'
-
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
-        _ = Configuration(config_dict,
-                          filepath,
-                          configdir=configdir)
 
     def check_logging_output(self, expected, function, *args, **kwargs):
 
@@ -875,63 +742,6 @@ class TestConfiguration:
 
         eq_(config['flag_column'], '[advisories]')
 
-    # this is a test for an attribute that will be
-    # deprecated
-    def test_get_filepath(self):
-        with warnings.catch_warnings(record=True) as warning_list:
-            filepath = '/path/to/file.json'
-            config = Configuration({"experiment_id": '001',
-                                    "train_file": "/foo/train.csv",
-                                    "test_file": "/foo/test.csv",
-                                    "trim_min": 1,
-                                    "trim_max": 6,
-                                    "flag_column": "[advisories]",
-                                    "model": 'LinearRegression'},
-                                   configdir='/path/to',
-                                   filename="file.json")
-
-            eq_(config.filepath, abspath(filepath))
-            assert len(warning_list) == 1  # we get one deprecation warning here
-            assert issubclass(warning_list[0].category, DeprecationWarning)
-
-    # make sure that accessing filepath attribute when filename
-    # is not defined raises an exception
-    @raises(AttributeError)
-    def test_get_filepath_no_filename(self):
-        with warnings.catch_warnings():
-            config = Configuration({"experiment_id": '001',
-                                    "train_file": "/foo/train.csv",
-                                    "test_file": "/foo/test.csv",
-                                    "trim_min": 1,
-                                    "trim_max": 6,
-                                    "flag_column": "[advisories]",
-                                    "model": 'LinearRegression'},
-                                   configdir='/path/to')
-
-            _ = config.filepath
-
-    # this is a test for an attribute that will be
-    # deprecated
-    def test_set_filepath(self):
-        with warnings.catch_warnings(record=True) as warning_list:
-            new_file_path = '/newpath/to/new.json'
-            config = Configuration({"experiment_id": '001',
-                                    "train_file": "/foo/train.csv",
-                                    "test_file": "/foo/test.csv",
-                                    "trim_min": 1,
-                                    "trim_max": 6,
-                                    "flag_column": "[advisories]",
-                                    "model": 'LinearRegression'},
-                                   configdir='/path/to',
-                                   filename="file.json")
-
-            config.filepath = new_file_path  # first deprecation warning
-            eq_(config._filename, 'new.json')
-            eq_(config.configdir, abspath('/newpath/to'))
-            eq_(config.filepath, abspath(new_file_path))  # second deprecation warning
-            assert len(warning_list) == 2  # we get two deprecation warnings here
-            assert issubclass(warning_list[0].category, DeprecationWarning)
-            assert issubclass(warning_list[1].category, DeprecationWarning)
 
     def test_get_configdir(self):
         configdir = '/path/to/dir/'
@@ -969,33 +779,6 @@ class TestConfiguration:
                                configdir=configdir)
         config.configdir = None
 
-    def test_get_filename(self):
-        filename = 'file.json'
-        config = Configuration({"experiment_id": '001',
-                                "train_file": "/foo/train.csv",
-                                "test_file": "/foo/test.csv",
-                                "trim_min": 1,
-                                "trim_max": 6,
-                                "flag_column": "[advisories]",
-                                "model": 'LinearRegression'},
-                               filename=filename)
-
-        eq_(config.filename, filename)
-
-    def test_set_filename(self):
-        filename = 'file.json'
-        new_filename = 'new_file.json'
-        config = Configuration({"experiment_id": '001',
-                                "train_file": "/foo/train.csv",
-                                "test_file": "/foo/test.csv",
-                                "trim_min": 1,
-                                "trim_max": 6,
-                                "flag_column": "[advisories]",
-                                "model": 'LinearRegression'},
-                               filename=filename)
-
-        config.filename = new_filename
-        eq_(config.filename, new_filename)
 
     def test_get_context(self):
         context = 'rsmtool'
@@ -1196,17 +979,6 @@ class TestConfiguration:
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
         eq_(trim_min_max_tolerance, (1.0, 6.0, 0.51))
-
-    def test_get_trim_min_max_deprecated(self):
-        dictionary = {"experiment_id": '001',
-                      "train_file": '/foo/train.csv',
-                      "test_file": '/foo/test.csv',
-                      "trim_min": 1,
-                      "trim_max": 6,
-                      "model": 'LinearRegression'}
-        config = Configuration(dictionary)
-        trim_min_max = config.get_trim_min_max()
-        eq_(trim_min_max, (1.0, 6.0))
 
     def test_get_trim_tolerance_no_min_max(self):
         dictionary = {"experiment_id": '001',

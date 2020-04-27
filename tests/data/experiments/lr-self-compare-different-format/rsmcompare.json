@@ -1,11 +1,11 @@
 {
-    "comparison_id": "lr_subgroups_vs_lr_subgroups",
-    "experiment_dir_old": "lr-subgroups",
-    "experiment_id_old": "lr_subgroups",
+    "comparison_id": "lr_with_tsv_output_vs_lr_with_tsv_output",
+    "experiment_dir_old": "lr-with-tsv-output",
+    "experiment_id_old": "lr_with_tsv_output",
     "description_old": "Using all features with a LinearRegression model.",
     "use_scaled_predictions_old": true,
-    "experiment_dir_new": "lr-subgroups",
-    "experiment_id_new": "lr_subgroups",
+    "experiment_dir_new": "lr-with-tsv-output",
+    "experiment_id_new": "lr_with_tsv_output",
     "description_new": "Using all features with a LinearRegression model.",
     "use_scaled_predictions_new": true,
     "subgroups": ["QUESTION"]

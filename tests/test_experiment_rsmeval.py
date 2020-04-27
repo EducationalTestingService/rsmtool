@@ -59,35 +59,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_evaluation(*args, **kwargs)
 
 
-def test_run_experiment_lr_eval_with_cfg():
-    '''
-    test rsmeval using a configuration file
-    '''
-
-    source = 'lr-eval-cfg'
-    experiment_id = 'lr_eval_cfg'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.cfg'.format(experiment_id))
-    do_run_evaluation(source, experiment_id, config_file)
-
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_report, html_report
-
-
 def test_run_experiment_lr_eval_with_object():
     '''
     test rsmeval using a Configuration object, rather than a file

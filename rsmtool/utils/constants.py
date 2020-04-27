@@ -70,29 +70,6 @@ BOOLEAN_FIELDS = ['exclude_zero_scores',
                   'use_truncation_thresholds',
                   'select_transformations']
 
-FIELD_NAME_MAPPING = {'expID': 'experiment_id',
-                      'LRmodel': 'model',
-                      'train': 'train_file',
-                      'test': 'test_file',
-                      'predictions': 'predictions_file',
-                      'feature': 'features',
-                      'train.lab': 'train_label_column',
-                      'test.lab': 'test_label_column',
-                      'trim.min': 'trim_min',
-                      'trim.max': 'trim_max',
-                      'scale': 'use_scaled_predictions',
-                      'feature.subset': 'feature_subset'}
-
-MODEL_NAME_MAPPING = {'empWt': 'LinearRegression',
-                      'eqWt': 'EqualWeightsLR',
-                      'empWtBalanced': 'RebalancedLR',
-                      'empWtDropNeg': '',
-                      'empWtNNLS': 'NNLR',
-                      'empWtDropNegLasso': 'LassoFixedLambdaThenNNLR',
-                      'empWtLasso': 'LassoFixedLambdaThenLR',
-                      'empWtLassoBest': 'PositiveLassoCVThenLR',
-                      'lassoWtLasso': 'LassoFixedLambda',
-                      'lassoWtLassoBest': 'PositiveLassoCV'}
 
 CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'model',
