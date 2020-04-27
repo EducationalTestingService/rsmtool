@@ -963,6 +963,18 @@ class TestSetupRsmCmdParser:
                                                 subgroups=True)
         eq_(parsed_namespace, expected_namespace)
 
+    def test_generate_subparser_with_subgroups_short_and_flag(self):
+        """
+        test generate subparser with short subgroups option and flag
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate -g'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=False,
+                                                quiet=False,
+                                                subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
     def test_generate_subparser_with_subgroups_but_no_flag(self):
         """
         test generate subparser with subgroups option but no flag
@@ -1009,12 +1021,35 @@ class TestSetupRsmCmdParser:
                                                 quiet=False)
         eq_(parsed_namespace, expected_namespace)
 
+    def test_generate_subparser_with_only_interactive_flag_short(self):
+        """
+        test generate subparser with only the short interactive flag
+        """
+        parser = setup_rsmcmd_parser('test')
+        parsed_namespace = parser.parse_args('generate -i'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                interactive=True,
+                                                quiet=False)
+        eq_(parsed_namespace, expected_namespace)
+
     def test_generate_subparser_with_subgroups_and_interactive_flags(self):
         """
         test generate subparser with subgroups and interactive flags
         """
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --interactive --subgroups'.split())
+        expected_namespace = argparse.Namespace(subcommand='generate',
+                                                quiet=False,
+                                                interactive=True,
+                                                subgroups=True)
+        eq_(parsed_namespace, expected_namespace)
+
+    def test_generate_subparser_with_subgroups_and_interactive_short_flags(self):
+        """
+        test generate subparser with short subgroups and interactive flags
+        """
+        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
+        parsed_namespace = parser.parse_args('generate -i -g'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
                                                 quiet=False,
                                                 interactive=True,
