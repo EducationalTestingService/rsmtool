@@ -125,7 +125,6 @@ class Configuration:
                  configdict,
                  *,
                  configdir=None,
-                 filename=None,
                  context='rsmtool'):
         """
         Create an object of the `Configuration` class.
@@ -145,11 +144,6 @@ class Configuration:
             object. When None, will be set during
             initialization to the current working directory.
             Defaults to None
-        filename : str, optional, keyword-only
-            The name of the configuration file.
-            The file must be stored in configdir.
-            This argument is currently not used in RSMTool.
-            Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
             The context of the tool.
@@ -172,7 +166,6 @@ class Configuration:
 
         self._config = configdict
         self._configdir = configdir
-        self._filename = filename
         self._context = context
 
     def __contains__(self, key):
@@ -297,29 +290,6 @@ class Configuration:
         # once this Windows bug is fixed: https://bugs.python.org/issue38671
         self._configdir = Path(abspath(new_path))
 
-    @property
-    def filename(self):
-        """
-        Get the name of the configuration file.
-
-        Returns
-        -------
-        filename : str
-            The name of the configuration file
-        """
-        return self._filename
-
-    @filename.setter
-    def filename(self, new_name):
-        """
-        Set a new name of the configuration file
-
-        Parameters
-        ----------
-        new_name : str
-            New name of the configuration file
-        """
-        self._filename = new_name
 
     @property
     def context(self):
@@ -838,7 +808,6 @@ class ConfigurationParser:
         # dictionary being passed in
         return Configuration(configdict,
                              configdir=self._configdir,
-                             filename=self._filename,
                              context=context)
 
     @classmethod

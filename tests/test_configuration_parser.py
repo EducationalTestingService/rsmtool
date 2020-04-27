@@ -423,34 +423,8 @@ class TestConfiguration:
                 continue
             eq_(config._config[key], config_dict[key])
         eq_(config._config['experiment_id'], config_dict['experiment_id'])
-        eq_(config._filename, None)
         eq_(config.configdir, abspath(getcwd()))
 
-
-    def test_init_with_filename_as_kword_argument(self):
-        filename = 'file.json'
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
-
-        config = Configuration(config_dict, filename=filename)
-        eq_(config._filename, filename)
-        eq_(config.configdir, getcwd())
-
-    def test_init_with_filename_and_configdir_as_kword_argument(self):
-        filename = 'file.json'
-        configdir = 'some/path'
-        config_dict = {'experiment_id': 'my_experiment',
-                       'train_file': 'path/to/train.tsv',
-                       'test_file': 'path/to/test.tsv',
-                       "model": 'LinearRegression'}
-
-        config = Configuration(config_dict,
-                               filename=filename,
-                               configdir=configdir)
-        eq_(config._filename, filename)
-        eq_(config._configdir, Path(configdir).resolve())
 
     def test_init_with_configdir_only_as_kword_argument(self):
         configdir = 'some/path'
@@ -461,7 +435,6 @@ class TestConfiguration:
 
         config = Configuration(config_dict,
                                configdir=configdir)
-        eq_(config._filename, None)
         eq_(config._configdir, Path(configdir).resolve())
 
 
@@ -798,33 +771,6 @@ class TestConfiguration:
                                configdir=configdir)
         config.configdir = None
 
-    def test_get_filename(self):
-        filename = 'file.json'
-        config = Configuration({"experiment_id": '001',
-                                "train_file": "/foo/train.csv",
-                                "test_file": "/foo/test.csv",
-                                "trim_min": 1,
-                                "trim_max": 6,
-                                "flag_column": "[advisories]",
-                                "model": 'LinearRegression'},
-                               filename=filename)
-
-        eq_(config.filename, filename)
-
-    def test_set_filename(self):
-        filename = 'file.json'
-        new_filename = 'new_file.json'
-        config = Configuration({"experiment_id": '001',
-                                "train_file": "/foo/train.csv",
-                                "test_file": "/foo/test.csv",
-                                "trim_min": 1,
-                                "trim_max": 6,
-                                "flag_column": "[advisories]",
-                                "model": 'LinearRegression'},
-                               filename=filename)
-
-        config.filename = new_filename
-        eq_(config.filename, new_filename)
 
     def test_get_context(self):
         context = 'rsmtool'
