@@ -300,4 +300,4 @@ class TestToolCLI:
 
         # this applies to all tools except rsmpredict and rsmsummarize
         for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
-            yield self.check_tool_cmd, context, "generate --sugroups", None, None
+            yield self.check_tool_cmd, context, "generate --subgroups", None, None
