@@ -9,20 +9,16 @@ and creating configuration objects.
 :organization: ETS
 """
 
-import functools
 import json
 import logging
 import re
-import warnings
 
 from copy import copy, deepcopy
 from collections import Counter
-from configparser import ConfigParser
 from os import getcwd
 from os.path import abspath
 
 from pathlib import Path
-from ruamel import yaml
 
 from skll import Learner
 from skll.metrics import SCORERS

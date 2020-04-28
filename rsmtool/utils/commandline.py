@@ -160,7 +160,8 @@ def setup_rsmcmd_parser(name,
     # Setting up options for the "generate" subparser #
     ###################################################
     if uses_subgroups:
-        parser_generate.add_argument('--subgroups',
+        parser_generate.add_argument('-g',
+                                     '--subgroups',
                                      dest='subgroups',
                                      action='store_true',
                                      default=False,
@@ -178,7 +179,8 @@ def setup_rsmcmd_parser(name,
                                       "using the generated configuration "
                                       "as-is will be suppressed.")
 
-    parser_generate.add_argument('--interactive',
+    parser_generate.add_argument('-i',
+                                 '--interactive',
                                  dest='interactive',
                                  action='store_true',
                                  default=False,
@@ -782,6 +784,11 @@ class ConfigurationGenerator:
         sys.stderr.write(" - press ctrl-c to cancel current entry for a field and enter again\n")
         sys.stderr.write(" - you may still need to edit the generated configuration\n")
         sys.stderr.write("\n")
+
+        if not self.use_subgroups:
+            sys.stderr.write("IMPORTANT: If you have subgroups and didn't specify the '-g' "
+                             "option, exit now (ctrl-d) and re-run!\n")
+            sys.stderr.write("\n")
 
         # instantiate a blank dictionary
         configdict = OrderedDict()

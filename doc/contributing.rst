@@ -144,6 +144,8 @@ Here are some advanced tips and tricks when working with RSMTool tests.
 
 3. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
 
+4. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nosetests`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nosetests`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
+
 .. rubric:: Footnotes
 
 .. [#] For older versions of conda, you may have to do ``source activate rsmtool`` on Linux/macOS and ``activate rsmtool`` on Windows.
