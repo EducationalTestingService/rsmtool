@@ -60,7 +60,7 @@ We end with a list of important things to note about interactive generation:
 
 - Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses. 
 
-- To reduce typing, use ``-i`` as an alias for ``--interactive`` and ``-g`` as an alias for ``--subgroups``. So, for example, if you want to interactively generate a configuration file with subgroups for ``rsmtool``, just run ``rsmtool generate -ig`` instead of ``rsmtool generate --interactive --subgroups``.
+- You can also use ``-i`` as an alias for ``--interactive`` and ``-g`` as an alias for ``--subgroups``. So, for example, if you want to interactively generate a configuration file with subgroups for ``rsmtool``, just run ``rsmtool generate -ig`` instead of ``rsmtool generate --interactive --subgroups``.
 
 - The configuration files generated interactively contain comments (as indicated by ``// ...``). While RSMTool handles JSON files with comments just fine, you may need to remove the comments manually if you wish to use these files outside of RSMTool.
 
