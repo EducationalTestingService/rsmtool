@@ -785,10 +785,10 @@ class ConfigurationGenerator:
         sys.stderr.write(" - you may still need to edit the generated configuration\n")
         sys.stderr.write("\n")
 
-        sys.stderr.write("IMPORTANT: If you have subgroups and didn't specify the '-g' "
-                         "option, exit now (ctrl-d) and re-run!\n")
-
-        sys.stderr.write("\n")
+        if not self.use_subgroups:
+            sys.stderr.write("IMPORTANT: If you have subgroups and didn't specify the '-g' "
+                             "option, exit now (ctrl-d) and re-run!\n")
+            sys.stderr.write("\n")
 
         # instantiate a blank dictionary
         configdict = OrderedDict()
