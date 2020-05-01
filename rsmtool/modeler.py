@@ -11,13 +11,13 @@ as well as making predictions for new data.
 
 import logging
 import pickle
-import warnings
 
 from math import log10, sqrt
 from os.path import join
 
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 
 from numpy.random import RandomState
 from scipy.optimize import nnls
@@ -30,10 +30,6 @@ from .utils.metrics import compute_expected_scores_from_model
 from .utils.models import is_skll_model
 from .preprocessor import FeaturePreprocessor
 from .writer import DataWriter
-
-with warnings.catch_warnings():
-    warnings.filterwarnings('ignore', category=FutureWarning)
-    import statsmodels.api as sm
 
 
 class Modeler:
