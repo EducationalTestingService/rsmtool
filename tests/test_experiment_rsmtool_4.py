@@ -2,7 +2,6 @@ import json
 import os
 
 from os.path import join
-from pathlib import Path
 
 from nose.tools import raises, assert_equal
 from parameterized import param, parameterized
