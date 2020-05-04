@@ -278,11 +278,12 @@ def run_experiment(config_file_or_obj_or_dict,
             # scale coefficients, and return DataContainer w/ scaled coefficients
             scaled_data_container = modeler.scale_coefficients(pred_config)
 
-        # Raise an error if the coefficient file exists but the 
-        # coefficients are not available for the current model 
-        #  which can happen if the user is re-running the same experiment with the same
-        # ID but with a non-linear model whereas the previous run of the same
-        # ID was with a linear model and the user has not cleared the directory
+        # raise an error if the coefficient file exists but the
+        # coefficients are not available for the current model
+        # which can happen if the user is re-running the same experiment
+        # with the same ID but with a non-linear model whereas the previous
+        # run of the same ID was with a linear model and the user has not
+        # cleared the directory
         except RuntimeError:
             raise ValueError("It appears you previously ran an experiment with the "
                              "same ID using a linear model and saved its output to "
