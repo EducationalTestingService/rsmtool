@@ -1409,6 +1409,11 @@ class Modeler:
             A data_container object containing `coefficients_scaled`
             This DataFrame contains the scaled coefficients
             and the feature names, along with the intercept.
+
+        Raises
+        ------
+        RuntimeError
+            If the model is non-linear and no coefficients are available.
         """
 
         Analyzer.check_param_names(configuration, ['train_predictions_mean',
@@ -1421,7 +1426,12 @@ class Modeler:
 
         feature_names = self.get_feature_names()
 
-        coefficients = self.get_coefficients()
+        # try to get the model coefficients, if available
+        try:
+            coefficients = self.get_coefficients()
+        except AttributeError:
+            raise RuntimeError("no coefficients available for this model.")
+
         intercept = self.get_intercept()
 
         # scale the coefficients and the intercept

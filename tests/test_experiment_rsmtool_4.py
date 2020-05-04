@@ -1,3 +1,4 @@
+import json
 import os
 
 from os.path import join
@@ -6,6 +7,8 @@ from nose.tools import raises, assert_equal
 from parameterized import param, parameterized
 from sklearn.exceptions import ConvergenceWarning
 
+from rsmtool import run_experiment
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_run_experiment,
                                 collect_warning_messages_from_report,
                                 do_run_experiment)
@@ -119,3 +122,18 @@ def test_run_experiment_with_warnings():
     assert_equal(len(unicode_warnings), 1)
     assert_equal(len(runtime_warnings), 1)
     assert_equal(len(user_warnings), 1)
+
+
+@raises(ValueError)
+def test_same_id_linear_then_non_linear_raises_error():
+
+    experiment_path = join(rsmtool_test_dir, "data", "experiments", "lr")
+    configpath = join(experiment_path, "lr.json")
+    configdict = json.load(open(configpath, "r"))
+
+    output_dir = "test_outputs/same-id-different-model"
+    config = Configuration(configdict, configdir=experiment_path)
+    run_experiment(config, output_dir, overwrite_output=True)
+
+    config['model'] = "SVC"
+    run_experiment(config, output_dir, overwrite_output=True)

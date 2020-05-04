@@ -269,26 +269,34 @@ def run_experiment(config_file_or_obj_or_dict,
     original_coef_file = join(csvdir, '{}_coefficients.{}'.format(pred_config['experiment_id'],
                                                                   file_format))
 
-    # If coefficients file exists, then generate
-    # scaled coefficients and save to file
+    # If coefficients file exists, then try to generate the scaled
+    # coefficients and save them to a file
     if exists(original_coef_file):
         logger.info('Scaling the coefficients and saving them to disk')
         try:
 
-            # Scale coefficients, and return DataContainer w/ scaled coefficients
+            # scale coefficients, and return DataContainer w/ scaled coefficients
             scaled_data_container = modeler.scale_coefficients(pred_config)
 
-            # Write out files to disk
+        # raise an error if the coefficient file exists but the
+        # coefficients are not available for the current model
+        # which can happen if the user is re-running the same experiment
+        # with the same ID but with a non-linear model whereas the previous
+        # run of the same ID was with a linear model and the user has not
+        # cleared the directory
+        except RuntimeError:
+            raise ValueError("It appears you previously ran an experiment with the "
+                             "same ID using a linear model and saved its output to "
+                             "the same directory. That output is interfering with "
+                             "the current experiment. Either clear the contents "
+                             "of the output directory or re-run the current "
+                             "experiment using a different experiment ID.")
+        else:
+
+            # Write out scaled coefficients to disk
             writer.write_experiment_output(csvdir,
                                            scaled_data_container,
                                            file_format=file_format)
-
-        except AttributeError:
-            raise ValueError("It appears you are trying to save two different "
-                             "experiments to the same directory using the same "
-                             "ID. Please clear the content of the directory and "
-                             "rerun both experiments using different "
-                             "experiment IDs.")
 
     # Add processed data_container frames to pred_data_container
     new_pred_data_container = pred_data_container + processed_container
