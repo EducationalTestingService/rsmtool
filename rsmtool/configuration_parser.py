@@ -712,7 +712,7 @@ class ConfigurationParser:
 
         # raise an exception if the user specified a directory
         if not pathlike.is_file():
-            raise OSError(f"The configuration file {pathlike} should be a "
+            raise OSError(f"The given path {pathlike} should be a "
                           f"file, not a directory.")
 
         # make sure we have a file that ends in ".json"
