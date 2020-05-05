@@ -185,13 +185,14 @@ class TestFeaturePreprocessor:
                                'spkitemlab': range(1, 9)})
 
         expected_df_excluded = bad_df.copy()
-        expected_df_excluded['sc1'] = np.nan
+        expected_df_excluded.drop('sc1', axis=1, inplace=True)
 
         df_filtered, df_excluded = self.fpp.filter_on_column(bad_df, 'sc1',
                                                              'spkitemlab',
                                                              exclude_zeros=True)
 
         ok_(df_filtered.empty)
+        ok_("sc1" not in df_filtered.columns)
         assert_frame_equal(df_excluded, expected_df_excluded, check_dtype=False)
 
     def test_filter_on_column_std_epsilon_zero(self):

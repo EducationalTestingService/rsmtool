@@ -740,6 +740,9 @@ class FeaturePreprocessor:
         # create a copy of the original data frame
         df_filter = df.copy()
 
+        # we start out assuming that we will not drop this column
+        drop_column = False
+
         # return a copy of the original data frame if
         # the given column does not exist at all
         if column not in df.columns:
@@ -752,43 +755,54 @@ class FeaturePreprocessor:
 
         # Save the values that have been converted to NaNs
         # as a separate data frame. We want to keep them as NaNs
-        # to do more analyses later.
-        # We also filter out inf values. Since these can only be generated
-        # during transformations we convert them to NaNs for consistency.
-        bad_rows = df_filter[df_filter[column].isnull() | np.isinf(df_filter[column])]
+        # to do more analyses later. We also filter out inf values.
+        # Since these can only be generated during transformations,
+        # we include them with NaNs for consistency.
+        bad_rows = df_filter[column].isnull() | np.isinf(df_filter[column])
+        df_bad_rows = df_filter[bad_rows]
 
-        # drop the NaNs that we might have gotten
-        df_filter = df_filter[df_filter[column].notnull() & ~np.isinf(df_filter[column])]
+        # if the column contained only non-numeric values, we need to drop it
+        if len(df_bad_rows) == len(df_filter):
+            logging.info(f"Feature {column} was excluded from the model "
+                         f"because it only contains non-numeric values.")
+            drop_column = True
+
+        # now drop the above bad rows containing NaNs from our data frame
+        df_filter = df_filter[~bad_rows]
 
         # exclude zeros if specified
         if exclude_zeros:
-            zero_indices = df_filter[df_filter[column] == 0].index.values
-            zero_rows = df.loc[zero_indices]
-            df_filter = df_filter[df_filter[column] != 0]
+            zero_rows = df_filter[column] == 0
+            df_zero_rows = df_filter[zero_rows]
+            df_filter = df_filter[~zero_rows]
         else:
-            zero_rows = pd.DataFrame()
+            df_zero_rows = pd.DataFrame()
 
         # combine all the filtered rows into a single data frame
-        df_exclude = pd.concat([bad_rows, zero_rows], sort=True)
+        df_exclude = pd.concat([df_bad_rows, df_zero_rows], sort=True)
 
         # reset the index so that the indexing works correctly
         # for the next feature with missing values
         df_filter.reset_index(drop=True, inplace=True)
         df_exclude.reset_index(drop=True, inplace=True)
 
-        # Drop this column if the standard deviation equals zero:
+        # Check if the the standard deviation equals zero:
         # for training set sd == 0 will break normalization.
         # We set the tolerance level to the 6th digit
-        # to account for a possibility that the exact value
-        # computed by std is not 0
+        # to account for the possibility that the exact value
+        # computed by `std()` is not 0
         if exclude_zero_sd is True:
             feature_sd = df_filter[column].std()
             if np.isclose(feature_sd, 0, atol=1e-07):
-                logging.info("Feature {} was excluded from the model "
-                             "because its standard deviation in the "
-                             "training set is equal to 0.".format(column))
-                df_filter = df_filter.drop(column, 1)
-                df_exclude = df_exclude.drop(column, 1)
+                logging.info(f"Feature {column} was excluded from the model "
+                             f"because its standard deviation in the "
+                             f"training set is equal to 0.")
+                drop_column = True
+
+        # if `drop_column` is true, then we need to drop the column
+        if drop_column:
+            df_filter = df_filter.drop(column, axis=1)
+            df_exclude = df_exclude.drop(column, axis=1)
 
         # return the filtered rows and the new data frame
         return (df_filter, df_exclude)
