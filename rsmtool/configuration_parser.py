@@ -694,10 +694,12 @@ class ConfigurationParser:
         Raises
         ------
         FileNotFoundError
-            If the given config file path does not exist.
+            If the given path does not exist.
+        OSError:
+            If the given path is a directory, not a file.
         ValueError
-            If the configuration file does not have a valid extension.
-            The only valid extension is ``.json``.
+            If the file at the given path does not have
+            a valid extension (``.json``).
         """
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
@@ -706,14 +708,18 @@ class ConfigurationParser:
         # raise an exception if the file does not exist
         if not pathlike.exists():
             raise FileNotFoundError(f"The configuration file {pathlike} "
-                                    "was not found.")
+                                    f"was not found.")
 
-        # make sure we have a JSON configuration file
+        # raise an exception if the user specified a directory
+        if not pathlike.is_file():
+            raise OSError(f"The configuration file {pathlike} should be a "
+                          f"file, not a directory.")
+
+        # make sure we have a file that ends in ".json"
         extension = pathlike.suffix.lower()
         if extension != '.json':
-            raise ValueError('Configuration file must be '
-                             'in `.json` '
-                             'format. You specified: {}.'.format(extension))
+            raise ValueError(f"The configuration file must be in `.json` "
+                             f"format. You specified: {extension}.")
 
         # set the various attributes to None
         self._filename = pathlike.name
