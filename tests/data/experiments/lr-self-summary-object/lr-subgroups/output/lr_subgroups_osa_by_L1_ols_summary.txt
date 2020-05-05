@@ -1,0 +1,27 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                     SE   R-squared:                       0.002
+Model:                            OLS   Adj. R-squared:                 -0.013
+Method:                 Least Squares   F-statistic:                    0.1381
+Date:                Tue, 05 May 2020   Prob (F-statistic):              0.937
+Time:                        16:14:45   Log-Likelihood:                -153.42
+No. Observations:                 200   AIC:                             314.8
+Df Residuals:                     196   BIC:                             328.0
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+======================================================================================
+                         coef    std err          t      P>|t|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.3836      0.067      5.738      0.000       0.252       0.515
+group[T.Navi]         -0.0098      0.100     -0.097      0.922      -0.207       0.188
+group[T.Klingon]      -0.0291      0.102     -0.284      0.777      -0.231       0.173
+group[T.Esperanto]     0.0412      0.105      0.391      0.696      -0.166       0.249
+==============================================================================
+Omnibus:                       69.254   Durbin-Watson:                   2.236
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              138.067
+Skew:                           1.734   Prob(JB):                     1.04e-30
+Kurtosis:                       5.132   Cond. No.                         4.38
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
