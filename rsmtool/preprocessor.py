@@ -772,7 +772,7 @@ class FeaturePreprocessor:
 
         # exclude zeros if specified
         if exclude_zeros:
-            zero_rows = df_filter[df_filter[column] == 0]
+            zero_rows = df_filter[column] == 0
             df_zero_rows = df_filter[zero_rows]
             df_filter = df_filter[~zero_rows]
         else:
