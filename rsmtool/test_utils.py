@@ -1109,7 +1109,8 @@ class FileUpdater(object):
         # the config JSON files or the OLS summary files or
         # the evaluation/prediction/model files for SKLL models
         new_files = dir_comparison.left_only
-        excluded_suffixes = ['_rsmtool.json', '_rsmeval.json', '_ols_summary.txt']
+        excluded_suffixes = ['_rsmtool.json', '_rsmeval.json',
+                             '_rsmsummarize.json', '_ols_summary.txt']
         new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
         if skll:
             new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]

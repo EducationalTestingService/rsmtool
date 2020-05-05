@@ -1,2 +1,2 @@
-,N,R2.raw_trim,RMSE.raw_trim,SMD.raw_trim,SMD.raw_trim_round,adj_agr.raw_trim_round,corr.raw_trim,exact_agr.raw_trim_round,h_mean,h_sd,kappa.raw_trim_round,sys_mean.raw_trim,sys_mean.raw_trim_round,sys_sd.raw_trim,sys_sd.raw_trim_round,wtkappa.raw_trim
-0,200,0.4913187091446416,0.6575553947973164,-0.008027609017385124,-0.005409686301658507,97.5,0.7067103392475101,52.0,3.5,0.9242680113386591,0.25,3.492580337777697,3.495,0.5702317338998583,0.6649706231467982,0.6334187969729184
+,N,h_mean,h_sd,sys_mean.raw_trim,sys_sd.raw_trim,wtkappa.raw_trim,corr.raw_trim,SMD.raw_trim,RMSE.raw_trim,R2.raw_trim,sys_mean.raw_trim_round,sys_sd.raw_trim_round,kappa.raw_trim_round,exact_agr.raw_trim_round,adj_agr.raw_trim_round,SMD.raw_trim_round
+0,200,3.5,0.9242680113386591,3.4925803377776963,0.5702317338998583,0.6315767667855283,0.7067103392475101,-0.008027609017386085,0.6575553947973164,0.4913187091446416,3.495,0.6649706231467982,0.25,52.0,97.5,-0.005409686301658507
