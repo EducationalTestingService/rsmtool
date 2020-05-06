@@ -1090,7 +1090,8 @@ class FileUpdater(object):
             test_name = source
         else:
             updated_output_path = self.updated_outputs_directory / input_source / "output"
-            existing_output_path = self.tests_directory / "data" / "experiments" / source / input_source / "output"
+            existing_output_path = (self.tests_directory / "data" / "experiments" / source /
+                                    input_source / "output")
             test_name = '{}/{}'.format(source, input_source)
 
         # if the directory for this source does not exist on the updated output
@@ -1140,7 +1141,7 @@ class FileUpdater(object):
 
         new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
 
-        #3. We also exclude files related to model evaluations for SKLL models.
+        # 3. We also exclude files related to model evaluations for SKLL models.
         if skll:
             new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
 
@@ -1234,8 +1235,8 @@ class FileUpdater(object):
                     continue
 
             # iterate over all the members and focus on only the experiment functions.
-            # For rsmtool/rsmeval we skip over the functions that are decorated with '@raises' since those
-            # functions do not need any test data to be updated.
+            # For rsmtool/rsmeval we skip over the functions that are decorated with
+            # '@raises' since those functions do not need any test data to be updated.
             # For rsmsummarize and rsmcompare we only update the input files for these functions.
             # For the rest, try to get
             # the source since that's what we need to update the test files
@@ -1249,7 +1250,7 @@ class FileUpdater(object):
                     # check if it has 'raises' in the qualified name
                     # and skip it
                     if 'raises' in member_qualified_name:
-                            continue
+                        continue
 
                     # otherwise first we check if it's the parameterized function and if so
                     # we can easily get the source from the parameter list
@@ -1302,5 +1303,6 @@ class FileUpdater(object):
         # if we updated any input files, let the user know that they need to
         # re-run the tests and update test outputs
         if len(updated_input_files) > 0:
-            print("WARNING: {} input files for rsmcompare/rsmsummarize tests have been updated ."
-                  "You need to re-run these tests and update test outputs".format(len(updated_input_files)))
+            print("WARNING: {} input files for rsmcompare/rsmsummarize "
+                  "tests have been updated. You need to re-run these "
+                  "tests and update test outputs".format(len(updated_input_files)))
