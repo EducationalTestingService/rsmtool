@@ -45,7 +45,10 @@ RSMTool is driven by a configuration file that users have to supply and given th
 
 .. raw:: html
    
-   <a href="https://asciinema.org/a/313107" target="_blank"><img src="https://asciinema.org/a/313107.svg" width="500"/></a>
+   <a href="https://asciinema.org/a/313107" target="_blank"><img align="center" src="https://asciinema.org/a/313107.svg" width="500"/></a>
+
+Getting Started
+---------------
 
 To get started with RSMTool, please see the extensive `official documentation <https://rsmtool.readthedocs.io>`_.  If you use the `Dash <https://kapeli.com/dash>`_ app on macOS, you can also download the complete RSMTool documentation for offline use. Go to the Dash preferences, click on "Downloads", then "User Contributed", and search for "RSMTool".
 
