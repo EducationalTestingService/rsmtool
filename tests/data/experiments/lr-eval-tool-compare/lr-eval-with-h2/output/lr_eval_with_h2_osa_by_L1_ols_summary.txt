@@ -3,8 +3,8 @@
 Dep. Variable:                     SE   R-squared:                       0.002
 Model:                            OLS   Adj. R-squared:                 -0.013
 Method:                 Least Squares   F-statistic:                    0.1381
-Date:                Tue, 05 May 2020   Prob (F-statistic):              0.937
-Time:                        16:09:23   Log-Likelihood:                -153.42
+Date:                Wed, 06 May 2020   Prob (F-statistic):              0.937
+Time:                        13:39:21   Log-Likelihood:                -153.42
 No. Observations:                 200   AIC:                             314.8
 Df Residuals:                     196   BIC:                             328.0
 Df Model:                           3                                         

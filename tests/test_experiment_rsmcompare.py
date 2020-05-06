@@ -25,7 +25,7 @@ else:
 # set this to False to disable auto-updating of all experiment
 # tests contained in this file via `update_files.py`.
 # TODO: re-enable this once we start saving rsmcompare outputs
-_AUTO_UPDATE = False
+#_AUTO_UPDATE = False
 
 
 @parameterized([

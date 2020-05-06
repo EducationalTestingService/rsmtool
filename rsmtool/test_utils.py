@@ -1124,13 +1124,22 @@ class FileUpdater(object):
         for file in existing_output_only_files:
             remove(existing_output_path / file)
 
-        # Next find all the NEW files in the updated outputs but do not include
-        # the config JSON files or the OLS summary files or
-        # the evaluation/prediction/model files for SKLL models
+        # Next find all the NEW files in the updated outputs.
         new_files = dir_comparison.left_only
-        excluded_suffixes = ['_rsmtool.json', '_rsmeval.json',
-                             '_rsmsummarize.json', '_ols_summary.txt']
+
+        # We also define several types of files we exclude.
+        # 1. we exclude OLS summary files
+        excluded_suffixes = ['_ols_summary.txt']
+
+        # 2. for output files we exclude all json files.
+        # We keep these files if we are dealing with input files.
+        if file_type == 'output':
+            excluded_suffixes.extend(['_rsmtool.json', '_rsmeval.json',
+                                      '_rsmsummarize.json', '_rsmcompare.json'])
+
         new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
+
+        #3. We also exclude files related to model evaluations for SKLL models.
         if skll:
             new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
 
@@ -1279,7 +1288,7 @@ class FileUpdater(object):
                                      not updated_file.endswith('.npy')]
 
         # find added/updated input files
-        updated_input_files = [(source, updated_file) for (source_updated_file)
+        updated_input_files = [(source, updated_file) for (source, updated_file)
                                in overall_updated_non_model if '/' in source]
 
 

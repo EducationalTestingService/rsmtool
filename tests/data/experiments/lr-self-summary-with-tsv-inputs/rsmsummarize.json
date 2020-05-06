@@ -1,5 +1,5 @@
 {
     "summary_id": "model_comparison",
-    "experiment_dirs": ["lr-subgroups-with-tsv-input", "lr-subgroups-with-tsv-input", "lr-subgroups-with-tsv-input"],
-    "description": "Comparison of rsmtool experiment with itself, with TSVs."
+    "experiment_dirs": ["lr-with-tsv-output", "lr-with-tsv-output","lr-with-tsv-output"],
+    "description": "Comparison of rsmtool experiment with itself, with TSVs output files."
 }

@@ -35,7 +35,8 @@ else:
     param('lr-self-summary-no-scaling'),
     param('lr-self-summary-with-h2'),
     param('summary-with-custom-names'),
-    param('lr-self-summary-null-trim-min')
+    param('lr-self-summary-null-trim-min'),
+    param('lr-self-summary-no-trim')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -73,7 +74,7 @@ def test_run_experiment_lr_summary_dictionary():
     '''
     Test rsmsummarize using the dictionary object, rather than a file;
     '''
-    source = 'lr-self-summary-dictionary'
+    source = 'lr-self-summary-dict'
 
     # set up a temporary directory since
     # we will be using getcwd
@@ -92,29 +93,6 @@ def test_run_experiment_lr_summary_dictionary():
                    "description": "Comparison of rsmtool experiment with itself."}
 
     check_run_summary(source, config_obj_or_dict=config_dict)
-
-
-def test_run_experiment_lr_summary_no_trim():
-    '''
-    Experiment to check the condition where no trim values can be located
-    also uses the `Configuration` object directly
-    '''
-    source = 'lr-self-summary-no-trim'
-
-    config_dir = join(rsmtool_test_dir,
-                      'data',
-                      'experiments',
-                      source)
-
-    config_dict = {"summary_id": "model_comparison",
-                   "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
-                   "description": "Comparison of rsmtool without trim values"}
-
-    config_obj = Configuration(config_dict,
-                               context='rsmsummarize',
-                               configdir=config_dir)
-
-    check_run_summary(source, config_obj_or_dict=config_obj)
 
 
 @raises(ValueError)
