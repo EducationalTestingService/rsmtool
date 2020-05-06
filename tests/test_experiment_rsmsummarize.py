@@ -35,7 +35,6 @@ else:
     param('lr-self-summary-no-scaling'),
     param('lr-self-summary-with-h2'),
     param('summary-with-custom-names'),
-    param('lr-self-summary-null-trim-min'),
     param('lr-self-summary-no-trim')
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
