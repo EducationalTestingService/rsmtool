@@ -41,7 +41,14 @@ Rater Scoring Modeling Tool (RSMTool) is a python package which automates and co
 
 We expect the primary users of RSMTool to be researchers working on developing new automated scoring engines or on improving existing ones. Note that RSMTool is not a scoring engine by itself but rather a tool for building and evaluating machine learning models that may be used in such engines. 
 
-For installation and usage, please see the `official documentation <https://rsmtool.readthedocs.io>`_.  If you use the `Dash <https://kapeli.com/dash>`_ app on macOS, you can also download the complete RSMTool documentation for offline use. Go to the Dash preferences, click on "Downloads", then "User Contributed", and search for "RSMTool".
+RSMTool is driven by a configuration file that users have to supply and given the large number of available options, this can get complicated especially for new users. That's why RSMTool can help users generate configuration files interactively via guided prompts! Click the image below to see a demo video of how this works.
+
+.. raw:: html
+   
+   <a href="https://asciinema.org/a/313107" target="_blank"><img src="https://asciinema.org/a/313107.svg" /></a>
+
+To get started with RSMTool, please see the extensive `official documentation <https://rsmtool.readthedocs.io>`_.  If you use the `Dash <https://kapeli.com/dash>`_ app on macOS, you can also download the complete RSMTool documentation for offline use. Go to the Dash preferences, click on "Downloads", then "User Contributed", and search for "RSMTool".
+
 
 Requirements
 ------------
