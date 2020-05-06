@@ -1129,7 +1129,8 @@ class FileUpdater(object):
 
         # We also define several types of files we exclude.
         # 1. we exclude OLS summary files
-        excluded_suffixes = ['_ols_summary.txt']
+        excluded_suffixes = ['_ols_summary.txt',
+                             '.ols', '.model', '.npy']
 
         # 2. for output files we exclude all json files.
         # We keep these files if we are dealing with input files.
@@ -1281,26 +1282,15 @@ class FileUpdater(object):
             print('{} {}'.format(source, deleted_file))
         print()
 
-        # find the added/updated files that are not model files
-        overall_updated_non_model = [(source, updated_file) for (source, updated_file)
-                                     in self.updated_files if not updated_file.endswith('.model') and
-                                     not updated_file.endswith('ols') and
-                                     not updated_file.endswith('.npy')]
-
         # find added/updated input files
         updated_input_files = [(source, updated_file) for (source, updated_file)
-                               in overall_updated_non_model if '/' in source]
+                               in self.updated_files if '/' in source]
 
 
         # print out the number and list of overall added/updated non-model files
-        print('{} added/updated:'.format(len(overall_updated_non_model)))
-        for source, updated_file in overall_updated_non_model:
+        print('{} added/updated:'.format(len(self.updated_files)))
+        for source, updated_file in self.updated_files:
             print('{} {}'.format(source, updated_file))
-        print()
-
-        # print out a summary statement for added/updated model files
-        num_updated_model_files = len(self.updated_files) - len(overall_updated_non_model)
-        print('{} model files (*.ols/*.model/*.npy) added/updated.'.format(num_updated_model_files))
         print()
 
         # now print out missing and/or empty updated output directories
