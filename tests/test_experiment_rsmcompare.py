@@ -30,7 +30,7 @@ else:
 
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
-    param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores'),
+    param('lr-different-compare', 'lr_vs_lr_subset_features'),
     param('lr-self-compare-with-h2', 'lr_with_h2_vs_lr_with_h2'),
     param('lr-self-compare-with-custom-order', 'lr_subgroups_vs_lr_subgroups'),
     param('lr-self-compare-with-chosen-sections', 'lr_subgroups_vs_lr_subgroups'),
