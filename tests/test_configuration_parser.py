@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import tempfile
-import warnings
 import pandas as pd
 
 from io import StringIO
@@ -16,7 +15,6 @@ from pandas.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
                         assert_not_equal,
-                        assert_raises,
                         eq_,
                         ok_,
                         raises)
@@ -35,6 +33,20 @@ class TestConfigurationParser:
     def setUp(self):
         pass
 
+    @raises(FileNotFoundError)
+    def test_init_nonexistent_file(self):
+        non_existent_file = "/x/y.json"
+        _ = ConfigurationParser(non_existent_file)
+
+    @raises(OSError)
+    def test_init_directory_instead_of_file(self):
+        with tempfile.TemporaryDirectory() as tempd:
+            _ = ConfigurationParser(tempd)
+
+    @raises(ValueError)
+    def test_init_non_json_file(self):
+        with tempfile.NamedTemporaryFile(suffix=".txt") as tempf:
+            _ = ConfigurationParser(tempf.name)
 
     def test_parse_config_from_dict_rsmtool(self):
         data = {'experiment_id': 'experiment_1',
@@ -50,7 +62,6 @@ class TestConfigurationParser:
         assert_array_equal(newdata['general_sections'], ['all'])
         assert_equal(newdata['description'], '')
         assert_equal(newdata.configdir, getcwd())
-
 
     def test_parse_config_from_dict_rsmeval(self):
         data = {'experiment_id': 'experiment_1',
