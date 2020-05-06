@@ -46,7 +46,7 @@ For installation and usage, please see the `official documentation <https://rsmt
 Requirements
 ------------
 
-- Python >=3.6, <3.7
+- Python >=3.6, <3.9
 - ``numpy``
 - ``scipy``
 - ``scikit-learn``
