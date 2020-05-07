@@ -137,6 +137,37 @@ If your changes resulted in updates to input files to RSMSummarize or RSMCompare
 
 Once you are satisified that the outputs are as expected, you can commit all the them.
 
+Two examples below walk you through the process: 
+
+.. topic:: Example 1: No change to input files. 
+    You made a code change to better handle an edge case that only affects one test. 
+     
+    1. Run ``nosetests --nologcapture tests/*.py``. The affected test failed.  
+
+    2. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. You will see the total number of deleted, updated and missing files. There should be no deleted files and no missing files. Only files for your new test should be updated. There are no warnings in the output. 
+
+    3. If this is the case, you are now ready to commit your change.  
+
+.. topic:: Example 2: Change to input file. 
+     You made a code change that changes the output of many tests. For example, you renamed one of the evaluation metrics. 
+     
+     1. Run ``nosetests --nologcapture tests/*.py``. Many tests now failed since the outputs changed. 
+
+     2. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. The files affected by your change are shown as added/deleted. You also see the following warning: 
+
+     .. code-block:: 
+     
+        WARNING: X input files for rsmcompare/rsmsummarize tests have been updated. You need to re-run these tests and update test outputs
+
+     3. This means that the input files for rsmsummarize/rsmcompare have changed and it is likely that the current test outputs no longer match the expected output. You need to re-run the tests for these two tools.
+
+     4. Run ``nosetests --nologcapture tests/*rsmsummarize*.py`` and ``nosetests --nologcapture tests/*rsmcompare*.py``. If you see errors, make sure they are related to the changes you made. 
+
+     3. Once you are satisfied, rerun ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. This should only update the outputs for the `rsmsummarize` tests. 
+
+     4. If this is the case, you are now ready to commit your changes. 
+
+
 Advanced tips and tricks
 ------------------------
 
