@@ -1093,7 +1093,7 @@ class FileUpdater(object):
             updated_output_path = self.updated_outputs_directory / input_source / "output"
             existing_output_path = (self.tests_directory / "data" / "experiments" / source /
                                     input_source / "output")
-            test_name = '{}/{}'.format(source, input_source)
+            test_name = f'{source}/{input_source}'
 
         # if the directory for this source does not exist on the updated output
         # side, then that's a problem and something we should report on later
@@ -1187,7 +1187,8 @@ class FileUpdater(object):
                          skll=False):
         """
         Determine whether we are updating input or output data
-        and run update_source with the relevant parameters.
+        and run ``update_source()`` with the relevant parameters.
+
         Parameters
         ----------
         source : str
@@ -1239,8 +1240,8 @@ class FileUpdater(object):
             # For rsmtool/rsmeval we skip over the functions that are decorated with
             # '@raises' since those functions do not need any test data to be updated.
             # For rsmsummarize and rsmcompare we only update the input files for these functions.
-            # For the rest, try to get
-            # the source since that's what we need to update the test files
+            # For the rest, try to get the source since that's what we need to update
+            # the test files.
             for member_name, member_object in getmembers(test_module):
                 if isfunction(member_object) and member_name.startswith('test_run_experiment'):
                     function = member_object
@@ -1284,7 +1285,8 @@ class FileUpdater(object):
             print('{} {}'.format(source, deleted_file))
         print()
 
-        # find added/updated input files
+        # find added/updated input files: in this case the source # will consist of
+        # the test name and the input test name separated by '/'.
         updated_input_files = [(source, updated_file) for (source, updated_file)
                                in self.updated_files if '/' in source]
 
