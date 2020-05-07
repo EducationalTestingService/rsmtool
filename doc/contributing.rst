@@ -161,7 +161,7 @@ The two examples below might help make this process easier to understand:
 
      4. Run ``nosetests --nologcapture tests/*rsmsummarize*.py`` and ``nosetests --nologcapture tests/*rsmcompare*.py``. If you see any failures, make sure they are related to the changes you made since those are expected.
 
-     3. Next, re=run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
+     3. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
 
      4. If this is the case, you are now ready to commit your changes. 
 
