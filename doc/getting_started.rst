@@ -2,7 +2,7 @@
 
 Installation
 ============
-Note that RSMTool works with Python 3.6, 3.7, and 3.8.
+Note that RSMTool currently only works with Python 3.6.x.
 
 Installing with conda
 ----------------------
@@ -11,9 +11,9 @@ Currently, the recommended way to install RSMTool is by using the ``conda`` pack
 
 1. To install ``conda``, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_. 
 
-2. Create a new conda environment (say, ``rsmtool``) and install the RSMTool conda package for, say, Python 3.8 by running::
+2. Create a new conda environment (say, ``rsmtool``) and install the RSMTool conda package for your preferred Python version. For example, for Python 3.8, run:::
 
-    conda create -n rsmtool -c conda-forge -c ets python=3.8 rsmtool
+    conda create -n rsmtool -c conda-forge -c ets python=3.6 rsmtool
 
 3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path. [#]_
 
