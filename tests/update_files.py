@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 """
-This script is designed to update the expected test output.
+This script is designed to update the expected test outputs and the test inputs for
+rsmsummarize and rsmcompare tests.
 It assumes that you have already run nosetests and ran the entire test suite.
 By doing so, the output has been generated under the given outputs directory.
 and that is what will be used to generate the new expected output under `tests/data/experiments`.
@@ -16,6 +17,10 @@ The scripts works as as follows. For each experiment test:
 - Old files in the expected test output are deleted.
 - Files that are already in the expected test output and have not changed are left alone.
 - Directories that are missing or empty under the updated test outputs are shown.
+- For RSMSummarize and RSMCompare tests, the same logic is also applied to input data. It is assumed that the input experiments are copies of the experiments from existing tests.
+
+Note: If running this script results in changes to the inputs for rsmcompare or rsmsummarize tests, you will
+need to first re-run the tests for those two tools and then, potentially, run this script again to update their test outputs.
 
 The script prints a log detailing the changes made for each experiment test.
 

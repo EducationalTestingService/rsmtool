@@ -21,16 +21,9 @@ if TEST_DIR:
 else:
     from rsmtool.test_utils import rsmtool_test_dir
 
-
-# set this to False to disable auto-updating of all experiment
-# tests contained in this file via `update_files.py`.
-# TODO: re-enable this once we start saving rsmcompare outputs
-_AUTO_UPDATE = False
-
-
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
-    param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores'),
+    param('lr-different-compare', 'lr_vs_lr_subset_features'),
     param('lr-self-compare-with-h2', 'lr_with_h2_vs_lr_with_h2'),
     param('lr-self-compare-with-custom-order', 'lr_subgroups_vs_lr_subgroups'),
     param('lr-self-compare-with-chosen-sections', 'lr_subgroups_vs_lr_subgroups'),

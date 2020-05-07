@@ -33,6 +33,10 @@ section_regexp = re.compile(r'<h2>(.*?)</h2>')
 # get the directory containing the tests
 rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
 
+tools_with_input_data = ['rsmsummarize', 'rsmcompare']
+tools_with_output = ['rsmtool', 'rsmeval',
+                     'rsmsummarize', 'rsmpredict']
+
 
 def check_run_experiment(source,
                          experiment_id,
@@ -1052,9 +1056,13 @@ class FileUpdater(object):
         return any(file_suffix == suffix for suffix in possible_suffixes) or \
             any(file_stem.endswith(stem) for stem in possible_stems)
 
-    def update_source(self, source, skll=False):
+    def update_source(self,
+                      source,
+                      skll=False,
+                      file_type='output',
+                      input_source=None):
         """
-        Update the test outputs for experiment test with `source` as the
+        Update the test output or input data for experiment test with `source` as the
         given name. It deletes files that are only in the tests directory,
         adds files that are only in the updated test outputs directory, and
         updates the files that have changed in the updated test outputs directory.
@@ -1068,18 +1076,31 @@ class FileUpdater(object):
         skll : bool, optional
             Whether the given source
             is for a SKLL-based experiment test.
+        file_type: str, optional
+            Whether we are updating test output files or test input files.
+            Input files are updated for rsmtool and rsmcompare.
+        input_source: str, optional
+            The name of the source directory for input files
         """
         # locate the updated outputs for the experiment under the given
-        # outputs directory and also locate the existing experiment outputs
-        updated_output_path = self.updated_outputs_directory / source / "output"
-        existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
+        # outputs directory, locate the existing experiment outputs
+        # and define how we will refer to the test
+        if file_type == 'output':
+            updated_output_path = self.updated_outputs_directory / source / "output"
+            existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
+            test_name = source
+        else:
+            updated_output_path = self.updated_outputs_directory / input_source / "output"
+            existing_output_path = (self.tests_directory / "data" / "experiments" / source /
+                                    input_source / "output")
+            test_name = f'{source}/{input_source}'
 
         # if the directory for this source does not exist on the updated output
         # side, then that's a problem and something we should report on later
         try:
             assert updated_output_path.exists()
         except AssertionError:
-            self.missing_or_empty_sources.append(source)
+            self.missing_or_empty_sources.append(test_name)
             return
 
         # if the existing output path does not exist, then create it
@@ -1087,7 +1108,7 @@ class FileUpdater(object):
             assert existing_output_path.exists()
         except AssertionError:
             sys.stderr.write("\nNo existing output for \"{}\". "
-                             "Creating directory ...\n".format(source))
+                             "Creating directory ...\n".format(test_name))
             existing_output_path.mkdir(parents=True)
 
         # get a comparison betwen the two directories
@@ -1096,7 +1117,7 @@ class FileUpdater(object):
         # if no output was found in the updated outputs directory, that's
         # likely to be a problem so save that source
         if not dir_comparison.left_list:
-            self.missing_or_empty_sources.append(source)
+            self.missing_or_empty_sources.append(test_name)
             return
 
         # first delete the files that only exist in the existing output directory
@@ -1105,12 +1126,23 @@ class FileUpdater(object):
         for file in existing_output_only_files:
             remove(existing_output_path / file)
 
-        # Next find all the NEW files in the updated outputs but do not include
-        # the config JSON files or the OLS summary files or
-        # the evaluation/prediction/model files for SKLL models
+        # Next find all the NEW files in the updated outputs.
         new_files = dir_comparison.left_only
-        excluded_suffixes = ['_rsmtool.json', '_rsmeval.json', '_ols_summary.txt']
+
+        # We also define several types of files we exclude.
+        # 1. we exclude OLS summary files
+        excluded_suffixes = ['_ols_summary.txt',
+                             '.ols', '.model', '.npy']
+
+        # 2. for output files we exclude all json files.
+        # We keep these files if we are dealing with input files.
+        if file_type == 'output':
+            excluded_suffixes.extend(['_rsmtool.json', '_rsmeval.json',
+                                      '_rsmsummarize.json', '_rsmcompare.json'])
+
         new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
+
+        # 3. We also exclude files related to model evaluations for SKLL models.
         if skll:
             new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
 
@@ -1145,8 +1177,47 @@ class FileUpdater(object):
             copyfile(updated_output_path / file, existing_output_path / file)
 
         # Update the lists with files that were changed for this source
-        self.deleted_files.extend([(source, file) for file in existing_output_only_files])
-        self.updated_files.extend([(source, file) for file in new_or_changed_files])
+        self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
+        self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
+
+
+    def update_test_data(self,
+                         source,
+                         test_tool,
+                         skll=False):
+        """
+        Determine whether we are updating input or output data
+        and run ``update_source()`` with the relevant parameters.
+
+        Parameters
+        ----------
+        source : str
+            Name of source directory.
+        test_tool : str
+            What tool is tested by this test.
+        skll : bool, optional
+            Whether the given source
+            is for a SKLL-based experiment test.
+        """
+        existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
+        # if we have a tool without with output
+        # we update the outputs
+        if test_tool in tools_with_output:
+            self.update_source(source, skll=skll)
+        # if we have a tool with input data we also update inputs
+        if test_tool in tools_with_input_data:
+            for input_dir in existing_output_path.parent.iterdir():
+                if not input_dir.is_dir():
+                    continue
+                if input_dir.name in ['output', 'figure', 'report']:
+                    continue
+                else:
+                    input_source = input_dir.name
+                    self.update_source(source,
+                                       skll=skll,
+                                       file_type='input',
+                                       input_source=input_source)
+
 
     def run(self):
         """
@@ -1158,16 +1229,19 @@ class FileUpdater(object):
         for test_suffix in self.test_suffixes:
             test_module_path = join(self.tests_directory, 'test_experiment_{}.py'.format(test_suffix))
             test_module = SourceFileLoader('loaded_{}'.format(test_suffix), test_module_path).load_module()
+            test_tool = test_suffix.split('_')[0]
 
             # skip the module if it tells us that it doesn't want the data for its tests updated
             if hasattr(test_module, '_AUTO_UPDATE'):
                 if not test_module._AUTO_UPDATE:
                     continue
 
-            # iterate over all the members and focus on only the experiment functions
-            # but skip over the functions that are decorated with '@raises' since those
-            # functions do not need any test data to be updated. For the rest, try to get
-            # the source since that's what we need to update the test files
+            # iterate over all the members and focus on only the experiment functions.
+            # For rsmtool/rsmeval we skip over the functions that are decorated with
+            # '@raises' since those functions do not need any test data to be updated.
+            # For rsmsummarize and rsmcompare we only update the input files for these functions.
+            # For the rest, try to get the source since that's what we need to update
+            # the test files.
             for member_name, member_object in getmembers(test_module):
                 if isfunction(member_object) and member_name.startswith('test_run_experiment'):
                     function = member_object
@@ -1175,7 +1249,8 @@ class FileUpdater(object):
                     # get the qualified name of the member function
                     member_qualified_name = member_object.__qualname__
 
-                    # check if it has 'raises' in the qualified name and skip it, if it does
+                    # check if it has 'raises' in the qualified name
+                    # and skip it
                     if 'raises' in member_qualified_name:
                         continue
 
@@ -1185,7 +1260,9 @@ class FileUpdater(object):
                         for param in function.parameterized_input:
                             source_name = param.args[0]
                             skll = param.kwargs.get('skll', False)
-                            self.update_source(source_name, skll=skll)
+                            self.update_test_data(source_name,
+                                                  test_tool,
+                                                  skll=skll)
 
                     # if it's another function, then we actually inspect the code
                     # to get the source. Note that this should never be a SKLL experiment
@@ -1195,7 +1272,8 @@ class FileUpdater(object):
                         source_line = [line for line in function_code_lines[0]
                                        if re.search(r'source = ', line)]
                         source_name = eval(source_line[0].strip().split(' = ')[1])
-                        self.update_source(source_name)
+                        self.update_test_data(source_name, test_tool)
+
 
     def print_report(self):
         """
@@ -1207,21 +1285,16 @@ class FileUpdater(object):
             print('{} {}'.format(source, deleted_file))
         print()
 
-        # find the added/updated files that are not model files
-        overall_updated_non_model = [(source, updated_file) for (source, updated_file)
-                                     in self.updated_files if not updated_file.endswith('.model') and
-                                     not updated_file.endswith('ols') and
-                                     not updated_file.endswith('.npy')]
+        # find added/updated input files: in this case the source # will consist of
+        # the test name and the input test name separated by '/'.
+        updated_input_files = [(source, updated_file) for (source, updated_file)
+                               in self.updated_files if '/' in source]
+
 
         # print out the number and list of overall added/updated non-model files
-        print('{} added/updated:'.format(len(overall_updated_non_model)))
-        for source, updated_file in overall_updated_non_model:
+        print('{} added/updated:'.format(len(self.updated_files)))
+        for source, updated_file in self.updated_files:
             print('{} {}'.format(source, updated_file))
-        print()
-
-        # print out a summary statement for added/updated model files
-        num_updated_model_files = len(self.updated_files) - len(overall_updated_non_model)
-        print('{} model files (*.ols/*.model/*.npy) added/updated.'.format(num_updated_model_files))
         print()
 
         # now print out missing and/or empty updated output directories
@@ -1229,3 +1302,10 @@ class FileUpdater(object):
         for source in self.missing_or_empty_sources:
             print('{}'.format(source))
         print()
+
+        # if we updated any input files, let the user know that they need to
+        # re-run the tests and update test outputs
+        if len(updated_input_files) > 0:
+            print("WARNING: {} input files for rsmcompare/rsmsummarize "
+                  "tests have been updated. You need to re-run these "
+                  "tests and update test outputs".format(len(updated_input_files)))

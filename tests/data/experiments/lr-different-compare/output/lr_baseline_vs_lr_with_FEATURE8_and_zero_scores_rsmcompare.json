@@ -1,0 +1,19 @@
+{
+    "comparison_id": "lr_baseline_vs_lr_with_FEATURE8_and_zero_scores",
+    "experiment_dir_old": "lr",
+    "experiment_id_old": "lr",
+    "description_old": "The baseline experiment.",
+    "use_scaled_predictions_old": true,
+    "experiment_dir_new": "lr-use-all-features",
+    "experiment_id_new": "lr_use_all_features",
+    "description_new": "Baseline model with new feature and including zero scores.",
+    "use_scaled_predictions_new": true,
+    "use_thumbnails": false,
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "subgroups": [],
+    "section_order": null
+}
