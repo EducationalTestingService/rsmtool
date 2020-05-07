@@ -34,7 +34,8 @@ section_regexp = re.compile(r'<h2>(.*?)</h2>')
 rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
 
 tools_with_input_data = ['rsmsummarize', 'rsmcompare']
-tools_with_output = ['rsmtool', 'rsmeval', 'rsmsummarize', 'rsmpredict']
+tools_with_output = ['rsmtool', 'rsmeval',
+                     'rsmsummarize', 'rsmpredict']
 
 
 def check_run_experiment(source,
@@ -1099,7 +1100,7 @@ class FileUpdater(object):
         try:
             assert updated_output_path.exists()
         except AssertionError:
-            self.missing_or_empty_sources.append(source)
+            self.missing_or_empty_sources.append(test_name)
             return
 
         # if the existing output path does not exist, then create it
