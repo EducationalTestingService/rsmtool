@@ -1285,7 +1285,8 @@ class FileUpdater(object):
             print('{} {}'.format(source, deleted_file))
         print()
 
-        # find added/updated input files
+        # find added/updated input files: in this case the source # will consist of
+        # the test name and the input test name separated by '/'.
         updated_input_files = [(source, updated_file) for (source, updated_file)
                                in self.updated_files if '/' in source]
 
