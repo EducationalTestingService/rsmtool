@@ -753,9 +753,8 @@ class TestConfiguration:
 
         eq_(config['flag_column'], '[advisories]')
 
-
     def test_get_configdir(self):
-        configdir = '/path/to/dir/'
+        configdir = 'path/to/dir/'
         config = Configuration({"experiment_id": '001',
                                 "train_file": "/foo/train.csv",
                                 "test_file": "/foo/test.csv",

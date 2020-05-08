@@ -1810,7 +1810,7 @@ class TestInteractiveGenerate:
 
         # point to the right file holding the expected configuration
         expected_file = f"interactive_{context}_config{groups_suffix}.json"
-        expected_path = rsmtool_test_dir / 'data' / 'output' / expected_file
+        expected_path = join(rsmtool_test_dir, 'data', 'output', expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
         # that calling 'interact()' doesn't actually print out anything
