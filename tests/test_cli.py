@@ -11,8 +11,15 @@ from nose.tools import assert_raises, eq_, ok_
 from rsmtool.test_utils import (check_file_output,
                                 check_generated_output,
                                 check_report,
-                                collect_warning_messages_from_report,
-                                rsmtool_test_dir)
+                                collect_warning_messages_from_report)
+
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 class TestToolCLI:
