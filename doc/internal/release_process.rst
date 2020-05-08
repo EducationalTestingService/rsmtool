@@ -29,9 +29,9 @@ This process is only meant for the project administrators, not users and develop
 
 7. Then run some tests from a RSMTool working copy. If the TestPyPI package works, then move on to the next step. If it doesn't, figure out why and rebuild and re-upload the package.
 
-8. Build the new generic conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool``)::
+8. Build the new generic conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool`` and that the latest version of ``numpy`` is ``1.18``)::
 
-    conda build -c conda-forge -c ets .
+    conda build -c conda-forge -c ets --numpy=1.18 .
 
 9. Upload the package to anaconda.org using ``anaconda upload --user ets <package tarball>``. You will need to have the appropriate permissions for the ``ets`` organization. 
 
