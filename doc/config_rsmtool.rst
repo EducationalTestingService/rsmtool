@@ -158,8 +158,9 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``true_score_evaluation``: evaluation of system scores against the :ref:`true scores <true_score_evaluation>`  estimated according to test theory. The notebook shows:
     
-        - variance of human scores for single and double-scored responses;
-        - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
+        - Number of single and double-scored responses.
+        - Variance of human rater errors and estimated variance of true scores
+        - Mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
     - ``pca``: Shows the results of principal components analysis on the processed feature values:
 
