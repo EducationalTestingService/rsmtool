@@ -2,7 +2,7 @@
 
 Installation
 ============
-Note that RSMTool currently only works with Python 3.6.x.
+Note that RSMTool currently works with Python 3.6, 3.7, and 3.8
 
 Installing with conda
 ----------------------
