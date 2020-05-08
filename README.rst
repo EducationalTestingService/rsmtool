@@ -44,7 +44,7 @@ We expect the primary users of RSMTool to be researchers working on developing n
 RSMTool is driven by a configuration file that users have to supply. Given the large number of available options, this can get complicated especially for new users. That's why RSMTool can help users generate configuration files interactively via guided prompts! Click the image below to see a demo video of this feature.
 
 .. image:: https://raw.githubusercontent.com/EducationalTestingService/rsmtool/release/8.0/doc/assets/demo.gif
-   :width: 500
+   :width: 400
    :alt: License
 
 Getting Started
