@@ -23,7 +23,8 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 
 # pre-define the list of HTML files we want to miodify
-FILES_TO_MODIFY = ["advanced_usage.html", "api.html", "contributing.html",
+FILES_TO_MODIFY = ["advanced_usage.html", "api.html", "builtin_models.html",
+                   "automated_configuration.html", "contributing.html",
                    "custom_notebooks.html", "evaluation.html",
                    "getting_started.html", "pipeline.html",
                    "internal.html", "tutorial.html",
