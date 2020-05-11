@@ -1,10 +1,8 @@
-import warnings
-
 import numpy as np
 import pandas as pd
 
 from numpy.testing import assert_array_equal
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 from nose.tools import (assert_equal,
                         assert_almost_equal,
@@ -185,13 +183,14 @@ class TestFeaturePreprocessor:
                                'spkitemlab': range(1, 9)})
 
         expected_df_excluded = bad_df.copy()
-        expected_df_excluded['sc1'] = np.nan
+        expected_df_excluded.drop('sc1', axis=1, inplace=True)
 
         df_filtered, df_excluded = self.fpp.filter_on_column(bad_df, 'sc1',
                                                              'spkitemlab',
                                                              exclude_zeros=True)
 
         ok_(df_filtered.empty)
+        ok_("sc1" not in df_filtered.columns)
         assert_frame_equal(df_excluded, expected_df_excluded, check_dtype=False)
 
     def test_filter_on_column_std_epsilon_zero(self):
@@ -797,9 +796,12 @@ class TestFeaturePreprocessor:
          test_processed,
          info_processed) = self.fpp.preprocess_features(train, test, specs)
 
-        assert_frame_equal(train_processed, train_expected)
-        assert_frame_equal(test_processed, test_expected)
-        assert_frame_equal(info_processed, info_expected)
+        assert_frame_equal(train_processed.sort_index(axis=1),
+                           train_expected.sort_index(axis=1))
+        assert_frame_equal(test_processed.sort_index(axis=1),
+                           test_expected.sort_index(axis=1))
+        assert_frame_equal(info_processed.sort_index(axis=1),
+                           info_expected.sort_index(axis=1))
 
     def test_filter_data_features(self):
 
@@ -1158,38 +1160,6 @@ class TestFeatureSpecsProcessor:
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
         assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
 
-    def test_normalize_and_validate_json_feature_file(self):
-        feature_json = {'features': [{'feature': 'f1',
-                                      'transform': 'raw',
-                                      'sign': 1},
-                                     {'feature': 'f2',
-                                      'transform': 'inv',
-                                      'sign': -1}]}
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
-        assert_equal(new_feature_json, feature_json)
-
-    def test_normalize_json_feature_file_old_file(self):
-        old_feature_json = {'feats': [{'featN': 'f1', 'trans': 'raw', 'wt': 1},
-                                      {'featN': 'f2', 'trans': 'inv', 'wt': -1}]}
-        expected_feature_json = {'features': [{'feature': 'f1', 'transform': 'raw', 'sign': 1},
-                                              {'feature': 'f2', 'transform': 'inv', 'sign': -1}]}
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            new_feature_json = FeatureSpecsProcessor.normalize_and_validate_json(old_feature_json)
-        assert_equal(new_feature_json, expected_feature_json)
-
-    @raises(KeyError)
-    def test_normalize_and_validate_json_feature_file_missing_fields(self):
-        feature_json = {'features': [{'feature': 'f1',
-                                      'sign': 1},
-                                     {'feature': 'f2',
-                                      'transform': 'inv'}]}
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DeprecationWarning)
-            FeatureSpecsProcessor.normalize_and_validate_json(feature_json)
 
     def test_validate_feature_specs(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
@@ -1293,6 +1263,54 @@ class TestFeatureSubsetProcessor:
                                                                    feature_subset_specs,
                                                                    'high_entropy'),
                            ['Grammar', 'Vocabulary'])
+
+    def test_check_feature_subset_file_subset_only(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'subset1': [0, 1, 0]})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
+
+
+    def test_check_feature_subset_file_sign_only(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+
+    def test_check_feature_subset_file_sign_and_subset(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+'],
+                                      'subset1': [0, 1, 0]})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         subset='subset1',
+                                                         sign='SYS')
+
+    def test_check_feature_subset_file_sign_named_with_sign(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    def test_check_feature_subset_file_sign_named_with_Sign(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'Sign_SYS': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    @raises(ValueError)
+    def test_check_feature_subset_file_sign_named_something_else(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'SYS_sign': ['+', '-', '+']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
+
+    @raises(ValueError)
+    def test_check_feature_subset_file_multiple_sign_columns(self):
+        feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
+                                      'sign_SYS': ['+', '-', '+'],
+                                      'Sign_SYS': ['-', '+', '-']})
+        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
+                                                         sign='SYS')
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_feature_column(self):

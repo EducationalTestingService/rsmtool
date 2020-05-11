@@ -1,5 +1,5 @@
 {
     "summary_id": "model_comparison",
-    "experiment_dirs": ["lr-subgroups1", "lr-subgroups2", "lr-subgroups3"],
-    "description": "Comparison of rsmtool experiment with itself."
+    "experiment_dirs": ["lr-subgroups", "lr-with-trim-tolerance", "lr-subgroups"],
+    "description": "Comparison of rsmtool experiment with and without trim tolerance."
 }

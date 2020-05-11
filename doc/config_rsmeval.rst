@@ -3,9 +3,11 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an example configuration file for `rsmeval <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmeval`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmeval/config_rsmeval.json>`_ for ``rsmeval``. 
 
-There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
+.. note:: To make it easy to get started with  ``rsmeval``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
+
+Next, we describe all of the ``rsmeval`` configuration fields in detail. There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 experiment_id
 ~~~~~~~~~~~~~
@@ -101,8 +103,9 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
     
     - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
 
-        - variance of human scores for single and double-scored responses;
-        - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
+        - Number of single and double-scored responses.
+        - Variance of human rater errors and estimated variance of true scores
+        - Mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the evaluation.
 
@@ -133,6 +136,13 @@ A single numeric value or a dictionary with keys as the group names listed in th
 .. note::
 
     If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
+
+.. _rater_error_variance_rsmeval:
+
+rater_error_variance *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmeval`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmeval``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
 
 .. _scale_with_eval:
 

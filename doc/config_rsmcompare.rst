@@ -3,9 +3,11 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an example configuration file for `rsmcompare <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmcompare/config_rsmcompare.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmcompare/config_rsmcompare.json>`_ for ``rsmcompare``. 
 
-There are seven required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
+.. note:: To make it easy to get started with  ``rsmcompare``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
+
+Next, we describe all of the ``rsmcompare`` configuration fields in detail. There are seven required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 comparison_id
 ~~~~~~~~~~~~~
@@ -79,8 +81,9 @@ RSMTool provides pre-defined sections for ``rsmcompare`` (listed below) and, by 
 
     - ``true_score_evaluation``: compares the evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
 
-        - variance of human scores for single and double-scored responses;
-        - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
+        - Number of single and double-scored responses.
+        - Variance of human rater errors and estimated variance of true scores
+        - Mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
     - ``pca``: Shows the results of principal components analysis on the processed feature values for the new model only:
 

@@ -22,11 +22,11 @@ from os.path import (abspath,
 from traitlets.config import Config
 from nbconvert.exporters import HTMLExporter
 
-from rsmtool import HAS_RSMEXTRA
-from rsmtool.reader import DataReader
+from . import HAS_RSMEXTRA
+from .reader import DataReader
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (special_section_list_rsmtool,
+    from rsmextra.settings import (special_section_list_rsmtool, # noqa
                                    special_section_list_rsmeval,
                                    special_section_list_rsmcompare,
                                    special_section_list_rsmsummarize,
@@ -626,8 +626,11 @@ class Reporter:
                      else config['min_items_per_candidate'])
 
         # determine minimum and maximum scores for trimming
-        min_score = config['trim_min'] - config['trim_tolerance']
-        max_score = config['trim_max'] + config['trim_tolerance']
+        (used_trim_min,
+         used_trim_max,
+         trim_tolerance) = config.get_trim_min_max_tolerance()
+        min_score = used_trim_min - trim_tolerance
+        max_score = used_trim_max + trim_tolerance
 
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'DESCRIPTION': config['description'],
@@ -650,8 +653,10 @@ class Reporter:
                           'STANDARDIZE_FEATURES': config.get('standardize_features', True),
                           'FILE_FORMAT': config.get('file_format', 'csv'),
                           'USE_THUMBNAILS': config.get('use_thumbnails', False),
+                          'SKLL_FIXED_PARAMETERS': config.get('skll_fixed_parameters', {}),
                           'SKLL_OBJECTIVE': config.get('skll_objective', ''),
                           'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
+                          'RATER_ERROR_VARIANCE': config.get('rater_error_variance', None),
                           'CONTEXT': context,
                           'JAVASCRIPT_PATH': javascript_path,
                           'OUTPUT_DIR': csvdir,

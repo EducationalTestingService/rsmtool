@@ -19,7 +19,7 @@ from os.path import (abspath,
 
 import pandas as pd
 
-from rsmtool.container import DataContainer
+from .container import DataContainer
 
 
 def read_jsonlines(filename, converters=None):
@@ -51,8 +51,7 @@ def read_jsonlines(filename, converters=None):
         raise ValueError("The jsonlines file is not formatted correctly. "
                          "Please check that each line ends with a comma, "
                          "there is no comma at the end of the last line, "
-                         "and that all quotes match. Please also check that"
-                         "any undefined values are written out as `null` and not `NaN`.")
+                         "and that all quotes match.")
 
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:
@@ -63,7 +62,7 @@ def read_jsonlines(filename, converters=None):
     dfs = []
     for column in df:
         try:
-            df_column = pd.io.json.json_normalize(df[column])
+            df_column = pd.json_normalize(df[column])
         except AttributeError:
             df_column = df[column].copy()
 
@@ -228,7 +227,7 @@ class DataReader:
         ------
         ValueError
             If the file has an extension that we do not support
-        pd.parser.CParserError
+        pandas.errors.ParserError
             If the file is badly formatted or corrupt.
 
         Note
@@ -264,10 +263,10 @@ class DataReader:
             warnings.filterwarnings('ignore', category=pd.io.common.DtypeWarning)
             try:
                 df = do_read(filename, **kwargs)
-            except pd.parser.CParserError:
-                raise pd.parser.CParserError('Cannot read {}. Please check that it is '
-                                             'not corrupt or in an incompatible format. '
-                                             '(Try running dos2unix?)'.format(filename))
+            except pd.errors.ParserError:
+                raise pd.errors.ParserError('Cannot read {}. Please check that it is '
+                                            'not corrupt or in an incompatible format. '
+                                            '(Try running dos2unix?)'.format(filename))
         return df
 
     @staticmethod

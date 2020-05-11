@@ -17,8 +17,8 @@ from collections import defaultdict
 from scipy.stats import pearsonr
 from os.path import exists, join
 
-from rsmtool.reader import DataReader
-from rsmtool.utils import get_output_directory_extension
+from .reader import DataReader
+from .utils.files import get_output_directory_extension
 
 
 _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
@@ -123,32 +123,15 @@ class Comparer:
         smd_name = 'SMD'
 
         # previously, the QWK metric used `trim_round` scores; now, we use just `trim` scores;
-        # to ensure backward compatibility, we check whether `trim_round` scores were used and
-        # if so, we update the rename dictionary and column lists accordingly
+        # We check whether `trim_round` scores were used and
+        # raise an error if this is the case
         if any(col.endswith('trim_round') for col in df if col.startswith('wtkappa')):
-
-            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
-            rename_dict_new = {(key.replace('_trim', '_trim_round')
-                                if key.startswith('wtkappa') else key):
-                               (val.replace("(b)", "(br)")
-                                if val.startswith('QWK') else val)
-                               for key, val in rename_dict_new.items()}
-
-            # replace the `wtkappa_*_trim` with `wtkappa_*_trim_round`
-            existing_eval_cols_new = [col.replace('_trim', '_trim_round')
-                                      if col.startswith('wtkappa') else col
-                                      for col in existing_eval_cols_new]
-
-            # replace the `QWK(b)` with `QWK(br)`
-            short_metrics_list_new = [col.replace("(b)", "(br)")
-                                      if col.startswith('QWK') else col
-                                      for col in short_metrics_list_new]
-
-            if raise_warnings:
-                warnings.warn("Please note that newer versions of RSMTool (7.0 or greater) use only the trimmed "
-                              "scores for weighted kappa calculations. Comparisons with experiments using "
-                              "`trim_round` for weighted kappa calculations will be deprecated in the next "
-                              "major release.", category=DeprecationWarning)
+            raise ValueError("RSMTool (7.0 or greater) uses "
+                             "unrounded scores for weighted kappa calculations. At least one "
+                             "of your experiments was run "
+                             "using an older version of RSMTool that used  "
+                             "rounded scores instead. Please re-run "
+                             "the experiment with the latest version of RSMTool.")
 
         # we check if DSM was calculated (which is what we expect for subgroup evals),
         # and if so, we update the rename dictionary and column lists accordingly; we
@@ -475,16 +458,6 @@ class Comparer:
                                                                               existing_eval_cols,
                                                                               short_metrics_list,
                                                                               raise_warnings=False)
-
-                # if `SMD` is being used, rather than `DSM`, we print a note for the user; we don't
-                # want to go so far as to raise a warning, but we do want to give the user some info
-                if smd_name == 'SMD':
-                    warnings.warn("The subgroup evaluations in `{}` use 'SMD'. Please note "
-                                  "that newer versions of RSMTool (7.0 or greater) use 'DSM' with subgroup "
-                                  "evaluations. For additional details on how these metrics "
-                                  "differ, see the RSMTool documentation. Comparisons with experiments "
-                                  "using SMD for subgroup calculations will be deprecated in the next major "
-                                  "release.".format(group_eval_file), category=DeprecationWarning)
 
                 df_eval = df_eval[existing_eval_cols_new]
                 df_eval = df_eval.rename(columns=rename_dict_new)

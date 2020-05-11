@@ -2,10 +2,10 @@ doc2dash
 jupyter
 nose
 notebook
-numpy==1.14.6
-pandas==0.23.4
+numpy
+pandas
 seaborn
-skll==2.0.0
+skll==2.1.0
 statsmodels
 coverage
 coveralls

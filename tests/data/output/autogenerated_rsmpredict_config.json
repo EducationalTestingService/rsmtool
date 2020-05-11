@@ -1,0 +1,17 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmpredict
+    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
+    "experiment_id": "ENTER_VALUE_HERE",
+    "experiment_dir": "ENTER_VALUE_HERE",
+    "input_features_file": "ENTER_VALUE_HERE",
+    // OPTIONAL: replace default values below based on your data.
+    "candidate_column": null,
+    "file_format": "csv",
+    "flag_column": null,
+    "human_score_column": "sc1",
+    "id_column": "spkitemid",
+    "predict_expected_scores": false,
+    "second_human_score_column": null,
+    "standardize_features": true,
+    "subgroups": []
+}

@@ -60,6 +60,8 @@ Let's take a look at the options in our configuration file.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmpredict>`.
 
+.. note:: You can also use our nifty capability to :ref:`automatically generate <autogen_configuration>` ``rsmpredict`` configuration files rather than creating them manually.
+
 Run the experiment
 ~~~~~~~~~~~~~~~~~~
 Now that we have the model, the features in the right format, and our configuration file in ``.json`` format, we can use the :ref:`rsmpredict <usage_rsmpredict>` command-line script to generate the predictions and to save them in ``predictions.csv``.

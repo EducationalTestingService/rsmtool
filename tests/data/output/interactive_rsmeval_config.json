@@ -1,0 +1,35 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#experiment-configuration-file
+    "experiment_id": "testeval",
+    "predictions_file": "preds.csv",
+    "system_score_column": "pred",
+    "trim_min": 1,
+    "trim_max": 6,
+    // OPTIONAL: replace default values below based on your data.
+    "candidate_column": null,
+    "custom_sections": null,
+    "description": "an rsmeval test",
+    "exclude_zero_scores": true,
+    "file_format": "xlsx",
+    "flag_column": null,
+    "general_sections": [
+        "data_description",
+        "consistency",
+        "evaluation",
+        "true_score_evaluation",
+        "intermediate_file_paths",
+        "sysinfo"
+    ],
+    "human_score_column": "score",
+    "id_column": "ID",
+    "min_items_per_candidate": null,
+    "min_n_per_group": null,
+    "rater_error_variance": null,
+    "scale_with": null,
+    "second_human_score_column": "score2",
+    "section_order": null,
+    "special_sections": null,
+    "subgroups": [],
+    "trim_tolerance": 0.4998,
+    "use_thumbnails": true
+}

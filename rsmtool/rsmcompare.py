@@ -10,23 +10,18 @@ Script to compare two RSMTool experiments.
 :organization: ETS
 """
 
-
-import argparse
 import glob
 import logging
-import os
 import sys
 
-from os.path import (abspath,
-                     exists,
-                     join,
-                     normpath)
+from os.path import abspath, exists, join, normpath
 
-from rsmtool import VERSION_STRING
-from rsmtool.configuration_parser import ConfigurationParser, Configuration
-from rsmtool.reader import DataReader
-from rsmtool.reporter import Reporter
-from rsmtool.utils import LogFormatter
+from .configuration_parser import configure
+from .reader import DataReader
+from .reporter import Reporter
+from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
+from .utils.constants import VALID_PARSER_SUBCOMMANDS
+from .utils.logging import LogFormatter
 
 
 def check_experiment_id(experiment_dir, experiment_id):
@@ -69,59 +64,29 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or Configuration or Dictionary
-        Path to the experiment configuration file.
-        Users can also pass a `Configuration` object that is in memory
-        or a Python dictionary with keys corresponding to fields in the
-        configuration file.
-        Relative paths in the configuration file will be interpreted relative
-        to the location of the file. For configuration object
-        `.configdir` needs to be set to indicate the reference path. If
-        the user passes a dictionary, the reference path will be set to
-        the current directory and all relative paths will be resolved relative
-        to this path.
+    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+        Path to the experiment configuration file either a a string
+        or as a ``pathlib.Path`` object. Users can also pass a
+        ``Configuration`` object that is in memory or a Python dictionary
+        with keys corresponding to fields in the configuration file. Given a
+        configuration file, any relative paths in the configuration file
+        will be interpreted relative to the location of the file. Given a
+        ``Configuration`` object, relative paths will be interpreted
+        relative to the ``configdir`` attribute, that _must_ be set. Given
+        a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
 
     Raises
     ------
-    ValueError
-        If any of the required fields are missing or ill-specified.
+    FileNotFoundError
+        If either of the two input directories in ``config_file_or_obj_or_dict``
+        do not exist, or if the directories do not contain rsmtool outputs at all.
     """
 
     logger = logging.getLogger(__name__)
 
-    # check what sort of input we got
-    # if we got a string we consider this to be path to config file
-    if isinstance(config_file_or_obj_or_dict, str):
-
-        # Instantiate configuration parser object
-        parser = ConfigurationParser.get_configparser(config_file_or_obj_or_dict)
-        configuration = parser.read_normalize_validate_and_process_config(config_file_or_obj_or_dict,
-                                                                          context='rsmcompare')
-
-    elif isinstance(config_file_or_obj_or_dict, dict):
-
-        # initialize the parser from dict
-        parser = ConfigurationParser()
-        configuration = parser.load_normalize_and_validate_config_from_dict(config_file_or_obj_or_dict,
-                                                                            context='rsmcompare')
-
-    elif isinstance(config_file_or_obj_or_dict, Configuration):
-
-        configuration = config_file_or_obj_or_dict
-        # raise an error if we are passed a Configuration object
-        # without a configdir attribute. This can only
-        # happen if the object was constructed using an earlier version
-        # of RSMTool and stored
-        if configuration.configdir is None:
-            raise AttributeError("Configuration object must have configdir attribute.")
-
-    else:
-        raise ValueError("The input to run_comparison must be "
-                         "a path to the file (str), a dictionary, "
-                         "or a configuration object. You passed "
-                         "{}.".format(type(config_file_or_obj_or_dict)))
+    configuration = configure('rsmcompare', config_file_or_obj_or_dict)
 
     logger.info('Saving configuration file.')
     configuration.save(output_dir)
@@ -211,44 +176,59 @@ def main():
     # set up the basic logging configuration
     formatter = LogFormatter()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(formatter)
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is necessary
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
 
-    logging.root.addHandler(handler)
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
     logging.root.setLevel(logging.INFO)
-
-    # get a logger
     logger = logging.getLogger(__name__)
 
-    # set up an argument parser
-    parser = argparse.ArgumentParser(prog='rsmcompare')
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmcompare',
+                                 uses_output_directory=True,
+                                 uses_subgroups=True)
 
-    parser.add_argument('config_file', help="The JSON configuration file for "
-                                            "this comparison")
+    # if the first argument is not one of the valid sub-commands
+    # or one of the valid optional arguments, then assume that they
+    # are arguments for the "run" sub-command. This allows the
+    # old style command-line invocations to work without modification.
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ['-h', '--help',
+                                                      '-V', '--version']:
+        args_to_pass = ['run'] + sys.argv[1:]
+    else:
+        args_to_pass = sys.argv[1:]
+    args = parser.parse_args(args=args_to_pass)
 
-    parser.add_argument('output_dir', nargs='?', default=os.getcwd(),
-                        help="The output directory where the report "
-                             "files for this comparison will be stored")
+    # call the appropriate function based on which sub-command was run
+    if args.subcommand == 'run':
 
-    parser.add_argument('-V', '--version', action='version',
-                        version=VERSION_STRING)
+        # when running, log to stdout
+        logging.root.addHandler(stdout_handler)
 
-    # parse given command line arguments
-    args = parser.parse_args()
-    logger.info('Output directory: {}'.format(args.output_dir))
+        # run the experiment
+        logger.info('Output directory: {}'.format(args.output_dir))
+        run_comparison(abspath(args.config_file),
+                       abspath(args.output_dir))
 
-    # convert all paths to absolute to make sure
-    # all files can be found later
-    config_file = abspath(args.config_file)
-    output_dir = abspath(args.output_dir)
+    else:
 
-    # make sure that the given configuration file exists
-    if not exists(config_file):
-        raise FileNotFoundError("Main configuration file {} not "
-                                "found.".format(config_file))
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
 
-    # generate a comparison report
-    run_comparison(config_file, output_dir)
+        # auto-generate an example configuration and print it to STDOUT
+        generator = ConfigurationGenerator('rsmcompare',
+                                           as_string=True,
+                                           suppress_warnings=args.quiet,
+                                           use_subgroups=args.subgroups)
+        configuration = generator.interact() if args.interactive else generator.generate()
+        print(configuration)
 
 
 if __name__ == '__main__':

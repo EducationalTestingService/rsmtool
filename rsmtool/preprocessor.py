@@ -16,17 +16,15 @@ import numpy as np
 import pandas as pd
 
 from collections import defaultdict
-from os.path import dirname, abspath
 
 from numpy.random import RandomState
 
-from rsmtool.configuration_parser import Configuration
-from rsmtool.reader import DataReader
-from rsmtool.container import DataContainer
-from rsmtool.reporter import Reporter
-from rsmtool.transformer import FeatureTransformer
-from rsmtool.utils import convert_to_float
-from rsmtool.utils import is_built_in_model, is_skll_model
+from .container import DataContainer
+from .reader import DataReader
+from .reporter import Reporter
+from .transformer import FeatureTransformer
+from .utils.conversion import convert_to_float
+from .utils.models import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
@@ -120,13 +118,22 @@ class FeatureSubsetProcessor:
                                  "file can only contain 0 or 1")
 
         if sign:
-            if ('sign_{}'.format(sign) not in df_feature_specs and
-                    'Sign_{}'.format(sign) not in df_feature_specs):
+            possible_sign_columns = ['sign_{}'.format(sign),
+                                     'Sign_{}'.format(sign)]
+            existing_sign_columns = [c for c in possible_sign_columns
+                                     if c in df_feature_specs]
+            if len(existing_sign_columns) > 1:
+                raise ValueError("The feature_subset_file contains "
+                                 "multiple columns for sign: "
+                                 "{}".format(' ,'.join(existing_sign_columns)))
+            elif len(existing_sign_columns) == 0:
                 raise ValueError("The feature_subset_file must "
                                  "contain the requested "
                                  "sign column 'sign_{}'".format(sign))
+            else:
+                sign_column = existing_sign_columns[0]
 
-            if not df_feature_specs[subset].isin(['-', '+']).all():
+            if not df_feature_specs[sign_column].isin(['-', '+']).all():
                 raise ValueError("The sign columns in feature "
                                  "file can only contain - or +")
 
@@ -135,66 +142,6 @@ class FeatureSpecsProcessor:
     """
     Encapsulate feature file processing methods.
     """
-
-    @classmethod
-    def normalize_and_validate_json(cls, feature_json):
-        """
-        Normalize the field names in `feature_json` in order to maintain
-        backwards compatibility with old config files.
-
-        Parameters
-        ----------
-        feature_json : dict
-            JSON object containing the information
-            specified in the feature file, possibly
-            containing the old-style names for feature
-            fields.
-
-        Returns
-        -------
-        new_feature_json : dict
-            JSON object with all old style names normalized to
-            new style names.
-
-        Raises
-        ------
-        KeyError
-            If required fields are missing in the feature JSON file.
-        """
-
-        warnings.warn("""The ``normalize_and_validate_json`` method is deprecated """
-                      """and will be removed in the next release. Users can no longer """
-                      """specify JSON feature files for the RSMTool experiments.""",
-                      category=DeprecationWarning)
-
-        field_mapping = {'wt': 'sign',
-                         'featN': 'feature',
-                         'trans': 'transform'}
-
-        required_fields = ['feature', 'sign', 'transform']
-
-        new_feature_json = defaultdict(list)
-
-        feature_list = (feature_json['features'] if 'features' in feature_json
-                        else feature_json['feats'])
-
-        for feature_dict in feature_list:
-            new_feature_dict = {}
-            for field in feature_dict:
-                norm_field = (field_mapping[field] if field in field_mapping
-                              else field)
-                new_feature_dict[norm_field] = feature_dict[field]
-
-            new_feature_keys = new_feature_dict.keys()
-            missing_fields = set(required_fields).difference(new_feature_keys)
-            if missing_fields:
-                raise KeyError("The feature file does not "
-                               "contain the following fields: "
-                               "{}".format(','.join(missing_fields)))
-
-            new_feature_json['features'].append(new_feature_dict)
-
-        return new_feature_json
 
     @classmethod
     def generate_default_specs(cls, feature_names):
@@ -793,6 +740,9 @@ class FeaturePreprocessor:
         # create a copy of the original data frame
         df_filter = df.copy()
 
+        # we start out assuming that we will not drop this column
+        drop_column = False
+
         # return a copy of the original data frame if
         # the given column does not exist at all
         if column not in df.columns:
@@ -805,43 +755,54 @@ class FeaturePreprocessor:
 
         # Save the values that have been converted to NaNs
         # as a separate data frame. We want to keep them as NaNs
-        # to do more analyses later.
-        # We also filter out inf values. Since these can only be generated
-        # during transformations we convert them to NaNs for consistency.
-        bad_rows = df_filter[df_filter[column].isnull() | np.isinf(df_filter[column])]
+        # to do more analyses later. We also filter out inf values.
+        # Since these can only be generated during transformations,
+        # we include them with NaNs for consistency.
+        bad_rows = df_filter[column].isnull() | np.isinf(df_filter[column])
+        df_bad_rows = df_filter[bad_rows]
 
-        # drop the NaNs that we might have gotten
-        df_filter = df_filter[df_filter[column].notnull() & ~np.isinf(df_filter[column])]
+        # if the column contained only non-numeric values, we need to drop it
+        if len(df_bad_rows) == len(df_filter):
+            logging.info(f"Feature {column} was excluded from the model "
+                         f"because it only contains non-numeric values.")
+            drop_column = True
+
+        # now drop the above bad rows containing NaNs from our data frame
+        df_filter = df_filter[~bad_rows]
 
         # exclude zeros if specified
         if exclude_zeros:
-            zero_indices = df_filter[df_filter[column] == 0].index.values
-            zero_rows = df.loc[zero_indices]
-            df_filter = df_filter[df_filter[column] != 0]
+            zero_rows = df_filter[column] == 0
+            df_zero_rows = df_filter[zero_rows]
+            df_filter = df_filter[~zero_rows]
         else:
-            zero_rows = pd.DataFrame()
+            df_zero_rows = pd.DataFrame()
 
         # combine all the filtered rows into a single data frame
-        df_exclude = pd.concat([bad_rows, zero_rows], sort=True)
+        df_exclude = pd.concat([df_bad_rows, df_zero_rows], sort=True)
 
         # reset the index so that the indexing works correctly
         # for the next feature with missing values
         df_filter.reset_index(drop=True, inplace=True)
         df_exclude.reset_index(drop=True, inplace=True)
 
-        # Drop this column if the standard deviation equals zero:
+        # Check if the the standard deviation equals zero:
         # for training set sd == 0 will break normalization.
         # We set the tolerance level to the 6th digit
-        # to account for a possibility that the exact value
-        # computed by std is not 0
+        # to account for the possibility that the exact value
+        # computed by `std()` is not 0
         if exclude_zero_sd is True:
             feature_sd = df_filter[column].std()
             if np.isclose(feature_sd, 0, atol=1e-07):
-                logging.info("Feature {} was excluded from the model "
-                             "because its standard deviation in the "
-                             "training set is equal to 0.".format(column))
-                df_filter = df_filter.drop(column, 1)
-                df_exclude = df_exclude.drop(column, 1)
+                logging.info(f"Feature {column} was excluded from the model "
+                             f"because its standard deviation in the "
+                             f"training set is equal to 0.")
+                drop_column = True
+
+        # if `drop_column` is true, then we need to drop the column
+        if drop_column:
+            df_filter = df_filter.drop(column, axis=1)
+            df_exclude = df_exclude.drop(column, axis=1)
 
         # return the filtered rows and the new data frame
         return (df_filter, df_exclude)
@@ -1666,12 +1627,6 @@ class FeaturePreprocessor:
         if feature_subset_file is not None:
             feature_subset_file = DataReader.locate_files(feature_subset_file, configdir)
 
-        # get the experiment ID
-        experiment_id = config_obj['experiment_id']
-
-        # get the description
-        description = config_obj['description']
-
         # get the column name for the labels for the training and testing data
         train_label_column = config_obj['train_label_column']
         test_label_column = config_obj['test_label_column']
@@ -1744,9 +1699,6 @@ class FeaturePreprocessor:
         # are we generating fake labels?
         use_fake_train_labels = train_label_column == 'fake'
         use_fake_test_labels = test_label_column == 'fake'
-
-        # are we analyzing scaled or raw prediction values
-        use_scaled_predictions = config_obj['use_scaled_predictions']
 
         # are we using truncations from the feature specs?
         use_truncations = config_obj['use_truncation_thresholds']
@@ -1950,37 +1902,21 @@ class FeaturePreprocessor:
                                                      standardize_features,
                                                      use_truncations)
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'train_file_location': train_file_location,
-                           'test_file_location': test_file_location,
-                           'model_name': model_name,
-                           'model_type': model_type,
-                           'train_label_column': train_label_column,
-                           'test_label_column': test_label_column,
-                           'id_column': id_column,
-                           'length_column': length_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'subgroups': subgroups,
-                           'feature_subset_file': feature_subset_file,
-                           'trim_min': used_trim_min,
-                           'trim_max': used_trim_max,
-                           'trim_tolerance': spec_trim_tolerance,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'standardize_features': standardize_features,
-                           'min_items': min_items,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # configuration options that either override previous values or are
+        # entirely for internal use
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'chosen_notebook_files': chosen_notebook_files,
+                                 'exclude_listwise': exclude_listwise,
+                                 'feature_subset_file': feature_subset_file,
+                                 'model_name': model_name,
+                                 'model_type': model_type,
+                                 'test_file_location': test_file_location,
+                                 'train_file_location': train_file_location,
+                                 'trim_min': used_trim_min,
+                                 'trim_max': used_trim_max}
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   configdir=config_obj.configdir,
-                                   filename=config_obj.filename)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         new_container = [{'name': 'train_features',
                           'frame': df_train_features},
@@ -2005,7 +1941,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmeval(self, config_obj, data_container_obj):
         """
@@ -2039,12 +1975,6 @@ class FeaturePreprocessor:
 
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
-
-        # get the experiment ID
-        experiment_id = config_obj['experiment_id']
-
-        # get the description
-        description = config_obj['description']
 
         # get the column name for the labels for the training and testing data
         human_score_column = config_obj['human_score_column']
@@ -2320,24 +2250,15 @@ class FeaturePreprocessor:
 
         df_pred_other_columns = df_filtered_pred[other_columns]
 
-        new_config_dict = {'experiment_id': experiment_id,
-                           'subgroups': subgroups,
-                           'description': description,
-                           'pred_file_location': pred_file_location,
-                           'id_column': id_column,
-                           'second_human_score_column': second_human_score_column,
-                           'candidate_column': candidate_column,
-                           'use_scaled_predictions': use_scaled_predictions,
-                           'exclude_zero_scores': exclude_zero_scores,
-                           'exclude_listwise': exclude_listwise,
-                           'chosen_notebook_files': chosen_notebook_files}
+        # add internal configuration options that we need
+        new_config_obj = config_obj.copy()
+        internal_options_dict = {'pred_file_location': pred_file_location,
+                                 'exclude_listwise': exclude_listwise,
+                                 'use_scaled_predictions': use_scaled_predictions,
+                                 'chosen_notebook_files': chosen_notebook_files}
 
-        config_as_dict = config_obj.to_dict()
-        config_as_dict.update(new_config_dict)
-
-        new_config = Configuration(config_as_dict,
-                                   filename=config_obj.filename,
-                                   configdir=config_obj.configdir)
+        for key, value in internal_options_dict.items():
+            new_config_obj[key] = value
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[['spkitemid'] + [column for column in df_excluded
@@ -2362,7 +2283,7 @@ class FeaturePreprocessor:
 
         new_container = DataContainer(new_container)
 
-        return new_config, new_container
+        return new_config_obj, new_container
 
     def process_data_rsmpredict(self, config_obj, data_container_obj):
         """
@@ -2479,7 +2400,7 @@ class FeaturePreprocessor:
 
         # if we are using a newly trained model, use trim_tolerance from the
         # df_postproc_params. If not, set it to the default value and show
-        # deprecation warning
+        # warning
         if 'trim_tolerance' in df_postproc_params:
             trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
         else:

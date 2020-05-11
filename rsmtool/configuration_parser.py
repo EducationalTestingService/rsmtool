@@ -9,85 +9,105 @@ and creating configuration objects.
 :organization: ETS
 """
 
-import functools
 import json
 import logging
 import re
-import warnings
 
 from copy import copy, deepcopy
 from collections import Counter
-from configparser import ConfigParser
+from os import getcwd
+from os.path import abspath
 
-from os import getcwd, makedirs
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join,
-                     splitext)
-
-from ruamel import yaml
-
-from rsmtool import HAS_RSMEXTRA
-from rsmtool.utils import parse_json_with_comments
-from rsmtool.utils import (DEFAULTS,
-                           CHECK_FIELDS,
-                           LIST_FIELDS,
-                           BOOLEAN_FIELDS,
-                           MODEL_NAME_MAPPING,
-                           FIELD_NAME_MAPPING,
-                           ID_FIELDS,
-                           is_skll_model)
+from pathlib import Path
 
 from skll import Learner
 from skll.metrics import SCORERS
 
+from . import HAS_RSMEXTRA
+from .utils.constants import (DEFAULTS,
+                              CHECK_FIELDS,
+                              LIST_FIELDS,
+                              BOOLEAN_FIELDS,
+                              ID_FIELDS)
+
+from .utils.files import parse_json_with_comments
+from .utils.models import is_skll_model
+
+
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file,
+    from rsmextra.settings import (default_feature_subset_file, # noqa
                                    default_feature_sign)
 
 
-def deprecated_positional_argument():
+def configure(context, config_file_or_obj_or_dict):
     """
-    This decorator allows the Configuration class to:
+    Get the configuration for ``context`` from the input
+    ``config_file_or_obj_or_dict``.
 
-    (a) accept the old method of specifying the now-deprecated ``filepath`` positional argument,
-    (b) accept the new method of specifying ``configdir`` and ``filename`` keyword arguments, but
-    (c) disallow using the old and the new methods in the same call
+    Parameters
+    ----------
+    context : str
+        The context that is being configured. Must be one of
+        ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmsummarize``, or
+        ``rsmpredict``.
+    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+        Path to the experiment configuration file either a a string
+        or as a ``pathlib.Path`` object. Users can also pass a
+        ``Configuration`` object that is in memory or a Python dictionary
+        with keys corresponding to fields in the configuration file. Given a
+        configuration file, any relative paths in the configuration file
+        will be interpreted relative to the location of the file. Given a
+        ``Configuration`` object, relative paths will be interpreted
+        relative to the ``configdir`` attribute, that _must_ be set. Given
+        a dictionary, the reference path is set to the current directory.
 
-    Adapted from: https://stackoverflow.com/a/49802489
+    Returns
+    -------
+    configuration : Configuration
+        The Configuration object for the tool.
+
+    Raises
+    ------
+    AttributeError
+        If the ``configdir`` attribute for the Configuration input is not set.
+    ValueError
+        If ``config_file_or_obj_or_dict`` contains anything except a string,
+        a path, a dictionary, or a ``Configuration`` object.
     """
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args, **kwargs):
-            # if we received two positional arguments
-            if len(args) > 2:
-                # if we also received a keyword argument for filepath
-                # or configdir, raise an error
-                if 'filename' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath "
-                                     "positional argument and the new-style filename "
-                                     "keyword argument.")
-                if 'configdir' in kwargs:
-                    raise ValueError("Cannot specify both the deprecated filepath "
-                                     "positional argument and the new-style configdir "
-                                     "keyword argument.")
-                # raise deprecation warning
-                warnings.warn("The filepath positional argument is deprecated and "
-                              " will be removed in v8.0. Use the ``configdir`` and "
-                              "``filename`` keyword arguments instead.",
-                              DeprecationWarning)
+    # check what sort of input we got
+    # if we got a string we consider this to be path to config file
+    if isinstance(config_file_or_obj_or_dict, (str, Path)):
 
-                # split filepath into
-                # configdir and filename
-                filepath = args[-1]
-                kwargs['filename'] = basename(filepath)
-                kwargs['configdir'] = dirname(abspath(filepath))
-                # remove filepath from positional arguments
-                args = args[:-1]
-            return f(*args, **kwargs)
-        return wrapper
-    return decorator
+        # Instantiate configuration parser object
+        parser = ConfigurationParser(config_file_or_obj_or_dict)
+        configuration = parser.parse(context=context)
+
+    elif isinstance(config_file_or_obj_or_dict, dict):
+
+        # directly instantiate the Configuration from the dictionary
+        configuration = Configuration(config_file_or_obj_or_dict,
+                                      context=context)
+
+    elif isinstance(config_file_or_obj_or_dict, Configuration):
+
+        # raise an error if we are passed a Configuration object
+        # without a configdir attribute. This can only
+        # happen if the object was constructed using an earlier version
+        # of RSMTool and stored
+        try:
+            assert config_file_or_obj_or_dict.configdir is not None
+        except AssertionError:
+            raise AttributeError("Configuration object must have configdir attribute.")
+        else:
+            configuration = config_file_or_obj_or_dict
+
+    else:
+        raise ValueError("The input to run_experiment must be "
+                         "a path to the file (str), a dictionary, "
+                         "or a configuration object. You passed "
+                         "{}.".format(type(config_file_or_obj_or_dict)))
+
+    return configuration
 
 
 class Configuration:
@@ -97,28 +117,20 @@ class Configuration:
     parameters.
     """
 
-    @deprecated_positional_argument()
     def __init__(self,
-                 config_dict,
+                 configdict,
                  *,
                  configdir=None,
-                 filename=None,
                  context='rsmtool'):
         """
         Create an object of the `Configuration` class.
 
-        Note that usually the Configuration
-        object used for RSMTool experiments is created using
-        `ConfigurationParser.load_normalize_and_validate_config_from_dict()` or
-        `ConfigurationParser.read_normalize_validate_and_process_config()`.
-        You should directly instantiate a Configuration object only if
-        you already have a normalized configuration dictionary
-        (e.g., from previous RSMTool experiments).
-
+        This method can be used to directly instantiate a Configuration
+        object.
 
         Parameters
         ----------
-        config_dict : dict
+        configdict : dict
             A dictionary of configuration parameters.
             The dictionary must be a valid configuration dictionary
             with default values filled as necessary.
@@ -128,30 +140,29 @@ class Configuration:
             object. When None, will be set during
             initialization to the current working directory.
             Defaults to None
-        filename : str, optional, keyword-only
-            The name of the configuration file.
-            The file must be stored in configdir.
-            This argument is not used in RSMTool and only added for
-            backwards compatibility for the deprecated `filepath` attribute.
-            Defaults to None.
         context : {'rsmtool', 'rsmeval', 'rsmcompare',
                    'rsmpredict', 'rsmsummarize'}
             The context of the tool.
             Defaults to 'rsmtool'.
         """
 
-        self._config = config_dict
-        self._context = context
+        if not isinstance(configdict, dict):
+            raise TypeError('The input must be a dictionary.')
+
+        # process and validate the configuration dictionary
+        configdict = ConfigurationParser.process_config(configdict)
+        configdict = ConfigurationParser.validate_config(configdict, context=context)
 
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
-            configdir = getcwd()
+            configdir = Path(getcwd())
             logging.info("Configuration directory will be set to {}".format(configdir))
         else:
-            configdir = abspath(configdir)
+            configdir = Path(configdir).resolve()
 
+        self._config = configdict
         self._configdir = configdir
-        self._filename = filename
+        self._context = context
 
     def __contains__(self, key):
         """
@@ -212,15 +223,22 @@ class Configuration:
 
     def __str__(self):
         """
-        Return string representation of the object keys
-        as comma-separated list.
+        Return a string representation of the underlying configuration
+        dictionary.
 
         Returns
         -------
-        config_names : str
-            A comma-separated list of names from the config dictionary.
+        config_string : str
+            A string representation of the underlying configuration
+            dictionary as encoded by ``json.dumps()``. It only
+            includes the configuration options that can be set by
+            the user.
         """
-        return ', '.join(self._config)
+        expected_fields = (CHECK_FIELDS[self._context]['required'] +
+                           CHECK_FIELDS[self._context]['optional'])
+
+        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
+        return json.dumps(output_config, indent=4, separators=(',', ': '))
 
     def __iter__(self):
         """
@@ -235,53 +253,6 @@ class Configuration:
             yield key
 
     @property
-    def filepath(self):
-        """
-        Get file path to the configuration file.
-
-        .. deprecated:: 8.0
-
-            ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
-            ``filename`` instead.
-
-        Returns
-        -------
-        filepath : str
-            The path for the config file.
-        """
-        warnings.warn("The `filepath` attribute of the Configuration "
-                      "object will be removed in RSMTool v8.0."
-                      "Use the `configdir` and `filename` attributes if you "
-                      "need the full path to the "
-                      "configuration file", DeprecationWarning)
-        filepath = join(self.configdir, self.filename)
-        return filepath
-
-    @filepath.setter
-    def filepath(self, new_path):
-        """
-        Set a new file path to configuration file.
-
-        .. deprecated:: 8.0
-        ``filepath`` will be removed in RSMTool v8.0. Use ``configdir`` and
-        ``filename`` instead.
-
-        Parameters
-        ----------
-        new_path : str
-            A new file path for the Configuration object.
-        """
-        warnings.warn("The `filepath` attribute of the Configuration "
-                      "object will be removed in RSMTool 8.0 "
-                      "use `configdir` and `filename` if you "
-                      "need to set a new path to the "
-                      "configuration file", DeprecationWarning)
-        new_filename = basename(new_path)
-        new_configdir = dirname(abspath(new_path))
-        self._filename = new_filename
-        self._configdir = new_configdir
-
-    @property
     def configdir(self):
         """
         Get the path to the configuration reference directory that
@@ -293,7 +264,7 @@ class Configuration:
         configdir : str
             The path to the configuration reference directory
         """
-        return self._configdir
+        return str(self._configdir)
 
     @configdir.setter
     def configdir(self, new_path):
@@ -310,31 +281,11 @@ class Configuration:
 
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
-        self._configdir = abspath(new_path)
 
-    @property
-    def filename(self):
-        """
-        Get the name of the configuration file.
+        # TODO: replace `Path(abspath(new_path))` with `Path(new_path).resolve()
+        # once this Windows bug is fixed: https://bugs.python.org/issue38671
+        self._configdir = Path(abspath(new_path))
 
-        Returns
-        -------
-        filename : str
-            The name of the configuration file
-        """
-        return self._filename
-
-    @filename.setter
-    def filename(self, new_path):
-        """
-        Set a new name of the configuration file
-
-        Parameters
-        ----------
-        new_name : str
-            New name of the configuration file
-        """
-        self._filename = new_path
 
     @property
     def context(self):
@@ -471,23 +422,19 @@ class Configuration:
 
         # save a copy of the main config into the output directory
         if output_dir is None:
-            output_dir = getcwd()
+            output_dir = Path(getcwd())
 
         # Create output directory, if it does not exist
-        output_dir = join(output_dir, 'output')
-        makedirs(output_dir, exist_ok=True)
+        output_dir = Path(output_dir).resolve() / 'output'
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
-        outjson = join(output_dir,
-                       '{}_{}.json'.format(self._config[id_field],
-                                           self._context))
+        experiment_id = self._config[id_field]
+        context = self._context
+        outjson = output_dir / f"{experiment_id}_{context}.json"
 
-        expected_fields = (CHECK_FIELDS[self._context]['required'] +
-                           CHECK_FIELDS[self._context]['optional'])
-
-        output_config = {k: v for k, v in self._config.items() if k in expected_fields}
-        with open(outjson, 'w') as outfile:
-            json.dump(output_config, outfile, indent=4, separators=(',', ': '))
+        with outjson.open(mode='w') as outfile:
+            outfile.write(str(self))
 
     def check_exclude_listwise(self):
         """
@@ -602,24 +549,6 @@ class Configuration:
                                               model_eval))
         return new_filter_dict
 
-    def get_trim_min_max(self):
-        """
-        This function is kept for backwards compatibility.
-        It is now replaced by get_trim_min_max_tolerance
-        and will be deprecated in future versions.
-
-        Returns
-        -------
-        spec_trim_min : float
-            Specified trim min value
-        spec_trim_max : float
-            Specified trim max value
-        """
-        logging.warning("get_trim_min_max method has been replaced by  "
-                        "get_trim_min_max_tolerance() and will "
-                        "not be supported in future releases.")
-        (trim_min, trim_max, tolerance) = self.get_trim_min_max_tolerance()
-        return (trim_min, trim_max)
 
     def get_trim_min_max_tolerance(self):
         """
@@ -649,6 +578,24 @@ class Configuration:
         if spec_trim_tolerance:
             spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
+
+    def get_rater_error_variance(self):
+        """
+        Get specified rater error variance, if any, and make sure it's numeric.
+
+        Returns:
+        --------
+        rater_error_variance : float
+            specified rater error variance
+        """
+        config = self._config
+
+        rater_error_variance = config.get('rater_error_variance', None)
+
+        if rater_error_variance:
+            rater_error_variance = float(rater_error_variance)
+
+        return rater_error_variance
 
     def get_default_converter(self):
         """
@@ -730,162 +677,115 @@ class Configuration:
 
 class ConfigurationParser:
     """
-    A `ConfigurationParser` class to create a
-    `Configuration` object.
+    A `ConfigurationParser` class to create a `Configuration` object.
     """
 
-    def __init__(self):
-
-        # Set configuration object to None
-        self._config = None
-        self._filename = None
-        self._configdir = None
-
-    def _check_config_is_loaded(self):
+    def __init__(self, pathlike):
         """
-        Check to make sure a configuration file
-        or dictionary was loaded; otherwise,
-        raise ``NameError``.
-
-        Raises
-        ------
-        NameError
-            If no configuration file or dictionary was loaded.
-        """
-        if self._config is None:
-            raise NameError('No configuration file was loaded '
-                            'Make sure to load a configuration file '
-                            'from a dict using the `load_config_from_dict()` '
-                            'method or use the `read_config_from_file()` method '
-                            'with the appropriate sub-class object to read from '
-                            'a file. You can use the `get_configparser` class '
-                            'method to instantiate the appropriate sub-class '
-                            'object for reading either `.json` or `.cfg` files.')
-
-
-    @classmethod
-    def get_configparser(cls, filepath, *args, **kwargs):
-        """
-        Get the correct `ConfigurationParser` object,
-        based on the file extension.
+        Instantiate a ConfigurationParser for a given config file path.
 
         Parameters
         ----------
-        filepath : str
-            The path to the configuration file.
+        pathlike : str or pathlib.Path
+            A string containing the path to the configuration file
+            that is to be parsed. A ``pathlib.Path`` instance is also
+            acceptable.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the given path does not exist.
+        OSError:
+            If the given path is a directory, not a file.
+        ValueError
+            If the file at the given path does not have
+            a valid extension (``.json``).
+        """
+        # if we passed in a string, convert it to a Path
+        if isinstance(pathlike, str):
+            pathlike = Path(pathlike)
+
+        # raise an exception if the file does not exist
+        if not pathlike.exists():
+            raise FileNotFoundError(f"The configuration file {pathlike} "
+                                    f"was not found.")
+
+        # raise an exception if the user specified a directory
+        if not pathlike.is_file():
+            raise OSError(f"The given path {pathlike} should be a "
+                          f"file, not a directory.")
+
+        # make sure we have a file that ends in ".json"
+        extension = pathlike.suffix.lower()
+        if extension != '.json':
+            raise ValueError(f"The configuration file must be in `.json` "
+                             f"format. You specified: {extension}.")
+
+        # set the various attributes to None
+        self._filename = pathlike.name
+        self._configdir = pathlike.resolve().parent
+
+    @staticmethod
+    def _fix_json(json_string):
+        """
+        Takes a bit of JSON that might have bad quotes
+        or capitalized booleans and fixes that stuff.
+
+        Parameters
+        ----------
+        json_string : str
+            A string to be reformatted for JSON parsing.
+
+        Return
+        ------
+        json_string : str
+            The updated string.
+        """
+        json_string = json_string.replace('True', 'true')
+        json_string = json_string.replace('False', 'false')
+        json_string = json_string.replace("'", '"')
+        return json_string
+
+    def _parse_json_file(self, filepath):
+        """
+        A private method to parse JSON configuration files and return
+        a Python dictionary.
+
+        Parameters
+        ----------
+        filepath : pathlib.Path
+            A ``pathlib.Path`` object containing the JSON configuration filepath.
 
         Returns
         -------
-        config : ConfigurationParser
-            The configuration parser object.
+        configdict : dict
+            A Python dictionary containing the parameters from the
+            JSON configuration file.
 
         Raises
         ------
         ValueError
-            If config file is not .json or .cfg.
+            If the JSON file could not be parsed.
         """
-        _, extension = splitext(filepath)
-        if extension.lower() not in CONFIG_TYPE:
-            raise ValueError('Configuration file must be '
-                             'in either `.json` or `.cfg`'
-                             'format. You specified: {}.'.format(extension))
+        try:
+            configdict = parse_json_with_comments(filepath)
+        except ValueError:
+            raise ValueError('The main configuration file `{}` exists but '
+                             'is formatted incorrectly. Please check that '
+                             'each line ends with a comma, there is no comma '
+                             'at the end of the last line, and that all quotes '
+                             'match.'.format(filepath))
 
-        return CONFIG_TYPE[extension.lower()](*args, **kwargs)
+        return configdict
 
-    @staticmethod
-    def check_id_fields(id_field_values):
+
+    def parse(self, context='rsmtool'):
         """
-        Check whether the ID fields in the given dictionary
-        are properly formatted, i.e., they ::
-        - do not contain any spaces
-        - are shorter than 200 characters
+        Parse the configuration file for which this parser was
+        instantiated.
 
         Parameters
         ----------
-        id_field_values : dict
-            A dictionary containing the ID fields names
-            as the keys and the value from the configuration
-            file as the value.
-
-        Raises
-        ------
-        ValueError
-            If the values for the ID fields in the given
-            dictionary are not formatted correctly.
-        """
-
-        for id_field, id_field_value in id_field_values.items():
-            if len(id_field_value) > 200:
-                raise ValueError("{} is too long (must be "
-                                 "<=200 characters)".format(id_field))
-
-            if re.search(r'\s', id_field_value):
-                raise ValueError("{} cannot contain any "
-                                 "spaces".format(id_field))
-
-    def load_config_from_dict(self,
-                              config_dict,
-                              configdir=None):
-        """
-        Load configuration dictionary.
-
-        Parameters
-        ----------
-        config_dict : dict
-            A dictionary containing the configuration
-            parameters to parse.
-        configdir : str, optional
-            Path to the reference directory used to resolve
-            any relative path in the dictionary. If not specified,
-            the current working directory will be used.
-        filename: str, optional
-
-
-        Raises
-        ------
-        TypeError
-            If `config_dict` is not a ``dict``
-        AttributeError
-            If config has already been assigned.
-        """
-        if not isinstance(config_dict, dict):
-            raise TypeError('The `config_dict` must be a dictionary.')
-
-        if self._config is None:
-            self._config = config_dict
-        else:
-            raise AttributeError('A configuration dictionary has already'
-                                 'been assigned. You cannot assign another'
-                                 'dictionary.')
-
-        if configdir is None:
-            configdir = getcwd()
-
-        self._configdir = abspath(configdir)
-        logging.info("Configuration directory will be set to {}".format(self._configdir))
-
-        # set filename to none since there was no configuration file.
-        # If the user for some reason wants
-        # to set it, they can do so explicitly.
-        self._filename = None
-
-
-    def load_normalize_and_validate_config_from_dict(self,
-                                                     config_dict,
-                                                     configdir=getcwd(),
-                                                     context='rsmtool'):
-        """
-        Load configuration dictionary.
-
-        Parameters
-        ----------
-        config_dict : dict
-            A dictionary containing the configuration
-            parameters to parse.
-        configdir : str, optional
-            Path to the reference directory used to resolve
-            any relative path in the dictionary.
-            Defaults to the current working directory.
         context : str, optional
             Context of the tool in which we are validating.
             Possible values are ::
@@ -897,130 +797,23 @@ class ConfigurationParser:
 
         Returns
         -------
-        config_obj : Configuration
-            A configuration object
-        """
-        self.load_config_from_dict(config_dict, configdir)
-        return self.normalize_validate_and_process_config(context=context)
-
-
-
-
-    def read_config_from_file(self, filepath):
-        """
-        Read the configuration file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-
-        Raises
-        ------
-        NotImplementedError
-            This method must be implemented in subclass.
-        """
-        raise NotImplementedError("The method `read_config_from_file()` "
-                                  "is only implemented in the subclasses "
-                                  "``CFGConfigurationParser`` and "
-                                  "``JSONConfigurationParser``. "
-                                  "You can use the class method "
-                                  "`get_configparser()` to retrieve "
-                                  "the correct configuration parser object "
-                                  "for parsing JSON or CFG files.")
-
-    def normalize_config(self, inplace=True):
-        """
-        Normalize the field names in `self._config` or `config` in order to
-        maintain backwards compatibility with old configuration files.
-
-        Parameters
-        ----------
-        inplace : bool
-            Maintain the state of the config object produced by
-            this method.
-            Defaults to True.
-
-        Returns
-        -------
-        new_config : Configuration
-            A normalized configuration object
-
-        Raises
-        ------
-        ValueError
-            If no JSON configuration object exists, or if value passed for
-            `use_scaled_predictions` is in the wrong format.
+        configuration : Configuration
+            A Configuration object containing the parameters in the
+            file that we instantiated the parser for.
         """
 
-        # Check to make sure a configuration file
-        # or dictionary has been loaded.
-        self._check_config_is_loaded()
+        filepath = self._configdir / self._filename
+        configdict = self._parse_json_file(filepath)
 
-        # Get the parameter dictionary
-        config = self._config
-
-        # Create a new JSON object with the normalized field names
-        new_config = {}
-
-        for field_name in config:
-
-            if field_name in FIELD_NAME_MAPPING:
-                norm_field_name = FIELD_NAME_MAPPING[field_name]
-                warnings.warn("""The field name "{}" is deprecated """
-                              """and will be removed  in a future """
-                              """release, please use the """
-                              """new field name "{}" """
-                              """instead.""".format(field_name,
-                                                    norm_field_name),
-                              category=DeprecationWarning)
-            else:
-                norm_field_name = field_name
-
-            new_config[norm_field_name] = config[field_name]
-
-        # Convert old values for prediction scaling:
-        if 'use_scaled_predictions' in new_config:
-            if new_config['use_scaled_predictions'] in ['scale', True]:
-                new_config['use_scaled_predictions'] = True
-            elif new_config['use_scaled_predictions'] in ['raw', False]:
-                new_config['use_scaled_predictions'] = False
-            else:
-                raise ValueError("Please use the new format "
-                                 "to specify prediction scaling:\n "
-                                 "'use_scaled_predictions': true/false")
-
-        # Convert old model names to new ones, if we have them
-        if 'model' in new_config:
-            model_name = new_config['model']
-
-            if model_name == 'empWtDropNeg':
-
-                # If someone is using `empWtDropNeg`, we tell them that it is
-                # no longer available and they should be using NNLR instead.
-                logging.error("""The model name "empWtDropNeg" is """
-                              """no longer available, please use the """
-                              """equivalent model "NNLR" instead.""")
-
-            # Otherwise, just raise a deprecation warning if they are using
-            # an old model name
-            elif model_name in MODEL_NAME_MAPPING:
-                norm_model_name = MODEL_NAME_MAPPING[model_name]
-                warnings.warn("""The model name "{}" is deprecated """
-                              """and will be removed  in a future """
-                              """release, please use the new model """
-                              """name "{}" instead.""".format(model_name,
-                                                              norm_model_name),
-                              category=DeprecationWarning)
-                new_config['model'] = norm_model_name
-
-        if inplace:
-            self._config = new_config
-        return Configuration(self._config,
+        # create a new Configuration object which will automatically
+        # process and validate the configuration
+        # dictionary being passed in
+        return Configuration(configdict,
                              configdir=self._configdir,
-                             filename=self._filename,)
+                             context=context)
 
-    def validate_config(self, context='rsmtool', inplace=True):
+    @classmethod
+    def validate_config(cls, config, context='rsmtool'):
         """
         Ensure that all required fields are specified, add default values
         values for all unspecified fields, and ensure that all specified
@@ -1052,12 +845,8 @@ class ConfigurationParser:
             If config does not exist, and no config passed.
         """
 
-        # Check to make sure a configuration file
-        # or dictionary has been loaded.
-        self._check_config_is_loaded()
-
-        # Get the parameter dictionary
-        new_config = self._config
+        # make a copy of the given parameter dictionary
+        new_config = deepcopy(config)
 
         # 1. Check to make sure all required fields are specified
         required_fields = CHECK_FIELDS[context]['required']
@@ -1082,11 +871,19 @@ class ConfigurationParser:
                                  " in json file".format(field))
 
         # 4. Check to make sure that the ID fields that will be
-        # used as part of filenames formatted correctly
+        # used as part of filenames are formatted correctly
+        # i.e., they do not contain any spaces and are < 200 characters
         id_field = ID_FIELDS[context]
         id_field_values = {id_field: new_config[id_field]}
 
-        self.check_id_fields(id_field_values)
+        for id_field, id_field_value in id_field_values.items():
+            if len(id_field_value) > 200:
+                raise ValueError("{} is too long (must be "
+                                 "<=200 characters)".format(id_field))
+
+            if re.search(r'\s', id_field_value):
+                raise ValueError("{} cannot contain any "
+                                 "spaces".format(id_field))
 
         # 5. Check that the feature file and feature subset/subset file are not
         # specified together
@@ -1107,7 +904,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You requested feature subsets but did not "
                                 "specify any feature file. "
@@ -1122,7 +919,7 @@ class ConfigurationParser:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
-                default_basename = basename(default_feature_subset_file)
+                default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
                 logging.warning("You specified the expected sign of "
                                 "correlation but did not specify a feature "
@@ -1164,7 +961,18 @@ class ConfigurationParser:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
                                      "documentation and choose a valid tuning objective.")
 
-        # 9. Check that if we are running rsmtool to ask for
+        # 9. Check that if "skll_fixed_parameters" is specified,
+        # it's specified for SKLL model and _not_ a built-in linear
+        # regression model; we cannot check whether the parameters
+        # are valid at parse time but SKLL will raise an error
+        # at run time for any invalid parameters
+        if new_config['skll_fixed_parameters']:
+            if not is_skll_model(new_config['model']):
+                logging.warning("You specified custom SKLL fixed parameters but "
+                                "also chose a non-SKLL model. The parameters will "
+                                "be ignored.")
+
+        # 10. Check that if we are running rsmtool to ask for
         # expected scores then the SKLL model type must actually
         # support probabilistic classification. If it's not a SKLL
         # model at all, we just treat it as a LinearRegression model
@@ -1177,13 +985,13 @@ class ConfigurationParser:
                                  "since it is not a probablistic classifier.".format(model_name))
             del dummy_learner
 
-        # 10. Check the fields that requires rsmextra
+        # 11. Check the fields that requires rsmextra
         if not HAS_RSMEXTRA:
             if new_config['special_sections']:
                 raise ValueError("Special sections are only available to ETS"
                                  " users by installing the rsmextra package.")
 
-        # 11. Raise a warning if we are specifiying a feature file but also
+        # 12. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
             logging.warning("You specified a feature file but also set "
@@ -1193,14 +1001,14 @@ class ConfigurationParser:
                             "the automatically selected transformations "
                             "and signs.")
 
-        # 12. If we have `experiment_names`, check that the length of the list
+        # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
         if context == 'rsmsummarize' and new_config['experiment_names']:
             if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
                 raise ValueError("The number of specified experiment names should be the same"
                                  " as the number of specified experiment directories.")
 
-        # 13. Check that if the user specified min_n_per_group, they also
+        # 14. Check that if the user specified min_n_per_group, they also
         # specified subgroups. If they supplied a dictionary, make
         # sure the keys match
         if new_config['min_n_per_group']:
@@ -1219,20 +1027,17 @@ class ConfigurationParser:
                 new_config['min_n_per_group'] = {group: new_config['min_n_per_group']
                                                  for group in new_config['subgroups']}
 
-        # 14. Clean up config dict to keep only context-specific fields
+        # 15. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
                                    CHECK_FIELDS[context]['required'])
 
         new_config = {k: v for k, v in new_config.items()
                       if k in context_relevant_fields}
 
-        if inplace:
-            self._config = new_config
-        return Configuration(self._config,
-                             configdir=self._configdir,
-                             filename=self._filename,)
+        return new_config
 
-    def process_config(self, inplace=True):
+    @classmethod
+    def process_config(cls, config):
         """
         Converts fields which are read in as string to the
         appropriate format. Fields which can take multiple
@@ -1257,12 +1062,8 @@ class ConfigurationParser:
             If config does not exist, or no config read.
         """
 
-        # Check to make sure a configuration file
-        # or dictionary has been loaded.
-        self._check_config_is_loaded()
-
         # Get the parameter dictionary
-        new_config = self._config
+        new_config = deepcopy(config)
 
         # convert multiple values into lists
         for field in LIST_FIELDS:
@@ -1288,204 +1089,4 @@ class ConfigurationParser:
                         bool_value = json.loads(m.group().lower())
                         new_config[field] = bool_value
 
-        if inplace:
-            self._config = new_config
-        return Configuration(self._config,
-                             configdir=self._configdir,
-                             filename=self._filename,)
-
-    def normalize_validate_and_process_config(self, context='rsmtool'):
-        """
-        Normalize, validate, and process data from a config file.
-
-        Parameters
-        ----------
-        context : str, optional
-            Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare',
-                 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
-
-        Returns
-        -------
-        config_obj : Configuration
-            A configuration object
-
-        Raises
-        -------
-        NameError
-            If config does not exist, or no config read.
-        """
-
-        # Check to make sure a configuration file
-        # or dictionary has been loaded.
-        self._check_config_is_loaded()
-
-        self.normalize_config()
-        self.process_config()
-        self.validate_config(context=context)
-        return Configuration(self._config,
-                             configdir=self._configdir,
-                             filename=self._filename,
-                             context=context)
-
-    def read_normalize_validate_and_process_config(self,
-                                                   filepath,
-                                                   context='rsmtool'):
-        """
-        Read, normalize, validate, and process data from a config file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-        context : str, optional
-            Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare', 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
-
-        Returns
-        -------
-        config_obj : Configuration
-            A configuration object
-        """
-
-        logging.info('Reading and preprocessing configuration file: {}'.format(filepath))
-        self.read_config_from_file(filepath)
-        return self.normalize_validate_and_process_config(context=context)
-
-
-class JSONConfigurationParser(ConfigurationParser):
-    """
-    A subclass of `ConfigurationParser` for parsing
-    JSON-style config files.
-    """
-
-    def __init__(self):
-
-        super().__init__()
-
-    def read_config_from_file(self, filepath):
-        """
-        Read the configuration file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-
-        Raises
-        ------
-        ValueError
-            If main configuration file is improperly formatted.
-        """
-        try:
-            config = parse_json_with_comments(filepath)
-        except ValueError:
-            raise ValueError('The main configuration file `{}` exists but '
-                             'is formatted incorrectly. Please check that '
-                             'each line ends with a comma, there is no comma '
-                             'at the end of the last line, and that all quotes '
-                             'match.'.format(filepath))
-
-        self._config = config
-        self._filename = basename(filepath)
-        self._configdir = dirname(abspath(filepath))
-
-
-class CFGConfigurationParser(ConfigurationParser):
-    """
-    A subclass of `ConfiguraitonParser` for parsing
-    Microsoft INI-style config files.
-    """
-
-    def __init__(self):
-
-        super().__init__()
-
-    @staticmethod
-    def _fix_json(json_string):
-        """
-        Takes a bit of JSON that might have bad quotes
-        or capitalized booleans and fixes that stuff.
-
-        Parameters
-        ----------
-        json_string : str
-            A string to be reformatted for JSON parsing.
-
-        Return
-        ------
-        json_string : str
-            The updated string.
-        """
-        json_string = json_string.replace('True', 'true')
-        json_string = json_string.replace('False', 'false')
-        json_string = json_string.replace("'", '"')
-        return json_string
-
-    def read_config_from_file(self, filepath):
-        """
-        Read the configuration file.
-
-        Parameters
-        ----------
-        filepath : str
-            The path to the configuration file.
-
-        Raises
-        ------
-        ValueError
-            If main configuration file is improperly formatted.
-        """
-
-        # Get the `ConfigParser` object
-        py_config_parser = ConfigParser()
-
-        # Try to read main configuration file.
-        try:
-            py_config_parser.read(filepath)
-        except Exception as error:
-            raise ValueError('Main configuration file '
-                             'could not be read: {}'.format(error))
-
-        config = {}
-
-        # Loop through all sections of the ConfigParser
-        # object and add items to the dictionary
-        for section in py_config_parser.sections():
-            for name, value in py_config_parser.items(section):
-
-                # Check if the key already exists in the config dictionary.
-                # If it does, skip it and log a warning.
-                if name in config:
-                    logging.warning('There are duplicate keys for `{}`'
-                                    'in the configuration file. Only '
-                                    'the first instance will be '
-                                    'included.'.format(name))
-                    continue
-
-                # Otherwise, safe convert the value
-                # and add it to the dictionary.
-                else:
-
-                    value = self._fix_json(value)
-                    value = yaml.safe_load(value)
-                    config[name] = value
-
-        self._config = config
-        self._filename = basename(filepath)
-        self._configdir = dirname(abspath(filepath))
-
-
-# Global config types
-CONFIG_TYPE = {'.cfg': CFGConfigurationParser,
-               '.json': JSONConfigurationParser}
+        return new_config

@@ -8,7 +8,7 @@ from nose.tools import raises
 from parameterized import param, parameterized
 
 from rsmtool import run_comparison
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_run_comparison,
                                 copy_data_files,
                                 do_run_comparison)
@@ -21,16 +21,9 @@ if TEST_DIR:
 else:
     from rsmtool.test_utils import rsmtool_test_dir
 
-
-# set this to False to disable auto-updating of all experiment
-# tests contained in this file via `update_files.py`.
-# TODO: re-enable this once we start saving rsmcompare outputs
-_AUTO_UPDATE = False
-
-
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
-    param('lr-different-compare', 'lr_baseline_vs_lr_with_FEATURE8_and_zero_scores'),
+    param('lr-different-compare', 'lr_vs_lr_subset_features'),
     param('lr-self-compare-with-h2', 'lr_with_h2_vs_lr_with_h2'),
     param('lr-self-compare-with-custom-order', 'lr_subgroups_vs_lr_subgroups'),
     param('lr-self-compare-with-chosen-sections', 'lr_subgroups_vs_lr_subgroups'),
@@ -39,7 +32,7 @@ _AUTO_UPDATE = False
     param('linearsvr-self-compare', 'LinearSVR_vs_LinearSVR'),
     param('lr-eval-self-compare', 'lr_eval_with_h2_vs_lr_eval_with_h2'),
     param('lr-eval-tool-compare', 'lr_with_h2_vs_lr_eval_with_h2'),
-    param('lr-self-compare-different-format', 'lr_subgroups_vs_lr_subgroups'),
+    param('lr-self-compare-different-format', 'lr_with_tsv_output_vs_lr_with_tsv_output'),
     param('lr-self-compare-with-subgroups-and-h2', 'lr-subgroups-with-h2_vs_lr-subgroups-with-h2'),
     param('lr-self-compare-with-subgroups-and-edge-cases',
           'lr-subgroups-with-edge-cases_vs_lr-subgroups-with-edge-cases')
@@ -75,10 +68,9 @@ def test_run_experiment_lr_compare_with_object():
                    "subgroups": ["QUESTION"]
                    }
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmcompare')
+    config_obj = Configuration(config_dict,
+                               context='rsmcompare',
+                               configdir=configdir)
 
     check_run_comparison(source,
                          experiment_id,

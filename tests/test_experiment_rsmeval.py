@@ -10,7 +10,7 @@ from parameterized import param, parameterized
 
 from rsmtool import run_evaluation
 
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_run_evaluation,
@@ -50,6 +50,8 @@ else:
     param('lr-eval-with-subset-double-scored', 'lr_eval_with_subset_double_scored', consistency=True),
     param('lr-eval-with-trim-tolerance', 'lr_evaluation_with_trim_tolerance'),
     param('lr-eval-with-numeric-threshold', 'lr_evaluation_with_numeric_threshold', subgroups=['QUESTION']),
+    param('lr-eval-system-score-constant', 'lr_eval_system_score_constant',
+          subgroups=['QUESTION', 'L1'], consistency=True, suppress_warnings_for=[UserWarning])
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
@@ -57,37 +59,9 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_evaluation(*args, **kwargs)
 
 
-def test_run_experiment_lr_eval_with_cfg():
-
-    # basic evaluation experiment using rsmeval
-
-    source = 'lr-eval-cfg'
-    experiment_id = 'lr_eval_cfg'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.cfg'.format(experiment_id))
-    do_run_evaluation(source, experiment_id, config_file)
-
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_report, html_report
-
-
 def test_run_experiment_lr_eval_with_object():
     '''
-    test rsmeval using the Configuration object, rather than a file
+    test rsmeval using a Configuration object, rather than a file
     '''
 
     source = 'lr-eval-object'
@@ -109,10 +83,7 @@ def test_run_experiment_lr_eval_with_object():
                    "trim_min": 1,
                    "trim_max": 6}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict,
-                                        configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config(context='rsmeval')
+    config_obj = Configuration(config_dict, context='rsmeval', configdir=configdir)
 
     check_run_evaluation(source,
                          experiment_id,

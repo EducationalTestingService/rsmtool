@@ -11,7 +11,7 @@ from parameterized import param, parameterized
 
 from rsmtool import run_experiment
 
-from rsmtool.configuration_parser import ConfigurationParser
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_file_output,
                                 check_report,
                                 check_scaled_coefficients,
@@ -57,39 +57,11 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 
-def test_run_experiment_lr_with_cfg():
-    # basic experiment with a LinearRegression model
-
-    source = 'lr-cfg'
-    experiment_id = 'lr_cfg'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.cfg'.format(experiment_id))
-    do_run_experiment(source, experiment_id, config_file)
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
-
-    csv_files = glob(join(output_dir, '*.csv'))
-    for csv_file in csv_files:
-        csv_filename = basename(csv_file)
-        expected_csv_file = join(expected_output_dir, csv_filename)
-
-        if exists(expected_csv_file):
-            yield check_file_output, csv_file, expected_csv_file
-
-    yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_scaled_coefficients, source, experiment_id
-    yield check_report, html_report
-
-
 
 def test_run_experiment_lr_with_object_and_configdir():
-
-    # test rsmtool using the Configuration object, rather than a file;
-    # with specified `configdir` attribute
+    '''
+    test rsmtool using a Configuration object and specified configdir
+    '''
 
     source = 'lr-object'
     experiment_id = 'lr_object'
@@ -112,9 +84,7 @@ def test_run_experiment_lr_with_object_and_configdir():
                    "experiment_id": "lr_object",
                    "description": "Using all features with an LinearRegression model."}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict, configdir=configdir)
-    config_obj = config_parser.normalize_validate_and_process_config()
+    config_obj = Configuration(config_dict, configdir=configdir)
 
     check_run_experiment(source,
                          experiment_id,
@@ -122,18 +92,14 @@ def test_run_experiment_lr_with_object_and_configdir():
 
 
 def test_run_experiment_lr_with_object_no_configdir():
-
-    # test rsmtool using the Configuration object, rather than a file;
-    # without passing configdir attribute
-    # to test whether the default setting of os.getcwd() is working
-    # correctly
-
+    '''
+    test rsmtool using a Configuration object and no specified configdir
+    '''
     source = 'lr-object-no-path'
     experiment_id = 'lr_object_no_path'
 
     # set up a temporary directory since
     # we will be using getcwd
-
     old_file_dict = {'train': 'data/files/train.csv',
                      'test': 'data/files/test.csv',
                      'features': 'data/experiments/lr-object-no-path/features.csv'}
@@ -156,9 +122,7 @@ def test_run_experiment_lr_with_object_no_configdir():
                    "experiment_id": "lr_object_no_path",
                    "description": "Using all features with an LinearRegression model."}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
-    config_obj = config_parser.normalize_validate_and_process_config()
+    config_obj = Configuration(config_dict)
 
     check_run_experiment(source,
                          experiment_id,
@@ -199,8 +163,9 @@ def test_run_experiment_lr_with_dictionary():
 
 @raises(AttributeError)
 def test_run_experiment_lr_with_object_and_filepath():
-    # This test checks for a rare potential use case where a user
-    # is trying to pass an old Configuration object
+    '''
+    test for rare use case where an old Configuration object is passed
+    '''
     source = 'lr-object'
     experiment_id = 'lr_object'
 
@@ -223,9 +188,8 @@ def test_run_experiment_lr_with_object_and_filepath():
                    "experiment_id": "lr_object",
                    "description": "Using all features with an LinearRegression model."}
 
-    config_parser = ConfigurationParser()
-    config_parser.load_config_from_dict(config_dict)
-    config_obj = config_parser.normalize_validate_and_process_config()
+    config_obj = Configuration(config_dict)
+
     # we catch the deprecation warning triggered by this line
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -259,26 +223,6 @@ def test_run_experiment_duplicate_feature_names():
                        source,
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
-
-
-@raises(ValueError)
-def test_run_experiment_lr_old_config():
-    # basic experiment with a LinearRegression model but using an
-    # old style configuration file
-
-    source = 'lr-old-config'
-    experiment_id = 'empWt'
-    config_file = join(rsmtool_test_dir,
-                       'data',
-                       'experiments',
-                       source,
-                       '{}.json'.format(experiment_id))
-
-    # run this experiment but suppress the expected deprecation warnings
-    do_run_experiment(source,
-                      experiment_id,
-                      config_file,
-                      suppress_warnings_for=[DeprecationWarning])
 
 
 @raises(ValueError)

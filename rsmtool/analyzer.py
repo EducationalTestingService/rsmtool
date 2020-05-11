@@ -10,6 +10,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 
 import numpy as np
 import pandas as pd
+import warnings
 
 from functools import partial
 
@@ -20,13 +21,13 @@ from skll.metrics import kappa
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
-from rsmtool.container import DataContainer
-from rsmtool.prmse_utils import compute_prmse
-from rsmtool.utils import (agreement,
-                           difference_of_standardized_means,
-                           partial_correlations,
-                           quadratic_weighted_kappa,
-                           standardized_mean_difference)
+from .container import DataContainer
+from .utils.metrics import (agreement,
+                            difference_of_standardized_means,
+                            partial_correlations,
+                            quadratic_weighted_kappa,
+                            standardized_mean_difference)
+from .utils.prmse import get_true_score_evaluations
 
 
 class Analyzer:
@@ -550,9 +551,12 @@ class Analyzer:
 
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
-                df_target_cors[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr[group] = pd.Series(index=df_group.columns)
-                df_target_pcorr_no_length[group] = pd.Series(index=df_group.columns)
+                df_target_cors[group] = pd.Series(data=np.nan,
+                                                  index=df_group.columns)
+                df_target_pcorr[group] = pd.Series(data=np.nan,
+                                                   index=df_group.columns)
+                df_target_pcorr_no_length[group] = pd.Series(data=np.nan,
+                                                             index=df_group.columns)
             else:
                 # if we are asked to include length, that means 'length' is
                 # in the data frame which means that we want to exclude that
@@ -598,8 +602,8 @@ class Analyzer:
                        smd_method='unpooled',
                        use_diff_std_means=False):
         """
-        This is a helper function that computes some basic agreement
-        and association metrics between the system scores and the
+        This is a helper function that computes several basic
+        association metrics between the system scores and the
         human scores.
 
         Parameters
@@ -617,16 +621,16 @@ class Analyzer:
         population_system_score_sd : float, optional
             Reference standard deviation for system scores. If `smd_method='williamson'`, this is
             used to compute SMD and should be the standard deviation for the whole population.If
-            `use_diff_std_means=True`, this must be used with `population_human_score_mn`.
+            `use_diff_std_means=True`, this must be used with `population_system_score_mn`.
             Otherwise, it is ignored.
             Defaults to None.
         population_human_score_mn : float, optional
             Reference mean for human scores. If `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_human_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         population_system_score_mn : float, optional
             Reference mean for system scores. If  `use_diff_std_means=True`, this must be used with
-            `population_human_score_mn`. Otherwise, it is ignored.
+            `population_system_score_sd`. Otherwise, it is ignored.
             Defaults to None.
         smd_method : {'williamson', 'johnson', pooled', 'unpooled'}, optional
             The SMD method to use, only used if `use_diff_std_means=False`.
@@ -1195,6 +1199,17 @@ class Analyzer:
                               for col in df_test.columns if col not in ['spkitemid',
                                                                         grouping_variable]}
 
+        # check if any of the standard deviations is zero and
+        # tell user to expect to see many warnings.
+        zero_sd_scores = [score for (score, sd) in population_sd_dict.items() if
+                          np.isclose(sd, 0, atol=1e-07)]
+        if len(zero_sd_scores) > 0:
+            warnings.warn("The standard deviation for {} scores "
+                          "is zero (all values are the same). You "
+                          "will see multiple warnings about DSM computation "
+                          "since this metric is computed separately for "
+                          "each subgroup.".format(', '.join(zero_sd_scores)))
+
         # create a duplicate data frame to compute evaluations
         # over the whole data, i.e., across groups
         df_preds_all = df_test.copy()
@@ -1652,11 +1667,20 @@ class Analyzer:
                     {'name': 'score_dist', 'frame': df_score_dist}]
 
         # compute true-score analyses if we have second score
-        if include_second_score:
+        # or have been given rater error variance
+        rater_error_variance = configuration.get_rater_error_variance()
+
+        if include_second_score or rater_error_variance is not None:
             system_score_columns = [col for col in prediction_columns
                                     if col not in ['sc1', 'sc2']]
-            df_prmse = compute_prmse(df_preds_second_score,
-                                     system_score_columns)
+
+            human_score_columns = [col for col in prediction_columns
+                                   if col in ['sc1', 'sc2']]
+
+            df_prmse = get_true_score_evaluations(df_preds_second_score,
+                                                  system_score_columns,
+                                                  human_score_columns,
+                                                  rater_error_variance)
 
             datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
 

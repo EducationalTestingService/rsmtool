@@ -65,5 +65,5 @@ test:
 
 about:
   home: https://github.com/EducationalTestingService/rsmtool
-  license: Apache 2.0
+  license: Apache-2.0
   license_file: LICENSE

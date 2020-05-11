@@ -3,9 +3,11 @@
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an example configuration file for `rsmtool <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmtool/config_rsmtool.json>`_.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmtool/config_rsmtool.json>`_ for ``rsmtool``. 
 
-There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
+.. note:: To make it easy to get started with  ``rsmtool``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
+
+Next, we describe all of the ``rsmtool`` configuration fields in detail. There are four required fields and the rest are all optional. We first describe the required fields and then the optional ones (sorted alphabetically).
 
 experiment_id
 """""""""""""
@@ -156,8 +158,9 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``true_score_evaluation``: evaluation of system scores against the :ref:`true scores <true_score_evaluation>`  estimated according to test theory. The notebook shows:
     
-        - variance of human scores for single and double-scored responses;
-        - variance of system scores and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
+        - Number of single and double-scored responses.
+        - Variance of human rater errors and estimated variance of true scores
+        - Mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
 
     - ``pca``: Shows the results of principal components analysis on the processed feature values:
 
@@ -208,6 +211,13 @@ If a probabilistic SKLL classifier is chosen to build the scoring model, then *e
 
     You may see slight differences in expected score predictions if you run the experiment on different machines or on different operating systems most likely due to very small probablity values for certain score points which can affect floating point computations.
 
+.. _rater_error_variance_rsmtool:
+
+rater_error_variance *(Optional)*
+"""""""""""""""""""""""""""""""""
+```suggestion
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmtool`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmtool``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
+
 .. _second_human_score_column_rsmtool:
 
 second_human_score_column *(Optional)*
@@ -254,6 +264,19 @@ Defaults to ``false``.
 sign *(Optional)*
 """""""""""""""""
 Name of the column containing expected correlation sign between each feature and human score if using :ref:`subset-based column selection <subset_column_selection>`.
+
+.. _skll_fixed_parameters:
+
+skll_fixed_parameters *(Optional)*
+""""""""""""""""""""""""""""""""""
+Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model. 
+This should be a dictionary with the names of the hyperparameters as the keys. To determine
+what hyperparameters are available for the SKLL learner you chose, consult the scikit-learn
+documentation for the learner with the same name as well as the `SKLL documentation <https://skll.readthedocs.io/en/latest/run_experiment.html#fixed-parameters-optional>`_.
+Any values you specify here will override both the scikit-learn and SKLL defaults. 
+The values for a key can be string, integer, float, or boolean depending on what the
+hyperparameter expects. Note that if this option is specified with the
+:ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _skll_objective:
 
