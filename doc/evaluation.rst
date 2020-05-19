@@ -210,7 +210,7 @@ The PRMSE formula implemented in RSMTool is more general and can also handle the
 
 In this case, the variance of rater errors is computed as a pooled variance estimator.
 
-We first calculate the within within-subject variance of human ratings for each response, :math:`V_i`, using denominator :math:`c_i - 1`:
+We first calculate the within-subject variance of human ratings for each response, :math:`V_i`, using denominator :math:`c_i - 1`:
 
 :math:`V_{i} = \displaystyle\frac{\sum_{j=1}^c H_{i,j} - \bar{H}_i}{c_i-1}`
 
