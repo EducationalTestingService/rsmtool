@@ -224,7 +224,7 @@ where
 
 We then take a weighted average of those within-responses variances:
 
-:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{\sum_{i=1}^N (c_i-1}`
+:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{\sum_{i=1}^N (c_i-1)}`
 
 The **true score variance** :math:`\sigma_T^2` is then estimated as 
 
