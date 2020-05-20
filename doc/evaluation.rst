@@ -212,7 +212,7 @@ In this case, the variance of rater errors is computed as a pooled variance esti
 
 We first calculate the within-subject variance of human ratings for each response, :math:`V_i`, using denominator :math:`c_i - 1`:
 
-:math:`V_{i} = \displaystyle\frac{\sum_{j=1}^c H_{i,j} - \bar{H}_i}{c_i-1}`
+:math:`V_{i} = \displaystyle\frac{\sum_{j=1}^c (H_{i,j} - \bar{H}_i)^2}{c_i-1}`
 
 where
 
@@ -224,7 +224,7 @@ where
 
 We then take a weighted average of those within-responses variances:
 
-:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{N}`
+:math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{\sum_{i=1}^N (c_i-1}`
 
 The **true score variance** :math:`\sigma_T^2` is then estimated as 
 
