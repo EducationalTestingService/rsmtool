@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -19,9 +21,13 @@ from rsmtool.utils.prmse import (get_true_score_evaluations,
                                  get_n_human_scores)
 
 
-# get the directory containing the tests
-test_dir = Path(__file__).parent
-
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 def test_compute_n_human_scores():
@@ -82,8 +88,6 @@ def test_get_true_score_evaluations_single_human_no_ve():
     get_true_score_evaluations(df, 'system', 'sc1')
 
 
-
-
 class TestPrmseJohnsonData():
 
     '''
@@ -94,13 +98,12 @@ class TestPrmseJohnsonData():
     '''
 
     def setUp(self):
-        full_matrix_file = test_dir / 'data' / 'files' / 'prmse_data.csv'
-        sparse_matrix_file = test_dir / 'data' / 'files' / 'prmse_data_sparse_matrix.csv'
+        full_matrix_file = Path(rsmtool_test_dir) / 'data' / 'files' / 'prmse_data.csv'
+        sparse_matrix_file = Path(rsmtool_test_dir) / 'data' / 'files' / 'prmse_data_sparse_matrix.csv'
         self.data_full = pd.read_csv(full_matrix_file)
         self.data_sparse = pd.read_csv(sparse_matrix_file)
         self.human_score_columns = ['h1', 'h2', 'h3', 'h4']
         self.system_score_columns = ['system']
-
 
     def test_variance_of_errors_full_matrix(self):
         human_scores = self.human_score_columns
@@ -108,7 +111,6 @@ class TestPrmseJohnsonData():
         variance_errors_human = variance_of_errors(df_humans)
         expected_v_e = 0.509375
         eq_(variance_errors_human, expected_v_e)
-
 
     def test_variance_of_errors_sparse_matrix(self):
         human_scores = self.human_score_columns
@@ -163,7 +165,6 @@ class TestPrmseJohnsonData():
                        df_humans,
                        variance_errors_human)
         assert_almost_equal(mse, expected_mse_true, 7)
-
 
     def test_mse_sparse_matrix_computed_ve(self):
         human_scores = self.human_score_columns

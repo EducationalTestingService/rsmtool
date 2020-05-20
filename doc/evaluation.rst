@@ -89,10 +89,10 @@ where:
 
         * :math:`n_{+k}` - total number of responses where :math:`M_i=k` 
 
-Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
+Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/metrics.html#skll.metrics.kappa>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
 .. note::
-   See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how the `SKLL implementation <https://skll.readthedocs.io/en/latest/api/skll.html#skll.kappa>`_  differs from the `scikit-learn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations might produce different results if the matrix contains missing labels. For example, consider the hypothetical scenario where our predictions only contain the labels ``1``, ``2``, and ``4``. In the SKLL implementation, the missing ``3``  will be automatically added to the list of labels whereas in the scikit-learn implementation, the ``3`` would only be added if a complete list of labels was passed to the function via the optional ``labels`` keyword argument.
+   See `this discussion <https://github.com/EducationalTestingService/skll/issues/391#issuecomment-444145567>`_ for the explanation of how the `SKLL implementation <https://skll.readthedocs.io/en/latest/api/metrics.html#skll.metrics.kappa>`_  differs from the `scikit-learn implementation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.cohen_kappa_score.html>`_. The two implementations might produce different results if the matrix contains missing labels. For example, consider the hypothetical scenario where our predictions only contain the labels ``1``, ``2``, and ``4``. In the SKLL implementation, the missing ``3``  will be automatically added to the list of labels whereas in the scikit-learn implementation, the ``3`` would only be added if a complete list of labels was passed to the function via the optional ``labels`` keyword argument.
 
 
 .. _qwk:
@@ -114,7 +114,7 @@ See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258
 
 .. note::
 
-	In RSMTool v6.x and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/skll.html#from-metrics-module>`_ with ``weights`` set to ``"quadratic"``. Continuous scores were rounded for computation. Both formulas produce the same scores for discrete (rounded scores) but QWK values for continuous scores computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/metrics.html#skll.metrics.kappa>`_ with ``weights`` set to ``"quadratic"``. Continuous scores were rounded for computation. Both formulas produce the same scores for discrete (rounded scores) but QWK values for continuous scores computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
 
 
 .. _r: 

@@ -1,5 +1,6 @@
 import argparse
 import tempfile
+import os
 import warnings
 
 from io import StringIO
@@ -26,8 +27,6 @@ from skll import FeatureSet, Learner
 from skll.metrics import kappa
 
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import rsmtool_test_dir
-
 from rsmtool.utils.commandline import (CmdOption,
                                        ConfigurationGenerator,
                                        InteractiveField,
@@ -52,6 +51,15 @@ from rsmtool.utils.notebook import (float_format_func,
                                     compute_subgroup_plot_params,
                                     get_thumbnail_as_html,
                                     get_files_as_html)
+
+
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get('TESTDIR', None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 def test_int_to_float():
@@ -1802,7 +1810,7 @@ class TestInteractiveGenerate:
 
         # point to the right file holding the expected configuration
         expected_file = f"interactive_{context}_config{groups_suffix}.json"
-        expected_path = rsmtool_test_dir / 'data' / 'output' / expected_file
+        expected_path = join(rsmtool_test_dir, 'data', 'output', expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
         # that calling 'interact()' doesn't actually print out anything
