@@ -664,7 +664,7 @@ def check_file_output(file1, file2, file_format='csv'):
         assert_frame_equal(df1,
                            df2,
                            check_exact=False,
-                           check_less_precise=False)
+                           rtol=1e-03)
     except AssertionError as e:
         message = e.args[0]
         new_message = 'File {} - {}'.format(basename(file1), message)
@@ -798,7 +798,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     assert_frame_equal(df_new_predictions.sort_index(axis=1),
                        df_old_predictions.sort_index(axis=1),
                        check_exact=False,
-                       check_less_precise=True)
+                       rtol=1e-03)
 
 
 def check_generated_output(generated_files, experiment_id, model_source, file_format='csv'):
