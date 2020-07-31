@@ -260,7 +260,7 @@ class DataReader:
 
         # ignore warnings about mixed data types for large files
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=pd.io.common.DtypeWarning)
+            warnings.filterwarnings('ignore', category=pd.errors.DtypeWarning)
             try:
                 df = do_read(filename, **kwargs)
             except pd.errors.ParserError:
