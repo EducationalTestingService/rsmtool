@@ -2,12 +2,14 @@ import os
 
 import numpy as np
 import pandas as pd
+import warnings
 
 from numpy.testing import assert_array_equal
 
 from pandas.testing import assert_frame_equal
 
 from nose.tools import (eq_,
+                        ok_,
                         raises,
                         assert_almost_equal)
 
@@ -72,13 +74,30 @@ def test_prmse_single_human_ve_array_as_input():
     eq_(prmse, 0.9090909090909091)
 
 
-@raises(ValueError)
 def test_variance_of_errors_all_single_scored():
+    # this test should raise a UserWarning
     sc1 = [1, 2, 3, None, None]
     sc2 = [None, None, None, 2, 3]
     df = pd.DataFrame({'sc1': sc1,
                        'sc2': sc2})
-    variance_of_errors(df)
+    with warnings.catch_warnings(record=True) as warning_list:
+            variance_of_errors_human = variance_of_errors(df)
+    ok_(variance_of_errors_human is None)
+    assert issubclass(warning_list[-1].category, UserWarning)
+
+
+def test_prmse_all_single_scored():
+    # this test should raise a UserWarning
+    system_scores = [1, 2, 3, 4, 5]
+    sc1 = [1, 2, 3, None, None]
+    sc2 = [None, None, None, 2, 3]
+    df = pd.DataFrame({'sc1': sc1,
+                       'sc2': sc2,
+                       'system': system_scores})
+    with warnings.catch_warnings(record=True) as warning_list:
+            prmse = prmse_true(df['system'], df[['sc1', 'sc2']])
+    ok_(prmse is None)
+    assert issubclass(warning_list[-1].category, UserWarning)
 
 
 @raises(ValueError)
@@ -89,14 +108,12 @@ def test_get_true_score_evaluations_single_human_no_ve():
 
 
 class TestPrmseJohnsonData():
-
-    '''
+    """
     This class tests the PRMSE functions against the benchmarks
     provided by Matt Johnson who did the original derivation and
     implemented the function in R. This test ensures that Python
     implementation results in the same values
-    '''
-
+    """
     def setUp(self):
         full_matrix_file = Path(rsmtool_test_dir) / 'data' / 'files' / 'prmse_data.csv'
         sparse_matrix_file = Path(rsmtool_test_dir) / 'data' / 'files' / 'prmse_data_sparse_matrix.csv'
@@ -197,7 +214,6 @@ class TestPrmseJohnsonData():
                            variance_errors_human)
         assert_almost_equal(prmse, expected_prmse_true, 7)
 
-
     def test_prmse_full_matrix_computed_ve(self):
         human_scores = self.human_score_columns
         df_humans = self.data_full[human_scores]
@@ -215,7 +231,6 @@ class TestPrmseJohnsonData():
         prmse = prmse_true(system,
                            df_humans)
         assert_almost_equal(prmse, expected_prmse_true, 7)
-
 
     def test_prmse_sparse_matrix_array_as_input(self):
         human_scores = self.human_score_columns
@@ -241,7 +256,6 @@ class TestPrmseJohnsonData():
                                               self.human_score_columns)
         assert_frame_equal(df_prmse, expected_df, check_dtype=False)
 
-
     def test_compute_true_score_evaluations_sparse(self):
         expected_df = pd.DataFrame({'N': 10000,
                                     "N raters": 4,
@@ -256,7 +270,6 @@ class TestPrmseJohnsonData():
                                               self.system_score_columns,
                                               self.human_score_columns)
         assert_frame_equal(df_prmse, expected_df, check_dtype=False)
-
 
     def test_compute_true_score_evaluations_given_ve(self):
         expected_df = pd.DataFrame({'N': 10000,
