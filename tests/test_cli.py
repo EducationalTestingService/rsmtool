@@ -46,6 +46,23 @@ class TestToolCLI:
         for tempdir in cls.temporary_directories:
             tempdir.cleanup()
 
+    def check_no_args(self, context):
+        """
+        A helper method that checks running the tool with no arguments
+        """
+        proc = subprocess.run(shlex.split(context, posix='win' not in sys.platform),
+                              capture_output=True)
+        eq_(proc.returncode, 0)
+        ok_(b'usage: ' + bytes(context, encoding="utf-8") in proc.stdout)
+
+    def test_no_args(self):
+        # test that the tool without any arguments prints help messag
+
+        # this applies to all tools
+        for context in ['rsmtool', 'rsmeval', 'rsmsummarize',
+                        'rsmpredict', 'rsmcompare']:
+            yield self.check_no_args, context
+
     def validate_run_output(self, name, experiment_dir):
         """
         A helper method that validates that the output of the "run"
@@ -133,7 +150,7 @@ class TestToolCLI:
 
     def check_tool_cmd(self, context, subcmd, output_dir=None, working_dir=None):
         """
-        A helper method to test that the ``cmd`` invocation for ``context`` works
+        A helper method to test that the ``subcmd`` invocation for ``context`` works
         as expected.
 
         Parameters
