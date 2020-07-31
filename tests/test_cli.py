@@ -51,7 +51,9 @@ class TestToolCLI:
         A helper method that checks running the tool with no arguments
         """
         proc = subprocess.run(shlex.split(context, posix='win' not in sys.platform),
-                              capture_output=True)
+                              check=False,
+                              stderr=subprocess.DEVNULL,
+                              stdout=subprocess.PIPE)
         eq_(proc.returncode, 0)
         ok_(b'usage: ' + bytes(context, encoding="utf-8") in proc.stdout)
 
