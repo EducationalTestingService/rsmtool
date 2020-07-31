@@ -248,6 +248,10 @@ def main():
                                  uses_output_directory=True,
                                  allows_overwriting=True)
 
+    # if we have no arguments at all then just show the help message
+    if len(sys.argv) < 2:
+        sys.argv.append("-h")
+
     # if the first argument is not one of the valid sub-commands
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
