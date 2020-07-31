@@ -50,7 +50,18 @@ class TestToolCLI:
         """
         A helper method that checks running the tool with no arguments
         """
-        proc = subprocess.run(shlex.split(context, posix='win' not in sys.platform),
+
+        # if the BINPATH environment variable is defined
+        # use that to construct the command instead of just
+        # the name; this is needed for the CI builds where
+        # we do not always activate the conda environment
+        binpath = os.environ.get('BINPATH', None)
+        if binpath is not None:
+            cmd = f"{binpath}/{context}"
+        else:
+            cmd = f"{context}"
+
+        proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                               check=False,
                               stderr=subprocess.DEVNULL,
                               stdout=subprocess.PIPE)
