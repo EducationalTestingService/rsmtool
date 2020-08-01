@@ -625,7 +625,6 @@ def check_file_output(file1, file2, file_format='csv'):
     for df in [df1, df2]:
         df.columns = df.columns.map(str)
 
-
     # if the first column is numeric, just force the index to string;
     # however, if it is non-numeric, assume that it is an index and
     # force it to string. We do this to ensure string indices are
