@@ -29,15 +29,15 @@ install:
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
 - |
-  cat << EOF > sitecustomize.py
-  import os
-  try:
-      import coverage
-      os.environ['COVERAGE_PROCESS_START'] = '.coveragerc'
-      coverage.process_startup()
-  except ImportError:
-      pass
-  EOF
+cat << EOF > sitecustomize.py
+import os
+try:
+    import coverage
+    os.environ['COVERAGE_PROCESS_START'] = '.coveragerc'
+    coverage.process_startup()
+except ImportError:
+    pass
+EOF
 
 script:
 - ${HOME}/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}
