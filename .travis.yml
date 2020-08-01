@@ -28,7 +28,7 @@ install:
 - ${HOME}/miniconda3/bin/conda create --name rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${TRAVIS_PYTHON_VERSION} --yes --quiet
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install nose-cov
 - ${HOME}/miniconda3/envs/rsmenv/bin/pip install -e .
-- >
+- |
   cat << EOF > sitecustomize.py
   import os
   try:
