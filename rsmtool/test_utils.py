@@ -645,7 +645,6 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(axis=1, inplace=True)
     df2.sort_index(axis=1, inplace=True)
 
-
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
