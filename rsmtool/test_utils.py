@@ -127,7 +127,13 @@ def check_run_experiment(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
-    check_report(html_report)
+    check_report(html_report, raise_warnings=False)
+
+    # we want to ignore deprecation warnings for RSMTool, so we remove
+    # them from the list; then, we make sure that there are no other warnings
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_evaluation(source,
