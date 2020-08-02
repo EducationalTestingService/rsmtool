@@ -117,15 +117,11 @@ class TestToolCLI:
             if name == 'rsmtool':
                 check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
 
-            # there's no report for rsmpredict
-            if name != 'rsmpredict':
-                report_dir = Path(experiment_dir) / 'report'
-                html_report = list(report_dir.glob('*_report.html'))[0]
-                check_report(str(html_report))
-
-        # rsmcompare only has a report and we want it to be warning-free
-        else:
-            report_dir = Path(experiment_dir)
+        # there's no report for rsmpredict but for the rest we want
+        # the reports to be free of warnings except deprecation warnings
+        # that might come from underlying packages
+        if name != 'rsmpredict':
+            report_dir = Path(experiment_dir) / 'report'
             html_report = list(report_dir.glob('*_report.html'))[0]
             check_report(str(html_report), raise_warnings=False)
 
