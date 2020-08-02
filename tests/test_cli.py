@@ -122,7 +122,7 @@ class TestToolCLI:
         # that might come from underlying packages
         if name != 'rsmpredict':
             output_dir = Path(experiment_dir)
-            report_dir = output_dir / "report" if name != "rscompare" else output_dir
+            report_dir = output_dir / "report" if name != "rsmcompare" else output_dir
             html_report = list(report_dir.glob('*_report.html'))[0]
             check_report(str(html_report), raise_warnings=False)
 
