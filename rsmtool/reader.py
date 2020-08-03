@@ -19,6 +19,12 @@ from os.path import (abspath,
 
 import pandas as pd
 
+# allow older versions of pandas to work
+try:
+    from pandas.io.common import DtypeWarning
+except ImportError:
+    from pandas.errors import DtypeWarning
+
 from .container import DataContainer
 
 
@@ -260,7 +266,7 @@ class DataReader:
 
         # ignore warnings about mixed data types for large files
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=pd.io.common.DtypeWarning)
+            warnings.filterwarnings('ignore', category=DtypeWarning)
             try:
                 df = do_read(filename, **kwargs)
             except pd.errors.ParserError:
