@@ -3,7 +3,7 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Make sure any and all tests are passing in ``master``. Make sure you have also run tests in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any deprecation warnings that show up in the HTML report that can be fixed before the release.
+1. Make sure any and all tests are passing in ``master``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any deprecation warnings in the HTML report that can be fixed before the release.
 
 2. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
 
