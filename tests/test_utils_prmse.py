@@ -81,7 +81,7 @@ def test_variance_of_errors_all_single_scored():
     df = pd.DataFrame({'sc1': sc1,
                        'sc2': sc2})
     with warnings.catch_warnings(record=True) as warning_list:
-            variance_of_errors_human = variance_of_errors(df)
+        variance_of_errors_human = variance_of_errors(df)
     ok_(variance_of_errors_human is None)
     assert issubclass(warning_list[-1].category, UserWarning)
 
@@ -95,7 +95,7 @@ def test_prmse_all_single_scored():
                        'sc2': sc2,
                        'system': system_scores})
     with warnings.catch_warnings(record=True) as warning_list:
-            prmse = prmse_true(df['system'], df[['sc1', 'sc2']])
+        prmse = prmse_true(df['system'], df[['sc1', 'sc2']])
     ok_(prmse is None)
     assert issubclass(warning_list[-1].category, UserWarning)
 
