@@ -179,6 +179,8 @@ Accuracy Metrics (True score)
 
 According to test theory, an observed score is a combination of the true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such an estimation requires that two human scores be available for *at least a* subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
 
+Evaluating system against true score produces performance estimates that are robust to errors in human scores and remain stable even when human-human agreeement varies (see `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2/>`_.
+
 The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``. 
 
 Proportional reduction in mean squared error for true scores (PRMSE)
@@ -206,7 +208,7 @@ and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of the PRMSE formula available via the :ref:`API<prmse_api>` supports cases where some of the responses have **more than two** ratings available. 
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of the PRMSE formula available via the :ref:`API<prmse_api>` supports cases where some of the responses have **more than two** ratings available. The formula was derived by Matt S. Johnson and is explained in more detail in `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2/>`_.
 
 In this case, the variance of rater errors is computed as a pooled variance estimator.
 
