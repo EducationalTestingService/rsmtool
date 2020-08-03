@@ -1,5 +1,6 @@
 [run]
-source = rsmtool
+source=rsmtool
+parallel=true
 omit =
     */python?.?/*
     */lib-python/?.?/*.py

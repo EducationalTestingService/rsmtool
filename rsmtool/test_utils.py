@@ -127,7 +127,13 @@ def check_run_experiment(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
-    check_report(html_report)
+    check_report(html_report, raise_warnings=False)
+
+    # we want to ignore deprecation warnings for RSMTool, so we remove
+    # them from the list; then, we make sure that there are no other warnings
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_evaluation(source,
@@ -203,7 +209,13 @@ def check_run_evaluation(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
 
-    check_report(html_report)
+    check_report(html_report, raise_warnings=False)
+
+    # we want to ignore deprecation warnings for RSMEval, so we remove
+    # them from the list; then, we make sure that there are no other warnings
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_comparison(source,
@@ -378,7 +390,13 @@ def check_run_summary(source,
         if exists(expected_output_file):
             check_file_output(output_file, expected_output_file)
 
-    check_report(html_report)
+    check_report(html_report, raise_warnings=False)
+
+    # we want to ignore deprecation warnings for RSMSummarize, so we remove
+    # them from the list; then, we make sure that there are no other warnings
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def do_run_experiment(source,
@@ -625,7 +643,6 @@ def check_file_output(file1, file2, file_format='csv'):
     for df in [df1, df2]:
         df.columns = df.columns.map(str)
 
-
     # if the first column is numeric, just force the index to string;
     # however, if it is non-numeric, assume that it is an index and
     # force it to string. We do this to ensure string indices are
@@ -645,7 +662,6 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(axis=1, inplace=True)
     df2.sort_index(axis=1, inplace=True)
 
-
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
@@ -664,7 +680,7 @@ def check_file_output(file1, file2, file_format='csv'):
         assert_frame_equal(df1,
                            df2,
                            check_exact=False,
-                           check_less_precise=False)
+                           rtol=1e-03)
     except AssertionError as e:
         message = e.args[0]
         new_message = 'File {} - {}'.format(basename(file1), message)
@@ -798,7 +814,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     assert_frame_equal(df_new_predictions.sort_index(axis=1),
                        df_old_predictions.sort_index(axis=1),
                        check_exact=False,
-                       check_less_precise=True)
+                       rtol=1e-03)
 
 
 def check_generated_output(generated_files, experiment_id, model_source, file_format='csv'):
