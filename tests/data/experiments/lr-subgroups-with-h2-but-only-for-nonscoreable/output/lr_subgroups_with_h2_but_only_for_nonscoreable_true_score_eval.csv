@@ -1,0 +1,7 @@
+,N,N raters,N single,N multiple,Variance of errors,True score var,MSE true,PRMSE true
+raw,151,1,151,0,,,,
+scale,151,1,151,0,,,,
+raw_trim,151,1,151,0,,,,
+raw_trim_round,151,1,151,0,,,,
+scale_trim,151,1,151,0,,,,
+scale_trim_round,151,1,151,0,,,,

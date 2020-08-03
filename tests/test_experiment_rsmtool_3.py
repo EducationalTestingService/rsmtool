@@ -49,7 +49,12 @@ else:
           'lr_subgroups_with_numeric_threshold_and_empty_group',
           subgroups=['L1', 'QUESTION']),
     param('lr-subgroups-h2-long-feature-names',
-          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True)
+          'lr_subgroups_h2_long_feature_names', subgroups=['L1', 'QUESTION'], consistency=True),
+    param('lr-subgroups-with-h2-but-only-for-nonscoreable',
+          'lr_subgroups_with_h2_but_only_for_nonscoreable',
+          subgroups=['L1', 'QUESTION'],
+          consistency=True,
+          suppress_warnings_for=[UserWarning])
 ])
 def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
