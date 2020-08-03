@@ -205,6 +205,10 @@ def prmse_true(system,
     """
     Compute Proportional Reduction in Mean Squared Error (PRMSE)
     when predicting true score from system scores.
+    The formula to compute PRMSE implemented in RSMTool
+    was derived at ETS by Matthew S. Johnson. See
+    `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2.pdf>`_
+    for further information about PRMSE.
 
     Parameters
     ----------
