@@ -63,8 +63,8 @@ def variance_of_errors(human_scores):
     # if we don't have valid human scores
     if multiple_mask.sum() == 0:
         warnings.warn("True score evaluations cannot be "
-                      "computed because None of the responses in the "
-                      "evaluation scores has valid "
+                      "computed because none of the responses in the "
+                      "evaluation set has valid "
                       "system scores and 2 human scores.")
         return None
 
