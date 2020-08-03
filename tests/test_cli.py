@@ -46,6 +46,36 @@ class TestToolCLI:
         for tempdir in cls.temporary_directories:
             tempdir.cleanup()
 
+    def check_no_args(self, context):
+        """
+        A helper method that checks running the tool with no arguments
+        """
+
+        # if the BINPATH environment variable is defined
+        # use that to construct the command instead of just
+        # the name; this is needed for the CI builds where
+        # we do not always activate the conda environment
+        binpath = os.environ.get('BINPATH', None)
+        if binpath is not None:
+            cmd = f"{binpath}/{context}"
+        else:
+            cmd = f"{context}"
+
+        proc = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
+                              check=False,
+                              stderr=subprocess.DEVNULL,
+                              stdout=subprocess.PIPE)
+        eq_(proc.returncode, 0)
+        ok_(b'usage: ' + bytes(context, encoding="utf-8") in proc.stdout)
+
+    def test_no_args(self):
+        # test that the tool without any arguments prints help messag
+
+        # this applies to all tools
+        for context in ['rsmtool', 'rsmeval', 'rsmsummarize',
+                        'rsmpredict', 'rsmcompare']:
+            yield self.check_no_args, context
+
     def validate_run_output(self, name, experiment_dir):
         """
         A helper method that validates that the output of the "run"
@@ -87,15 +117,12 @@ class TestToolCLI:
             if name == 'rsmtool':
                 check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
 
-            # there's no report for rsmpredict
-            if name != 'rsmpredict':
-                report_dir = Path(experiment_dir) / 'report'
-                html_report = list(report_dir.glob('*_report.html'))[0]
-                check_report(str(html_report))
-
-        # rsmcompare only has a report and we want it to be warning-free
-        else:
-            report_dir = Path(experiment_dir)
+        # there's no report for rsmpredict but for the rest we want
+        # the reports to be free of warnings except deprecation warnings
+        # that might come from underlying packages
+        if name != 'rsmpredict':
+            output_dir = Path(experiment_dir)
+            report_dir = output_dir / "report" if name != "rsmcompare" else output_dir
             html_report = list(report_dir.glob('*_report.html'))[0]
             check_report(str(html_report), raise_warnings=False)
 
@@ -133,7 +160,7 @@ class TestToolCLI:
 
     def check_tool_cmd(self, context, subcmd, output_dir=None, working_dir=None):
         """
-        A helper method to test that the ``cmd`` invocation for ``context`` works
+        A helper method to test that the ``subcmd`` invocation for ``context`` works
         as expected.
 
         Parameters
