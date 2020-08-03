@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import warnings
@@ -36,6 +37,12 @@ rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
 tools_with_input_data = ['rsmsummarize', 'rsmcompare']
 tools_with_output = ['rsmtool', 'rsmeval',
                      'rsmsummarize', 'rsmpredict']
+
+# check if tests are being run in strict mode
+# if so, any deprecation warnings found in HTML
+# reports should not be ignored
+STRICT_MODE = os.environ.get('STRICT', None)
+IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
 
 
 def check_run_experiment(source,
@@ -127,12 +134,15 @@ def check_run_experiment(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
+    # check report for any errors but ignore warnings
+    # which we check below separately
     check_report(html_report, raise_warnings=False)
 
-    # we want to ignore deprecation warnings for RSMTool, so we remove
-    # them from the list; then, we make sure that there are no other warnings
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -209,12 +219,15 @@ def check_run_evaluation(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
 
+    # check report for any errors but ignore warnings
+    # which we check below separately
     check_report(html_report, raise_warnings=False)
 
-    # we want to ignore deprecation warnings for RSMEval, so we remove
-    # them from the list; then, we make sure that there are no other warnings
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -262,12 +275,16 @@ def check_run_comparison(source,
                       suppress_warnings_for=suppress_warnings_for)
 
     html_report = join('test_outputs', source, '{}_report.html'.format(experiment_id))
+
+    # check report for any errors but ignore warnings
+    # which we check below separately
     check_report(html_report, raise_warnings=False)
 
-    # we want to ignore deprecation warnings for RSMCompare, so we remove
-    # them from the list; then, we make sure that there are no other warnings
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -390,12 +407,15 @@ def check_run_summary(source,
         if exists(expected_output_file):
             check_file_output(output_file, expected_output_file)
 
+    # check report for any errors but ignore warnings
+    # which we check below separately
     check_report(html_report, raise_warnings=False)
 
-    # we want to ignore deprecation warnings for RSMSummarize, so we remove
-    # them from the list; then, we make sure that there are no other warnings
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
