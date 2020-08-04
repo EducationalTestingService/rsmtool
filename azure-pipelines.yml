@@ -42,7 +42,7 @@ jobs:
   - script: |
       CALL activate rsmdev
       echo $(pytestfiles)
-      nosetests --with-xunit $(pytestfiles)
+      nosetests --nologcapture --with-xunit $(pytestfiles)
     displayName: 'Run tests'
 
   - task: PublishTestResults@2

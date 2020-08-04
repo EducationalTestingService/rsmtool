@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import warnings
@@ -36,6 +37,12 @@ rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
 tools_with_input_data = ['rsmsummarize', 'rsmcompare']
 tools_with_output = ['rsmtool', 'rsmeval',
                      'rsmsummarize', 'rsmpredict']
+
+# check if tests are being run in strict mode
+# if so, any deprecation warnings found in HTML
+# reports should not be ignored
+STRICT_MODE = os.environ.get('STRICT', None)
+IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
 
 
 def check_run_experiment(source,
@@ -127,7 +134,16 @@ def check_run_experiment(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
-    check_report(html_report)
+    # check report for any errors but ignore warnings
+    # which we check below separately
+    check_report(html_report, raise_warnings=False)
+
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_evaluation(source,
@@ -203,7 +219,16 @@ def check_run_evaluation(source,
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
 
-    check_report(html_report)
+    # check report for any errors but ignore warnings
+    # which we check below separately
+    check_report(html_report, raise_warnings=False)
+
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def check_run_comparison(source,
@@ -250,12 +275,16 @@ def check_run_comparison(source,
                       suppress_warnings_for=suppress_warnings_for)
 
     html_report = join('test_outputs', source, '{}_report.html'.format(experiment_id))
+
+    # check report for any errors but ignore warnings
+    # which we check below separately
     check_report(html_report, raise_warnings=False)
 
-    # we want to ignore deprecation warnings for RSMCompare, so we remove
-    # them from the list; then, we make sure that there are no other warnings
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -378,7 +407,16 @@ def check_run_summary(source,
         if exists(expected_output_file):
             check_file_output(output_file, expected_output_file)
 
-    check_report(html_report)
+    # check report for any errors but ignore warnings
+    # which we check below separately
+    check_report(html_report, raise_warnings=False)
+
+    # make sure that there are no warnings in the report
+    # but ignore deprecation warnings if appropriate
+    warning_msgs = collect_warning_messages_from_report(html_report)
+    if IGNORE_DEPRECATION_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    assert_equal(len(warning_msgs), 0)
 
 
 def do_run_experiment(source,
@@ -625,7 +663,6 @@ def check_file_output(file1, file2, file_format='csv'):
     for df in [df1, df2]:
         df.columns = df.columns.map(str)
 
-
     # if the first column is numeric, just force the index to string;
     # however, if it is non-numeric, assume that it is an index and
     # force it to string. We do this to ensure string indices are
@@ -645,7 +682,6 @@ def check_file_output(file1, file2, file_format='csv'):
     df1.sort_index(axis=1, inplace=True)
     df2.sort_index(axis=1, inplace=True)
 
-
     # convert any integer columns to floats in either data frame
     for df in [df1, df2]:
         for c in df.columns:
@@ -664,7 +700,7 @@ def check_file_output(file1, file2, file_format='csv'):
         assert_frame_equal(df1,
                            df2,
                            check_exact=False,
-                           check_less_precise=False)
+                           rtol=1e-03)
     except AssertionError as e:
         message = e.args[0]
         new_message = 'File {} - {}'.format(basename(file1), message)
@@ -798,7 +834,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     assert_frame_equal(df_new_predictions.sort_index(axis=1),
                        df_old_predictions.sort_index(axis=1),
                        check_exact=False,
-                       check_less_precise=True)
+                       rtol=1e-03)
 
 
 def check_generated_output(generated_files, experiment_id, model_source, file_format='csv'):
