@@ -21,6 +21,12 @@ if TEST_DIR:
 else:
     from rsmtool.test_utils import rsmtool_test_dir
 
+# check if tests are being run in strict mode
+# if so, any deprecation warnings found in HTML
+# reports should not be ignored
+STRICT_MODE = os.environ.get('STRICT', None)
+IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
+
 
 class TestToolCLI:
 
@@ -118,16 +124,21 @@ class TestToolCLI:
                 check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
 
         # there's no report for rsmpredict but for the rest we want
-        # the reports to be free of warnings except deprecation warnings
-        # that might come from underlying packages
+        # the reports to be free of errors and warnings
         if name != 'rsmpredict':
             output_dir = Path(experiment_dir)
             report_dir = output_dir / "report" if name != "rsmcompare" else output_dir
             html_report = list(report_dir.glob('*_report.html'))[0]
-            check_report(str(html_report), raise_warnings=False)
 
+            # check report for any errors but ignore warnings
+            # which we check below separately
+            check_report(html_report, raise_warnings=False)
+
+            # make sure that there are no warnings in the report
+            # but ignore deprecation warnings if appropriate
             warning_msgs = collect_warning_messages_from_report(html_report)
-            warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+            if IGNORE_DEPRECATION_WARNINGS:
+                warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
             eq_(len(warning_msgs), 0)
 
     def validate_generate_output(self, name, output, subgroups=False):
