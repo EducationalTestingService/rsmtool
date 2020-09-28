@@ -3,6 +3,7 @@ import logging
 import os
 import tempfile
 import pandas as pd
+import warnings
 
 from io import StringIO
 from os import getcwd
@@ -304,6 +305,34 @@ class TestConfigurationParser:
                                     "L2": 50}}
 
         _ = ConfigurationParser.validate_config(data)
+
+    def test_validate_config_warning_feature_file_and_transformations(self):
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'select_transformations': True,
+                'features': 'some_file.csv'}
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            _ = ConfigurationParser.validate_config(data)
+            eq_(len(warning_list), 1)
+            ok_(issubclass(warning_list[0].category, UserWarning))
+
+
+    def test_validate_config_warning_feature_list_and_transformations(self):
+        # this should no show warnings
+        data = {'experiment_id': 'experiment_1',
+                'train_file': 'data/rsmtool_smTrain.csv',
+                'test_file': 'data/rsmtool_smEval.csv',
+                'model': 'LinearRegression',
+                'select_transformations': True,
+                'features': ['feature1', 'feature2']}
+
+        with warnings.catch_warnings(record=True) as warning_list:
+            _ = ConfigurationParser.validate_config(data)
+            eq_(len(warning_list), 0)
+
 
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',

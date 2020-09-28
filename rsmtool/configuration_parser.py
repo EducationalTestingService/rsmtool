@@ -1010,12 +1010,14 @@ class ConfigurationParser:
         # 12. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
-            warnings.warn("You specified a feature file but also set "
-                          "`select_transformations` to True. Any "
-                          "transformations or signs specified in "
-                          "the feature file will be overwritten by "
-                          "the automatically selected transformations "
-                          "and signs.")
+            # Show a warning unless a user passed a list of features.
+            if not isinstance(new_config['features'], list):
+                warnings.warn("You specified a feature file but also set "
+                              "`select_transformations` to True. Any "
+                              "transformations or signs specified in "
+                              "the feature file will be overwritten by "
+                              "the automatically selected transformations "
+                              "and signs.")
 
         # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
