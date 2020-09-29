@@ -179,7 +179,7 @@ Here are some advanced tips and tricks when working with RSMTool tests.
 
 4. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nosetests`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nosetests`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
 
-5. In RSMTool 8.0.1 and later by default the tests will pass even if the reports contain warnings. To catch any warnings that may appear in the reports run the tests in strict mode (``STRICT=1 nosetests --nologcapture tests``).
+5. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nosetests --nologcapture tests``).
 
 .. rubric:: Footnotes
 

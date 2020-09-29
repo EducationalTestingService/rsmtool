@@ -563,7 +563,7 @@ class Configuration:
 
     def get_trim_min_max_tolerance(self):
         """
-        Get trim min, trim max and tolerance.
+        Get trim min, trim max, and tolerance.
 
         Get the specified trim min and max,
         and trim_tolerance if any,
@@ -689,7 +689,7 @@ class Configuration:
 
 
 class ConfigurationParser:
-    """A `ConfigurationParser` class to create a `Configuration` object."""
+    """A ``ConfigurationParser`` class to create a ``Configuration`` object."""
 
     def __init__(self, pathlike):
         """
@@ -795,7 +795,7 @@ class ConfigurationParser:
 
     def parse(self, context='rsmtool'):
         """
-        Parse the configuration file.
+        Parse configuration file.
 
         Parse the configuration file for which this parser was
         instantiated.
