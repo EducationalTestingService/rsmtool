@@ -596,8 +596,8 @@ class Configuration:
         """
         Get specified rater error variance, if any, and make sure it's numeric.
 
-        Returns:
-        --------
+        Returns
+        -------
         rater_error_variance : float
             specified rater error variance
         """
