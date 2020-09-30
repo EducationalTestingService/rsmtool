@@ -5,6 +5,10 @@ Rater Scoring Modeling Tool
    :target: https://travis-ci.org/EducationalTestingService/rsmtool
    :alt: Build status
 
+.. image:: https://dev.azure.com/EducationalTestingService/RSMTool/_apis/build/status/EducationalTestingService.rsmtool
+   :target: https://dev.azure.com/EducationalTestingService/RSMTool/_build?view=runs
+   :alt: Build status
+
 .. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/master.svg
    :target: https://coveralls.io/r/EducationalTestingService/rsmtool
    :alt: Coverage status
