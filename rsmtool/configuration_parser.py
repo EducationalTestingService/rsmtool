@@ -1,4 +1,6 @@
 """
+Configuration parser.
+
 Classes related to parsing configuration files
 and creating configuration objects.
 
@@ -11,6 +13,7 @@ and creating configuration objects.
 
 import json
 import logging
+import warnings
 import re
 
 from copy import copy, deepcopy
@@ -41,6 +44,8 @@ if HAS_RSMEXTRA:
 
 def configure(context, config_file_or_obj_or_dict):
     """
+    Create a Configuration object.
+
     Get the configuration for ``context`` from the input
     ``config_file_or_obj_or_dict``.
 
@@ -112,7 +117,9 @@ def configure(context, config_file_or_obj_or_dict):
 
 class Configuration:
     """
-    Configuration class, which encapsulates all of the
+    Configuration class.
+
+    Encapsulates all of the
     configuration parameters and methods to access these
     parameters.
     """
@@ -145,7 +152,6 @@ class Configuration:
             The context of the tool.
             Defaults to 'rsmtool'.
         """
-
         if not isinstance(configdict, dict):
             raise TypeError('The input must be a dictionary.')
 
@@ -166,6 +172,8 @@ class Configuration:
 
     def __contains__(self, key):
         """
+        Key check.
+
         Check if configuration object
         contains a given key.
 
@@ -223,6 +231,8 @@ class Configuration:
 
     def __str__(self):
         """
+        Return string representation.
+
         Return a string representation of the underlying configuration
         dictionary.
 
@@ -255,6 +265,8 @@ class Configuration:
     @property
     def configdir(self):
         """
+        Get the path to configuration directory.
+
         Get the path to the configuration reference directory that
         will be used to resolve any relative paths in
         the configuration.
@@ -269,7 +281,7 @@ class Configuration:
     @configdir.setter
     def configdir(self, new_path):
         """
-        Set a new configuration reference directory
+        Set a new configuration reference directory.
 
         Parameters
         ----------
@@ -278,7 +290,6 @@ class Configuration:
             directory used to resolve any relative paths
             in the configuration object.
         """
-
         if new_path is None:
             raise ValueError("The `configdir` attribute cannot be set to `None` ")
 
@@ -286,18 +297,15 @@ class Configuration:
         # once this Windows bug is fixed: https://bugs.python.org/issue38671
         self._configdir = Path(abspath(new_path))
 
-
     @property
     def context(self):
-        """
-        Get the context.
-        """
+        """Get the context."""
         return self._context
 
     @context.setter
     def context(self, new_context):
         """
-        Set a new context
+        Set a new context.
 
         Parameters
         ----------
@@ -373,6 +381,8 @@ class Configuration:
 
     def pop(self, key, default=None):
         """
+        Remove and return value.
+
         Remove and returns an element from
         the object having the given key.
 
@@ -419,7 +429,6 @@ class Configuration:
         output_dir : str
             The path to the output directory.
         """
-
         # save a copy of the main config into the output directory
         if output_dir is None:
             output_dir = Path(getcwd())
@@ -438,6 +447,8 @@ class Configuration:
 
     def check_exclude_listwise(self):
         """
+        Check for candidate exclusion.
+
         Check if we are excluding candidates
         based on number of responses, and
         add this to the configuration file
@@ -456,8 +467,9 @@ class Configuration:
                           flag_column='flag_column',
                           partition='unknown'):
         """
-        Make sure the `flag_column` field is in the correct format. Get
-        flag columns and values for filtering if any and convert single
+        Make sure the `flag_column` field is in the correct format.
+
+        Get flag columns and values for filtering if any and convert single
         values to lists. Raises an exception if `flag_column` is not
         correctly specified.
 
@@ -549,9 +561,10 @@ class Configuration:
                                               model_eval))
         return new_filter_dict
 
-
     def get_trim_min_max_tolerance(self):
         """
+        Get trim min, trim max, and tolerance.
+
         Get the specified trim min and max,
         and trim_tolerance if any,
         and make sure they are numeric.
@@ -583,8 +596,8 @@ class Configuration:
         """
         Get specified rater error variance, if any, and make sure it's numeric.
 
-        Returns:
-        --------
+        Returns
+        -------
         rater_error_variance : float
             specified rater error variance
         """
@@ -621,6 +634,7 @@ class Configuration:
     def get_names_and_paths(self, keys, names):
         """
         Get a a list of values, given keys.
+
         Remove any values that are None.
 
         Parameters
@@ -641,7 +655,6 @@ class Configuration:
         ValueError
             If there are any duplicate keys or names.
         """
-
         assert len(keys) == len(names)
 
         # Make sure keys are not duplicated
@@ -676,9 +689,7 @@ class Configuration:
 
 
 class ConfigurationParser:
-    """
-    A `ConfigurationParser` class to create a `Configuration` object.
-    """
+    """A ``ConfigurationParser`` class to create a ``Configuration`` object."""
 
     def __init__(self, pathlike):
         """
@@ -728,7 +739,9 @@ class ConfigurationParser:
     @staticmethod
     def _fix_json(json_string):
         """
-        Takes a bit of JSON that might have bad quotes
+        Fix json.
+
+        Take a bit of JSON that might have bad quotes
         or capitalized booleans and fixes that stuff.
 
         Parameters
@@ -748,6 +761,8 @@ class ConfigurationParser:
 
     def _parse_json_file(self, filepath):
         """
+        Parse json.
+
         A private method to parse JSON configuration files and return
         a Python dictionary.
 
@@ -778,9 +793,10 @@ class ConfigurationParser:
 
         return configdict
 
-
     def parse(self, context='rsmtool'):
         """
+        Parse configuration file.
+
         Parse the configuration file for which this parser was
         instantiated.
 
@@ -801,7 +817,6 @@ class ConfigurationParser:
             A Configuration object containing the parameters in the
             file that we instantiated the parser for.
         """
-
         filepath = self._configdir / self._filename
         configdict = self._parse_json_file(filepath)
 
@@ -815,6 +830,8 @@ class ConfigurationParser:
     @classmethod
     def validate_config(cls, config, context='rsmtool'):
         """
+        Validate configuration file.
+
         Ensure that all required fields are specified, add default values
         values for all unspecified fields, and ensure that all specified
         fields are valid.
@@ -844,7 +861,6 @@ class ConfigurationParser:
         ValueError
             If config does not exist, and no config passed.
         """
-
         # make a copy of the given parameter dictionary
         new_config = deepcopy(config)
 
@@ -954,8 +970,8 @@ class ConfigurationParser:
         # linear regression model
         if new_config['skll_objective']:
             if not is_skll_model(new_config['model']):
-                logging.warning("You specified a custom SKLL objective but also chose a "
-                                "non-SKLL model. The objective will be ignored.")
+                warnings.warn("You specified a custom SKLL objective but also chose a "
+                              "non-SKLL model. The objective will be ignored.")
             else:
                 if new_config['skll_objective'] not in SCORERS:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
@@ -968,9 +984,9 @@ class ConfigurationParser:
         # at run time for any invalid parameters
         if new_config['skll_fixed_parameters']:
             if not is_skll_model(new_config['model']):
-                logging.warning("You specified custom SKLL fixed parameters but "
-                                "also chose a non-SKLL model. The parameters will "
-                                "be ignored.")
+                warnings.warn("You specified custom SKLL fixed parameters but "
+                              "also chose a non-SKLL model. The parameters will "
+                              "be ignored.")
 
         # 10. Check that if we are running rsmtool to ask for
         # expected scores then the SKLL model type must actually
@@ -994,12 +1010,14 @@ class ConfigurationParser:
         # 12. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config['features'] and new_config['select_transformations']:
-            logging.warning("You specified a feature file but also set "
-                            "`select_transformations` to True. Any "
-                            "transformations or signs specified in "
-                            "the feature file will be overwritten by "
-                            "the automatically selected transformations "
-                            "and signs.")
+            # Show a warning unless a user passed a list of features.
+            if not isinstance(new_config['features'], list):
+                warnings.warn("You specified a feature file but also set "
+                              "`select_transformations` to True. Any "
+                              "transformations or signs specified in "
+                              "the feature file will be overwritten by "
+                              "the automatically selected transformations "
+                              "and signs.")
 
         # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
@@ -1039,6 +1057,8 @@ class ConfigurationParser:
     @classmethod
     def process_config(cls, config):
         """
+        Process configuration file.
+
         Converts fields which are read in as string to the
         appropriate format. Fields which can take multiple
         string values are converted to lists if they have
@@ -1061,7 +1081,6 @@ class ConfigurationParser:
         NameError
             If config does not exist, or no config read.
         """
-
         # Get the parameter dictionary
         new_config = deepcopy(config)
 
