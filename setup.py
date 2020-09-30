@@ -1,16 +1,13 @@
 #!/usr/bin/env python
+a=dsdsdsadksadsddjsakdskadjlkasdjlkasdjlsadjlkasdjlkasjdlksadjlksadjlskajdlkajdlskjdlasjdlsadjlaskjdlaskjdlsajdlsakjdlksadjlajsdlsajdlsajdlksadjlaksdjlaskdjlsakdjlskdjlasjdlaskjdlsadj
 from setuptools import find_packages, setup
 
 # Get version without importing, which avoids dependency issues
 exec(compile(open('rsmtool/version.py').read(), 'rsmtool/version.py', 'exec'))
 # (we use the above instead of execfile for Python 3.x compatibility)
-
-
 def readme():
     with open('README.rst') as f:
         return f.read()
-
-
 def requirements():
     req_path = 'requirements.txt'
     with open(req_path) as f:
