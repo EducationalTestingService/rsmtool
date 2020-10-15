@@ -26,7 +26,7 @@ ASAP Example
 
 Let's see how we can apply this basic RSMTool workflow to a simple example based on a 2012 Kaggle competition on automated essay scoring called the `Automated Student Assessment Prize (ASAP) contest <https://www.kaggle.com/c/asap-aes>`_. As part of that contest, responses to 8 different essay questions written by students in grades 6-10 were provided. The responses were scored by humans and given a holistic score indicating the English proficiency of the student. The goal of the contest was to build an automated scoring model with the highest accuracy on held-out evaluation data.
 
-For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a scoring model and evaluate its performance. All of the data we refer to below can be found in the ``examples/rsmtool`` folder in the `github repository <https://github.com/EducationalTestingService/rsmtool/tree/master/examples/rsmtool>`_.
+For our tutorial, we will use one of the questions from this data to illustrate how to use RSMTool to train a scoring model and evaluate its performance. All of the data we refer to below can be found in the ``examples/rsmtool`` folder in the `github repository <https://github.com/EducationalTestingService/rsmtool/tree/main/examples/rsmtool>`_.
 
 Extract features
 ^^^^^^^^^^^^^^^^

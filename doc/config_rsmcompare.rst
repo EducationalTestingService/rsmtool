@@ -3,7 +3,7 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/master/examples/rsmcompare/config_rsmcompare.json>`_ for ``rsmcompare``. 
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmcompare`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmcompare/config_rsmcompare.json>`_ for ``rsmcompare``.
 
 .. note:: To make it easy to get started with  ``rsmcompare``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
 
