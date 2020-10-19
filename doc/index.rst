@@ -1,4 +1,4 @@
-.. RSMTool documentation main file, created by
+.. RSMTool documentation master file, created by
    sphinx-quickstart on Mon Dec 11 10:52:16 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
