@@ -8,7 +8,7 @@ Setting up
 
 To set up a local development environment, follow the steps below:
 
-1. Pull the latest version of RSMTool from GitHub and switch to the ``master`` branch.
+1. Pull the latest version of RSMTool from GitHub and switch to the ``main`` branch.
 
 2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 

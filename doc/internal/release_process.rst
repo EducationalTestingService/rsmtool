@@ -3,7 +3,7 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
-1. Make sure any and all tests are passing in ``master``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any deprecation warnings in the HTML report that can be fixed before the release.
+1. Make sure any and all tests are passing in ``main``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any deprecation warnings in the HTML report that can be fixed before the release.
 
 2. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
 
@@ -41,17 +41,17 @@ This process is only meant for the project administrators, not users and develop
 
 12. Draft a release on GitHub while the Linux and Windows package tester builds are running.
 
-13. Once both builds have passed, make a pull request with the release branch to be merged into ``master`` and request code review.
+13. Once both builds have passed, make a pull request with the release branch to be merged into ``main`` and request code review.
 
-14. Once the build for the PR passes and the reviewers approve, merge the release branch into ``master``.
+14. Once the build for the PR passes and the reviewers approve, merge the release branch into ``main``.
 
 15. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-16. Make sure that the ReadTheDocs build for ``master`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/latest>`_ - this should say "passing" in green.
+16. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/latest>`_ - this should say "passing" in green.
 
-17. Tag the latest commit in ``master`` with the appropriate release tag and publish the release on GitHub.
+17. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
 
-18. Make another PR to merge ``master`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
+18. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
 
 19. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
