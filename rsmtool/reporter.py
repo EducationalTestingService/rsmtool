@@ -320,8 +320,9 @@ class Reporter:
         # set a high timeout for datasets with a large number of features
         report_config = Config({'ExecutePreprocessor': {'enabled': True,
                                                         'timeout': 3600},
-                                'HTMLExporter': {'template_path': [template_path],
-                                                 'template_file': 'report.tpl'}})
+                                'HTMLExporter': {"template_name": "classic",
+                                                 "template_file": join(template_path,
+                                                                       'report.tpl')}})
 
         exportHtml = HTMLExporter(config=report_config)
         output, _ = exportHtml.from_filename(notebook_file)
