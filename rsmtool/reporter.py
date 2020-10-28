@@ -9,9 +9,11 @@ Classes for dealing with report generation.
 """
 
 import argparse
+import asyncio
 import logging
 import json
 import os
+import sys
 
 from os.path import (abspath,
                      basename,
@@ -316,6 +318,15 @@ class Reporter:
         This function is also exposed as the
         :ref:`render_notebook <render_notebook>` command-line utility.
         """
+
+        # `nbconvert` uses `asyncio` which uses an entirely default
+        # implemention of the event loop on Windows for Cpython 3.8
+        # which breaks the report generation unless we include the
+        # following workaround
+        if (sys.version_info[0] == 3 and
+                sys.version_info[1] >= 8 and
+                sys.platform.startswith('win')):
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
         # set a high timeout for datasets with a large number of features
         report_config = Config({'ExecutePreprocessor': {'enabled': True,
