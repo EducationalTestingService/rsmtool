@@ -1,4 +1,4 @@
-{%- extends 'full.tpl' -%}
+{%- extends 'index.html.j2' -%}
 
 {% block input %}
 {%- endblock input %}

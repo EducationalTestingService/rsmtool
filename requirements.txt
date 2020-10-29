@@ -3,7 +3,6 @@ jupyter
 ipython<7.17
 nose
 notebook
-nbconvert<6.0
 numpy
 pandas
 seaborn
