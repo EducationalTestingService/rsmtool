@@ -13,24 +13,18 @@ import logging
 import os
 import re
 import sys
-
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from itertools import chain, product
 from pathlib import Path
 
-from prompt_toolkit.completion import (FuzzyWordCompleter,
-                                       PathCompleter,
-                                       WordCompleter)
+from prompt_toolkit.completion import FuzzyWordCompleter, PathCompleter, WordCompleter
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit.shortcuts import (clear,
-                                      print_formatted_text,
-                                      prompt,
-                                      CompleteStyle)
+from prompt_toolkit.shortcuts import CompleteStyle, clear, print_formatted_text, prompt
 from prompt_toolkit.validation import Validator
-
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
+
 from .constants import (CHECK_FIELDS,
                         CONFIGURATION_DOCUMENTATION_SLUGS,
                         DEFAULTS,

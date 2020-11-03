@@ -8,18 +8,15 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 :organization: ETS
 """
 
-import numpy as np
-import pandas as pd
 import warnings
-
 from functools import partial
 
+import numpy as np
+import pandas as pd
 from scipy.stats import kurtosis, pearsonr
 from sklearn.decomposition import PCA
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import r2_score
 
 from .container import DataContainer
 from .utils.metrics import (agreement,

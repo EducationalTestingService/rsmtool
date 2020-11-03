@@ -8,14 +8,14 @@ Classes for comparing outputs of two RSMTool experiments.
 :organization: ETS
 """
 
+import warnings
+from collections import defaultdict
+from copy import deepcopy
+from os.path import exists, join
+
 import numpy as np
 import pandas as pd
-import warnings
-
-from copy import deepcopy
-from collections import defaultdict
 from scipy.stats import pearsonr
-from os.path import exists, join
 
 from .reader import DataReader
 from .utils.files import get_output_directory_extension
