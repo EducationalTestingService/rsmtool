@@ -13,7 +13,6 @@ Script to compare two RSMTool experiments.
 import glob
 import logging
 import sys
-
 from os.path import abspath, exists, join, normpath
 
 from .configuration_parser import configure

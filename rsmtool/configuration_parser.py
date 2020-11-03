@@ -13,29 +13,21 @@ and creating configuration objects.
 
 import json
 import logging
-import warnings
 import re
-
-from copy import copy, deepcopy
+import warnings
 from collections import Counter
+from copy import copy, deepcopy
 from os import getcwd
 from os.path import abspath
-
 from pathlib import Path
 
 from skll import Learner
 from skll.metrics import SCORERS
 
 from . import HAS_RSMEXTRA
-from .utils.constants import (DEFAULTS,
-                              CHECK_FIELDS,
-                              LIST_FIELDS,
-                              BOOLEAN_FIELDS,
-                              ID_FIELDS)
-
+from .utils.constants import BOOLEAN_FIELDS, CHECK_FIELDS, DEFAULTS, ID_FIELDS, LIST_FIELDS
 from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
-
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import (default_feature_subset_file, # noqa

@@ -10,22 +10,18 @@ and converting them to DataContainer objects.
 """
 
 import warnings
-
 from functools import partial
-from os.path import (abspath,
-                     exists,
-                     join,
-                     splitext)
+from os.path import abspath, exists, join, splitext
 
 import pandas as pd
+
+from .container import DataContainer
 
 # allow older versions of pandas to work
 try:
     from pandas.io.common import DtypeWarning
 except ImportError:
     from pandas.errors import DtypeWarning
-
-from .container import DataContainer
 
 
 def read_jsonlines(filename, converters=None):

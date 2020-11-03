@@ -2,11 +2,7 @@ import os
 import re
 import sys
 import warnings
-
-import numpy as np
-
 from ast import literal_eval as eval
-from bs4 import BeautifulSoup
 from filecmp import clear_cache, dircmp
 from glob import glob
 from importlib.machinery import SourceFileLoader
@@ -16,16 +12,18 @@ from os.path import basename, exists, join
 from pathlib import Path
 from shutil import copyfile, copytree
 
+import numpy as np
+from bs4 import BeautifulSoup
 from nose.tools import assert_equal, ok_
 from pandas.testing import assert_frame_equal
 
-from .reader import DataReader
 from .modeler import Modeler
-from .rsmtool import run_experiment
+from .reader import DataReader
 from .rsmcompare import run_comparison
 from .rsmeval import run_evaluation
 from .rsmpredict import compute_and_save_predictions
 from .rsmsummarize import run_summary
+from .rsmtool import run_experiment
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
 html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')

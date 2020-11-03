@@ -10,13 +10,9 @@ Classes for preprocessing input data in various contexts.
 
 import logging
 import re
-import warnings
 
 import numpy as np
 import pandas as pd
-
-from collections import defaultdict
-
 from numpy.random import RandomState
 
 from .container import DataContainer

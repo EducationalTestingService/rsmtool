@@ -11,9 +11,9 @@ newer feature files in tabular formats (csv/tsv/xls/xlsx).
 import argparse
 import json
 import os
-import pandas as pd
-
 from os.path import splitext
+
+import pandas as pd
 
 
 def convert_feature_json_file(json_file, output_file, delete=False):

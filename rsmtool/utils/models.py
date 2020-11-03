@@ -1,5 +1,5 @@
 from importlib import import_module
-from inspect import isclass, getmembers
+from inspect import getmembers, isclass
 
 _skll_module = import_module('skll.learner')
 

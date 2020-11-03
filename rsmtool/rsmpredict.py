@@ -15,23 +15,13 @@ import glob
 import logging
 import os
 import sys
-
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     exists,
-                     join,
-                     normpath,
-                     splitext,
-                     split)
+from os.path import abspath, basename, dirname, exists, join, normpath, split, splitext
 
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
-from .utils.commandline import (ConfigurationGenerator,
-                                CmdOption,
-                                setup_rsmcmd_parser)
+from .utils.commandline import CmdOption, ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter

@@ -11,14 +11,12 @@ as well as making predictions for new data.
 
 import logging
 import pickle
-
 from math import log10, sqrt
 from os.path import join
 
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-
 from numpy.random import RandomState
 from scipy.optimize import nnls
 from sklearn.linear_model import LassoCV
@@ -26,9 +24,9 @@ from skll import FeatureSet, Learner
 
 from .analyzer import Analyzer
 from .container import DataContainer
+from .preprocessor import FeaturePreprocessor
 from .utils.metrics import compute_expected_scores_from_model
 from .utils.models import is_skll_model
-from .preprocessor import FeaturePreprocessor
 from .writer import DataWriter
 
 

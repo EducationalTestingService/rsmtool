@@ -14,12 +14,8 @@ import glob
 import logging
 import os
 import sys
-
 from os import listdir
-from os.path import (abspath,
-                     exists,
-                     join,
-                     normpath)
+from os.path import abspath, exists, join, normpath
 
 from .configuration_parser import configure
 from .reader import DataReader

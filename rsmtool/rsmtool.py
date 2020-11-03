@@ -12,7 +12,6 @@ The main RSMTool script.
 
 import logging
 import sys
-
 from os import listdir, makedirs
 from os.path import abspath, exists, join
 

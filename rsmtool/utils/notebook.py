@@ -13,8 +13,8 @@ from os.path import exists, isabs, relpath
 from pathlib import Path
 from string import Template
 from textwrap import wrap
-from IPython.display import display, HTML
 
+from IPython.display import HTML, display
 
 HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
 

@@ -10,10 +10,9 @@ Utility classes and functions for RSMTool file management.
 
 import json
 import re
-
 from glob import glob
-from pathlib import Path
 from os.path import join
+from pathlib import Path
 
 from .constants import POSSIBLE_EXTENSIONS
 

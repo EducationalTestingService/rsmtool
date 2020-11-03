@@ -10,19 +10,14 @@ Classes for dealing with report generation.
 
 import argparse
 import asyncio
-import logging
 import json
+import logging
 import os
 import sys
+from os.path import abspath, basename, dirname, join, splitext
 
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join,
-                     splitext)
-
-from traitlets.config import Config
 from nbconvert.exporters import HTMLExporter
+from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
 from .reader import DataReader

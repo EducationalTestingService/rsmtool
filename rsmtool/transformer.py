@@ -9,8 +9,8 @@ Class for transforming features.
 """
 
 import logging
-import numpy as np
 
+import numpy as np
 from scipy.stats.stats import pearsonr
 
 
