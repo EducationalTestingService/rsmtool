@@ -1,6 +1,11 @@
 """
-Classes for storing any kind of data contained
-in a pd.DataFrame object.
+Class to encapsulate data contained in multiple pandas DataFrames.
+
+It represents each of the multiple data sources as a "dataset". Each
+dataset is represented by three things:
+- "name" : the name of the data set
+- "frame" : the pandas DataFrame that contains the actual data
+- "path" : the path to the file on disk from which the data was read
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -14,22 +19,20 @@ from copy import copy, deepcopy
 
 
 class DataContainer:
-    """
-    A class to encapsulate datasets.
-    """
+    """Class to encapsulate datasets."""
 
-    def __init__(self,
-                 datasets=None):
+    def __init__(self, datasets=None):
         """
-        Initialize ``DataContainer`` object.
+        Initialize a DataContainer object.
 
         Parameters
         ----------
         datasets : list of dicts, optional
-            A list of dataset dicts. Each dict should have the following keys:
-            ``name`` containing the name of the dataset, ``frame`` containing
-            the dataframe object that contains the dataset, and ``path`` containing
-            the file from which the dataset was read.
+            A list of dataset dictionaries. Each dict should have the
+            following keys: "name" containing the name of the dataset,
+            "frame" containing the dataframe object representing the
+            dataset, and "path" containing the file from which the frame
+            was read.
         """
         self._names = []
         self._dataframes = {}
@@ -37,92 +40,103 @@ class DataContainer:
 
         if datasets is not None:
             for dataset_dict in datasets:
-                self.add_dataset(dataset_dict,
-                                 update=False)
+                self.add_dataset(dataset_dict, update=False)
 
-    def __contains__(self, key):
+    def __contains__(self, name):
         """
-        Check if DataContainer object
-        contains a given key.
+        Check if the container object contains a dataset with a given name.
 
         Parameters
         ----------
-        key : str
-            A key to check in the DataContainer object
+        name : str
+            The name to check in the container object.
 
         Returns
         -------
         key_check : bool
-            True if key in DataContainer object, else False
+            ``True`` if a dataset with this name exists in the container
+            object, else ``False``.
         """
-        return key in self._names
+        return name in self._names
 
-    def __getitem__(self, key):
+    def __getitem__(self, name):
         """
-        Get frame, given key.
+        Get the data frame for the dataset with the given name.
 
         Parameters
         ----------
-        key : str
-            Name for the data.
+        name : str
+            The name for the dataset.
 
         Returns
         -------
-        frame : pd.DataFrame
-            The DataFrame.
+        frame : pandas DataFrame
+            The data frame for the dataset with the given name.
 
         Raises
         ------
         KeyError
-            If the key does not exist.
+            If the name does not exist in the container.
         """
-        return self.get_frame(key)
+        return self.get_frame(name)
 
     def __len__(self):
         """
-        Return the length of the
-        DataContainer names.
+        Return the number of datasets in the container.
 
         Returns
         -------
         length : int
-            The length of the container (i.e. number of frames)
+            The size of the container (i.e. number of datasets)
         """
         return len(self._names)
 
     def __str__(self):
         """
-        String representation of the object.
+        Return a string representation of the container.
 
         Returns
         -------
         container_names : str
-            A comma-separated list of names from the container.
+            A comma-separated list of dataset names from the container.
         """
         return ', '.join(self._names)
 
     def __add__(self, other):
         """
-        Add two DataContainer objects together and return a new
-        DataContainer object with DataFrames common to both
-        DataContainers
+        Add another container object to instance.
+
+        Return a new container object with datasets common to
+        both containers.
+
+        Parameters
+        ----------
+        other : DataContainer
+            The container object to add.
+
+        Returns
+        -------
+        output : DataContainer
+            New container object containing datasets
+            common to this instance and the other instance.
 
         Raises
         ------
-        ValueError
-            If the object being added is not a DataContainer
         KeyError
-            If there are duplicate keys in the two DataContainers.
+            If there are duplicate keys in the two containers.
+        ValueError
+            If the object being added is not a container.
+
         """
         if not isinstance(other, DataContainer):
-            raise ValueError('Object must be `DataContainer`, '
+            raise ValueError('Object must be a `DataContainer`, '
                              'not {}.'.format(type(other)))
 
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)
         if common_keys:
             raise KeyError('The key(s) `{}` already exist in the '
-                           'DataContainer.'.format(', '.join(common_keys)))
+                           'container.'.format(', '.join(common_keys)))
 
         dicts = DataContainer.to_datasets(self)
         dicts.extend(DataContainer.to_datasets(other))
@@ -130,12 +144,12 @@ class DataContainer:
 
     def __iter__(self):
         """
-        Iterate through configuration object keys.
+        Iterate through the container keys (dataset names).
 
         Yields
         ------
         key
-            A key in the container dictionary
+            A key (name) in the container dictionary
         """
         for key in self.keys():
             yield key
@@ -143,13 +157,15 @@ class DataContainer:
     @staticmethod
     def to_datasets(data_container):
         """
-        Convert a DataContainer object to a list of dataset dictionaries
-        with keys {`name`, `path`, `frame`}.
+        Convert container object to a list of dataset dictionaries.
+
+        Each dictionary will contain the "name", "frame", and
+        "path" keys.
 
         Parameters
         ----------
         data_container : DataContainer
-            A DataContainer object.
+            The container object to convert.
 
         Returns
         -------
@@ -166,15 +182,16 @@ class DataContainer:
 
     def add_dataset(self, dataset_dict, update=False):
         """
-        Update or add a new DataFrame to the instance.
+        Add a new dataset (or update an existing one).
 
         Parameters
         ----------
-        dataset_dict : pd.DataFrame
-            The dataset dictionary to add.
+        dataset_dict : dict
+            The dataset dictionary to add or update
+            with the "name", "frame", and "path" keys.
         update : bool, optional
-            Update an existing DataFrame, if True.
-            Defaults to False.
+            Update an existing DataFrame, if ``True``.
+            Defaults to ``False``.
         """
         name = dataset_dict['name']
         data_frame = dataset_dict['frame']
@@ -183,7 +200,7 @@ class DataContainer:
         if not update:
             if name in self._names:
                 raise KeyError('The name {} already exists in the '
-                               'DataContainer dictionary.'.format(name))
+                               'container dictionary.'.format(name))
 
         if name not in self._names:
             self._names.append(name)
@@ -193,70 +210,67 @@ class DataContainer:
 
         self.__setattr__(name, data_frame)
 
-    def get_path(self, key, default=None):
+    def get_path(self, name, default=None):
         """
-        Get path, given key.
+        Get the path for the dataset given the name.
 
         Parameters
         ----------
-        key : str
-            Name for the data.
+        name : str
+            The name for the dataset.
 
         Returns
         -------
         path : str
-            Path to the data.
+            The path for the named dataset.
         """
-        if key not in self._names:
+        if name not in self._names:
             return default
-        return self._data_paths[key]
+        return self._data_paths[name]
 
-    def get_frame(self, key, default=None):
+    def get_frame(self, name, default=None):
         """
-        Get frame, given key.
+        Get the data frame given the dataset name.
 
         Parameters
         ----------
-        key : str
-            Name for the data.
+        name : str
+            The name for the dataset.
         default
-            The default argument, if the frame does not exist
+            The default argument, if the frame does not exist.
 
         Returns
         -------
-        frame : pd.DataFrame
-            The DataFrame.
+        frame : pandas DataFrame
+            The data frame for the named dataset.
         """
-        if key not in self._names:
+        if name not in self._names:
             return default
-        return self._dataframes[key]
+        return self._dataframes[name]
 
     def get_frames(self, prefix=None, suffix=None):
         """
-        Get all data frames in the container that have
-        a specified prefix and/or suffix. Note that
-        the selection by prefix or suffix will be
-        case-insensitive.
+        Get all data frames with a given prefix or suffix in their name.
+
+        Note that the selection by prefix or suffix is case-insensitive.
 
         Parameters
         ----------
-        prefix : str or None, optional
-            Only return frames with the given prefix.
-            If None, then do not exclude any frames based
-            on their prefix.
-            Defaults to None.
-        suffix : str or None, optional
-            Only return frames with the given suffix.
-            If None, then do not exclude any frames based
-            on their suffix.
-            Defaults to None.
+        prefix : str, optional
+            Only return frames with the given prefix. If ``None``, then
+            do not exclude any frames based on their prefix.
+            Defaults to ``None``.
+        suffix : str, optional
+            Only return frames with the given suffix. If ``None``, then
+            do not exclude any frames based on their suffix.
+            Defaults to ``None``.
 
         Returns
         -------
         frames : dict
-            A dictionary with all of the data frames
-            that contain the specified prefix and suffix.
-            The keys are the names of the data frames.
+            A dictionary with the data frames that contain the specified
+            prefix and/or suffix in their corresponding names. The names
+            are the keys and the frames are the values.
         """
         if prefix is None:
             prefix = ''
@@ -273,49 +287,47 @@ class DataContainer:
             frames[name] = self._dataframes[name]
         return frames
 
-    def keys(self):
+    def keys(self):  # noqa: D402
         """
-        Return keys as a list.
+        Return the container keys (dataset names) as a list.
 
         Returns
         -------
         keys : list
-            A list of keys in the Configuration object.
+            A list of keys (names) in the container object.
         """
         return self._names
 
     def values(self):
         """
-        Return values as a list.
+        Return all data frames as a list.
 
         Returns
         -------
         values : list
-            A list of values in the Configuration object.
+            A list of all data frames in the container object.
         """
         return [self._dataframes[name] for name in self._names]
 
     def items(self):
         """
-        Return items as a list of tuples.
+        Return the container items as a list of (name, frame) tuples.
 
         Returns
         -------
         items : list of tuples
-            A list of (key, value) tuples in the Configuration object.
+            A list of (name, frame) tuples in the container object.
         """
         return [(name, self._dataframe[name]) for name in self._names]
 
     def drop(self, name):
         """
-        Drop a given data frame from the
-        container.
+        Drop a given dataset from the container and return instance.
 
         Parameters
         ----------
         name : str
-            The name of the data frame to drop from the
-            container object.
+            The name of the dataset to drop.
 
         Returns
         -------
@@ -323,7 +335,7 @@ class DataContainer:
         """
         if name not in self:
             warnings.warn('The name `{}` is not in the '
-                          'container. No data frames will '
+                          'container. No datasets will '
                           'be dropped.'.format(name))
         else:
             self._names.remove(name)
@@ -333,17 +345,14 @@ class DataContainer:
 
     def rename(self, name, new_name):
         """
-        Rename a given data frame in the
-        container.
+        Rename a given dataset in the container and return instance.
 
         Parameters
         ----------
         name : str
-            The name of the current data frame
-            in the container object.
+            The name of the current dataset in the container object.
         new_name : str
-            The the new name for the data frame
-            in the container object.
+            The new name for the dataset in the container object.
 
         Returns
         -------
@@ -356,23 +365,20 @@ class DataContainer:
         else:
             frame = self._dataframes[name]
             path = self._data_paths[name]
-            self.add_dataset({'name': new_name,
-                              'frame': frame,
-                              'path': path},
+            self.add_dataset({'name': new_name, 'frame': frame, 'path': path},
                              update=True)
             self.drop(name)
         return self
 
     def copy(self, deep=True):
         """
-        Create a copy of the DataContainer object.
+        Return a copy of the container object.
 
         Parameters
         ----------
         deep : bool, optional
-            If True, create a deep copy of the
-            underlying data frames.
-            Defaults to True.
+            If ``True``, create a deep copy of the underlying data frames.
+            Defaults to ``True``.
         """
         if deep:
             return deepcopy(self)

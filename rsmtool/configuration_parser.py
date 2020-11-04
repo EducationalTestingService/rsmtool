@@ -45,8 +45,8 @@ def configure(context, config_file_or_obj_or_dict):
     ----------
     context : str
         The context that is being configured. Must be one of
-        ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmsummarize``, or
-        ``rsmpredict``.
+        "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", or
+        "rsmpredict".
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
@@ -111,9 +111,8 @@ class Configuration:
     """
     Configuration class.
 
-    Encapsulates all of the
-    configuration parameters and methods to access these
-    parameters.
+    Encapsulates all of the configuration parameters and methods to 
+    access these parameters.
     """
 
     def __init__(self,
@@ -134,15 +133,14 @@ class Configuration:
             The dictionary must be a valid configuration dictionary
             with default values filled as necessary.
         configdir : str, optional, keyword-only
-            The reference path used to
-            resolve any relative paths in the configuration
-            object. When None, will be set during
+            The reference path used to resolve any relative paths
+            in the configuration object. When ``None``, will be set during
             initialization to the current working directory.
-            Defaults to None
-        context : {'rsmtool', 'rsmeval', 'rsmcompare',
-                   'rsmpredict', 'rsmsummarize'}
-            The context of the tool.
-            Defaults to 'rsmtool'.
+            Defaults to ``None``,
+        context : str
+            The context of the tool. One of {"rsmtool", "rsmeval", "rsmcompare",
+            "rsmpredict", "rsmsummarize"}.
+            Defaults to "rsmtool".
         """
         if not isinstance(configdict, dict):
             raise TypeError('The input must be a dictionary.')
@@ -164,10 +162,7 @@ class Configuration:
 
     def __contains__(self, key):
         """
-        Key check.
-
-        Check if configuration object
-        contains a given key.
+        Check if the configuration object contains a given key.
 
         Parameters
         ----------
@@ -177,56 +172,53 @@ class Configuration:
         Returns
         -------
         key_check : bool
-            True if key in Configuration object, else False
+            ``True`` if key is in configuration object, else ``False``.
         """
         return key in self._config
 
     def __getitem__(self, key):
         """
-        Get value, given key.
+        Get configuration value for the given key.
 
         Parameters
         ----------
         key : str
-            Key to check in the Configuration object
+            Key to check in the configuration object
 
         Returns
         -------
         value
-            The value in the Configuration object dictionary.
+            The value in the configuration object dictionary.
         """
         return self._config[key]
 
     def __setitem__(self, key, value):
         """
-        Set value, given key.
+        Set configuration value for the given key.
 
         Parameters
         ----------
         key : str
-            Key to check in the Configuration object.
+            Key to set in the configuration object.
         value
-            A value to be set on the key.
+            The value to be set for the key.
         """
         self._config[key] = value
 
     def __len__(self):
         """
-        Return the length of the Configuration dictionary.
+        Return the size of the configuration dictionary.
 
         Returns
         -------
-        length : int
-            The length of the config dictionary (i.e. number of elements)
+        size : int
+            The number of elements in the configuration dictionary.
         """
         return len(self._config)
 
     def __str__(self):
         """
-        Return string representation.
-
-        Return a string representation of the underlying configuration
-        dictionary.
+        Return string representation of the configuration dictionary.
 
         Returns
         -------
@@ -248,7 +240,7 @@ class Configuration:
 
         Yields
         ------
-        key
+        key : str
             A key in the config dictionary
         """
         for key in self.keys():
@@ -266,7 +258,7 @@ class Configuration:
         Returns
         -------
         configdir : str
-            The path to the configuration reference directory
+            The path to the configuration reference directory.
         """
         return str(self._configdir)
 
@@ -302,14 +294,13 @@ class Configuration:
         Parameters
         ----------
         new_context : str
-            A new context  for the
-            configuration object.
+            A new context for the configuration object.
         """
         self._context = new_context
 
     def get(self, key, default=None):
         """
-        Get value or default, given key.
+        Get value or default for the given key.
 
         Parameters
         ----------
@@ -317,18 +308,18 @@ class Configuration:
             Key to check in the Configuration object.
         default, optional
             The default value to return, if no key exists.
-            Defaults to None.
+            Defaults to ``None``.
 
         Returns
         -------
         value
-            The value in the Configuration object dictionary.
+            The value in the configuration object dictionary.
         """
         return self._config.get(key, default)
 
     def to_dict(self):
         """
-        Get a dictionary representation of the Configuration object.
+        Get a dictionary representation of the configuration object.
 
         Returns
         -------
@@ -344,24 +335,24 @@ class Configuration:
         Returns
         -------
         keys : list of str
-            A list of keys in the Configuration object.
+            A list of keys in the configuration object.
         """
         return [k for k in self._config.keys()]
 
     def values(self):
         """
-        Return values as a list.
+        Return configuration values as a list.
 
         Returns
         -------
         values : list
-            A list of values in the Configuration object.
+            A list of values in the configuration object.
         """
         return [v for v in self._config.values()]
 
     def items(self):
         """
-        Return items as a list of tuples.
+        Return configuration items as a list of tuples.
 
         Returns
         -------
@@ -373,10 +364,7 @@ class Configuration:
 
     def pop(self, key, default=None):
         """
-        Remove and return value.
-
-        Remove and returns an element from
-        the object having the given key.
+        Remove and return an element from the object having the given key.
 
         Parameters
         ----------
@@ -384,7 +372,7 @@ class Configuration:
             Key to pop in the configuration object.
         default, optional
             The default value to return, if no key exists.
-            Defaults to None.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -401,7 +389,7 @@ class Configuration:
         ----------
         deep : bool, optional
             Whether to perform a deep copy.
-            Defaults to True.
+            Defaults to ``True``.
 
         Returns
         -------
@@ -441,14 +429,13 @@ class Configuration:
         """
         Check for candidate exclusion.
 
-        Check if we are excluding candidates
-        based on number of responses, and
-        add this to the configuration file
+        Check if we are excluding candidates based on number of responses, and
+        add this to the configuration file.
 
         Returns
         -------
         exclude_listwise : bool
-            Whether to exclude list-wise
+            Whether to exclude list-wise.
         """
         exclude_listwise = False
         if self._config.get('min_items_per_candidate'):
@@ -459,55 +446,55 @@ class Configuration:
                           flag_column='flag_column',
                           partition='unknown'):
         """
-        Make sure the `flag_column` field is in the correct format.
+        Make sure the column name in ``flag_column`` is correctly specified.
 
-        Get flag columns and values for filtering if any and convert single
-        values to lists. Raises an exception if `flag_column` is not
-        correctly specified.
+        Get flag columns and values for filtering, if any, and convert single
+        values to lists. Raises an exception if the column name in ``flag_column``
+        is not correctly specified in the configuration file.
 
         Parameters
         ----------
         flag_column : str
-            The flag column to check. Currently used fields are `flag_column` or
-            `flag_column_test`.
-            Defaults to 'flag_column'.
+            The flag column name to check. Currently used names are
+            "flag_column" or "flag_column_test".
+            Defaults to "flag_column".
 
-        partition: {'train', 'test', 'both', 'unknown'}
-            Partition which is filtered based on the flag column.
-            This is used to display more helpful warning messages.
-            Defaults to 'both'
+        partition: str
+            The data partition which is filtered based on the flag column name.
+            One of {"train", "test", "both", "unknown"}.
+            Defaults to "both".
 
         Returns
         -------
         new_filtering_dict : dict
-            Properly formatted `flag_column` dictionary.
+            Properly formatted dictionary for the column
+            name in ``flag_column``.
 
         Raises
         ------
         ValueError
-            If the `flag_column` is not  a dictionary
-
-            If `partition` value if not in the expected list
-
-            If `partition` value does not match the `flag_column`
+            If the specified value of the column name in ``flag_column``
+            is not a dictionary.
+            If the value of ``partition`` is not in the expected list.
+            If the value of ``partition`` does not match the ``flag_column``.
         """
         config = self._config
 
         new_filter_dict = {}
 
-        flag_message = {'train': 'training',
-                        'test': 'evaluating',
-                        'both': 'training and evaluating',
-                        'unknown': 'training and/or evaluating'}
+        flag_message = {"train": "training",
+                        "test": "evaluating",
+                        "both": "training and evaluating",
+                        "unknown": "training and/or evaluating"}
 
         if partition not in flag_message:
             raise ValueError("Unknown value for partition: {} "
                              "This must be one of the following: {}."
                              "".format(partition, ','.join(flag_message.keys())))
 
-        if flag_column == 'flag_column_test':
-            if partition in ['both', 'train']:
-                raise ValueError("The conditions specified in `flag_column_test` "
+        if flag_column == "flag_column_test":
+            if partition in ["both", "train"]:
+                raise ValueError("Conditions specified in 'flag_column_test' "
                                  "can only be applied to the evaluation partition.")
 
         if config.get(flag_column):
@@ -555,20 +542,19 @@ class Configuration:
 
     def get_trim_min_max_tolerance(self):
         """
-        Get trim min, trim max, and tolerance.
+        Get trim min, trim max, and tolerance values.
 
-        Get the specified trim min and max,
-        and trim_tolerance if any,
+        Get the specified trim min and max, and trim_tolerance if any,
         and make sure they are numeric.
 
         Returns
         -------
         spec_trim_min : float
-            Specified trim min value
+            Specified trim min value.
         spec_trim_max : float
-            Specified trim max value
+            Specified trim max value.
         spec_trim_tolerance: float
-            specified trim tolerance value
+            Specified trim tolerance value.
         """
         config = self._config
 
@@ -591,7 +577,7 @@ class Configuration:
         Returns
         -------
         rater_error_variance : float
-            specified rater error variance
+            Specified rater error variance.
         """
         config = self._config
 
@@ -604,7 +590,7 @@ class Configuration:
 
     def get_default_converter(self):
         """
-        Get the default converter dictionary for reader.
+        Get default converter dictionary for data reader.
 
         Returns
         -------
@@ -625,9 +611,9 @@ class Configuration:
 
     def get_names_and_paths(self, keys, names):
         """
-        Get a a list of values, given keys.
+        Get a list of values for the given keys.
 
-        Remove any values that are None.
+        Remove any values that are ``None``.
 
         Parameters
         -------
@@ -635,7 +621,7 @@ class Configuration:
             A list of keys whose values to retrieve.
         names : list
             The default value to use if key cannot be found.
-            Defaults to None.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -681,11 +667,11 @@ class Configuration:
 
 
 class ConfigurationParser:
-    """A ``ConfigurationParser`` class to create a ``Configuration`` object."""
+    """``ConfigurationParser`` class to create ``Configuration`` objects."""
 
     def __init__(self, pathlike):
         """
-        Instantiate a ConfigurationParser for a given config file path.
+        Instantiate a ``ConfigurationParser`` for a given config file path.
 
         Parameters
         ----------
@@ -702,7 +688,7 @@ class ConfigurationParser:
             If the given path is a directory, not a file.
         ValueError
             If the file at the given path does not have
-            a valid extension (``.json``).
+            a valid extension (".json").
         """
         # if we passed in a string, convert it to a Path
         if isinstance(pathlike, str):
@@ -731,7 +717,7 @@ class ConfigurationParser:
     @staticmethod
     def _fix_json(json_string):
         """
-        Fix json.
+        Fix the configuration JSON.
 
         Take a bit of JSON that might have bad quotes
         or capitalized booleans and fixes that stuff.
@@ -753,7 +739,7 @@ class ConfigurationParser:
 
     def _parse_json_file(self, filepath):
         """
-        Parse json.
+        Parse the configuration JSON.
 
         A private method to parse JSON configuration files and return
         a Python dictionary.
@@ -761,7 +747,8 @@ class ConfigurationParser:
         Parameters
         ----------
         filepath : pathlib.Path
-            A ``pathlib.Path`` object containing the JSON configuration filepath.
+            A ``pathlib.Path`` object containing the JSON configuration
+            filepath.
 
         Returns
         -------
@@ -795,18 +782,15 @@ class ConfigurationParser:
         Parameters
         ----------
         context : str, optional
-            Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare', 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
+            Context of the tool in which we are validating. One of:
+            {"rsmtool", "rsmeval", "rsmpredict", "rsmcompare",
+            "rsmsummarize"}.
+            Defaults to "rsmtool".
 
         Returns
         -------
         configuration : Configuration
-            A Configuration object containing the parameters in the
+            A configuration object containing the parameters in the
             file that we instantiated the parser for.
         """
         filepath = self._configdir / self._filename
@@ -832,16 +816,13 @@ class ConfigurationParser:
         ----------
         context : str, optional
             Context of the tool in which we are validating.
-            Possible values are ::
-
-                {'rsmtool', 'rsmeval',
-                 'rsmpredict', 'rsmcompare', 'rsmsummarize'}
-
-            Defaults to 'rsmtool'.
+            One of {"rsmtool", "rsmeval", "rsmpredict",
+            "rsmcompare", "rsmsummarize"}.
+            Defaults to "rsmtool".
         inplace : bool
             Maintain the state of the config object produced by
             this method.
-            Defaults to True.
+            Defaults to ``True``.
 
         Returns
         -------
@@ -1061,7 +1042,7 @@ class ConfigurationParser:
         inplace : bool
             Maintain the state of the config object produced by
             this method.
-            Defaults to True.
+            Defaults to ``True``.
 
         Returns
         -------

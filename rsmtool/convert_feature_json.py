@@ -1,6 +1,5 @@
 """
-Provides a function to convert older feature JSON files to
-newer feature files in tabular formats (csv/tsv/xls/xlsx).
+Convert older feature files in JSON to CSV/TSV/XLS/XLSX.
 
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)
@@ -18,18 +17,19 @@ import pandas as pd
 
 def convert_feature_json_file(json_file, output_file, delete=False):
     """
-    Convert the given feature JSON file into a tabular
-    format inferred by the extension of the output file.
+    Convert given feature JSON file into tabular format.
+
+    The specific format is inferred by the extension of the output file.
 
     Parameters
     ----------
     json_file : str
-        Path to feature JSON file that is to be converted.
+        Path to feature JSON file to be converted.
     output_file : str
         Path to CSV/TSV/XLS/XLSX output file.
     delete : bool, optional
         Whether to delete the original file after conversion.
-        Defaults to False.
+        Defaults to ``False``.
 
     Raises
     ------
@@ -37,7 +37,6 @@ def convert_feature_json_file(json_file, output_file, delete=False):
         If the given input file is not a valid feature JSON file
         or if the output file has an unsupported extension.
     """
-
     # make sure the input file is a valid feature JSON file
     json_dict = json.load(open(json_file, 'r'))
     if not list(json_dict.keys()) == ['features']:
@@ -65,7 +64,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
         os.unlink(json_file)
 
 
-def main():
+def main():  # noqa: D103
     parser = argparse.ArgumentParser(prog='convert_feature_json')
     parser.add_argument('json_file',
                         help="The feature JSON file to convert "
@@ -86,5 +85,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
