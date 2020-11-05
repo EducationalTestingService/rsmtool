@@ -29,18 +29,23 @@ def convert_to_ordered_category(group_values, base_group=None):
 
     Parameters
     ----------
-    group_values: pandas Series
+    group_values : pandas Series
         A series indicating group membership
 
-    base_group: str, optional
+    base_group : str, optional
         The group to use as the first category.
         This overrides the default ordering.
         Defaults to ``None``.
 
     Returns
     -------
-    group_ordered_category: pandas Series
+    group_ordered_category : pandas Series
         The ordered category.
+
+    Raises
+    ------
+    ValueError
+        If ``base_group`` is specified but does not exist in the data.
     """
     # get ordered list by size
 

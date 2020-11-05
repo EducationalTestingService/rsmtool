@@ -218,8 +218,9 @@ class Comparer:
         Raises
         ------
         ValueError
-            If there are no shared features between the two sets or if there
-            are no shared responses between the two sets.
+            If there are no shared features between the two sets.
+        ValueError
+            If there are no shared responses between the two sets.
         """
         # Only use features that appear in both datasets
         features_old = [column for column in df_old

@@ -34,8 +34,9 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     Raises
     ------
     RuntimeError
-        If the given input file is not a valid feature JSON file
-        or if the output file has an unsupported extension.
+        If the given input file is not a valid feature JSON file.
+    RuntimeError
+        If the output file has an unsupported extension.
     """
     # make sure the input file is a valid feature JSON file
     json_dict = json.load(open(json_file, 'r'))

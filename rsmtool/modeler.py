@@ -261,7 +261,7 @@ class Modeler:
 
     def train_linear_regression(self, df_train, feature_columns):
         """
-        Train a ``LinearRegression`` model.
+        Train a "LinearRegression" model.
 
         This model is a simple linear regression model.
 
@@ -302,7 +302,7 @@ class Modeler:
 
     def train_equal_weights_lr(self, df_train, feature_columns):
         """
-        Train an ``EqualWeightsLR`` model.
+        Train an "EqualWeightsLR" model.
 
         This model ensures that all features get equal weights.
 
@@ -358,7 +358,7 @@ class Modeler:
 
     def train_rebalanced_lr(self, df_train, feature_columns):
         """
-        Train a ``RebalancedLR`` model.
+        Train a "RebalancedLR" model.
 
         This model balances empirical weights by changing betas (adapted
         from `here <https://stats.stackexchange.com/q/30876>`_).
@@ -428,7 +428,7 @@ class Modeler:
 
     def train_lasso_fixed_lambda_then_lr(self, df_train, feature_columns):
         """
-        Train a ``LassoFixedLambdaThenLR`` model.
+        Train a "LassoFixedLambdaThenLR" model.
 
         First do feature selection using lasso regression with
         a fixed lambda and then use only those features to train
@@ -488,11 +488,11 @@ class Modeler:
 
     def train_positive_lasso_cv_then_lr(self, df_train, feature_columns):
         """
-        Train a ``PositiveLassoCVThenLR`` model.
+        Train a "PositiveLassoCVThenLR" model.
 
         First do feature selection using lasso regression optimized
         for log likelihood using cross validation and then use only
-        those features to train a second linear regression
+        those features to train a second linear regression.
 
         Parameters
         ----------
@@ -543,7 +543,7 @@ class Modeler:
 
     def train_non_negative_lr(self, df_train, feature_columns):
         """
-        Train an ``NNLR`` model.
+        Train an "NNLR" model.
 
         To do this, we first do feature selection using non-negative
         least squares (NNLS) and then use only its non-zero features to
@@ -617,7 +617,7 @@ class Modeler:
 
     def train_non_negative_lr_iterative(self, df_train, feature_columns):
         """
-        Train an ``NNLR_iterative`` model.
+        Train an "NNLR_iterative" model.
 
         For applications where there is a concern that standard NNLS may not
         converge, an alternate method of training NNLR by iteratively fitting
@@ -682,7 +682,7 @@ class Modeler:
 
     def train_lasso_fixed_lambda_then_non_negative_lr(self, df_train, feature_columns):
         """
-        Train an ``LassoFixedLambdaThenNNLR`` model.
+        Train an "LassoFixedLambdaThenNNLR" model.
 
         First do feature selection using lasso regression and positive
         only weights. Then fit an NNLR (see above) on those features.
@@ -771,7 +771,7 @@ class Modeler:
 
     def train_lasso_fixed_lambda(self, df_train, feature_columns):
         """
-        Train a `LassoFixedLambda` model.
+        Train a "LassoFixedLambda" model.
 
         This is a Lasso model with a fixed lambda.
 
@@ -822,7 +822,7 @@ class Modeler:
 
     def train_positive_lasso_cv(self, df_train, feature_columns):
         """
-        Train a ``PositiveLassoCV`` model.
+        Train a "PositiveLassoCV" model.
 
         Do feature selection using lasso regression optimized for
         log likelihood using cross validation.
@@ -879,7 +879,7 @@ class Modeler:
 
     def train_score_weighted_lr(self, df_train, feature_columns):
         """
-        Train a ``ScoreWeightedLR`` model.
+        Train a "ScoreWeightedLR" model.
 
         This is a linear regression model weighted by score.
 
@@ -1231,6 +1231,7 @@ class Modeler:
         ValueError
             If the model cannot predict probability distributions and
             ``predict_expected`` is set to ``True``.
+        ValueError
             If  the score range specified by ``min_score`` and ``max_score``
             does not match what the model predicts in its probability
             distribution.

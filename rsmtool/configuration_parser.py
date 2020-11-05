@@ -475,7 +475,9 @@ class Configuration:
         ValueError
             If the specified value of the column name in ``flag_column``
             is not a dictionary.
+        ValueError
             If the value of ``partition`` is not in the expected list.
+        ValueError
             If the value of ``partition`` does not match the ``flag_column``.
         """
         config = self._config
@@ -1050,9 +1052,12 @@ class ConfigurationParser:
             A configuration object
 
         Raises
-        -------
+        ------
         NameError
-            If config does not exist, or no config read.
+            If ``config`` does not exist, or ``config`` could not be read.
+        ValueError
+            If boolean configuration fields contain a value other then
+            "true" or "false" (in JSON).
         """
         # Get the parameter dictionary
         new_config = deepcopy(config)
