@@ -149,7 +149,7 @@ class DataReader:
         Raises
         ------
         AssertionError
-            If the number of paths is not equal to number of names.
+            If ``len(filepaths)`` does not equal ``len(framenames)``.
         ValueError
             If ``file_converters`` is not a dictionary or if any of its
             values is not a dictionary.
@@ -288,8 +288,8 @@ class DataReader:
         --------
         retval :  str or list
             Absolute path to the experiment file or ``None``
-            if the file could not be located. If the ``filepaths```
-            argument was a string, this method will return a string.
+            if the file could not be located. If ``filepaths``
+            was a string, this method will return a string.
             Otherwise, it will return a list.
 
         Raises
