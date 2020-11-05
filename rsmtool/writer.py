@@ -1,6 +1,5 @@
 """
-Classes for writing DataContainer
-DataFrames to files.
+Class for writing DataContainer frames to disk.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -14,14 +13,9 @@ from os.path import join
 
 
 class DataWriter:
-    """
-    A DataWriter class to write out
-    DataContainer objects
-    """
+    """Class to write out DataContainer objects."""
 
-    def __init__(self, experiment_id=None):
-        """
-        """
+    def __init__(self, experiment_id=None):  # noqa: D107
         self._id = experiment_id
 
     def write_experiment_output(self,
@@ -35,47 +29,51 @@ class DataWriter:
                                 index=False,
                                 **kwargs):
         """
-        Write out each of the given list of data frames as a ''.csv``, ''.tsv``,
-        or ``.xlsx`` file in the given directory. Each data frame was generated
-        as part of running an RSMTool experiment. All files are prefixed with the
-        given experiment ID and suffixed with either the name of the data frame in
-        the DataContainer (or dict) object, or a new name if ``new_names_dict``
-        is specified. Additionally, the indexes in the  data frames are reset if so
-        specified.
+        Write out each of the named frames to disk.
+
+        This function writes out each of the given list of data frames as a
+        ".csv", ".tsv", or ``.xlsx`` file in the given directory. Each data
+        frame was generated as part of running an RSMTool experiment. All files
+        are prefixed with the given experiment ID and suffixed with either the
+        name of the data frame in the DataContainer (or dict) object, or a new
+        name if ``new_names_dict`` is specified. Additionally, the indexes in
+        the  data frames are reset if so specified.
 
         Parameters
         ----------
         csvdir : str
-            Path to the `output` experiment sub-directory that will
+            Path to the output experiment sub-directory that will
             contain the CSV files corresponding to each of the data frames.
         container_or_dict : container.DataContainer or dict
             A DataContainer object or dict, where keys are data frame
             names and vales are ``pd.DataFrame`` objects.
         dataframe_names : list of str, optional
             List of data frame names, one for each of the data frames.
+            Defaults to ``None``.
         new_names_dict : dict, optional
             New dictionary with new names for the data frames, if desired.
-            Defaults to None.
+            Defaults to ``None``.
         include_experiment_id : str, optional
             Whether to include the experiment ID in the file name.
-            Defaults to True.
+            Defaults to ``True``.
         reset_index : bool, optional
             Whether to reset the index of each data frame
-            before writing to disk. Defaults to `False`.
-        file_format : {'csv', 'xlsx', 'tsv'}, optional
+            before writing to disk.
+            Defaults to ``False``.
+        file_format : str, optional
             The file format in which to output the data.
-            Defaults to 'csv'.
-        index : bool
-            Whether to include index.
-            Defaults to False.
+            One of {"csv", "xlsx", "tsv"}.
+            Defaults to "csv".
+        index : bool, optional
+            Whether to include the index in the output file.
+            Defaults to ``False``.
 
         Raises
         ------
         KeyError
-            If file_format is not correct, or data frame
-            is not in the container or dictionary
+            If ``file_format`` is not valid, or a named data frame
+            is not present in ``container_or_dict``.
         """
-
         container_or_dict = container_or_dict.copy()
 
         # If no `dataframe_names` specified, use all names
@@ -87,8 +85,8 @@ class DataWriter:
         else:
             for name in dataframe_names:
                 if name not in container_or_dict:
-                    raise KeyError('The name `{}` is not in the container '
-                                   'or dictionary.'.format(name))
+                    raise KeyError("The name `{}` is not in the container "
+                                   "or dictionary.".format(name))
 
         # Loop through DataFrames, and save
         # output in specified format
@@ -154,25 +152,25 @@ class DataWriter:
                           include_experiment_id=True,
                           file_format='csv'):
         """
-        Write out the feature file to disk.
+        Write out the selected features to disk.
 
         Parameters
         ----------
         featuredir : str
-            Path to the `feature` experiment output directory where the
+            Path to the experiment output directory where the
             feature JSON file will be saved.
         data_container : container.DataContainer
-            A DataContainer object.
+            A data container object.
         selected_features : list of str
             List of features that were selected for model building.
-        include_experiment_id : str, optional
+        include_experiment_id : bool, optional
             Whether to include the experiment ID in the file name.
-            Defaults to True.
-        file_format : {'csv', 'xlsx', 'tsv'}, optional
+            Defaults to ``True``.
+        file_format : str, optional
             The file format in which to output the data.
-            Defaults to 'csv'.
+            One of {"csv", "tsv", "xlsx"}.
+            Defaults to "csv".
         """
-
         df_feature_specs = data_container['feature_specs']
 
         # Select specific features used in training
