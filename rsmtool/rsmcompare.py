@@ -17,7 +17,7 @@ from os.path import abspath, exists, join, normpath
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandlinrsme import ConfigurationGenerator, setup_rsmcmd_parser
+from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 
