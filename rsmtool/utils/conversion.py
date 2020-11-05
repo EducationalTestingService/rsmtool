@@ -18,7 +18,7 @@ def int_to_float(value):
     Parameters
     ----------
     value
-        Name of the experiment file we want to locate.
+        Name of the value we want to convert.
 
     Returns
     -------

@@ -41,7 +41,6 @@ def parse_json_with_comments(pathlike):
     This code was adapted from:
     https://web.archive.org/web/20150520154859/http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
     """
-
     # Regular expression to identify comments
     comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
                             re.DOTALL | re.MULTILINE)
@@ -79,9 +78,9 @@ def has_files_with_extension(directory, ext):
 
     Returns
     -------
-    bool
-        True if directory contains files with given extension,
-        else False.
+    ans : bool
+        ``True`` if directory contains files with given extension,
+        else ``False``.
     """
     files_with_extension = glob(join(directory, '*.{}'.format(ext)))
     return len(files_with_extension) > 0
@@ -89,14 +88,15 @@ def has_files_with_extension(directory, ext):
 
 def get_output_directory_extension(directory, experiment_id):
     """
-    Check the output directory to determine what file extensions
-    exist. If more than one extension (in the possible list of
-    extensions) exists, then raise a ValueError. Otherwise,
-    return the one file extension. If no extensions can be found, then
-    `csv` will be returned by default.
+    Check output directory to determine what file extensions exist.
 
-    Possible extensions include: `csv`, `tsv`, `xlsx`. Files in the
-    directory with none of these extensions will be ignored.
+    If more than one extension (in the possible list of
+    extensions) exists, then raise a ``ValueError``. Otherwise,
+    return the one file extension. If no extensions can be found, then
+    "csv" will be returned by default.
+
+    Possible extensions include: "csv", "tsv", and "xlsx". Files in the
+    directory with none of these extensions are ignored.
 
     Parameters
     ----------
@@ -107,15 +107,15 @@ def get_output_directory_extension(directory, experiment_id):
 
     Returns
     -------
-    extension : {'csv', 'tsv', 'xlsx'}
+    extension : str
         The extension that output files in this directory
-        end with.
+        end with. One of {"csv", "tsv", "xlsx"}.
 
     Raises
     ------
     ValueError
-        If any files in the directory have different extensions,
-        and are in the list of possible output extensions.
+        If any files in the directory have extensions
+        other than "csv", "tsv", or "xlsx".
     """
     extension = 'csv'
     extensions_identified = {ext for ext in POSSIBLE_EXTENSIONS
