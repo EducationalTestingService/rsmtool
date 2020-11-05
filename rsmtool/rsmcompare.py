@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 """
-Script to compare two RSMTool experiments.
+Compare two rsmtool/rsmeval experiments.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -18,33 +17,28 @@ from os.path import abspath, exists, join, normpath
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
-from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
+from .utils.commandlinrsme import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 
 
 def check_experiment_id(experiment_dir, experiment_id):
     """
-    Check that the supplied ``experiment_dir`` contains
-    the outputs for the supplied ``experiment_id``.
+    Check that ``experiment_dir`` contains the outputs for ``experiment_id``.
 
     Parameters
     ----------
     experiment_dir : str
-        path to the directory with the experiment output
+        path to the directory with the experiment output.
     experiment_id : str
-        experiment_id of the original experiment used to generate the
-        output
+        The ID of the original experiment used to generate the output.
 
     Raises
     ------
     FileNotFoundError
-        if the ``experument_dir`` does not contain any outputs
-        for the ``experiment_id``
+        If ``experiment_dir`` does not contain any outputs for ``experiment_id``.
     """
-
-    # list all possible output files which start with
-    # experiment_id
+    # list all possible output files which start with experiment_id
     outputs = glob.glob(join(experiment_dir,
                              'output',
                              '{}_*.*'.format(experiment_id)))
@@ -58,8 +52,10 @@ def check_experiment_id(experiment_dir, experiment_id):
 
 def run_comparison(config_file_or_obj_or_dict, output_dir):
     """
-    Run an ``rsmcompare`` experiment using the given configuration
-    file and generate the report in the given directory.
+    Run an rsmcompare experiment.configuration.
+
+    Use the given configuration file and generate the report in
+    the given directory.
 
     Parameters
     ----------
@@ -80,9 +76,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     ------
     FileNotFoundError
         If either of the two input directories in ``config_file_or_obj_or_dict``
-        do not exist, or if the directories do not contain rsmtool outputs at all.
+        do not exist, or if the directories do not contain rsmtool outputs
+        at all.
     """
-
     logger = logging.getLogger(__name__)
 
     configuration = configure('rsmcompare', config_file_or_obj_or_dict)
@@ -170,7 +166,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
                                       output_dir)
 
 
-def main():
+def main():  # noqa: D103
 
     # set up the basic logging configuration
     formatter = LogFormatter()

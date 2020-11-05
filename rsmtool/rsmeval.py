@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Run evaluation only experiments.
 
@@ -31,11 +30,10 @@ def run_evaluation(config_file_or_obj_or_dict,
                    output_dir,
                    overwrite_output=False):
     """
-    Run an ``rsmeval`` experiment using the given configuration
-    file and generate all outputs in the given directory.
+    Run an rsmeval experiment using the given configuration.
 
-    If ``overwrite_output`` is ``True``, overwrite any existing
-    output in the given ``output_dir``.
+    All outputs are generated under ``output_dir``. If ``overwrite_output``
+    is ``True``, any existing output in ``output_dir`` is overwritten.
 
     Parameters
     ----------
@@ -213,7 +211,7 @@ def run_evaluation(config_file_or_obj_or_dict,
                            context='rsmeval')
 
 
-def main():
+def main():  # noqa: D103
 
     # set up the basic logging configuration
     formatter = LogFormatter()
