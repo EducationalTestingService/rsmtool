@@ -28,8 +28,9 @@ VALID_SKLL_MODELS = [name for name, member in getmembers(_skll_module)
 def is_skll_model(model_name):
     """
     Check whether the given model is a valid learner name in SKLL.
-    Note that the `LinearRegression` model is also available in
-    SKLL but we always want to use the built-in model with that name.
+
+    Note that the "LinearRegression" model is also available in
+    SKLL but we use the built-in model with that name instead.
 
     Parameters
     ----------
@@ -39,8 +40,8 @@ def is_skll_model(model_name):
     Returns
     -------
     valid: bool
-        `True` if the given model name is a valid SKLL learner,
-        `False` otherwise
+        ``True`` if the given model name is a valid SKLL learner,
+        ``False`` otherwise.
     """
     return hasattr(_skll_module, model_name) and model_name != 'LinearRegression'
 
@@ -57,7 +58,7 @@ def is_built_in_model(model_name):
     Returns
     -------
     valid: bool
-        `True` if the given model name is a valid built-in model,
-        `False` otherwise
+        ``True`` if the given model name is a valid built-in model,
+        ``False`` otherwise.
     """
     return model_name in BUILTIN_MODELS

@@ -21,8 +21,7 @@ HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
 
 def float_format_func(num, prec=3):
     """
-    Format the given floating point number to the specified precision
-    and return as a string.
+    Format given float to the specified precision as a string.
 
     Parameters:
     ----------
@@ -34,10 +33,9 @@ def float_format_func(num, prec=3):
 
     Returns:
     -------
-    ans: str
+    ans : str
         The formatted string representing the given number.
     """
-
     formatter_string = Template('{:.${prec}f}').substitute(prec=prec)
     ans = formatter_string.format(num)
     return ans
@@ -45,9 +43,10 @@ def float_format_func(num, prec=3):
 
 def int_or_float_format_func(num, prec=3):
     """
-    Identify whether the number is float or integer. When displaying
-    integers, use no decimal. For a float, round to the specified
-    number of decimal places. Return as a string.
+    Identify whether the number is float or integer.
+
+    When displaying integers, use no decimal. For a float, round to the
+    specified number of decimal places as a string.
 
     Parameters:
     -----------
@@ -62,7 +61,6 @@ def int_or_float_format_func(num, prec=3):
     ans : str
         The formatted string representing the given number.
     """
-
     if float.is_integer(num):
         ans = '{}'.format(int(num))
     else:
@@ -77,10 +75,11 @@ def custom_highlighter(num,
                        absolute=False,
                        span_class='bold'):
     """
-    Return the supplied float as an HTML <span> element with the specified
-    class if its value is below ``low`` or above ``high``. If its value does
-    not meet those constraints, then return as a plain string with the
-    specified number of decimal places.
+    Convert float as an HTML <span> element with given class.
+
+    The conversion only happens if the given float is below ``low``
+    or above ``high``. If it does not meet those constraints, then
+    a plain string is returned with specified number of decimal places.
 
     Parameters:
     -----------
@@ -94,17 +93,17 @@ def custom_highlighter(num,
         Defaults to 1.
     prec : int
         The number of decimal places to display for x. Defaults to 3.
-    absolute: bool
-        If True, use the absolute value of x for comparison.
-        Defaults to False.
-    span_class: str
-        One of ``bold`` or ``color``. These are the two classes
+    absolute : bool
+        If ``True``, use the absolute value of x for comparison.
+        Defaults to ``False``.
+    span_class : str
+        One of "bold" or "color". These are the two classes
         available for the HTML span tag.
 
     Returns:
     --------
     ans : str
-        The formatted (plain or HTML) string representing the given number.
+        The plain or HTML string representing the given number.
     """
     abs_num = abs(num) if absolute else num
     val = float_format_func(num, prec=prec)
@@ -115,8 +114,7 @@ def custom_highlighter(num,
 
 def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
-    Instantiating ``custom_highlighter()`` with the ``bold`` class as
-    the default.
+    Instantiate a ``custom_highlighter()`` with "bold" as default class.
 
     Parameters:
     -----------
@@ -131,9 +129,9 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     prec : int
         The number of decimal places to display for x.
         Defaults to 3.
-    absolute: bool
-        If True, use the absolute value of x for comparison.
-        Defaults to False.
+    absolute : bool
+        If ``True``, use the absolute value of x for comparison.
+        Defaults to ``False``.
 
     Returns:
     --------
@@ -146,8 +144,7 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
 
 def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
-    Instantiating ``custom_highlighter()`` with the ``color`` class as
-    the default.
+    Instantiate a ``custom_highlighter()`` with "color" as the default class.
 
     Parameters:
     -----------
@@ -162,9 +159,9 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     prec : int
         The number of decimal places to display for x.
         Defaults to 3.
-    absolute: bool
-        If True, use the absolute value of x for comparison.
-        Defaults to False.
+    absolute : bool
+        If ``True``, use the absolute value of x for comparison.
+        Defaults to ``False``.
 
     Returns:
     --------
@@ -175,15 +172,16 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     return ans
 
 
-def compute_subgroup_plot_params(group_names,
-                                 num_plots):
+def compute_subgroup_plot_params(group_names, num_plots):
     """
-    Computing subgroup plot and figure parameters based on number of
-    subgroups and number of plots to be generated.
+    Compute subgroup plot and figure parameters.
+
+    The parameters are computed based on the number of subgroups and the
+    number of plots to be generated.
 
     Parameters
     ----------
-    group_names : list
+    group_names : list of str
         A list of subgroup names for plots.
     num_plots : int
         The number of plots to compute.
@@ -220,10 +218,12 @@ def compute_subgroup_plot_params(group_names,
 
 def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     """
-    Given an path to an image file, generate the HTML for
-    a click-able thumbnail version of the image.
-    On click, this HTML will open the full-sized version
-    of the image in a new window.
+    Generate HTML for a clickable thumbnail of given image.
+
+    Given the path to an image file, generate the HTML for
+    a click-able thumbnail version of the image. When clicked,
+    this HTML will open the full-sized version of the image in
+    a new window.
 
     Parameters
     ----------
@@ -234,10 +234,10 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     image_id : int
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
-    path_to_thumbnail : str or None, optional
+    path_to_thumbnail : str, optional
         If you would like to use a different thumbnail
         image, specify the path to this thumbnail.
-        Defaults to None.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -304,10 +304,10 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
 
 def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     """
-    Given an path to an image file, display
-    a click-able thumbnail version of the image.
-    On click, open the full-sized version of the
-    image in a new window.
+    Display the HTML for an image thumbnail in a Jupyter notebook.
+
+    Given the path to an image file, generate the HTML for its
+    thumbnail and display it in the notebook.
 
     Parameters
     ----------
@@ -318,15 +318,15 @@ def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     image_id : int
         The id of the <img> tag in the HTML. This must
         be unique for each <img> tag.
-    path_to_thumbnail : str or None, optional
+    path_to_thumbnail : str, optional
         If you would like to use a different thumbnail
         image, specify the path to the thumbnail.
-        Defaults to None.
+        Defaults to ``None``.
 
     Displays
     --------
     display : IPython.core.display.HTML
-        The HTML display of the thumbnail image.
+        The HTML for the thumbnail image.
     """
     display(HTML(get_thumbnail_as_html(path_to_image,
                                        image_id,
@@ -335,9 +335,9 @@ def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
 
 def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     """
-    Generate HTML list items for each file name,
-    given output directory. Optionally pass a
-    replacement dictionary to use more descriptive
+    Generate an HTML list for each output file in given directory.
+
+    Optionally pass a replacement dictionary to use more descriptive
     titles for the file names.
 
     Parameters
@@ -350,7 +350,7 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
         The format of the output files.
     replace_dict : dict, optional
         A dictionary which makes file names to descriptions.
-        Defaults to empty dictionary.
+        Defaults to ``{}``.
 
     Returns
     ------
@@ -384,7 +384,7 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
 
 def show_files(output_dir, experiment_id, file_format, replace_dict={}):
     """
-    Show files for a given output directory.
+    Show files in a given directory as an HTML list in a Jupyter notebook.
 
     Parameters
     ----------
@@ -396,7 +396,7 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
         The format of the output files.
     replace_dict : dict, optional
         A dictionary which makes file names to descriptions.
-        Defaults to empty dictionary.
+        Defaults to ``{}``.
 
     Displays
     --------
