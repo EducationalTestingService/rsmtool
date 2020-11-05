@@ -96,12 +96,12 @@ def true_score_variance(human_scores,
     human_scores : array-like of shape (n_samples, n_ratings)
         Human ratings for each response.
 
-    variance_errors_human : float
-        Estimated variance of errors in human scores
-        When no value is supplied, the variance will
-        be estimated from the data. In this case
-        at least some responses must have more than
-        one human score.
+    variance_errors_human : float, optional
+        Estimated variance of errors in human scores.
+        If ``None``, the variance will be estimated
+        from the data. In this case at least some responses
+        must have more than one human score.
+        Defaults to ``None``.
 
 
     Returns
@@ -162,10 +162,7 @@ def mse_true(system,
              human_scores,
              variance_errors_human=None):
     """
-    Mean squared error (MSE).
-
-    Compute MSE when predicting true score
-    from system score.
+    Compute mean squared error (MSE) when predicting true score from system score.
 
     Parameters
     ----------
@@ -173,13 +170,12 @@ def mse_true(system,
         System scores for each response.
     human_scores : array-like of shape (n_samples, n_ratings)
         Human ratings for each response.
-    variance_errors_human : float
-        Estimated variance of errors in human scores
-        When no value is supplied, the variance will
-        be estimated from the data. In this case
-        at least some responses must have more than
-        one human score.
-
+    variance_errors_human : float, optional
+        Estimated variance of errors in human scores.
+        If ``None``, the variance will be estimated from
+        the data. In this case at least some responses must
+        have more than one human score.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -215,10 +211,9 @@ def prmse_true(system,
                human_scores,
                variance_errors_human=None):
     """
-    PRMSE.
+    Compute PRMSE when predicting true score from system scores.
 
-    Compute Proportional Reduction in Mean Squared Error (PRMSE)
-    when predicting true score from system scores.
+    PRMSE = Proportional Reduction in Mean Squared Error.
     The formula to compute PRMSE implemented in RSMTool
     was derived at ETS by Matthew S. Johnson. See
     `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2.pdf>`_
@@ -230,12 +225,12 @@ def prmse_true(system,
         System scores for each response.
     human_scores : array-like of shape (n_samples, n_ratings)
         Human ratings for each response.
-    variance_errors_human : float
-        Estimated variance of errors in human scores
-        When no value is supplied, the variance will
-        be estimated from the data. In this case
-        at least some responses must have more than
-        one human score.
+    variance_errors_human : float, optional
+        Estimated variance of errors in human scores.
+        If ``None``, the variance will be estimated from
+        the data. In this case at least some responses must
+        have more than one human score.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -276,7 +271,7 @@ def get_true_score_evaluations(df,
                                human_score_columns,
                                variance_errors_human=None):
     """
-    Get true score evaluations for reporting.
+    Generate true score evaluations for HTML reports.
 
     Parameters
     ----------
@@ -292,26 +287,30 @@ def get_true_score_evaluations(df,
         two or more human ratings. If  ``human_score_columns`` is
         a single column name,  ``variance_errors_human`` must also
         be specified.
-    variance_errors_human : float
+    variance_errors_human : float, optional
         Estimated variance of errors in human scores.
-        If no value is supplied, the variance will
-        be estimated from the data in which case
-        some responses must have more than one
-        human rating.
+        If ``None``, the variance will be estimated from
+        the data in which case some responses must have more
+        than one human rating.
+        Defaults to ``None``.
 
     Returns
     -------
     prmse_metrics: pandas DataFrame
         DataFrame containing different evaluation metrics related to the evaluation
-        of system scores against true scores:
-        - ``N``: total number of responses
-        - ``N raters``: maximum number of ratings available for a single response
-        - ``N_single``: total number of responses with a single human score
-        - ``N_multiple``: total number of responses with more than one human score
-        - ``variance_of_errors``: estimated variance of human errors
-        - ``tru_var``: estimated true score variance
-        - ``mse_true``: mean squared error when predicting true score from machine score
-        - ``prmse``: proportional reduction in mean squared error when predicting true score
+        of system scores against true scores. The column names are:
+
+        - "N": total number of responses
+        - "N raters": maximum number of ratings available for a single response
+        - "N_single": total number of responses with a single human score
+        - "N_multiple": total number of responses with more than one
+          human score
+        - "variance_of_errors": estimated variance of human errors
+        - "tru_var": estimated true score variance
+        - "mse_true": mean squared error when predicting true score from
+          machine score
+        - "prmse": proportional reduction in mean squared error when
+          predicting true score
     """
     # check that if we only have one human column, we were also given
     # variance of errors
