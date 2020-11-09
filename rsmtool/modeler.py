@@ -953,9 +953,9 @@ class Modeler:
             Path to the `output` experiment output directory.
         figdir : str
             Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx'}, optional
-            The format in which to save files.
-            Defaults to 'csv'.
+        file_format : str, optional
+            The format in which to save files. One of {"csv", "tsv", "xlsx"}.
+            Defaults to "csv".
 
         Returns
         -------
@@ -1080,14 +1080,15 @@ class Modeler:
         experiment_id : str
             The experiment ID.
         filedir : str
-            Path to the `output` experiment output directory.
+            Path to the "output" experiment output directory.
         figdir : str
-            Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx'}, optional
+            Path to the "figure" experiment output directory.
+        file_format : str, optional
             The format in which to save files. For SKLL models,
             this argument does not actually change the format of
             the output files at this time, as no betas are computed.
-            Defaults to 'csv'.
+            One of {"csv", "tsv", "xlsx"}.
+            Defaults to "csv".
         custom_fixed_parameters : dict, optional
             A dictionary containing any fixed parameters for the SKLL
             model.
@@ -1102,8 +1103,9 @@ class Modeler:
 
         Returns
         -------
-        Tuple containing a SKLL Learner object of the appropriate type
-        and the chosen tuning objective.
+        learner_and_objective : tuple
+            A 2-tuple containing a SKLL Learner object of the appropriate type
+            and the chosen tuning objective.
         """
         # Instantiate the given SKLL learner and set its probability value
         # and fixed parameters appropriately
@@ -1159,16 +1161,18 @@ class Modeler:
         parameters
         ----------
         configuration : configuration_parser.Configuration
-            A configuration object containing `experiment_id` and `model_name`
+            A configuration object containing "experiment_id" and "model_name"
+            parameters.
         data_container : container.DataContainer
-            A data_container object containing `train_preprocessed_features`
+            A data container object containing "train_preprocessed_features"
+            data set.
         filedir : str
-            Path to the `output` experiment output directory.
+            Path to the "output" experiment output directory.
         figdir : str
-            Path to the `figure` experiment output directory.
-        file_format : {'csv', 'tsv', 'xlsx'}, optional
-            The format in which to save files.
-            Defaults to 'csv'.
+            Path to the "figure" experiment output directory.
+        file_format : str, optional
+            The format in which to save files. One of {"csv", "tsv", "xlsx"}.
+            Defaults to "csv".
 
         Returns
         -------
