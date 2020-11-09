@@ -1,57 +1,44 @@
 import argparse
-import tempfile
 import os
+import tempfile
 import warnings
-
 from io import StringIO
-from itertools import product
+from itertools import count, product
+from os import getcwd, listdir, unlink
+from os.path import abspath, join, relpath
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
-
-from numpy.testing import assert_almost_equal
-from itertools import count
 from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
-from os import getcwd, unlink, listdir
-from os.path import abspath, join, relpath
+from numpy.testing import assert_almost_equal
 from pandas.testing import assert_frame_equal
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
-
+from rsmtool.configuration_parser import Configuration
+from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
+from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
+from rsmtool.utils.conversion import convert_to_float, int_to_float
+from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
+from rsmtool.utils.metrics import (compute_expected_scores_from_model,
+                                   difference_of_standardized_means,
+                                   partial_correlations,
+                                   quadratic_weighted_kappa,
+                                   standardized_mean_difference)
+from rsmtool.utils.notebook import (bold_highlighter,
+                                    color_highlighter,
+                                    compute_subgroup_plot_params,
+                                    custom_highlighter,
+                                    float_format_func,
+                                    get_files_as_html,
+                                    get_thumbnail_as_html,
+                                    int_or_float_format_func)
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 from skll.metrics import kappa
-
-from rsmtool.configuration_parser import Configuration
-from rsmtool.utils.commandline import (CmdOption,
-                                       ConfigurationGenerator,
-                                       InteractiveField,
-                                       setup_rsmcmd_parser)
-from rsmtool.utils.constants import (CHECK_FIELDS,
-                                     DEFAULTS,
-                                     INTERACTIVE_MODE_METADATA)
-from rsmtool.utils.conversion import int_to_float, convert_to_float
-from rsmtool.utils.files import (parse_json_with_comments,
-                                 has_files_with_extension,
-                                 get_output_directory_extension)
-from rsmtool.utils.metrics import (difference_of_standardized_means,
-                                   partial_correlations,
-                                   compute_expected_scores_from_model,
-                                   standardized_mean_difference,
-                                   quadratic_weighted_kappa)
-from rsmtool.utils.notebook import (float_format_func,
-                                    int_or_float_format_func,
-                                    custom_highlighter,
-                                    bold_highlighter,
-                                    color_highlighter,
-                                    compute_subgroup_plot_params,
-                                    get_thumbnail_as_html,
-                                    get_files_as_html)
-
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -748,22 +735,16 @@ class TestCmdOption:
 
     @raises(TypeError)
     def test_cmd_option_no_help(self):
-        """
-        test that CmdOption with no help raises exception
-        """
+        """Test that CmdOption with no help raises exception."""
         _ = CmdOption(longname='foo', dest='blah')
 
     @raises(TypeError)
     def test_cmd_option_no_dest(self):
-        """
-        test that CmdOption with no dest raises exception
-        """
+        """Test that CmdOption with no dest raises exception."""
         _ = CmdOption(longname='foo', help='this option has no dest')
 
     def test_cmd_option_attributes(self):
-        """
-        test CmdOption attributes
-        """
+        """Test CmdOption attributes."""
         co = CmdOption(dest='good', help='this option has only dest and help')
         eq_(co.dest, 'good')
         eq_(co.help, 'this option has only dest and help')
@@ -778,9 +759,7 @@ class TestCmdOption:
 class TestSetupRsmCmdParser:
 
     def test_run_subparser_no_args(self):
-        """
-        test run subparser with no arguments
-        """
+        """Test run subparser with no arguments."""
         parser = setup_rsmcmd_parser('test')
         # we need to patch sys.exit since --help just exists otherwise
         with patch('sys.exit') as exit_mock:
@@ -793,16 +772,12 @@ class TestSetupRsmCmdParser:
 
     @raises(SystemExit)
     def test_run_subparser_non_existent_config_file(self):
-        """
-        test run subparser with a non-existent config file
-        """
+        """Test run subparser with a non-existent config file."""
         parser = setup_rsmcmd_parser('test')
         _ = parser.parse_args('run fake.json'.split())
 
     def test_run_subparser_with_output_directory(self):
-        """
-        test run subparser with a specified output directory
-        """
+        """Test run subparser with a specified output directory."""
         parser = setup_rsmcmd_parser('test')
         config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
         parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir".split())
@@ -813,9 +788,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_no_output_directory(self):
-        """
-        test run subparser where no output directory is required
-        """
+        """Test run subparser where no output directory is required."""
         parser = setup_rsmcmd_parser('test', uses_output_directory=False)
         config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
         parsed_namespace = parser.parse_args(f"run {config_file}".split())
@@ -825,9 +798,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_overwrite_enabled(self):
-        """
-        test run subparser with overwriting enabled
-        """
+        """Test run subparser with overwriting enabled."""
         parser = setup_rsmcmd_parser('test', allows_overwriting=True)
         config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
         parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir -f".split())
@@ -838,9 +809,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_extra_options(self):
-        """
-        test run subparser with extra options
-        """
+        """Test run subparser with extra options."""
         extra_options = [CmdOption(dest='test_arg',
                                    help='a test positional argument'),
                          CmdOption(shortname='t',
@@ -873,9 +842,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_extra_options_required_true_not_specified(self):
-        """
-        test run subparser with an unspecified required optional
-        """
+        """Test run subparser with an unspecified required optional."""
         extra_options = [CmdOption(dest='test_arg',
                                    help='a test positional argument'),
                          CmdOption(longname='zeta',
@@ -897,9 +864,7 @@ class TestSetupRsmCmdParser:
         assert exit_mock.called
 
     def test_run_subparser_with_extra_options_required_true_and_specified(self):
-        """
-        test run subparser with a specified required optional
-        """
+        """Test run subparser with a specified required optional."""
         extra_options = [CmdOption(dest='test_arg',
                                    help='a test positional argument'),
                          CmdOption(longname='zeta',
@@ -920,9 +885,7 @@ class TestSetupRsmCmdParser:
 
     @raises(TypeError)
     def test_run_subparser_with_extra_options_bad_required_value(self):
-        """
-        test run subparser with a non-boolean value for required
-        """
+        """Test run subparser with a non-boolean value for required."""
         extra_options = [CmdOption(dest='test_arg',
                                    help='a test positional argument'),
                          CmdOption(longname='zeta',
@@ -935,9 +898,7 @@ class TestSetupRsmCmdParser:
                                 extra_run_options=extra_options)
 
     def test_generate_subparser_help_flag(self):
-        """
-        test generate subparser with --help specified
-        """
+        """Test generate subparser with --help specified."""
         parser = setup_rsmcmd_parser('test')
         # we need to patch sys.exit since --help just exists otherwise
         with patch('sys.exit') as exit_mock:
@@ -949,9 +910,7 @@ class TestSetupRsmCmdParser:
         assert exit_mock.called
 
     def test_generate_subparser(self):
-        """
-        test generate subparser with no arguments
-        """
+        """Test generate subparser with no arguments."""
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -960,9 +919,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_flag(self):
-        """
-        test generate subparser with subgroups option and flag
-        """
+        """Test generate subparser with subgroups option and flag."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --subgroups'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -972,9 +929,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_option_and_short_flag(self):
-        """
-        test generate subparser with subgroups option and short flag
-        """
+        """Test generate subparser with subgroups option and short flag."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate -g'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -984,9 +939,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_option_but_no_flag(self):
-        """
-        test generate subparser with subgroups option but no flag
-        """
+        """Test generate subparser with subgroups option but no flag."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -996,9 +949,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_quiet_flag(self):
-        """
-        test generate subparser with only the quiet flag
-        """
+        """Test generate subparser with only the quiet flag."""
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate --quiet'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1007,9 +958,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_quiet_flags(self):
-        """
-        test generate subparser with subgroups and quiet flags
-        """
+        """Test generate subparser with subgroups and quiet flags."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --subgroups -q'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1019,9 +968,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_interactive_flag(self):
-        """
-        test generate subparser with only the interactive flag
-        """
+        """Test generate subparser with only the interactive flag."""
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate --interactive'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1030,9 +977,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_interactive_short_flag(self):
-        """
-        test generate subparser with only the short interactive flag
-        """
+        """Test generate subparser with only the short interactive flag."""
         parser = setup_rsmcmd_parser('test')
         parsed_namespace = parser.parse_args('generate -i'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1041,9 +986,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_interactive_flags(self):
-        """
-        test generate subparser with subgroups and interactive flags
-        """
+        """Test generate subparser with subgroups and interactive flags."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate --interactive --subgroups'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1053,9 +996,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_interactive_short_flags(self):
-        """
-        test generate subparser with short subgroups and interactive flags
-        """
+        """Test generate subparser with short subgroups and interactive flags."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate -i -g'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1065,9 +1006,7 @@ class TestSetupRsmCmdParser:
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_interactive_short_flags_together(self):
-        """
-        test generate subparser with short subgroups and interactive flags together
-        """
+        """Test generate subparser with short subgroups and interactive flags together."""
         parser = setup_rsmcmd_parser('test', uses_subgroups=True)
         parsed_namespace = parser.parse_args('generate -ig'.split())
         expected_namespace = argparse.Namespace(subcommand='generate',
@@ -1266,9 +1205,7 @@ class TestInteractiveField:
     # tested externally
 
     def check_boolean_field(self, field_type, user_input, final_value):
-        """
-        Check that boolean fields are handled correctly
-        """
+        """Check that boolean fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_bool',
                                       field_type,
@@ -1297,9 +1234,7 @@ class TestInteractiveField:
             yield self.check_boolean_field, field_type, user_input, final_value
 
     def check_choice_field(self, user_input, final_value):
-        """
-        Check that choice fields are handled correctly
-        """
+        """Check that choice fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_choice',
                                       'required',
@@ -1338,9 +1273,7 @@ class TestInteractiveField:
                              {'label': 'choose one', 'type': 'choice'})
 
     def check_dir_field(self, user_input, final_value):
-        """
-        Check that dir fields are handled correctly
-        """
+        """Check that dir fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_file',
                                       'required',
@@ -1385,9 +1318,7 @@ class TestInteractiveField:
             yield self.check_dir_field, user_input, final_value
 
     def check_file_field(self, user_input, final_value):
-        """
-        Check that file fields are handled correctly
-        """
+        """Check that file fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_file',
                                       'required',
@@ -1449,9 +1380,7 @@ class TestInteractiveField:
             yield self.check_file_field, user_input, final_value
 
     def check_format_field(self, user_input, final_value):
-        """
-        Check that file format fields are handled correctly
-        """
+        """Check that file format fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_file_format',
                                       'optional',
@@ -1486,9 +1415,7 @@ class TestInteractiveField:
             yield self.check_format_field, user_input, final_value
 
     def check_id_field(self, user_input, final_value):
-        """
-        Check that ID fields are handled correctly
-        """
+        """Check that ID fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_int',
                                       'required',
@@ -1517,9 +1444,7 @@ class TestInteractiveField:
             yield self.check_id_field, user_input, final_value
 
     def check_integer_field(self, field_type, user_input, final_value):
-        """
-        Check that integer fields are handled correctly
-        """
+        """Check that integer fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_int',
                                       field_type,
@@ -1553,9 +1478,7 @@ class TestInteractiveField:
             yield self.check_integer_field, field_type, user_input, final_value
 
     def check_text_field(self, field_type, user_input, final_value):
-        """
-        Check that text fields are handled correctly
-        """
+        """Check that text fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_text',
                                       field_type,
@@ -1574,9 +1497,7 @@ class TestInteractiveField:
             yield self.check_text_field, field_type, user_input, final_value
 
     def check_multiple_count_field(self, user_input, final_value, num_entries, field_type):
-        """
-        Check that fields that accept multiple values are handled correctly
-        """
+        """Check that fields that accept multiple values are handled correctly."""
         # int this particular case, we also need to patch the
         # `print_formatted_text()` function since we use that
         # for multiple count fields to print out the label, instead

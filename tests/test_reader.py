@@ -1,18 +1,14 @@
-import os
 import json
+import os
 import tempfile
 import warnings
+from shutil import rmtree
 
 import numpy as np
 import pandas as pd
-
-from nose.tools import raises, eq_
+from nose.tools import eq_, raises
 from pandas.testing import assert_frame_equal
-from shutil import rmtree
-
-from rsmtool.reader import (DataReader,
-                            read_jsonlines,
-                            try_to_load_file)
+from rsmtool.reader import DataReader, read_jsonlines, try_to_load_file
 
 
 def test_try_to_load_file_none():
@@ -84,9 +80,7 @@ class TestDataReader:
         return tempf.name
 
     def get_container(self, name_ext_tuples, converters=None):
-        """
-        Get a DataContainer object from a list of tuples with (`name`, `ext`)
-        """
+        """Get DataContainer object from a list of (name, ext) tuples."""
         names_ = []
         paths_ = []
         for name, ext in name_ext_tuples:
@@ -111,10 +105,7 @@ class TestDataReader:
         return container
 
     def check_read_from_file(self, extension):
-        """
-        Test whether the ``read_from_file()`` method works as expected.
-        """
-
+        """Test whether ``read_from_file()`` works as expected."""
         name = TestDataReader.make_file_from_ext(self.df_train, extension)
 
         # now read in the file using `read_data_file()`
@@ -384,8 +375,7 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_jsons_with_nulls(self):
-        '''None is written to json as `null`.
-        We test if those are handled correctly'''
+        """Test if null in JSONs are properly read as ``None``."""
         all_nested_jsonlines = [{'values': {'id': '001',
                                             'feature1': None,
                                             'feature2': 1.5}},
@@ -401,9 +391,11 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_json_with_NaNs(self):
-        '''This test is no longer failing
-        because Pandas can now parse NaNs:
-        https://github.com/pandas-dev/pandas/issues/12213'''
+        #####################################################
+        # NOTE: This test is no longer failing              #
+        # because Pandas can now parse NaNs:                #
+        # https://github.com/pandas-dev/pandas/issues/12213 #
+        #####################################################
         all_nested_jsonlines = [{'values': {'id': '001',
                                             'feature1': np.nan,
                                             'feature2': 1.5}},

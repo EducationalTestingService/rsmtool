@@ -1,24 +1,14 @@
 import os
 import tempfile
 import warnings
-
-from glob import glob
 from os import getcwd
-from os.path import basename, exists, join
+from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
-
 from rsmtool import run_experiment
-
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import (check_file_output,
-                                check_report,
-                                check_scaled_coefficients,
-                                check_generated_output,
-                                check_run_experiment,
-                                copy_data_files,
-                                do_run_experiment)
+from rsmtool.test_utils import check_run_experiment, copy_data_files, do_run_experiment
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -64,10 +54,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_with_object_and_configdir():
-    '''
-    test rsmtool using a Configuration object and specified configdir
-    '''
-
+    """Test rsmtool using a Configuration object and specified configdir."""
     source = 'lr-object'
     experiment_id = 'lr_object'
 
@@ -97,9 +84,7 @@ def test_run_experiment_lr_with_object_and_configdir():
 
 
 def test_run_experiment_lr_with_object_no_configdir():
-    '''
-    test rsmtool using a Configuration object and no specified configdir
-    '''
+    """Test rsmtool using a Configuration object and no specified configdir."""
     source = 'lr-object-no-path'
     experiment_id = 'lr_object_no_path'
 
@@ -168,9 +153,7 @@ def test_run_experiment_lr_with_dictionary():
 
 @raises(AttributeError)
 def test_run_experiment_lr_with_object_and_filepath():
-    '''
-    test for rare use case where an old Configuration object is passed
-    '''
+    """Test for rare use case where an old Configuration object is passed."""
     source = 'lr-object'
     experiment_id = 'lr_object'
 
