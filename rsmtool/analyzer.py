@@ -501,7 +501,7 @@ class Analyzer:
         separately for each level in the the grouping variable.
         If ``include_length`` is ``True``, it additionally computes partial
         correlations of each column in the data frame against the target
-        variable after controlling for the ``length`` column.
+        variable after controlling for the "length" column.
 
         Parameters
         ----------
@@ -515,7 +515,7 @@ class Analyzer:
         include_length: bool, optional
             If True compute additional partial correlations of each column
             in the data frame against `target variable` only partialling out
-            ``length`` column.
+            "length" column.
 
         Returns
         -------
@@ -526,13 +526,13 @@ class Analyzer:
             Data frame containing Pearson's correlation coefficients for
             partial correlations between each feature and `target_variable`
             after controlling for all other features. If ``include_length`` is
-            set to ``True``, `length` will not be included into partial
+            set to ``True``, "length" will not be included into partial
             correlation computation.
         df_target_partcors_no_length: pandas DataFrame
             If ``include_length`` is set to ``True``: Data frame containing
             Pearson's correlation coefficients for partial correlations
             between each feature and ``target_variable`` after controlling
-            for ``length``. Otherwise, it will be an empty data frame.
+            for "length". Otherwise, it will be an empty data frame.
         """
         # group by the group columns
         grouped = df.groupby(grouping_variable)

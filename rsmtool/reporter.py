@@ -436,6 +436,7 @@ class Reporter:
             Type of the model. One of {"BUILTIN", "SKLL", ``None``}.
             We allow ``None`` here so that rsmeval can use the same
             function.
+            Defaults to ``None``.
         context : str, optional
             Context of the tool in which we are validating.
             One of {"rsmtool", "rsmeval", "rsmcompare"}.

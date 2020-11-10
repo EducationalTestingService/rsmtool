@@ -51,7 +51,7 @@ def convert_to_ordered_category(group_values, base_group=None):
 
     # To get the ordered list by size, we convert the value counts to data
     # frame to allow for multilevel sorting. This ensures that the order
-    # is consistent and reproducible across runs when there are more than
+    # is consistent and reproducible across runs when there is more than
     # one group with the maximum number of occurrences
     df_groups_by_size = pd.DataFrame(group_values.value_counts()).reset_index()
     df_groups_by_size.columns = ['group_name', 'count']
@@ -196,8 +196,8 @@ def get_fairness_analyses(df,
     base_group: str, optional
         Name of the group to use as the reference category.
         Defaults to ``None`` in which case the group with the
-        largest number of cases will be used a reference category.
-        Ties are broken alphabetically.
+        largest number of cases will be used as the reference
+        category. Ties are broken alphabetically.
 
     Returns
     -------

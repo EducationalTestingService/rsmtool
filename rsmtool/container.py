@@ -218,6 +218,9 @@ class DataContainer:
         ----------
         name : str
             The name for the dataset.
+        default : str, optional
+            The default path to return if the named dataset does not exist.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -236,8 +239,9 @@ class DataContainer:
         ----------
         name : str
             The name for the dataset.
-        default
-            The default argument, if the frame does not exist.
+        default : pandas DataFrame, optional
+            The default value to return if the named dataset does not exist.
+            Defaults to ``None``.
 
         Returns
         -------
