@@ -102,7 +102,7 @@ class Modeler:
     @staticmethod
     def model_fit_to_dataframe(fit):
         """
-        Extract fit metrics from a statsmodels fit object into a data frame.
+        Extract fit metrics from a ``statsmodels`` fit object into a data frame.
 
         Parameters
         ----------
@@ -183,7 +183,7 @@ class Modeler:
         Note
         ----
         1. We use the ``coef_`` attribute of the scikit-learn model underlying
-           the SKLL learner instead of the latter's' ``model_params`` attribute.
+           the SKLL learner instead of the latter's ``model_params`` attribute.
            This is because ``model_params`` ignores zero coefficients, which we
            do not want.
         2. The first row in the output data frame is always for the intercept
@@ -225,7 +225,7 @@ class Modeler:
         Returns
         -------
         learner: skll Learner object
-            SKLL Learner object representing a LinearRegression model
+            SKLL Learner object representing a ``LinearRegression`` model
             with the specified coefficients.
         """
         # initialize a random number generator
@@ -278,7 +278,7 @@ class Modeler:
         learner : skll.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
-            A statsmodels regression results object.
+            A ``statsmodels`` regression results object.
         df_coef : pandas DataFrame
             Data frame containing the model coefficients.
         used_features : list of str
@@ -319,7 +319,7 @@ class Modeler:
         learner : skll.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
-            A statsmodels regression results object.
+            A ``statsmodels`` regression results object.
         df_coef : pandas DataFrame
             Data frame containing the model coefficients.
         used_features : list of str
@@ -376,7 +376,7 @@ class Modeler:
         learner : skll.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
-            A statsmodels regression results object.
+            A ``statsmodels`` regression results object.
         df_coef : pandas DataFrame
              Data frame containing the model coefficients.
         used_features : list of str
@@ -447,7 +447,7 @@ class Modeler:
         learner : skll.Learner
             The SKLL learner object
         fit : statsmodels.RegressionResults
-            A statsmodels regression results object.
+            A ``statsmodels`` regression results object.
         df_coef : pandas DataFrame
             The model coefficients in a data_frame
         used_features : list of str
@@ -1095,7 +1095,7 @@ class Modeler:
             Defaults to ``None``.
         custom_objective : str, optional
             Name of custom user-specified objective. If not specified
-            or `None`, "neg_mean_squared_error" is used as the objective.
+            or ``None``, "neg_mean_squared_error" is used as the objective.
             Defaults to ``None``.
         predict_expected_scores : bool, optional
             Whether we want the trained classifiers to predict expected scores.

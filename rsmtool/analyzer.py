@@ -28,7 +28,7 @@ from .utils.prmse import get_true_score_evaluations
 
 
 class Analyzer:
-    """Class to performs analysis on all metrics, predictions, etc."""
+    """Class to perform analysis on all metrics, predictions, etc."""
 
     @staticmethod
     def check_frame_names(data_container, dataframe_names):
@@ -89,7 +89,7 @@ class Analyzer:
                                    exclude_zero_scores=True,
                                    exclude_listwise=False):
         """
-        Compute statistics for reponses excluded from analyses.
+        Compute statistics for responses excluded from analyses.
 
         This method computes various statistics for the responses that
         were excluded from analyses, either in the training set or in
@@ -171,7 +171,7 @@ class Analyzer:
     @staticmethod
     def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
         """
-        Compute statistics for reponses used in analyses.
+        Compute statistics for responses used in analyses.
 
         This method computes various statistics on the responses that
         were used in analyses, either in the training set or in the
@@ -531,7 +531,7 @@ class Analyzer:
         df_target_partcors_no_length: pandas DataFrame
             If ``include_length`` is set to ``True``: Data frame containing
             Pearson's correlation coefficients for partial correlations
-            between each feature and `target_variable` after controlling
+            between each feature and ``target_variable`` after controlling
             for ``length``. Otherwise, it will be an empty data frame.
         """
         # group by the group columns
@@ -1045,10 +1045,10 @@ class Analyzer:
             metrics.
         df_human_machine_eval_filtered : pandas DataFrame
             Data frame containing the human-human statistics
-            but is empty if `include_second_score` is False.
+            but is empty if ``include_second_score`` is ``False``.
         df_human_human_eval : pandas DataFrame
             A shortened version of the first data frame but
-            is empty if ``compute_shortened`` is False.
+            is empty if ``compute_shortened`` is ``False``.
         """
         # shorter variable name is easier to work with
         use_scaled = use_scaled_predictions

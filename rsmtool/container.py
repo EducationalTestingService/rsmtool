@@ -2,7 +2,7 @@
 Class to encapsulate data contained in multiple pandas DataFrames.
 
 It represents each of the multiple data sources as a "dataset". Each
-dataset is represented by three things:
+dataset is represented by three properties:
 - "name" : the name of the data set
 - "frame" : the pandas DataFrame that contains the actual data
 - "path" : the path to the file on disk from which the data was read
@@ -87,7 +87,7 @@ class DataContainer:
         Returns
         -------
         length : int
-            The size of the container (i.e. number of datasets)
+            The size of the container (i.e. number of datasets).
         """
         return len(self._names)
 
@@ -149,7 +149,7 @@ class DataContainer:
         Yields
         ------
         key
-            A key (name) in the container dictionary
+            A key (name) in the container dictionary.
         """
         for key in self.keys():
             yield key

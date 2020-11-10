@@ -52,7 +52,7 @@ def check_experiment_id(experiment_dir, experiment_id):
 
 def run_comparison(config_file_or_obj_or_dict, output_dir):
     """
-    Run an rsmcompare experiment.configuration.
+    Run an rsmcompare experiment configuration.
 
     Use the given configuration file and generate the report in
     the given directory.

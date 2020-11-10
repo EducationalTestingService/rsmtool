@@ -157,7 +157,7 @@ class FeatureSpecsProcessor:
         ----
         Since these are default specifications, the values for the
         "transform" column for each feature will be "raw" and the
-        value for the "sign" column will be 1.
+        value for the "sign" column will be ``1``.
         """
         df_feature_specs = pd.DataFrame({'feature': feature_names})
         df_feature_specs['transform'] = 'raw'
@@ -196,7 +196,7 @@ class FeatureSpecsProcessor:
         """
         Validate given feature specs.
 
-        Check given feature specs to make sure that there are no duplicate
+        Check given feature specifications to make sure that there are no duplicate
         feature names and that all columns are in the right format. Add the
         default values for  "transform" and "sign" if none are given.
 
@@ -398,7 +398,7 @@ class FeaturePreprocessor:
         tolerance : float, optional
             The tolerance that will be used to compute the
             trim interval.
-            Defaults to 0.4998.
+            Defaults to ``0.4998``.
 
         Returns
         -------

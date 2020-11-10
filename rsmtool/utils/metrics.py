@@ -41,7 +41,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
     ValueError
         If the given model cannot predict probability distributions.
     ValueError
-        If the score range specified by `min_score` and `max_score`
+        If the score range specified by ``min_score`` and ``max_score``
         does not match what the model predicts in its probability
         distribution.
     """

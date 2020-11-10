@@ -50,7 +50,7 @@ def convert_to_ordered_category(group_values, base_group=None):
     # get ordered list by size
 
     # To get the ordered list by size, we convert the value counts to data
-    # frame to allow for multilevel sorting. This makes sure that the order
+    # frame to allow for multilevel sorting. This ensures that the order
     # is consistent and reproducible across runs when there are more than
     # one group with the maximum number of occurrences
     df_groups_by_size = pd.DataFrame(group_values.value_counts()).reset_index()
@@ -208,7 +208,7 @@ def get_fairness_analyses(df,
         A datacontainer with the following datasets:
 
          - "estimates_<METRIC>_by_<GROUP>" where "<GROUP>" corresponds to
-           the given group and "<METRIC>" can be osa, osd and csd estimates
+           the given group and "<METRIC>" can be "osa", "osd" and "csd" estimates
            for each group computed by the respective models.
          - "fairness_metrics_by_<GROUP>" - a summary of model fits (R2 and
            p values).
