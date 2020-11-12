@@ -187,9 +187,9 @@ class Comparer:
                                               human_score='sc1',
                                               id_column='spkitemid'):
         """
-        Compute correlations between respective feature values.
+        Compute correlations between old and new feature values.
 
-        This method computes correlations between respective feature values
+        This method computes correlations between old and new feature values
         in the two given frames as well as the correlations between each
         feature value and the human score.
 

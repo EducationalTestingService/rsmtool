@@ -94,7 +94,7 @@ def run_summary(config_file_or_obj_or_dict,
                 output_dir,
                 overwrite_output=False):
     """
-    Run rsmsummarize experiment using the given configuration file.
+    Run rsmsummarize experiment using the given configuration.
 
     All outputs are generated under ``output_dir``. If ``overwrite_output``
     is ``True``, any existing output in ``output_dir`` is overwritten.

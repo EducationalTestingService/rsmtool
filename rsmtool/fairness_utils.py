@@ -78,7 +78,7 @@ def convert_to_ordered_category(group_values, base_group=None):
 
 def get_coefficients(fit, base_category):
     """
-    Extract estimates, significance, and confidence intervals for given group.
+    Extract estimates, significance, and confidence intervals for a given group.
 
     The names of the predictors are processed to remove the
     prefix added by ``statmodels``. The name of the base category
@@ -176,7 +176,7 @@ def get_fairness_analyses(df,
     """
     Compute fairness analyses described in `Loukina et al. 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
 
-    The functions computes how much variance group membership explains in
+    The function computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),
     and conditional score difference (csd). See the paper for more
     details.

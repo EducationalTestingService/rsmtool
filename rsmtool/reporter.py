@@ -139,7 +139,7 @@ notebook_path_dict = {'general': {'rsmtool': notebook_path,
 
 
 class Reporter:
-    """Class to generate Jupyter notebook reports, and convert them to HTML."""
+    """Class to generate Jupyter notebook reports and convert them to HTML."""
 
     @staticmethod
     def locate_custom_sections(custom_report_section_paths, configdir):
@@ -335,7 +335,7 @@ class Reporter:
                                   subgroups,
                                   context='rsmtool'):
         """
-        Compile a combined a list of section names to be included in the report.
+        Compile a combined list of section names to be included in the report.
 
         Parameters
         ----------
@@ -688,7 +688,7 @@ class Reporter:
                                  figdir_new,
                                  output_dir):
         """
-        Generate an HTML report for comparing the two given rsmtool experiments.
+        Generate an HTML report for comparing two rsmtool experiments.
 
         Parameters
         ----------

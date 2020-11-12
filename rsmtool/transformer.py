@@ -33,7 +33,7 @@ class FeatureTransformer:
             Numpy array containing the feature values.
         raise_error : bool, optional
             If ``True``, raises an error if the transform is applied to
-            a feature that can have negative values.
+            a feature that has negative values.
             Defaults to ``True``.
 
         Returns
@@ -92,8 +92,8 @@ class FeatureTransformer:
         Raises
         ------
         ValueError
-            If the transform is applied to a feature that is
-            zero or negative and ``raise_error`` is ``True``.
+            If the transform is applied to a feature that has
+            zero or negative values and ``raise_error`` is ``True``.
         """
         # check if the feature has any zeros
         if np.any(values == 0):
@@ -141,8 +141,8 @@ class FeatureTransformer:
             Numpy array containing the feature values.
         raise_error : bool, optional
             If ``True``, raises an error if the transform is applied to
-            a feature that can be zero or to a feature that can have
-            different signs.
+            a feature that has zero values or to a feature that has
+           both positive and negative values.
             Defaults to ``True``.
         sd_multiplier : int, optional
             Use this std. dev. multiplier to compute the ceiling
@@ -231,7 +231,7 @@ class FeatureTransformer:
         ------
         ValueError
             If the transform is applied to a feature that
-            is negative and ``raise_error`` is ``True``.
+            has negative values and ``raise_error`` is ``True``.
         """
         # check if the feature has any negative values
         if np.any(values < 0):
@@ -277,7 +277,7 @@ class FeatureTransformer:
         ------
         ValueError
             If the transform is applied to a feature that
-            is negative and ``raise_error`` is ``True``.
+            has negative values and ``raise_error`` is ``True``.
         """
         # check if the feature has any negative values
         if np.any(values < 0):

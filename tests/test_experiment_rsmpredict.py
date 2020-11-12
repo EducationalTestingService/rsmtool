@@ -192,7 +192,7 @@ def test_run_experiment_lr_predict_missing_feature_file():
 
 @raises(FileNotFoundError)
 def test_run_experiment_lr_predict_missing_postprocessing_file():
-    """Run smpredict experiment with missing post-processing file."""
+    """Run rsmpredict experiment with missing post-processing file."""
     source = 'lr-predict-missing-postprocessing-file'
     config_file = join(rsmtool_test_dir,
                        'data',

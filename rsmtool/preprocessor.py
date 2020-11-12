@@ -194,7 +194,7 @@ class FeatureSpecsProcessor:
     @classmethod
     def validate_feature_specs(cls, df, use_truncations=False):
         """
-        Validate given feature specs.
+        Validate given feature specifications.
 
         Check given feature specifications to make sure that there are no duplicate
         feature names and that all columns are in the right format. Add the
@@ -341,7 +341,7 @@ class FeatureSpecsProcessor:
 
 
 class FeaturePreprocessor:
-    """Class to preprocess training and testing features."""
+    """Class to preprocess features in training and testing sets."""
 
     @staticmethod
     def check_model_name(model_name):
@@ -1030,8 +1030,7 @@ class FeaturePreprocessor:
         """
         Remove outliers and transform the values in given numpy array.
 
-        Use the given outlier and transformation parameters. The values
-        are assumed for the given feature name.
+        Use the given outlier and transformation parameters.
 
         Parameters
         ----------
@@ -1048,7 +1047,7 @@ class FeaturePreprocessor:
             Std. dev. value to use for outlier detection instead
             of the std. dev. of the given feature values.
         exclude_zero_sd : bool, optional
-            Exclude any column it it has zero standard deviation.
+            Exclude the feature if it has zero standard deviation.
             Defaults to ``False``.
         raise_error : bool, optional
             Raise an error if any of the transformations lead to "inf" values

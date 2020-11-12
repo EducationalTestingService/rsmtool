@@ -304,7 +304,7 @@ class Modeler:
         """
         Train an "EqualWeightsLR" model.
 
-        This model ensures that all features get equal weights.
+        This model assigns the same weight to all features.
 
         Parameters
         ----------

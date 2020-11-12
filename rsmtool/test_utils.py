@@ -1000,7 +1000,7 @@ def copy_data_files(temp_dir_name,
                     input_file_dict,
                     given_test_dir):
     """
-    Copy files from given test directory to temporary directory.
+    Copy files from given test directory to a temporary directory.
 
     Useful for tests where the current directory is to be used as the
     reference for resolving paths in the configuration.
@@ -1282,7 +1282,7 @@ class FileUpdater(object):
                                        input_source=input_source)
 
     def run(self):
-        """Update tests in files given by the ``test_suffixes`` attribute."""
+        """Update test data in files given by the ``test_suffixes`` attribute."""
         # import all the test_suffix experiment files using SourceFileLoader
         # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:

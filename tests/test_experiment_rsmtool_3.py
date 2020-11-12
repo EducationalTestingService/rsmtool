@@ -153,7 +153,7 @@ def test_run_experiment_lr_with_dictionary():
 
 @raises(AttributeError)
 def test_run_experiment_lr_with_object_and_filepath():
-    """Test for rare use case where an old Configuration object is passed."""
+    """Test for a rare use case where an old Configuration object is passed."""
     source = 'lr-object'
     experiment_id = 'lr_object'
 

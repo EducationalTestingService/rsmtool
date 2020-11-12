@@ -46,7 +46,7 @@ def int_or_float_format_func(num, prec=3):
     Identify whether the number is float or integer.
 
     When displaying integers, use no decimal. For a float, round to the
-    specified number of decimal places as a string.
+    specified number of decimal places and convert to a string.
 
     Parameters:
     -----------
@@ -75,7 +75,7 @@ def custom_highlighter(num,
                        absolute=False,
                        span_class='bold'):
     """
-    Convert float as an HTML <span> element with given class.
+    Convert float to an HTML <span> element with given class.
 
     The conversion only happens if the given float is below ``low``
     or above ``high``. If it does not meet those constraints, then
@@ -221,7 +221,7 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     Generate HTML for a clickable thumbnail of given image.
 
     Given the path to an image file, generate the HTML for
-    a click-able thumbnail version of the image. When clicked,
+    a clickable thumbnail version of the image. When clicked,
     this HTML will open the full-sized version of the image in
     a new window.
 
