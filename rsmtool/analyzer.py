@@ -649,7 +649,7 @@ class Analyzer:
             Defaults to ``None``.
         smd_method : {"williamson", "johnson", "pooled", "unpooled"}, optional
             The SMD method to use, only used if ``use_diff_std_means`` is
-            ``False``. All methods have the same numerator:
+            ``False``. All methods have the same numerator
             mean(`y_pred`) - mean(`y_true_observed`) and the following
             denominators :
 
@@ -1040,14 +1040,14 @@ class Analyzer:
             Defaults to ``None``.
         smd_method : {"williamson", "johnson", pooled", "unpooled"}, optional
             The SMD method to use, only used if ``use_diff_std_means`` is
-            ``False``. All methods have the same numerator:
+            ``False``. All methods have the same numerator
             mean(`y_pred`) - mean(`y_true_observed`) and the following
             denominators:
 
             - "williamson": pooled population standard deviation of human and
-              system scores computed based on values in ``population_sd_dict``
+              system scores computed based on values in ``population_sd_dict``.
             - "johnson": population standard deviation of human scores computed
-              based on values in ``population_sd_dict`.
+              based on values in ``population_sd_dict``.
             - "pooled": pooled standard deviation of `y_true_observed` and
               `y_pred` for this group.
             - "unpooled": standard deviation of `y_true_observed` for this
