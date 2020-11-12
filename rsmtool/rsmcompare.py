@@ -76,8 +76,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     ------
     FileNotFoundError
         If either of the two input directories in ``config_file_or_obj_or_dict``
-        do not exist, or if the directories do not contain rsmtool outputs
-        at all.
+        do not exist.
+    FileNotFoundError
+        If the directories do not contain rsmtool outputs at all.
     """
     logger = logging.getLogger(__name__)
 

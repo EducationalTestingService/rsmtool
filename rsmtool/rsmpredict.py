@@ -57,8 +57,11 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     ------
     FileNotFoundError
         If any of the files contained in ``config_file_or_obj_or_dict``
-        cannot be located, or if ``experiment_dir`` does not exist,
-        or if ``experiment_dir`` does not contain the required output
+        cannot be located.
+    FileNotFoundError
+        If ``experiment_dir`` does not exist.
+    FileNotFoundError
+        If ``experiment_dir`` does not contain the required output
         needed from an rsmtool experiment.
     RuntimeError
         If the name of the output file does not end in
