@@ -31,9 +31,7 @@ from .writer import DataWriter
 
 class Modeler:
     """
-    Class to train and predict with built-in or SKLL models.
-
-    Also provides helper functions for predicting train and test datasets.
+    Class to train model and generate predictions with built-in or SKLL models.
     """
 
     def __init__(self):
@@ -825,7 +823,8 @@ class Modeler:
         Train a "PositiveLassoCV" model.
 
         Do feature selection using lasso regression optimized for
-        log likelihood using cross validation.
+        log likelihood using cross validation. All coefficients
+        are constrained to have positive values.
 
         Parameters
         ----------

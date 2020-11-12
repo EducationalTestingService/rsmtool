@@ -33,8 +33,10 @@ def run_experiment(config_file_or_obj_or_dict,
     """
     Run an rsmtool experiment using the given configuration.
 
-    All outputs are generated under ``output_dir``. If ``overwrite_output``
-    is ``True``, any existing output in ``output_dir`` is overwritten.
+    Run rsmtool experiment using the given configuration file, object, or
+    dictionary. All outputs are generated under ``output_dir``. If
+    ``overwrite_output`` is ``True``, any existing output in ``output_dir``
+    is overwritten.
 
     Parameters
     ----------

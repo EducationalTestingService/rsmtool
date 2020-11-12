@@ -270,7 +270,7 @@ class Analyzer:
     @staticmethod
     def compute_basic_descriptives(df, selected_features):
         """
-        Compute basic descriptive statistics for columns in given data frame.
+        Compute basic descriptive statistics for columns in the given data frame.
 
         Parameters
         ----------
@@ -319,7 +319,7 @@ class Analyzer:
                             selected_features,
                             percentiles=None):
         """
-        Compute percentiles and outliers for columns in given data frame.
+        Compute percentiles and outliers for columns in the given data frame.
 
         Parameters
         ----------
@@ -434,7 +434,7 @@ class Analyzer:
     @staticmethod
     def compute_pca(df, selected_features):
         """
-        Compute PCA decomposition of given features.
+        Compute PCA decomposition of the given features.
 
         This method computes the PCA decomposition of features in the
         data frame, restricted to the given columns. The number of components
@@ -526,8 +526,8 @@ class Analyzer:
             Data frame containing Pearson's correlation coefficients for
             partial correlations between each feature and `target_variable`
             after controlling for all other features. If ``include_length`` is
-            set to ``True``, "length" will not be included into partial
-            correlation computation.
+            set to ``True``, the "length" column will not be included in the
+            partial correlation computation.
         df_target_partcors_no_length: pandas DataFrame
             If ``include_length`` is set to ``True``: Data frame containing
             Pearson's correlation coefficients for partial correlations
@@ -607,27 +607,45 @@ class Analyzer:
             Series containing numeric scores predicted by the model.
         population_human_score_sd : float, optional
             Reference standard deviation for human scores.
-            If ``smd_method`` is set to "williamson", this is used to
-            compute SMD and should be the standard deviation for the whole
-            population. If ``use_diff_std_means`` is ``True``, this must be
-            used with ``population_human_score_mn``. Otherwise, it is ignored.
+            This must be specified when the function is used to compute
+            association metrics for a subset of responses, for example,
+            responses from a particular demographic subgroup. If ``smd_method``
+            is set to "williamson" or "johnson", this should be the standard
+            deviation for the whole population (in most cases, the standard
+            deviation for the whole test set). If ``use_diff_std_means`` is
+            ``True``, this must be the standard deviation for the whole
+            population and ``population_human_score_mn`` must also be specified.
+            Otherwise, it is ignored.
             Defaults to ``None``.
         population_system_score_sd : float, optional
-            Reference standard deviation for system scores. If
-            ``smd_method`` is set to "williamson", this is used to compute
-            SMD and should be the standard deviation for the whole population.
-            If ``use_diff_std_means`` is ``True``, this must be used with
-            ``population_system_score_mn``. Otherwise, it is ignored.
+            Reference standard deviation for system scores.
+            This must be specified when the function is used to compute
+            association metrics for a subset of responses, for example,
+            responses from a particular demographic subgroup. If ``smd_method``
+            is set to "williamson", this should be the standard deviation for
+            the whole population (in most cases, the standard deviation for the
+            whole test set). If ``use_diff_std_means`` is ``True``, this must
+            be the standard deviation for the whole population and
+            ``population_system_score_mn`` must also be specified. Otherwise,
+            it is ignored.
             Defaults to ``None``.
         population_human_score_mn : float, optional
-            Reference mean for human scores. If ``use_diff_std_means`` is
-            ``True``, this must be used with ``population_human_score_sd``.
+            Reference mean for human scores. This must be specified when the
+            function is used to compute association metrics for a subset of
+            responses, for example, responses from a particular demographic
+            subgroup. If ``use_diff_std_means`` is ``True``, this must be the
+            mean for the whole population (in most cases, the full test set)
+            and  ``population_human_score_sd`` must also be specified.
             Otherwise, it is ignored.
             Defaults to ``None``.
         population_system_score_mn : float, optional
-            Reference mean for system scores. If  ``use_diff_std_means`` is
-            ``True``, this must be used with ``population_system_score_sd``.
-            Otherwise, it is ignored.
+            Reference mean for system scores. This must be specified when the
+            function is used to compute association metrics for a subset of
+            responses, for example, responses from a particular demographic
+            subgroup. If ``use_diff_std_means`` is ``True``, this must be the
+            mean for the whole population (in most cases, the full test set)
+            and ``population_system_score_sd`` must also be specified. Otherwise,
+            it is ignored.
             Defaults to ``None``.
         smd_method : {"williamson", "johnson", "pooled", "unpooled"}, optional
             The SMD method to use, only used if ``use_diff_std_means`` is
@@ -636,8 +654,9 @@ class Analyzer:
             denominators :
 
             - "williamson": pooled population standard deviation of
-              `y_true_observed` and `y_pred`.
-            - "johnson": population standard deviation of `y_true_observed`.
+              `y_true_observed` and `y_pred` computed using
+              ``population_human_score_sd`` and ``population_system_score_sd``.
+            - "johnson": ``population_human_score_sd``.
             - "pooled": pooled standard deviation of `y_true_observed` and
               `y_pred` for this group.
             - "unpooled": standard deviation of `y_true_observed` for this
@@ -771,38 +790,40 @@ class Analyzer:
         return metrics
 
     @staticmethod
-    def compute_disattenuated_correlations(human_machine_corr,
+    def compute_disattenuated_correlations(human_system_corr,
                                            human_human_corr):
         """
-        Compute disattenuated correlations between human and machine scores.
+        Compute disattenuated correlations between human and system scores.
 
         These are computed as the Pearson's correlation between the human score
-        and the machine score divided by the square root of correlation between
+        and the system score divided by the square root of correlation between
         two human raters.
 
         Parameters
         ----------
-        human_machine_corr : pandas Series
-            Series containing of pearson's correlation coefficients human-machine correlations
+        human_system_corr : pandas Series
+            Series containing of pearson's correlation coefficients human-system
+            correlations.
         human_human_corr : pandas Series
-            Series containing of pearson's correlation coefficients for human-human correlations.
-            This can contain a single value or have the index matching that of human-machine
-            correlations
+            Series containing of pearson's correlation coefficients for human-human
+            correlations. This can contain a single value or have the index
+            matching that of human-system correlations.
 
         Returns
         -------
         df_correlations: pandas DataFrame
-            Data frame containing the HM correlation, HH correlation,
-            and disattenuated correlation
+            Data frame containing the human-system correlations, human-human
+            correlations, and disattenuated correlations.
         """
         # if we only have a single value for human correlation and the index
-        # is not in human-machine values, we use the same HH value in all cases
-        if len(human_human_corr) == 1 and not human_human_corr.index[0] in human_machine_corr.index:
-            human_human_corr = pd.Series(human_human_corr.values.repeat(len(human_machine_corr)),
-                                         index=human_machine_corr.index)
+        # is not in human-system values, we use the same HH value in all cases
+        if (len(human_human_corr) == 1 and
+                not human_human_corr.index[0] in human_system_corr.index):
+            human_human_corr = pd.Series(human_human_corr.values.repeat(len(human_system_corr)),
+                                         index=human_system_corr.index)
 
         # we now concatenate the two series on index
-        df_correlations = pd.concat([human_machine_corr, human_human_corr],
+        df_correlations = pd.concat([human_system_corr, human_human_corr],
                                     axis=1,
                                     sort=True,
                                     keys=['corr_HM', 'corr_HH'])
@@ -981,17 +1002,17 @@ class Analyzer:
                         smd_method='unpooled',
                         use_diff_std_means=False):
         """
-        Compute evaluation metrics for scores in the given data frame.
+        Compute association metrics for scores in the given data frame.
 
-        This function compute evaluation metrics for all score types.
+        This function compute association metrics for all score types.
         If ``include_second_score`` is ``True``, then it is assumed that
         a column called `sc2` containing a second human score is available
         and it should be used to compute the human-human evaluation stats
         and the performance degradation statistics.
 
         If ``compute_shortened`` is ``True``, then this function also
-        computes a shortened version of the full human-machine metrics data
-        frame. See ``filter_metrics()`` for a description of the default
+        computes a shortened version of the full human-system metrics data
+        frame. See ``filter_metrics()`` for the description of the default
         columns included in the shortened data frame.
 
         Parameters
@@ -1023,9 +1044,10 @@ class Analyzer:
             mean(`y_pred`) - mean(`y_true_observed`) and the following
             denominators:
 
-            - "williamson": pooled population standard deviation of
-              `y_true_observed` and `y_pred`
-            - "johnson": population standard deviation of `y_true_observed`.
+            - "williamson": pooled population standard deviation of human and
+              system scores computed based on values in ``population_sd_dict``
+            - "johnson": population standard deviation of human scores computed
+              based on values in ``population_sd_dict`.
             - "pooled": pooled standard deviation of `y_true_observed` and
               `y_pred` for this group.
             - "unpooled": standard deviation of `y_true_observed` for this
@@ -1040,10 +1062,10 @@ class Analyzer:
 
         Returns
         -------
-        df_human_machine_eval : pandas DataFrame
+        df_human_system_eval : pandas DataFrame
             Data frame containing the full set of evaluation
             metrics.
-        df_human_machine_eval_filtered : pandas DataFrame
+        df_human_system_eval_filtered : pandas DataFrame
             Data frame containing the human-human statistics
             but is empty if ``include_second_score`` is ``False``.
         df_human_human_eval : pandas DataFrame
@@ -1066,7 +1088,7 @@ class Analyzer:
 
         # if the second human score column is available, the values are
         # probably not available for all of the responses in the test
-        # set and so we want to exclude 'sc2' from human-machine metrics
+        # set and so we want to exclude 'sc2' from human-system metrics
         # computation. In addition, we also want to compute the human-human
         # metrics only on the data that is double scored.
         df_human_human = pd.DataFrame()
@@ -1074,15 +1096,15 @@ class Analyzer:
 
             df_single = df.drop('sc2', axis=1)
 
-            df_human_machine = df_single.apply(lambda s:
-                                               self.metrics_helper(df_single['sc1'],
-                                                                   s,
-                                                                   population_sd_dict['sc1'],
-                                                                   population_sd_dict[s.name],
-                                                                   population_mn_dict['sc1'],
-                                                                   population_mn_dict[s.name],
-                                                                   smd_method,
-                                                                   use_diff_std_means))
+            df_human_system = df_single.apply(lambda s:
+                                              self.metrics_helper(df_single['sc1'],
+                                                                  s,
+                                                                  population_sd_dict['sc1'],
+                                                                  population_sd_dict[s.name],
+                                                                  population_mn_dict['sc1'],
+                                                                  population_mn_dict[s.name],
+                                                                  smd_method,
+                                                                  use_diff_std_means))
             df_double = df[df['sc2'].notnull()][['sc1', 'sc2']]
             df_human_human = df_double.apply(lambda s:
                                              self.metrics_helper(df_double['sc1'],
@@ -1117,48 +1139,48 @@ class Analyzer:
                 df_human_human['N'] = 0
             df_human_human.index = ['']
         else:
-            df_human_machine = df.apply(lambda s: self.metrics_helper(df['sc1'],
-                                                                      s,
-                                                                      population_sd_dict['sc1'],
-                                                                      population_sd_dict[s.name],
-                                                                      population_mn_dict['sc1'],
-                                                                      population_mn_dict[s.name],
-                                                                      smd_method,
-                                                                      use_diff_std_means))
+            df_human_system = df.apply(lambda s: self.metrics_helper(df['sc1'],
+                                                                     s,
+                                                                     population_sd_dict['sc1'],
+                                                                     population_sd_dict[s.name],
+                                                                     population_mn_dict['sc1'],
+                                                                     population_mn_dict[s.name],
+                                                                     smd_method,
+                                                                     use_diff_std_means))
 
-        # drop 'sc1' column from the human-machine frame and transpose
-        df_human_machine = df_human_machine.drop('sc1', 1)
-        df_human_machine = df_human_machine.transpose()
+        # drop 'sc1' column from the human-system frame and transpose
+        df_human_system = df_human_system.drop('sc1', 1)
+        df_human_system = df_human_system.transpose()
 
         # sort the columns and rows in the correct order
-        df_human_machine = df_human_machine[['N',
-                                             'h_mean', 'h_sd',
-                                             'h_min', 'h_max',
-                                             'sys_mean', 'sys_sd',
-                                             'sys_min', 'sys_max',
-                                             'corr',
-                                             'wtkappa', 'R2', 'kappa',
-                                             'exact_agr', 'adj_agr',
-                                             smd_name, 'RMSE']]
+        df_human_system = df_human_system[['N',
+                                           'h_mean', 'h_sd',
+                                           'h_min', 'h_max',
+                                           'sys_mean', 'sys_sd',
+                                           'sys_min', 'sys_max',
+                                           'corr',
+                                           'wtkappa', 'R2', 'kappa',
+                                           'exact_agr', 'adj_agr',
+                                           smd_name, 'RMSE']]
 
         # make N column an integer if it's not NaN else set it to 0
-        df_human_machine['N'] = df_human_machine['N'].astype(int)
+        df_human_system['N'] = df_human_system['N'].astype(int)
         all_rows_order = ['raw', 'raw_trim', 'raw_trim_round',
                           'scale', 'scale_trim', 'scale_trim_round']
-        existing_rows_index = [row for row in all_rows_order if row in df_human_machine.index]
-        df_human_machine = df_human_machine.reindex(existing_rows_index)
+        existing_rows_index = [row for row in all_rows_order if row in df_human_system.index]
+        df_human_system = df_human_system.reindex(existing_rows_index)
 
         # extract some default metrics for a shorter version of this data frame
         # if we were asked to do so
         if compute_shortened:
-            df_human_machine_filtered = self.filter_metrics(df_human_machine,
-                                                            use_scaled_predictions=use_scaled)
+            df_human_system_filtered = self.filter_metrics(df_human_system,
+                                                           use_scaled_predictions=use_scaled)
         else:
-            df_human_machine_filtered = pd.DataFrame()
+            df_human_system_filtered = pd.DataFrame()
 
         # return all data frames
-        return (df_human_machine,
-                df_human_machine_filtered,
+        return (df_human_system,
+                df_human_system_filtered,
                 df_human_human)
 
     def compute_metrics_by_group(self,
@@ -1191,10 +1213,10 @@ class Analyzer:
 
         Returns
         -------
-        df_human_machine_eval_by_group : pandas DataFrame
+        df_human_system_by_group : pandas DataFrame
             Data frame containing the correlation
-            human-machine association statistics.
-        df_human_human_eval_by_group : pandas DataFrame
+            human-system association statistics.
+        df_human_human_by_group : pandas DataFrame
             Data frame that either contains the human-human
             statistics or is an empty data frame, depending
             on whether ``include_second_score`` is `True``.
@@ -1232,14 +1254,14 @@ class Analyzer:
         # group by the grouping_variable columns
         grouped = df_preds_combined.groupby(grouping_variable)
 
-        df_human_machine_by_group = pd.DataFrame()
+        df_human_system_by_group = pd.DataFrame()
         df_human_human_by_group = pd.DataFrame()
 
         for group, df_group in grouped:
             df_group = df_group.drop(grouping_variable, 1)
 
-            (df_human_machine_metrics,
-             df_human_machine_metrics_short,
+            (df_human_system_metrics,
+             df_human_system_metrics_short,
              df_human_human_metrics
              ) = self.compute_metrics(df_group,
                                       compute_shortened=True,
@@ -1250,7 +1272,7 @@ class Analyzer:
                                       use_diff_std_means=True)
 
             # we need to convert the shortened data frame to a series here
-            df_human_machine_by_group[group] = df_human_machine_metrics_short.iloc[0]
+            df_human_system_by_group[group] = df_human_system_metrics_short.iloc[0]
 
             # update the by group human-human metrics frame if
             # we have the second score column available
@@ -1258,25 +1280,25 @@ class Analyzer:
                 df_human_human_metrics.index = [group]
                 df_human_human_by_group = df_human_human_by_group.append(df_human_human_metrics)
 
-        # transpose the by group human-machine metrics frame
-        df_human_machine_by_group = df_human_machine_by_group.transpose()
+        # transpose the by group human-system metrics frame
+        df_human_system_by_group = df_human_system_by_group.transpose()
 
-        return (df_human_machine_by_group, df_human_human_by_group)
+        return (df_human_system_by_group, df_human_human_by_group)
 
     def compute_degradation_and_disattenuated_correlations(self,
                                                            df,
                                                            use_all_responses=True):
         """
-        Compute the degradation in performance when using machine score.
+        Compute the degradation in performance when using system score.
 
         This method computes the degradation in performance when using the
-        machine to predict the score instead of a second human and also the
-        disattenuated correlations between human and machine scores.
+        system to predict the score instead of a second human and also the
+        disattenuated correlations between human and system scores.
         These are computed as the Pearson's correlation between the human score
-        and the machine score divided by the square root of correlation between
+        and the system score divided by the square root of correlation between
         two human raters.
 
-        For this, we can compute the machine performance either only on the
+        For this, we can compute the system performance either only on the
         double scored data or on the full dataset. Both options have their
         pros and cons. The default is to use the full dataset. This function
         also assumes that the `sc2` column exists in the given data frame,
@@ -1287,18 +1309,16 @@ class Analyzer:
         df : pandas DataFrame
             Input data frame.
         use_all_responses : bool, optional
-            Use the full data set instead of only using
-            the double-scored subset.
+            Use the full data set instead of only using the double-scored subset.
             Defaults to ``True``.
 
         Returns
         -------
         df_degradation : pandas DataFrame
             Data frame containing the degradation statistics.
-
         df_correlations : pandas DataFrame
-            Data frame containing the HM correlation, HH correlation
-            and disattenuated correlation
+            Data frame containing the human-system correlations, human-human
+            correlations and disattenuated correlation.
         """
         if use_all_responses:
             df_responses = df
@@ -1306,23 +1326,23 @@ class Analyzer:
             # use only double scored data
             df_responses = df[df['sc2'].notnull()]
 
-        # compute the human-machine and human-human metrics
-        (df_human_machine_eval,
+        # compute the human-system and human-human metrics
+        (df_human_system_eval,
          _,
          df_human_human_eval) = self.compute_metrics(df_responses,
                                                      include_second_score=True)
 
         # compute disattenuated correlations
-        df_correlations = self.compute_disattenuated_correlations(df_human_machine_eval['corr'],
+        df_correlations = self.compute_disattenuated_correlations(df_human_system_eval['corr'],
                                                                   df_human_human_eval['corr'])
 
         # Compute degradation. we only care about the degradation in these metrics
         degradation_metrics = ['corr', 'kappa', 'wtkappa',
                                'exact_agr', 'adj_agr', 'SMD']
-        df_human_machine_eval = df_human_machine_eval[degradation_metrics]
+        df_human_system_eval = df_human_system_eval[degradation_metrics]
         df_human_human_eval = df_human_human_eval[degradation_metrics]
-        df_degradation = df_human_machine_eval.apply(lambda row:
-                                                     row - df_human_human_eval.loc[''], axis=1)
+        df_degradation = df_human_system_eval.apply(lambda row:
+                                                    row - df_human_human_eval.loc[''], axis=1)
 
         return (df_degradation, df_correlations)
 
@@ -1532,7 +1552,7 @@ class Analyzer:
                                 data_container,
                                 configuration):
         """
-        Run all analyses on the machine predictions.
+        Run all analyses on the system scores (predictions).
 
         Parameters
         ----------
@@ -1604,8 +1624,8 @@ class Analyzer:
             df_preds_second_score = df_preds
 
         # compute the evaluation metrics over the whole data set
-        (df_human_machine,
-         df_human_machine_short,
+        (df_human_system,
+         df_human_system_short,
          df_human_human) = self.compute_metrics(df_preds_second_score[prediction_columns],
                                                 compute_shortened=True,
                                                 use_scaled_predictions=use_scaled_predictions,
@@ -1641,7 +1661,7 @@ class Analyzer:
         labels = sorted(human_scores.append(system_scores).unique())
         df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
 
-        # compute the score distributions of the rounded human and machine scores
+        # compute the score distributions of the rounded human and system scores
         df_score_dist = df_preds[['sc1_round',
                                   '{}_trim_round'
                                   ''.format(score_type)]].apply(lambda s:
@@ -1662,8 +1682,8 @@ class Analyzer:
                                        'difference']]
         df_score_dist.sort_values(by='score', inplace=True)
 
-        datasets = [{'name': 'eval', 'frame': df_human_machine},
-                    {'name': 'eval_short', 'frame': df_human_machine_short},
+        datasets = [{'name': 'eval', 'frame': df_human_system},
+                    {'name': 'eval_short', 'frame': df_human_system_short},
                     {'name': 'consistency', 'frame': df_human_human},
                     {'name': 'degradation', 'frame': df_degradation},
                     {'name': 'disattenuated_correlations', 'frame': df_correlations},

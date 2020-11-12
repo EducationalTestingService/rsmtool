@@ -13,7 +13,8 @@ under `tests/data/experiments`.
 
 The scripts works as as follows. For each experiment test:
 - The script locates the output under the updated outputs directory.
-- New and changed files under are copied over to the expected test output location.
+- New and changed files in this directory are copied over to the expected test
+  output location.
 - Old files in the expected test output are deleted.
 - Files that are already in the expected test output and have not changed are
   left alone.
@@ -25,6 +26,9 @@ The scripts works as as follows. For each experiment test:
 Note: If running this script results in changes to the inputs for rsmcompare
 or rsmsummarize tests, you will need to first re-run the tests for those two
 tools and then, potentially, run this script again to update their test outputs.
+
+See `documentation <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_
+for a further explanation of this process.
 
 The script prints a log detailing the changes made for each experiment test.
 

@@ -31,8 +31,8 @@ class DataContainer:
             A list of dataset dictionaries. Each dict should have the
             following keys: "name" containing the name of the dataset,
             "frame" containing the dataframe object representing the
-            dataset, and "path" containing the file from which the frame
-            was read.
+            dataset, and "path" containing the path to the file from
+            which the frame was read.
         """
         self._names = []
         self._dataframes = {}
@@ -106,8 +106,8 @@ class DataContainer:
         """
         Add another container object to instance.
 
-        Return a new container object with datasets common to
-        both containers.
+        Return a new container object with datasets included
+        in either of the two containers.
 
         Parameters
         ----------
@@ -118,7 +118,7 @@ class DataContainer:
         -------
         output : DataContainer
             New container object containing datasets
-            common to this instance and the other instance.
+            included in this instance and the other instance.
 
         Raises
         ------

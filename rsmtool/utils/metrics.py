@@ -223,9 +223,9 @@ def standardized_mean_difference(y_true_observed,
         The SMD method to use. Possible options are:
 
         - "williamson": Denominator is the pooled population standard deviation
-          of ``y_true_observed`` and ``y_pred``.
-        - "johnson": Denominator is the population standard deviation
-          of ``y_true_observed``.
+          of ``y_true_observed`` and ``y_pred`` computed using
+          ``population_y_true_observed_sd`` and ``population_y_pred_sd``.
+        - "johnson": Denominator is ``population_y_true_observed_sd``.
         - "pooled": Denominator is the pooled standard deviation of
           ``y_true_observed`` and ``y_pred`` for this group.
         - "unpooled": Denominator is the standard deviation of
@@ -249,6 +249,8 @@ def standardized_mean_difference(y_true_observed,
     ValueError
         If method is "williamson" and either ``population_y_true_observed_sd``
         or ``population_y_pred_sd`` is ``None``.
+    ValueError
+        If method is "johnson" and ``population_y_true_observed_sd`` is ``None``.
     ValueError
         If method is not one of {"unpooled", "pooled", "williamson", "johnson"}.
 
@@ -296,7 +298,7 @@ def difference_of_standardized_means(y_true_observed,
                                      population_y_pred_sd=None,
                                      ddof=1):
     """
-    Calculate the difference of standardized means.
+    Calculate the difference between standardized means.
 
     First, standardize both observed and predicted scores to z-scores using
     mean and standard deviation for the whole population. Then

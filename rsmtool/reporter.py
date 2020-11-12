@@ -487,9 +487,9 @@ class Reporter:
                                    model_type=None,
                                    context='rsmtool'):
         """
-        Check all section names and the order of section.
+        Check all section names and the order of the sections.
 
-        combine all section names with the appropriate file mapping,
+        Combine all section names with the appropriate file mapping,
         and generate an ordered list of notebook files that are
         needed to generate the final report.
 

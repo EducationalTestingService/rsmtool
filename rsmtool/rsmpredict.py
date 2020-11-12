@@ -29,9 +29,10 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                  output_file,
                                  feats_file=None):
     """
-    Run rsmpredict with given configuration file.
+    Run rsmpredict using the given configuration.
 
-    Predictions are saved in ``output_file``. Optionally,
+    Generate predictions using given configuration file, object, or
+    dictionary. Predictions are saved in ``output_file``. Optionally,
     pre-processed feature values are saved in ``feats_file``,
     if specified.
 
@@ -63,7 +64,6 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         If the name of the output file does not end in
         ".csv", ".tsv", or ".xlsx".
     """
-
     logger = logging.getLogger(__name__)
 
     configuration = configure('rsmpredict', config_file_or_obj_or_dict)

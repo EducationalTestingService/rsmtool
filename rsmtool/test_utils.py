@@ -1244,7 +1244,6 @@ class FileUpdater(object):
         self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
         self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
 
-
     def update_test_data(self,
                          source,
                          test_tool,

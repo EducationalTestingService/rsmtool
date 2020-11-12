@@ -1110,7 +1110,7 @@ class FeaturePreprocessor:
                             standardize_features=True,
                             use_truncations=False):
         """
-        Preprocess features in given data with matching specifications.
+        Preprocess features in given data using corresponding specifications.
 
         Preprocess the feature values in the training and testing data
         frames whose specifications are contained in ``df_feature_specs``.
@@ -1256,12 +1256,12 @@ class FeaturePreprocessor:
 
         Check whether any features that are specifically requested in
         ``requested_feature_names`` are missing from the data. If no
-        feature names are requested, they are generated based on column
-        names and subset information, if available. The function then excludes
-        non-numeric values for any feature. It will also exclude zero scores
-        if ``exclude_zero_scores`` is ``True``. If the user requested to exclude
-        candidates with less than ``min_candidate_items``, such candidates
-        are also excluded.
+        feature names are requested, the feature list is generated based
+        on column names and subset information, if available. The function
+        then excludes non-numeric values for any feature. It will also exclude
+        zero scores if ``exclude_zero_scores`` is ``True``. If the user
+        requested to exclude candidates with less than ``min_candidate_items``,
+        such candidates are also excluded.
 
         It also generates fake labels between 1 and 10 if
         ``use_fake_parameters`` is ``True``. Finally, it renames the ID
