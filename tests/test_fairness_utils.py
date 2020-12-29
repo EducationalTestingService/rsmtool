@@ -1,20 +1,11 @@
-"""
-Tests for function in fairness_utils.py
-"""
+"""Test functions in rsmtool.fairness_utils."""
 
-
-import pandas as pd
-
-from nose.tools import (eq_,
-                        ok_,
-                        raises,
-                        assert_almost_equal)
 
 from os.path import dirname
 
-from rsmtool.fairness_utils import (convert_to_ordered_category,
-                                    get_fairness_analyses)
-
+import pandas as pd
+from nose.tools import assert_almost_equal, eq_, ok_, raises
+from rsmtool.fairness_utils import convert_to_ordered_category, get_fairness_analyses
 
 # get the directory containing the tests
 test_dir = dirname(__file__)

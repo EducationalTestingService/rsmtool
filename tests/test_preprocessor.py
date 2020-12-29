@@ -1,18 +1,9 @@
 import numpy as np
 import pandas as pd
-
+from nose.tools import assert_almost_equal, assert_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
-
-from nose.tools import (assert_equal,
-                        assert_almost_equal,
-                        raises,
-                        ok_,
-                        eq_)
-
-from rsmtool.preprocessor import (FeaturePreprocessor,
-                                  FeatureSubsetProcessor,
-                                  FeatureSpecsProcessor)
+from rsmtool.preprocessor import FeaturePreprocessor, FeatureSpecsProcessor, FeatureSubsetProcessor
 
 
 class TestFeaturePreprocessor:

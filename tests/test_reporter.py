@@ -1,14 +1,12 @@
-from nose.tools import eq_, raises, ok_
-
 from os.path import join, normpath
 
-from rsmtool.reporter import Reporter
-
-from rsmtool.reporter import (master_section_dict,
-                              notebook_path,
+from nose.tools import eq_, ok_, raises
+from rsmtool.reporter import (Reporter,
                               comparison_notebook_path,
-                              summary_notebook_path,
-                              notebook_path_dict)
+                              master_section_dict,
+                              notebook_path,
+                              notebook_path_dict,
+                              summary_notebook_path)
 
 # Since we are in test mode, we want to add a placeholder
 # special section to the master section list so that the tests

@@ -1,17 +1,13 @@
 import os
 import tempfile
-
 from os import getcwd
 from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
-
 from rsmtool import run_comparison
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import (check_run_comparison,
-                                copy_data_files,
-                                do_run_comparison)
+from rsmtool.test_utils import check_run_comparison, copy_data_files, do_run_comparison
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -20,6 +16,7 @@ if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
     from rsmtool.test_utils import rsmtool_test_dir
+
 
 @parameterized([
     param('lr-self-compare', 'lr_subgroups_vs_lr_subgroups'),
@@ -44,10 +41,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_compare_with_object():
-    '''
-    test rsmcompare using the Configuration object, rather than a file;
-    '''
-
+    """Test rsmcompare using the Configuration object, rather than a file."""
     source = 'lr-self-compare-object'
     experiment_id = 'lr_self_compare_object'
 
@@ -78,10 +72,7 @@ def test_run_experiment_lr_compare_with_object():
 
 
 def test_run_experiment_lr_compare_with_dictionary():
-    '''
-    test rsmcompare using the dictionary object, rather than a file
-    '''
-
+    """Test rsmcompare using the dictionary object, rather than a file."""
     source = 'lr-self-compare-dict'
     experiment_id = 'lr_self_compare_dict'
 

@@ -8,20 +8,21 @@ Classes for comparing outputs of two RSMTool experiments.
 :organization: ETS
 """
 
+import warnings
+from collections import defaultdict
+from copy import deepcopy
+from os.path import exists, join
+
 import numpy as np
 import pandas as pd
-import warnings
-
-from copy import deepcopy
-from collections import defaultdict
 from scipy.stats import pearsonr
-from os.path import exists, join
 
 from .reader import DataReader
 from .utils.files import get_output_directory_extension
 
-
-_df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
+_df_eval_columns_existing_raw = ["N",
+                                 "h_mean",
+                                 "h_sd",
                                  "sys_mean.raw_trim",
                                  "sys_sd.raw_trim",
                                  "corr.raw_trim",
@@ -36,7 +37,9 @@ _df_eval_columns_existing_raw = ["N", "h_mean", "h_sd",
                                  "R2.raw_trim",
                                  "RMSE.raw_trim"]
 
-_df_eval_columns_existing_scale = ["N", "h_mean", "h_sd",
+_df_eval_columns_existing_scale = ["N",
+                                   "h_mean",
+                                   "h_sd",
                                    "sys_mean.scale_trim",
                                    "sys_sd.scale_trim",
                                    "corr.scale_trim",
@@ -52,7 +55,9 @@ _df_eval_columns_existing_scale = ["N", "h_mean", "h_sd",
                                    "RMSE.scale_trim"]
 
 
-_df_eval_columns_renamed = ["N", "H1 mean", "H1 SD",
+_df_eval_columns_renamed = ["N",
+                            "H1 mean",
+                            "H1 SD",
                             "score mean(b)",
                             "score SD(b)",
                             "Pearson(b)",
@@ -74,9 +79,7 @@ scale_rename_dict = dict(zip(_df_eval_columns_existing_scale,
 
 
 class Comparer:
-    """
-    A class to perform comparisons between two RSMTool experiments.
-    """
+    """Class to perform comparisons between two RSMTool experiments."""
 
     @staticmethod
     def _modify_eval_columns_to_ensure_version_compatibilty(df,
@@ -85,30 +88,33 @@ class Comparer:
                                                             short_metrics_list,
                                                             raise_warnings=True):
         """
-        This is a helper method to ensure that the column names for eval data frames
-        are forward and backward compatible. There are two major changes in RSMTool (7.0 or greater)
-        that necessitate this: (1) for subgroup calculations, 'DSM' is now used
-        instead of 'SMD', and (2) QWK statistics are now calculated on un-rounded scores.
-        Thus, we need to check these columns to see which sets of names are being used.
+        Ensure that column names in eval data frames are backwards compatible.
+
+        This helper method ensures that the column names for eval data frames
+        are forward and backward compatible. There are two major changes in
+        RSMTool (7.0 or greater) that necessitate this: (1) for subgroup
+        calculations, 'DSM' is now used instead of 'SMD', and (2) QWK
+        statistics are now calculated on un-rounded scores. Thus, we need to
+        check these columns to see which sets of names are being used.
 
         Parameters
         ----------
         df : pandas Data Frame
-            The evaluation data frame
+            The evaluation data frame.
         rename_dict : dict
-            The rename dictionary
+            The rename dictionary.
         existing_eval_cols : list
-            The existing evaluation columns
+            The existing evaluation columns.
         short_metrics_list : list
             The list of columns for the short metrics file.
         raise_warnings : bool, optional
             Whether to raise warnings.
-            Defaults to True.
+            Defaults to ``True``.
 
         Returns
         -------
         rename_dict_new : dict
-            The updated rename dictionary
+            The updated rename dictionary.
         existing_eval_cols_new : list
             The updated existing evaluation columns
         short_metrics_list_new : list
@@ -116,7 +122,6 @@ class Comparer:
         smd_name : str
             The SMD column name (either 'SMD' or 'DSM')
         """
-
         rename_dict_new = deepcopy(rename_dict)
         existing_eval_cols_new = deepcopy(existing_eval_cols)
         short_metrics_list_new = deepcopy(short_metrics_list)
@@ -143,7 +148,10 @@ class Comparer:
             rename_dict_new = {key.replace('SMD', 'DSM'): val.replace('SMD', 'DSM')
                                for key, val in rename_dict_new.items()}
 
-        return rename_dict_new, existing_eval_cols_new, short_metrics_list_new, smd_name
+        return (rename_dict_new,
+                existing_eval_cols_new,
+                short_metrics_list_new,
+                smd_name)
 
     @staticmethod
     def make_summary_stat_df(df):
@@ -161,7 +169,6 @@ class Comparer:
             Data frame containing summary statistics for data
             in the input frame.
         """
-
         series = []
         for summary_func in [np.mean, np.std, np.median, np.min, np.max]:
 
@@ -180,9 +187,11 @@ class Comparer:
                                               human_score='sc1',
                                               id_column='spkitemid'):
         """
-        Computes correlations between respective feature values in the
-        two given frames as well as the correlations between each feature
-        values and the human scores.
+        Compute correlations between old and new feature values.
+
+        This method computes correlations between old and new feature values
+        in the two given frames as well as the correlations between each
+        feature value and the human score.
 
         Parameters
         ----------
@@ -191,29 +200,28 @@ class Comparer:
         df_new : pandas DataFrame
             Data frame with feature values for the 'new' model.
         human_score : str, optional
-            Name of the column containing human score. Defaults to ``sc1``.
+            Name of the column containing human score. Defaults to "sc1".
             Must be the same for both data sets.
         id_column : str, optional
             Name of the column containing id for each response. Defaults to
-            ``spkitemid``. Must be the same for both data sets.
+            "spkitemid". Must be the same for both data sets.
 
         Returns
         -------
         df_correlations: pandas DataFrame
-            Data frame with a row for each feature and the following columns ::
-
-                - N: total number of responses
-                - human_old: correlation with human score in the old frame
-                - human_new: correlation with human score in the new frame
-                - old_new: correlation between old and new frames
+            Data frame with a row for each feature and the following columns:
+                - "N": total number of responses
+                - "human_old": correlation with human score in the old frame
+                - "human_new": correlation with human score in the new frame
+                - "old_new": correlation between old and new frames
 
         Raises
         ------
         ValueError
-            If there are no shared features between the two sets or if there are
-            no shared responses between the two sets.
+            If there are no shared features between the two sets.
+        ValueError
+            If there are no shared responses between the two sets.
         """
-
         # Only use features that appear in both datasets
         features_old = [column for column in df_old
                         if column not in [id_column, human_score]]
@@ -273,13 +281,12 @@ class Comparer:
     @staticmethod
     def process_confusion_matrix(conf_matrix):
         """
-        Process confusion matrix to add 'human' and 'machine'
-        to column names.
+        Add "human" and "machine" to column names in the confusion matrix.
 
         Parameters
         ----------
-        conf_matrix : TYPE
-            pandas Data Frame containing the confusion matrix.
+        conf_matrix : pandas DataFrame
+            data frame containing the confusion matrix.
 
         Returns
         -------
@@ -294,7 +301,8 @@ class Comparer:
 
     def load_rsmtool_output(self, filedir, figdir, experiment_id, prefix, groups_eval):
         """
-        Function to load all of the outputs of an rsmtool experiment.
+        Load all of the outputs of an rsmtool experiment.
+
         For each type of output, we first check whether the file exists
         to allow comparing experiments with different sets of outputs.
 
@@ -321,7 +329,6 @@ class Comparer:
         figs: dict
             A dictionary with experiment figures.
         """
-
         file_format = get_output_directory_extension(filedir, experiment_id)
 
         files = defaultdict(pd.DataFrame)

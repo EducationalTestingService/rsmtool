@@ -1,21 +1,18 @@
 import os
 import tempfile
-
 from glob import glob
 from os import getcwd
 from os.path import basename, exists, join
 
 from nose.tools import raises
 from parameterized import param, parameterized
-
 from rsmtool import compute_and_save_predictions
-
 from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import (check_file_output,
-                                check_report,
-                                check_scaled_coefficients,
                                 check_generated_output,
+                                check_report,
                                 check_run_prediction,
+                                check_scaled_coefficients,
                                 copy_data_files,
                                 do_run_experiment,
                                 do_run_prediction)
@@ -56,11 +53,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_rsmtool_and_rsmpredict():
-    '''
-    this test is to make sure that both rsmtool
-    and rsmpredict generate the same files
-    '''
-
+    """Check that both rsmtool and rsmpredict generate the same files."""
     source = 'lr-rsmtool-rsmpredict'
     experiment_id = 'lr_rsmtool_rsmpredict'
     rsmtool_config_file = join(rsmtool_test_dir,
@@ -104,10 +97,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
 
 
 def test_run_experiment_lr_predict_with_object():
-    '''
-    test rsmpredict using the Configuration object, rather than a file
-    '''
-
+    """Test rsmpredict using the Configuration object, rather than a file."""
     source = 'lr-predict-object'
 
     configdir = join(rsmtool_test_dir,
@@ -131,10 +121,7 @@ def test_run_experiment_lr_predict_with_object():
 
 
 def test_run_experiment_lr_predict_with_dictionary():
-    '''
-    test rsmpredict using the dictionary object, rather than a file
-    '''
-
+    """Test rsmpredict using the dictionary object, rather than a file."""
     source = 'lr-predict-dict'
 
     # set up a temporary directory since
@@ -181,9 +168,7 @@ def test_compute_predictions_wrong_input_format():
 
 @raises(FileNotFoundError)
 def test_run_experiment_lr_predict_missing_model_file():
-    '''
-    rsmpredict experiment with missing model file
-    '''
+    """Run rsmpredict experiment with missing model file."""
     source = 'lr-predict-missing-model-file'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -195,9 +180,7 @@ def test_run_experiment_lr_predict_missing_model_file():
 
 @raises(FileNotFoundError)
 def test_run_experiment_lr_predict_missing_feature_file():
-    '''
-    rsmpredict experiment with missing feature file
-    '''
+    """Run rsmpredict experiment with missing feature file."""
     source = 'lr-predict-missing-feature-file'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -209,9 +192,7 @@ def test_run_experiment_lr_predict_missing_feature_file():
 
 @raises(FileNotFoundError)
 def test_run_experiment_lr_predict_missing_postprocessing_file():
-    '''
-    rsmpredict experiment with missing post-processing file
-    '''
+    """Run rsmpredict experiment with missing post-processing file."""
     source = 'lr-predict-missing-postprocessing-file'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -223,9 +204,7 @@ def test_run_experiment_lr_predict_missing_postprocessing_file():
 
 @raises(FileNotFoundError)
 def test_run_experiment_predict_no_input_feature_file():
-    '''
-    rsmpredict experiment with missing feature file
-    '''
+    """Run rsmpredict experiment with missing feature file."""
     source = 'lr-predict-no-input-feature-file'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -237,9 +216,7 @@ def test_run_experiment_predict_no_input_feature_file():
 
 @raises(FileNotFoundError)
 def test_run_experiment_predict_no_experiment_dir():
-    '''
-    rsmpredict experiment with missing experiment dir
-    '''
+    """Run rsmpredict experiment with missing experiment dir."""
     source = 'lr-predict-no-experiment-dir'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -251,10 +228,7 @@ def test_run_experiment_predict_no_experiment_dir():
 
 @raises(FileNotFoundError)
 def test_run_experiment_predict_no_output_dir():
-    '''
-    rsmpredict experiment where experiment_dir
-    does not containt output directory
-    '''
+    """Run rsmpredict experiment with a missing "output" directory."""
     source = 'lr-predict-no-output-dir'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -266,10 +240,7 @@ def test_run_experiment_predict_no_output_dir():
 
 @raises(FileNotFoundError)
 def test_run_experiment_predict_no_experiment_id():
-    '''
-    rsmpredict experiment ehere the experiment_dir
-    does not contain the experiment with the stated id
-    '''
+    """Run rsmpredict experiment with no experiment ID."""
     source = 'lr-predict-no-experiment-id'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -281,10 +252,7 @@ def test_run_experiment_predict_no_experiment_id():
 
 @raises(KeyError)
 def test_run_experiment_lr_predict_missing_columns():
-    '''
-    rsmpredict experiment with missing columns
-    from the config file
-    '''
+    """Run rsmpredict experiment with missing columns from the config file."""
     source = 'lr-predict-missing-columns'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -296,9 +264,7 @@ def test_run_experiment_lr_predict_missing_columns():
 
 @raises(KeyError)
 def test_run_experiment_lr_predict_missing_feature():
-    '''
-    rsmpredict experiment with missing features
-    '''
+    """Run rsmpredict experiment with missing features."""
     source = 'lr-predict-missing-feature'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -310,9 +276,7 @@ def test_run_experiment_lr_predict_missing_feature():
 
 @raises(ValueError)
 def test_run_experiment_lr_predict_no_numeric_feature_values():
-    '''
-    rsmpredict experiment with missing post-processing file
-    '''
+    """Run rsmpredict experiment with missing post-processing file."""
     source = 'lr-predict-no-numeric-feature-values'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -324,10 +288,7 @@ def test_run_experiment_lr_predict_no_numeric_feature_values():
 
 @raises(ValueError)
 def test_run_experiment_predict_expected_scores_builtin_model():
-    '''
-    rsmpredict experiment for expected scores but with
-    a built-in model which is not supporte
-    '''
+    """Run rsmpredict experiment for expected scores with unsupported built-in model."""
     source = 'lr-predict-expected-scores-builtin-model'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -339,10 +300,7 @@ def test_run_experiment_predict_expected_scores_builtin_model():
 
 @raises(ValueError)
 def test_run_experiment_predict_expected_scores_wrong_skll_model():
-    '''
-    rsmpredict experiment for expected scores but with
-    a non-probabilistic SKLL learner
-    '''
+    """Run rsmpredict experiment for expected scores with an unsupported SKLL learner."""
     source = 'predict-expected-scores-wrong-skll-model'
     config_file = join(rsmtool_test_dir,
                        'data',
@@ -354,10 +312,7 @@ def test_run_experiment_predict_expected_scores_wrong_skll_model():
 
 @raises(ValueError)
 def test_run_experiment_predict_expected_scores_non_probablistic_svc():
-    '''
-    rsmpredict experiment for expected scores but with
-    a non-probabilistic SKLL learner
-    '''
+    """Run rsmpredict experiment for expected scores with a non-probabilistic learner."""
     source = 'predict-expected-scores-non-probabilistic-svc'
     config_file = join(rsmtool_test_dir,
                        'data',

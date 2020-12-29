@@ -10,19 +10,14 @@ Classes for dealing with report generation.
 
 import argparse
 import asyncio
-import logging
 import json
+import logging
 import os
 import sys
+from os.path import abspath, basename, dirname, join, splitext
 
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     join,
-                     splitext)
-
-from traitlets.config import Config
 from nbconvert.exporters import HTMLExporter
+from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
 from .reader import DataReader
@@ -144,14 +139,13 @@ notebook_path_dict = {'general': {'rsmtool': notebook_path,
 
 
 class Reporter:
-    """
-    A class for generating Jupyter notebook reports, and
-    converting them to HTML.
-    """
+    """Class to generate Jupyter notebook reports and convert them to HTML."""
 
     @staticmethod
     def locate_custom_sections(custom_report_section_paths, configdir):
         """
+        Locate custom report section files.
+
         Get the absolute paths for custom report sections and check that
         the files exist. If a file does not exist, raise an exception.
 
@@ -174,7 +168,6 @@ class Reporter:
         FileNotFoundError
             If any of the files cannot be found.
         """
-
         custom_report_sections = []
         for cs_path in custom_report_section_paths:
             cs_location = DataReader.locate_files(cs_path, configdir)
@@ -201,7 +194,6 @@ class Reporter:
         ----
         Adapted from: https://stackoverflow.com/q/20454668.
         """
-
         # Merging ipython notebooks basically means that we keep the
         # metadata from the "first" notebook and then add in the cells
         # from all the other notebooks.
@@ -220,22 +212,21 @@ class Reporter:
                             section_type,
                             context='rsmtool'):
         """
-        Check whether the specified section names are valid
-        and raise an exception if they are not.
+        Validate the specified section names.
+
+        This function checks whether the specified section names are valid
+        and raises an exception if they are not.
 
         Parameters
         ----------
         specified_sections : list of str
             List of report section names.
         section_type : str
-            'general' or 'special'
+            One of "general" or "special".
         context : str, optional
             Context in which we are validating the section
-            names. Possible values are ::
-
-                {'rsmtool', 'rsmeval', 'rsmcompare'}
-
-            Defaults to 'rsmtool'.
+            names. One of {"rsmtool", "rsmeval", "rsmcompare"}.
+            Defaults to "rsmtool".
 
         Raises
         ------
@@ -303,8 +294,7 @@ class Reporter:
     @staticmethod
     def convert_ipynb_to_html(notebook_file, html_file):
         """
-        Convert the given Jupyter notebook file (``.ipynb``)
-        to HTML and write it out as the given ``.html`` file.
+        Convert given Jupyter notebook (``.ipynb``) to HTML file.
 
         Parameters
         ----------
@@ -318,7 +308,6 @@ class Reporter:
         This function is also exposed as the
         :ref:`render_notebook <render_notebook>` command-line utility.
         """
-
         # `nbconvert` uses `asyncio` which uses an entirely default
         # implemention of the event loop on Windows for Cpython 3.8
         # which breaks the report generation unless we include the
@@ -346,8 +335,7 @@ class Reporter:
                                   subgroups,
                                   context='rsmtool'):
         """
-        Determine the section names that have been chosen
-        by the user and that will be generated in the report.
+        Compile a combined list of section names to be included in the report.
 
         Parameters
         ----------
@@ -362,8 +350,8 @@ class Reporter:
             information.
         context : str, optional
             Context of the tool in which we are validating.
-            Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
-            Defaults to 'rsmtool'.
+            One of  {"rsmtool", "rsmeval", "rsmcompare"}
+            Defaults to "rsmtool".
 
         Returns
         -------
@@ -374,11 +362,9 @@ class Reporter:
         Raises
         ------
         ValueError
-            If a subgroup report section is requested but
-            no subgroups were specified in the configuration
-            file.
+            If a subgroup report section is requested but no
+            subgroups were specified in the configuration file.
         """
-
         # 1. Include all general sections unless we are asked to include
         # a specific (and valid) subset.
         general_section_list = master_section_dict['general'][context]
@@ -438,7 +424,7 @@ class Reporter:
                              model_type=None,
                              context='rsmtool'):
         """
-        Map the section names to IPython notebook filenames.
+        Map section names to IPython notebook filenames.
 
         Parameters
         ----------
@@ -446,14 +432,15 @@ class Reporter:
             List of special sections.
         custom_sections : list of str
             List of custom sections.
-        model_type : None, optional
-            Type of the model. Possible values are
-            {'BUILTIN', 'SKLL'}. We allow None here so that
-            RSMEval can use the same function.
+        model_type : str, optional
+            Type of the model. One of {"BUILTIN", "SKLL", ``None``}.
+            We allow ``None`` here so that rsmeval can use the same
+            function.
+            Defaults to ``None``.
         context : str, optional
             Context of the tool in which we are validating.
-            Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
-            Defaults to 'rsmtool'
+            One of {"rsmtool", "rsmeval", "rsmcompare"}.
+            Defaults to "rsmtool".
 
         Returns
         -------
@@ -461,7 +448,6 @@ class Reporter:
             Dictionary mapping each section name to the
             corresponding IPython notebook filename.
         """
-
         # create the original section file map for general sections
         selected_notebook_path = notebook_path_dict['general'][context]
         general_sections = master_section_dict['general'][context]
@@ -501,8 +487,9 @@ class Reporter:
                                    model_type=None,
                                    context='rsmtool'):
         """
-        Check all section names and section order,
-        combine all section names with the appropriate file mapping,
+        Check all section names and the order of the sections.
+
+        Combine all section names with the appropriate file mapping,
         and generate an ordered list of notebook files that are
         needed to generate the final report.
 
@@ -512,26 +499,27 @@ class Reporter:
             List of specified general sections.
         special_sections : list, optional
             List of specified special sections, if any.
+            Defaults to ``[]``.
         custom_sections : list, optional
             List of specified custom sections, if any.
-            Defaults to empty list.
-        section_order : None, optional
+            Defaults to ``[]``.
+        section_order : list, optional
             Ordered list in which the user wants the specified
             sections.
-            Defaults to empty list
+            Defaults to ``None``.
         subgroups : list, optional
             List of column names that contain grouping
             information.
-            Defaults to empty list.
+            Defaults to ``[]``.
         model_type : None, optional
             Type of the model. Possible values are
-            {'BUILTIN', 'SKLL'}. We allow None here so that
-            RSMEval can use the same function.
-            Defaults to None
+            {"BUILTIN", "SKLL", ``None``.}. We allow ``None``
+            here so that rsmeval can use the same function.
+            Defaults to ``None``.
         context : str, optional
             Context of the tool in which we are validating.
-            Possible values are {'rsmtool', 'rsmeval', 'rsmcompare'}
-            Defaults to 'rsmtool'
+            One of {"rsmtool", "rsmeval", "rsmcompare"}.
+            Defaults to "rsmtool".
 
         Returns
         -------
@@ -539,7 +527,6 @@ class Reporter:
             List of the IPython notebook files that have
             to be rendered into the HTML report.
         """
-
         chosen_sections = self.determine_chosen_sections(general_sections,
                                                          special_sections,
                                                          custom_sections,
@@ -590,12 +577,10 @@ class Reporter:
                       figdir,
                       context='rsmtool'):
         """
-        The main driver function to generate the RSMTool HTML
-        report the experiment as defined by the given arguments.
+        Generate HTML report for an rsmtool/rsmeval experiment.
 
         Parameters
         ----------
-
         config : configuration_parser.Configuration
             A configuration object
         csvdir : str
@@ -603,20 +588,16 @@ class Reporter:
         figdir : str
             The figure output directory
         context : str
-            The context of the script
-            Defaults to 'rsmtool'
-
-        Returns
-        -------
-        notebook
-            A jupyter notebook
+            Context of the tool in which we are validating.
+            One of {"rsmtool", "rsmeval"}.
+            Defaults to "rsmtool".
 
         Raises
         ------
         KeyError
-            If `test_file_location or `pred_file_location` not in config.
+            If "test_file_location" or "pred_file_location" fields
+            are not specified in the configuration.
         """
-
         logger = logging.getLogger(__name__)
 
         test_file_location = config.get('test_file_location')
@@ -707,13 +688,10 @@ class Reporter:
                                  figdir_new,
                                  output_dir):
         """
-        The main driver function to generate a comparison
-        report comparing the two RSMTool experiments as
-        defined by the given arguments.
+        Generate an HTML report for comparing two rsmtool experiments.
 
         Parameters
         ----------
-
         config : configuration_parser.Configuration
             A configuration object
         csvdir_old : str
@@ -726,13 +704,7 @@ class Reporter:
             The old figure output directory
         output_dir : str
             The output dir for the new report.
-
-        Returns
-        -------
-        notebook
-            A jupyter notebook
         """
-
         logger = logging.getLogger(__name__)
 
         # whether to use scaled predictions for both new and old; default to false
@@ -783,26 +755,17 @@ class Reporter:
                               all_experiments,
                               csvdir):
         """
-        The main function to generate a summary
-        report comparing several RSMTool experiments as
-        defined by the given arguments.
+        Generate an HTML report for summarizing the given rsmtool experiments.
 
         Parameters
         ----------
-
         config : configuration_parser.Configuration
             A configuration object
-        all_experiments : list
-            A list of experiments to summarize.
+        all_experiments : list of str
+            A list of experiment configuration files to summarize.
         csvdir : str
             The experiment CSV output directory.
-
-        Returns
-        -------
-        notebook
-            A jupyter notebook
         """
-
         logger = logging.getLogger(__name__)
 
         environ_config = {'SUMMARY_ID': config['summary_id'],
@@ -839,7 +802,7 @@ class Reporter:
                                    join(reportdir, '{}.html'.format(report_name)))
 
 
-def main():
+def main():  # noqa: D103
 
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='render_notebook')
@@ -854,5 +817,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()

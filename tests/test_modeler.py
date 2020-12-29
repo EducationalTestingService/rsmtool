@@ -1,9 +1,7 @@
 import numpy as np
 import pandas as pd
-
 from nose.tools import eq_
 from numpy.testing import assert_array_equal
-
 from rsmtool.modeler import Modeler
 
 

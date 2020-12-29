@@ -1,27 +1,18 @@
 import os
+import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import warnings
-
+from nose.tools import assert_almost_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
-
 from pandas.testing import assert_frame_equal
-
-from nose.tools import (eq_,
-                        ok_,
-                        raises,
-                        assert_almost_equal)
-
-from pathlib import Path
-
-from rsmtool.utils.prmse import (get_true_score_evaluations,
-                                 true_score_variance,
-                                 variance_of_errors,
+from rsmtool.utils.prmse import (get_n_human_scores,
+                                 get_true_score_evaluations,
                                  mse_true,
                                  prmse_true,
-                                 get_n_human_scores)
-
+                                 true_score_variance,
+                                 variance_of_errors)
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

@@ -2,29 +2,19 @@ import json
 import logging
 import os
 import tempfile
-import pandas as pd
 import warnings
-
 from io import StringIO
 from os import getcwd
 from os.path import abspath, dirname, join
 from pathlib import Path
 from shutil import rmtree
 
+import pandas as pd
+from nose.tools import assert_equal, assert_not_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
-
-from nose.tools import (assert_equal,
-                        assert_not_equal,
-                        eq_,
-                        ok_,
-                        raises)
-
+from rsmtool.configuration_parser import Configuration, ConfigurationParser
 from rsmtool.convert_feature_json import convert_feature_json_file
-
-from rsmtool.configuration_parser import (Configuration,
-                                          ConfigurationParser)
-
 
 _MY_DIR = dirname(__file__)
 
@@ -319,7 +309,6 @@ class TestConfigurationParser:
             eq_(len(warning_list), 1)
             ok_(issubclass(warning_list[0].category, UserWarning))
 
-
     def test_validate_config_warning_feature_list_and_transformations(self):
         # this should no show warnings
         data = {'experiment_id': 'experiment_1',
@@ -332,7 +321,6 @@ class TestConfigurationParser:
         with warnings.catch_warnings(record=True) as warning_list:
             _ = ConfigurationParser.validate_config(data)
             eq_(len(warning_list), 0)
-
 
     def test_process_fields(self):
         data = {'experiment_id': 'experiment_1',
@@ -466,7 +454,6 @@ class TestConfiguration:
         eq_(config._config['experiment_id'], config_dict['experiment_id'])
         eq_(config.configdir, abspath(getcwd()))
 
-
     def test_init_with_configdir_only_as_kword_argument(self):
         configdir = 'some/path'
         config_dict = {'experiment_id': 'my_experiment',
@@ -478,13 +465,11 @@ class TestConfiguration:
                                configdir=configdir)
         eq_(config._configdir, Path(configdir).resolve())
 
-
     @raises(TypeError)
     def test_init_wrong_input_type(self):
         config_input = [('experiment_id', "XXX"),
                         ('train_file', 'path/to/train.tsv')]
         config = Configuration(config_input)
-
 
     def check_logging_output(self, expected, function, *args, **kwargs):
 
@@ -818,7 +803,6 @@ class TestConfiguration:
                                configdir=configdir)
         config.configdir = None
 
-
     def test_get_context(self):
         context = 'rsmtool'
 
@@ -1047,8 +1031,6 @@ class TestConfiguration:
         config = Configuration(dictionary)
         rater_error_variance = config.get_rater_error_variance()
         eq_(rater_error_variance, None)
-
-
     def test_get_names_and_paths_with_feature_file(self):
         filepaths = ['path/to/train.tsv',
                      'path/to/test.tsv',

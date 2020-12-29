@@ -1,22 +1,13 @@
 import os
 import tempfile
-
-from glob import glob
 from os import getcwd
-from os.path import basename, exists, join
+from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
-
 from rsmtool import run_evaluation
-
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import (check_file_output,
-                                check_report,
-                                check_run_evaluation,
-                                copy_data_files,
-                                do_run_evaluation)
-
+from rsmtool.test_utils import check_run_evaluation, copy_data_files, do_run_evaluation
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -60,10 +51,7 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 
 def test_run_experiment_lr_eval_with_object():
-    '''
-    test rsmeval using a Configuration object, rather than a file
-    '''
-
+    """Test rsmeval using a Configuration object, rather than a file."""
     source = 'lr-eval-object'
     experiment_id = 'lr_eval_object'
 
@@ -91,10 +79,7 @@ def test_run_experiment_lr_eval_with_object():
 
 
 def test_run_experiment_lr_eval_with_dictionary():
-    '''
-    test rsmeval using the dictionary object, rather than a file
-    '''
-
+    """Test rsmeval using the dictionary object, rather than a file."""
     source = 'lr-eval-dict'
     experiment_id = 'lr_eval_dict'
 

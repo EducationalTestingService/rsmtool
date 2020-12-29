@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-
 """
-Utility to generate predictions on new data
-from existing RSMTool models.
+Generate predictions on new data from rsmtool models.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -15,23 +13,13 @@ import glob
 import logging
 import os
 import sys
-
-from os.path import (abspath,
-                     basename,
-                     dirname,
-                     exists,
-                     join,
-                     normpath,
-                     splitext,
-                     split)
+from os.path import abspath, basename, dirname, exists, join, normpath, split, splitext
 
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
-from .utils.commandline import (ConfigurationGenerator,
-                                CmdOption,
-                                setup_rsmcmd_parser)
+from .utils.commandline import CmdOption, ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
@@ -41,8 +29,12 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                  output_file,
                                  feats_file=None):
     """
-    Run ``rsmpredict`` with given configuration file and generate
-    predictions (and, optionally, pre-processed feature values).
+    Run rsmpredict using the given configuration.
+
+    Generate predictions using given configuration file, object, or
+    dictionary. Predictions are saved in ``output_file``. Optionally,
+    pre-processed feature values are saved in ``feats_file``,
+    if specified.
 
     Parameters
     ----------
@@ -64,13 +56,17 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     Raises
     ------
     FileNotFoundError
-        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
-        be located, or if ``experiment_dir`` does not exist, or if ``experiment_dir``
-        does not contain the required output needed from an rsmtool experiment.
+        If any of the files contained in ``config_file_or_obj_or_dict``
+        cannot be located.
+    FileNotFoundError
+        If ``experiment_dir`` does not exist.
+    FileNotFoundError
+        If ``experiment_dir`` does not contain the required output
+        needed from an rsmtool experiment.
     RuntimeError
-        If the name of the output file does not end in '.csv', '.tsv', or '.xlsx'.
+        If the name of the output file does not end in
+        ".csv", ".tsv", or ".xlsx".
     """
-
     logger = logging.getLogger(__name__)
 
     configuration = configure('rsmpredict', config_file_or_obj_or_dict)
@@ -227,7 +223,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                        file_format=file_format)
 
 
-def main():
+def main():  # noqa: D103
 
     # set up the basic logging configuration
     formatter = LogFormatter()

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-
 """
-This is a utility script to copy over json files from rsmextra/rsmtool tests and
+Copy over JSON configuration files from tests and rename them.
+
+This utility script copies over json files from rsmextra/rsmtool tests and
 rename them so that they all have unique names which match the experiment ids
 with the tool name appended to the end
 
@@ -16,12 +17,10 @@ import argparse
 import glob
 import json
 import re
-
 from os import getcwd
 from os.path import abspath, basename, dirname, exists, join
 
 from rsmtool.input import parse_json_with_comments
-
 
 PATH_FIELDS = ['train_file',
                'test_file',
@@ -74,14 +73,10 @@ SKIP_TESTS = ['lr-with-subgroup-as-feature-name',
 
 
 def copy_jsons(source_dir, target_dir):
-    '''
-    find all .jsons in the source directory
-    '''
-
+    """Find JSON files in the ``source_dir`` and copy to ``target_dir``."""
     dir_content = glob.glob(join(source_dir, '**/*.json'))
 
     # iterate over jsons and copy as applicable
-
     for filename in dir_content:
 
         experiment_dir = basename(dirname(filename))
@@ -112,7 +107,6 @@ def copy_jsons(source_dir, target_dir):
 
         # change the id and the file name to the directory name since these are more
         # explicit about the purpose of the test
-
         if not tool == 'rsmcompare':
             new_id = '{}_{}'.format(experiment_dir, tool)
             json_obj['experiment_id'] = new_id
@@ -143,7 +137,7 @@ def copy_jsons(source_dir, target_dir):
             json.dump(json_obj, outfile, indent=4, separators=(',', ': '))
 
 
-def main():
+def main():  # noqa: D103
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='copy_jsons.py')
     parser.add_argument(dest='source_dir',

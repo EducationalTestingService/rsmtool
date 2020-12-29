@@ -170,7 +170,6 @@ From :py:mod:`~rsmtool.reporter` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: rsmtool.reporter
     :members:
-    :undoc-members:
     :show-inheritance:
 
 From :py:mod:`~rsmtool.transformer` Module

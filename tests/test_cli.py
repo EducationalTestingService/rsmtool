@@ -2,12 +2,10 @@ import os
 import shlex
 import subprocess
 import sys
-
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from nose.tools import assert_raises, eq_, ok_
-
 from rsmtool.test_utils import (check_file_output,
                                 check_generated_output,
                                 check_report,
@@ -53,10 +51,7 @@ class TestToolCLI:
             tempdir.cleanup()
 
     def check_no_args(self, context):
-        """
-        A helper method that checks running the tool with no arguments
-        """
-
+        """Check running the tool with no arguments."""
         # if the BINPATH environment variable is defined
         # use that to construct the command instead of just
         # the name; this is needed for the CI builds where
@@ -84,11 +79,9 @@ class TestToolCLI:
 
     def validate_run_output(self, name, experiment_dir):
         """
-        A helper method that validates that the output of the "run"
-        subcommand for the ``name`` tool as stored in ``experiment_dir``
-        is as expected.
+        Validate output of "run" subcommand for given tool in ``experiment_dir``.
 
-        This is heavily inspired by ``rsmtool.test_utils.check_run_*()``
+        This method is heavily inspired by the ``rsmtool.test_utils.check_run_*()``
         functions.
 
         Parameters
@@ -143,8 +136,7 @@ class TestToolCLI:
 
     def validate_generate_output(self, name, output, subgroups=False):
         """
-        A helper method that validates that the ``output`` of the ``name`` tool
-        as output by the "generate" subcommand is as expected.
+        Validate output of "generate" subcommand for given tool in ``experiment_dir``.
 
         Parameters
         ----------
@@ -171,8 +163,7 @@ class TestToolCLI:
 
     def check_tool_cmd(self, context, subcmd, output_dir=None, working_dir=None):
         """
-        A helper method to test that the ``subcmd`` invocation for ``context`` works
-        as expected.
+        Test that the ``subcmd`` invocation for ``context`` works as expected.
 
         Parameters
         ----------
@@ -180,14 +171,15 @@ class TestToolCLI:
             Name of the tool being tested.
         subcmd : str
             The tool command-line invocation that is being tested.
-        output_dir : None, optional
+        output_dir : str, optional
             Directory containing the output for "run" subcommands.
             Will be ``None`` for "generate" subcommands.
-        working_dir : None, optional
+            Defaults to ``None``.
+        working_dir : str, optional
             If we want the "run" subcommand to be run in a specific
             working directory.
+            Defaults to ``None``.
         """
-
         # if the BINPATH environment variable is defined
         # use that to construct the command instead of just
         # the name; this is needed for the CI builds where
@@ -259,9 +251,7 @@ class TestToolCLI:
             yield self.check_tool_cmd, context, subcmd, tempdir.name, tempdir.name
 
     def check_run_bad_overwrite(self, cmd):
-        """
-        A helper method that checks that the overwriting error is raised properly.
-        """
+        """Check that the overwriting error is raised properly."""
         with assert_raises(subprocess.CalledProcessError) as e:
             _ = subprocess.run(shlex.split(cmd, posix='win' not in sys.platform),
                                check=True,
@@ -315,10 +305,6 @@ class TestToolCLI:
             yield self.check_tool_cmd, context, subcmd, tempdir.name, None
 
     def test_rsmpredict_run_features_file(self):
-        """
-        test that rsmpredict "run" command works with ``--features``.
-        """
-
         tempdir = TemporaryDirectory()
         self.temporary_directories.append(tempdir)
 

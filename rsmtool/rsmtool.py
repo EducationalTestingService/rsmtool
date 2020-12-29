@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-The main RSMTool script.
+Run an rsmtool experiment.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -12,7 +12,6 @@ The main RSMTool script.
 
 import logging
 import sys
-
 from os import listdir, makedirs
 from os.path import abspath, exists, join
 
@@ -32,11 +31,12 @@ def run_experiment(config_file_or_obj_or_dict,
                    output_dir,
                    overwrite_output=False):
     """
-    Run an ``rsmtool`` experiment using the given configuration
-    file and generate all outputs in the given directory.
+    Run an rsmtool experiment using the given configuration.
 
-    If ``overwrite_output`` is ``True``, overwrite any existing
-    output in the given ``output_dir``.
+    Run rsmtool experiment using the given configuration file, object, or
+    dictionary. All outputs are generated under ``output_dir``. If
+    ``overwrite_output`` is ``True``, any existing output in ``output_dir``
+    is overwritten.
 
     Parameters
     ----------
@@ -65,10 +65,10 @@ def run_experiment(config_file_or_obj_or_dict,
         If ``output_dir`` already contains the output of a previous experiment
         and ``overwrite_output`` is ``False``.
     ValueError
-        If ``output_dir`` was previously used to store the output of a linear
-        model running on the same data with the same experiment ID.
+        If the current configuration specifies a non-linear model but
+        ``output_dir`` already contains the output of a previous
+        experiment that used a linear model with the same experiment ID.
     """
-
     logger = logging.getLogger(__name__)
 
     # create the 'output' and the 'figure' sub-directories
@@ -321,7 +321,7 @@ def run_experiment(config_file_or_obj_or_dict,
                            figdir)
 
 
-def main():
+def main():  # noqa: D103
 
     # set up the basic logging configuration
     formatter = LogFormatter()
