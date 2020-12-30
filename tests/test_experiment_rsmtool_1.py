@@ -4,6 +4,7 @@ from os.path import join
 from nbconvert.preprocessors import CellExecutionError
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool.reporter import Reporter
 from rsmtool.test_utils import check_report, check_run_experiment, do_run_experiment
 

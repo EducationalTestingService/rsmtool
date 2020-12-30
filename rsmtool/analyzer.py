@@ -19,11 +19,13 @@ from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
 
 from .container import DataContainer
-from .utils.metrics import (agreement,
-                            difference_of_standardized_means,
-                            partial_correlations,
-                            quadratic_weighted_kappa,
-                            standardized_mean_difference)
+from .utils.metrics import (
+    agreement,
+    difference_of_standardized_means,
+    partial_correlations,
+    quadratic_weighted_kappa,
+    standardized_mean_difference,
+)
 from .utils.prmse import get_true_score_evaluations
 
 

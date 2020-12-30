@@ -23,15 +23,17 @@ from . import HAS_RSMEXTRA
 from .reader import DataReader
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (special_section_list_rsmtool, # noqa
-                                   special_section_list_rsmeval,
-                                   special_section_list_rsmcompare,
-                                   special_section_list_rsmsummarize,
-                                   ordered_section_list_with_special_sections_rsmtool,
-                                   ordered_section_list_with_special_sections_rsmeval,
-                                   ordered_section_list_with_special_sections_rsmcompare,
-                                   ordered_section_list_with_special_sections_rsmsummarize,
-                                   special_notebook_path)
+    from rsmextra.settings import (  # noqa
+        ordered_section_list_with_special_sections_rsmcompare,
+        ordered_section_list_with_special_sections_rsmeval,
+        ordered_section_list_with_special_sections_rsmsummarize,
+        ordered_section_list_with_special_sections_rsmtool,
+        special_notebook_path,
+        special_section_list_rsmcompare,
+        special_section_list_rsmeval,
+        special_section_list_rsmsummarize,
+        special_section_list_rsmtool,
+    )
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval

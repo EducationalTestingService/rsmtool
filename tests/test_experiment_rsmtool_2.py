@@ -3,6 +3,7 @@ from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool.test_utils import check_run_experiment, do_run_experiment
 
 # allow test directory to be set via an environment variable

@@ -21,15 +21,18 @@ from prompt_toolkit.completion import FuzzyWordCompleter, PathCompleter, WordCom
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle, clear, print_formatted_text, prompt
 from prompt_toolkit.validation import Validator
+
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
 
-from .constants import (CHECK_FIELDS,
-                        CONFIGURATION_DOCUMENTATION_SLUGS,
-                        DEFAULTS,
-                        INTERACTIVE_MODE_METADATA,
-                        POSSIBLE_EXTENSIONS)
+from .constants import (
+    CHECK_FIELDS,
+    CONFIGURATION_DOCUMENTATION_SLUGS,
+    DEFAULTS,
+    INTERACTIVE_MODE_METADATA,
+    POSSIBLE_EXTENSIONS,
+)
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
 # to specify additional options for either of the subcommand parsers.
