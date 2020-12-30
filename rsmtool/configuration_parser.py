@@ -806,7 +806,7 @@ class ConfigurationParser:
                              context=context)
 
     @classmethod
-    def validate_config(cls, config, context='rsmtool'):
+    def validate_config(cls, config, context='rsmtool'):  # noqa: C901
         """
         Validate configuration file.
 

@@ -52,7 +52,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_experiment(*args, **kwargs)
 
 
-
 def test_run_experiment_lr_with_object_and_configdir():
     """Test rsmtool using a Configuration object and specified configdir."""
     source = 'lr-object'

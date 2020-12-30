@@ -18,7 +18,7 @@ def requirements(path):
 
 
 setup(name='rsmtool',
-      version=__version__,
+      version=__version__,  # noqa: F821
       description='Rater scoring modeling tool',
       long_description=readme(),
       keywords='scoring modeling',

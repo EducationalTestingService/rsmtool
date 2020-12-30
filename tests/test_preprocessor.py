@@ -1151,7 +1151,6 @@ class TestFeatureSpecsProcessor:
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
         assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
 
-
     def test_validate_feature_specs(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                          'sign': [1.0, 1.0, -1.0],
@@ -1260,13 +1259,11 @@ class TestFeatureSubsetProcessor:
                                       'subset1': [0, 1, 0]})
         FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
 
-
     def test_check_feature_subset_file_sign_only(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS': ['+', '-', '+']})
         FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
                                                          sign='SYS')
-
 
     def test_check_feature_subset_file_sign_and_subset(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],

@@ -750,7 +750,7 @@ class ConfigurationGenerator:
         # insert first comment right above the first required field
         if insert_required_comment:
             configuration = re.sub(fr'([ ]+)("{self._first_required_field}": [^,]+,\n)',
-                                   fr'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
+                                   r'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
                                    configuration)
 
         # insert second comment right above the first optional field
