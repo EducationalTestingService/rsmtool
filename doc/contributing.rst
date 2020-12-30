@@ -18,7 +18,7 @@ To set up a local development environment, follow the steps below:
 
 #. Activate the environment using ``conda activate rsmdev``. [#]_
 
-#. Run ``pip install -e .[dev]`` to install rsmtool into the environment with development dependencies added and in editable mode which is what we need for development.
+#. Run ``pip install -e ."[dev]"`` to install rsmtool into the environment with development dependencies added and in editable mode which is what we need for development.
 
 #. Install `pre-commit <https://pre-commit.com/>`_ for automatically running git commit hooks::
 
