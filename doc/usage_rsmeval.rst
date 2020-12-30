@@ -62,4 +62,3 @@ figure
 This folder contains all of the figures generated as part of the various analyses performed, saved as ``.svg`` files.
 
 .. include:: intermediate_files_rsmeval.rst
-

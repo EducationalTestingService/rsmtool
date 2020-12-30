@@ -81,7 +81,3 @@ This should produce output like::
     Saving predictions to /Users/nmadnani/work/rsmtool/examples/rsmpredict/predictions.csv
 
 You should now see a file named ``predictions.csv`` in the current directory which contains the predicted scores for the new data in the ``predictions`` column.
-
-
-
-

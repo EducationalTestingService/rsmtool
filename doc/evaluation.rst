@@ -373,4 +373,3 @@ Therefore, SMD between two human scores is computed using :ref:`rsmtool.utils.st
 .. note::
 
 	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.
-

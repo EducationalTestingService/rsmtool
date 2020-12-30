@@ -60,4 +60,3 @@ This process is only meant for the project administrators, not users and develop
 21. Send an email around at ETS announcing the release and the changes.
 
 22. Create a `Dash <https://kapeli.com/dash>`_ docset from the documentation by following the instructions :ref:`here <dash_docset>`.
-

@@ -82,5 +82,3 @@ Our experiment report contains the overview of main aspects of model performance
 .. note::
 
     Some of the information such as model fit and model parameters are only available for ``rsmtool`` experiments.
-
-

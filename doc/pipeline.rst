@@ -120,4 +120,3 @@ The scaled scores trimmed in the same way as raw_trim scores.
 scale_trim_round
 ~~~~~~~~~~~~~~~~
 The scale_trim scores scores rounded to the nearest integer.
-
