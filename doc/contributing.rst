@@ -20,6 +20,10 @@ To set up a local development environment, follow the steps below:
 
 #. Run ``pip install -e .[dev]`` to install rsmtool into the environment with development dependencies added and in editable mode which is what we need for development.
 
+#. Install `pre-commit <https://pre-commit.com/>`_ for automatically running git commit hooks::
+
+    pre-commit install
+
 #. Create a new git branch with a useful and descriptive name.
 
 #. Make your changes and add tests. See the next section for more on writing new tests.
@@ -32,6 +36,39 @@ Documentation
 Note that the file ``doc/requirements.txt`` is meant specifically for the ReadTheDocs documentation build process and should not be used locally. To build the documentation locally, you *must* use the same conda environment created above.
 
 If you are on macOS and use the `Dash <https://kapeli.com/dash>`_ app, follow steps 1 and 2 :ref:`here <dash_docset>` to build the RSMTool Dash docset locally.
+
+Pre-commit Hooks
+----------------
+
+``pre-commit`` automatically runs at every commit attempt if installed. In some cases,
+it will cause file reformatting and then fail, giving the developer an opportunity to
+review the changes and then continue to commit them if they are sensible. There are,
+however, ways to run the checks before attempting a commit and to skip certain checks
+altogether.
+
+To run on all files (not just those that have changed)::
+
+    pre-commit run --all-files
+
+To run all hooks on changed files::
+
+    pre-commit run
+
+To run the ``isort`` hook alone on changed files::
+
+    pre-commit run isort
+
+To run the ``isort`` hook alone on a given file::
+
+    pre-commit run isort <file-path>
+
+Finally, the ``SKIP`` environment variable can be used to indicate to ``pre-commit``
+that certain checks should be skipped. It can be assigned a comma-separated list of
+check names::
+
+    SKIP=check-added-large-files git commit -m "Adding a large file that we definitely need"
+
+To view all checks, consult the ``.pre-commit-config.yaml`` file in the root of the repository.
 
 Code style
 ----------
@@ -56,6 +93,7 @@ The RSMTool codebase follows certain best practices when it comes to the code st
         from .reader import DataReader
 
     Rather than doing this grouping and sorting manually, we recommend to use the `isort <https://pycqa.github.io/isort/>`_ Python library to do this. The best way to use ``isort`` is via plugins for your favorite editor, e.g., `Sublime Text <https://packagecontrol.io/packages/isort>`_, `VS Code <https://code.visualstudio.com/docs/python/editing#_sort-imports>`_, and `PyCharm <https://github.com/PyCQA/isort/issues/258>`_.
+    This check is enforced by ``pre-commit``, so a developer can have some freedom during development and let ``pre-commit`` handle import sorting.
 
 2. All classes, functions, and methods in the main code files should have `numpy-formatted docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_ that comply with `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_. For Sublime Text, this can be done using the `AutoDocstring <https://packagecontrol.io/packages/AutoDocstring>`_ and `SublimeLinter-pydocstyle <https://packagecontrol.io/packages/SublimeLinter-pydocstyle>`_ plugins. For VS Code, these `two <https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring>`_ `links <https://code.visualstudio.com/docs/python/linting#_specific-linters>`_ may be relevant. PyCharm does not seem to support automatic numpy-format docstrings out of the box.
 
