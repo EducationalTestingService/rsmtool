@@ -11,9 +11,8 @@ def readme():
         return f.read()
 
 
-def requirements():
-    req_path = 'requirements.txt'
-    with open(req_path) as f:
+def requirements(path):
+    with open(path) as f:
         reqs = f.read().splitlines()
     return reqs
 
@@ -38,7 +37,10 @@ setup(name='rsmtool',
                      'render_notebook = rsmtool.reporter:main',
                      'convert_feature_json = rsmtool.convert_feature_json:main']
                     },
-      install_requires=requirements(),
+      install_requires=requirements('requirements.txt'),
+      extras_require={
+          'dev': requirements('dev-requirements.txt')
+      },
       classifiers=['Intended Audience :: Science/Research',
                    'Intended Audience :: Developers',
                    'Programming Language :: Python',

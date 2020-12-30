@@ -8,23 +8,23 @@ Setting up
 
 To set up a local development environment, follow the steps below:
 
-1. Pull the latest version of RSMTool from GitHub and switch to the ``main`` branch.
+#. Pull the latest version of RSMTool from GitHub and switch to the ``main`` branch.
 
-2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
+#. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 
-3. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
+#. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
 
     conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
 
-4. Activate the environment using ``conda activate rsmdev``. [#]_
+#. Activate the environment using ``conda activate rsmdev``. [#]_
 
-5. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
+#. Run ``pip install -e .[dev]`` to install rsmtool into the environment with development dependencies added and in editable mode which is what we need for development.
 
-6. Create a new git branch with a useful and descriptive name.
+#. Create a new git branch with a useful and descriptive name.
 
-7. Make your changes and add tests. See the next section for more on writing new tests. 
+#. Make your changes and add tests. See the next section for more on writing new tests. 
 
-8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+#. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
 Documentation
 -------------

@@ -1,0 +1,6 @@
+doc2dash
+coverage
+coveralls
+pre-commit
+sphinx
+sphinx_rtd_theme
