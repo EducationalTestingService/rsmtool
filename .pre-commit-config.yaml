@@ -12,6 +12,7 @@ repos:
         exclude: conda-recipe/rsmtool/meta.yaml
     -   id: check-added-large-files
     -   id: check-ast
+    -   id: debug-statements
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.4
     hooks:
