@@ -5,8 +5,8 @@ API Documentation
 The primary method of using RSMTool is via the command-line scripts :ref:`rsmtool <usage_rsmtool>`, :ref:`rsmeval <usage_rsmeval>`, :ref:`rsmpredict <usage_rsmpredict>`, :ref:`rsmcompare <usage_rsmcompare>`, and :ref:`rsmsummarize <usage_rsmsummarize>`. However, there are certain functions in the ``rsmtool`` API that may also be useful to advanced users for use directly in their Python code. We document these functions below.
 
 .. note::
-    
-    RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes. 
+
+    RSMTool v5.7 and older provided the API functions ``metrics_helper``, ``convert_ipynb_to_html``, and ``remove_outliers``. These functions have now been turned into static methods for different classes.
 
     In addition, with RSMTool v8.0 onwards, the functions ``agreement``, ``difference_of_standardized_means``, ``get_thumbnail_as_html``,  ``parse_json_with_comments``, ``partial_correlations``,  ``quadratic_weighted_kappa``, ``show_thumbnail``,  and ``standardized_mean_difference`` that ``utils.py`` had previously provided have been moved to new locations.
 
@@ -19,25 +19,25 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 
      from rsmtool.report import convert_ipynb_to_html
      convert_ipynb_to_html(...)
-        
+
      from rsmtool.preprocess import remove_outliers
      remove_outliers(...)
 
      from rsmtool.utils import agreement
      agreement(...)
-        
+
      from rsmtool.utils import difference_of_standardized_means
      difference_of_standardized_means(...)
-        
+
      from rsmtool.utils import partial_correlations
      partial_correlations(...)
-        
+
      from rsmtool.utils import quadratic_weighted_kappa
      quadratic_weighted_kappa(...)
-        
+
      from rsmtool.utils import standardized_mean_difference
      standardized_mean_difference(...)
-        
+
      from rsmtool.utils import parse_json_with_comments
      parse_json_with_comments(...)
 
@@ -56,25 +56,25 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 
      from rsmtool.reporter import Reporter
      Reporter.convert_ipynb_to_html(...)
-    
+
      from rsmtool.preprocessor import FeaturePreprocessor
      FeaturePreprocessor.remove_outliers(...)
 
      from rsmtool.utils.metrics import agreement
      agreement(...)
-    
+
      from rsmtool.utils.metrics import difference_of_standardized_means
      difference_of_standardized_means(...)
-    
+
      from rsmtool.utils.metrics import partial_correlations
      partial_correlations(...)
-    
+
      from rsmtool.utils.metrics import quadratic_weighted_kappa
      quadratic_weighted_kappa(...)
-    
+
      from rsmtool.utils.metrics import standardized_mean_difference
      standardized_mean_difference(...)
-    
+
      from rsmtool.utils.files import parse_json_with_comments
      parse_json_with_comments(...)
 
@@ -85,7 +85,7 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
      show_thumbnail(...)
 
 .. note ::
-    In RSMTool v8.0 the API for computing ``PRMSE`` has changed. 
+    In RSMTool v8.0 the API for computing ``PRMSE`` has changed.
     See :ref:`rsmtool.utils.prmse<prmse_api>`.
 
 

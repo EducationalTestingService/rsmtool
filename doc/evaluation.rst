@@ -4,7 +4,7 @@ Evaluation Metrics
 """"""""""""""""""
 
 This section documents the exact mathematical definitions of the primary metrics used in RSMTool for evaluating the performance of automated scoring engines. RSMTool reports also include many secondary evaluations as described in :ref:`intermediary files<rsmtool_eval_files>` and the :ref:`report sections<general_sections_rsmtool>`.
- 
+
 The following conventions are used in the formulas in this section:
 
 :math:`N` \\-\\- total number of responses in the :ref:`evaluation set<test_file>` with numeric human scores and numeric system scores. Zero human scores are, by default, excluded from evaluations unless :ref:`exclude_zero_scores<exclude_zero_scores_rsmtool>` was set to ``false``.
@@ -25,7 +25,7 @@ The following conventions are used in the formulas in this section:
 
 :math:`\sigma_M` \\-\\- Standard deviation of :math:`M` ; :math:`\sigma_M` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(M_i-\bar{M})^2}}{N-1}}`
 
-:math:`\sigma_H` \\-\\- Standard deviation of :math:`H` ; :math:`\sigma_H` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}` 
+:math:`\sigma_H` \\-\\- Standard deviation of :math:`H` ; :math:`\sigma_H` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N}{(H_i-\bar{H})^2}}{N-1}}`
 
 :math:`\sigma_{H2}` \\-\\- Standard deviation of :math:`H2` ; :math:`\sigma_{H2}` = :math:`\displaystyle\sqrt{\frac{\sum_{i=1}^{N_2}{(H2_i-\bar{H2})^2}}{N_2-1}}`
 
@@ -35,14 +35,14 @@ The following conventions are used in the formulas in this section:
 Accuracy Metrics (Observed score)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These metrics show how well system scores :math:`M` predict observed human scores :math:`H`. The computed metrics are available in the :ref:`intermediate file<rsmtool_eval_files>` ``eval``, with a subset of the metrics also available in the intermediate file ``eval_short``. 
+These metrics show how well system scores :math:`M` predict observed human scores :math:`H`. The computed metrics are available in the :ref:`intermediate file<rsmtool_eval_files>` ``eval``, with a subset of the metrics also available in the intermediate file ``eval_short``.
 
 .. _exact_agreement:
 
 Percent exact agreement (rounded scores only)
 +++++++++++++++++++++++++++++++++++++++++++++
 
-Percentage responses where human and system scores match exactly. 
+Percentage responses where human and system scores match exactly.
 
 :math:`A = \displaystyle\sum_{i=1}^{N}\frac{w_i}{N} \times 100`
 
@@ -65,7 +65,7 @@ where :math:`w_i=1` if :math:`|M_i-H_i| \leq 1` and :math:`w_i=0` if  :math:`|M_
 The percent exact + adjacent agreement is computed using :ref:`rsmtool.utils.agreement<agreement_api>` with ``tolerance`` set to ``1``.
 
 
-.. _kappa: 
+.. _kappa:
 
 Cohen's kappa (rounded scores only)
 +++++++++++++++++++++++++++++++++++
@@ -79,15 +79,15 @@ where:
 
 - :math:`K` is the number of scale score categories (maximum observed rating - minimum observed rating + 1). Note that for :math:`\kappa` computation the values of `H` and `M` are shifted to `H-minimum_rating` and `M-minimum_rating` so that the lowest value is 0. This is done to support negative labels.
 
-- :math:`X_{jk}` is the number times where :math:`H=j` and :math:`M=k`. 
+- :math:`X_{jk}` is the number times where :math:`H=j` and :math:`M=k`.
 
 - :math:`m_{jk}` is the percent chance agreement:
 
     :math:`m_{jk} = \displaystyle\sum_{k=1}^{K}{\frac{n_{k+}}{N}\frac{n_{+k}}{N}}`, where
 
-        * :math:`n_{k+}` - total number of responses where :math:`H_i=k` 
+        * :math:`n_{k+}` - total number of responses where :math:`H_i=k`
 
-        * :math:`n_{+k}` - total number of responses where :math:`M_i=k` 
+        * :math:`n_{+k}` - total number of responses where :math:`M_i=k`
 
 Kappa is computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/metrics.html#skll.metrics.kappa>`_ with ``weights`` set to ``None`` and ``allow_off_by_one`` set to ``False`` (default).
 
@@ -101,39 +101,39 @@ Quadratic weighted kappa (QWK)
 ++++++++++++++++++++++++++++++
 
 
-Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continuous scores using the following formula: 
+Unlike :ref:`Cohen's kappa<kappa>` which is only computed for rounded scores, quadratic weighted kappa is computed for continuous scores using the following formula:
 
 
 :math:`QWK=\displaystyle\frac{2*Cov(M,H)}{Var(H)+Var(M)+(\bar{M}-\bar{H})^2}`
 
-Note that in this case the variances and covariance are computed by dividing by ``N`` and not by ``N-1``, as in other cases.  
+Note that in this case the variances and covariance are computed by dividing by ``N`` and not by ``N-1``, as in other cases.
 
 QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
 
-See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_ for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one. 
+See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_ for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one.
 
 .. note::
 
 	In RSMTool v6.x and earlier QWK was computed using `skll.metrics.kappa <https://skll.readthedocs.io/en/latest/api/metrics.html#skll.metrics.kappa>`_ with ``weights`` set to ``"quadratic"``. Continuous scores were rounded for computation. Both formulas produce the same scores for discrete (rounded scores) but QWK values for continuous scores computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
 
 
-.. _r: 
+.. _r:
 
 Pearson Correlation coefficient (r)
 ++++++++++++++++++++++++++++++++++++
 
 :math:`r=\displaystyle\frac{\sum_{i=1}^{N}{(H_i-\bar{H})(M_i-\bar{M})}}{\sqrt{\sum_{i=1}^{N}{(H_i-\bar{H})^2} \sum_{i=1}^{N}{(M-\bar{M})^2}}}`
 
-Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html>`_. 
+Pearson correlation coefficients is computed using `scipy.stats.pearsonr <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html>`_.
 
 If the variance of human or system scores is ``0`` (all scores are the same) or only one response is available, RSMTool returns ``None``.
 
 .. note::
-  In `scipy` v1.4.1 and later, the implementation uses the following formula: 
+  In `scipy` v1.4.1 and later, the implementation uses the following formula:
 
   :math:`r=\displaystyle\frac{H-\bar{H}}{\left\|H-\bar{H}\right\|_2}\cdot\frac{M-\bar{M}}{\left\|M-\bar{M}\right\|_2}`
 
-  This implementation is more robust to very large values but is more likely to return a value slightly smaller than 1 (for example, 0.9999999999999998) for perfect correlation when `n` is small. See this `comment <https://github.com/scipy/scipy/commit/1acf46f508afa2c6d498e1001ca17e8ad98b46ef>`_ for further detail. 
+  This implementation is more robust to very large values but is more likely to return a value slightly smaller than 1 (for example, 0.9999999999999998) for perfect correlation when `n` is small. See this `comment <https://github.com/scipy/scipy/commit/1acf46f508afa2c6d498e1001ca17e8ad98b46ef>`_ for further detail.
 
 
 .. _smd:
@@ -181,20 +181,20 @@ According to test theory, an observed score is a combination of the true score :
 
 Evaluating system against true score produces performance estimates that are robust to errors in human scores and remain stable even when human-human agreeement varies (see `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2/>`_.
 
-The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``. 
+The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``.
 
 Proportional reduction in mean squared error for true scores (PRMSE)
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-PRMSE shows how well system scores can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (suggesting a very bad fit) or exceed 1 (suggesting that the sample size is too small to reliably estimate rater error variance). 
+PRMSE shows how well system scores can predict true scores. This metric generally varies between 0 (random prediction) and 1 (perfect prediction), although in some cases in can take negative values (suggesting a very bad fit) or exceed 1 (suggesting that the sample size is too small to reliably estimate rater error variance).
 
-PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2>`, but with the true score :math:`T` used instead of the observed score :math:`H`, that is, as the percentage of variance in the true scores explained by the system scores. 
+PRMSE for true scores is defined similarly to :ref:`PRMSE for observed scores<r2>`, but with the true score :math:`T` used instead of the observed score :math:`H`, that is, as the percentage of variance in the true scores explained by the system scores.
 
 :math:`PRMSE=1-\displaystyle\frac{MSE(T|M)}{\sigma_T^2}`
 
 In the simple case where all responses have two human scores, :math:`MSE(T|M)` (**mean squared error when predicting true score with system score**) and :math:`\sigma_T^2` (**variance of true score**) are estimated from their observed score counterparts :math:`MSE(H|M)` and :math:`\sigma_H^2` as follows:
 
-- :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`. 
+- :math:`\hat{H}` is used instead of :math:`H` to compute :math:`MSE(\hat{H}|M)` and :math:`\sigma_{\hat{H}}^2`. :math:`\hat{H}` is the average of two human scores for each response (:math:`\hat{H_i} = \frac{{H_i}+{H2_i}}{2}`). These evaluations use :math:`\hat{H}` rather than :math:`H` because the measurement errors for each rater are assumed to be random and, thus, can partially cancel out making the average :math:`\hat{H}` closer to true score :math:`T` than :math:`H` or :math:`H2`.
 
 - To compute estimates for true scores, the values for observed scores are adjusted for **variance of measurement errors** (:math:`\sigma_{e}^2`) in human scores defined as:
 
@@ -204,7 +204,7 @@ In the simple case, where **all responses are double-scored**, :math:`MSE(T|M)` 
 
    :math:`MSE(T|M) = MSE(\hat{H}|M)-\displaystyle\frac{1}{2}\sigma_{e}^2`
 
-and :math:`\sigma_T^2` is estimated as: 
+and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
@@ -220,33 +220,33 @@ where
 
 * :math:`H_{i,j}` is the human score assigned by rater :math:`j` to response :math:`i`
 
-* :math:`c_i` is the total number of human scores available for response :math:`i`. For double-scored responses this equals 2. 
+* :math:`c_i` is the total number of human scores available for response :math:`i`. For double-scored responses this equals 2.
 
-* :math:`\bar{H}_i` is the average human rating for response :math:`i`. 
+* :math:`\bar{H}_i` is the average human rating for response :math:`i`.
 
 We then take a weighted average of those within-responses variances:
 
 :math:`\sigma_{e}^2 = \frac{\sum_{i=1}^N V_{i} * (c_i-1)}{\sum_{i=1}^N (c_i-1)}`
 
-The **true score variance** :math:`\sigma_T^2` is then estimated as 
+The **true score variance** :math:`\sigma_T^2` is then estimated as
 
 :math:`\sigma_T^2 = \displaystyle\frac{\sum_{i=1}^N c_i (\bar{H}_i - \bar{H})^2 -
 (N-1) \sigma_{e}^2}{c_\cdot - \frac{\sum_{i=1}^N
 c_i^2}{c_\cdot}}`
 
-where 
+where
 
-* :math:`c_\cdot = \sum_{i=1}^N c_i` is the total number of observed human scores. 
+* :math:`c_\cdot = \sum_{i=1}^N c_i` is the total number of observed human scores.
 
 * :math:`\bar{H}_i` is the average human rating for response :math:`i`. For responses with only one rating this will be the single human score `H`.
 
-**Mean squared error** :math:`MSE(T|M)` is estimated as: 
+**Mean squared error** :math:`MSE(T|M)` is estimated as:
 
 :math:`MSE(T|M) = \displaystyle\frac{1}{c_\cdot} \left (\sum_{i=1}^N c_i (\bar{H}_i - M_i)^2  -
 N\sigma_{e}^2 \right )`
 
 
-The formulas are derived to ensure consistent results regardless of the number of raters and of the number of ratings availvable for each response. 
+The formulas are derived to ensure consistent results regardless of the number of raters and of the number of ratings availvable for each response.
 
 PRMSE is computed using the :ref:`rsmtool.utils.prmse_true <prmse_api>` function.
 
@@ -264,9 +264,9 @@ Fairness
 
 Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://www.aclweb.org/anthology/W17-1605/>`_).
 
-When defining an experiment, the RSMTool user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations. 
+When defining an experiment, the RSMTool user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations.
 
-All fairness evaluations are conducted on the evaluation set. The metrics are only computed for either `raw_trim` or `scale_trim` scores (see :ref:`score postprocessing<score_postprocessing>` for further details) depending on the value of :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` in RSMTool or the value of :ref:`scale_with<scale_with_eval>` in RSMEval. 
+All fairness evaluations are conducted on the evaluation set. The metrics are only computed for either `raw_trim` or `scale_trim` scores (see :ref:`score postprocessing<score_postprocessing>` for further details) depending on the value of :ref:`use_scaled_predictions<use_scaled_predictions_rsmtool>` in RSMTool or the value of :ref:`scale_with<scale_with_eval>` in RSMEval.
 
 .. _dsm:
 
@@ -286,7 +286,7 @@ DSM is computed as follows:
 
 2. For each response :math:i, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
 
-3. Calculate the mean of the difference :math:`z_{M_{i}} - z_{H_{i}}` by subgroup of interest. 
+3. Calculate the mean of the difference :math:`z_{M_{i}} - z_{H_{i}}` by subgroup of interest.
 
 DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_api>` with:
 
@@ -303,14 +303,14 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 	In RSMTool v6.x and earlier, subgroup differences were computed using :ref:`standardized mean difference <SMD>` with the ``method`` argument set to ``"williamson"``. Since the differences computed in this manner were very sensitive to score distributions, RSMTool no longer uses this function to compute subgroup differences starting with v7.0.
 
 
-.. _fairness_extra: 
+.. _fairness_extra:
 
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
 Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
 
-These include: 
+These include:
 
 - Overall score accuracy: percentage of variance in squared error :math:`(M-H)^2` explained by subgroup membership
 
@@ -318,7 +318,7 @@ These include:
 
 - Conditional score difference: percentage of variance in absolute error :math:`(M-H)` explained by subgroup membership when controlling for human score
 
-Please refer to the paper for full descriptions of these metrics. 
+Please refer to the paper for full descriptions of these metrics.
 
 The fairness metrics are computed using :ref:`rsmtool.fairness_utils.get_fairness_analyses<fairness_api>`.
 

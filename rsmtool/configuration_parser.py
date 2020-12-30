@@ -111,7 +111,7 @@ class Configuration:
     """
     Configuration class.
 
-    Encapsulates all of the configuration parameters and methods to 
+    Encapsulates all of the configuration parameters and methods to
     access these parameters.
     """
 

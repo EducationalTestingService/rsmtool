@@ -41,10 +41,10 @@ The next step is to create an :ref:`experiment configuration file <config_file_r
 
 Let's take a look at the options in our configuration file.
 
-- **Line 2**: We provide the ``summary_id`` for the comparison. This will be used to generate the name of the final report. 
+- **Line 2**: We provide the ``summary_id`` for the comparison. This will be used to generate the name of the final report.
 - **Line 3**: We give a short description of this comparison experiment. This will be shown in the report.
 - **Line 4**: We also give the list of paths to the directories containing the outputs of the experiments we want to compare.
-- **Line 5**: Since we want to compare experiments that all used the same experiment id (``ASAP2``), we instead list the names that we want to use for each experiment in the summary report. 
+- **Line 5**: Since we want to compare experiments that all used the same experiment id (``ASAP2``), we instead list the names that we want to use for each experiment in the summary report.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmsummarize>`.
 
@@ -76,11 +76,11 @@ Our experiment report contains the overview of main aspects of model performance
 
 1. Brief description of all experiments.
 2. Information about model parameters and model fit for all ``rsmtool`` experiments.
-3. Model performance for all experiments. 
+3. Model performance for all experiments.
 
 
 .. note::
 
-    Some of the information such as model fit and model parameters are only available for ``rsmtool`` experiments. 
+    Some of the information such as model fit and model parameters are only available for ``rsmtool`` experiments.
 
 

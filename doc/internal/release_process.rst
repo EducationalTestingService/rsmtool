@@ -5,7 +5,7 @@ This process is only meant for the project administrators, not users and develop
 
 1. Make sure any and all tests are passing in ``main``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any deprecation warnings in the HTML report that can be fixed before the release.
 
-2. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. 
+2. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released.
 
 3. Create a release branch ``release/XX`` on GitHub.
 
@@ -35,7 +35,7 @@ This process is only meant for the project administrators, not users and develop
 
     conda build -c conda-forge -c ets --numpy=1.19 .
 
-10. Upload the package to anaconda.org using ``anaconda upload --user ets <package tarball>``. You will need to have the appropriate permissions for the ``ets`` organization. 
+10. Upload the package to anaconda.org using ``anaconda upload --user ets <package tarball>``. You will need to have the appropriate permissions for the ``ets`` organization.
 
 11. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and TestPyPI packages on Linux and Windows.
 
