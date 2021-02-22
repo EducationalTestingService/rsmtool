@@ -59,7 +59,7 @@ To get started with RSMTool, please see the extensive `official documentation <h
 Requirements
 ------------
 
-- Python >=3.6, <3.9
+- Python >=3.7, <3.10
 - ``numpy``
 - ``scipy``
 - ``scikit-learn``
