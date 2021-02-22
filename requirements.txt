@@ -1,6 +1,6 @@
 doc2dash
 jupyter
-ipython<7.17
+ipython
 nose
 notebook
 nbconvert<6.0
