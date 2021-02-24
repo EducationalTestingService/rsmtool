@@ -14,9 +14,10 @@ from os.path import join
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
+from statsmodels.stats.anova import anova_lm
+
 from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
-from statsmodels.stats.anova import anova_lm
 
 
 def convert_to_ordered_category(group_values, base_group=None):

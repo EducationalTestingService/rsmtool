@@ -85,6 +85,3 @@ Our experiment report contains all the information we would need to compare the 
 .. note::
 
     Since we are comparing the experiment to itself, the comparison is not very interesting, e.g., the differences between various values will always be 0.
-
-
-

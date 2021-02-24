@@ -5,6 +5,7 @@ from os.path import dirname
 
 import pandas as pd
 from nose.tools import assert_almost_equal, eq_, ok_, raises
+
 from rsmtool.fairness_utils import convert_to_ordered_category, get_fairness_analyses
 
 # get the directory containing the tests

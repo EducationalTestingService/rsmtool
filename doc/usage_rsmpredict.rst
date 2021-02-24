@@ -8,10 +8,10 @@ RSMTool provides the ``rsmpredict`` command-line utility to generate predictions
 ``rsmpredict`` pre-processes the feature values according to user specifications before using them to generate the predicted scores. The generated scores are post-processed in the same manner as they are in ``rsmtool`` output.
 
 .. note::
-    No score is generated for responses with non-numeric values for any of the features included into the model. 
-    
+    No score is generated for responses with non-numeric values for any of the features included into the model.
+
     If the original model specified transformations for some of the features and these transformations led to ``NaN`` or ``Inf`` values when applied to the new data, ``rsmpredict`` will raise a warning. No score will be generated for such responses.
-    
+
 
 .. include:: tutorial_rsmpredict.rst
 
@@ -50,8 +50,8 @@ Here are all the arguments to the ``rsmpredict`` command-line script.
 Output
 """"""
 
-``rsmpredict`` produces a ``.csv`` file with predictions for all responses in new data set, and, optionally, a ``.csv`` file with pre-processed feature values. If any of the responses had non-numeric feature values in 
-the original data or after applying transformations, these are saved in a file name ``PREDICTIONS_NAME_excluded_responses.csv`` where ``PREDICTIONS_NAME`` is the name of the predictions file supplied by the user without the extension. 
+``rsmpredict`` produces a ``.csv`` file with predictions for all responses in new data set, and, optionally, a ``.csv`` file with pre-processed feature values. If any of the responses had non-numeric feature values in
+the original data or after applying transformations, these are saved in a file name ``PREDICTIONS_NAME_excluded_responses.csv`` where ``PREDICTIONS_NAME`` is the name of the predictions file supplied by the user without the extension.
 
 The predictions ``.csv`` file contains the following columns:
 

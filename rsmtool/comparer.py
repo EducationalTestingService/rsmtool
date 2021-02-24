@@ -299,7 +299,7 @@ class Comparer:
         conf_matrix_renamed.columns = ['human {}'.format(x) for x in conf_matrix.columns]
         return conf_matrix_renamed
 
-    def load_rsmtool_output(self, filedir, figdir, experiment_id, prefix, groups_eval):
+    def load_rsmtool_output(self, filedir, figdir, experiment_id, prefix, groups_eval):  # noqa: C901
         """
         Load all of the outputs of an rsmtool experiment.
 

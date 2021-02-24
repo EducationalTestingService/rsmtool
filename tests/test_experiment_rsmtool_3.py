@@ -6,6 +6,7 @@ from os.path import join
 
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool import run_experiment
 from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import check_run_experiment, copy_data_files, do_run_experiment
@@ -50,7 +51,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
     if TEST_DIR:
         kwargs['given_test_dir'] = TEST_DIR
     check_run_experiment(*args, **kwargs)
-
 
 
 def test_run_experiment_lr_with_object_and_configdir():

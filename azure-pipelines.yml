@@ -33,10 +33,10 @@ jobs:
       conda create --name rsmdev --yes --quiet -c conda-forge -c defaults -c ets python=%PYTHON_VERSION% --file requirements.txt
       conda init cmd.exe
       CALL activate rsmdev
-      pip install -e .
+      pip install -e .[dev]
     displayName: 'Install dependencies & code'
 
-  - powershell: ./DistributeTests.ps1 
+  - powershell: ./DistributeTests.ps1
     displayName: 'PowerShell Script to distribute tests'
 
   - script: |

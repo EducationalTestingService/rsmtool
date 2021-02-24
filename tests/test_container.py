@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from nose.tools import assert_equal, assert_false, assert_not_equal, eq_, raises
 from pandas.testing import assert_frame_equal
+
 from rsmtool.container import DataContainer
 
 

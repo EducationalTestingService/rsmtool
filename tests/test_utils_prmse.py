@@ -7,12 +7,15 @@ import pandas as pd
 from nose.tools import assert_almost_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
-from rsmtool.utils.prmse import (get_n_human_scores,
-                                 get_true_score_evaluations,
-                                 mse_true,
-                                 prmse_true,
-                                 true_score_variance,
-                                 variance_of_errors)
+
+from rsmtool.utils.prmse import (
+    get_n_human_scores,
+    get_true_score_evaluations,
+    mse_true,
+    prmse_true,
+    true_score_variance,
+    variance_of_errors,
+)
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

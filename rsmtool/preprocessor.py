@@ -1232,7 +1232,7 @@ class FeaturePreprocessor:
                 df_test_preprocessed,
                 df_feature_info)
 
-    def filter_data(self,
+    def filter_data(self,  # noqa: C901
                     df,
                     label_column,
                     id_column,
@@ -1582,7 +1582,7 @@ class FeaturePreprocessor:
                 trim_max,
                 feature_names)
 
-    def process_data_rsmtool(self, config_obj, data_container_obj):
+    def process_data_rsmtool(self, config_obj, data_container_obj):  # noqa: C901
         """
         Set up rsmtool experiment by loading & preprocessing train/test data.
 
@@ -1952,7 +1952,7 @@ class FeaturePreprocessor:
 
         return new_config_obj, new_container
 
-    def process_data_rsmeval(self, config_obj, data_container_obj):
+    def process_data_rsmeval(self, config_obj, data_container_obj):  # noqa: C901
         """
         Set up rsmeval experiment by loading & preprocessing evaluation data.
 
@@ -2510,7 +2510,7 @@ class FeaturePreprocessor:
         elif context == 'rsmpredict':
             return self.process_data_rsmpredict(config_obj, data_container_obj)
         else:
-            raise ValueError("The 'context' argument must be in the set: "
+            raise ValueError("The 'context' argument must be in the set: "  # noqa: F524
                              "{'rsmtool', 'rsmeval', 'rsmpredict'}. "
                              "You specified `{}`.".format(context))
 

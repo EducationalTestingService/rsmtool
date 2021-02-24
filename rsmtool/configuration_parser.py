@@ -25,13 +25,21 @@ from skll import Learner
 from skll.metrics import SCORERS
 
 from . import HAS_RSMEXTRA
-from .utils.constants import BOOLEAN_FIELDS, CHECK_FIELDS, DEFAULTS, ID_FIELDS, LIST_FIELDS
+from .utils.constants import (
+    BOOLEAN_FIELDS,
+    CHECK_FIELDS,
+    DEFAULTS,
+    ID_FIELDS,
+    LIST_FIELDS,
+)
 from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file, # noqa
-                                   default_feature_sign)
+    from rsmextra.settings import (  # noqa
+        default_feature_sign,
+        default_feature_subset_file,
+    )
 
 
 def configure(context, config_file_or_obj_or_dict):
@@ -111,7 +119,7 @@ class Configuration:
     """
     Configuration class.
 
-    Encapsulates all of the configuration parameters and methods to 
+    Encapsulates all of the configuration parameters and methods to
     access these parameters.
     """
 
@@ -806,7 +814,7 @@ class ConfigurationParser:
                              context=context)
 
     @classmethod
-    def validate_config(cls, config, context='rsmtool'):
+    def validate_config(cls, config, context='rsmtool'):  # noqa: C901
         """
         Validate configuration file.
 

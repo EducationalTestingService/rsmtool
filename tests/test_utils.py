@@ -16,29 +16,43 @@ from numpy.testing import assert_almost_equal
 from pandas.testing import assert_frame_equal
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
-from rsmtool.configuration_parser import Configuration
-from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
-from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
-from rsmtool.utils.conversion import convert_to_float, int_to_float
-from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
-from rsmtool.utils.metrics import (compute_expected_scores_from_model,
-                                   difference_of_standardized_means,
-                                   partial_correlations,
-                                   quadratic_weighted_kappa,
-                                   standardized_mean_difference)
-from rsmtool.utils.notebook import (bold_highlighter,
-                                    color_highlighter,
-                                    compute_subgroup_plot_params,
-                                    custom_highlighter,
-                                    float_format_func,
-                                    get_files_as_html,
-                                    get_thumbnail_as_html,
-                                    int_or_float_format_func)
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
 from skll import FeatureSet, Learner
 from skll.metrics import kappa
+
+from rsmtool.configuration_parser import Configuration
+from rsmtool.utils.commandline import (
+    CmdOption,
+    ConfigurationGenerator,
+    InteractiveField,
+    setup_rsmcmd_parser,
+)
+from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
+from rsmtool.utils.conversion import convert_to_float, int_to_float
+from rsmtool.utils.files import (
+    get_output_directory_extension,
+    has_files_with_extension,
+    parse_json_with_comments,
+)
+from rsmtool.utils.metrics import (
+    compute_expected_scores_from_model,
+    difference_of_standardized_means,
+    partial_correlations,
+    quadratic_weighted_kappa,
+    standardized_mean_difference,
+)
+from rsmtool.utils.notebook import (
+    bold_highlighter,
+    color_highlighter,
+    compute_subgroup_plot_params,
+    custom_highlighter,
+    float_format_func,
+    get_files_as_html,
+    get_thumbnail_as_html,
+    int_or_float_format_func,
+)
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

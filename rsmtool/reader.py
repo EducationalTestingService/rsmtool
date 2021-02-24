@@ -195,7 +195,7 @@ class DataReader:
                 # Make sure file converter is a `dict`
                 file_converter = file_converters[file_converter_name]
                 if not isinstance(file_converter, dict):
-                    raise ValueError('Value for {} must be``dict`` ',
+                    raise ValueError('Value for {} must be``dict``, '
                                      'not {}'.format(file_converter_name,
                                                      type(file_converter)))
 

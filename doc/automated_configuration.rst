@@ -16,7 +16,7 @@ For example, to generate an ``rsmtool`` configuration file interactively, run th
 The following screencast shows an example interactive session after the above command is run (click to play):
 
 .. raw:: html
-   
+
    <script id="asciicast-313107" src="https://asciinema.org/a/313107.js" data-autoplay="false" async></script>
 
 
@@ -36,7 +36,7 @@ There are some configuration options that can accept multiple inputs. For exampl
 The following screencast shows the interactive session (click to play):
 
 .. raw:: html
-    
+
    <script id="asciicast-313149" src="https://asciinema.org/a/313149.js" data-autoplay="false" async></script>
 
 And here is the generated configuration file for ``rsmsummarize``:
@@ -44,9 +44,9 @@ And here is the generated configuration file for ``rsmsummarize``:
 .. literalinclude:: assets/example_rsmsummarize.json
     :language: javascript
 
-.. important:: 
+.. important::
 
-    If you want to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, you should add ``--subgroups`` to the command. For example, when you run ``rsmeval generate --interactive --subgroups`` you would be prompted to enter the subgroup column names and the ``general_sections`` list will also include subgroup-based sections. Since the ``subgroups`` option can accept multiple inputs, it is handled in the same way as the ``experiment_dirs`` option for ``rsmsummarize`` above. 
+    If you want to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, you should add ``--subgroups`` to the command. For example, when you run ``rsmeval generate --interactive --subgroups`` you would be prompted to enter the subgroup column names and the ``general_sections`` list will also include subgroup-based sections. Since the ``subgroups`` option can accept multiple inputs, it is handled in the same way as the ``experiment_dirs`` option for ``rsmsummarize`` above.
 
 We end with a list of important things to note about interactive generation:
 
@@ -58,7 +58,7 @@ We end with a list of important things to note about interactive generation:
 
 - Required fields will *not* accept a blank input (just pressing enter) and will show an error message in the bottom left until a valid input is provided.
 
-- Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses. 
+- Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses.
 
 - You can also use ``-i`` as an alias for ``--interactive`` and ``-g`` as an alias for ``--subgroups``. So, for example, if you want to interactively generate a configuration file with subgroups for ``rsmtool``, just run ``rsmtool generate -ig`` instead of ``rsmtool generate --interactive --subgroups``.
 
@@ -87,7 +87,7 @@ This warning explains that the generated file *cannot* be used directly as input
 
 Note the two comments demarcating the locations of the required and optional fields. Note also that the required fields are filled with the dummy value "ENTER_VALUE_HERE" that *must* be manually edited by the user. The optional fields are filled with default values that may also need to be further edited depending on the data being used.
 
-Just like interactive generation, non-interactive generation is supported by all 5 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, and ``rsmsummarize``. 
+Just like interactive generation, non-interactive generation is supported by all 5 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, and ``rsmsummarize``.
 
 Similarly, to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, just add ``--subgroups`` (or ``-g``) to the command. Note that unlike in interactive mode, this would *only* add subgroup-based sections to the ``general_sections`` list in the output file. You will need to manually edit the ``subgroups`` option in the configuration file to enter the subgroup column names.
 

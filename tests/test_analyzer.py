@@ -7,6 +7,7 @@ from nose.tools import assert_almost_equal, assert_equal
 from numpy.random import RandomState
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_series_equal
+
 from rsmtool.analyzer import Analyzer
 
 
@@ -27,7 +28,7 @@ class TestAnalyzer:
         self.df_features_same_score[['sc1']] = [3] * 10
 
         self.df_features_with_groups = self.df_features.copy()
-        self.df_features_with_groups['group'] = ['group1']*5 + ['group2']*5
+        self.df_features_with_groups['group'] = ['group1'] * 5 + ['group2'] * 5
 
         self.df_features_with_groups_and_length = self.df_features_with_groups.copy()
         self.df_features_with_groups_and_length['length'] = self.prng.normal(50, 250, 10)

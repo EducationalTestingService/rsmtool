@@ -6,16 +6,19 @@ from os.path import basename, exists, join
 
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool import compute_and_save_predictions
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import (check_file_output,
-                                check_generated_output,
-                                check_report,
-                                check_run_prediction,
-                                check_scaled_coefficients,
-                                copy_data_files,
-                                do_run_experiment,
-                                do_run_prediction)
+from rsmtool.test_utils import (
+    check_file_output,
+    check_generated_output,
+    check_report,
+    check_run_prediction,
+    check_scaled_coefficients,
+    copy_data_files,
+    do_run_experiment,
+    do_run_prediction,
+)
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

@@ -100,7 +100,7 @@ RSMTool provides pre-defined sections for ``rsmeval`` (listed below) and, by def
         - percentage of variance in raw (signed) error explained by subgroup membership
         - percentage of variance in raw (signed) error explained by subgroup membership when controlling for human score
         - plots showing estimates for each subgroup for each model
-    
+
     - ``true_score_evaluation``: evaluation of system scores against the true scores estimated according to test theory. The notebook shows:
 
         - Number of single and double-scored responses.
@@ -131,18 +131,18 @@ An integer value for the minimum number of responses expected from each candidat
 
 min_n_per_group *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmeval>` will still show the results for *all* groups. 
+A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmeval>` will still show the results for *all* groups.
 
 .. note::
 
-    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary.
 
 .. _rater_error_variance_rsmeval:
 
 rater_error_variance *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmeval`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmeval``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmeval`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmeval``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline.
 
 .. _scale_with_eval:
 
@@ -197,8 +197,8 @@ The single numeric value that will be used to pad the trimming range specified i
 Defaults to 0.4998.
 
 .. note::
-    
-    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
+
+    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.
 
 .. _use_thumbnails_rsmeval:
 

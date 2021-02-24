@@ -4,6 +4,7 @@ from os.path import join
 from nbconvert.preprocessors import CellExecutionError
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool.reporter import Reporter
 from rsmtool.test_utils import check_report, check_run_experiment, do_run_experiment
 
@@ -85,7 +86,7 @@ def test_run_experiment_lr_with_notebook_rerun_fail():
                        '{}.json'.format(experiment_id))
     do_run_experiment(source, experiment_id, config_file)
 
-    report_env = join('test_outputs', source, 'report', '.environ.json'.format(experiment_id))
+    report_env = join('test_outputs', source, 'report', '.environ.json')
     report_ipynb = join('test_outputs', source, 'report', '{}_report.ipynb'.format(experiment_id))
     report_html = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
 

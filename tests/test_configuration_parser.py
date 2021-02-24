@@ -13,6 +13,7 @@ import pandas as pd
 from nose.tools import assert_equal, assert_not_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
+
 from rsmtool.configuration_parser import Configuration, ConfigurationParser
 from rsmtool.convert_feature_json import convert_feature_json_file
 
@@ -469,7 +470,7 @@ class TestConfiguration:
     def test_init_wrong_input_type(self):
         config_input = [('experiment_id', "XXX"),
                         ('train_file', 'path/to/train.tsv')]
-        config = Configuration(config_input)
+        Configuration(config_input)
 
     def check_logging_output(self, expected, function, *args, **kwargs):
 
@@ -1031,6 +1032,7 @@ class TestConfiguration:
         config = Configuration(dictionary)
         rater_error_variance = config.get_rater_error_variance()
         eq_(rater_error_variance, None)
+
     def test_get_names_and_paths_with_feature_file(self):
         filepaths = ['path/to/train.tsv',
                      'path/to/test.tsv',
