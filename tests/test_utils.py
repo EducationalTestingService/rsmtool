@@ -37,7 +37,8 @@ from rsmtool.utils.notebook import (bold_highlighter,
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
-from skll import FeatureSet, Learner
+from skll.data import FeatureSet
+from skll.learner import Learner
 from skll.metrics import kappa
 
 # allow test directory to be set via an environment variable
