@@ -21,7 +21,7 @@ from os import getcwd
 from os.path import abspath
 from pathlib import Path
 
-from skll import Learner
+from skll.learner import Learner
 from skll.metrics import SCORERS
 
 from . import HAS_RSMEXTRA
