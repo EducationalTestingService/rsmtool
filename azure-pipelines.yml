@@ -45,6 +45,19 @@ jobs:
       nosetests --nologcapture --with-xunit $(pytestfiles)
     displayName: 'Run tests'
 
+  - powershell: gci env:* | sort-object name | Format-Table -AutoSize | Out-File $env:BUILD_ARTIFACTSTAGINGDIRECTORY/environment-variables.txt
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: test_outputs/lr-rsmtool-rsmpredict/report
+      contents: '**/*.html'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: drop
+
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
     inputs:
