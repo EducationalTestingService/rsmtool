@@ -83,7 +83,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
 
     yield check_scaled_coefficients, source, experiment_id
     yield check_generated_output, csv_files, experiment_id, 'rsmtool'
-    yield check_report, html_report
+    yield check_report, html_report, True, False
 
     # check that the rsmpredict generated the same results
     for csv_pair in [('predictions.csv',
