@@ -26,7 +26,7 @@ from .rsmsummarize import run_summary
 from .rsmtool import run_experiment
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
-html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>')
+html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>([^<]+)')
 section_regexp = re.compile(r'<h2>(.*?)</h2>')
 
 # get the directory containing the tests
@@ -797,7 +797,9 @@ def check_report(html_file,
                 report_errors += 1
             m_warning = html_warning_regexp.search(line)
             if m_warning:
-                report_warnings += 1
+                warning_text = m_warning.group(1)
+                if not re.search(r'font\s*cache', warning_text, flags=re.IGNORECASE):
+                    report_warnings += 1
 
     if raise_errors:
         assert_equal(report_errors, 0)
