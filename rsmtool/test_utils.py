@@ -798,6 +798,7 @@ def check_report(html_file,
             m_warning = html_warning_regexp.search(line)
             if m_warning:
                 warning_text = m_warning.group(1)
+                # we do not want to flag matlplotlib font cache warning
                 if not re.search(r'font\s*cache', warning_text, flags=re.IGNORECASE):
                     report_warnings += 1
 
