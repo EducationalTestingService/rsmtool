@@ -70,7 +70,7 @@ class TestDataReader:
             df.to_csv(tempf.name, index=False)
         elif ext.lower() == 'tsv':
             df.to_csv(tempf.name, sep='\t', index=False)
-        elif ext.lower() in ['xls', 'xlsx']:
+        elif ext.lower() == 'xlsx':
             df.to_excel(tempf.name, index=False)
         elif ext.lower() in ['jsonlines']:
             df.to_json(tempf.name,
@@ -133,7 +133,7 @@ class TestDataReader:
     def test_read_data_file(self):
         # note that we cannot check for capital .xls and .xlsx
         # because xlwt does not support these extensions
-        for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
+        for extension in ['csv', 'tsv', 'xlsx', 'CSV', 'TSV']:
             yield self.check_read_from_file, extension
 
     @raises(ValueError)
@@ -143,7 +143,7 @@ class TestDataReader:
     def test_container_train_property(self):
         test_lists = [[('train', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('test', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'csv'), ('test', 'xlsx'), ('train_metadata', 'tsv')],
                       [('train', 'jsonlines'), ('test', 'jsonlines')]]
 
         converter = {'id': str, 'feature1': np.int64, 'feature2': np.int64, 'candidate': str}
@@ -157,7 +157,7 @@ class TestDataReader:
     def test_container_feature_specs_property(self):
         test_lists = [[('feature_specs', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('feature_specs', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'csv'), ('feature_specs', 'tsv'), ('train_metadata', 'tsv')],
                       [('train', 'jsonlines'), ('feature_specs', 'jsonlines')]]
         for test_list in test_lists:
             yield self.check_feature_specs, test_list
