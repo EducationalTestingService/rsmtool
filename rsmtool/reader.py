@@ -241,7 +241,7 @@ class DataReader:
             do_read = partial(pd.read_csv, sep=sep, converters=converters)
         elif file_extension == '.xlsx':
             do_read = partial(pd.read_excel, converters=converters)
-        elif file_extension in ['.sas7bdat']:
+        elif file_extension == '.sas7bdat':
             if 'encoding' not in kwargs:
                 encoding = 'latin-1'
             else:
