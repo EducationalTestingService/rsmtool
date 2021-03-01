@@ -205,7 +205,7 @@ class DataReader:
     @staticmethod
     def read_from_file(filename, converters=None, **kwargs):
         """
-        Read a CSV/TSV/XLS/XLSX/JSONLINES/SAS7BDAT file and return a data frame.
+        Read a CSV/TSV/XLSX/JSONLINES/SAS7BDAT file and return a data frame.
 
         Parameters
         ----------
@@ -239,7 +239,7 @@ class DataReader:
         if file_extension in ['.csv', '.tsv']:
             sep = '\t' if file_extension == '.tsv' else ','
             do_read = partial(pd.read_csv, sep=sep, converters=converters)
-        elif file_extension in ['.xls', '.xlsx']:
+        elif file_extension == '.xlsx':
             do_read = partial(pd.read_excel, converters=converters)
         elif file_extension in ['.sas7bdat']:
             if 'encoding' not in kwargs:
@@ -251,7 +251,7 @@ class DataReader:
             do_read = partial(read_jsonlines, converters=converters)
         else:
             raise ValueError("RSMTool only supports files in .csv, "
-                             ".tsv, .xls/.xlsx, and .sas7bdat formats. "
+                             ".tsv, .xlsx, and .sas7bdat formats. "
                              "Input files should have one of these "
                              "extensions. The file you "
                              "passed is: {}.".format(filename))

@@ -26,7 +26,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     json_file : str
         Path to feature JSON file to be converted.
     output_file : str
-        Path to CSV/TSV/XLS/XLSX output file.
+        Path to CSV/TSV/XLSX output file.
     delete : bool, optional
         Whether to delete the original file after conversion.
         Defaults to ``False``.
@@ -49,16 +49,17 @@ def convert_feature_json_file(json_file, output_file, delete=False):
 
     # make sure the output file is in a supported format
     output_extension = splitext(output_file)[1].lower()
-    if output_extension not in ['.csv', '.tsv', '.xls', '.xlsx']:
+    if output_extension not in ['.csv', '.tsv', '.xlsx']:
         raise RuntimeError("The output file {} has an unsupported "
-                           "extension. It must be a CSV/TSV/XLS/XLSX "
-                           "file.".format(output_file))
+                           "extension. It must be a CSV/TSV/XLSX "
+                           "file. RSMTool no longer supports .xls "
+                           "files".format(output_file))
 
     if output_extension == '.csv':
         df_feature.to_csv(output_file, index=False)
     elif output_extension == '.tsv':
         df_feature.to_csv(output_file, sep='\t', index=False)
-    elif output_extension in ['.xls', '.xlsx']:
+    elif output_extension == '.xlsx':
         df_feature.to_excel(output_file, sheet_name='features', index=False)
 
     if delete:
