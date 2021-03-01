@@ -23,7 +23,7 @@ import glob
 from os import getcwd, remove
 from os.path import dirname, join
 
-from skll import Learner
+from skll.learner import Learner
 
 TEST_DIR = getcwd()
 

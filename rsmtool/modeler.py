@@ -19,7 +19,8 @@ import statsmodels.api as sm
 from numpy.random import RandomState
 from scipy.optimize import nnls
 from sklearn.linear_model import LassoCV
-from skll import FeatureSet, Learner
+from skll.data import FeatureSet
+from skll.learner import Learner
 
 from .analyzer import Analyzer
 from .container import DataContainer

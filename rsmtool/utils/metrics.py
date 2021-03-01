@@ -49,7 +49,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         # Tell the model we want probabiltiies as output. This is likely already set
         # to True but it might not be, e.g., when using rsmpredict.
         model.probability = True
-        probability_distributions = model.predict(featureset)
+        probability_distributions = model.predict(featureset, class_labels=False)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have
         num_score_points_specified = max_score - min_score + 1

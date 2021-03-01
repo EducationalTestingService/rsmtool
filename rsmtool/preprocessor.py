@@ -456,7 +456,7 @@ class FeaturePreprocessor:
             Numpy array with the outliers clamped.
         """
         # convert data to a numpy float array before doing any clamping
-        new_values = np.array(values, dtype=np.float)
+        new_values = np.array(values, dtype=np.float64)
 
         if not mean:
             mean = new_values.mean()
@@ -497,7 +497,7 @@ class FeaturePreprocessor:
             Numpy array with the outliers clamped.
         """
         # convert data to a numpy float array before doing any clamping
-        new_values = np.array(values, dtype=np.float)
+        new_values = np.array(values, dtype=np.float64)
 
         minimum = truncations.loc[feature_name, 'min']
         maximum = truncations.loc[feature_name, 'max']
