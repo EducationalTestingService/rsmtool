@@ -463,7 +463,7 @@ class InteractiveField:
             and files with valid input file extensions as potential
             completions for user input. Valid input file
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
-            "xlsx", and "xlsx". We need directory names so that
+            and "xlsx". We need directory names so that
             users can look into sub-directories etc.
         """
         def valid_file(filename):
@@ -472,7 +472,6 @@ class InteractiveField:
                                                                   'jsonlines',
                                                                   'sas7bdat',
                                                                   'tsv',
-                                                                  'xls',
                                                                   'xlsx'])
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
@@ -490,7 +489,7 @@ class InteractiveField:
             actually existing files with valid input file extensions
             are chosen as the final user input. Valid input file
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
-            "xlsx", and "xlsx".
+            and "xlsx".
         """
         def is_valid(filepath):
             return (Path(filepath).is_file() and
@@ -498,7 +497,6 @@ class InteractiveField:
                                                                   'jsonlines',
                                                                   'sas7bdat',
                                                                   'tsv',
-                                                                  'xls',
                                                                   'xlsx'])
         validator = Validator.from_callable(is_valid, error_message="invalid file")
         return validator
