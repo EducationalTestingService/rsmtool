@@ -22,7 +22,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
 
     Parameters
     ----------
-    model : skll.Learner
+    model : skll.learner.Learner
         The SKLL learner object to use for computing the expected scores.
     featureset : skll.data.FeatureSet
         The SKLL featureset object for which predictions are to be made.
