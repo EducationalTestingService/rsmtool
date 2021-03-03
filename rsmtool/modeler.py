@@ -75,7 +75,7 @@ class Modeler:
 
         Parameters
         ----------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             A SKLL Learner object.
 
         Returns
@@ -170,7 +170,7 @@ class Modeler:
 
         Parameters
         ----------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             A SKLL learner object.
 
         Returns
@@ -223,7 +223,7 @@ class Modeler:
 
         Returns
         -------
-        learner: skll Learner object
+        learner: skll.learner.Learner
             SKLL Learner object representing a ``LinearRegression`` model
             with the specified coefficients.
         """
@@ -274,7 +274,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A ``statsmodels`` regression results object.
@@ -315,7 +315,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A ``statsmodels`` regression results object.
@@ -372,7 +372,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A ``statsmodels`` regression results object.
@@ -443,7 +443,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object
         fit : statsmodels.RegressionResults
             A ``statsmodels`` regression results object.
@@ -503,7 +503,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A statsmodels regression results object.
@@ -562,7 +562,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A statsmodels regression results object.
@@ -636,7 +636,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A statsmodels regression results object.
@@ -696,7 +696,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object.
         fit : statsmodels.RegressionResults
             A statsmodels regression results object.
@@ -784,7 +784,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object
         fit : ``None``
             This is always ``None`` since there is no OLS
@@ -837,7 +837,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object
         fit : ``None``
             This is always ``None`` since there is no OLS
@@ -893,7 +893,7 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
+        learner : skll.learner.Learner
             The SKLL learner object
         fit : statsmodels.RegressionResults
             A statsmodels regression results object.
@@ -959,8 +959,8 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.Learner
-            SKLL ``LinearRegression`` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.Learner>`_
+        learner : skll.learner.Learner
+            SKLL ``LinearRegression`` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_
             object containing the coefficients learned by training
             the built-in model.
         """

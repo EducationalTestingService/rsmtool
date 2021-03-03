@@ -111,7 +111,7 @@ The raw_trim predictions rounded to the nearest integer.
 
 .. note::
 
-    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
+    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <https://numpy.org/doc/stable/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
 
 scale
 ~~~~~

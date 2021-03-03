@@ -31,33 +31,37 @@ This process is only meant for the project administrators, not users and develop
 
 8. Then run some tests from a RSMTool working copy. If the TestPyPI package works, then move on to the next step. If it doesn't, figure out why and rebuild and re-upload the package.
 
-9. Build the new generic conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool`` and that the latest version of ``numpy`` is ``1.19``)::
+9. Build the new generic conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool``)::
 
-    conda build -c conda-forge -c ets --numpy=1.19 .
+    conda build -c conda-forge -c ets .
 
-10. Upload the package to anaconda.org using ``anaconda upload --user ets <package tarball>``. You will need to have the appropriate permissions for the ``ets`` organization. 
+10. This will create python 3.7, 3.8, and 3.9 packages for your native platform, e.g., ``osx-64``.
 
-11. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and TestPyPI packages on Linux and Windows.
+11. Convert these built packages for the other two platforms. For example, if you ran the above command on macOS, run ``conda convert -p linux-64 -p win-64 <packages files>``, where `<packages_files>` are the package files that were created in step 10.
 
-12. Draft a release on GitHub while the Linux and Windows package tester builds are running.
+12. Upload all 9 package files (3 Python versions x 3 platforms) to anaconda.org using ``anaconda upload --user ets <path_to_files>``. You will need to have the appropriate permissions for the ``ets`` organization. 
 
-13. Once both builds have passed, make a pull request with the release branch to be merged into ``main`` and request code review.
+13. Create pull requests on the `rsmtool-conda-tester <https://github.com/EducationalTestingService/rsmtool-conda-tester/>`_ and `rsmtool-pip-tester <https://github.com/EducationalTestingService/rsmtool-pip-tester/>`_ repositories to test the conda and TestPyPI packages on Linux and Windows.
 
-14. Once the build for the PR passes and the reviewers approve, merge the release branch into ``main``.
+14. Draft a release on GitHub while the Linux and Windows package tester builds are running.
 
-15. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
+15. Once both builds have passed, make a pull request with the release branch to be merged into ``main`` and request code review.
 
-16. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/latest>`_ - this should say "passing" in green.
+16. Once the build for the PR passes and the reviewers approve, merge the release branch into ``main``.
 
-17. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
+17. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-18. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
+18. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/latest>`_ - this should say "passing" in green.
 
-19. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
+19. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
 
-20. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+20. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
 
-21. Send an email around at ETS announcing the release and the changes.
+21. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
-22. Create a `Dash <https://kapeli.com/dash>`_ docset from the documentation by following the instructions :ref:`here <dash_docset>`.
+22. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
+
+23. Send an email around at ETS announcing the release and the changes.
+
+24. Create a `Dash <https://kapeli.com/dash>`_ docset from the documentation by following the instructions :ref:`here <dash_docset>`.
 
