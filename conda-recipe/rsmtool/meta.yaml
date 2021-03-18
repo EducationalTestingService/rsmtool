@@ -9,7 +9,6 @@ source:
 
 build:
   number: 0
-  noarch: python
   script:
     - cd $SRC_DIR
     - "{{ PYTHON }} -m pip install . --no-deps -vv"
@@ -22,19 +21,35 @@ build:
     - render_notebook = rsmtool.reporter:main
     - convert_feature_json = rsmtool.convert_feature_json:main
 
-{% block requirements -%}
 requirements:
   build:
-    - python >=3.6
-    {% for req in data.get('install_requires', []) -%}
-    - {{req.replace(">", " >").replace("<", " <").replace("==", " ")}}
-    {% endfor %}
+    - python
+    - jupyter
+    - ipython
+    - notebook
+    - numpy {{ numpy }}
+    - pandas
+    - seaborn
+    - skll==2.5.0
+    - statsmodels
+    - openpyxl
+    - xlrd
+    - xlwt
+
   run:
-    - python >=3.6
-    {% for req in data.get('install_requires', []) -%}
-    - {{req.replace(">", " >").replace("<", " <").replace("==", " ")}}
-    {% endfor %}
-{%- endblock %}
+    - python
+    - jupyter
+    - ipython
+    - nose
+    - notebook
+    - numpy
+    - pandas
+    - seaborn
+    - skll==2.5.0
+    - statsmodels
+    - openpyxl
+    - xlrd
+    - xlwt
 
 test:
   # Python imports

@@ -4,6 +4,8 @@
 :author: Nitin Madnani (nmadnani@ets.org)
 
 :organization: ETS
+
+isort:skip_file
 """
 
 # do we have rsmextra installed? we try to import rsmextra here

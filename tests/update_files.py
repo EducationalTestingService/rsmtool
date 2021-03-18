@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-
 """
-This script is designed to update the expected test outputs and the test inputs for
-rsmsummarize and rsmcompare tests.
-It assumes that you have already run nosetests and ran the entire test suite.
-By doing so, the output has been generated under the given outputs directory.
-and that is what will be used to generate the new expected output under `tests/data/experiments`.
+Update the expected test outputs and inputs for rsmsummarize and rsmcompare tests.
+
+This script assumes that you have already run nosetests and ran the entire
+test suite. By doing so, the output has been generated under the given outputs
+directory. And that is what will be used to generate the new expected output
+under `tests/data/experiments`.
 
 #############################################################################################
 # IMPORTANT: DO NOT RUN THIS SCRIPT BEFORE RUNNING THE TEST SUITE OR IT WILL BE DISASTROUS. #
@@ -13,14 +13,22 @@ and that is what will be used to generate the new expected output under `tests/d
 
 The scripts works as as follows. For each experiment test:
 - The script locates the output under the updated outputs directory.
-- New and changed files under are copied over to the expected test output location.
+- New and changed files in this directory are copied over to the expected test
+  output location.
 - Old files in the expected test output are deleted.
-- Files that are already in the expected test output and have not changed are left alone.
+- Files that are already in the expected test output and have not changed are
+  left alone.
 - Directories that are missing or empty under the updated test outputs are shown.
-- For RSMSummarize and RSMCompare tests, the same logic is also applied to input data. It is assumed that the input experiments are copies of the experiments from existing tests.
+- For rsmsummarize and rsmcompare tests, the same logic is also applied to input
+  data. It is assumed that the input experiments are copies of the experiments
+  from existing tests.
 
-Note: If running this script results in changes to the inputs for rsmcompare or rsmsummarize tests, you will
-need to first re-run the tests for those two tools and then, potentially, run this script again to update their test outputs.
+Note: If running this script results in changes to the inputs for rsmcompare
+or rsmsummarize tests, you will need to first re-run the tests for those two
+tools and then, potentially, run this script again to update their test outputs.
+
+See `documentation <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_
+for a further explanation of this process.
 
 The script prints a log detailing the changes made for each experiment test.
 
@@ -34,13 +42,12 @@ The script prints a log detailing the changes made for each experiment test.
 import argparse
 import re
 import sys
-
 from pathlib import Path
 
 from rsmtool.test_utils import FileUpdater
 
 
-def main():
+def main():  # noqa: D103
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='update_test_files.py')
     parser.add_argument('--tests',

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-
 """
-Utility script for comparing .json files.
+Compare configuration JSON files.
+
 The script takes the reference directory and the test output directory,
 identifies all .jsons in the reference directory, finds matching
 jsons in the test output directory and compare the content of the two files.
@@ -12,16 +12,13 @@ jsons in the test output directory and compare the content of the two files.
 :organization: ETS
 """
 
-
 import argparse
 import fnmatch
 import re
-
-from os import getcwd, walk, linesep
+from os import getcwd, linesep, walk
 from os.path import abspath, join
 
-from rsmtool.input import (check_main_config,
-                           parse_json_with_comments)
+from rsmtool.input import check_main_config, parse_json_with_comments
 
 PATH_FIELDS = ['train_file',
                'test_file',
@@ -43,9 +40,7 @@ LIST_FIELDS = ['feature_prefix',
 
 
 def find_jsons(json_dir):
-    '''
-    find all jsons files in the directory
-    '''
+    """Find all JSON files in given directory."""
     dir_content = walk(json_dir)
     json_file_dict = {}
     for dirpath, ___, filenames in dir_content:
@@ -66,8 +61,25 @@ def find_jsons(json_dir):
 
 
 def get_dict_differences(ref_json, test_json, ref_file, test_file):
-    ''' identify the differences between the dictionaries
-    '''
+    """
+    Identify differences between the two JSON dictionaries.
+
+    Parameters
+    ----------
+    ref_json : dict
+        Refernce JSON configuration dictionary.
+    test_json : dict
+        Test JSON configuration dictionary.
+    ref_file : str
+        Name of reference configuration file.
+    test_file : str
+        Name of test configuration file.
+
+    Returns
+    -------
+    result : list of str
+        List containing comparison results.
+    """
     result = ["REF: {}, TEST: {}".format(ref_file, test_file)]
     for key in ref_json:
         if key not in test_json:
@@ -90,9 +102,7 @@ def get_dict_differences(ref_json, test_json, ref_file, test_file):
 
 
 def compare_jsons(ref_dir, test_dir):
-    '''
-    compare the jsons in the two directories
-    '''
+    """Compare the configuration JSONs in the two given directories."""
     ref_json_dict = find_jsons(ref_dir)
     test_json_dict = find_jsons(test_dir)
     result_dict = {}
@@ -142,6 +152,7 @@ def compare_jsons(ref_dir, test_dir):
 
 
 def print_result(result_dict):
+    """Print overall comparison results."""
     matched = sorted([json for (json, result) in result_dict.items() if result == 'OK'])
     missing = sorted([json for (json, result) in result_dict.items() if result == 'missing'])
     discrepant = [json for json in result_dict
@@ -161,7 +172,7 @@ def print_result(result_dict):
     print("Total discrepant: {}".format(len(discrepant)))
 
 
-def main():
+def main():  # noqa: D103
     # set up an argument parser
     parser = argparse.ArgumentParser(prog='compare_config_jsons.py')
     parser.add_argument(dest='ref_dir',
@@ -177,5 +188,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

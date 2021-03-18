@@ -23,7 +23,7 @@ import glob
 from os import getcwd, remove
 from os.path import dirname, join
 
-from skll import Learner
+from skll.learner import Learner
 
 TEST_DIR = getcwd()
 
@@ -48,7 +48,7 @@ def update_model(model_file):
     model.save(model_file)
 
 
-def main():
+def main():  # noqa: D103
     model_files = glob.glob(join(TEST_DIR, 'data', 'experiments',
                                  '*predict*', 'existing_experiment',
                                  'output', "*.model"))

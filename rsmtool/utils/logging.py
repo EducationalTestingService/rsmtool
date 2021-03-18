@@ -15,10 +15,9 @@ class LogFormatter(logging.Formatter):
     """
     Custom logging formatter.
 
-    Adapted from:
-        http://stackoverflow.com/questions/1343227/
-        can-pythons-logging-format-be-modified-depending-
-        on-the-message-log-level
+    Note
+    ----
+    This class is adapted from https://stackoverflow.com/q/1343227.
     """
 
     info_fmt = "%(msg)s"
@@ -27,20 +26,18 @@ class LogFormatter(logging.Formatter):
     err_fmt = "ERROR: %(msg)s"
     dbg_fmt = "DEBUG: %(module)s: %(lineno)d: %(msg)s"
 
-    def __init__(self, fmt="%(levelno)s: %(msg)s"):
-
+    def __init__(self, fmt="%(levelno)s: %(msg)s"):  # noqa: D107
         logging.Formatter.__init__(self, fmt)
 
     def format(self, record):
         """
-        format the logger
+        Format the given record.
 
         Parameters
         ----------
-        record
-            The record to format
+        record : logging.LogRecord
+            The record to format.
         """
-
         # Save the original format configured by the user
         # when the logger formatter was instantiated
         format_orig = self._fmt

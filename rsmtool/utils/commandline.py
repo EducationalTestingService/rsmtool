@@ -1,5 +1,5 @@
 """
-Utility functions used in RSMTool command-line tools.
+Utility functions for RSMTool command-line tools.
 
 :author: Nitin Madnani (nmadnani@ets.org)
 :author: Jeremy Biggs (jbiggs@ets.org)
@@ -13,24 +13,18 @@ import logging
 import os
 import re
 import sys
-
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from itertools import chain, product
 from pathlib import Path
 
-from prompt_toolkit.completion import (FuzzyWordCompleter,
-                                       PathCompleter,
-                                       WordCompleter)
+from prompt_toolkit.completion import FuzzyWordCompleter, PathCompleter, WordCompleter
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit.shortcuts import (clear,
-                                      print_formatted_text,
-                                      prompt,
-                                      CompleteStyle)
+from prompt_toolkit.shortcuts import CompleteStyle, clear, print_formatted_text, prompt
 from prompt_toolkit.validation import Validator
-
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
+
 from .constants import (CHECK_FIELDS,
                         CONFIGURATION_DOCUMENTATION_SLUGS,
                         DEFAULTS,
@@ -56,7 +50,7 @@ def setup_rsmcmd_parser(name,
                         extra_run_options=[],
                         uses_subgroups=False):
     """
-    A helper function to create argument parsers for RSM command-line utilities.
+    Create argument parsers for RSM command-line utilities.
 
     Since the various RSM command-line utilities (``rsmtool``, ``rsmeval``,
     ``rsmcompare``, etc.) have very similar argument parsers, refactoring that
@@ -88,19 +82,23 @@ def setup_rsmcmd_parser(name,
         Add the ``output_dir`` positional argument to the "run" subcommand
         parser. This argument means that the respective tool uses an output
         directory to store its various outputs.
+        Defaults to ``True``.
     allows_overwriting : bool, optional
         Add the ``-f``/``-force_write`` optional argument to the "run" subcommand
         parser. This argument allows the output for the respective
         tool to be overwritten even if it already exists (file) or contains
         output (directory).
+        Defaults to ``False``.
     extra_run_options : list, optional
         Any additional options to be added to the "run" subcommand parser,
         each specified as a ``CmdOption`` instance.
+        Defaults to ``[]``.
     uses_subgroups : bool, optional
         Add the ``--subgroups`` optional argument to the "generate" subcommand
         parser. This argument means that the tool for which we are automatically
         generating a configuration file includes additional information when
         subgroup information is available.
+        Defaults to ``False``.
 
     Returns
     -------
@@ -118,7 +116,6 @@ def setup_rsmcmd_parser(name,
     ----
     This function is only meant to be used by RSMTool developers.
     """
-
     # a special callable to test whether configuration files exist
     # or not; this is nested because it is only used within this function
     # and should never be used externally
@@ -299,8 +296,10 @@ class InteractiveField:
 
     def __init__(self, field_name, field_type, field_metadata):
         """
-        Create a new InteractiveField instance for the given field name
-        and with the given field type (required/optional).
+        Create a new InteractiveField instance.
+
+        Create a new instance for the given field name and with the given
+        field type ("required" or "optional").
 
         Parameters
         ----------
@@ -316,7 +315,8 @@ class InteractiveField:
             the "label" key and can have the following optional
             keys: "choices", "count", and "type". For descriptions of what
             these keys mean, see the docstring for the ``InteractiveField``
-            class. Examples of such dictionaries can be found in ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
+            class. Examples of such dictionaries can be found in
+            ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
 
         Raises
         ------
@@ -368,8 +368,10 @@ class InteractiveField:
 
     def _make_boolean_validator(self, allow_empty=False):
         """
-        Private method that creates a validator for a field
-        with ``data_type`` of "boolean".
+        Create a validator for boolean fields.
+
+        This private method creates a validator for a field with
+        ``data_type`` of "boolean".
 
         Parameters
         ----------
@@ -395,7 +397,9 @@ class InteractiveField:
 
     def _make_choice_validator(self, choices):
         """
-        Private method that creates a validator for a field
+        Create a validator for choice fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "choice".
 
         Parameters
@@ -415,7 +419,9 @@ class InteractiveField:
 
     def _make_directory_completer(self):
         """
-        Private method that creates a completer for a field
+        Create a completer for directory fields.
+
+        This private method creates a completer for a field
         with ``data_type`` of "dir".
 
         Returns
@@ -428,7 +434,9 @@ class InteractiveField:
 
     def _make_directory_validator(self):
         """
-        Private method that creates a validator for a field
+        Create a validator for directory fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "dir".
 
         Returns
@@ -443,7 +451,9 @@ class InteractiveField:
 
     def _make_file_completer(self):
         """
-        Private method that creates a completer for a field
+        Create a completer for file fields.
+
+        This private method creates a completer for a field
         with ``data_type`` of "file".
 
         Returns
@@ -453,7 +463,7 @@ class InteractiveField:
             and files with valid input file extensions as potential
             completions for user input. Valid input file
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
-            "xlsx", and "xlsx". We need directory names so that
+            and "xlsx". We need directory names so that
             users can look into sub-directories etc.
         """
         def valid_file(filename):
@@ -462,13 +472,14 @@ class InteractiveField:
                                                                   'jsonlines',
                                                                   'sas7bdat',
                                                                   'tsv',
-                                                                  'xls',
                                                                   'xlsx'])
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
     def _make_file_validator(self):
         """
-        Private method that creates a validator for a field
+        Create a validator for file fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "file".
 
         Returns
@@ -478,7 +489,7 @@ class InteractiveField:
             actually existing files with valid input file extensions
             are chosen as the final user input. Valid input file
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
-            "xlsx", and "xlsx".
+            and "xlsx".
         """
         def is_valid(filepath):
             return (Path(filepath).is_file() and
@@ -486,14 +497,15 @@ class InteractiveField:
                                                                   'jsonlines',
                                                                   'sas7bdat',
                                                                   'tsv',
-                                                                  'xls',
                                                                   'xlsx'])
         validator = Validator.from_callable(is_valid, error_message="invalid file")
         return validator
 
     def _make_file_format_validator(self):
         """
-        Private method that creates a validator for a field
+        Create a validator for file format fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "format".
 
         Returns
@@ -510,7 +522,9 @@ class InteractiveField:
 
     def _make_id_validator(self):
         """
-        Private method that creates a validator for a field
+        Create a validator for id fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "id".
 
         Returns
@@ -527,7 +541,9 @@ class InteractiveField:
 
     def _make_integer_validator(self, allow_empty=False):
         """
-        Private method that creates a validator for a field
+        Create a validator for integer fields.
+
+        This private method creates a validator for a field
         with ``data_type`` of "integers".
 
         Parameters
@@ -554,7 +570,9 @@ class InteractiveField:
 
     def _get_user_input(self):
         """
-        Private method to display the appropriate prompt label
+        Display appropriate label and collect user input.
+
+        This private method displays the appropriate prompt label
         for the field using the appropriate display function
         and collect the user input.
 
@@ -565,7 +583,6 @@ class InteractiveField:
             or a list of strings for fields that accept multiple
             inputs, e.g., subgroups.
         """
-
         # if we are dealing with a field that accepts multiple inputs
         if self.count == 'multiple':
 
@@ -609,18 +626,20 @@ class InteractiveField:
 
     def _finalize(self, user_input):
         """
-        Private method that takes the provided user input
+        Convert given input to appropriate type.
+
+        This private method takes the provided user input
         and converts it to the appropriate type.
 
         Parameters
         ----------
-        user_input : TYPE
+        user_input : list or str
             Description
 
         Returns
         -------
-        TYPE
-            Description
+        final value
+            The converted value.
         """
         if (user_input == '' or user_input == []) and self.field_type == 'optional':
             final_value = DEFAULTS.get(self.field_name)
@@ -638,8 +657,9 @@ class InteractiveField:
 
     def get_value(self):
         """
-        The main public method for this class to get the value
-        of an instantiated interactive field.
+        Get value of instantiated interactive field.
+
+        This is the main public method for this class.
 
         Returns
         -------
@@ -664,8 +684,7 @@ class InteractiveField:
 
 class ConfigurationGenerator:
     """
-    Class that encapsulates automated batch-mode and interactive
-    generation of various tool configurations.
+    Class to encapsulate automated batch-mode and interactive generation.
 
     Attributes
     ----------
@@ -691,7 +710,7 @@ class ConfigurationGenerator:
                  context,
                  as_string=False,
                  suppress_warnings=False,
-                 use_subgroups=False):
+                 use_subgroups=False):  # noqa
         self.context = context
         self.use_subgroups = use_subgroups
         self.suppress_warnings = suppress_warnings

@@ -9,15 +9,13 @@ Class for transforming features.
 """
 
 import logging
-import numpy as np
 
+import numpy as np
 from scipy.stats.stats import pearsonr
 
 
 class FeatureTransformer:
-    """
-    Encapsulate feature transformation methods.
-    """
+    """Encapsulate feature transformation methods."""
 
     @classmethod
     def apply_sqrt_transform(cls,
@@ -25,33 +23,31 @@ class FeatureTransformer:
                              values,
                              raise_error=True):
         """
-        Apply the `sqrt` transform to `values`.
+        Apply the "sqrt" transform to ``values``.
 
         Parameters
         ----------
         name : str
             Name of the feature to transform.
-        values : numpy array
+        values : np.array
             Numpy array containing the feature values.
         raise_error : bool, optional
-            When set to true, raises an error if the transform is applied to
-            a feature that can have negative values.
+            If ``True``, raises an error if the transform is applied to
+            a feature that has negative values.
+            Defaults to ``True``.
 
         Returns
         -------
-        new_data : numpy array
-            Numpy array containing the transformed feature
-            values.
+        new_data : np.array
+            Numpy array containing the transformed feature values.
 
         Raises
         ------
         ValueError
-            If the transform is applied to a feature
-            that has negative values and `raise_error` is set to true.
+            If the transform is applied to a feature that has negative
+            values and ``raise_error`` is ``True``.
         """
-
         # check if the feature has any negative values
-
         if np.any(values < 0):
             if raise_error:
                 raise ValueError("The sqrt transformation should not be "
@@ -74,17 +70,18 @@ class FeatureTransformer:
                             values,
                             raise_error=True):
         """
-        Apply the `log` transform to `values`.
+        Apply the "log" transform to ``values``.
 
         Parameters
         ----------
         name : str
             Name of the feature to transform.
-        values : numpy array
+        values : np.array
             Numpy array containing the feature values.
         raise_error : bool, optional
-            When set to true, raises an error if the transform is applied to
+            If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
+            Defaults to ``True``.
 
         Returns
         -------
@@ -95,10 +92,9 @@ class FeatureTransformer:
         Raises
         ------
         ValueError
-            If the transform is applied to a feature that
-            can be zero or negative and `raise_error` is set to true.
+            If the transform is applied to a feature that has
+            zero or negative values and ``raise_error`` is ``True``.
         """
-
         # check if the feature has any zeros
         if np.any(values == 0):
             if raise_error:
@@ -135,35 +131,37 @@ class FeatureTransformer:
                                 raise_error=True,
                                 sd_multiplier=4):
         """
-        Apply the inverse transform to `values`.
+        Apply the "inv" (inverse) transform to ``values``.
 
         Parameters
         ----------
         name : str
             Name of the feature to transform.
-        values : numpy array
+        values : np.array
             Numpy array containing the feature values.
         raise_error : bool, optional
-            When set to true, raises an error if the transform is applied to
-            a feature that can be zero or to a feature that can have
-            different signs.
+            If ``True``, raises an error if the transform is applied to
+            a feature that has zero values or to a feature that has
+           both positive and negative values.
+            Defaults to ``True``.
         sd_multiplier : int, optional
             Use this std. dev. multiplier to compute the ceiling
             and floor for outlier removal and check that these
             are not equal to zero.
+            Defaults to 4.
 
         Returns
         -------
-        new_data: numpy array
+        new_data : np.array
             Numpy array containing the transformed feature
             values.
 
         Raises
         ------
         ValueError
-            If the transform is applied to a feature that can
-            be zero or to a feature that can have different
-            signs and `raise_error` is set to 'True'
+            If the transform is applied to a feature that is
+            zero or to a feature that can have different
+            signs, and ``raise_error`` is ``True``.
         """
         if np.any(values == 0):
             if raise_error:
@@ -211,7 +209,7 @@ class FeatureTransformer:
                                         values,
                                         raise_error=True):
         """
-        Apply the add one and invert transform to `values`.
+        Apply the "addOneInv" (add one and invert) transform to ``values``.
 
         Parameters
         ----------
@@ -220,22 +218,21 @@ class FeatureTransformer:
         values : np.array
             Numpy array containing the feature values.
         raise_error : bool, optional
-            When set to true, raises an error if the transform is applied to
+            If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
+            Defaults to ``True``.
 
         Returns
         -------
         new_data : np.array
-            Numpy array containing the transformed feature
-            values.
+            Numpy array containing the transformed feature values.
 
         Raises
         ------
         ValueError
-            If the transform is applied to a feature
-            that can be negative and `raise_error` is set to True.
+            If the transform is applied to a feature that
+            has negative values and ``raise_error`` is ``True``.
         """
-
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
@@ -258,31 +255,30 @@ class FeatureTransformer:
                                     values,
                                     raise_error=True):
         """
-        Apply the add one and log transform to `values`.
+        Apply the "addOneLn" (add one and log) transform to ``values``.
 
         Parameters
         ----------
         name : str
             Name of the feature to transform.
-        values : numpy array
+        values : np.array
             Numpy array containing the feature values.
         raise_error : bool, optional
-            When set to true, raises an error if the transform is applied to
+            If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
+            Defaults to ``True``.
 
         Returns
         -------
-        new_data : numpy array
-            Numpy array that contains the transformed feature
-            values.
+        new_data : np.array
+            Numpy array that contains the transformed feature values.
 
         Raises
         ------
         ValueError
             If the transform is applied to a feature that
-            can be negative.
+            has negative values and ``raise_error`` is ``True``.
         """
-
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
@@ -307,9 +303,9 @@ class FeatureTransformer:
                           transform,
                           raise_error=True):
         """
-        Applies the given transform to all of the values in the given
-        numpy array. The values are assumed to be for the feature with
-        the given name.
+        Apply given transform to all values in the given numpy array.
+
+        The values are assumed to be for the feature with the given name.
 
         Parameters
         ----------
@@ -318,22 +314,17 @@ class FeatureTransformer:
         column_name : str
             Name of the feature to transform.
         transform : str
-            Name of the transform to apply.
-            Valid options include ::
-
-                {'inv', 'sqrt', 'log',
-                 'addOneInv', 'addOneLn',
-                 'raw', 'org'}
-
+            Name of the transform to apply. One of {"inv", "sqrt", "log",
+            "addOneInv", "addOneLn", "raw", "org"}.
         raise_error : bool, optional
-            Raise a ValueError if a transformation leads to `Inf` values or may
-            change the ranking of the responses
+            If ``True``, raise a ValueError if a transformation leads to
+            invalid values or may change the ranking of the responses.
+            Defaults to ``True``.
 
         Returns
         -------
         new_data : np.array
-            Numpy array containing the transformed feature
-            values.
+            Numpy array containing the transformed feature values.
 
         Raises
         ------
@@ -346,7 +337,6 @@ class FeatureTransformer:
         span both negative and positive values. Some transformations may
         throw errors for negative feature values.
         """
-
         transforms = {'inv': FeatureTransformer.apply_inverse_transform,
                       'sqrt': FeatureTransformer.apply_sqrt_transform,
                       'log': FeatureTransformer.apply_log_transform,
@@ -370,8 +360,10 @@ class FeatureTransformer:
                                feature_value,
                                scores):
         """
-        Identify the best transformation based on the
-        highest absolute Pearson correlation with human score.
+        Identify best transformation for feature given correlation with score.
+
+        The best transformation is chosen based on the absolute Pearson
+        correlation with human score.
 
         Parameters
         ----------
@@ -390,7 +382,6 @@ class FeatureTransformer:
             :ref:`documentation <select_transformations_rsmtool>` for the
             full list of transformations.
         """
-
         # Do not use sqrt and ln for potential negative features.
         # Do not use inv for positive features.
         if any(feature_value < 0):

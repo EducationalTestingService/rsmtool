@@ -16,15 +16,16 @@ import pandas as pd
 
 def compute_expected_scores_from_model(model, featureset, min_score, max_score):
     """
-    Compute expected scores using probability distributions over the labels
-    from the given SKLL model.
+    Compute expected scores using probability distributions over labels.
+
+    This function only works with SKLL models.
 
     Parameters
     ----------
-    model : skll.Learner
-        The SKLL Learner object to use for computing the expected scores.
+    model : skll.learner.Learner
+        The SKLL learner object to use for computing the expected scores.
     featureset : skll.data.FeatureSet
-        The SKLL FeatureSet object for which predictions are to be made.
+        The SKLL featureset object for which predictions are to be made.
     min_score : int
         Minimum score level to be used for computing expected scores.
     max_score : int
@@ -38,8 +39,9 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
     Raises
     ------
     ValueError
-        If the given model cannot predict probability distributions and
-        or if the score range specified by `min_score` and `max_score`
+        If the given model cannot predict probability distributions.
+    ValueError
+        If the score range specified by ``min_score`` and ``max_score``
         does not match what the model predicts in its probability
         distribution.
     """
@@ -47,7 +49,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         # Tell the model we want probabiltiies as output. This is likely already set
         # to True but it might not be, e.g., when using rsmpredict.
         model.probability = True
-        probability_distributions = model.predict(featureset)
+        probability_distributions = model.predict(featureset, class_labels=False)
         # check to make sure that the number of labels in the probability
         # distributions matches the number of score points we have
         num_score_points_specified = max_score - min_score + 1
@@ -71,16 +73,16 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
 
 def covariance_to_correlation(m):
     """
-    This is a port of the R `cov2cor` function.
+    Implement the R ``cov2cor`` function in Python.
 
     Parameters
     ----------
-    m : numpy array
+    m : np.array
         The covariance matrix.
 
     Returns
     -------
-    retval : numpy array
+    retval : np.array
         The cross-correlation matrix.
 
     Raises
@@ -88,7 +90,6 @@ def covariance_to_correlation(m):
     ValueError
         If the input matrix is not square.
     """
-
     # make sure the matrix is square
     numrows, numcols = m.shape
     if not numrows == numcols:
@@ -102,10 +103,10 @@ def covariance_to_correlation(m):
 
 def partial_correlations(df):
     """
-    This is a python port of the `pcor` function implemented in
-    the `ppcor` R package, which computes partial correlations
-    of each pair of variables in the given data frame `df`,
-    excluding all other variables.
+    Implement the R ``pcor`` function from ``ppcor`` package in Python.
+
+    This computes partial correlations of each pair of variables
+    in the given data frame ``df``, excluding all other variables.
 
     Parameters
     ----------
@@ -116,7 +117,7 @@ def partial_correlations(df):
     -------
     df_pcor : pd.DataFrame
         Data frame containing the partial correlations of of each
-        pair of variables in the given data frame `df`,
+        pair of variables in the given data frame ``df``,
         excluding all other variables.
     """
     numrows, numcols = df.shape
@@ -160,9 +161,7 @@ def partial_correlations(df):
 
 def agreement(score1, score2, tolerance=0):
     """
-    This function computes the agreement between
-    two raters, taking into account the provided
-    tolerance.
+    Compute the agreement between two raters, under given tolerance.
 
     Parameters
     ----------
@@ -179,7 +178,6 @@ def agreement(score1, score2, tolerance=0):
     agreement_value : float
         The percentage agreement between the two scores.
     """
-
     # make sure the two sets of scores
     # are for the same number of items
     assert len(score1) == len(score2)
@@ -198,8 +196,8 @@ def standardized_mean_difference(y_true_observed,
                                  method='unpooled',
                                  ddof=1):
     """
-    This function computes the standardized mean
-    difference between a system score and human score.
+    Compute the standardized mean difference between system and human scores.
+
     The numerator is calculated as mean(y_pred) - mean(y_true_observed)
     for all of the available methods.
 
@@ -209,30 +207,36 @@ def standardized_mean_difference(y_true_observed,
         The observed scores for the group or subgroup.
     y_pred : array-like
         The predicted score for the group or subgroup.
-    population_y_true_observed_sd : float or None, optional
+    population_y_true_observed_sd : float, optional
         The population true score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-        Defaults to None.
-    population_y_pred_sd : float or None, optional
+        Defaults to ``None``.
+    population_y_pred_sd : float, optional
         The predicted score standard deviation.
         When the SMD is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-        Defaults to None.
-    method : {'williamson', 'johnson', 'pooled', 'unpooled'}, optional
-        The SMD method to use.
-        - `williamson`: Denominator is the pooled population standard deviation of `y_true_observed` and `y_pred`.
-        - `johnson`: Denominator is the population standard deviation of `y_true_observed`.
-        - `pooled`: Denominator is the pooled standard deviation of `y_true_observed` and `y_pred for this group.
-        - `unpooled`: Denominator is the standard deviation of `y_true_observed` for this group.
+        Defaults to ``None``.
+    method : str, optional
+        The SMD method to use. Possible options are:
 
-        Defaults to 'unpooled'.
+        - "williamson": Denominator is the pooled population standard deviation
+          of ``y_true_observed`` and ``y_pred`` computed using
+          ``population_y_true_observed_sd`` and ``population_y_pred_sd``.
+        - "johnson": Denominator is ``population_y_true_observed_sd``.
+        - "pooled": Denominator is the pooled standard deviation of
+          ``y_true_observed`` and ``y_pred`` for this group.
+        - "unpooled": Denominator is the standard deviation of
+          ``y_true_observed`` for this group.
+
+        Defaults to "unpooled".
+
     ddof : int, optional
-        Means Delta Degrees of Freedom. The divisor used in
+        The delta degrees of freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements. By default ddof is zero.
+        number of elements.
         Defaults to 1.
 
     Returns
@@ -243,16 +247,19 @@ def standardized_mean_difference(y_true_observed,
     Raises
     ------
     ValueError
-        If method='williamson' and either population_y_true_observed_sd or
-        population_y_pred_sd is None.
+        If method is "williamson" and either ``population_y_true_observed_sd``
+        or ``population_y_pred_sd`` is ``None``.
     ValueError
-        If method is not in {'unpooled', 'pooled', 'williamson', 'johnson'}.
+        If method is "johnson" and ``population_y_true_observed_sd`` is ``None``.
+    ValueError
+        If method is not one of {"unpooled", "pooled", "williamson", "johnson"}.
 
-    Notes
-    -----
-    The 'williamson' implementation was recommended by Williamson, et al. (2012).
-    The metric is only applicable when both sets of scores are on the same
-    scale.
+    Note
+    ----
+    - The "williamson" implementation was recommended by Williamson,
+      et al. (2012).
+    - The metric is only applicable when both sets of scores are on
+      the same scale.
     """
     numerator = np.mean(y_pred) - np.mean(y_true_observed)
 
@@ -291,10 +298,11 @@ def difference_of_standardized_means(y_true_observed,
                                      population_y_pred_sd=None,
                                      ddof=1):
     """
-    Calculate the difference of standardized means. This is done by standardizing
-    both observed and predicted scores to z-scores using mean and standard deviation
-    for the whole population and then calculating differences between standardized
-    means for each subgroup.
+    Calculate the difference between standardized means.
+
+    First, standardize both observed and predicted scores to z-scores using
+    mean and standard deviation for the whole population. Then
+    calculate differences between standardized means for each subgroup.
 
     Parameters
     ----------
@@ -303,34 +311,34 @@ def difference_of_standardized_means(y_true_observed,
     y_pred : array-like
         The predicted score for the group or subgroup.
         The predicted scores.
-    population_y_true_observed_mn : float or None, optional
+    population_y_true_observed_mn : float, optional
         The population true score mean.
         When the DSM is being calculated for a subgroup,
         this should be the mean for the whole
         population.
-        Defaults to None.
-    population_y_pred_mn : float or None, optional
+        Defaults to ``None``.
+    population_y_pred_mn : float, optional
         The predicted score mean.
         When the DSM is being calculated for a subgroup,
         this should be the mean for the whole
         population.
-        Defaults to None.
-    population_y_true_observed_sd : float or None, optional
+        Defaults to ``None``.
+    population_y_true_observed_sd : float, optional
         The population true score standard deviation.
         When the DSM is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
-        Defaults to None.
-    population_y_pred_sd : float or None, optional
+        Defaults to ``None``.
+    population_y_pred_sd : float, optional
         The predicted score standard deviation.
         When the DSM is being calculated for a subgroup,
         this should be the standard deviation for the whole
         population.
         Defaults to None.
     ddof : int, optional
-        Means Delta Degrees of Freedom. The divisor used in
+        The delta degrees of freedom. The divisor used in
         calculations is N - ddof, where N represents the
-        number of elements. By default ddof is zero.
+        number of elements.
         Defaults to 1.
 
     Returns
@@ -341,11 +349,11 @@ def difference_of_standardized_means(y_true_observed,
     Raises
     ------
     ValueError
-        If only one of `population_y_true_observed_mn` and `population_y_true_observed_sd` is
-        not None.
+        If only one of ``population_y_true_observed_mn`` and
+        ``population_y_true_observed_sd`` is not ``None``.
     ValueError
-        If only one of `population_y_pred_mn` and `population_y_pred_sd` is
-        not None.
+        If only one of ``population_y_pred_mn`` and ``population_y_pred_sd``
+        is not ``None``.
     """
     assert len(y_true_observed) == len(y_pred)
 
@@ -392,13 +400,11 @@ def difference_of_standardized_means(y_true_observed,
     # values is a value very close to 0.
     # We use the same tolerance as used for identifying
     # features with zero standard deviation
-
-    if np.isclose(population_y_pred_sd, 0, atol=1e-07) \
-        or np.isclose(population_y_true_observed_sd, 0, atol=1e-07):
+    if (np.isclose(population_y_pred_sd, 0, atol=1e-07) or
+            np.isclose(population_y_true_observed_sd, 0, atol=1e-07)):
         warnings.warn("Population standard deviations for the computation of "
                       "DSM is zero. No value will be computed.")
         return None
-
 
     # calculate the z-scores for observed and predicted
     y_true_observed_subgroup_z = ((y_true_observed - population_y_true_observed_mn) /
@@ -412,16 +418,15 @@ def difference_of_standardized_means(y_true_observed,
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
+def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
     """
-    Calculate Quadratic-weighted Kappa that works
-    for both discrete and continuous values.
+    Calculate quadratic-weighted kappa for both discrete and continuous values.
 
-    The formula to compute quadratic-weighted kappa
-    for continuous values was developed at ETS by
-    Shelby Haberman. See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_. for the full
-    derivation. The discrete case is simply treated as
-    a special case of the continuous one.
+    The formula to compute quadratic-weighted kappa for continuous values
+    was developed at ETS by Shelby Haberman.
+    See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_
+    for the full derivation. The discrete case is simply treated as a
+    special case of the continuous one.
 
     The formula is as follows:
 
@@ -431,9 +436,8 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
         - :math:`H` - the human score
         - :math:`M` - the system score
         - :math:`\\bar{H}` - mean of :math:`H`
-        - :math:`\\bar{M}` - the mean of :math:`M`
+        - :math:`\\bar{M}` - mean of :math:`M`
         - :math:`Var(X)` - variance of X
-
 
     Parameters
     ----------
@@ -459,7 +463,6 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):
         If the number of elements in ``y_true_observed`` is not equal
         to the number of elements in ``y_pred``.
     """
-
     assert len(y_true_observed) == len(y_pred)
     y_true_observed_var, y_true_observed_avg = (np.var(y_true_observed, ddof=ddof),
                                                 np.mean(y_true_observed))

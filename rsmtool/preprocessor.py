@@ -10,13 +10,9 @@ Classes for preprocessing input data in various contexts.
 
 import logging
 import re
-import warnings
 
 import numpy as np
 import pandas as pd
-
-from collections import defaultdict
-
 from numpy.random import RandomState
 
 from .container import DataContainer
@@ -28,30 +24,27 @@ from .utils.models import is_built_in_model, is_skll_model
 
 
 class FeatureSubsetProcessor:
-    """
-    Encapsulate feature sub-setting methods.
-    """
+    """Class to encapsulate feature sub-setting methods."""
 
     @classmethod
     def select_by_subset(cls, feature_columns, feature_subset_specs, subset):
         """
-        Select feature columns using feature subset specs.
+        Select feature columns using feature subset specifications.
 
         Parameters
         ----------
-        feature_columns : list
+        feature_columns : list of str
             A list of feature columns
-        feature_subset_specs : pd.DataFrame
-            The feature subset spec DataFrame.
+        feature_subset_specs : pandas DataFrame
+            The feature subset specification data frame.
         subset : str
             The column to subset.
 
         Returns
         -------
-        feature_names : list
+        feature_names : list of str
             A list of feature names to include.
         """
-
         feature_subset = feature_subset_specs[feature_subset_specs[subset] == 1]['Feature']
         feature_names = [feature for feature in feature_columns
                          if feature in feature_subset.values]
@@ -77,31 +70,31 @@ class FeatureSubsetProcessor:
     @classmethod
     def check_feature_subset_file(cls, df, subset=None, sign=None):
         """
-        Check that the file is in the correct format and contains all
-        the requested values. Raises an exception if it finds any errors
-        but otherwise returns nothing.
+        Check that feature subset file is complete and in the correct format.
+
+        Raises an exception if it finds any errors but otherwise
+        returns nothing.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The feature subset file DataFrame.
+        df : pandas DataFrame
+            The data frame containing the feature subset file.
         subset : str, optional
             Name of a pre-defined feature subset.
-            Defaults to None.
+            Defaults to ``None``.
         sign : str, optional
-            Value of the sign
-            Defaults to None.
+            Value of the sign.
+            Defaults to ``None``.
 
         Raises
         ------
         ValueError
-            If any columns are missing from the subset file
-            or if any of the columns contain invalid values.
+            If any columns are missing from the subset file.
+        ValueError
+            If any of the columns contain invalid values.
         """
-
         # we want to allow title-cased names of columns for historical reasons
         # e.g., `Feature` instead of `feature` etc.
-
         df_feature_specs = df.copy()
 
         if ('feature' not in df_feature_specs and
@@ -139,20 +132,19 @@ class FeatureSubsetProcessor:
 
 
 class FeatureSpecsProcessor:
-    """
-    Encapsulate feature file processing methods.
-    """
+    """Encapsulate feature file processing methods."""
 
     @classmethod
     def generate_default_specs(cls, feature_names):
         """
-        Generate default feature "specifications" for the features
-        with the given names. The specifications are stored as a data frame with
-        three columns "feature", "transform", and "sign".
+        Generate default feature "specifications" for given feature names.
+
+        The specifications are stored as a data frame with three columns
+        "feature", "transform", and "sign".
 
         Parameters
         ----------
-        feature_names: list
+        feature_names: list of str
             List of feature names for which to generate specifications.
 
         Returns
@@ -164,10 +156,9 @@ class FeatureSpecsProcessor:
         Note
         ----
         Since these are default specifications, the values for the
-        `transform` column for each feature will be `"raw"` and the value
-        for the `sign` column will be `1`.
+        "transform" column for each feature will be "raw" and the
+        value for the "sign" column will be ``1``.
         """
-
         df_feature_specs = pd.DataFrame({'feature': feature_names})
         df_feature_specs['transform'] = 'raw'
         df_feature_specs['sign'] = 1.0
@@ -176,12 +167,12 @@ class FeatureSpecsProcessor:
     @classmethod
     def find_feature_sign(cls, feature, sign_dict):
         """
-        Get the sign from the feature.csv file
+        Get the feature sign from the feature CSV file.
 
         Parameters
         ----------
         feature : str
-            The name of the feature
+            The name of the feature.
         sign_dict : dict
             A dictionary of feature signs.
 
@@ -190,7 +181,6 @@ class FeatureSpecsProcessor:
         feature_sign_numeric : float
             The signed feature.
         """
-
         if feature not in sign_dict.keys():
             logging.warning("No information about sign is available "
                             "for feature {}. The feature will be assigned "
@@ -204,35 +194,38 @@ class FeatureSpecsProcessor:
     @classmethod
     def validate_feature_specs(cls, df, use_truncations=False):
         """
-        Check the supplied feature specs to make sure that there are no duplicate
-        feature names and that all columns are in the right format. Add the default values
-        for  `transform` and `sign` if none is supplied
+        Validate given feature specifications.
+
+        Check given feature specifications to make sure that there are no duplicate
+        feature names and that all columns are in the right format. Add the
+        default values for  "transform" and "sign" if none are given.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        df : pandas DataFrame
             The feature specification DataFrame to validate.
         use_truncations : bool, optional
             Whether to use truncation values. If this is
-            True and truncation values are not specified,
-            raise an error.
-            Defaults to False.
+            ``True`` and truncation values are not specified,
+            an exception is raised.
+            Defaults to ``False``.
 
         Returns
         ------
         df_specs_new : pandas DataFrame
-                A data frame with normalized values
+            The output data frame with normalized values.
 
         Raises
         ------
-        KeyError :
-            If the data frame does not have a ``feature`` column.
-        ValueError:
-            If there are duplicate values in the ``feature`` column
-            or if the ``sign`` column contains invalid values.
+        KeyError
+            If the input data frame does not have a "feature" column.
         ValueError
-            If ``use_truncations`` is set to True, and no
-            ``min`` and ``max`` columns exist in the data set.
+            If there are duplicate values in the "feature" column.
+        ValueError
+            if the "sign" column contains invalid values.
+        ValueError
+            If ``use_truncations`` is set to ``True``, and no
+            "min" and "max" columns exist in the data set.
         """
         df_specs_org = df
         df_specs_new = df_specs_org.copy()
@@ -292,30 +285,32 @@ class FeatureSpecsProcessor:
                        feature_subset=None,
                        feature_sign=None):
         """
-        Generate feature specifications using the features.csv
-        for sign and the correlation with score to identify
-        the best transformation.
+        Generate feature specifications using the feature CSV file.
+
+        Compute the specifications for "sign" and the correlation with score
+        to identify the best transformation.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame form which to generate specs.
-        feature_names : list
+        df : pandas DataFrame
+            The input data frame from which to generate the specifications.
+        feature_names : list of str
             A list of feature names.
         train_label : str
             The label column for the training data
-        feature_subset : pd.DataFrame, optional
-            A feature_subset_specs DataFrame
+        feature_subset : pandas DataFrame, optional
+            A data frame containing the feature subset specifications.
+            Defaults to ``None``.
         feature_sign : int, optional
             The sign of the feature.
+            Defaults to ``None``.
 
         Returns
         -------
-        df_feature_specs : pd.DataFrame
-            A feature specifications DataFrame
+        df_feature_specs : pandas DataFrame
+            The output data frame containing the feature specifications.
         """
-
-        # get feature sign info if available
+        # get feature sign information, if available
         if feature_sign:
             # Convert to dictionary {feature:sign}
             sign_dict = dict(zip(feature_subset.Feature,
@@ -346,9 +341,7 @@ class FeatureSpecsProcessor:
 
 
 class FeaturePreprocessor:
-    """
-    A class to pre-process training and testing features.
-    """
+    """Class to preprocess features in training and testing sets."""
 
     @staticmethod
     def check_model_name(model_name):
@@ -363,14 +356,13 @@ class FeaturePreprocessor:
         Returns
         -------
         model_type: str
-            One of `BUILTIN` or `SKLL`.
+            One of "BUILTIN" or "SKLL".
 
         Raises
         ------
         ValueError
             If the model is not supported.
         """
-
         if is_built_in_model(model_name):
             model_type = 'BUILTIN'
         elif is_skll_model(model_name):
@@ -388,9 +380,10 @@ class FeaturePreprocessor:
              trim_max,
              tolerance=0.4998):
         """
-        Trim the values contained in the given numpy array to
-        `trim_min` - `tolerance` as the floor and
-        `trim_max` + `tolerance` as the ceiling.
+        Trim values in given numpy array.
+
+        The trimming uses ``trim_min`` - ``tolerance`` as the floor and
+        ``trim_max`` + ``tolerance`` as the ceiling.
 
         Parameters
         ----------
@@ -404,7 +397,8 @@ class FeaturePreprocessor:
             trimming the raw regression predictions.
         tolerance : float, optional
             The tolerance that will be used to compute the
-            trim interval. Defaults to 0.4998.
+            trim interval.
+            Defaults to ``0.4998``.
 
         Returns
         -------
@@ -425,14 +419,17 @@ class FeaturePreprocessor:
     def remove_outliers(values,
                         mean=None,
                         sd=None,
-                        sd_multiplier=4):
+                        sd_multiplier=4):  # noqa: D301
         """
-        Clamp any values in the given numpy array that are
-        +/- `sd_multiplier` (:math:`m`) standard deviations (:math:`\\sigma`)
-        away from the mean (:math:`\\mu`). Use given `mean` and `sd` instead
-        of computing :math:`\\sigma` and :math:`\\mu`, if specified.
-        The values are clamped to the interval .. math::
+        Remove outliers from given array of values by clamping them.
 
+        Clamp any given values that are
+        ± ``sd_multiplier`` (:math:`m`) standard deviations (:math:`\\sigma`)
+        away from the mean (:math:`\\mu`). Use given ``mean`` and ``sd``
+        instead of computing :math:`\\sigma` and :math:`\\mu`, if specified.
+        The values are clamped to the interval:
+
+        .. math::
             [\\mu - m * \\sigma, \\mu + m * \\sigma]
 
         Parameters
@@ -442,12 +439,12 @@ class FeaturePreprocessor:
         mean : int or float, optional
             Use the given mean value when computing outliers
             instead of the mean from the data.
-            Defaults to None
+            Defaults to ``None``.
         sd : None, optional
             Use the given std. dev. value when computing
             outliers instead of the std. dev. from the
             data.
-            Defaults to None.
+            Defaults to ``None``.
         sd_multiplier : int, optional
             Use the given multipler for the std. dev. when
             computing the outliers. Defaults to 4.
@@ -458,9 +455,8 @@ class FeaturePreprocessor:
         new_values : np.array
             Numpy array with the outliers clamped.
         """
-
         # convert data to a numpy float array before doing any clamping
-        new_values = np.array(values, dtype=np.float)
+        new_values = np.array(values, dtype=np.float64)
 
         if not mean:
             mean = new_values.mean()
@@ -479,9 +475,10 @@ class FeaturePreprocessor:
                                           feature_name,
                                           truncations):
         """
-        Remove outliers using truncation groups,
-        rather than calculating the outliers based
-        on the training set.
+        Remove outliers using pre-specified truncation groups.
+
+        This is different from ``remove_outliers()`` which calculates the
+        outliers based on the training set.
 
         Parameters
         ----------
@@ -490,7 +487,7 @@ class FeaturePreprocessor:
         feature_name : str
             Name of the feature whose outliers are
             being clamped.
-        truncations : pd.DataFrame
+        truncations : pandas DataFrame
             A data frame with truncation values. The
             features should be set as the index.
 
@@ -499,9 +496,8 @@ class FeaturePreprocessor:
         new_values : numpy array
             Numpy array with the outliers clamped.
         """
-
         # convert data to a numpy float array before doing any clamping
-        new_values = np.array(values, dtype=np.float)
+        new_values = np.array(values, dtype=np.float64)
 
         minimum = truncations.loc[feature_name, 'min']
         maximum = truncations.loc[feature_name, 'max']
@@ -515,28 +511,27 @@ class FeaturePreprocessor:
                           N,
                           candidate_col='candidate'):
         """
-        Only select candidates which have responses to N or more items.
+        Select candidates which have responses to N or more items.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame from which to select candidates with N or more items.
+        df : pandas DataFrame
+            The data frame from which to select candidates with N or more items.
         N: int
-            minimal number of items per candidate
+            Minimal number of items per candidate
         candidate_col : str, optional
-            name of the column which contains candidate ids.
-            Defaults to 'candidate'.
+            Name of the column which contains candidate ids.
+            Defaults to "candidate".
 
         Returns
         -------
         df_included: pandas DataFrame
             Data frame with responses from candidates with responses to N
-            or more items
+            or more items.
         df_excluded: pandas DataFrame
             Data frame with responses from candidates with responses to
-            less than N items
+            less than N items.
         """
-
         items_per_candidate = df[candidate_col].value_counts()
 
         selected_candidates = items_per_candidate[items_per_candidate >= N]
@@ -555,18 +550,20 @@ class FeaturePreprocessor:
     @staticmethod
     def check_subgroups(df, subgroups):
         """
+        Validate subgroup names in the given data.
+
         Check that all subgroups, if specified, correspond to columns in the
         provided data frame, and replace all NaNs in subgroups values with
-        'No info' for later convenience. Raises an exception if any specified
-        subgroup columns are missing.
+        'No info' for later convenience.
+
+        Raises an exception if any specified subgroup columns are missing.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            DataFrame with subgroups to check.
+        df : pandas DataFrame
+            Input data frame with subgroups to check.
         subgroups : list of str
-            List of column names that contain grouping
-            information.
+            List of column names that contain grouping information.
 
         Returns
         -------
@@ -576,9 +573,8 @@ class FeaturePreprocessor:
         Raises
         ------
         KeyError
-            If the data does not contain columns for all subgroups
+            If the data does not contain columns for all specified subgroups.
         """
-
         missing_sub_cols = set(subgroups).difference(df.columns)
         if missing_sub_cols:
             raise KeyError("The data does not contain columns "
@@ -607,30 +603,36 @@ class FeaturePreprocessor:
                                system_score_column,
                                candidate_column):
         """
-        Standardize all column names and rename all columns with default
-        names to ##NAME##.
+        Standardize column names and rename columns with reserved column names.
+
+        RSMTool reserves some column names for internal use, e.g., "sc1",
+        "spkitemid" etc. If the given data already contains columns with
+        these names, then they must be renamed to prevent conflict. This
+        method renames such columns to "##NAME##", e.g., an existing column
+        named "sc1" will be renamed to "##sc1##".
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame whose columns to rename.
-        requested_feature_names : list
+        df : pandas DataFrame
+            The data frame containing the columns to rename.
+        requested_feature_names : list of str
             List of feature column names that we want
             to include in the scoring model.
         id_column : str
             Column name containing the response IDs.
-        first_human_score_column : str or None
+        first_human_score_column : str or ``None``.
             Column name containing the H1 scores.
-        second_human_score_column : str or None
+            Should be ``None`` if no H1 scores are available.
+        second_human_score_column : str or ``None``
             Column name containing the H2 scores.
-            Should be None if no H2 scores are available.
-        length_column : str or None
+            Should be ``None`` if no H2 scores are available.
+        length_column : str or ``None``
             Column name containing response lengths.
-            Should be None if lengths are not available.
+            Should be ``None`` if lengths are not available.
         system_score_column : str
             Column name containing the score predicted
-            by the system. This is only used for RSMEval.
-        candidate_column : str or None
+            by the system. This is only used for rsmeval.
+        candidate_column : str or ``None``
             Column name containing identifying information
             at the candidate level. Should be None if such
             information is not available.
@@ -641,7 +643,6 @@ class FeaturePreprocessor:
             Modified input data frame with all the approximate
             re-namings.
         """
-
         df = df.copy()
 
         columns = [id_column,
@@ -686,12 +687,10 @@ class FeaturePreprocessor:
             # if the column has already been renamed because it used a
             # default name, then use the updated name
             if column in columns_with_incorrect_default_names:
-                df.rename(columns={'##{}##'.format(column):
-                                   name_mapping[column]},
+                df.rename(columns={'##{}##'.format(column): name_mapping[column]},
                           inplace=True)
             else:
-                df.rename(columns={column:
-                                   name_mapping[column]},
+                df.rename(columns={column: name_mapping[column]},
                           inplace=True)
 
         return df
@@ -701,8 +700,10 @@ class FeaturePreprocessor:
                          column,
                          id_column,
                          exclude_zeros=False,
-                         exclude_zero_sd=False):
+                         exclude_zero_sd=False):  # noqa: D301
         """
+        Filter out rows containing non-numeric values.
+
         Filter out the rows in the given data frame that contain non-numeric
         (or zero, if specified) values in the specified column. Additionally,
         it may exclude any columns if they have a standard deviation
@@ -710,18 +711,20 @@ class FeaturePreprocessor:
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame to filter on.
+        df : pandas DataFrame
+            The data frame containing the data to be filtered.
         column : str
             Name of the column from which to filter out values.
         id_column : str
             Name of the column containing the unique response IDs.
         exclude_zeros : bool, optional
             Whether to exclude responses containing zeros
-            in the specified column. Defaults to `False`.
+            in the specified column.
+            Defaults to ``False``.
         exclude_zero_sd : bool, optional
             Whether to perform the additional filtering step of removing
-            columns that have :math:`\\sigma = 0`. Defaults to `False`.
+            columns that have :math:`\\sigma = 0`.
+            Defaults to ``False``.
 
         Returns
         -------
@@ -734,9 +737,8 @@ class FeaturePreprocessor:
         Note
         ----
         The columns with :math:`\\sigma=0` are removed from both output
-        data frames.
+        data frames, assuming ``exclude_zero_scores`` is ``True``.
         """
-
         # create a copy of the original data frame
         df_filter = df.copy()
 
@@ -817,12 +819,11 @@ class FeaturePreprocessor:
                             trim_max,
                             trim_tolerance=0.4998):
         """
-        Process predictions to create scaled, trimmed
-        and rounded predictions.
+        Process predictions to create scaled, trimmed and rounded predictions.
 
         Parameters
         ----------
-        df_test_predictions : pd.DataFrame
+        df_test_predictions : pandas DataFrame
             Data frame containing the test set predictions.
         train_predictions_mean : float
             The mean of the predictions on the training set.
@@ -847,11 +848,10 @@ class FeaturePreprocessor:
 
         Returns
         -------
-        df_pred_processed : pd.DataFrame
+        df_pred_processed : pandas DataFrame
             Data frame containing the various trimmed
             and rounded predictions.
         """
-
         # rescale the test set predictions by boosting
         # them to match the human mean and SD
         scaled_test_predictions = (df_test_predictions['raw'] -
@@ -884,18 +884,19 @@ class FeaturePreprocessor:
                                df,
                                flag_column_dict):
         """
+        Filter based on specific flag columns.
+
         Check that all flag_columns are present in the given
         data frame, convert these columns to strings and filter
         out the values which do not match the condition in
-        `flag_column_dict`.
+        ``flag_column_dict``.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        df : pandas DataFrame
             The DataFrame to filter on.
         flag_column_dict : dict
-            Dictionary containing the flag column
-            information.
+            Dictionary containing the flag column information.
 
         Returns
         -------
@@ -916,7 +917,6 @@ class FeaturePreprocessor:
             If no responses remain after filtering based
             on the flag column information.
         """
-
         df = df.copy()
 
         flag_columns = list(flag_column_dict.keys())
@@ -981,27 +981,26 @@ class FeaturePreprocessor:
                                feature_subset_specs,
                                feature_subset):
         """
-        Generate the feature names from the column
-        names of the given data frame and select the
-        specified subset of features.
+        Generate feature names from column names in data frame.
+
+        This method also selects the specified subset of features.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame from which to generate feature names.
-        reserved_column_names : list
+        df : pandas DataFrame
+            The data frame from which to generate feature names.
+        reserved_column_names : list of str
             Names of reserved columns.
-        feature_subset_specs : pd.DataFrame
-            Feature subset specs
+        feature_subset_specs : pandas DataFrame
+            Feature subset specifications.
         feature_subset : str
             Feature subset column.
 
         Returns
         -------
-        feautre_names : list
+        feature_names : list of str
             A list of features names.
         """
-
         df = df.copy()
 
         # Exclude the reserved names
@@ -1029,14 +1028,14 @@ class FeaturePreprocessor:
                            raise_error=True,
                            truncations=None):
         """
-        Remove outliers and transform the values in the given numpy array
-        using the given outlier and transformation parameters. The values
-        are assumed for the given feature name.
+        Remove outliers and transform the values in given numpy array.
+
+        Use the given outlier and transformation parameters.
 
         Parameters
         ----------
         values : np.array
-            The feature values to preprocess
+            The feature values to preprocess.
         feature_name : str
             Name of the feature being pre-processed.
         feature_transform : str
@@ -1048,40 +1047,35 @@ class FeaturePreprocessor:
             Std. dev. value to use for outlier detection instead
             of the std. dev. of the given feature values.
         exclude_zero_sd : bool, optional
-            Check `data` has a zero
-            std. dev.
-            Defaults to False.
+            Exclude the feature if it has zero standard deviation.
+            Defaults to ``False``.
         raise_error : bool, optional
-            Raise error if any of the transformations lead to inf values
+            Raise an error if any of the transformations lead to "inf" values
             or may change the ranking of feature values.
-            Defaults to True.
-        truncations : pd.DataFrame or None, optional
-            The truncations set, if we are using pre-defined
-            truncation values. Otherwise, None.
-            Defaults to None.
+            Defaults to ``True``.
+        truncations : pandas DataFrame, optional
+            A set of pre-defined truncation values.
+            Defaults to ``None``.
 
         Returns
         -------
-        transformed_feature : numpy array
+        transformed_feature : np.array
             Numpy array containing the transformed and clamped
             feature values.
 
         Raises
         ------
         ValueError
-            If the given values have zero standard deviation and
-            `exclude_zero_sd` is set to `True`.
+            If the preprocessed feature values have zero standard deviation
+            and ``exclude_zero_sd`` is set to ``True``.
         """
-
         if truncations is not None:
-
             # clamp outlier values using the truncations set
             features_no_outliers = self.remove_outliers_using_truncations(values,
                                                                           feature_name,
                                                                           truncations)
 
         else:
-
             # clamp any outlier values that are 4 standard deviations
             # away from the mean
             features_no_outliers = self.remove_outliers(values,
@@ -1116,10 +1110,12 @@ class FeaturePreprocessor:
                             standardize_features=True,
                             use_truncations=False):
         """
-        Pre-process those features in the given training and testing
-        data frame `df` whose specifications are contained in
-        `feature_specs`. Also return a third data frame containing the
-        feature specs themselves.
+        Preprocess features in given data using corresponding specifications.
+
+        Preprocess the feature values in the training and testing data
+        frames whose specifications are contained in ``df_feature_specs``.
+        Also returns a third data frame containing the feature specifications
+        and other information.
 
         Parameters
         ----------
@@ -1133,23 +1129,22 @@ class FeaturePreprocessor:
             Data frame containing the various specifications
             from the feature file.
         standardize_features : bool, optional
-            Whether to standardize the features
-            Defaults to True.
+            Whether to standardize the features.
+            Defaults to ``True``.
         use_truncations : bool, optional
             Whether we should use the truncation set
             for removing outliers.
-            Defaults to False.
+            Defaults to ``False``.
 
         Returns
         -------
-        df_train_preprocessed : pd.DataFrame
-            DataFrame with preprocessed training data
-        df_test_preprocessed : pd.DataFrame
-            DataFrame with preprocessed test data
-        df_feature_info : pd.DataFrame
-            DataFrame with feature information
+        df_train_preprocessed : pandas DataFrame
+            Data frame with preprocessed training data.
+        df_test_preprocessed : pandas DataFrame
+            Data frame with preprocessed test data.
+        df_feature_info : pandas DataFrame
+            Data frame with feature information.
         """
-
         # keep the original data frames and make copies
         # that only include features used in the model
         df_train_preprocessed = df_train.copy()
@@ -1257,25 +1252,28 @@ class FeaturePreprocessor:
                     min_candidate_items=None,
                     use_fake_labels=False):
         """
-        Filter the data to remove rows that have zero/non-numeric values
-        for `label_column`. If feature_names are specified, check whether any
-        features that are specifically requested in `feature_names`
-        are missing from the data. If no feature_names are specified,
-        these are generated based on column names and subset information,
-        if available. The function then excludes non-numeric values for
-        any feature. If the user requested to exclude candidates with less
-        than min_items_per_candidates, such candidates are excluded.
+        Filter rows with zero/non-numeric values for ``label_column``.
+
+        Check whether any features that are specifically requested in
+        ``requested_feature_names`` are missing from the data. If no
+        feature names are requested, the feature list is generated based
+        on column names and subset information, if available. The function
+        then excludes non-numeric values for any feature. It will also exclude
+        zero scores if ``exclude_zero_scores`` is ``True``. If the user
+        requested to exclude candidates with less than ``min_candidate_items``,
+        such candidates are also excluded.
+
         It also generates fake labels between 1 and 10 if
-        `use_fake_parameters` is set to True. Finally, it renames the id
-        and label column and splits the data into the data frame with
-        feature values and score label, the data frame with information about
-        subgroup and candidate (metadata) and the data frame with all other
+        ``use_fake_parameters`` is ``True``. Finally, it renames the ID
+        and label columns and splits the data into: (a) data frame with
+        feature values and scores (b) data frame with information about
+        subgroup and candidate (metadata) and (c) the data frame with all other
         columns.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            The DataFrame to filter.
+        df : pandas DataFrame
+            The data frame to filter.
         label_column : str
             The label column in the data.
         id_column : str
@@ -1300,47 +1298,46 @@ class FeaturePreprocessor:
             A list of subgroups, if any.
         exclude_zero_scores : bool
             Whether to exclude zero scores.
-            Defaults to True.
+            Defaults to ``True``.
         exclude_zero_sd : bool, optional
             Whether to exclude zero standard deviation.
-            Defaults to False.
-        feature_subset_specs : pd.DataFrame, optional
-            The feature_subset_specs DataFrame
-            Defaults to None.
+            Defaults to ``False``.
+        feature_subset_specs : pandas DataFrame, optional
+            The data frame containing the feature subset specifications.
+            Defaults to ``None``.
         feature_subset : str, optional
             The feature subset group (e.g. 'A').
-            Defaults to None.
+            Defaults to ``None``.
         min_candidate_items : int, optional
             The minimum number of items needed to include candidate.
-            Defaults to None
+            Defaults to ``None``.
         use_fake_labels : bool, optional
             Whether to use fake labels.
-            Defaults to None.
+            Defaults to ``False``.
 
         Returns
         -------
-        df_filtered_features : pd.DataFrame
-            DataFrame with filtered features
-        df_filtered_metadata : pd.DataFrame
-            DataFrame with filtered metadata
-        df_filtered_other_columns : pd.DataFrame
-            DataFrame with other columns filtered
-        df_excluded : pd.DataFrame
-            DataFrame with excluded records
-        df_filtered_length : pd.DataFrame
-            DataFrame with length column(s) filtered
-        df_filtered_human_scores : pd.DataFrame
-            DataFrame with human scores filtered
-        df_responses_with_excluded_flags : pd.DataFrame
-            A DataFrame containing responses with excluded flags
+        df_filtered_features : pandas DataFrame
+            Data frame with filtered features.
+        df_filtered_metadata : pandas DataFrame
+            Data frame with filtered metadata.
+        df_filtered_other_columns : pandas DataFrame
+            Data frame with other columns filtered.
+        df_excluded : pandas DataFrame
+            Data frame with excluded records.
+        df_filtered_length : pandas DataFrame
+            Data frame with length column(s) filtered.
+        df_filtered_human_scores : pandas DataFrame
+            Data frame with human scores filtered.
+        df_responses_with_excluded_flags : pandas DataFrame
+            Data frame containing responses with excluded flags.
         trim_min : float
-            The maximum trim value
+            The maximum trim value.
         trim_max : float
-            The minimum trim value
+            The minimum trim value.
         feature_names  : list
-            A list of feature names
+            A list of feature names.
         """
-
         # make sure that the columns specified in the
         # config file actually exist
         columns_to_check = [id_column, label_column]
@@ -1587,9 +1584,11 @@ class FeaturePreprocessor:
 
     def process_data_rsmtool(self, config_obj, data_container_obj):
         """
-        The main function that sets up the experiment by loading the
-        training and evaluation data sets and preprocessing them. Raises
-        appropriate exceptions .
+        Set up rsmtool experiment by loading & preprocessing train/test data.
+
+        This function takes a configuration object and a container object
+        as input and returns the same types of objects as output after
+        the loading, normalizing, and preprocessing.
 
         Parameters
         ----------
@@ -1601,14 +1600,24 @@ class FeaturePreprocessor:
         Returns
         -------
         config_obj : configuration_parser.Configuration
-            A Configuration object.
+            A new configuration object.
         data_container : container.DataContainer
-            A DataContainer object.
+            A new data container object.
 
         Raises
         ------
         ValueError
-            If the columns in the config file do not exist in the data.
+            If columns specified in the configuration do not exist in the data.
+        ValueError
+            If the test label column and second human score columns have the
+            same name.
+        ValueError
+            If the length column is requested as a feature.
+        ValueError
+            If the second human score column is requested as a feature.
+        ValueError
+            If "use_truncations" was specified in the configuration,
+            but no feature CSV file was found.
         """
         train = data_container_obj.train
         test = data_container_obj.test
@@ -1945,9 +1954,11 @@ class FeaturePreprocessor:
 
     def process_data_rsmeval(self, config_obj, data_container_obj):
         """
-        The main function that sets up the experiment by loading the
-        training and evaluation data sets and preprocessing them. Raises
-        appropriate exceptions .
+        Set up rsmeval experiment by loading & preprocessing evaluation data.
+
+        This function takes a configuration object and a container object
+        as input and returns the same types of objects as output after
+        the loading, normalizing, and preprocessing.
 
         Parameters
         ----------
@@ -1960,19 +1971,30 @@ class FeaturePreprocessor:
         -------
         config_obj : configuration_parser.Configuration
             A new configuration object.
-        data_congtainer : container.DataContainer
+        data_container : container.DataContainer
             A new data container object.
 
         Raises
         ------
+        KeyError
+            If columns specified in the configuration do not exist in the
+            predictions file.
         ValueError
+            If the columns containing the human scores and the system
+            scores in the predictions file have the same name.
+        ValueError
+            If the columns containing the first set of human scores
+            and the second set of human scores in the predictions file
+            have the same name.
+        ValueError
+            If the predictions file contains the same response ID more than
+            once.
+        ValueError
+            No responses were left after filtering out zero or non-numeric
+            values for the various columns.
         """
-
         # get the directory where the config file lives
-        # if this is the 'expm' directory, then go
-        # up one level.
         configpath = config_obj.configdir
-
         pred_file_location = DataReader.locate_files(config_obj['predictions_file'],
                                                      configpath)
 
@@ -2079,8 +2101,6 @@ class FeaturePreprocessor:
         logging.info(message)
 
         df_pred = data_container_obj.predictions
-
-        # make sure that the columns specified in the config file actually exist
 
         # make sure that the columns specified in the config file actually exist
         columns_to_check = [id_column, human_score_column, system_score_column]
@@ -2287,7 +2307,11 @@ class FeaturePreprocessor:
 
     def process_data_rsmpredict(self, config_obj, data_container_obj):
         """
-        Process data for RSM predict.
+        Process data for rsmpredict experiments.
+
+        This function takes a configuration object and a container object
+        as input and returns the same types of objects as output after
+        the loading, normalizing, and preprocessing.
 
         Parameters
         ----------
@@ -2306,11 +2330,10 @@ class FeaturePreprocessor:
         Raises
         ------
         KeyError
-            If columns in the config file do not exist in the data
+            If columns specified in the configuration do not exist in the data.
         ValueError
-            If data contains duplicate response IDs
+            If data contains duplicate response IDs.
         """
-
         df_input = data_container_obj.input_features
         df_feature_info = data_container_obj.feature_info
         df_postproc_params = data_container_obj.postprocessing_params
@@ -2456,7 +2479,7 @@ class FeaturePreprocessor:
 
     def process_data(self, config_obj, data_container_obj, context='rsmtool'):
         """
-        Process the date for a given context.
+        Process and setup the data for an experiment in the given context.
 
         Parameters
         ----------
@@ -2464,20 +2487,21 @@ class FeaturePreprocessor:
             A configuration object.
         data_container_obj : container.DataContainer
             A data container object.
-        context : {'rsmtool', 'rsmeval', 'rsmpredict'}
-            The context of the tool.
+        context : str
+            The tool context: one of {"rsmtool", "rsmeval", "rsmpredict"}.
+            Defaults to "rsmtool".
 
         Returns
         -------
         config_obj : configuration_parser.Configuration
             A new configuration object.
-        data_congtainer : container.DataContainer
+        data_container : container.DataContainer
             A new data container object.
 
         Raises
         ------
         ValueError
-            If the the context is not in {'rsmtool', 'rsmeval', 'rsmpredict'}
+            If the context is not one of {"rsmtool", "rsmeval", "rsmpredict"}.
         """
         if context == 'rsmtool':
             return self.process_data_rsmtool(config_obj, data_container_obj)
@@ -2486,18 +2510,19 @@ class FeaturePreprocessor:
         elif context == 'rsmpredict':
             return self.process_data_rsmpredict(config_obj, data_container_obj)
         else:
-            raise ValueError("The `context` argument must be in the set: "
+            raise ValueError("The 'context' argument must be in the set: "
                              "{'rsmtool', 'rsmeval', 'rsmpredict'}. "
-                             "You passed `{}`.".format(context))
+                             "You specified `{}`.".format(context))
 
     def preprocess_new_data(self,
                             df_input,
                             df_feature_info,
                             standardize_features=True):
         """
-        Process a data frame with feature values by applying
-        :ref:`preprocessing parameters <preprocessing_parameters>`
-        stored in `df_feature_info`.
+        Preprocess feature values using the parameters in ``df_feature_info``.
+
+        For more details on what these preprocessing parameters are,
+        see :ref:`documentation <preprocessing_parameters>`.
 
         Parameters
         ----------
@@ -2505,45 +2530,46 @@ class FeaturePreprocessor:
             Data frame with raw feature values that will be used to generate
             the scores. Each feature is stored in a separate column. Each row
             corresponds to one response. There should also be a column named
-            `spkitemid` containing a unique ID for each response.
+            "spkitemid" containing a unique ID for each response.
         df_feature_info : pandas DataFrame
-            Data frame with preprocessing parameters stored in the following columns ::
+            Data frame with preprocessing parameters in the following columns:
 
-                - `feature` : the name of the feature; should match the feature names
-                   in `df_input`.
-                - `sign` : `1` or `-1`.  Indicates whether the feature value needs to
-                   be multiplied by -1.
-                - `transform` : :ref:`transformation <json_transformation>` that needs
-                   to be applied to this feature
-                - `train_mean`, `train_sd` : mean and standard deviation for outlier
-                   truncation.
-                - `train_transformed_mean`,`train_transformed_sd` : mean and standard
-                   deviation for computing `z`-scores.
+            - "feature" : the name of the feature; should match the feature names
+              in ``df_input``.
+            - "sign" : 1 or -1.  Indicates whether the feature value needs to
+              be multiplied by -1.
+            - "transform" : :ref:`transformation <select_transformations_rsmtool>`
+              that needs to be applied to this feature.
+            - "train_mean", "train_sd" : mean and standard deviation for outlier
+              truncation.
+            - "train_transformed_mean", "train_transformed_sd" : mean and standard
+              deviation for computing z-scores.
+
         standardize_features : bool, optional
             Whether the features should be standardized prior to prediction.
-            Defaults to True.
+            Defaults to ``True``.
 
         Returns
         -------
-        df_features_preprocessed : pd.DataFrame
-            Data frame with processed feature values
-        df_excluded: pd.DataFrame
+        df_features_preprocessed : pandas DataFrame
+            Data frame with processed feature values.
+        df_excluded: pandas DataFrame
             Data frame with responses excluded from further analysis
             due to non-numeric feature values in the original file
-            or after applying transformations. The data frame always contains the
-            original feature values.
+            or after applying transformations. This data frame always
+            contains the original feature values.
 
         Raises
         ------
         KeyError
-            if some of the features specified in `df_feature_info` are not present
-            in `df_input`
+            if some of the features specified in ``df_feature_info`` are
+            not present in ``df_input``.
         ValueError
-            if all responses have at least one non-numeric feature value and therefore
-            no score can be generated for any of the responses.
+            If all responses have at least one non-numeric feature value
+            and, therefore,  no score can be generated for any of the
+            responses.
         """
         # get the list of required features
-
         required_features = df_feature_info.index.tolist()
 
         # ensure that all the features that are needed by the model

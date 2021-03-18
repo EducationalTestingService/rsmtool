@@ -40,7 +40,7 @@ Convert an older feature JSON file to a new file in tabular format.
 
 .. option:: --output
 
-    Path to output CSV/TSV/XLS/XLSX file containing the features in tabular format.
+    Path to output CSV/TSV/XLSX file containing the features in tabular format.
 
 .. option:: --delete
 

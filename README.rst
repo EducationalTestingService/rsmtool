@@ -1,7 +1,7 @@
 Rater Scoring Modeling Tool
 ---------------------------
 
-.. image:: https://img.shields.io/travis/EducationalTestingService/rsmtool/master.svg
+.. image:: https://img.shields.io/travis/EducationalTestingService/rsmtool/main.svg
    :target: https://travis-ci.org/EducationalTestingService/rsmtool
    :alt: Build status
 
@@ -9,15 +9,15 @@ Rater Scoring Modeling Tool
    :target: https://dev.azure.com/EducationalTestingService/RSMTool/_build?view=runs
    :alt: Build status
 
-.. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/master.svg
+.. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/main.svg
    :target: https://coveralls.io/r/EducationalTestingService/rsmtool
    :alt: Coverage status
 
 .. image:: https://img.shields.io/conda/v/ets/rsmtool.svg
-   :target: https://anaconda.org/desilinguist/rsmtool
+   :target: https://anaconda.org/ets/rsmtool
    :alt: Conda package for SKLL
 
-.. image:: https://img.shields.io/readthedocs/rsmtool.svg
+.. image:: https://img.shields.io/readthedocs/rsmtool/stable.svg
    :target: https://rsmtool.readthedocs.io
    :alt: Docs
 
@@ -47,7 +47,7 @@ We expect the primary users of RSMTool to be researchers working on developing n
 
 RSMTool is driven by a configuration file that users have to supply. Given the large number of available options, this can get complicated especially for new users. That's why RSMTool can help users generate configuration files interactively via guided prompts! The video below demonstrates this feature.
 
-.. image:: https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/doc/assets/demo.gif
+.. image:: https://raw.githubusercontent.com/EducationalTestingService/rsmtool/main/doc/assets/demo.gif
    :alt: Interactive Generation Demo Video
 
 Getting Started

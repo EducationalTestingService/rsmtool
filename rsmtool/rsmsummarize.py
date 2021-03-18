@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-
 """
-The script to create a summary report for experiment
+Summarize rsmtool/rsmeval experiments.
 
 :author: Jeremy Biggs (jbiggs@ets.org)
 :author: Anastassia Loukina (aloukina@ets.org)
@@ -14,12 +13,8 @@ import glob
 import logging
 import os
 import sys
-
 from os import listdir
-from os.path import (abspath,
-                     exists,
-                     join,
-                     normpath)
+from os.path import abspath, exists, join, normpath
 
 from .configuration_parser import configure
 from .reader import DataReader
@@ -33,8 +28,7 @@ def check_experiment_dir(experiment_dir,
                          experiment_name,
                          configpath):
     """
-    Check that the supplied experiment directory exists and contains
-    the output of the rsmtool experiment.
+    Check that ``experiment_dir`` exists & contains output for ``experiment_name``.
 
     Parameters
     ----------
@@ -47,19 +41,22 @@ def check_experiment_dir(experiment_dir,
 
     Returns
     -------
-    jsons : list
-        A list paths to all configuration json files contained in the output directory
+    jsons : list of str
+        A list of paths to all JSON configuration files contained
+        in the output directory.
 
     Raises
     ------
     FileNotFoundError
-        If the directory does not exist or does not contain and output
-        of an RSMTool experiment.
+        If ``experiment_dir`` does not exist.
+    FileNotFoundError
+        If ``experiment_dir`` does not contain the output of the experiment.
     ValueError
-        If the given experiment directory contains several JSON configuration
+        If ``experiment_dir`` contains several JSON configuration
         files instead of just one.
     """
-    full_path_experiment_dir = DataReader.locate_files(experiment_dir, configpath)
+    full_path_experiment_dir = DataReader.locate_files(experiment_dir,
+                                                       configpath)
     if not full_path_experiment_dir:
         raise FileNotFoundError("The directory {} "
                                 "does not exist.".format(experiment_dir))
@@ -97,11 +94,12 @@ def run_summary(config_file_or_obj_or_dict,
                 output_dir,
                 overwrite_output=False):
     """
-    Run rsmsummarize experiment using the given configuration
-    file and generate all outputs in the given directory.
+    Run rsmsummarize experiment using the given configuration.
 
-    If ``overwrite_output`` is ``True``, overwrite any existing
-    output in the given ``output_dir``.
+    Summarize several rsmtool experiments using the given configuration
+    file, object, or dictionary. All outputs are generated under ``output_dir``.
+    If ``overwrite_output`` is ``True``, any existing output in ``output_dir``
+    is overwritten.
 
     Parameters
     ----------
@@ -224,7 +222,7 @@ def run_summary(config_file_or_obj_or_dict,
                                    csvdir)
 
 
-def main():
+def main():  # noqa: D103
 
     # set up the basic logging configuration
     formatter = LogFormatter()

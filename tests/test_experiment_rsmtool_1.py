@@ -1,16 +1,11 @@
 import os
-
 from os.path import join
 
+from nbconvert.preprocessors import CellExecutionError
 from nose.tools import raises
 from parameterized import param, parameterized
-
-from nbconvert.preprocessors import CellExecutionError
-
 from rsmtool.reporter import Reporter
-from rsmtool.test_utils import (check_report,
-                                check_run_experiment,
-                                do_run_experiment)
+from rsmtool.test_utils import check_report, check_run_experiment, do_run_experiment
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

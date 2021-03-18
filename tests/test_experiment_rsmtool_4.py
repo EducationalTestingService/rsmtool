@@ -1,17 +1,13 @@
 import json
 import os
-
 from os.path import join
 
-from nose.tools import raises, assert_equal
+from nose.tools import assert_equal, raises
 from parameterized import param, parameterized
-from sklearn.exceptions import ConvergenceWarning
-
 from rsmtool import run_experiment
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import (check_run_experiment,
-                                collect_warning_messages_from_report,
-                                do_run_experiment)
+from rsmtool.test_utils import check_run_experiment, collect_warning_messages_from_report, do_run_experiment
+from sklearn.exceptions import ConvergenceWarning
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing

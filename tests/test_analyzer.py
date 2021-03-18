@@ -1,17 +1,12 @@
 import warnings
-
 from os.path import dirname, join
 
 import numpy as np
 import pandas as pd
-
-from nose.tools import (assert_almost_equal,
-                        assert_equal)
-
+from nose.tools import assert_almost_equal, assert_equal
 from numpy.random import RandomState
-from pandas.testing import assert_series_equal
 from numpy.testing import assert_array_equal
-
+from pandas.testing import assert_series_equal
 from rsmtool.analyzer import Analyzer
 
 
@@ -81,13 +76,10 @@ class TestAnalyzer:
         assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
         assert issubclass(warning_list[-1].category, UserWarning)
 
-
-
     def test_correlation_helper_for_data_with_groups(self):
         retval = Analyzer.correlation_helper(self.df_features_with_groups, 'sc1', 'group')
         assert_equal(len(retval[0]), 2)
         assert_equal(len(retval[1]), 2)
-
 
     def test_correlation_helper_for_one_group_with_one_row(self):
         # this should return a data frames with nans for group with 1 row
@@ -103,7 +95,6 @@ class TestAnalyzer:
             assert_equal(len(df), 2)
             assert_equal(len(df.columns), 3)
 
-
     def test_correlation_helper_for_group_with_one_row_and_length(self):
         # this should return a data frames with nans for group with 1 row
         retval = Analyzer.correlation_helper(self.df_features_with_groups_and_length[:6],
@@ -111,8 +102,6 @@ class TestAnalyzer:
         for df in retval:
             assert_equal(len(df), 2)
             assert_equal(len(df.columns), 3)
-
-
 
     def test_that_correlation_helper_works_for_data_with_the_same_human_score(self):
         # this test should raise UserWarning because the determinant is very close to
@@ -124,7 +113,6 @@ class TestAnalyzer:
             assert_equal(retval[0].isnull().values.sum(), 3)
             assert_equal(retval[1].isnull().values.sum(), 3)
             assert issubclass(warning_list[-1].category, UserWarning)
-
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
         # There should be NaNs for SMD, correlations and both sds
@@ -182,7 +170,6 @@ class TestAnalyzer:
         assert_series_equal(computed_metrics1.sort_index(), expected_metrics1.sort_index())
         assert_series_equal(computed_metrics2.sort_index(), expected_metrics2.sort_index())
 
-
     def test_metrics_helper_zero_system_sd(self):
         human_scores = [1, 3, 4, 2, 3, 1, 3, 4, 2, 1]
         system_score = [2.54] * 10
@@ -220,7 +207,6 @@ class TestAnalyzer:
         assert_series_equal(computed_metrics2.sort_index(),
                             expected_metrics2.sort_index(),
                             check_dtype=False)
-
 
     def test_compute_pca_less_samples_than_features(self):
         # test pca when we have less samples than

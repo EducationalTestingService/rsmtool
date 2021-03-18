@@ -12,7 +12,7 @@ As its primary input, RSMTool takes a :ref:`data file <input_file_format>` conta
 
 This trained model can then be used to generate scores for a held-out evaluation data whose feature values are pre-processed using the same :ref:`Pre-processing Parameters <preprocessing_parameters>`. In addition to the raw scores predicted by the model, the **Prediction Analysis** component of the pipline generates several additional :ref:`post-processed scores <score_postprocessing>` that are commonly used in automated scoring.
 
-The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different :ref:`evaluation measures <evaluation>` illustrating model efficacy. More Details about these analyses can be found in this documentaion and in a separate `technical paper <https://raw.githubusercontent.com/EducationalTestingService/rsmtool/master/doc/assets/rsmtool.pdf>`_.
+The primary output of RSMTool is a comprehensive, customizable HTML statistical report that contains the multiple analyses required for a comprehensive evaluation of an automated scoring model including descriptive analyses for all features, model analyses, subgroup comparisons, as well as several different :ref:`evaluation measures <evaluation>` illustrating model efficacy. More Details about these analyses can be found in this documentaion and in a separate `technical paper <https://raw.githubusercontent.com/EducationalTestingService/rsmtool/main/doc/assets/rsmtool.pdf>`_.
 
 In addition to the HTML report, RSMTool also saves the intermediate outputs of all of the performed analyses as :ref:`CSV files <intermediate_files_rsmtool>`.
 
@@ -24,9 +24,13 @@ Input file format
 
 The input files for the training and evaluation data should either be in a tabular format with responses as rows and features and score(s) in the columns  in the ``jsonlines`` format with a JSON object per responses on each line. See below for a more detailed description of the ``.jsonlines`` format. 
 
-RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``xls``/``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
+RSMTool supports input files in ``.csv``, ``.tsv``, ``.sas7bdat``, ``.xlsx``, or ``.jsonlines`` format. The format of the file is determined based on the extension. In all cases the :ref:`output files<intermediate_files_rsmtool>` will be saved in ``.csv`` format by default (see :ref:`file format <file_format>` for other intermediate file output options).
 
 For ``Excel`` spreadsheets, all data must be stored in the first sheet. 
+
+.. note::
+
+    RSMTool 8.1 and higher no longer support ``.xls`` files. All Excel files must be in ``.xlsx`` format. 
 
 In a ``.jsonlines`` format file, each line corresponds to a response and is represented as a dictionary with column names as the keys and column values as the values. For example:
 
@@ -107,7 +111,7 @@ The raw_trim predictions rounded to the nearest integer.
 
 .. note::
 
-    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <https://docs.scipy.org/doc/numpy/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
+    The rounding is done using ``rint`` function from ``numpy``. See `numpy documentation <https://numpy.org/doc/stable/reference/generated/numpy.around.html#numpy.around>`_ for treatment of values such as 1.5.
 
 scale
 ~~~~~

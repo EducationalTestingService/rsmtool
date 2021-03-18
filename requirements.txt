@@ -3,11 +3,10 @@ jupyter
 ipython
 nose
 notebook
-nbconvert<6.0
 numpy
 pandas
 seaborn
-skll==2.1.0
+skll==2.5.0
 statsmodels
 coverage
 coveralls

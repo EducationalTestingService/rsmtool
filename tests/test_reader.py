@@ -1,18 +1,14 @@
-import os
 import json
+import os
 import tempfile
 import warnings
+from shutil import rmtree
 
 import numpy as np
 import pandas as pd
-
-from nose.tools import raises, eq_
+from nose.tools import eq_, raises
 from pandas.testing import assert_frame_equal
-from shutil import rmtree
-
-from rsmtool.reader import (DataReader,
-                            read_jsonlines,
-                            try_to_load_file)
+from rsmtool.reader import DataReader, read_jsonlines, try_to_load_file
 
 
 def test_try_to_load_file_none():
@@ -74,7 +70,7 @@ class TestDataReader:
             df.to_csv(tempf.name, index=False)
         elif ext.lower() == 'tsv':
             df.to_csv(tempf.name, sep='\t', index=False)
-        elif ext.lower() in ['xls', 'xlsx']:
+        elif ext.lower() == 'xlsx':
             df.to_excel(tempf.name, index=False)
         elif ext.lower() in ['jsonlines']:
             df.to_json(tempf.name,
@@ -84,9 +80,7 @@ class TestDataReader:
         return tempf.name
 
     def get_container(self, name_ext_tuples, converters=None):
-        """
-        Get a DataContainer object from a list of tuples with (`name`, `ext`)
-        """
+        """Get DataContainer object from a list of (name, ext) tuples."""
         names_ = []
         paths_ = []
         for name, ext in name_ext_tuples:
@@ -111,10 +105,7 @@ class TestDataReader:
         return container
 
     def check_read_from_file(self, extension):
-        """
-        Test whether the ``read_from_file()`` method works as expected.
-        """
-
+        """Test whether ``read_from_file()`` works as expected."""
         name = TestDataReader.make_file_from_ext(self.df_train, extension)
 
         # now read in the file using `read_data_file()`
@@ -142,7 +133,7 @@ class TestDataReader:
     def test_read_data_file(self):
         # note that we cannot check for capital .xls and .xlsx
         # because xlwt does not support these extensions
-        for extension in ['csv', 'tsv', 'xls', 'xlsx', 'CSV', 'TSV']:
+        for extension in ['csv', 'tsv', 'xlsx', 'CSV', 'TSV']:
             yield self.check_read_from_file, extension
 
     @raises(ValueError)
@@ -152,7 +143,7 @@ class TestDataReader:
     def test_container_train_property(self):
         test_lists = [[('train', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('test', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'csv'), ('test', 'xlsx'), ('train_metadata', 'tsv')],
                       [('train', 'jsonlines'), ('test', 'jsonlines')]]
 
         converter = {'id': str, 'feature1': np.int64, 'feature2': np.int64, 'candidate': str}
@@ -166,7 +157,7 @@ class TestDataReader:
     def test_container_feature_specs_property(self):
         test_lists = [[('feature_specs', 'csv'), ('test', 'tsv')],
                       [('train', 'csv'), ('feature_specs', 'xlsx')],
-                      [('train', 'csv'), ('feature_specs', 'xls'), ('train_metadata', 'tsv')],
+                      [('train', 'csv'), ('feature_specs', 'tsv'), ('train_metadata', 'tsv')],
                       [('train', 'jsonlines'), ('feature_specs', 'jsonlines')]]
         for test_list in test_lists:
             yield self.check_feature_specs, test_list
@@ -384,8 +375,7 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_jsons_with_nulls(self):
-        '''None is written to json as `null`.
-        We test if those are handled correctly'''
+        """Test if null in JSONs are properly read as ``None``."""
         all_nested_jsonlines = [{'values': {'id': '001',
                                             'feature1': None,
                                             'feature2': 1.5}},
@@ -401,9 +391,11 @@ class TestJsonLines:
         self.check_jsonlines_output(all_nested_jsonlines)
 
     def test_read_json_with_NaNs(self):
-        '''This test is no longer failing
-        because Pandas can now parse NaNs:
-        https://github.com/pandas-dev/pandas/issues/12213'''
+        #####################################################
+        # NOTE: This test is no longer failing              #
+        # because Pandas can now parse NaNs:                #
+        # https://github.com/pandas-dev/pandas/issues/12213 #
+        #####################################################
         all_nested_jsonlines = [{'values': {'id': '001',
                                             'feature1': np.nan,
                                             'feature2': 1.5}},
