@@ -40,7 +40,8 @@ tools_with_output = ['rsmtool', 'rsmeval',
 # if so, any deprecation warnings found in HTML
 # reports should not be ignored
 STRICT_MODE = os.environ.get('STRICT', None)
-IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
+# IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
+IGNORE_WARNINGS = False if STRICT_MODE else True
 
 
 def check_run_experiment(source,
@@ -143,8 +144,10 @@ def check_run_experiment(source,
     # make sure that there are no warnings in the report
     # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_DEPRECATION_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    # if IGNORE_DEPRECATION_WARNINGS:
+    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -233,8 +236,10 @@ def check_run_evaluation(source,
     # make sure that there are no warnings in the report
     # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_DEPRECATION_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    # if IGNORE_DEPRECATION_WARNINGS:
+    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -293,8 +298,10 @@ def check_run_comparison(source,
     # make sure that there are no warnings in the report
     # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_DEPRECATION_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    # if IGNORE_DEPRECATION_WARNINGS:
+    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
@@ -430,8 +437,10 @@ def check_run_summary(source,
     # make sure that there are no warnings in the report
     # but ignore deprecation warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_DEPRECATION_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    # if IGNORE_DEPRECATION_WARNINGS:
+    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+    if IGNORE_WARNINGS:
+        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
 
 
