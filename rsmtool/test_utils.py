@@ -37,10 +37,9 @@ tools_with_output = ['rsmtool', 'rsmeval',
                      'rsmsummarize', 'rsmpredict']
 
 # check if tests are being run in strict mode
-# if so, any deprecation warnings found in HTML
+# if so, any warnings found in HTML
 # reports should not be ignored
 STRICT_MODE = os.environ.get('STRICT', None)
-# IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
 IGNORE_WARNINGS = False if STRICT_MODE else True
 
 
@@ -142,10 +141,8 @@ def check_run_experiment(source,
     check_report(html_report, raise_warnings=False)
 
     # make sure that there are no warnings in the report
-    # but ignore deprecation warnings if appropriate
+    # but ignore warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    # if IGNORE_DEPRECATION_WARNINGS:
-    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     if IGNORE_WARNINGS:
         warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
@@ -234,10 +231,8 @@ def check_run_evaluation(source,
     check_report(html_report, raise_warnings=False)
 
     # make sure that there are no warnings in the report
-    # but ignore deprecation warnings if appropriate
+    # but ignore warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    # if IGNORE_DEPRECATION_WARNINGS:
-    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     if IGNORE_WARNINGS:
         warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
@@ -296,10 +291,8 @@ def check_run_comparison(source,
     check_report(html_report, raise_warnings=False)
 
     # make sure that there are no warnings in the report
-    # but ignore deprecation warnings if appropriate
+    # but ignore warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    # if IGNORE_DEPRECATION_WARNINGS:
-    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     if IGNORE_WARNINGS:
         warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
@@ -435,10 +428,8 @@ def check_run_summary(source,
     check_report(html_report, raise_warnings=False)
 
     # make sure that there are no warnings in the report
-    # but ignore deprecation warnings if appropriate
+    # but ignore warnings if appropriate
     warning_msgs = collect_warning_messages_from_report(html_report)
-    # if IGNORE_DEPRECATION_WARNINGS:
-    #     warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
     if IGNORE_WARNINGS:
         warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
     assert_equal(len(warning_msgs), 0)
@@ -799,20 +790,26 @@ def check_report(html_file,
     report_errors = 0
     report_warnings = 0
 
+    # Setting raise_warnings to false if not in STRICT mode
+    if IGNORE_WARNINGS:
+        raise_warnings = False
+
     with open(html_file, 'r') as htmlf:
-        for line in htmlf:
+        for i, line in enumerate(htmlf):
             m_error = html_error_regexp.search(line)
             if m_error:
                 report_errors += 1
             m_warning = html_warning_regexp.search(line)
             if m_warning:
-                warning_text = m_warning.group(1)
+                # actual text of warning is in the next line of HTML file
+                warning_text = htmlf.readline()
                 # we do not want to flag matlplotlib font cache warning
                 if not re.search(r'font\s*cache', warning_text, flags=re.IGNORECASE):
                     report_warnings += 1
 
     if raise_errors:
         assert_equal(report_errors, 0)
+    
     if raise_warnings:
         assert_equal(report_warnings, 0)
 

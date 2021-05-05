@@ -20,10 +20,10 @@ else:
     from rsmtool.test_utils import rsmtool_test_dir
 
 # check if tests are being run in strict mode
-# if so, any deprecation warnings found in HTML
+# if so, any warnings found in HTML
 # reports should not be ignored
 STRICT_MODE = os.environ.get('STRICT', None)
-IGNORE_DEPRECATION_WARNINGS = False if STRICT_MODE else True
+IGNORE_WARNINGS = False if STRICT_MODE else True
 
 
 class TestToolCLI:
@@ -128,10 +128,10 @@ class TestToolCLI:
             check_report(html_report, raise_warnings=False)
 
             # make sure that there are no warnings in the report
-            # but ignore deprecation warnings if appropriate
+            # but ignore warnings if in STRICT mode
             warning_msgs = collect_warning_messages_from_report(html_report)
-            if IGNORE_DEPRECATION_WARNINGS:
-                warning_msgs = [msg for msg in warning_msgs if 'DeprecationWarning' not in msg]
+            if IGNORE_WARNINGS:
+                warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
             eq_(len(warning_msgs), 0)
 
     def validate_generate_output(self, name, output, subgroups=False):
