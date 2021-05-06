@@ -142,10 +142,9 @@ def check_run_experiment(source,
 
     # make sure that there are no warnings in the report
     # but ignore warnings if appropriate
-    warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
-    assert_equal(len(warning_msgs), 0)
+    if not IGNORE_WARNINGS:
+        warning_msgs = collect_warning_messages_from_report(html_report)
+        assert_equal(len(warning_msgs), 0)
 
 
 def check_run_evaluation(source,
@@ -232,10 +231,9 @@ def check_run_evaluation(source,
 
     # make sure that there are no warnings in the report
     # but ignore warnings if appropriate
-    warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
-    assert_equal(len(warning_msgs), 0)
+    if not IGNORE_WARNINGS:
+        warning_msgs = collect_warning_messages_from_report(html_report)
+        assert_equal(len(warning_msgs), 0)
 
 
 def check_run_comparison(source,
@@ -292,10 +290,9 @@ def check_run_comparison(source,
 
     # make sure that there are no warnings in the report
     # but ignore warnings if appropriate
-    warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
-    assert_equal(len(warning_msgs), 0)
+    if not IGNORE_WARNINGS:
+        warning_msgs = collect_warning_messages_from_report(html_report)
+        assert_equal(len(warning_msgs), 0)
 
 
 def check_run_prediction(source,
@@ -429,10 +426,9 @@ def check_run_summary(source,
 
     # make sure that there are no warnings in the report
     # but ignore warnings if appropriate
-    warning_msgs = collect_warning_messages_from_report(html_report)
-    if IGNORE_WARNINGS:
-        warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
-    assert_equal(len(warning_msgs), 0)
+    if not IGNORE_WARNINGS:
+        warning_msgs = collect_warning_messages_from_report(html_report)
+        assert_equal(len(warning_msgs), 0)
 
 
 def do_run_experiment(source,
@@ -795,7 +791,7 @@ def check_report(html_file,
         raise_warnings = False
 
     with open(html_file, 'r') as htmlf:
-        for i, line in enumerate(htmlf):
+        for line in htmlf:
             m_error = html_error_regexp.search(line)
             if m_error:
                 report_errors += 1
@@ -809,7 +805,7 @@ def check_report(html_file,
 
     if raise_errors:
         assert_equal(report_errors, 0)
-    
+
     if raise_warnings:
         assert_equal(report_warnings, 0)
 

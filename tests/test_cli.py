@@ -129,10 +129,9 @@ class TestToolCLI:
 
             # make sure that there are no warnings in the report
             # but ignore warnings if in STRICT mode
-            warning_msgs = collect_warning_messages_from_report(html_report)
-            if IGNORE_WARNINGS:
-                warning_msgs = [msg for msg in warning_msgs if 'Warning' not in msg]
-            eq_(len(warning_msgs), 0)
+            if not IGNORE_WARNINGS:
+                warning_msgs = collect_warning_messages_from_report(html_report)
+                eq_(len(warning_msgs), 0)
 
     def validate_generate_output(self, name, output, subgroups=False):
         """
