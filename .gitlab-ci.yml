@@ -4,7 +4,6 @@ stages:
 variables:
   PYVERSION: "3.7"
   BINPATH: "/root/miniconda3/envs/rsmenv/bin"
-  COVERALLS_PARALLEL: true
 
 # set up 6 jobs to run in parallel, for different groups of test files
 runtests:
