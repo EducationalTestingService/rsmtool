@@ -1,13 +1,13 @@
 Rater Scoring Modeling Tool
 ---------------------------
 
-.. image:: https://img.shields.io/travis/EducationalTestingService/rsmtool/main.svg
-   :target: https://travis-ci.org/EducationalTestingService/rsmtool
-   :alt: Build status
+   image:: https://gitlab.com/EducationalTestingService/rsmtool/badges/main/pipeline.svg
+   :target: https://gitlab.com/EducationalTestingService/rsmtool/-/pipelines
+   :alt: Gitlab CI status
 
 .. image:: https://dev.azure.com/EducationalTestingService/RSMTool/_apis/build/status/EducationalTestingService.rsmtool
    :target: https://dev.azure.com/EducationalTestingService/RSMTool/_build?view=runs
-   :alt: Build status
+   :alt: Azure Pipeline status
 
 .. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/main.svg
    :target: https://coveralls.io/r/EducationalTestingService/rsmtool
