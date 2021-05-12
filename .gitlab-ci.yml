@@ -1,20 +1,17 @@
+image: continuumio/miniconda3:latest
+
 stages:
   - test
 
 variables:
   PYVERSION: "3.7"
   BINPATH: "/root/miniconda3/envs/rsmenv/bin"
+  CODECOV_TOKEN: "488304b7-b1c5-4fc7-bfb6-9e7cbcb36a08"
 
-# set up 6 jobs to run in parallel, for different groups of test files
-runtests:
-  stage: test
+# set up basic job
+.runtests:
   before_script:
-    - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-    - if [ -x /root/miniconda3/pkgs ]; then pushd /root/miniconda3/pkgs && find -maxdepth 1 -mindepth 1 -type d | xargs rm -rf && popd; fi
-    - chmod +x miniconda.sh
-    - ./miniconda.sh -b -f
-    - /root/miniconda3/bin/conda update conda --yes
-    - "/root/miniconda3/bin/conda create --name rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${TRAVIS_PYTHON_VERSION} --yes --quiet"
+    - "conda create --name rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${PYVERSION} codecov --yes --quiet"
     - /root/miniconda3/envs/rsmenv/bin/pip install nose-cov
     - /root/miniconda3/envs/rsmenv/bin/pip install -e .
     - echo "import os" > sitecustomize.py
@@ -26,13 +23,40 @@ runtests:
     - echo "    pass" >> sitecustomize.py
   script:
     - "/root/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}"
-  parallel:
-    matrix:
-      - TESTFILES:
-        - "tests/test_experiment_rsmtool_1.py"
-        - "tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
-        - "tests/test_analyzer.py tests/test_experiment_rsmeval.py tests/test_fairness_utils.py tests/test_utils_prmse.py tests/test_container.py tests/test_test_utils.py tests/test_cli.py"
-        - "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
-        - "tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
   after_script:
-    - /root/miniconda3/envs/rsmenv/bin/coveralls
+    - /root/miniconda3/envs/rsmenv/bin/codecov
+
+# first set of test files
+testset1:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_experiment_rsmtool_1.py"
+  stage: "test"
+
+# second set of test files
+testset2:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_comparer.py tests/test_configuration_parser.py tests/test_experiment_rsmtool_2.py"
+  stage: "test"
+
+# third set of test files
+testset3:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_analyzer.py tests/test_experiment_rsmeval.py tests/test_fairness_utils.py tests/test_utils_prmse.py tests/test_container.py tests/test_test_utils.py tests/test_cli.py"
+  stage: "test"
+
+# fourth set of test files
+testset4:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
+  stage: "test"
+
+# fifth set of test files
+testset5:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
+  stage: "test"
