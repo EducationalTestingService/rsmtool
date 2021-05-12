@@ -5,7 +5,7 @@ stages:
 
 variables:
   PYVERSION: "3.7"
-  BINDIR: "/root/rsmenv/bin"
+  BINPATH: "/root/rsmenv/bin"
   CODECOV_TOKEN: "488304b7-b1c5-4fc7-bfb6-9e7cbcb36a08"
 
 # set up basic job
