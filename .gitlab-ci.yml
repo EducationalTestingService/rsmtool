@@ -5,15 +5,15 @@ stages:
 
 variables:
   PYVERSION: "3.7"
-  BINPATH: "/root/miniconda3/envs/rsmenv/bin"
+  BINDIR: "/root/rsmenv/bin"
   CODECOV_TOKEN: "488304b7-b1c5-4fc7-bfb6-9e7cbcb36a08"
 
 # set up basic job
 .runtests:
   before_script:
-    - "conda create --name rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${PYVERSION} codecov --yes --quiet"
-    - /root/miniconda3/envs/rsmenv/bin/pip install nose-cov
-    - /root/miniconda3/envs/rsmenv/bin/pip install -e .
+    - "conda create --prefix /root/rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${PYVERSION} codecov --yes --quiet"
+    - /root/rsmenv/bin/pip install nose-cov
+    - /root/rsmenv/bin/pip install -e .
     - echo "import os" > sitecustomize.py
     - echo "try:" >> sitecustomize.py
     - echo "    import coverage" >> sitecustomize.py
@@ -22,9 +22,9 @@ variables:
     - echo "except ImportError:" >> sitecustomize.py
     - echo "    pass" >> sitecustomize.py
   script:
-    - "/root/miniconda3/envs/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}"
+    - "/root/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}"
   after_script:
-    - /root/miniconda3/envs/rsmenv/bin/codecov
+    - /root/rsmenv/bin/codecov
 
 # first set of test files
 testset1:
