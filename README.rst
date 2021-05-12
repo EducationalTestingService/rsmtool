@@ -1,7 +1,7 @@
 Rater Scoring Modeling Tool
 ---------------------------
 
-   image:: https://gitlab.com/EducationalTestingService/rsmtool/badges/main/pipeline.svg
+.. image:: https://gitlab.com/EducationalTestingService/rsmtool/badges/main/pipeline.svg
    :target: https://gitlab.com/EducationalTestingService/rsmtool/-/pipelines
    :alt: Gitlab CI status
 
