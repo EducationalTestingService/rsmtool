@@ -9,9 +9,9 @@ Rater Scoring Modeling Tool
    :target: https://dev.azure.com/EducationalTestingService/RSMTool/_build?view=runs
    :alt: Azure Pipeline status
 
-.. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/main.svg
-   :target: https://coveralls.io/r/EducationalTestingService/rsmtool
-   :alt: Coverage status
+.. image:: https://codecov.io/gh/EducationalTestingService/rsmtool/branch/main/graph/badge.svg?token=wMCnQrB49J
+   :target: https://codecov.io/gh/EducationalTestingService/rsmtool
+   :alt: Coverage status   
 
 .. image:: https://img.shields.io/conda/v/ets/rsmtool.svg
    :target: https://anaconda.org/ets/rsmtool
