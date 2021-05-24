@@ -73,7 +73,7 @@ Requirements
 
 Contributing
 ------------
-Contributions to RSMTool are very welcome. Please refer to the `documentation <http://rsmtool.readthedocs.io/en/latest/contributing.html>`_ for how to get started on developing new features or functionality for RSMTool.
+Contributions to RSMTool are very welcome. Please refer to the `documentation <https://rsmtool.readthedocs.io/en/main/contributing.html>`_ for how to get started on developing new features or functionality for RSMTool.
 
 Citing
 ------

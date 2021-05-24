@@ -8,7 +8,7 @@ Setting up
 
 To set up a local development environment, follow the steps below:
 
-1. Pull the latest version of RSMTool from GitHub and switch to the ``main`` branch.
+1. Clone the `Github repository <https://github.com/EducationalTestingService/rsmtool>`_ for RSMTool. If you have already have a local version of the repository, pull the latest version from GitHub and switch to the ``main`` branch.
 
 2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 
