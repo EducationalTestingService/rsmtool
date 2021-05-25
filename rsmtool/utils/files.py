@@ -42,7 +42,7 @@ def parse_json_with_comments(pathlike):
     https://web.archive.org/web/20150520154859/http://www.lifl.fr/~riquetd/parse-a-json-file-with-comments.html
     """
     # Regular expression to identify comments
-    comment_re = re.compile(r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+    comment_re = re.compile(r'(^)?[^\S\n]*(?:/\*(.*?)\*/[^\S\n]*|(?<!https:)(?<!http:)//[^\n]*)($)?',
                             re.DOTALL | re.MULTILINE)
 
     # if we passed in a string, convert it to a Path
