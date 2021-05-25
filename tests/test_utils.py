@@ -66,24 +66,98 @@ def test_convert_to_float():
 
 def test_parse_json_with_comments():
 
-    # Need to add comments
-    json_with_comments = ("""{"key1": "value1", /*some comments */\n"""
-                          """/*more comments */\n"""
-                          """"key2": "value2", "key3": 5}""")
+    json_with_comments = """
+    {{
+        "key1": "{0}", {1}
+        {1}
+        "key2": "value2", 
+        "key3": 5
+    }}"""
 
-    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
+    # ensure that URLs are not filtered out
+    for value in ['value1', 'http://stash.research.ets.org:8000', 'https://stash.research.ets.org:8000']:
+        for comment in ["/*some comments */", "//some comments "]:
+            test_json_string = json_with_comments.format(value, comment)
+            expected_result = {'key1': value, 'key2': 'value2', 'key3': 5}
+            yield check_parse_json_with_comments, test_json_string, expected_result
+
+
+def test_parse_json_with_comments_no_comments():
+
+    test_json_string = r"""
+    {
+        "advisories": {},
+        "metadata": {
+            "program": null,
+            "score_max": 5,
+            "score_min": 1
+        },
+        "multiple_models": false,
+        "predict": {
+            "trim_max": null,
+            "trim_min": null
+        },
+        "read_data": {
+            "data_to_plaintext": [
+                "textpipes.pipes.CharFixerDefault",
+                "textpipes.pipes.ReplaceTabsWithSpace",
+                "textpipes.pipes.MultiSpaceToSingleSpace",
+                "textpipes.pipes.Strip"
+            ]
+        },
+        "text_to_instance": null,
+        "train": {
+            "notes": "The training process was recorded here: https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
+            "repository_commit": "12.2020_model_deployment_1.0",
+            "repository_name": "strides-scoring-pt",
+            "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
+            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet"
+        }
+    }"""
+
+    expected_result = {
+        "advisories": {},
+        "metadata": {
+            "program": None,
+            "score_max": 5,
+            "score_min": 1
+        },
+        "multiple_models": False,
+        "predict": {
+            "trim_max": None,
+            "trim_min": None
+        },
+        "read_data": {
+            "data_to_plaintext": [
+                "textpipes.pipes.CharFixerDefault",
+                "textpipes.pipes.ReplaceTabsWithSpace",
+                "textpipes.pipes.MultiSpaceToSingleSpace",
+                "textpipes.pipes.Strip"
+            ]
+        },
+        "text_to_instance": None,
+        "train": {
+            "notes": r"The training process was recorded here: https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
+            "repository_commit": "12.2020_model_deployment_1.0",
+            "repository_name": "strides-scoring-pt",
+            "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
+            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet"
+        }
+    }
+    yield check_parse_json_with_comments, test_json_string, expected_result
+
+
+def check_parse_json_with_comments(test_json_string, expected_result):
+    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
     filename = tempf.name
+    tempf.write(test_json_string)
     tempf.close()
-
-    with open(filename, 'w') as buff:
-        buff.write(json_with_comments)
 
     result = parse_json_with_comments(filename)
 
     # get rid of the file now that have read it into memory
     unlink(filename)
-
-    eq_(result, {'key1': 'value1', 'key2': 'value2', 'key3': 5})
+    eq_(result, expected_result)
 
 
 def test_float_format_func_default_prec():
