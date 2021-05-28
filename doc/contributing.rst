@@ -181,7 +181,7 @@ The two examples below might help make this process easier to understand:
 
      2. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. The files affected by your change are shown as added/deleted. You also see the following warning: 
 
-        .. code-block:: 
+        .. code-block:: text
      
             WARNING: X input files for rsmcompare/rsmsummarize tests have been updated. You need to re-run these tests and update test outputs
 
@@ -189,9 +189,9 @@ The two examples below might help make this process easier to understand:
 
      4. Run ``nosetests --nologcapture tests/*rsmsummarize*.py`` and ``nosetests --nologcapture tests/*rsmcompare*.py``. If you see any failures, make sure they are related to the changes you made since those are expected.
 
-     3. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
+     5. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
 
-     4. If this is the case, you are now ready to commit your changes. 
+     6. If this is the case, you are now ready to commit your changes. 
 
 
 Advanced tips and tricks
