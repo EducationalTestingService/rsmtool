@@ -3,9 +3,20 @@ RSMTool Release Process
 
 This process is only meant for the project administrators, not users and developers.
 
+#. Recreate the development environment so all unpinned packages are updated to their latest versions. See instructions for this `here <https://rsmtool.readthedocs.io/en/main/contributing.html#setting-up>`_.
+
 #. Make sure any and all tests are passing in ``main``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any warnings in the HTML report that can be fixed before the release.
 
 #. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_.
+
+    .. note:: 
+
+        Several files have been excluded from the repository due to their non-deterministic nature so please do not add them back to the repository. The following files are currently excluded:
+
+            * Fairness test files for `lr-eval-system-score-constant` test
+            * Predictions and all evaluation files for `linearsvr` test. 
+     
+        Note that the full set of outputs from these test files are also used as input for `rsmcompare` and `rsmsummarize` tests. These *input* files need to be updated following the process under **Example 2** in `Writing new functional tests <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information. 
 
 #. Create a release branch ``release/XX`` on GitHub.
 
@@ -64,4 +75,3 @@ This process is only meant for the project administrators, not users and develop
 #. Send an email around at ETS announcing the release and the changes.
 
 #. Create a `Dash <https://kapeli.com/dash>`_ docset from the documentation by following the instructions :ref:`here <dash_docset>`.
-
