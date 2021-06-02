@@ -9,6 +9,14 @@ This process is only meant for the project administrators, not users and develop
 
 #. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_.
 
+    .. note:: 
+
+        Some input files might be updated or changed due to changes in SKLL or scikit-learn packages, for example, the inputs and outputs for linearsvr. In this case, the tests need to be rerun and fixed. The process is similar to Example 2 under `Writing new functional tests <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information. 
+
+    .. note:: 
+
+        Fairness test files have been excluded from the repository due to their non-deterministic nature so please do not add them back to the repository. More information on these files can be found in `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/410>`_.
+
 #. Create a release branch ``release/XX`` on GitHub.
 
 #. In the release branch:
