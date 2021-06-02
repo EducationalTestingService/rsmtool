@@ -11,11 +11,12 @@ This process is only meant for the project administrators, not users and develop
 
     .. note:: 
 
-        Some input files might be updated or changed due to changes in SKLL or scikit-learn packages, for example, the inputs and outputs for linearsvr. In this case, the tests need to be rerun and fixed. The process is similar to Example 2 under `Writing new functional tests <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information. 
+        Several files have been excluded from the repository due to their non-deterministic nature so please do not add them back to the repository. The following files are currently excluded:
 
-    .. note:: 
-
-        Fairness test files have been excluded from the repository due to their non-deterministic nature so please do not add them back to the repository. More information on these files can be found in `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/410>`_.
+            * Fairness test files for `lr-eval-system-score-constant` test
+            * Predictions and all evaluation files for `linearsvr` test. 
+     
+        Note that the full set of outputs from these test files are also used as input for `rsmcompare` and `rsmsummarize` tests. These *input* files need to be updated following the process under **Example 2** in `Writing new functional tests <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information. 
 
 #. Create a release branch ``release/XX`` on GitHub.
 
@@ -74,4 +75,3 @@ This process is only meant for the project administrators, not users and develop
 #. Send an email around at ETS announcing the release and the changes.
 
 #. Create a `Dash <https://kapeli.com/dash>`_ docset from the documentation by following the instructions :ref:`here <dash_docset>`.
-
