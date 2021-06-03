@@ -28,13 +28,13 @@ This process is only meant for the project administrators, not users and develop
 
    #. update the documentation with any new features or details about changes.
 
-   #. run ``make linkcheck`` on the documentation and fix any redirected/broken links.
+   #. run ``make linkcheck`` on the documentation (i.e. from the ``doc/`` folder) and fix any redirected/broken links.
 
    #. update the README and this release documentation, if necessary.
 
 #. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively.
 
-#. Upload the source and wheel distributions to TestPyPI  using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__.
+#. Upload the source and wheel distributions to TestPyPI  using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization
 
 #. Install the TestPyPI package as follows::
 
@@ -62,11 +62,11 @@ This process is only meant for the project administrators, not users and develop
 
 #. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-#. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/latest>`_ - this should say "passing" in green.
+#. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/main.svg>`_ - this should say "passing" in green.
 
 #. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
 
-#. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release.
+#. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release. There are two versions of the documentation, one for the ``stable`` `branch <https://rsmtool.readthedocs.io/>`_ and the other for the ``main`` `branch <https://rsmtool.readthedocs.io/en/main/index.html>`_. The ``stable`` version of the documentation needs to be updated with each new release.
 
 #. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
