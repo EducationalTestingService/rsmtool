@@ -1,17 +1,17 @@
 Rater Scoring Modeling Tool
 ---------------------------
 
-.. image:: https://img.shields.io/travis/EducationalTestingService/rsmtool/main.svg
-   :target: https://travis-ci.org/EducationalTestingService/rsmtool
-   :alt: Build status
+.. image:: https://gitlab.com/EducationalTestingService/rsmtool/badges/main/pipeline.svg
+   :target: https://gitlab.com/EducationalTestingService/rsmtool/-/pipelines
+   :alt: Gitlab CI status
 
 .. image:: https://dev.azure.com/EducationalTestingService/RSMTool/_apis/build/status/EducationalTestingService.rsmtool
    :target: https://dev.azure.com/EducationalTestingService/RSMTool/_build?view=runs
-   :alt: Build status
+   :alt: Azure Pipeline status
 
-.. image:: https://img.shields.io/coveralls/EducationalTestingService/rsmtool/main.svg
-   :target: https://coveralls.io/r/EducationalTestingService/rsmtool
-   :alt: Coverage status
+.. image:: https://codecov.io/gh/EducationalTestingService/rsmtool/branch/main/graph/badge.svg?token=wMCnQrB49J
+   :target: https://codecov.io/gh/EducationalTestingService/rsmtool
+   :alt: Coverage status   
 
 .. image:: https://img.shields.io/conda/v/ets/rsmtool.svg
    :target: https://anaconda.org/ets/rsmtool
@@ -73,7 +73,7 @@ Requirements
 
 Contributing
 ------------
-Contributions to RSMTool are very welcome. Please refer to the `documentation <http://rsmtool.readthedocs.io/en/latest/contributing.html>`_ for how to get started on developing new features or functionality for RSMTool.
+Contributions to RSMTool are very welcome. Please refer to the `documentation <https://rsmtool.readthedocs.io/en/main/contributing.html>`_ for how to get started on developing new features or functionality for RSMTool.
 
 Citing
 ------

@@ -8,23 +8,23 @@ Setting up
 
 To set up a local development environment, follow the steps below:
 
-1. Pull the latest version of RSMTool from GitHub and switch to the ``main`` branch.
+#. Clone the `Github repository <https://github.com/EducationalTestingService/rsmtool>`_ for RSMTool. If you have already have a local version of the repository, pull the latest version from GitHub and switch to the ``main`` branch.
 
-2. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
+#. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 
-3. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
+#. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
 
     conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
 
-4. Activate the environment using ``conda activate rsmdev``. [#]_
+#. Activate the environment using ``conda activate rsmdev``. [#]_
 
-5. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
+#. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
 
-6. Create a new git branch with a useful and descriptive name.
+#. Create a new git branch with a useful and descriptive name.
 
-7. Make your changes and add tests. See the next section for more on writing new tests. 
+#. Make your changes and add tests. See the next section for more on writing new tests. 
 
-8. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
+#. Run ``nosetests -v --nologcapture tests`` to run the tests. We use the ``--nologcapture`` switch, since otherwise test failures for some tests tend to produce very long Jupyter notebook traces.
 
 Documentation
 -------------
@@ -37,7 +37,7 @@ Code style
 ----------
 The RSMTool codebase follows certain best practices when it comes to the code style and we expect any contributed code to do the same. These best practices are:
 
-1. The imports at the top of any Python files should be grouped and sorted as follows: STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER. As an example, consider the imports at the top of ``reporter.py`` which look like this:
+#. The imports at the top of any Python files should be grouped and sorted as follows: STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER. As an example, consider the imports at the top of ``reporter.py`` which look like this:
 
     .. code-block:: python
 
@@ -57,9 +57,9 @@ The RSMTool codebase follows certain best practices when it comes to the code st
 
     Rather than doing this grouping and sorting manually, we recommend to use the `isort <https://pycqa.github.io/isort/>`_ Python library to do this. The best way to use ``isort`` is via plugins for your favorite editor, e.g., `Sublime Text <https://packagecontrol.io/packages/isort>`_, `VS Code <https://code.visualstudio.com/docs/python/editing#_sort-imports>`_, and `PyCharm <https://github.com/PyCQA/isort/issues/258>`_. 
 
-2. All classes, functions, and methods in the main code files should have `numpy-formatted docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_ that comply with `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_. For Sublime Text, this can be done using the `AutoDocstring <https://packagecontrol.io/packages/AutoDocstring>`_ and `SublimeLinter-pydocstyle <https://packagecontrol.io/packages/SublimeLinter-pydocstyle>`_ plugins. For VS Code, these `two <https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring>`_ `links <https://code.visualstudio.com/docs/python/linting#_specific-linters>`_ may be relevant. PyCharm does not seem to support automatic numpy-format docstrings out of the box. 
+#. All classes, functions, and methods in the main code files should have `numpy-formatted docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_ that comply with `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_. For Sublime Text, this can be done using the `AutoDocstring <https://packagecontrol.io/packages/AutoDocstring>`_ and `SublimeLinter-pydocstyle <https://packagecontrol.io/packages/SublimeLinter-pydocstyle>`_ plugins. For VS Code, these `two <https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring>`_ `links <https://code.visualstudio.com/docs/python/linting#_specific-linters>`_ may be relevant. PyCharm does not seem to support automatic numpy-format docstrings out of the box. 
 
-3. When writing docstrings, make sure to use the appropriate quotes when referring to argument names vs. argument values. As an example, consider the docstring for the `train_skll_model <https://rsmtool.readthedocs.io/en/stable/api.html#rsmtool.modeler.Modeler.train_skll_model>`_  method of the ``rsmtool.modeler.Modeler`` class. Note that string argument values are enclosed in double quotes (e.g., "csv", "neg_mean_squared_error") whereas values of other built-in types are written as literals (e.g., ``True``, ``False``, ``None``). Note also that if one had to refer to an argument name in the docstring, this referent should be written as a literal. In general, we strongly encourage looking at the docstrings in the existing code to make sure that new docstrings follow the same practices.
+#. When writing docstrings, make sure to use the appropriate quotes when referring to argument names vs. argument values. As an example, consider the docstring for the `train_skll_model <https://rsmtool.readthedocs.io/en/stable/api.html#rsmtool.modeler.Modeler.train_skll_model>`_  method of the ``rsmtool.modeler.Modeler`` class. Note that string argument values are enclosed in double quotes (e.g., "csv", "neg_mean_squared_error") whereas values of other built-in types are written as literals (e.g., ``True``, ``False``, ``None``). Note also that if one had to refer to an argument name in the docstring, this referent should be written as a literal. In general, we strongly encourage looking at the docstrings in the existing code to make sure that new docstrings follow the same practices.
 
 RSMTool tests
 -------------
@@ -68,9 +68,9 @@ Existing tests for RSMTool are spread across the various ``test_*.py`` files und
 
 There are two kinds of existing tests in RSMTool: 
 
-1. The first type of tests are **unit tests**, i.e., very specific tests for which you have a single example (usually embedded in the test itself) and you compare the generated output with known or expected output. These tests should have a very narrow and well defined scope. To see examples of such unit tests, see the test functions in the file `tests/test_utils.py`. 
+#. The first type of tests are **unit tests**, i.e., very specific tests for which you have a single example (usually embedded in the test itself) and you compare the generated output with known or expected output. These tests should have a very narrow and well defined scope. To see examples of such unit tests, see the test functions in the file `tests/test_utils.py`. 
 
-2. The second type of tests are **functional tests** which are generally written from the users' perspective to test that RSMTool is doing things that users would expect it to. In RSMTool, most (if not all) functional tests are written in the form of "experiment tests", i.e., we first define an experimental configuration using an ``rsmtool`` (or ``rsmeval``/``rsmpredict``/``rsmcompare``/``rsmsummarize``) configuration file, then we run the experiment, and then compare the generated output files to expected output files to make sure that RSMTool components are operating as expected. To see examples of such tests, you can look at any of the ``tests/test_experiment_*.py`` files. 
+#. The second type of tests are **functional tests** which are generally written from the users' perspective to test that RSMTool is doing things that users would expect it to. In RSMTool, most (if not all) functional tests are written in the form of "experiment tests", i.e., we first define an experimental configuration using an ``rsmtool`` (or ``rsmeval``/``rsmpredict``/``rsmcompare``/``rsmsummarize``) configuration file, then we run the experiment, and then compare the generated output files to expected output files to make sure that RSMTool components are operating as expected. To see examples of such tests, you can look at any of the ``tests/test_experiment_*.py`` files. 
 
 .. note:: 
 
@@ -169,29 +169,29 @@ The two examples below might help make this process easier to understand:
 
 .. topic:: Example 1: You made a code change to better handle an edge case that only affects one test. 
      
-    1. Run ``nosetests --nologcapture tests/*.py``. The affected test failed.  
+    #. Run ``nosetests --nologcapture tests/*.py``. The affected test failed.  
 
-    2. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. You will see the total number of deleted, updated and missing files. There should be no deleted files and no missing files. Only the files for your new test should be updated. There are no warnings in the output. 
+    #. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. You will see the total number of deleted, updated and missing files. There should be no deleted files and no missing files. Only the files for your new test should be updated. There are no warnings in the output. 
 
-    3. If this is the case, you are now ready to commit your change and the updated test outputs.
+    #. If this is the case, you are now ready to commit your change and the updated test outputs.
 
 .. topic:: Example 2: You made a code change that changes the output of many tests. For example, you renamed one of the evaluation metrics. 
      
-     1. Run ``nosetests --nologcapture tests/*.py``. Many tests will now fail since the output produced by the tool(s) has changed. 
+     #. Run ``nosetests --nologcapture tests/*.py``. Many tests will now fail since the output produced by the tool(s) has changed. 
 
-     2. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. The files affected by your change are shown as added/deleted. You also see the following warning: 
+     #. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. The files affected by your change are shown as added/deleted. You also see the following warning: 
 
-        .. code-block:: 
+        .. code-block:: text
      
             WARNING: X input files for rsmcompare/rsmsummarize tests have been updated. You need to re-run these tests and update test outputs
 
-     3. This means that the changes you made to the code changed the outputs for one or more ``rsmtool``/``rsmeval`` tests that served as inputs to one or more ``rsmcompare``/``rsmsummarize`` tests. Therefore, it is likely that the current test outputs no longer match the expected output and the tests for those two tools must be be re-run.
+     #. This means that the changes you made to the code changed the outputs for one or more ``rsmtool``/``rsmeval`` tests that served as inputs to one or more ``rsmcompare``/``rsmsummarize`` tests. Therefore, it is likely that the current test outputs no longer match the expected output and the tests for those two tools must be be re-run.
 
-     4. Run ``nosetests --nologcapture tests/*rsmsummarize*.py`` and ``nosetests --nologcapture tests/*rsmcompare*.py``. If you see any failures, make sure they are related to the changes you made since those are expected.
+     #. Run ``nosetests --nologcapture tests/*rsmsummarize*.py`` and ``nosetests --nologcapture tests/*rsmcompare*.py``. If you see any failures, make sure they are related to the changes you made since those are expected.
 
-     3. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
+     #. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests. 
 
-     4. If this is the case, you are now ready to commit your changes. 
+     #. If this is the case, you are now ready to commit your changes. 
 
 
 Advanced tips and tricks
@@ -199,15 +199,15 @@ Advanced tips and tricks
 
 Here are some advanced tips and tricks when working with RSMTool tests.
 
-1. To run a specific test function in a specific test file, simply use ``nosetests --nologcapture tests/test_X.py:Y`` where ``test_X.py`` is the name of the test file, and ``Y`` is the test functions. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other ``param()`` calls and run the ``test_run_experiment_parameterized()`` function as above.
+#. To run a specific test function in a specific test file, simply use ``nosetests --nologcapture tests/test_X.py:Y`` where ``test_X.py`` is the name of the test file, and ``Y`` is the test functions. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other ``param()`` calls and run the ``test_run_experiment_parameterized()`` function as above.
 
-2. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and then update the *expected* test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
+#. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and then update the *expected* test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
 
-3. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
+#. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
 
-4. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nosetests`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nosetests`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
+#. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nosetests`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nosetests`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
 
-5. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nosetests --nologcapture tests``).
+#. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nosetests --nologcapture tests``).
 
 .. rubric:: Footnotes
 
