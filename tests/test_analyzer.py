@@ -24,7 +24,6 @@ class TestAnalyzer:
                                         index=range(0, 10))
 
         self.df_features_same_score = self.df_features.copy()
-        print(self.df_features_same_score)
         self.df_features_same_score['sc1'] = [3] * 10
 
         self.df_features_with_groups = self.df_features.copy()
