@@ -127,6 +127,8 @@ class TestDataReader:
     def check_feature_specs(self, name_ext_tuples, converters=None):
         container = self.get_container(name_ext_tuples, converters)
         frame = container.feature_specs
+        print(frame)
+        print(self.df_specs)
         assert_frame_equal(frame.sort_index(axis=1),
                            self.df_specs.sort_index(axis=1))
 

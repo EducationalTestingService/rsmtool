@@ -63,8 +63,18 @@ def read_jsonlines(filename, converters=None):
 
     dfs = []
     for column in df:
+        # let's try to normalize this column
         try:
             df_column = pd.json_normalize(df[column])
+
+            # from Pandas 1.3 we get an empty df
+            # if the column does not contain a nested json
+            # in this case we simply copy the column
+            if df_column.empty:
+                df_column = df[column].copy()
+
+        # Pandas <1.3 will raise an attribute error:
+        # we'll catch that too
         except AttributeError:
             df_column = df[column].copy()
 
