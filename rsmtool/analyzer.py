@@ -542,7 +542,7 @@ class Analyzer:
         df_target_pcorr_no_length = pd.DataFrame()
 
         for group, df_group in grouped:
-            df_group = df_group.drop(grouping_variable, 1)
+            df_group = df_group.drop(grouping_variable, axis=1)
 
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
@@ -1116,7 +1116,7 @@ class Analyzer:
                                                                  'pooled',
                                                                  use_diff_std_means))
             # drop the sc1 column from the human-human agreement frame
-            df_human_human = df_human_human.drop('sc1', 1)
+            df_human_human = df_human_human.drop('sc1', axis=1)
 
             # sort the rows in the correct order
             df_human_human = df_human_human.reindex(['N', 'h_mean', 'h_sd',
@@ -1149,7 +1149,7 @@ class Analyzer:
                                                                      use_diff_std_means))
 
         # drop 'sc1' column from the human-system frame and transpose
-        df_human_system = df_human_system.drop('sc1', 1)
+        df_human_system = df_human_system.drop('sc1', axis=1)
         df_human_system = df_human_system.transpose()
 
         # sort the columns and rows in the correct order
@@ -1258,7 +1258,7 @@ class Analyzer:
         df_human_human_by_group = pd.DataFrame()
 
         for group, df_group in grouped:
-            df_group = df_group.drop(grouping_variable, 1)
+            df_group = df_group.drop(grouping_variable, axis=1)
 
             (df_human_system_metrics,
              df_human_system_metrics_short,

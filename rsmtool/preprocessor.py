@@ -1225,7 +1225,7 @@ class FeaturePreprocessor:
 
         # reset the index for the feature metadata frame
         # since we built it up row by row
-        df_feature_info = df_feature_info.reset_index().drop('index', 1)
+        df_feature_info = df_feature_info.reset_index().drop('index', axis=1)
 
         # return the three data frames
         return (df_train_preprocessed,
