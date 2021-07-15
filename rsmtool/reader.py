@@ -67,9 +67,9 @@ def read_jsonlines(filename, converters=None):
         try:
             df_column = pd.json_normalize(df[column])
 
-            # from Pandas 1.3 we get an empty df
-            # if the column does not contain a nested json
-            # in this case we simply copy the column
+            # Starting with Pandas v1.3, we get an empty data frame
+            # if the column does not contain a nested json. 
+            # If this is the case, we simply copy the column.
             if df_column.empty:
                 df_column = df[column].copy()
 
