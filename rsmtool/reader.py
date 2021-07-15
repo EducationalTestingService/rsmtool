@@ -73,8 +73,8 @@ def read_jsonlines(filename, converters=None):
             if df_column.empty:
                 df_column = df[column].copy()
 
-        # Pandas <1.3 will raise an attribute error:
-        # we'll catch that too
+        # Pandas <v1.3 will raise an attribute error instead, 
+        # so we'll catch that too
         except AttributeError:
             df_column = df[column].copy()
 
