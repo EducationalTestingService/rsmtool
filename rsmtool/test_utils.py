@@ -799,6 +799,13 @@ def check_report(html_file,
             if m_warning:
                 # actual text of warning is in the next line of HTML file
                 warning_text = htmlf.readline()
+
+                # NOTE: there is a separate function
+                # ``collect_warning_messages_from_the_report`` that once again
+                # checks for warnings. The warnings filtered here might still
+                # be flagged by that function.
+                # See https://github.com/EducationalTestingService/rsmtool/issues/539
+
                 # we do not want to flag matlplotlib font cache warning
                 if not re.search(r'font\s*cache', warning_text, flags=re.IGNORECASE):
                     report_warnings += 1
