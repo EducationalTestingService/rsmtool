@@ -24,7 +24,7 @@ class TestAnalyzer:
                                         index=range(0, 10))
 
         self.df_features_same_score = self.df_features.copy()
-        self.df_features_same_score[['sc1']] = [3] * 10
+        self.df_features_same_score['sc1'] = [3] * 10
 
         self.df_features_with_groups = self.df_features.copy()
         self.df_features_with_groups['group'] = ['group1']*5 + ['group2']*5
@@ -212,9 +212,13 @@ class TestAnalyzer:
         # test pca when we have less samples than
         # features. In this case the number of components
         # equals to the number of samples.
-        df = pd.DataFrame({'a': range(50)})
-        for i in range(100):
-            df[i] = df['a'] * i
+        dfs = []
+        # to avoid inserting too many columns,
+        # we create a list of data frames and then
+        # concatenate them together
+        for i in range(1, 101):
+            dfs.append(pd.DataFrame({i: pd.Series(range(50)) * i}))
+        df = pd.concat(dfs, axis=1)
         (components, variance) = Analyzer.compute_pca(df, df.columns)
         assert_equal(len(components.columns), 50)
         assert_equal(len(variance.columns), 50)
