@@ -47,6 +47,7 @@ Documentation
    api
    utilities
    contributing
+   faq
    internal
 
 Indices and tables
