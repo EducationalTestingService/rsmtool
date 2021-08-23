@@ -140,6 +140,7 @@ Then, in order to use feature subset "A" (``feature2`` and ``feature3``) in an e
         ...
     }
 
+.. _clever_sign_note:
 
 .. note::
 

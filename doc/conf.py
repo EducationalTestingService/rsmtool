@@ -35,7 +35,8 @@ from rsmtool.version import __version__ as version  # isort:skip
 # ones.
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode',
-              'sphinx.ext.mathjax', 'sphinx.ext.napoleon']
+              'sphinx.ext.mathjax', 'sphinx.ext.napoleon',
+              'sphinx_panels']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
