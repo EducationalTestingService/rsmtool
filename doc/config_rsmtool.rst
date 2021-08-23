@@ -13,6 +13,8 @@ experiment_id
 """""""""""""
 An identifier for the experiment that will be used to name the report and all :ref:`intermediate files <intermediate_files_rsmtool>`. It can be any combination of alphanumeric values, must *not* contain spaces, and must *not* be any longer than 200 characters.
 
+.. _model_:
+
 model
 """""
 The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
@@ -227,6 +229,8 @@ The name for an optional column in the test data containing a second human score
 .. note::
 
     You do not need to have second human scores for *all* responses to use this option. The human-human agreement statistics will be computed as long as there is at least one response with numeric value in this column. For responses that do not have a second human score, the value in this column should be blank.
+
+.. _section_order_rsmtool:
 
 section_order *(Optional)*
 """"""""""""""""""""""""""
