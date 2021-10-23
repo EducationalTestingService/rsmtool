@@ -1034,8 +1034,8 @@ class Modeler:
 
         # save the OLS fit object and its summary to files
         if fit:
-            ols_file = join(filedir, '{}.ols'.format(experiment_id))
-            summary_file = join(filedir, '{}_ols_summary.txt'.format(experiment_id))
+            ols_file = join(filedir, f'{experiment_id}.ols')
+            summary_file = join(filedir, f'{experiment_id}_ols_summary.txt')
             with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
                 pickle.dump(fit, olsf)
                 summf.write(str(fit.summary()))
@@ -1047,7 +1047,7 @@ class Modeler:
             frames.append({'name': 'model_fit', 'frame': df_model_fit})
 
         # save the SKLL model to a file
-        model_file = join(filedir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, f'{experiment_id}.model')
         learner.save(model_file)
 
         container = DataContainer(frames)
@@ -1137,7 +1137,7 @@ class Modeler:
         # TODO: compute betas for linear SKLL models?
 
         # save the SKLL model to disk with the given model name prefix
-        model_file = join(filedir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, f'{experiment_id}.model')
         learner.save(model_file)
 
         self.learner = learner

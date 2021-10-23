@@ -108,13 +108,13 @@ def copy_jsons(source_dir, target_dir):
         # change the id and the file name to the directory name since these are more
         # explicit about the purpose of the test
         if not tool == 'rsmcompare':
-            new_id = '{}_{}'.format(experiment_dir, tool)
+            new_id = f'{experiment_dir}_{tool}'
             json_obj['experiment_id'] = new_id
-            output_fname = join(target_dir, '{}.json'.format(new_id))
+            output_fname = join(target_dir, f'{new_id}.json')
 
         # for rsmcompare we replace the first id with the directory name
         if tool == 'rsmcompare':
-            new_old_id = '{}_{}'.format(experiment_dir, tool)
+            new_old_id = f'{experiment_dir}_{tool}'
             json_obj['experiment_id_old'] = new_old_id
             output_fname = join(target_dir, "{}_vs_{}.json".format(new_old_id,
                                                                    json_obj['experiment_id_new']))
@@ -132,7 +132,7 @@ def copy_jsons(source_dir, target_dir):
                 json_obj[field] = new_ref_path
 
         if exists(output_fname):
-            print("WARNING: {} exists and will be overwritten".format(basename(output_fname)))
+            print(f"WARNING: {basename(output_fname)} exists and will be overwritten")
         with open(output_fname, 'w') as outfile:
             json.dump(json_obj, outfile, indent=4, separators=(',', ': '))
 

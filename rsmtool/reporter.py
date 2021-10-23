@@ -288,8 +288,7 @@ class Reporter:
             elif extra_sections and not missing_sections:
                 raise ValueError(error_message_extra)
             else:
-                raise ValueError("{}\n{}".format(error_message_missing,
-                                                 error_message_extra))
+                raise ValueError(f"{error_message_missing}\n{error_message_extra}")
 
     @staticmethod
     def convert_ipynb_to_html(notebook_file, html_file):
@@ -452,7 +451,7 @@ class Reporter:
         selected_notebook_path = notebook_path_dict['general'][context]
         general_sections = master_section_dict['general'][context]
 
-        section_file_map = {s: join(selected_notebook_path, '{}.ipynb'.format(s))
+        section_file_map = {s: join(selected_notebook_path, f'{s}.ipynb')
                             for s in general_sections + ['header', 'footer']}
 
         # update the file map to point the 'model section to either the built-in
@@ -460,13 +459,13 @@ class Reporter:
         # was passed in
         if context == 'rsmtool' and model_type:
             section_file_map['model'] = join(selected_notebook_path,
-                                             '{}_model.ipynb'.format(model_type.lower()))
+                                             f'{model_type.lower()}_model.ipynb')
 
         # update the file map to include the special sections
         if special_sections:
             selected_special_notebook_path = notebook_path_dict['special'][context]
             section_file_map.update({ss: join(selected_special_notebook_path,
-                                              "{}.ipynb".format(ss))
+                                              f"{ss}.ipynb")
                                      for ss in special_sections})
 
         # update the file map to include the custom sections with
@@ -659,8 +658,8 @@ class Reporter:
         # get the report directory which is at the same level
         # as the output and the figure directory
         reportdir = abspath(join(csvdir, '..', 'report'))
-        report_name = '{}_report'.format(config['experiment_id'])
-        merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        report_name = f"{config['experiment_id']}_report"
+        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
         environ_config_file = join(reportdir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -678,7 +677,7 @@ class Reporter:
         # an HTML file in the report directory
         logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, '{}.html'.format(report_name)))
+                                   join(reportdir, f'{report_name}.html'))
 
     def create_comparison_report(self,
                                  config,
@@ -729,8 +728,8 @@ class Reporter:
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
-        report_name = '{}_report'.format(config['comparison_id'])
-        merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+        report_name = f"{config['comparison_id']}_report"
+        merged_notebook_file = join(output_dir, f'{report_name}.ipynb')
         environ_config_file = join(output_dir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -748,7 +747,7 @@ class Reporter:
         # an HTML file in the report directory
         logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(output_dir, '{}.html'.format(report_name)))
+                                   join(output_dir, f'{report_name}.html'))
 
     def create_summary_report(self,
                               config,
@@ -779,9 +778,9 @@ class Reporter:
                           'OUTPUT_DIR': csvdir
                           }
 
-        report_name = '{}_report'.format(config['summary_id'])
+        report_name = f"{config['summary_id']}_report"
         reportdir = abspath(join(csvdir, '..', 'report'))
-        merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
         environ_config_file = join(reportdir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -799,7 +798,7 @@ class Reporter:
         # an HTML file in the report directory
         logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, '{}.html'.format(report_name)))
+                                   join(reportdir, f'{report_name}.html'))
 
 
 def main():  # noqa: D103

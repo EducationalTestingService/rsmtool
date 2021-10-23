@@ -41,8 +41,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     # make sure the input file is a valid feature JSON file
     json_dict = json.load(open(json_file, 'r'))
     if not list(json_dict.keys()) == ['features']:
-        raise RuntimeError("{} is not a valid feature JSON "
-                           "file".format(json_file))
+        raise RuntimeError(f"{json_file} is not a valid feature JSON file")
 
     # convert to tabular format
     df_feature = pd.DataFrame(json_dict['features'])

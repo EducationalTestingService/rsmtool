@@ -58,11 +58,11 @@ def test_run_experiment_lr_with_notebook_rerun():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
-    report_ipynb = join('test_outputs', source, 'report', '{}_report.ipynb'.format(experiment_id))
-    report_html = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    report_ipynb = join('test_outputs', source, 'report', f'{experiment_id}_report.ipynb')
+    report_html = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
 
     del os.environ['RSM_REPORT_DIR']
 
@@ -82,12 +82,12 @@ def test_run_experiment_lr_with_notebook_rerun_fail():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
     report_env = join('test_outputs', source, 'report', '.environ.json'.format(experiment_id))
-    report_ipynb = join('test_outputs', source, 'report', '{}_report.ipynb'.format(experiment_id))
-    report_html = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    report_ipynb = join('test_outputs', source, 'report', f'{experiment_id}_report.ipynb')
+    report_html = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
 
     del os.environ['RSM_REPORT_DIR']
     os.remove(report_env)
@@ -106,7 +106,7 @@ def test_run_experiment_lr_subset_feature_file_and_feature_file():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -122,7 +122,7 @@ def test_run_experiment_lr_with_sc2_as_feature_name():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -138,7 +138,7 @@ def test_run_experiment_lr_with_subgroup_as_feature_name():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -155,7 +155,7 @@ def test_run_experiment_lr_all_non_numeric_scores():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -172,7 +172,7 @@ def test_run_experiment_lr_one_fully_non_numeric_feature():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -189,7 +189,7 @@ def test_run_experiment_lr_none_flagged():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -203,5 +203,5 @@ def test_run_experiment_wrong_model_name():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)

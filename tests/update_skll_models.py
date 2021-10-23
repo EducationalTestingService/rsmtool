@@ -53,7 +53,7 @@ def main():  # noqa: D103
                                  '*predict*', 'existing_experiment',
                                  'output', "*.model"))
     for model_file in model_files:
-        print("Processing {}".format(model_file))
+        print(f"Processing {model_file}")
         update_model(model_file)
 
 

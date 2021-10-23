@@ -129,8 +129,7 @@ class DataContainer:
 
         """
         if not isinstance(other, DataContainer):
-            raise ValueError('Object must be a `DataContainer`, '
-                             'not {}.'.format(type(other)))
+            raise ValueError(f'Object must be a `DataContainer`, not {type(other)}.')
 
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)

@@ -82,7 +82,7 @@ def has_files_with_extension(directory, ext):
         ``True`` if directory contains files with given extension,
         else ``False``.
     """
-    files_with_extension = glob(join(directory, '*.{}'.format(ext)))
+    files_with_extension = glob(join(directory, f'*.{ext}'))
     return len(files_with_extension) > 0
 
 

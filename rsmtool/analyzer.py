@@ -352,7 +352,7 @@ class Analyzer:
         df_output = df_output.transpose()
 
         # change the column names to be more readable
-        df_output.columns = ['{}%'.format(p) for p in percentiles]
+        df_output.columns = [f'{p}%' for p in percentiles]
 
         # add the inter-quartile range column
         df_output['IQR'] = df_output['75%'] - df_output['25%']
@@ -466,7 +466,7 @@ class Analyzer:
         df_components = pd.DataFrame(pca.components_)
         n_components = len(df_components)
         df_components.columns = selected_features
-        df_components.index = ['PC{}'.format(i) for i in range(1, n_components + 1)]
+        df_components.index = [f'PC{i}' for i in range(1, n_components + 1)]
         df_components = df_components.transpose()
 
         # compute the variance data frame
@@ -483,7 +483,7 @@ class Analyzer:
                                    'Cumulative percentage of variance']]
 
         # set the row names and take the transpose
-        df_variance.index = ['PC{}'.format(i) for i in range(1, n_components + 1)]
+        df_variance.index = [f'PC{i}' for i in range(1, n_components + 1)]
         df_variance = df_variance.transpose()
 
         return df_components, df_variance
@@ -963,7 +963,7 @@ class Analyzer:
             chosen_metrics = chosen_metric_dict
         else:
             smd_name = 'DSM' if 'DSM' in df_metrics else 'SMD'
-            chosen_metrics = {'{}_trim'.format(score_prefix): ['N',
+            chosen_metrics = {f'{score_prefix}_trim': ['N',
                                                                'h_mean',
                                                                'h_sd',
                                                                'sys_mean',
@@ -973,7 +973,7 @@ class Analyzer:
                                                                smd_name,
                                                                'RMSE',
                                                                'R2'],
-                              '{}_trim_round'.format(score_prefix): ['sys_mean',
+                              f'{score_prefix}_trim_round': ['sys_mean',
                                                                      'sys_sd',
                                                                      'kappa',
                                                                      'exact_agr',
@@ -985,7 +985,7 @@ class Analyzer:
         for score_type in chosen_metrics:
             for metric in chosen_metrics[score_type]:
                 colname = (metric if metric in ['h_mean', 'h_sd', 'N']
-                           else '{}.{}'.format(metric, score_type))
+                           else f'{metric}.{score_type}')
                 values = df_metrics[metric][score_type]
                 metricdict[colname] = values
 
@@ -1527,9 +1527,9 @@ class Analyzer:
                                                  pd.DataFrame(),
                                                  pd.DataFrame()))
 
-            datasets.extend([{'name': 'margcor_length_by_{}'.format(group),
+            datasets.extend([{'name': f'margcor_length_by_{group}',
                               'frame': length_marg_cors},
-                             {'name': 'pcor_length_by_{}'.format(group),
+                             {'name': f'pcor_length_by_{group}',
                               'frame': length_part_cors}])
 
         # Add score correlations by group datasets
@@ -1539,11 +1539,11 @@ class Analyzer:
              sc1_part_cors,
              sc1_part_cors_no_length) = score_corr_by_group_dict[group]
 
-            datasets.extend([{'name': 'margcor_score_by_{}'.format(group),
+            datasets.extend([{'name': f'margcor_score_by_{group}',
                               'frame': sc1_marg_cors},
-                             {'name': 'pcor_score_by_{}'.format(group),
+                             {'name': f'pcor_score_by_{group}',
                               'frame': sc1_part_cors},
-                             {'name': 'pcor_score_no_length_by_{}'.format(group),
+                             {'name': f'pcor_score_no_length_by_{group}',
                               'frame': sc1_part_cors_no_length}])
 
         return configuration, DataContainer(datasets=datasets)
@@ -1656,15 +1656,14 @@ class Analyzer:
         # compute the confusion matrix as a data frame
         score_type = 'scale' if use_scaled_predictions else 'raw'
         human_scores = df_preds['sc1_round'].astype('int64')
-        system_scores = df_preds['{}_trim_round'.format(score_type)].astype('int64')
+        system_scores = df_preds[f'{score_type}_trim_round'].astype('int64')
         conf_matrix = confusion_matrix(human_scores, system_scores)
         labels = sorted(human_scores.append(system_scores).unique())
         df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
 
         # compute the score distributions of the rounded human and system scores
         df_score_dist = df_preds[['sc1_round',
-                                  '{}_trim_round'
-                                  ''.format(score_type)]].apply(lambda s:
+                                  f'{score_type}_trim_round']].apply(lambda s:
                                                                 (s.value_counts() /
                                                                  len(df_test) * 100))
 
@@ -1672,13 +1671,13 @@ class Analyzer:
         # predicts a particular score label, with zeros.
         df_score_dist.fillna(0, inplace=True)
 
-        df_score_dist.columns = ['human', 'sys_{}'.format(score_type)]
-        df_score_dist['difference'] = (df_score_dist['sys_{}'.format(score_type)] -
+        df_score_dist.columns = ['human', f'sys_{score_type}']
+        df_score_dist['difference'] = (df_score_dist[f'sys_{score_type}'] -
                                        df_score_dist['human'])
         df_score_dist['score'] = df_score_dist.index
 
         df_score_dist = df_score_dist[['score', 'human',
-                                       'sys_{}'.format(score_type),
+                                       f'sys_{score_type}',
                                        'difference']]
         df_score_dist.sort_values(by='score', inplace=True)
 
@@ -1713,16 +1712,16 @@ class Analyzer:
 
             # compute disattenuated correlations if we have the second human score
             if include_second_score:
-                dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group['corr.{}_trim'.format(score_type)],
+                dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group[f'corr.{score_type}_trim'],
                                                                             consistency_by_group['corr'])
             else:
                 dis_corr_by_group = pd.DataFrame()
 
-            datasets.extend([{'name': 'eval_by_{}'.format(group),
+            datasets.extend([{'name': f'eval_by_{group}',
                               'frame': eval_by_group},
-                             {'name': 'consistency_by_{}'.format(group),
+                             {'name': f'consistency_by_{group}',
                               'frame': consistency_by_group},
-                             {'name': 'disattenuated_correlations_by_{}'.format(group),
+                             {'name': f'disattenuated_correlations_by_{group}',
                               'frame': dis_corr_by_group}])
 
         return configuration, DataContainer(datasets=datasets)
@@ -1821,7 +1820,7 @@ class Analyzer:
 
         for group in data_composition_by_group_dict:
 
-            datasets.append({'name': 'data_composition_by_{}'.format(group),
+            datasets.append({'name': f'data_composition_by_{group}',
                              'frame': data_composition_by_group_dict[group]})
 
         return configuration, DataContainer(datasets=datasets)
@@ -1907,7 +1906,7 @@ class Analyzer:
 
         for group in data_composition_by_group_dict:
 
-            datasets.append({'name': 'data_composition_by_{}'.format(group),
+            datasets.append({'name': f'data_composition_by_{group}',
                              'frame': data_composition_by_group_dict[group]})
 
         return configuration, DataContainer(datasets=datasets)

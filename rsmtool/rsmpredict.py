@@ -116,7 +116,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     # check that the directory contains outher required files
     required_file_types = ['feature', 'postprocessing_params']
     for file_type in required_file_types:
-        expected_file_name = "{}_{}.csv".format(experiment_id, file_type)
+        expected_file_name = f"{experiment_id}_{file_type}.csv"
         if not exists(join(experiment_output_dir, expected_file_name)):
             raise FileNotFoundError('{} does not contain the required file '
                                     '{} that was generated during the '
@@ -126,10 +126,10 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     logger.info('Reading input files.')
 
     feature_info = join(experiment_output_dir,
-                        '{}_feature.csv'.format(experiment_id))
+                        f'{experiment_id}_feature.csv')
 
     post_processing = join(experiment_output_dir,
-                           '{}_postprocessing_params.csv'.format(experiment_id))
+                           f'{experiment_id}_postprocessing_params.csv')
 
     file_paths = [input_features_file, feature_info, post_processing]
     file_names = ['input_features',
@@ -144,7 +144,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     # load the Modeler to generate the predictions
     model = Modeler.load_from_file(join(experiment_output_dir,
-                                        '{}.model'.format(experiment_id)))
+                                        f'{experiment_id}.model'))
 
     # Add the model to the configuration object
     configuration['model'] = model
@@ -159,7 +159,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     # save the pre-processed features to disk if we were asked to
     if feats_file is not None:
-        logger.info('Saving pre-processed feature values to {}'.format(feats_file))
+        logger.info(f'Saving pre-processed feature values to {feats_file}')
 
         feats_dir = dirname(feats_file)
 

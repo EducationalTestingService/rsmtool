@@ -126,7 +126,7 @@ def try_to_load_file(filename,
     if exists(filename):
         return DataReader.read_from_file(filename, converters, **kwargs)
 
-    message = "The file '{}' could not be located.".format(filename)
+    message = f"The file '{filename}' could not be located."
     if raise_error:
         raise FileNotFoundError(message)
 
@@ -179,8 +179,7 @@ class DataReader:
             frames_with_no_path = [framenames[i] for i in range(len(framenames))
                                    if filepaths[i] is None]
 
-            raise ValueError("No path specified for "
-                             "{}".format(' ,'.join(frames_with_no_path)))
+            raise ValueError(f"No path specified for {' ,'.join(frames_with_no_path)}")
 
         # Assign names and paths lists
         self.dataset_names = framenames
@@ -370,7 +369,7 @@ class DataReader:
             converter = self.file_converters.get(name, None)
 
             if not exists(set_path):
-                raise FileNotFoundError('The file {} does not exist'.format(set_path))
+                raise FileNotFoundError(f'The file {set_path} does not exist')
 
             if kwargs_dict is not None:
                 kwargs = kwargs_dict.get(name, {})

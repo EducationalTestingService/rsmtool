@@ -5,6 +5,7 @@ nose
 notebook
 numpy
 pandas
+pre-commit
 seaborn
 skll==2.5.0
 statsmodels

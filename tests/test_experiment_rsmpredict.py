@@ -60,7 +60,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
                                'data',
                                'experiments',
                                source,
-                               '{}.json'.format(experiment_id))
+                               f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, rsmtool_config_file)
     rsmpredict_config_file = join(rsmtool_test_dir,
                                   'data',
@@ -71,7 +71,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(rsmtool_test_dir, 'data', 'experiments', source, 'output')
     csv_files = glob(join(output_dir, '*.csv'))
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    html_report = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
 
     # Check the results for  rsmtool
     for csv_file in csv_files:
@@ -87,9 +87,9 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
 
     # check that the rsmpredict generated the same results
     for csv_pair in [('predictions.csv',
-                      '{}_pred_processed.csv'.format(experiment_id)),
+                      f'{experiment_id}_pred_processed.csv'),
                      ('preprocessed_features.csv',
-                      '{}_test_preprocessed_features.csv'.format(experiment_id))]:
+                      f'{experiment_id}_test_preprocessed_features.csv')]:
         output_file = join(output_dir, csv_pair[0])
         expected_output_file = join(expected_output_dir, csv_pair[1])
 

@@ -115,7 +115,7 @@ def get_coefficients(fit, base_category):
     # rename the rows
     df_results.index = [v.split('.')[1].strip(']')
                         if not v == 'Intercept'
-                        else 'Intercept ({})'.format(base_category)
+                        else f'Intercept ({base_category})'
                         for v in df_results.index]
 
     return df_results
@@ -150,9 +150,7 @@ def write_fairness_results(fit_dictionary,
     for model in fit_dictionary:
         fit = fit_dictionary[model]
 
-        ols_file = join(output_dir, '{}_{}_by_{}.ols'.format(experiment_id,
-                                                             model,
-                                                             group))
+        ols_file = join(output_dir, f'{experiment_id}_{model}_by_{group}.ols')
         summary_file = join(output_dir, '{}_{}_by_{}_ols_summary.txt'.format(experiment_id,
                                                                              model,
                                                                              group))
@@ -290,13 +288,13 @@ def get_fairness_analyses(df,
 
     # assemble all datasets into a DataContainer
 
-    datasets = [{'name': 'estimates_osa_by_{}'.format(group),
+    datasets = [{'name': f'estimates_osa_by_{group}',
                  'frame': df_coefficients_osa},
-                {'name': 'estimates_osd_by_{}'.format(group),
+                {'name': f'estimates_osd_by_{group}',
                  'frame': df_coefficients_osd},
-                {'name': 'estimates_csd_by_{}'.format(group),
+                {'name': f'estimates_csd_by_{group}',
                  'frame': df_coefficients_csd},
-                {'name': 'fairness_metrics_by_{}'.format(group),
+                {'name': f'fairness_metrics_by_{group}',
                  'frame': df_r2_all}]
 
     # assemble all models into a dictionary

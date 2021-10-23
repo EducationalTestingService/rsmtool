@@ -150,7 +150,7 @@ def run_evaluation(config_file_or_obj_or_dict,
 
     converters = {'predictions': configuration.get_default_converter()}
 
-    logger.info('Reading predictions: {}.'.format(configuration['predictions_file']))
+    logger.info(f"Reading predictions: {configuration['predictions_file']}.")
 
     # Initialize the reader
     reader = DataReader(file_paths, file_names, converters)
@@ -258,7 +258,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_evaluation(abspath(args.config_file),
                        abspath(args.output_dir),
                        overwrite_output=args.force_write)

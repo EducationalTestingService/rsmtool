@@ -195,7 +195,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                    analyzed_container,
                                    file_format=file_format)
 
-    logger.info('Training {} model.'.format(processed_config['model_name']))
+    logger.info(f"Training {processed_config['model_name']} model.")
 
     # Initialize modeler
     modeler = Modeler()
@@ -368,7 +368,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_experiment(abspath(args.config_file),
                        abspath(args.output_dir),
                        overwrite_output=args.force_write)

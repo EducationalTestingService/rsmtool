@@ -64,7 +64,7 @@ class TestDataReader:
     @staticmethod
     def make_file_from_ext(df, ext):
         tempf = tempfile.NamedTemporaryFile(mode='w',
-                                            suffix='.{}'.format(ext),
+                                            suffix=f'.{ext}',
                                             delete=False)
         if ext.lower() == 'csv':
             df.to_csv(tempf.name, index=False)

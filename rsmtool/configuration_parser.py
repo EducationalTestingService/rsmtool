@@ -152,7 +152,7 @@ class Configuration:
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
             configdir = Path(getcwd())
-            logging.info("Configuration directory will be set to {}".format(configdir))
+            logging.info(f"Configuration directory will be set to {configdir}")
         else:
             configdir = Path(configdir).resolve()
 
@@ -844,8 +844,7 @@ class ConfigurationParser:
 
         for field in required_fields:
             if field not in new_config:
-                raise ValueError("The config file must "
-                                 "specify '{}'".format(field))
+                raise ValueError(f"The config file must specify '{field}'")
 
         # 2. Add default values for unspecified optional fields
         # for given RSMTool context
@@ -858,8 +857,7 @@ class ConfigurationParser:
         # 3. Check to make sure no unrecognized fields are specified
         for field in new_config:
             if field not in defaults and field not in required_fields:
-                raise ValueError("Unrecognized field '{}'"
-                                 " in json file".format(field))
+                raise ValueError(f"Unrecognized field '{field}' in json file")
 
         # 4. Check to make sure that the ID fields that will be
         # used as part of filenames are formatted correctly
@@ -869,12 +867,10 @@ class ConfigurationParser:
 
         for id_field, id_field_value in id_field_values.items():
             if len(id_field_value) > 200:
-                raise ValueError("{} is too long (must be "
-                                 "<=200 characters)".format(id_field))
+                raise ValueError(f"{id_field} is too long (must be <=200 characters)")
 
             if re.search(r'\s', id_field_value):
-                raise ValueError("{} cannot contain any "
-                                 "spaces".format(id_field))
+                raise ValueError(f"{id_field} cannot contain any spaces")
 
         # 5. Check that the feature file and feature subset/subset file are not
         # specified together
@@ -1072,8 +1068,7 @@ class ConfigurationParser:
 
         # make sure all boolean values are boolean
         for field in BOOLEAN_FIELDS:
-            error_message = ('Field {} can only be set to '
-                             'True or False.'.format(field))
+            error_message = f'Field {field} can only be set to True or False.'
             if field in new_config and new_config[field] is not None:
                 if not isinstance(new_config[field], bool):
                     # we first convert the value to string to avoid

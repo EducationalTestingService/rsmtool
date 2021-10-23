@@ -347,8 +347,7 @@ class FeatureTransformer:
 
         # make sure we have a valid transform function
         if transform is None or transform not in transforms:
-            raise ValueError('Unrecognized feature transformation: '
-                             ' {}'.format(transform))
+            raise ValueError(f'Unrecognized feature transformation:  {transform}')
 
         transformer = transforms.get(transform)
         new_data = transformer(column_name, values, raise_error)

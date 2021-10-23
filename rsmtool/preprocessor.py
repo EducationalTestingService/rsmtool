@@ -104,15 +104,15 @@ class FeatureSubsetProcessor:
                              "containing the feature names.")
         if subset:
             if subset not in df_feature_specs:
-                raise ValueError("Unknown value for feature_subset: {}".format(subset))
+                raise ValueError(f"Unknown value for feature_subset: {subset}")
 
             if not df_feature_specs[subset].isin([0, 1]).all():
                 raise ValueError("The subset columns in feature "
                                  "file can only contain 0 or 1")
 
         if sign:
-            possible_sign_columns = ['sign_{}'.format(sign),
-                                     'Sign_{}'.format(sign)]
+            possible_sign_columns = [f'sign_{sign}',
+                                     f'Sign_{sign}']
             existing_sign_columns = [c for c in possible_sign_columns
                                      if c in df_feature_specs]
             if len(existing_sign_columns) > 1:
@@ -314,7 +314,7 @@ class FeatureSpecsProcessor:
         if feature_sign:
             # Convert to dictionary {feature:sign}
             sign_dict = dict(zip(feature_subset.Feature,
-                                 feature_subset['Sign_{}'.format(feature_sign)]))
+                                 feature_subset[f'Sign_{feature_sign}']))
         # else create an empty dictionary
         else:
             sign_dict = {}
@@ -671,7 +671,7 @@ class FeaturePreprocessor:
                                                     column not in requested_feature_names)]
         # rename these columns
         if columns_with_incorrect_default_names:
-            new_column_names = ['##{}##'.format(column) for column
+            new_column_names = [f'##{column}##' for column
                                 in columns_with_incorrect_default_names]
             df.rename(columns=dict(zip(columns_with_incorrect_default_names,
                                        new_column_names)),
@@ -687,7 +687,7 @@ class FeaturePreprocessor:
             # if the column has already been renamed because it used a
             # default name, then use the updated name
             if column in columns_with_incorrect_default_names:
-                df.rename(columns={'##{}##'.format(column): name_mapping[column]},
+                df.rename(columns={f'##{column}##': name_mapping[column]},
                           inplace=True)
             else:
                 df.rename(columns={column: name_mapping[column]},
@@ -1434,8 +1434,7 @@ class FeaturePreprocessor:
             df_filtered = df_responses_with_requested_flags.copy()
             trim_min = given_trim_min if given_trim_min else 1
             trim_max = given_trim_max if given_trim_max else 10
-            logging.info("Generating labels randomly "
-                         "from [{}, {}]".format(trim_min, trim_max))
+            logging.info(f"Generating labels randomly from [{trim_min}, {trim_max}]")
             randgen = RandomState(seed=1234567890)
             df_filtered[label_column] = randgen.random_integers(trim_min,
                                                                 trim_max,
@@ -1507,7 +1506,7 @@ class FeaturePreprocessor:
                             "provided. The column will be renamed as ##{}## and "
                             "saved in *train_other_columns.csv.".format(length_column,
                                                                         length_column))
-            df_filtered.rename(columns={'length': '##{}##'.format(length_column)},
+            df_filtered.rename(columns={'length': f'##{length_column}##'},
                                inplace=True)
 
         # if requested, exclude the candidates with less than X responses

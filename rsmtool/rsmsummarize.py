@@ -58,8 +58,7 @@ def check_experiment_dir(experiment_dir,
     full_path_experiment_dir = DataReader.locate_files(experiment_dir,
                                                        configpath)
     if not full_path_experiment_dir:
-        raise FileNotFoundError("The directory {} "
-                                "does not exist.".format(experiment_dir))
+        raise FileNotFoundError(f"The directory {experiment_dir} does not exist.")
     else:
         # check that there is an output directory
         csvdir = normpath(join(full_path_experiment_dir, 'output'))
@@ -268,7 +267,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_summary(abspath(args.config_file),
                     abspath(args.output_dir),
                     overwrite_output=args.force_write)

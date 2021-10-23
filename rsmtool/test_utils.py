@@ -102,7 +102,7 @@ def check_run_experiment(source,
                             'data',
                             'experiments',
                             source,
-                            '{}.json'.format(experiment_id))
+                            f'{experiment_id}.json')
     else:
         config_input = config_obj_or_dict
 
@@ -115,9 +115,9 @@ def check_run_experiment(source,
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    html_report = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
 
-    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    output_files = glob(join(output_dir, f'*.{file_format}'))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
@@ -201,7 +201,7 @@ def check_run_evaluation(source,
                             'data',
                             'experiments',
                             source,
-                            '{}.json'.format(experiment_id))
+                            f'{experiment_id}.json')
     else:
         config_input = config_obj_or_dict
 
@@ -212,9 +212,9 @@ def check_run_evaluation(source,
 
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', '{}_report.html'.format(experiment_id))
+    html_report = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
 
-    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    output_files = glob(join(output_dir, f'*.{file_format}'))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
@@ -282,7 +282,7 @@ def check_run_comparison(source,
                       config_input,
                       suppress_warnings_for=suppress_warnings_for)
 
-    html_report = join('test_outputs', source, '{}_report.html'.format(experiment_id))
+    html_report = join('test_outputs', source, f'{experiment_id}_report.html')
 
     # check report for any errors but ignore warnings
     # which we check below separately
@@ -349,10 +349,10 @@ def check_run_prediction(source,
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
 
-    output_files = ['predictions.{}'.format(file_format),
-                    'preprocessed_features.{}'.format(file_format)]
+    output_files = [f'predictions.{file_format}',
+                    f'preprocessed_features.{file_format}']
     if excluded:
-        output_files.append('predictions_excluded_responses.{}'.format(file_format))
+        output_files.append(f'predictions_excluded_responses.{file_format}')
     for output_file in output_files:
         generated_output_file = join(output_dir, output_file)
         expected_output_file = join(expected_output_dir, output_file)
@@ -412,7 +412,7 @@ def check_run_summary(source,
     output_dir = join('test_outputs', source, 'output')
     expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
 
-    output_files = glob(join(output_dir, '*.{}'.format(file_format)))
+    output_files = glob(join(output_dir, f'*.{file_format}'))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
@@ -716,8 +716,8 @@ def check_file_output(file1, file2, file_format='csv'):
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
-    if (file1.endswith('pca.{}'.format(file_format)) or
-            file1.endswith('factor_correlations.{}'.format(file_format))):
+    if (file1.endswith(f'pca.{file_format}') or
+            file1.endswith(f'factor_correlations.{file_format}')):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
@@ -729,7 +729,7 @@ def check_file_output(file1, file2, file_format='csv'):
                            rtol=1e-03)
     except AssertionError as e:
         message = e.args[0]
-        new_message = 'File {} - {}'.format(basename(file1), message)
+        new_message = f'File {basename(file1)} - {message}'
         e.args = (new_message, )
         raise
 
@@ -844,8 +844,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     predictions_file = join('test_outputs',
                             source,
                             'output',
-                            '{}_pred_processed.{}'.format(experiment_id,
-                                                          file_format))
+                            f'{experiment_id}_pred_processed.{file_format}')
 
     postprocessing_params_file = join('test_outputs',
                                       source,
@@ -892,29 +891,29 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
         The format of the output files.
         Defaults to "csv".
     """
-    file_must_have_both = ["_confMatrix.{}".format(file_format),
-                           "_cors_orig.{}".format(file_format),
-                           "_cors_processed.{}".format(file_format),
-                           "_eval.{}".format(file_format),
-                           "_eval_short.{}".format(file_format),
-                           "_feature.{}".format(file_format),
-                           "_feature_descriptives.{}".format(file_format),
-                           "_feature_descriptivesExtra.{}".format(file_format),
-                           "_feature_outliers.{}".format(file_format),
-                           "_margcor_score_all_data.{}".format(file_format),
-                           "_pca.{}".format(file_format),
-                           "_pcavar.{}".format(file_format),
-                           "_pcor_score_all_data.{}".format(file_format),
-                           "_pred_processed.{}".format(file_format),
-                           "_pred_train.{}".format(file_format),
-                           "_score_dist.{}".format(file_format),
-                           "_train_preprocessed_features.{}".format(file_format),
-                           "_test_preprocessed_features.{}".format(file_format),
-                           "_postprocessing_params.{}".format(file_format)
+    file_must_have_both = [f"_confMatrix.{file_format}",
+                           f"_cors_orig.{file_format}",
+                           f"_cors_processed.{file_format}",
+                           f"_eval.{file_format}",
+                           f"_eval_short.{file_format}",
+                           f"_feature.{file_format}",
+                           f"_feature_descriptives.{file_format}",
+                           f"_feature_descriptivesExtra.{file_format}",
+                           f"_feature_outliers.{file_format}",
+                           f"_margcor_score_all_data.{file_format}",
+                           f"_pca.{file_format}",
+                           f"_pcavar.{file_format}",
+                           f"_pcor_score_all_data.{file_format}",
+                           f"_pred_processed.{file_format}",
+                           f"_pred_train.{file_format}",
+                           f"_score_dist.{file_format}",
+                           f"_train_preprocessed_features.{file_format}",
+                           f"_test_preprocessed_features.{file_format}",
+                           f"_postprocessing_params.{file_format}"
                            ]
 
-    file_must_have_rsmtool = ["_betas.{}".format(file_format),
-                              "_coefficients.{}".format(file_format)]
+    file_must_have_rsmtool = [f"_betas.{file_format}",
+                              f"_coefficients.{file_format}"]
     if model_source == 'rsmtool':
         file_must_have = file_must_have_both + file_must_have_rsmtool
     else:
@@ -923,7 +922,7 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
     missing_file = set(file_must_with_id).difference(set(file_exist))
-    assert_equal(len(missing_file), 0, "Missing files: {}".format(','.join(missing_file)))
+    assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
 
 
 def check_consistency_files_exist(generated_files, experiment_id, file_format='csv'):
@@ -940,15 +939,15 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format='c
         The format of the output files.
         Defaults to "csv".
     """
-    file_must_have = ["_consistency.{}".format(file_format),
-                      "_degradation.{}".format(file_format),
-                      "_disattenuated_correlations.{}".format(file_format),
-                      "_true_score_eval.{}".format(file_format)]
+    file_must_have = [f"_consistency.{file_format}",
+                      f"_degradation.{file_format}",
+                      f"_disattenuated_correlations.{file_format}",
+                      f"_true_score_eval.{file_format}"]
 
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
     missing_file = set(file_must_with_id).difference(set(file_exist))
-    assert_equal(len(missing_file), 0, "Missing files: {}".format(','.join(missing_file)))
+    assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
 
 
 def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='csv'):
@@ -969,13 +968,11 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
         Defaults to "csv".
     """
     train_preprocessed_file = join(output_dir,
-                                   '{}_train_metadata.{}'.format(experiment_id,
-                                                                 file_format))
+                                   f'{experiment_id}_train_metadata.{file_format}')
     train_preprocessed = DataReader.read_from_file(train_preprocessed_file, index_col=0)
 
     test_preprocessed_file = join(output_dir,
-                                  '{}_test_metadata.{}'.format(experiment_id,
-                                                               file_format))
+                                  f'{experiment_id}_test_metadata.{file_format}')
     test_preprocessed = DataReader.read_from_file(test_preprocessed_file,
                                                   index_col=0)
     for group in subgroups:
@@ -986,8 +983,7 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
     # in data composition and the total N categories matches what is
     # in overall data composition
     file_data_composition_all = join(output_dir,
-                                     '{}_data_composition.{}'.format(experiment_id,
-                                                                     file_format))
+                                     f'{experiment_id}_data_composition.{file_format}')
     df_data_composition_all = DataReader.read_from_file(file_data_composition_all)
     for group in subgroups:
         file_composition_by_group = join(output_dir,
@@ -999,8 +995,7 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
             partition_info = df_data_composition_all.loc[df_data_composition_all['partition'] ==
                                                          partition]
 
-            summation = sum(composition_by_group['{} set'
-                                                 ''.format(partition)])
+            summation = sum(composition_by_group[f'{partition} set'])
             ok_(summation == partition_info.iloc[0]['responses'])
 
             length = len(composition_by_group.loc[composition_by_group['{} set'
@@ -1297,8 +1292,8 @@ class FileUpdater(object):
         # import all the test_suffix experiment files using SourceFileLoader
         # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:
-            test_module_path = join(self.tests_directory, 'test_experiment_{}.py'.format(test_suffix))
-            test_module = SourceFileLoader('loaded_{}'.format(test_suffix), test_module_path).load_module()
+            test_module_path = join(self.tests_directory, f'test_experiment_{test_suffix}.py')
+            test_module = SourceFileLoader(f'loaded_{test_suffix}', test_module_path).load_module()
             test_tool = test_suffix.split('_')[0]
 
             # skip the module if it tells us that it doesn't want the data for its tests updated
@@ -1347,9 +1342,9 @@ class FileUpdater(object):
     def print_report(self):
         """Print a report of all changes made when the updater was run."""
         # print out the number and list of overall deleted files
-        print('{} deleted:'.format(len(self.deleted_files)))
+        print(f'{len(self.deleted_files)} deleted:')
         for source, deleted_file in self.deleted_files:
-            print('{} {}'.format(source, deleted_file))
+            print(f'{source} {deleted_file}')
         print()
 
         # find added/updated input files: in this case the source # will consist of
@@ -1358,15 +1353,15 @@ class FileUpdater(object):
                                in self.updated_files if '/' in source]
 
         # print out the number and list of overall added/updated non-model files
-        print('{} added/updated:'.format(len(self.updated_files)))
+        print(f'{len(self.updated_files)} added/updated:')
         for source, updated_file in self.updated_files:
-            print('{} {}'.format(source, updated_file))
+            print(f'{source} {updated_file}')
         print()
 
         # now print out missing and/or empty updated output directories
-        print('{} missing/empty sources in updated outputs:'.format(len(self.missing_or_empty_sources)))
+        print(f'{len(self.missing_or_empty_sources)} missing/empty sources in updated outputs:')
         for source in self.missing_or_empty_sources:
-            print('{}'.format(source))
+            print(f'{source}')
         print()
 
         # if we updated any input files, let the user know that they need to

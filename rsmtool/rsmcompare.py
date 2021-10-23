@@ -41,7 +41,7 @@ def check_experiment_id(experiment_dir, experiment_id):
     # list all possible output files which start with experiment_id
     outputs = glob.glob(join(experiment_dir,
                              'output',
-                             '{}_*.*'.format(experiment_id)))
+                             f'{experiment_id}_*.*'))
 
     # raise an error if none exists
     if len(outputs) == 0:
@@ -213,7 +213,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_comparison(abspath(args.config_file),
                        abspath(args.output_dir))
 
