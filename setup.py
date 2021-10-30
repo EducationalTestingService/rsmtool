@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import find_packages, setup
+from setuptools import find_packages, setup, __version__
 
 # Get version without importing, which avoids dependency issues
 exec(compile(open("rsmtool/version.py").read(), "rsmtool/version.py", "exec"))

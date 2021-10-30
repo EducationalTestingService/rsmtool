@@ -285,9 +285,7 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     function getPicture(picpath) {{
         window.open(picpath, 'Image', resizable=1);
     }};
-    </script>""".format(
-        image_id
-    )
+    </script>"""
 
     # generate image tags
     image = (

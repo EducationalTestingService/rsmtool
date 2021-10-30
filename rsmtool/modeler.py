@@ -61,7 +61,8 @@ class Modeler:
         """
         if not model_path.lower().endswith(".model"):
             raise ValueError(
-                f"The file `{model_path}` does not end with the proper extension. Please make sure that it is a `.model` file."
+                f"The file `{model_path}` does not end with the proper extension. "
+                f"Please make sure that it is a `.model` file."
             )
 
         # Create SKLL learner from file
@@ -243,7 +244,9 @@ class Modeler:
                 # exclude NA coefficients
                 if coefficient == np.nan:
                     logging.warning(
-                        f"No coefficient was estimated for {feature}. This is likely due to exact collinearity in the model. This feature will not be used for model building"
+                        f"No coefficient was estimated for {feature}. "
+                        f"This is likely due to exact collinearity in the model. "
+                        f"This feature will not be used for model building"
                     )
                 else:
                     coefdict[feature] = coefficient
@@ -968,8 +971,8 @@ class Modeler:
 
         Returns
         -------
-        learner : skll.learner.Learner
-            SKLL ``LinearRegression`` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_
+        learner : skll.learner.Learner SKLL ``LinearRegression`` `Learner
+        <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_
             object containing the coefficients learned by training
             the built-in model.
         """

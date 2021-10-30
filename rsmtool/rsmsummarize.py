@@ -61,21 +61,25 @@ def check_experiment_dir(experiment_dir, experiment_name, configpath):
         csvdir = normpath(join(full_path_experiment_dir, "output"))
         if not exists(csvdir):
             raise FileNotFoundError(
-                f"The directory {full_path_experiment_dir} does not contain the output of an rsmtool experiment."
+                f"The directory {full_path_experiment_dir} "
+                f"does not contain the output of an rsmtool experiment."
             )
 
         # find the json configuration files for all experiments stored in this directory
         jsons = glob.glob(join(csvdir, "*.json"))
         if len(jsons) == 0:
             raise FileNotFoundError(
-                f"The directory {full_path_experiment_dir} does not contain the .json configuration files for rsmtool experiments."
+                f"The directory {full_path_experiment_dir} "
+                f"does not contain the .json configuration files for rsmtool experiments."
             )
 
         # Raise an error if the user specified a list of experiment names
         # but we found several .jsons in the same directory
         if experiment_name and len(jsons) > 1:
             raise ValueError(
-                f"{full_path_experiment_dir} seems to contain the output of multiple experiments. In order to use custom experiment names, you must have a separate directory for each experiment"
+                f"{full_path_experiment_dir} seems to contain the output of multiple experiments."
+                f" In order to use custom experiment names,"
+                f" you must have a separate directory for each experiment"
             )
 
         # return [(json, experiment_name)] when we have experiment name or
@@ -145,7 +149,9 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False):
             )
         else:
             logger.warning(
-                f"{output_dir} already contains a non-empty 'output' directory. The generated report might contain unexpected information from a previous experiment."
+                f"{output_dir} already contains a non-empty 'output' directory. "
+                f"The generated report might contain unexpected information "
+                f"from a previous experiment."
             )
 
     configuration = configure("rsmsummarize", config_file_or_obj_or_dict)

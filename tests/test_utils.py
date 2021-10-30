@@ -147,11 +147,14 @@ def test_parse_json_with_comments_no_comments():
         },
         "text_to_instance": None,
         "train": {
-            "notes": r"The training process was recorded here: https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
+            "notes": r"The training process was recorded here: "
+            r"https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
             "repository_commit": "12.2020_model_deployment_1.0",
             "repository_name": "strides-scoring-pt",
             "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
-            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet",
+            "train_cmd": "futil.run_experiment "
+            "--config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet"
+            "--config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet",
         },
     }
     yield check_parse_json_with_comments, test_json_string, expected_result

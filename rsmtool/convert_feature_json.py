@@ -50,7 +50,8 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     output_extension = splitext(output_file)[1].lower()
     if output_extension not in [".csv", ".tsv", ".xlsx"]:
         raise RuntimeError(
-            f"The output file {output_file} has an unsupported extension. It must be a CSV/TSV/XLSX file. RSMTool no longer supports .xls files"
+            f"The output file {output_file} has an unsupported extension. "
+            f"It must be a CSV/TSV/XLSX file. RSMTool no longer supports .xls files"
         )
 
     if output_extension == ".csv":

@@ -276,7 +276,9 @@ class Reporter:
         invalid_section_names = set(specified_sections).difference(master_section_list)
         if invalid_section_names:
             raise ValueError(
-                f"The following {section_type} report section names are invalid or not supported for {context}: {invalid_section_names}\nThe following sections are currently available: {master_section_list}"
+                f"The following {section_type} report section names are invalid "
+                f"or not supported for {context}: {invalid_section_names}\n"
+                f"The following sections are currently available: {master_section_list}"
             )
 
     @staticmethod
@@ -302,11 +304,21 @@ class Reporter:
             # check for discrepancies and create a helpful error message
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
-                error_message_missing = f"'section_order' must list all sections selected for your experiment: Please edit section order to include the following missing sections: {', '.join(missing_sections)}"
+                error_message_missing = (
+                    f"'section_order' must list all sections selected "
+                    f"for your experiment: Please edit section order to "
+                    f"include the following missing sections: "
+                    f"{', '.join(missing_sections)}"
+                )
 
             extra_sections = set(section_order).difference(set(chosen_sections))
             if extra_sections:
-                error_message_extra = f"'section order' can only include sections availabe for this experiment. The following sections are either unavailable or were not selected for this experiment {', '.join(extra_sections)}"
+                error_message_extra = (
+                    f"'section order' can only include sections available "
+                    f"for this experiment. The following sections are "
+                    f"either unavailable or were not selected"
+                    f" for this experiment {', '.join(extra_sections)}"
+                )
 
             # raise an appropriate error message or a combination of messages
             if missing_sections and not extra_sections:
@@ -424,7 +436,10 @@ class Reporter:
 
             if not all_general_sections and len(subgroup_sections) != 0:
                 raise ValueError(
-                    f"You requested sections for subgroup analysis but did not specify any subgroups. Please amend the config files to define the subgroups or delete the following sections from the list of sections: {', '.join(subgroup_sections)}"
+                    f"You requested sections for subgroup analysis but did not specify "
+                    f"any subgroups. Please amend the config files to define the subgroups "
+                    f"or delete the following sections from the list of sections: "
+                    f"{', '.join(subgroup_sections)}"
                 )
 
             # if we are using the default list, we simply remove the

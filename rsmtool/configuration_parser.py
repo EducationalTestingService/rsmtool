@@ -107,7 +107,9 @@ def configure(context, config_file_or_obj_or_dict):
 
     else:
         raise ValueError(
-            f"The input to run_experiment must be a path to the file (str), a dictionary, or a configuration object. You passed {type(config_file_or_obj_or_dict)}."
+            f"The input to run_experiment must be a path to the file (str), "
+            f"a dictionary, or a configuration object. "
+            f"You passed {type(config_file_or_obj_or_dict)}."
         )
 
     return configuration
@@ -495,7 +497,8 @@ class Configuration:
 
         if partition not in flag_message:
             raise ValueError(
-                f"Unknown value for partition: {partition} This must be one of the following: {','.join(flag_message.keys())}."
+                f"Unknown value for partition: {partition} "
+                f"This must be one of the following: {','.join(flag_message.keys())}."
             )
 
         if flag_column == "flag_column_test":
@@ -523,14 +526,20 @@ class Configuration:
                 if not isinstance(original_filter_dict[column], list):
                     new_filter_dict[column] = [original_filter_dict[column]]
                     logging.warning(
-                        f"The filtering condition {original_filter_dict[column]} for column {column} was converted to list. Only responses where {column} == {original_filter_dict[column]} will be used for {flag_message[partition]} the model. You can ignore this warning if this is the correct interpretation of your configuration settings."
+                        f"The filtering condition {original_filter_dict[column]} "
+                        f"for column {column} was converted to list."
+                        f" Only responses where {column} == {original_filter_dict[column]} "
+                        f"will be used for {flag_message[partition]} the model. "
+                        f"You can ignore this warning if this is the correct interpretation "
+                        f"of your configuration settings."
                     )
                 else:
                     new_filter_dict[column] = original_filter_dict[column]
 
                     model_eval = ", ".join(map(str, original_filter_dict[column]))
                     logging.info(
-                        f"Only responses where {column} equals one of the following values will be used for {flag_message[partition]} the model: {model_eval}."
+                        f"Only responses where {column} equals one of the following values"
+                        f" will be used for {flag_message[partition]} the model: {model_eval}."
                     )
         return new_filter_dict
 
@@ -632,12 +641,16 @@ class Configuration:
         # Make sure keys are not duplicated
         if not len(set(keys)) == len(keys):
             raise ValueError(
-                f"The ``keys`` must be unique. However, the following duplicate keys were found: {', '.join([key for key, val in Counter(keys).items() if val > 1])}."
+                f"The ``keys`` must be unique. "
+                f"However, the following duplicate keys were found: "
+                f"{', '.join([key for key, val in Counter(keys).items() if val > 1])}."
             )
         # Make sure names are not duplicated
         if not len(set(names)) == len(names):
             raise ValueError(
-                f"The``names`` must be unique. However, the following duplicate names were found: {', '.join([name for name, val in Counter(names).items() if val > 1])}."
+                f"The``names`` must be unique. "
+                f"However, the following duplicate names were found: "
+                f"{', '.join([name for name, val in Counter(names).items() if val > 1])}."
             )
         existing_names = []
         existing_paths = []
@@ -761,7 +774,9 @@ class ConfigurationParser:
             configdict = parse_json_with_comments(filepath)
         except ValueError:
             raise ValueError(
-                f"The main configuration file `{filepath}` exists but is formatted incorrectly. Please check that each line ends with a comma, there is no comma at the end of the last line, and that all quotes match."
+                f"The main configuration file `{filepath}` exists but is formatted incorrectly."
+                f" Please check that each line ends with a comma, "
+                f"there is no comma at the end of the last line, and that all quotes match."
             )
 
         return configdict
@@ -885,7 +900,9 @@ class ConfigurationParser:
                 default_basename = Path(default_feature_subset_file).name
                 new_config["feature_subset_file"] = default_feature_subset_file
                 logging.warning(
-                    f"You requested feature subsets but did not specify any feature file. The tool will use the default feature file {default_basename} available via rsmextra"
+                    f"You requested feature subsets but did not specify any feature file. "
+                    f"The tool will use the default feature file {default_basename} available"
+                    f" via rsmextra"
                 )
             else:
                 raise ValueError(
@@ -900,7 +917,10 @@ class ConfigurationParser:
                 default_basename = Path(default_feature_subset_file).name
                 new_config["feature_subset_file"] = default_feature_subset_file
                 logging.warning(
-                    f"You specified the expected sign of correlation but did not specify a feature subset file. The tool will use the default feature subset file {default_basename} available via rsmextra"
+                    f"You specified the expected sign of correlation"
+                    f" but did not specify a feature subset file. "
+                    f"The tool will use the default feature subset file {default_basename} "
+                    f"available via rsmextra"
                 )
             else:
                 raise ValueError(
@@ -972,7 +992,8 @@ class ConfigurationParser:
             )
             if not hasattr(dummy_learner.model_type, "predict_proba"):
                 raise ValueError(
-                    f"{model_name} does not support expected scores since it is not a probablistic classifier."
+                    f"{model_name} does not support expected scores "
+                    f"since it is not a probablistic classifier."
                 )
             del dummy_learner
 

@@ -101,7 +101,8 @@ def compute_and_save_predictions(
         experiment_output_dir = normpath(join(experiment_dir, "output"))
         if not exists(experiment_output_dir):
             raise FileNotFoundError(
-                f"The directory {experiment_dir} does not contain the output of an rsmtool experiment."
+                f"The directory {experiment_dir} "
+                f"does not contain the output of an rsmtool experiment."
             )
 
     # find all the .model files in the experiment output directory
@@ -114,7 +115,9 @@ def compute_and_save_predictions(
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
     if experiment_id not in experiment_ids:
         raise FileNotFoundError(
-            f'{experiment_output_dir} does not contain a model for the experiment "{experiment_id}". The following experiments are contained in this directory: {experiment_ids}'
+            f"{experiment_output_dir} "
+            f'does not contain a model for the experiment "{experiment_id}".'
+            f" The following experiments are contained in this directory: {experiment_ids}"
         )
 
     # check that the directory contains outher required files
@@ -123,7 +126,9 @@ def compute_and_save_predictions(
         expected_file_name = f"{experiment_id}_{file_type}.csv"
         if not exists(join(experiment_output_dir, expected_file_name)):
             raise FileNotFoundError(
-                f"{experiment_output_dir} does not contain the required file {expected_file_name} that was generated during the original model training"
+                f"{experiment_output_dir} "
+                f"does not contain the required file {expected_file_name} "
+                f"that was generated during the original model training"
             )
 
     logger.info("Reading input files.")
@@ -211,7 +216,8 @@ def compute_and_save_predictions(
 
         # save the predictions to disk
         logger.info(
-            f"Saving excluded responses to {join(output_dir, '{}_excluded_responses.csv'.format(filename))}"
+            f"Saving excluded responses to "
+            f"{join(output_dir, '{}_excluded_responses.csv'.format(filename))}"
         )
 
         # Write out files

@@ -36,7 +36,8 @@ def read_jsonlines(filename, converters=None):
     converters : dict, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+        format as for `pd.read_csv()
+        <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
         Defaults to ``None``.
 
     Returns
@@ -57,7 +58,8 @@ def read_jsonlines(filename, converters=None):
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:
         raise ValueError(
-            f"It looks like {filename} is a simple json file. Please check documentation (for the expected file format"
+            f"It looks like {filename} is a simple json file. "
+            f"Please check documentation (for the expected file format"
         )
 
     dfs = []
@@ -100,7 +102,8 @@ def try_to_load_file(
     converters : dict, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+        format as for `pd.read_csv()
+        <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
         Defaults to ``None``.
     raise_error : bool, optional
         Raise an error if the file cannot be located.
@@ -186,22 +189,24 @@ class DataReader:
         if file_converters is not None:
             if not isinstance(file_converters, dict):
                 raise ValueError(
-                    f"The 'file_converters' argument must be a `dict`, not `{type(file_converters)}`."
+                    f"The 'file_converters' argument must be a `dict`,"
+                    f" not `{type(file_converters)}`."
                 )
 
             for file_converter_name in file_converters:
                 # Make sure file_converter name is in `dataset_names`
                 if file_converter_name not in self.dataset_names:
                     raise NameError(
-                        f"The file converter name ``{file_converter_name}`` does not exist in the dataset names that you passed."
+                        f"The file converter name ``{file_converter_name}`` "
+                        f"does not exist in the dataset names that you passed."
                     )
 
                 # Make sure file converter is a `dict`
                 file_converter = file_converters[file_converter_name]
                 if not isinstance(file_converter, dict):
                     raise ValueError(
-                        "Value for {} must be``dict`` ",
-                        "not {}".format(file_converter_name, type(file_converter)),
+                        f"Value for {file_converter_name} must be``dict`` "
+                        f"not {file_converter}"
                     )
 
         # Default file_converters dict
@@ -219,7 +224,8 @@ class DataReader:
         converters : dict, optional
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
-            format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+            format as for `pd.read_csv()
+            <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
             Defaults to ``None``.
 
         Returns
@@ -256,7 +262,9 @@ class DataReader:
             do_read = partial(read_jsonlines, converters=converters)
         else:
             raise ValueError(
-                f"RSMTool only supports files in .csv, .tsv, .xlsx, and .sas7bdat formats. Input files should have one of these extensions. The file you passed is: {filename}."
+                f"RSMTool only supports files in .csv, .tsv, .xlsx, and .sas7bdat formats. "
+                f"Input files should have one of these extensions. "
+                f"The file you passed is: {filename}."
             )
 
         # ignore warnings about mixed data types for large files
@@ -266,7 +274,9 @@ class DataReader:
                 df = do_read(filename, **kwargs)
             except pd.errors.ParserError:
                 raise pd.errors.ParserError(
-                    f"Cannot read {filename}. Please check that it is not corrupt or in an incompatible format. (Try running dos2unix?)"
+                    f"Cannot read {filename}. "
+                    f"Please check that it is not corrupt or in an incompatible format."
+                    f" (Try running dos2unix?)"
                 )
         return df
 

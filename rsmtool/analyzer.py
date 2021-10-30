@@ -1381,7 +1381,10 @@ class Analyzer:
         ]
         if len(zero_sd_scores) > 0:
             warnings.warn(
-                f"The standard deviation for {', '.join(zero_sd_scores)} scores is zero (all values are the same). You will see multiple warnings about DSM computation since this metric is computed separately for each subgroup."
+                f"The standard deviation for {', '.join(zero_sd_scores)} scores is zero "
+                f"(all values are the same). "
+                f"You will see multiple warnings about DSM computation "
+                f"since this metric is computed separately for each subgroup."
             )
 
         # create a duplicate data frame to compute evaluations

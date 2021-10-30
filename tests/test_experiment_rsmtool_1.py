@@ -32,7 +32,8 @@ else:
             "lr_with_id_with_leading_zeros",
             subgroups=["ITEM", "QUESTION"],
         ),
-        # we suppress UserWarnings for this test since we expect to get a warning in partial correlations
+        # we suppress UserWarnings for this test since we expect
+        # to get a warning in partial correlations
         # due to edge cases
         param(
             "lr-subgroups-with-edge-cases",

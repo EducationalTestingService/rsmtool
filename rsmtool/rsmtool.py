@@ -98,7 +98,9 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
             )
         else:
             logger.warning(
-                f"{output_dir} already contains a non-empty 'output' directory. The generated report might contain unexpected information from a previous experiment."
+                f"{output_dir} already contains a non-empty 'output' directory. "
+                f"The generated report might contain unexpected information"
+                f" from a previous experiment."
             )
 
     configuration = configure("rsmtool", config_file_or_obj_or_dict)

@@ -44,7 +44,8 @@ def check_experiment_id(experiment_dir, experiment_id):
     # raise an error if none exists
     if len(outputs) == 0:
         raise FileNotFoundError(
-            f"The directory {experiment_dir} does not contain any outputs of an rsmtool experiment {experiment_id}"
+            f"The directory {experiment_dir} does not contain any outputs of an rsmtool "
+            f"experiment {experiment_id}"
         )
 
 
@@ -99,7 +100,8 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     figdir_old = normpath(join(experiment_dir_old, "figure"))
     if not exists(csvdir_old) or not exists(figdir_old):
         raise FileNotFoundError(
-            f"The directory {experiment_dir_old} does not contain the output of an rsmtool experiment."
+            f"The directory {experiment_dir_old} "
+            f"does not contain the output of an rsmtool experiment."
         )
 
     check_experiment_id(experiment_dir_old, experiment_id_old)
@@ -118,7 +120,8 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     figdir_new = normpath(join(experiment_dir_new, "figure"))
     if not exists(csvdir_new) or not exists(figdir_new):
         raise FileNotFoundError(
-            f"The directory {experiment_dir_new} does not contain the output of an rsmtool experiment."
+            f"The directory {experiment_dir_new} "
+            f"does not contain the output of an rsmtool experiment."
         )
 
     check_experiment_id(experiment_dir_new, experiment_id_new)

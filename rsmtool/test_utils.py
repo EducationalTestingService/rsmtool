@@ -1310,7 +1310,8 @@ class FileUpdater(object):
     def run(self):
         """Update test data in files given by the ``test_suffixes`` attribute."""
         # import all the test_suffix experiment files using SourceFileLoader
-        # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+        # adapted from:
+        # http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:
             test_module_path = join(
                 self.tests_directory, f"test_experiment_{test_suffix}.py"
@@ -1400,5 +1401,7 @@ class FileUpdater(object):
         # re-run the tests and update test outputs
         if len(updated_input_files) > 0:
             print(
-                f"WARNING: {len(updated_input_files)} input files for rsmcompare/rsmsummarize tests have been updated. You need to re-run these tests and update test outputs"
+                f"WARNING: {len(updated_input_files)} input files for "
+                f"rsmcompare/rsmsummarize tests have been updated. "
+                f"You need to re-run these tests and update test outputs"
             )

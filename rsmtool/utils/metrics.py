@@ -56,7 +56,8 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         num_score_points_in_learner = probability_distributions.shape[1]
         if num_score_points_specified != num_score_points_in_learner:
             raise ValueError(
-                f"The specified number of score points ({num_score_points_specified}) does not match that from the the learner ({num_score_points_in_learner})."
+                f"The specified number of score points ({num_score_points_specified}) "
+                f"does not match that from the the learner ({num_score_points_in_learner})."
             )
         expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
@@ -67,7 +68,8 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
             )
         else:
             raise ValueError(
-                f"Expected scores cannot be computed since {model.model_type.__name__} is not a probabilistic classifier."
+                f"Expected scores cannot be computed since {model.model_type.__name__} "
+                f"is not a probabilistic classifier."
             )
 
     return expected_scores

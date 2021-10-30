@@ -64,7 +64,8 @@ def convert_to_ordered_category(group_values, base_group=None):
         # if we have user-supplied base group, check that it's actually in the data
         if base_group not in group_values.values:
             raise ValueError(
-                f"The reference group {base_group} must be one of the existing values for this group"
+                f"The reference group {base_group} must be "
+                f"one of the existing values for this group"
             )
         else:
             # move the supplied reference group to the beginning of the list

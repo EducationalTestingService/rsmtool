@@ -126,7 +126,10 @@ def get_output_directory_extension(directory, experiment_id):
 
     if len(extensions_identified) > 1:
         raise ValueError(
-            f"Some of the files in the experiment output directory (`{directory}`) for `{experiment_id}` have different extensions. All files in this directory must have the same extension. The following extensions were identified : {', '.join(extensions_identified)}"
+            f"Some of the files in the experiment output directory (`{directory}`) for "
+            f"`{experiment_id}` have different extensions. "
+            f"All files in this directory must have the same extension. "
+            f"The following extensions were identified : {', '.join(extensions_identified)}"
         )
 
     elif len(extensions_identified) == 1:

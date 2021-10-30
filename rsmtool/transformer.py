@@ -48,11 +48,14 @@ class FeatureTransformer:
         if np.any(values < 0):
             if raise_error:
                 raise ValueError(
-                    f"The sqrt transformation should not be applied to feature {name} which can have negative values"
+                    f"The sqrt transformation should not be applied to feature {name} "
+                    f"which can have negative values"
                 )
             else:
                 logging.warning(
-                    f"The sqrt transformation was applied to feature {name} which has negative values for some responses. No system score will be generated for such responses"
+                    f"The sqrt transformation was applied to feature {name} "
+                    f"which has negative values for some responses. "
+                    f"No system score will be generated for such responses"
                 )
 
         with np.errstate(invalid="ignore"):
@@ -91,22 +94,28 @@ class FeatureTransformer:
         if np.any(values == 0):
             if raise_error:
                 raise ValueError(
-                    f"The log transformation should not be applied to feature {name} which can have a value of 0"
+                    f"The log transformation should not be applied to feature {name} "
+                    f"which can have a value of 0"
                 )
             else:
                 logging.warning(
-                    f"The log transformation was applied to feature {name} which has a value of 0 for some responses. No system score will be generated for such responses"
+                    f"The log transformation was applied to feature {name} "
+                    f"which has a value of 0 for some responses. "
+                    f"No system score will be generated for such responses"
                 )
 
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
                 raise ValueError(
-                    f"The log transformation should not be applied to feature {name} which can have negative values"
+                    f"The log transformation should not be applied to feature {name} "
+                    f"which can have negative values"
                 )
             else:
                 logging.warning(
-                    f"The log transformation was applied to feature {name} which has negative values for some responses. No system score will be generated for such responses"
+                    f"The log transformation was applied to feature {name} "
+                    f"which has negative values for some responses. "
+                    f"No system score will be generated for such responses"
                 )
 
         new_data = np.log(values)
@@ -150,11 +159,14 @@ class FeatureTransformer:
         if np.any(values == 0):
             if raise_error:
                 raise ValueError(
-                    f"The inverse transformation should not be applied to feature {name} which can have a value of 0"
+                    f"The inverse transformation should not be applied to feature {name} "
+                    f"which can have a value of 0"
                 )
             else:
                 logging.warning(
-                    f"The inverse transformation was applied to feature {name} which has a value of 0 for some responses. No system score will be generated for such responses"
+                    f"The inverse transformation was applied to feature {name} "
+                    f"which has a value of 0 for some responses. "
+                    f"No system score will be generated for such responses"
                 )
 
         # check if the floor or ceiling are zero
@@ -164,7 +176,8 @@ class FeatureTransformer:
         ceiling = data_mean + sd_multiplier * data_sd
         if floor == 0 or ceiling == 0:
             logging.warning(
-                f"The floor/ceiling for feature {name} is zero after applying the inverse transformation"
+                f"The floor/ceiling for feature {name} "
+                f"is zero after applying the inverse transformation"
             )
 
         # check if the feature can be both positive and negative
@@ -173,11 +186,14 @@ class FeatureTransformer:
         if not (all_positive or all_negative):
             if raise_error:
                 raise ValueError(
-                    f"The inverse transformation should not be applied to feature {name} where the values can have different signs"
+                    f"The inverse transformation should not be applied to feature {name} "
+                    f"where the values can have different signs"
                 )
             else:
                 logging.warning(
-                    f"The inverse transformation was applied to feature {name} where the values canhave different signs. This can change the ranking of the responses"
+                    f"The inverse transformation was applied to feature {name} "
+                    f"where the values canhave different signs. "
+                    f"This can change the ranking of the responses"
                 )
 
         with np.errstate(divide="ignore"):
@@ -216,11 +232,14 @@ class FeatureTransformer:
         if np.any(values < 0):
             if raise_error:
                 raise ValueError(
-                    f"The addOneInv transformation should not be applied to feature {name} which can have negative values"
+                    f"The addOneInv transformation should not be applied to feature {name} "
+                    f"which can have negative values"
                 )
             else:
                 logging.warning(
-                    f"The addOneInv transformation was applied to feature {name} which has negative values for some responses. This can change the ranking of the responses"
+                    f"The addOneInv transformation was applied to feature {name} "
+                    f"which has negative values for some responses. "
+                    f"This can change the ranking of the responses"
                 )
 
         new_data = 1 / (values + 1)
@@ -257,11 +276,15 @@ class FeatureTransformer:
         if np.any(values < 0):
             if raise_error:
                 raise ValueError(
-                    f"The addOneLn transformation should not be applied to feature {name} which can have negative values"
+                    f"The addOneLn transformation should not be applied to feature {name} "
+                    f"which can have negative values"
                 )
             else:
                 logging.warning(
-                    f"The log transformation was applied to feature {name} which has negative values for some responses. If the feature value remains negative after adding one, no score will be generated for such responses"
+                    f"The log transformation was applied to feature {name} "
+                    f"which has negative values for some responses. "
+                    f"If the feature value remains negative after adding one, "
+                    f"no score will be generated for such responses"
                 )
 
         new_data = np.log(values + 1)

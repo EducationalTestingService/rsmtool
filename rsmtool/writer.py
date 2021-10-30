@@ -144,10 +144,10 @@ class DataWriter:
                 df.to_excel(outfile, index=index, **kwargs)
 
             else:
-                raise KeyError(
-                    "Please make sure that the `file_format` specified "
-                    "is one of the following:\n{`csv`, `tsv`, `xlsx`}\n."
-                    "You specified {}.".format(file_format)
+                raise print(
+                    f"Please make sure that the `file_format` specified "
+                    f"is one of the following:\n{{`csv`, `tsv`, `xlsx`}}\n."
+                    f"You specified {file_format}."
                 )
 
     def write_feature_csv(

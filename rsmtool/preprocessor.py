@@ -58,13 +58,17 @@ class FeatureSubsetProcessor:
             extra_columns = set(feature_columns).difference(feature_subset_specs_set)
             if extra_columns:
                 logging.warning(
-                    f"No subset information was available for the following columns in the input file. These columns will not be used in the model: {', '.join(extra_columns)}"
+                    f"No subset information was available for the following columns "
+                    f"in the input file. These columns will not be used in the model: "
+                    f"{', '.join(extra_columns)}"
                 )
         if len(feature_subset) != len(feature_names):
             extra_subset_features = set(feature_subset).difference(set(feature_names))
             if extra_subset_features:
                 logging.warning(
-                    f"The following features were included into the {subset} subset in the feature_subset_file but were not specified in the input data: {', '.join(extra_subset_features)}"
+                    f"The following features were included into the {subset} subset"
+                    f" in the feature_subset_file but were not specified in the input data:"
+                    f" {', '.join(extra_subset_features)}"
                 )
         return feature_names
 
@@ -120,7 +124,8 @@ class FeatureSubsetProcessor:
             ]
             if len(existing_sign_columns) > 1:
                 raise ValueError(
-                    f"The feature_subset_file contains multiple columns for sign: {' ,'.join(existing_sign_columns)}"
+                    f"The feature_subset_file contains multiple columns for sign:"
+                    f" {' ,'.join(existing_sign_columns)}"
                 )
             elif len(existing_sign_columns) == 0:
                 raise ValueError(
@@ -187,7 +192,8 @@ class FeatureSpecsProcessor:
         """
         if feature not in sign_dict.keys():
             logging.warning(
-                f"No information about sign is available for feature {feature}. The feature will be assigned the default positive weight."
+                f"No information about sign is available for feature {feature}. "
+                f"The feature will be assigned the default positive weight."
             )
             feature_sign_numeric = 1.0
         else:
@@ -250,7 +256,8 @@ class FeatureSpecsProcessor:
         duplicate_features = feature_name_count[feature_name_count > 1]
         if len(duplicate_features) > 0:
             raise ValueError(
-                f"The following feature names  are duplicated in the feature file: {duplicate_features.index}"
+                f"The following feature names  are duplicated in the feature file: "
+                f"{duplicate_features.index}"
             )
 
         # if we have `sign` column, check that it can be converted to float
@@ -574,7 +581,11 @@ class FeaturePreprocessor:
         missing_sub_cols = set(subgroups).difference(df.columns)
         if missing_sub_cols:
             raise KeyError(
-                f"The data does not contain columns for all subgroups specified in the configuration file. Please check for capitalization and other spelling errors and make sure the subgroup names do not contain hyphens. The data does not have columns for the following subgroups: {', '.join(missing_sub_cols)}"
+                f"The data does not contain columns for all subgroups specified "
+                f"in the configuration file. Please check for capitalization and "
+                f"other spelling errors and make sure the subgroup names do not contain hyphens. "
+                f"The data does not have columns for the following subgroups: "
+                f"{', '.join(missing_sub_cols)}"
             )
 
         # replace any empty values in subgroups values by "No info"
@@ -936,7 +947,12 @@ class FeaturePreprocessor:
             missing_flag_columns = set(flag_columns).difference(df.columns)
             if missing_flag_columns:
                 raise KeyError(
-                    f"The data does not contain columns for all flag columns specified in the configuration file. Please check for capitalization and other spelling errors and make sure the flag column names do not contain hyphens. The data does not have the following columns: {', '.join(missing_flag_columns)}"
+                    f"The data does not contain columns for all flag columns "
+                    f"specified in the configuration file. "
+                    f"Please check for capitalization and other spelling errors and "
+                    f"make sure the flag column names do not contain hyphens. "
+                    f"The data does not have the following columns:"
+                    f" {', '.join(missing_flag_columns)}"
                 )
 
             # since flag column may be a mix of strings and numeric values
@@ -1103,7 +1119,8 @@ class FeaturePreprocessor:
             feature_sd = np.std(transformed_feature, ddof=1)
             if np.isclose(feature_sd, 0, atol=1e-07):
                 raise ValueError(
-                    f"The standard deviation for feature {feature_name} is 0 after pre-processing. Please exclude this feature and re-run the experiment."
+                    f"The standard deviation for feature {feature_name} is 0 after pre-processing. "
+                    f"Please exclude this feature and re-run the experiment."
                 )
 
         return transformed_feature
@@ -1414,7 +1431,8 @@ class FeaturePreprocessor:
         # check that the id_column contains unique values
         if df["spkitemid"].size != df["spkitemid"].unique().size:
             raise ValueError(
-                f"The data contains duplicate response IDs in '{id_column}'. Please make sure all response IDs are unique and re-run the tool."
+                f"The data contains duplicate response IDs in '{id_column}'. "
+                f"Please make sure all response IDs are unique and re-run the tool."
             )
 
         # Generate feature names if no specific features were requested by the user
@@ -1432,7 +1450,9 @@ class FeaturePreprocessor:
         illegal_feature_names = set(feature_names).intersection(reserved_column_names)
         if illegal_feature_names:
             raise ValueError(
-                f"The following reserved column names cannot be used as feature names: '{', '.join(illegal_feature_names)}'. Please rename these columns and re-run the experiment."
+                f"The following reserved column names cannot be used as feature names: "
+                f"'{', '.join(illegal_feature_names)}'. Please rename these columns and "
+                f"re-run the experiment."
             )
 
         # check to make sure that the subgroup columns are all present
@@ -1511,7 +1531,9 @@ class FeaturePreprocessor:
             )
             if omitted_features:
                 raise ValueError(
-                    f"The following requested features were excluded because their standard deviation on the training set was 0: {', '.join(omitted_features)}.\nPlease edit the feature file to exclude these features and re-run the tool"
+                    f"The following requested features were excluded because their standard "
+                    f"deviation on the training set was 0: {', '.join(omitted_features)}.\nPlease "
+                    f"edit the feature file to exclude these features and re-run the tool"
                 )
             # Update the feature names
             feature_names = [
@@ -1519,7 +1541,11 @@ class FeaturePreprocessor:
             ]
         else:
             raise KeyError(
-                f"DataFrame does not contain columns for all features specified in the feature file. Please check for capitalization and other spelling errors and make sure the feature names do not contain hyphens. The data does not have columns for the following features: {', '.join(missing_features)}"
+                f"DataFrame does not contain columns for all features specified "
+                f"in the feature file. Please check for capitalization and other spelling errors "
+                f"and make sure the feature names do not contain hyphens. "
+                f"The data does not have columns for the following features:"
+                f" {', '.join(missing_features)}"
             )
 
         # if ``length_column`` exists, make sure it's converted to numeric;
@@ -1538,7 +1564,10 @@ class FeaturePreprocessor:
             or df_filtered["length"].std() <= 0
         ):
             logging.warning(
-                f"The {length_column} column either has missing values or a standard deviation <= 0. No length-based analysis will be provided. The column will be renamed as ##{length_column}## and saved in *train_other_columns.csv."
+                f"The {length_column} column either has missing values or "
+                f"a standard deviation <= 0. No length-based analysis will be provided. "
+                f"The column will be renamed as ##{length_column}## and saved "
+                f"in *train_other_columns.csv."
             )
             df_filtered.rename(columns={"length": f"##{length_column}##"}, inplace=True)
 
@@ -1552,7 +1581,9 @@ class FeaturePreprocessor:
             # check that there are still responses left for analysis
             if len(df_filtered_candidates) == 0:
                 raise ValueError(
-                    f"After filtering non-numeric scores and non-numeric feature values there were no candidates with {min_candidate_items} or more responses left for analysis"
+                    f"After filtering non-numeric scores and non-numeric feature values "
+                    f"there were no candidates with {min_candidate_items} or more responses "
+                    f"left for analysis"
                 )
 
             # redefine df_filtered
@@ -1829,7 +1860,8 @@ class FeaturePreprocessor:
         # are not also included in the requested features, if they are specified
         if length_column and length_column in requested_features:
             raise ValueError(
-                f"The value of 'length_column' ('{length_column}') cannot be used as a model feature."
+                f"The value of 'length_column' ('{length_column}') "
+                f"cannot be used as a model feature."
             )
 
         if (
@@ -1837,7 +1869,8 @@ class FeaturePreprocessor:
             and second_human_score_column in requested_features
         ):
             raise ValueError(
-                f"The value of 'second_human_score_column' ('{second_human_score_column}') cannot be used as a model feature."
+                f"The value of 'second_human_score_column' ('{second_human_score_column}') "
+                f"cannot be used as a model feature."
             )
 
         # Specify column names that cannot be used as features
@@ -2229,7 +2262,8 @@ class FeaturePreprocessor:
         missing_columns = set(columns_to_check).difference(df_pred.columns)
         if missing_columns:
             raise KeyError(
-                f"Columns {missing_columns} from the config file do not exist in the predictions file."
+                f"Columns {missing_columns} from the config file do not exist"
+                f" in the predictions file."
             )
 
         df_pred = self.rename_default_columns(
@@ -2246,7 +2280,8 @@ class FeaturePreprocessor:
         # check that the id_column contains unique values
         if df_pred["spkitemid"].size != df_pred["spkitemid"].unique().size:
             raise ValueError(
-                f"The data contains duplicate response IDs in '{id_column}'. Please make sure all response IDs are unique and re-run the tool."
+                f"The data contains duplicate response IDs in '{id_column}'. "
+                f"Please make sure all response IDs are unique and re-run the tool."
             )
 
         df_pred = self.check_subgroups(df_pred, subgroups)
@@ -2312,7 +2347,9 @@ class FeaturePreprocessor:
             # check that there are still responses left for analysis
             if len(df_filtered_candidates) == 0:
                 raise ValueError(
-                    f"After filtering non-numeric human and system scores there were no candidates with {str(min_items_per_candidate)} or more responses left for analysis"
+                    f"After filtering non-numeric human and system scores "
+                    f"there were no candidates with {str(min_items_per_candidate)} "
+                    f"or more responses left for analysis"
                 )
 
             # redefine df_filtered_pred
@@ -2567,7 +2604,8 @@ class FeaturePreprocessor:
         # check that the id_column contains unique values
         if df_input["spkitemid"].size != df_input["spkitemid"].unique().size:
             raise ValueError(
-                f"The data contains repeated response IDs in {id_column}. Please make sure all response IDs are unique and re-run the tool."
+                f"The data contains repeated response IDs in {id_column}. "
+                f"Please make sure all response IDs are unique and re-run the tool."
             )
 
         (df_features_preprocessed, df_excluded) = self.preprocess_new_data(
@@ -2683,9 +2721,9 @@ class FeaturePreprocessor:
             return self.process_data_rsmpredict(config_obj, data_container_obj)
         else:
             raise ValueError(
-                "The 'context' argument must be in the set: "
-                "{'rsmtool', 'rsmeval', 'rsmpredict'}. "
-                "You specified `{}`.".format(context)
+                f"The 'context' argument must be in the set: "
+                f"{{'rsmtool', 'rsmeval', 'rsmpredict'}}. "
+                f"You specified `{context}`."
             )
 
     def preprocess_new_data(self, df_input, df_feature_info, standardize_features=True):
