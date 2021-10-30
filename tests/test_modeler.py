@@ -6,10 +6,9 @@ from rsmtool.modeler import Modeler
 
 
 class TestModeler:
-
     def setUp(self):
 
-        series = pd.Series([34, .34, 1.2], index=['const', 'A', 'B'])
+        series = pd.Series([34, 0.34, 1.2], index=["const", "A", "B"])
         coef = Modeler.ols_coefficients_to_dataframe(series)
         learner = Modeler.create_fake_skll_learner(coef)
         self.modeler = Modeler.load_from_learner(learner)
@@ -32,7 +31,7 @@ class TestModeler:
 
     def test_get_feature_names(self):
         intercept = self.modeler.get_feature_names()
-        eq_(intercept, ['A', 'B'])
+        eq_(intercept, ["A", "B"])
 
     def test_get_feature_names_is_none(self):
         modeler = Modeler()

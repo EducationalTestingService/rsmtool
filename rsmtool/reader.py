@@ -45,21 +45,20 @@ def read_jsonlines(filename, converters=None):
          Data frame containing the data in the given file.
     """
     try:
-        df = pd.read_json(filename,
-                          orient='records',
-                          lines=True,
-                          dtype=converters)
+        df = pd.read_json(filename, orient="records", lines=True, dtype=converters)
     except ValueError:
-        raise ValueError("The jsonlines file is not formatted correctly. "
-                         "Please check that each line ends with a comma, "
-                         "there is no comma at the end of the last line, "
-                         "and that all quotes match.")
+        raise ValueError(
+            "The jsonlines file is not formatted correctly. "
+            "Please check that each line ends with a comma, "
+            "there is no comma at the end of the last line, "
+            "and that all quotes match."
+        )
 
     # make sure we didn't get a plain json
     if type(df.columns) == pd.RangeIndex:
-        raise ValueError("It looks like {} is a simple json file. "
-                         "Please check documentation (for the expected "
-                         "file format".format(filename))
+        raise ValueError(
+            f"It looks like {filename} is a simple json file. Please check documentation (for the expected file format"
+        )
 
     dfs = []
     for column in df:
@@ -85,11 +84,9 @@ def read_jsonlines(filename, converters=None):
     return df
 
 
-def try_to_load_file(filename,
-                     converters=None,
-                     raise_error=False,
-                     raise_warning=False,
-                     **kwargs):
+def try_to_load_file(
+    filename, converters=None, raise_error=False, raise_warning=False, **kwargs
+):
     """
     Read a single file, if it exists.
 
@@ -137,10 +134,7 @@ def try_to_load_file(filename,
 class DataReader:
     """Class to generate DataContainer objects."""
 
-    def __init__(self,
-                 filepaths,
-                 framenames,
-                 file_converters=None):
+    def __init__(self, filepaths, framenames, file_converters=None):
         """
         Initialize a DataReader object.
 
@@ -176,8 +170,9 @@ class DataReader:
 
         # Make sure that there are no Nones in the filepaths
         if None in filepaths:
-            frames_with_no_path = [framenames[i] for i in range(len(framenames))
-                                   if filepaths[i] is None]
+            frames_with_no_path = [
+                framenames[i] for i in range(len(framenames)) if filepaths[i] is None
+            ]
 
             raise ValueError(f"No path specified for {' ,'.join(frames_with_no_path)}")
 
@@ -190,23 +185,24 @@ class DataReader:
         # and add all elements to `file_converters` list
         if file_converters is not None:
             if not isinstance(file_converters, dict):
-                raise ValueError("The 'file_converters' argument must be a `dict`, "
-                                 "not `{}`.".format(type(file_converters)))
+                raise ValueError(
+                    f"The 'file_converters' argument must be a `dict`, not `{type(file_converters)}`."
+                )
 
             for file_converter_name in file_converters:
                 # Make sure file_converter name is in `dataset_names`
                 if file_converter_name not in self.dataset_names:
-                    raise NameError('The file converter name ``{}`` '
-                                    'does not exist in the '
-                                    'dataset names that you '
-                                    'passed.'.format(file_converter_name))
+                    raise NameError(
+                        f"The file converter name ``{file_converter_name}`` does not exist in the dataset names that you passed."
+                    )
 
                 # Make sure file converter is a `dict`
                 file_converter = file_converters[file_converter_name]
                 if not isinstance(file_converter, dict):
-                    raise ValueError('Value for {} must be``dict`` ',
-                                     'not {}'.format(file_converter_name,
-                                                     type(file_converter)))
+                    raise ValueError(
+                        "Value for {} must be``dict`` ",
+                        "not {}".format(file_converter_name, type(file_converter)),
+                    )
 
         # Default file_converters dict
         self.file_converters = {} if file_converters is None else file_converters
@@ -245,35 +241,33 @@ class DataReader:
         """
         file_extension = splitext(filename)[1].lower()
 
-        if file_extension in ['.csv', '.tsv']:
-            sep = '\t' if file_extension == '.tsv' else ','
+        if file_extension in [".csv", ".tsv"]:
+            sep = "\t" if file_extension == ".tsv" else ","
             do_read = partial(pd.read_csv, sep=sep, converters=converters)
-        elif file_extension == '.xlsx':
+        elif file_extension == ".xlsx":
             do_read = partial(pd.read_excel, converters=converters)
-        elif file_extension == '.sas7bdat':
-            if 'encoding' not in kwargs:
-                encoding = 'latin-1'
+        elif file_extension == ".sas7bdat":
+            if "encoding" not in kwargs:
+                encoding = "latin-1"
             else:
-                encoding = kwargs.pop('encoding')
+                encoding = kwargs.pop("encoding")
             do_read = partial(pd.read_sas, encoding=encoding)
-        elif file_extension in ['.jsonlines']:
+        elif file_extension in [".jsonlines"]:
             do_read = partial(read_jsonlines, converters=converters)
         else:
-            raise ValueError("RSMTool only supports files in .csv, "
-                             ".tsv, .xlsx, and .sas7bdat formats. "
-                             "Input files should have one of these "
-                             "extensions. The file you "
-                             "passed is: {}.".format(filename))
+            raise ValueError(
+                f"RSMTool only supports files in .csv, .tsv, .xlsx, and .sas7bdat formats. Input files should have one of these extensions. The file you passed is: {filename}."
+            )
 
         # ignore warnings about mixed data types for large files
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=DtypeWarning)
+            warnings.filterwarnings("ignore", category=DtypeWarning)
             try:
                 df = do_read(filename, **kwargs)
             except pd.errors.ParserError:
-                raise pd.errors.ParserError('Cannot read {}. Please check that it is '
-                                            'not corrupt or in an incompatible format. '
-                                            '(Try running dos2unix?)'.format(filename))
+                raise pd.errors.ParserError(
+                    f"Cannot read {filename}. Please check that it is not corrupt or in an incompatible format. (Try running dos2unix?)"
+                )
         return df
 
     @staticmethod
@@ -308,10 +302,10 @@ class DataReader:
         """
         # the feature config file can be in the 'feature' directory
         # at the same level as the main config file
-        if not (isinstance(filepaths, str) or
-                isinstance(filepaths, list)):
-            raise ValueError("The 'filepaths' argument must be a "
-                             "string or a list, not {}.".format(type(filepaths)))
+        if not (isinstance(filepaths, str) or isinstance(filepaths, list)):
+            raise ValueError(
+                f"The 'filepaths' argument must be a string or a list, not {type(filepaths)}."
+            )
 
         if isinstance(filepaths, str):
             filepaths = [filepaths]
@@ -369,7 +363,7 @@ class DataReader:
             converter = self.file_converters.get(name, None)
 
             if not exists(set_path):
-                raise FileNotFoundError(f'The file {set_path} does not exist')
+                raise FileNotFoundError(f"The file {set_path} does not exist")
 
             if kwargs_dict is not None:
                 kwargs = kwargs_dict.get(name, {})
@@ -379,8 +373,8 @@ class DataReader:
             dataframe = self.read_from_file(set_path, converter, **kwargs)
 
             # Add to list of datasets
-            self.datasets.append({'name': name.strip(),
-                                  'path': set_path,
-                                  'frame': dataframe})
+            self.datasets.append(
+                {"name": name.strip(), "path": set_path, "frame": dataframe}
+            )
 
         return DataContainer(self.datasets)

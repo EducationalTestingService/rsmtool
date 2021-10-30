@@ -25,33 +25,34 @@ from .rsmpredict import compute_and_save_predictions
 from .rsmsummarize import run_summary
 from .rsmtool import run_experiment
 
-html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
+html_error_regexp = re.compile(r"Traceback \(most recent call last\)")
 html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>([^<]+)')
-section_regexp = re.compile(r'<h2>(.*?)</h2>')
+section_regexp = re.compile(r"<h2>(.*?)</h2>")
 
 # get the directory containing the tests
-rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath('tests')
+rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath("tests")
 
-tools_with_input_data = ['rsmsummarize', 'rsmcompare']
-tools_with_output = ['rsmtool', 'rsmeval',
-                     'rsmsummarize', 'rsmpredict']
+tools_with_input_data = ["rsmsummarize", "rsmcompare"]
+tools_with_output = ["rsmtool", "rsmeval", "rsmsummarize", "rsmpredict"]
 
 # check if tests are being run in strict mode
 # if so, any warnings found in HTML
 # reports should not be ignored
-STRICT_MODE = os.environ.get('STRICT', None)
+STRICT_MODE = os.environ.get("STRICT", None)
 IGNORE_WARNINGS = False if STRICT_MODE else True
 
 
-def check_run_experiment(source,
-                         experiment_id,
-                         subgroups=None,
-                         consistency=False,
-                         skll=False,
-                         file_format='csv',
-                         given_test_dir=None,
-                         config_obj_or_dict=None,
-                         suppress_warnings_for=[]):
+def check_run_experiment(
+    source,
+    experiment_id,
+    subgroups=None,
+    consistency=False,
+    skll=False,
+    file_format="csv",
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
     """
     Run a parameterized rsmtool experiment test.
 
@@ -98,43 +99,48 @@ def check_run_experiment(source,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(test_dir,
-                            'data',
-                            'experiments',
-                            source,
-                            f'{experiment_id}.json')
+        config_input = join(
+            test_dir, "data", "experiments", source, f"{experiment_id}.json"
+        )
     else:
         config_input = config_obj_or_dict
 
-    model_type = 'skll' if skll else 'rsmtool'
+    model_type = "skll" if skll else "rsmtool"
 
-    do_run_experiment(source,
-                      experiment_id,
-                      config_input,
-                      suppress_warnings_for=suppress_warnings_for)
+    do_run_experiment(
+        source, experiment_id, config_input, suppress_warnings_for=suppress_warnings_for
+    )
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
+    output_dir = join("test_outputs", source, "output")
+    expected_output_dir = join(test_dir, "data", "experiments", source, "output")
+    html_report = join("test_outputs", source, "report", f"{experiment_id}_report.html")
 
-    output_files = glob(join(output_dir, f'*.{file_format}'))
+    output_files = glob(join(output_dir, f"*.{file_format}"))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(output_file, expected_output_file, file_format=file_format)
+            check_file_output(
+                output_file, expected_output_file, file_format=file_format
+            )
 
-    check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
+    check_generated_output(
+        output_files, experiment_id, model_type, file_format=file_format
+    )
 
     if not skll:
         check_scaled_coefficients(source, experiment_id, file_format=file_format)
 
     if subgroups:
-        check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
+        check_subgroup_outputs(
+            output_dir, experiment_id, subgroups, file_format=file_format
+        )
 
     if consistency:
-        check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
+        check_consistency_files_exist(
+            output_files, experiment_id, file_format=file_format
+        )
 
     # check report for any errors but ignore warnings
     # which we check below separately
@@ -147,14 +153,16 @@ def check_run_experiment(source,
         assert_equal(len(warning_msgs), 0)
 
 
-def check_run_evaluation(source,
-                         experiment_id,
-                         subgroups=None,
-                         consistency=False,
-                         file_format='csv',
-                         given_test_dir=None,
-                         config_obj_or_dict=None,
-                         suppress_warnings_for=[]):
+def check_run_evaluation(
+    source,
+    experiment_id,
+    subgroups=None,
+    consistency=False,
+    file_format="csv",
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
     """
     Run a parameterized rsmeval experiment test.
 
@@ -197,30 +205,29 @@ def check_run_evaluation(source,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(test_dir,
-                            'data',
-                            'experiments',
-                            source,
-                            f'{experiment_id}.json')
+        config_input = join(
+            test_dir, "data", "experiments", source, f"{experiment_id}.json"
+        )
     else:
         config_input = config_obj_or_dict
 
-    do_run_evaluation(source,
-                      experiment_id,
-                      config_input,
-                      suppress_warnings_for=suppress_warnings_for)
+    do_run_evaluation(
+        source, experiment_id, config_input, suppress_warnings_for=suppress_warnings_for
+    )
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
-    html_report = join('test_outputs', source, 'report', f'{experiment_id}_report.html')
+    output_dir = join("test_outputs", source, "output")
+    expected_output_dir = join(test_dir, "data", "experiments", source, "output")
+    html_report = join("test_outputs", source, "report", f"{experiment_id}_report.html")
 
-    output_files = glob(join(output_dir, f'*.{file_format}'))
+    output_files = glob(join(output_dir, f"*.{file_format}"))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(output_file, expected_output_file, file_format=file_format)
+            check_file_output(
+                output_file, expected_output_file, file_format=file_format
+            )
 
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
@@ -236,11 +243,13 @@ def check_run_evaluation(source,
         assert_equal(len(warning_msgs), 0)
 
 
-def check_run_comparison(source,
-                         experiment_id,
-                         given_test_dir=None,
-                         config_obj_or_dict=None,
-                         suppress_warnings_for=[]):
+def check_run_comparison(
+    source,
+    experiment_id,
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
     """
     Run a parameterized rsmcompare experiment test.
 
@@ -270,19 +279,13 @@ def check_run_comparison(source,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(test_dir,
-                            'data',
-                            'experiments',
-                            source,
-                            'rsmcompare.json')
+        config_input = join(test_dir, "data", "experiments", source, "rsmcompare.json")
     else:
         config_input = config_obj_or_dict
 
-    do_run_comparison(source,
-                      config_input,
-                      suppress_warnings_for=suppress_warnings_for)
+    do_run_comparison(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
-    html_report = join('test_outputs', source, f'{experiment_id}_report.html')
+    html_report = join("test_outputs", source, f"{experiment_id}_report.html")
 
     # check report for any errors but ignore warnings
     # which we check below separately
@@ -295,12 +298,14 @@ def check_run_comparison(source,
         assert_equal(len(warning_msgs), 0)
 
 
-def check_run_prediction(source,
-                         excluded=False,
-                         file_format='csv',
-                         given_test_dir=None,
-                         config_obj_or_dict=None,
-                         suppress_warnings_for=[]):
+def check_run_prediction(
+    source,
+    excluded=False,
+    file_format="csv",
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
     """
     Run a parameterized rsmpredict experiment test.
 
@@ -334,25 +339,21 @@ def check_run_prediction(source,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(test_dir,
-                            'data',
-                            'experiments',
-                            source,
-                            'rsmpredict.json')
+        config_input = join(test_dir, "data", "experiments", source, "rsmpredict.json")
     else:
         config_input = config_obj_or_dict
 
-    do_run_prediction(source,
-                      config_input,
-                      suppress_warnings_for=suppress_warnings_for)
+    do_run_prediction(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    output_dir = join("test_outputs", source, "output")
+    expected_output_dir = join(test_dir, "data", "experiments", source, "output")
 
-    output_files = [f'predictions.{file_format}',
-                    f'preprocessed_features.{file_format}']
+    output_files = [
+        f"predictions.{file_format}",
+        f"preprocessed_features.{file_format}",
+    ]
     if excluded:
-        output_files.append(f'predictions_excluded_responses.{file_format}')
+        output_files.append(f"predictions_excluded_responses.{file_format}")
     for output_file in output_files:
         generated_output_file = join(output_dir, output_file)
         expected_output_file = join(expected_output_dir, output_file)
@@ -360,11 +361,13 @@ def check_run_prediction(source,
         check_file_output(generated_output_file, expected_output_file)
 
 
-def check_run_summary(source,
-                      file_format='csv',
-                      given_test_dir=None,
-                      config_obj_or_dict=None,
-                      suppress_warnings_for=[]):
+def check_run_summary(
+    source,
+    file_format="csv",
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
     """
     Run a parameterized rsmsummarize experiment test.
 
@@ -395,24 +398,20 @@ def check_run_summary(source,
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(test_dir,
-                            'data',
-                            'experiments',
-                            source,
-                            'rsmsummarize.json')
+        config_input = join(
+            test_dir, "data", "experiments", source, "rsmsummarize.json"
+        )
     else:
         config_input = config_obj_or_dict
 
-    do_run_summary(source,
-                   config_input,
-                   suppress_warnings_for=suppress_warnings_for)
+    do_run_summary(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
-    html_report = join('test_outputs', source, 'report', 'model_comparison_report.html')
+    html_report = join("test_outputs", source, "report", "model_comparison_report.html")
 
-    output_dir = join('test_outputs', source, 'output')
-    expected_output_dir = join(test_dir, 'data', 'experiments', source, 'output')
+    output_dir = join("test_outputs", source, "output")
+    expected_output_dir = join(test_dir, "data", "experiments", source, "output")
 
-    output_files = glob(join(output_dir, f'*.{file_format}'))
+    output_files = glob(join(output_dir, f"*.{file_format}"))
     for output_file in output_files:
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
@@ -431,10 +430,7 @@ def check_run_summary(source,
         assert_equal(len(warning_msgs), 0)
 
 
-def do_run_experiment(source,
-                      experiment_id,
-                      config_input,
-                      suppress_warnings_for=[]):
+def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for=[]):
     """
     Run rsmtool experiment automatically.
 
@@ -458,31 +454,28 @@ def do_run_experiment(source,
         are always suppressed.
         Defaults to ``[]``.
     """
-    source_output_dir = 'test_outputs'
+    source_output_dir = "test_outputs"
     experiment_dir = join(source_output_dir, source)
 
     # remove all previously created files
-    for output_subdir in ['output', 'figure', 'report']:
-        files = glob(join(source_output_dir, source, output_subdir, '*'))
+    for output_subdir in ["output", "figure", "report"]:
+        files = glob(join(source_output_dir, source, output_subdir, "*"))
         for f in files:
             remove(f)
 
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
-            warnings.filterwarnings('ignore', category=warning_type)
+            warnings.filterwarnings("ignore", category=warning_type)
 
         run_experiment(config_input, experiment_dir)
 
 
-def do_run_evaluation(source,
-                      experiment_id,
-                      config_input,
-                      suppress_warnings_for=[]):
+def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for=[]):
     """
     Run rsmeval experiment automatically.
 
@@ -506,30 +499,28 @@ def do_run_evaluation(source,
         are always suppressed.
         Defaults to ``[]``.
     """
-    source_output_dir = 'test_outputs'
+    source_output_dir = "test_outputs"
     experiment_dir = join(source_output_dir, source)
 
     # remove all previously created files
-    for output_subdir in ['output', 'figure', 'report']:
-        files = glob(join(source_output_dir, source, output_subdir, '*'))
+    for output_subdir in ["output", "figure", "report"]:
+        files = glob(join(source_output_dir, source, output_subdir, "*"))
         for f in files:
             remove(f)
 
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
-            warnings.filterwarnings('ignore', category=warning_type)
+            warnings.filterwarnings("ignore", category=warning_type)
 
         run_evaluation(config_input, experiment_dir)
 
 
-def do_run_prediction(source,
-                      config_input,
-                      suppress_warnings_for=[]):
+def do_run_prediction(source, config_input, suppress_warnings_for=[]):
     """
     Run rsmpredict experiment automatically.
 
@@ -550,33 +541,31 @@ def do_run_prediction(source,
         experiments.
         Defaults to ``[]``.
     """
-    source_output_dir = 'test_outputs'
+    source_output_dir = "test_outputs"
 
     # The `csv` file extension is ultimately dropped by the `rsmpredict.py`
     # script, so these arguments can be used for CSV, TSV, or XLSX output
-    output_file = join(source_output_dir, source, 'output', 'predictions.csv')
-    feats_file = join(source_output_dir, source, 'output', 'preprocessed_features.csv')
+    output_file = join(source_output_dir, source, "output", "predictions.csv")
+    feats_file = join(source_output_dir, source, "output", "preprocessed_features.csv")
 
     # remove all previously created files
-    files = glob(join(source_output_dir, 'output', '*'))
+    files = glob(join(source_output_dir, "output", "*"))
     for f in files:
         remove(f)
 
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
-            warnings.filterwarnings('ignore', category=warning_type)
+            warnings.filterwarnings("ignore", category=warning_type)
 
         compute_and_save_predictions(config_input, output_file, feats_file)
 
 
-def do_run_comparison(source,
-                      config_input,
-                      suppress_warnings_for=[]):
+def do_run_comparison(source, config_input, suppress_warnings_for=[]):
     """
     Run rsmcompre experiment automatically.
 
@@ -598,24 +587,22 @@ def do_run_comparison(source,
         are always suppressed.
         Defaults to ``[]``.
     """
-    source_output_dir = 'test_outputs'
+    source_output_dir = "test_outputs"
     experiment_dir = join(source_output_dir, source)
 
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
-            warnings.filterwarnings('ignore', category=warning_type)
+            warnings.filterwarnings("ignore", category=warning_type)
 
         run_comparison(config_input, experiment_dir)
 
 
-def do_run_summary(source,
-                   config_input,
-                   suppress_warnings_for=[]):
+def do_run_summary(source, config_input, suppress_warnings_for=[]):
     """
     Run rsmsummarize experiment automatically.
 
@@ -636,28 +623,28 @@ def do_run_summary(source,
         experiments.
         Defaults to ``[]``.
     """
-    source_output_dir = 'test_outputs'
+    source_output_dir = "test_outputs"
     experiment_dir = join(source_output_dir, source)
 
     # remove all previously created files
-    for output_subdir in ['output', 'figure', 'report']:
-        files = glob(join(source_output_dir, source, output_subdir, '*'))
+    for output_subdir in ["output", "figure", "report"]:
+        files = glob(join(source_output_dir, source, output_subdir, "*"))
         for f in files:
             remove(f)
 
     with warnings.catch_warnings():
 
         # always suppress runtime warnings
-        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         # suppress additional warning types if specified
         for warning_type in suppress_warnings_for:
-            warnings.filterwarnings('ignore', category=warning_type)
+            warnings.filterwarnings("ignore", category=warning_type)
 
         run_summary(config_input, experiment_dir)
 
 
-def check_file_output(file1, file2, file_format='csv'):
+def check_file_output(file1, file2, file_format="csv"):
     """
     Check if the two given tabular files contain matching values.
 
@@ -677,7 +664,7 @@ def check_file_output(file1, file2, file_format='csv'):
     """
     # make sure that the main id columns are read as strings since
     # this may affect merging in custom notebooks
-    string_columns = ['spkitemid', 'candidate']
+    string_columns = ["spkitemid", "candidate"]
 
     converter_dict = {column: str for column in string_columns}
 
@@ -716,21 +703,19 @@ def check_file_output(file1, file2, file_format='csv'):
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
-    if (file1.endswith(f'pca.{file_format}') or
-            file1.endswith(f'factor_correlations.{file_format}')):
+    if file1.endswith(f"pca.{file_format}") or file1.endswith(
+        f"factor_correlations.{file_format}"
+    ):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
 
     try:
-        assert_frame_equal(df1,
-                           df2,
-                           check_exact=False,
-                           rtol=1e-03)
+        assert_frame_equal(df1, df2, check_exact=False, rtol=1e-03)
     except AssertionError as e:
         message = e.args[0]
-        new_message = f'File {basename(file1)} - {message}'
-        e.args = (new_message, )
+        new_message = f"File {basename(file1)} - {message}"
+        e.args = (new_message,)
         raise
 
 
@@ -748,8 +733,8 @@ def collect_warning_messages_from_report(html_file):
     warnings_text : list of str
         The list of collected warnings.
     """
-    with open(html_file, 'r') as htmlf:
-        soup = BeautifulSoup(htmlf.read(), 'html.parser')
+    with open(html_file, "r") as htmlf:
+        soup = BeautifulSoup(htmlf.read(), "html.parser")
 
     warnings_text = []
     for div in soup.findAll("div", {"class": "output_stderr"}):
@@ -758,15 +743,13 @@ def collect_warning_messages_from_report(html_file):
         # and split the lines; we only keep the lines that contain 'Warning:'
         for pre in div.findAll("pre"):
             warnings_msgs = pre.text.splitlines()
-            warnings_msgs = [msg for msg in warnings_msgs if 'Warning:' in msg]
+            warnings_msgs = [msg for msg in warnings_msgs if "Warning:" in msg]
             warnings_text.extend(warnings_msgs)
 
     return warnings_text
 
 
-def check_report(html_file,
-                 raise_errors=True,
-                 raise_warnings=True):
+def check_report(html_file, raise_errors=True, raise_warnings=True):
     """
     Raise ``AssertionError`` if given HTML report contains errors or warnings.
 
@@ -790,7 +773,7 @@ def check_report(html_file,
     if IGNORE_WARNINGS:
         raise_warnings = False
 
-    with open(html_file, 'r') as htmlf:
+    with open(html_file, "r") as htmlf:
         for line in htmlf:
             m_error = html_error_regexp.search(line)
             if m_error:
@@ -807,7 +790,7 @@ def check_report(html_file,
                 # See https://github.com/EducationalTestingService/rsmtool/issues/539
 
                 # we do not want to flag matlplotlib font cache warning
-                if not re.search(r'font\s*cache', warning_text, flags=re.IGNORECASE):
+                if not re.search(r"font\s*cache", warning_text, flags=re.IGNORECASE):
                     report_warnings += 1
 
     if raise_errors:
@@ -817,7 +800,7 @@ def check_report(html_file,
         assert_equal(report_warnings, 0)
 
 
-def check_scaled_coefficients(source, experiment_id, file_format='csv'):
+def check_scaled_coefficients(source, experiment_id, file_format="csv"):
     """
     Check that predictions using scaled coefficients match scaled scores.
 
@@ -831,31 +814,36 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
         The format of the output files.
         Defaults to "csv".
     """
-    preprocessed_test_file = join('test_outputs',
-                                  source,
-                                  'output',
-                                  '{}_test_preprocessed_features.{}'.format(experiment_id,
-                                                                            file_format))
-    scaled_coefficients_file = join('test_outputs',
-                                    source,
-                                    'output',
-                                    '{}_coefficients_scaled.{}'.format(experiment_id,
-                                                                       file_format))
-    predictions_file = join('test_outputs',
-                            source,
-                            'output',
-                            f'{experiment_id}_pred_processed.{file_format}')
+    preprocessed_test_file = join(
+        "test_outputs",
+        source,
+        "output",
+        f"{experiment_id}_test_preprocessed_features.{file_format}",
+    )
+    scaled_coefficients_file = join(
+        "test_outputs",
+        source,
+        "output",
+        f"{experiment_id}_coefficients_scaled.{file_format}",
+    )
+    predictions_file = join(
+        "test_outputs",
+        source,
+        "output",
+        f"{experiment_id}_pred_processed.{file_format}",
+    )
 
-    postprocessing_params_file = join('test_outputs',
-                                      source,
-                                      'output',
-                                      '{}_postprocessing_params.{}'.format(experiment_id,
-                                                                           file_format))
+    postprocessing_params_file = join(
+        "test_outputs",
+        source,
+        "output",
+        f"{experiment_id}_postprocessing_params.{file_format}",
+    )
 
     postproc_params = DataReader.read_from_file(postprocessing_params_file).loc[0]
     df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
     df_old_predictions = DataReader.read_from_file(predictions_file)
-    df_old_predictions = df_old_predictions[['spkitemid', 'sc1', 'scale']]
+    df_old_predictions = df_old_predictions[["spkitemid", "sc1", "scale"]]
 
     # create fake skll objects with new coefficients
     df_coef = DataReader.read_from_file(scaled_coefficients_file)
@@ -863,19 +851,25 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
     modeler = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'
-    df_new_predictions = modeler.predict(df_preprocessed_test_data,
-                                         postproc_params['trim_min'],
-                                         postproc_params['trim_max'])
-    df_new_predictions.rename(columns={'raw': 'scale'}, inplace=True)
+    df_new_predictions = modeler.predict(
+        df_preprocessed_test_data,
+        postproc_params["trim_min"],
+        postproc_params["trim_max"],
+    )
+    df_new_predictions.rename(columns={"raw": "scale"}, inplace=True)
 
     # check that new predictions match the scaled old predictions
-    assert_frame_equal(df_new_predictions.sort_index(axis=1),
-                       df_old_predictions.sort_index(axis=1),
-                       check_exact=False,
-                       rtol=1e-03)
+    assert_frame_equal(
+        df_new_predictions.sort_index(axis=1),
+        df_old_predictions.sort_index(axis=1),
+        check_exact=False,
+        rtol=1e-03,
+    )
 
 
-def check_generated_output(generated_files, experiment_id, model_source, file_format='csv'):
+def check_generated_output(
+    generated_files, experiment_id, model_source, file_format="csv"
+):
     """
     Check that all necessary output files have been generated.
 
@@ -891,30 +885,30 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
         The format of the output files.
         Defaults to "csv".
     """
-    file_must_have_both = [f"_confMatrix.{file_format}",
-                           f"_cors_orig.{file_format}",
-                           f"_cors_processed.{file_format}",
-                           f"_eval.{file_format}",
-                           f"_eval_short.{file_format}",
-                           f"_feature.{file_format}",
-                           f"_feature_descriptives.{file_format}",
-                           f"_feature_descriptivesExtra.{file_format}",
-                           f"_feature_outliers.{file_format}",
-                           f"_margcor_score_all_data.{file_format}",
-                           f"_pca.{file_format}",
-                           f"_pcavar.{file_format}",
-                           f"_pcor_score_all_data.{file_format}",
-                           f"_pred_processed.{file_format}",
-                           f"_pred_train.{file_format}",
-                           f"_score_dist.{file_format}",
-                           f"_train_preprocessed_features.{file_format}",
-                           f"_test_preprocessed_features.{file_format}",
-                           f"_postprocessing_params.{file_format}"
-                           ]
+    file_must_have_both = [
+        f"_confMatrix.{file_format}",
+        f"_cors_orig.{file_format}",
+        f"_cors_processed.{file_format}",
+        f"_eval.{file_format}",
+        f"_eval_short.{file_format}",
+        f"_feature.{file_format}",
+        f"_feature_descriptives.{file_format}",
+        f"_feature_descriptivesExtra.{file_format}",
+        f"_feature_outliers.{file_format}",
+        f"_margcor_score_all_data.{file_format}",
+        f"_pca.{file_format}",
+        f"_pcavar.{file_format}",
+        f"_pcor_score_all_data.{file_format}",
+        f"_pred_processed.{file_format}",
+        f"_pred_train.{file_format}",
+        f"_score_dist.{file_format}",
+        f"_train_preprocessed_features.{file_format}",
+        f"_test_preprocessed_features.{file_format}",
+        f"_postprocessing_params.{file_format}",
+    ]
 
-    file_must_have_rsmtool = [f"_betas.{file_format}",
-                              f"_coefficients.{file_format}"]
-    if model_source == 'rsmtool':
+    file_must_have_rsmtool = [f"_betas.{file_format}", f"_coefficients.{file_format}"]
+    if model_source == "rsmtool":
         file_must_have = file_must_have_both + file_must_have_rsmtool
     else:
         file_must_have = file_must_have_both
@@ -925,7 +919,7 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
     assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
 
 
-def check_consistency_files_exist(generated_files, experiment_id, file_format='csv'):
+def check_consistency_files_exist(generated_files, experiment_id, file_format="csv"):
     """
     Check that the consistency files were generated.
 
@@ -939,10 +933,12 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format='c
         The format of the output files.
         Defaults to "csv".
     """
-    file_must_have = [f"_consistency.{file_format}",
-                      f"_degradation.{file_format}",
-                      f"_disattenuated_correlations.{file_format}",
-                      f"_true_score_eval.{file_format}"]
+    file_must_have = [
+        f"_consistency.{file_format}",
+        f"_degradation.{file_format}",
+        f"_disattenuated_correlations.{file_format}",
+        f"_true_score_eval.{file_format}",
+    ]
 
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
@@ -950,7 +946,7 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format='c
     assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
 
 
-def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='csv'):
+def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="csv"):
     """
     Check that the subgroup-related outputs are accurate.
 
@@ -967,14 +963,15 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
         The format of the output files.
         Defaults to "csv".
     """
-    train_preprocessed_file = join(output_dir,
-                                   f'{experiment_id}_train_metadata.{file_format}')
+    train_preprocessed_file = join(
+        output_dir, f"{experiment_id}_train_metadata.{file_format}"
+    )
     train_preprocessed = DataReader.read_from_file(train_preprocessed_file, index_col=0)
 
-    test_preprocessed_file = join(output_dir,
-                                  f'{experiment_id}_test_metadata.{file_format}')
-    test_preprocessed = DataReader.read_from_file(test_preprocessed_file,
-                                                  index_col=0)
+    test_preprocessed_file = join(
+        output_dir, f"{experiment_id}_test_metadata.{file_format}"
+    )
+    test_preprocessed = DataReader.read_from_file(test_preprocessed_file, index_col=0)
     for group in subgroups:
         ok_(group in train_preprocessed.columns)
         ok_(group in test_preprocessed.columns)
@@ -982,30 +979,31 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format='cs
     # check that the total sum of N per category matches the total N
     # in data composition and the total N categories matches what is
     # in overall data composition
-    file_data_composition_all = join(output_dir,
-                                     f'{experiment_id}_data_composition.{file_format}')
+    file_data_composition_all = join(
+        output_dir, f"{experiment_id}_data_composition.{file_format}"
+    )
     df_data_composition_all = DataReader.read_from_file(file_data_composition_all)
     for group in subgroups:
-        file_composition_by_group = join(output_dir,
-                                         '{}_data_composition_by_{}.{}'.format(experiment_id,
-                                                                               group,
-                                                                               file_format))
+        file_composition_by_group = join(
+            output_dir,
+            f"{experiment_id}_data_composition_by_{group}.{file_format}",
+        )
         composition_by_group = DataReader.read_from_file(file_composition_by_group)
-        for partition in ['Training', 'Evaluation']:
-            partition_info = df_data_composition_all.loc[df_data_composition_all['partition'] ==
-                                                         partition]
+        for partition in ["Training", "Evaluation"]:
+            partition_info = df_data_composition_all.loc[
+                df_data_composition_all["partition"] == partition
+            ]
 
-            summation = sum(composition_by_group[f'{partition} set'])
-            ok_(summation == partition_info.iloc[0]['responses'])
+            summation = sum(composition_by_group[f"{partition} set"])
+            ok_(summation == partition_info.iloc[0]["responses"])
 
-            length = len(composition_by_group.loc[composition_by_group['{} set'
-                                                                       ''.format(partition)] != 0])
+            length = len(
+                composition_by_group.loc[composition_by_group[f"{partition} set"] != 0]
+            )
             ok_(length == partition_info.iloc[0][group])
 
 
-def copy_data_files(temp_dir_name,
-                    input_file_dict,
-                    given_test_dir):
+def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
     """
     Copy files from given test directory to a temporary directory.
 
@@ -1082,10 +1080,7 @@ class FileUpdater(object):
         empty.
     """
 
-    def __init__(self,
-                 test_suffixes,
-                 tests_directory,
-                 updated_outputs_directory):
+    def __init__(self, test_suffixes, tests_directory, updated_outputs_directory):
         """Instantiate a FileUpdater object."""
         self.test_suffixes = test_suffixes
         self.tests_directory = Path(tests_directory)
@@ -1112,21 +1107,24 @@ class FileUpdater(object):
             ``True`` if the file should be excluded.
             ``False`` otherwise.
         """
-        possible_suffixes = ['.model', '.npy']
-        possible_stems = ['_postprocessing_params', '_eval', '_eval_short',
-                          '_confMatrix', '_pred_train', '_pred_processed',
-                          '_score_dist']
+        possible_suffixes = [".model", ".npy"]
+        possible_stems = [
+            "_postprocessing_params",
+            "_eval",
+            "_eval_short",
+            "_confMatrix",
+            "_pred_train",
+            "_pred_processed",
+            "_score_dist",
+        ]
 
         file_stem = Path(filename).stem
         file_suffix = Path(filename).suffix
-        return any(file_suffix == suffix for suffix in possible_suffixes) or \
-            any(file_stem.endswith(stem) for stem in possible_stems)
+        return any(file_suffix == suffix for suffix in possible_suffixes) or any(
+            file_stem.endswith(stem) for stem in possible_stems
+        )
 
-    def update_source(self,
-                      source,
-                      skll=False,
-                      file_type='output',
-                      input_source=None):
+    def update_source(self, source, skll=False, file_type="output", input_source=None):
         """
         Update test output or input data for test named ``source``.
 
@@ -1156,15 +1154,25 @@ class FileUpdater(object):
         # locate the updated outputs for the experiment under the given
         # outputs directory, locate the existing experiment outputs
         # and define how we will refer to the test
-        if file_type == 'output':
+        if file_type == "output":
             updated_output_path = self.updated_outputs_directory / source / "output"
-            existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
+            existing_output_path = (
+                self.tests_directory / "data" / "experiments" / source / "output"
+            )
             test_name = source
         else:
-            updated_output_path = self.updated_outputs_directory / input_source / "output"
-            existing_output_path = (self.tests_directory / "data" / "experiments" / source /
-                                    input_source / "output")
-            test_name = f'{source}/{input_source}'
+            updated_output_path = (
+                self.updated_outputs_directory / input_source / "output"
+            )
+            existing_output_path = (
+                self.tests_directory
+                / "data"
+                / "experiments"
+                / source
+                / input_source
+                / "output"
+            )
+            test_name = f"{source}/{input_source}"
 
         # if the directory for this source does not exist on the updated output
         # side, then that's a problem and something we should report on later
@@ -1178,8 +1186,9 @@ class FileUpdater(object):
         try:
             assert existing_output_path.exists()
         except AssertionError:
-            sys.stderr.write("\nNo existing output for \"{}\". "
-                             "Creating directory ...\n".format(test_name))
+            sys.stderr.write(
+                f'\nNo existing output for "{test_name}". Creating directory ...\n'
+            )
             existing_output_path.mkdir(parents=True)
 
         # get a comparison betwen the two directories
@@ -1202,16 +1211,25 @@ class FileUpdater(object):
 
         # We also define several types of files we exclude.
         # 1. we exclude OLS summary files
-        excluded_suffixes = ['_ols_summary.txt',
-                             '.ols', '.model', '.npy']
+        excluded_suffixes = ["_ols_summary.txt", ".ols", ".model", ".npy"]
 
         # 2. for output files we exclude all json files.
         # We keep these files if we are dealing with input files.
-        if file_type == 'output':
-            excluded_suffixes.extend(['_rsmtool.json', '_rsmeval.json',
-                                      '_rsmsummarize.json', '_rsmcompare.json'])
+        if file_type == "output":
+            excluded_suffixes.extend(
+                [
+                    "_rsmtool.json",
+                    "_rsmeval.json",
+                    "_rsmsummarize.json",
+                    "_rsmcompare.json",
+                ]
+            )
 
-        new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
+        new_files = [
+            f
+            for f in new_files
+            if not any(f.endswith(suffix) for suffix in excluded_suffixes)
+        ]
 
         # 3. We also exclude files related to model evaluations for SKLL models.
         if skll:
@@ -1228,12 +1246,14 @@ class FileUpdater(object):
             include_file = True
             updated_output_filepath = updated_output_path / changed_file
             existing_output_filepath = existing_output_path / changed_file
-            file_format = updated_output_filepath.suffix.lstrip('.')
-            if file_format in ['csv', 'tsv', 'xlsx']:
+            file_format = updated_output_filepath.suffix.lstrip(".")
+            if file_format in ["csv", "tsv", "xlsx"]:
                 try:
-                    check_file_output(str(updated_output_filepath),
-                                      str(existing_output_filepath),
-                                      file_format=file_format)
+                    check_file_output(
+                        str(updated_output_filepath),
+                        str(existing_output_filepath),
+                        file_format=file_format,
+                    )
                 except AssertionError:
                     pass
                 else:
@@ -1248,13 +1268,12 @@ class FileUpdater(object):
             copyfile(updated_output_path / file, existing_output_path / file)
 
         # Update the lists with files that were changed for this source
-        self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
+        self.deleted_files.extend(
+            [(test_name, file) for file in existing_output_only_files]
+        )
         self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
 
-    def update_test_data(self,
-                         source,
-                         test_tool,
-                         skll=False):
+    def update_test_data(self, source, test_tool, skll=False):
         """
         Determine whether to update input or output data and run ``update_source()``.
 
@@ -1268,7 +1287,9 @@ class FileUpdater(object):
             Whether the given source is for a SKLL-based test.
             Defaults to ``False``.
         """
-        existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
+        existing_output_path = (
+            self.tests_directory / "data" / "experiments" / source / "output"
+        )
         # if we have a tool without with output
         # we update the outputs
         if test_tool in tools_with_output:
@@ -1278,26 +1299,29 @@ class FileUpdater(object):
             for input_dir in existing_output_path.parent.iterdir():
                 if not input_dir.is_dir():
                     continue
-                if input_dir.name in ['output', 'figure', 'report']:
+                if input_dir.name in ["output", "figure", "report"]:
                     continue
                 else:
                     input_source = input_dir.name
-                    self.update_source(source,
-                                       skll=skll,
-                                       file_type='input',
-                                       input_source=input_source)
+                    self.update_source(
+                        source, skll=skll, file_type="input", input_source=input_source
+                    )
 
     def run(self):
         """Update test data in files given by the ``test_suffixes`` attribute."""
         # import all the test_suffix experiment files using SourceFileLoader
         # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:
-            test_module_path = join(self.tests_directory, f'test_experiment_{test_suffix}.py')
-            test_module = SourceFileLoader(f'loaded_{test_suffix}', test_module_path).load_module()
-            test_tool = test_suffix.split('_')[0]
+            test_module_path = join(
+                self.tests_directory, f"test_experiment_{test_suffix}.py"
+            )
+            test_module = SourceFileLoader(
+                f"loaded_{test_suffix}", test_module_path
+            ).load_module()
+            test_tool = test_suffix.split("_")[0]
 
             # skip the module if it tells us that it doesn't want the data for its tests updated
-            if hasattr(test_module, '_AUTO_UPDATE'):
+            if hasattr(test_module, "_AUTO_UPDATE"):
                 if not test_module._AUTO_UPDATE:
                     continue
 
@@ -1308,7 +1332,9 @@ class FileUpdater(object):
             # For the rest, try to get the source since that's what we need to update
             # the test files.
             for member_name, member_object in getmembers(test_module):
-                if isfunction(member_object) and member_name.startswith('test_run_experiment'):
+                if isfunction(member_object) and member_name.startswith(
+                    "test_run_experiment"
+                ):
                     function = member_object
 
                     # get the qualified name of the member function
@@ -1316,57 +1342,63 @@ class FileUpdater(object):
 
                     # check if it has 'raises' in the qualified name
                     # and skip it
-                    if 'raises' in member_qualified_name:
+                    if "raises" in member_qualified_name:
                         continue
 
                     # otherwise first we check if it's the parameterized function and if so
                     # we can easily get the source from the parameter list
-                    if member_name.endswith('parameterized'):
+                    if member_name.endswith("parameterized"):
                         for param in function.parameterized_input:
                             source_name = param.args[0]
-                            skll = param.kwargs.get('skll', False)
-                            self.update_test_data(source_name,
-                                                  test_tool,
-                                                  skll=skll)
+                            skll = param.kwargs.get("skll", False)
+                            self.update_test_data(source_name, test_tool, skll=skll)
 
                     # if it's another function, then we actually inspect the code
                     # to get the source. Note that this should never be a SKLL experiment
                     # since those should always be run parameterized
                     else:
                         function_code_lines = getsourcelines(function)
-                        source_line = [line for line in function_code_lines[0]
-                                       if re.search(r'source = ', line)]
-                        source_name = eval(source_line[0].strip().split(' = ')[1])
+                        source_line = [
+                            line
+                            for line in function_code_lines[0]
+                            if re.search(r"source = ", line)
+                        ]
+                        source_name = eval(source_line[0].strip().split(" = ")[1])
                         self.update_test_data(source_name, test_tool)
 
     def print_report(self):
         """Print a report of all changes made when the updater was run."""
         # print out the number and list of overall deleted files
-        print(f'{len(self.deleted_files)} deleted:')
+        print(f"{len(self.deleted_files)} deleted:")
         for source, deleted_file in self.deleted_files:
-            print(f'{source} {deleted_file}')
+            print(f"{source} {deleted_file}")
         print()
 
         # find added/updated input files: in this case the source # will consist of
         # the test name and the input test name separated by '/'.
-        updated_input_files = [(source, updated_file) for (source, updated_file)
-                               in self.updated_files if '/' in source]
+        updated_input_files = [
+            (source, updated_file)
+            for (source, updated_file) in self.updated_files
+            if "/" in source
+        ]
 
         # print out the number and list of overall added/updated non-model files
-        print(f'{len(self.updated_files)} added/updated:')
+        print(f"{len(self.updated_files)} added/updated:")
         for source, updated_file in self.updated_files:
-            print(f'{source} {updated_file}')
+            print(f"{source} {updated_file}")
         print()
 
         # now print out missing and/or empty updated output directories
-        print(f'{len(self.missing_or_empty_sources)} missing/empty sources in updated outputs:')
+        print(
+            f"{len(self.missing_or_empty_sources)} missing/empty sources in updated outputs:"
+        )
         for source in self.missing_or_empty_sources:
-            print(f'{source}')
+            print(f"{source}")
         print()
 
         # if we updated any input files, let the user know that they need to
         # re-run the tests and update test outputs
         if len(updated_input_files) > 0:
-            print("WARNING: {} input files for rsmcompare/rsmsummarize "
-                  "tests have been updated. You need to re-run these "
-                  "tests and update test outputs".format(len(updated_input_files)))
+            print(
+                f"WARNING: {len(updated_input_files)} input files for rsmcompare/rsmsummarize tests have been updated. You need to re-run these tests and update test outputs"
+            )

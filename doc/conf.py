@@ -20,7 +20,7 @@ from datetime import datetime
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 from rsmtool.version import __version__ as version  # isort:skip
 
@@ -34,28 +34,32 @@ from rsmtool.version import __version__ as version  # isort:skip
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode',
-              'sphinx.ext.mathjax', 'sphinx.ext.napoleon']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = u'Rater Scoring Modeling Tool'
+project = "Rater Scoring Modeling Tool"
 current_year = datetime.now().year
-copyright = f'{current_year}, Educational Testing Service'
-author = 'Nitin Madnani, Jeremy Biggs, and Anastassia Loukina'
+copyright = f"{current_year}, Educational Testing Service"
+author = "Nitin Madnani, Jeremy Biggs, and Anastassia Loukina"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -69,65 +73,65 @@ release = version
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
-                    'add_dash_anchors.py'
-                    'builtin_models.rst',
-                    'column_selection_rsmtool.rst',
-                    'config_rsmcompare.rst',
-                    'config_rsmeval.rst',
-                    'config_rsmpredict.rst',
-                    'config_rsmsummarize.rst',
-                    'config_rsmtool.rst',
-                    'intermediate_files_rsmeval.rst',
-                    'intermediate_files_rsmtool.rst',
-                    'tutorial_rsmcompare.rst',
-                    'tutorial_rsmeval.rst',
-                    'tutorial_rsmpredict.rst',
-                    'tutorial_rsmsummarize.rst',
-                    'usage_rsmcompare.rst',
-                    'usage_rsmeval.rst',
-                    'usage_rsmpredict.rst',
-                    'usage_rsmsummarize.rst']
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "add_dash_anchors.py" "builtin_models.rst",
+    "column_selection_rsmtool.rst",
+    "config_rsmcompare.rst",
+    "config_rsmeval.rst",
+    "config_rsmpredict.rst",
+    "config_rsmsummarize.rst",
+    "config_rsmtool.rst",
+    "intermediate_files_rsmeval.rst",
+    "intermediate_files_rsmtool.rst",
+    "tutorial_rsmcompare.rst",
+    "tutorial_rsmeval.rst",
+    "tutorial_rsmpredict.rst",
+    "tutorial_rsmsummarize.rst",
+    "usage_rsmcompare.rst",
+    "usage_rsmeval.rst",
+    "usage_rsmpredict.rst",
+    "usage_rsmsummarize.rst",
+]
 
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
 # concatenate both the  class’ and the __init__ method’s docstring and insert
-autoclass_content = 'both'
+autoclass_content = "both"
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-for_dash = os.environ.get('DASH', None) == 'True'
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+for_dash = os.environ.get("DASH", None) == "True"
 if not on_rtd and not for_dash:
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
+
+    html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 elif for_dash:
     import alabaster
-    html_theme = 'alabaster'
+
+    html_theme = "alabaster"
     html_theme_path = [alabaster.get_path()]
-    html_theme_options = {
-        'nosidebar': True
-    }
+    html_theme_options = {"nosidebar": True}
 
 # copy over any static assets
-html_static_path = ['assets']
+html_static_path = ["assets"]
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'RSMTool', 'RSMTool Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "RSMTool", "RSMTool Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -136,7 +140,13 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'RSMTool', 'RSMTool Documentation',
-     author, 'RSMTool', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "RSMTool",
+        "RSMTool Documentation",
+        author,
+        "RSMTool",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]

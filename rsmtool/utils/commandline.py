@@ -25,11 +25,13 @@ from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
 
-from .constants import (CHECK_FIELDS,
-                        CONFIGURATION_DOCUMENTATION_SLUGS,
-                        DEFAULTS,
-                        INTERACTIVE_MODE_METADATA,
-                        POSSIBLE_EXTENSIONS)
+from .constants import (
+    CHECK_FIELDS,
+    CONFIGURATION_DOCUMENTATION_SLUGS,
+    DEFAULTS,
+    INTERACTIVE_MODE_METADATA,
+    POSSIBLE_EXTENSIONS,
+)
 
 # a named tuple for use with the `setup_rsmcmd_parser` function below
 # to specify additional options for either of the subcommand parsers.
@@ -38,17 +40,20 @@ from .constants import (CHECK_FIELDS,
 # the `ArgParser.add_argument()` method. The `dest` and `help`
 # options are required but the rest can be left unspecified and
 # will default to `None`.
-CmdOption = namedtuple('CmdOption',
-                       ['dest', 'help', 'shortname', 'longname', 'action',
-                        'default', 'required', 'nargs'],
-                       defaults=(None,) * 6)
+CmdOption = namedtuple(
+    "CmdOption",
+    ["dest", "help", "shortname", "longname", "action", "default", "required", "nargs"],
+    defaults=(None,) * 6,
+)
 
 
-def setup_rsmcmd_parser(name,
-                        uses_output_directory=True,
-                        allows_overwriting=False,
-                        extra_run_options=[],
-                        uses_subgroups=False):
+def setup_rsmcmd_parser(
+    name,
+    uses_output_directory=True,
+    allows_overwriting=False,
+    extra_run_options=[],
+    uses_subgroups=False,
+):
     """
     Create argument parsers for RSM command-line utilities.
 
@@ -123,61 +128,67 @@ def setup_rsmcmd_parser(name,
         if Path(string).exists():
             return string
         else:
-            msg = f'The configuration file {string!r} does not exist.'
+            msg = f"The configuration file {string!r} does not exist."
             raise argparse.ArgumentTypeError(msg)
 
     # initialize an argument parser
     parser = argparse.ArgumentParser(prog=f"{name}")
 
     # we always want to have a version flag for the main parser
-    parser.add_argument('-V',
-                        '--version',
-                        action='version',
-                        version=VERSION_STRING,
-                        help=f"show the {name} version number and exit")
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="version",
+        version=VERSION_STRING,
+        help=f"show the {name} version number and exit",
+    )
 
     # each RSM command-line utility has two subcommands
     # - generate : used to auto-generate configuration files
     # - run : used to run experiments
 
     # let's set up the sub-parsers corresponding to these subcommands
-    subparsers = parser.add_subparsers(dest='subcommand', title='subcommands')
-    parser_generate = subparsers.add_parser('generate',
-                                            help=f"automatically generate an "
-                                                 f"{name} configuration file")
-    parser_run = subparsers.add_parser('run',
-                                       help=f"run an {name} experiment")
+    subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
+    parser_generate = subparsers.add_parser(
+        "generate", help=f"automatically generate an " f"{name} configuration file"
+    )
+    parser_run = subparsers.add_parser("run", help=f"run an {name} experiment")
 
     ###################################################
     # Setting up options for the "generate" subparser #
     ###################################################
     if uses_subgroups:
-        parser_generate.add_argument('-g',
-                                     '--subgroups',
-                                     dest='subgroups',
-                                     action='store_true',
-                                     default=False,
-                                     help=f"if specified, the generated {name} "
-                                          f"configuration file will include the "
-                                          f"subgroup sections in the general "
-                                          f"sections list")
+        parser_generate.add_argument(
+            "-g",
+            "--subgroups",
+            dest="subgroups",
+            action="store_true",
+            default=False,
+            help=f"if specified, the generated {name} "
+            f"configuration file will include the "
+            f"subgroup sections in the general "
+            f"sections list",
+        )
 
-    parser_generate.add_argument('-q',
-                                 '--quiet',
-                                 dest='quiet',
-                                 action='store_true',
-                                 default=False,
-                                 help="if specified, the warning about not "
-                                      "using the generated configuration "
-                                      "as-is will be suppressed.")
+    parser_generate.add_argument(
+        "-q",
+        "--quiet",
+        dest="quiet",
+        action="store_true",
+        default=False,
+        help="if specified, the warning about not "
+        "using the generated configuration "
+        "as-is will be suppressed.",
+    )
 
-    parser_generate.add_argument('-i',
-                                 '--interactive',
-                                 dest='interactive',
-                                 action='store_true',
-                                 default=False,
-                                 help=f"if specified, generate the {name} "
-                                      f"configuration file interactively")
+    parser_generate.add_argument(
+        "-i",
+        "--interactive",
+        dest="interactive",
+        action="store_true",
+        default=False,
+        help=f"if specified, generate the {name} " f"configuration file interactively",
+    )
 
     ##############################################
     # Setting up options for the "run" subparser #
@@ -185,29 +196,35 @@ def setup_rsmcmd_parser(name,
 
     # since this is an RSMTool command-line utility, we will
     # always need a configuration file
-    parser_run.add_argument('config_file',
-                            type=existing_configuration_file,
-                            help=f"the {name} JSON configuration file to run")
+    parser_run.add_argument(
+        "config_file",
+        type=existing_configuration_file,
+        help=f"the {name} JSON configuration file to run",
+    )
 
     # if it uses an output directory, let's add that
     if uses_output_directory:
-        parser_run.add_argument('output_dir',
-                                nargs='?',
-                                default=os.getcwd(),
-                                help="the output directory where all the files "
-                                     "for this run will be stored")
+        parser_run.add_argument(
+            "output_dir",
+            nargs="?",
+            default=os.getcwd(),
+            help="the output directory where all the files "
+            "for this run will be stored",
+        )
 
     # if it allows overwrting the output directory, let's add that
     if allows_overwriting:
-        parser_run.add_argument('-f',
-                                '--force',
-                                dest='force_write',
-                                action='store_true',
-                                default=False,
-                                help=f"if specified, {name} will overwrite the "
-                                     f"contents of the output file or directory "
-                                     f"even if it contains the output of a "
-                                     f"previous run ")
+        parser_run.add_argument(
+            "-f",
+            "--force",
+            dest="force_write",
+            action="store_true",
+            default=False,
+            help=f"if specified, {name} will overwrite the "
+            f"contents of the output file or directory "
+            f"even if it contains the output of a "
+            f"previous run ",
+        )
 
     # add any extra options passed in for the rub subcommand;
     for parser_option in extra_run_options:
@@ -227,19 +244,21 @@ def setup_rsmcmd_parser(name,
         if parser_option.longname is not None:
             argparse_option_args.append(f"--{parser_option.longname}")
         if parser_option.action is not None:
-            argparse_option_kwargs['action'] = f"{parser_option.action}"
+            argparse_option_kwargs["action"] = f"{parser_option.action}"
         if parser_option.default is not None:
             argparse_option_kwargs["default"] = f"{parser_option.default}"
         if parser_option.required is not None:
             try:
                 assert type(parser_option.required) == bool
             except AssertionError:
-                raise TypeError(f"the 'required' field for CmdOption must be "
-                                f"boolean, you specified '{parser_option.required}'")
+                raise TypeError(
+                    f"the 'required' field for CmdOption must be "
+                    f"boolean, you specified '{parser_option.required}'"
+                )
             else:
                 argparse_option_kwargs["required"] = parser_option.required
         if parser_option.nargs is not None:
-            argparse_option_kwargs['nargs'] = f"{parser_option.nargs}"
+            argparse_option_kwargs["nargs"] = f"{parser_option.nargs}"
 
         # add this argument to the parser
         parser_run.add_argument(*argparse_option_args, **argparse_option_kwargs)
@@ -327,10 +346,10 @@ class InteractiveField:
         # assign metadata attributes to class attributes
         self.field_name = field_name
         self.field_type = field_type
-        self.label = field_metadata['label']
-        self.choices = field_metadata.get('choices', [])
-        self.count = field_metadata.get('count', 'single')
-        self.data_type = field_metadata.get('type', 'text')
+        self.label = field_metadata["label"]
+        self.choices = field_metadata.get("choices", [])
+        self.count = field_metadata.get("count", "single")
+        self.data_type = field_metadata.get("type", "text")
 
         # instantiate the interaction-related attributes to their default values
         self.completer = None
@@ -338,32 +357,32 @@ class InteractiveField:
         self.validator = None
 
         # now override these attributes as necessary depending on field data types
-        if self.data_type == 'boolean':
-            allow_empty = field_type == 'optional'
-            self.completer = WordCompleter(['true', 'false'])
+        if self.data_type == "boolean":
+            allow_empty = field_type == "optional"
+            self.completer = WordCompleter(["true", "false"])
             self.validator = self._make_boolean_validator(allow_empty=allow_empty)
-        elif self.data_type == 'choice':
+        elif self.data_type == "choice":
             if not self.choices:
                 raise ValueError(f"invalid list of choices for field '{field_name}'")
             else:
                 self.completer = FuzzyWordCompleter(self.choices)
                 self.validator = self._make_choice_validator(self.choices)
                 self.complete_style = CompleteStyle.MULTI_COLUMN
-        elif self.data_type == 'dir':
+        elif self.data_type == "dir":
             self.completer = self._make_directory_completer()
             self.validator = self._make_directory_validator()
-        elif self.data_type == 'file':
+        elif self.data_type == "file":
             self.completer = self._make_file_completer()
             self.validator = self._make_file_validator()
-        elif self.data_type == 'format':
+        elif self.data_type == "format":
             self.completer = WordCompleter(POSSIBLE_EXTENSIONS)
             self.validator = self._make_file_format_validator()
-        elif self.data_type == 'id':
+        elif self.data_type == "id":
             self.completer = None
             self.validator = self._make_id_validator()
-        elif self.data_type == 'integer':
+        elif self.data_type == "integer":
             self.completer = None
-            allow_empty = field_type == 'optional'
+            allow_empty = field_type == "optional"
             self.validator = self._make_integer_validator(allow_empty=allow_empty)
 
     def _make_boolean_validator(self, allow_empty=False):
@@ -391,8 +410,9 @@ class InteractiveField:
         correct_choices = ["true", "false"]
         if allow_empty:
             correct_choices.append("")
-        validator = Validator.from_callable(lambda answer: answer in correct_choices,
-                                            error_message="invalid answer")
+        validator = Validator.from_callable(
+            lambda answer: answer in correct_choices, error_message="invalid answer"
+        )
         return validator
 
     def _make_choice_validator(self, choices):
@@ -413,8 +433,9 @@ class InteractiveField:
             A ``Validator`` instance that ensures that the user
             input for the field is one of the possible choices.
         """
-        validator = Validator.from_callable(lambda choice: choice in choices,
-                                            error_message="invalid choice")
+        validator = Validator.from_callable(
+            lambda choice: choice in choices, error_message="invalid choice"
+        )
         return validator
 
     def _make_directory_completer(self):
@@ -445,8 +466,9 @@ class InteractiveField:
             A ``Validator`` instance that makes sure that only
             directory names are chosen as the final user input.
         """
-        validator = Validator.from_callable(lambda filepath: Path(filepath).is_dir(),
-                                            error_message="invalid directory")
+        validator = Validator.from_callable(
+            lambda filepath: Path(filepath).is_dir(), error_message="invalid directory"
+        )
         return validator
 
     def _make_file_completer(self):
@@ -466,13 +488,12 @@ class InteractiveField:
             and "xlsx". We need directory names so that
             users can look into sub-directories etc.
         """
+
         def valid_file(filename):
-            return (Path(filename).is_dir() or
-                    Path(filename).suffix.lower().lstrip('.') in ['csv',
-                                                                  'jsonlines',
-                                                                  'sas7bdat',
-                                                                  'tsv',
-                                                                  'xlsx'])
+            return Path(filename).is_dir() or Path(filename).suffix.lower().lstrip(
+                "."
+            ) in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]
+
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
     def _make_file_validator(self):
@@ -491,13 +512,12 @@ class InteractiveField:
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
             and "xlsx".
         """
+
         def is_valid(filepath):
-            return (Path(filepath).is_file() and
-                    Path(filepath).suffix.lower().lstrip('.') in ['csv',
-                                                                  'jsonlines',
-                                                                  'sas7bdat',
-                                                                  'tsv',
-                                                                  'xlsx'])
+            return Path(filepath).is_file() and Path(filepath).suffix.lower().lstrip(
+                "."
+            ) in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]
+
         validator = Validator.from_callable(is_valid, error_message="invalid file")
         return validator
 
@@ -517,7 +537,10 @@ class InteractiveField:
             user input. We want to allow empty string because
             intermediate file formats are optional to specify.
         """
-        validator = Validator.from_callable(lambda ext: ext in POSSIBLE_EXTENSIONS or ext == '', error_message="invalid format")
+        validator = Validator.from_callable(
+            lambda ext: ext in POSSIBLE_EXTENSIONS or ext == "",
+            error_message="invalid format",
+        )
         return validator
 
     def _make_id_validator(self):
@@ -535,8 +558,10 @@ class InteractiveField:
             contain spaces. We do not allow blanks since IDs
             are always required.
         """
-        validator = Validator.from_callable(lambda text: len(text) > 0 and ' ' not in text,
-                                            error_message="blanks/spaces not allowed")
+        validator = Validator.from_callable(
+            lambda text: len(text) > 0 and " " not in text,
+            error_message="blanks/spaces not allowed",
+        )
         return validator
 
     def _make_integer_validator(self, allow_empty=False):
@@ -561,11 +586,13 @@ class InteractiveField:
             fixed-point number or integer. Blank strings may
             also be allowed if ``allow_empty`` is ``True``.
         """
-        integer_regex = r'^[0-9]+$'
+        integer_regex = r"^[0-9]+$"
         if allow_empty:
-            integer_regex += r'|^$'
-        validator = Validator.from_callable(lambda answer: re.match(integer_regex, answer),
-                                            error_message="invalid integer")
+            integer_regex += r"|^$"
+        validator = Validator.from_callable(
+            lambda answer: re.match(integer_regex, answer),
+            error_message="invalid integer",
+        )
         return validator
 
     def _get_user_input(self):
@@ -584,7 +611,7 @@ class InteractiveField:
             inputs, e.g., subgroups.
         """
         # if we are dealing with a field that accepts multiple inputs
-        if self.count == 'multiple':
+        if self.count == "multiple":
 
             # instantiate a blank list to hold the multiple values
             values = []
@@ -595,17 +622,21 @@ class InteractiveField:
 
             # ask the user how many of the multiple inputs they
             # intend to provide; this must be non-zero
-            num_entries = prompt("  How many do you want to specify: ",
-                                 validator=self._make_integer_validator())
+            num_entries = prompt(
+                "  How many do you want to specify: ",
+                validator=self._make_integer_validator(),
+            )
             num_entries = int(num_entries)
 
             # display secondary prompts, one for each of the inputs
             # with the appropriate completer, validator, and style
             for i in range(num_entries):
-                value = prompt(f"   Enter #{i+1}: ",
-                               completer=self.completer,
-                               validator=self.validator,
-                               complete_style=self.complete_style)
+                value = prompt(
+                    f"   Enter #{i+1}: ",
+                    completer=self.completer,
+                    validator=self.validator,
+                    complete_style=self.complete_style,
+                )
                 # save the value in the list
                 values.append(value)
 
@@ -617,10 +648,12 @@ class InteractiveField:
             # nothing fancy, just display the label, attach
             # the appropriate completer, validator, and style,
             # and get the user input
-            user_input = prompt(HTML(f" <b>{self.label}</b>: "),
-                                completer=self.completer,
-                                validator=self.validator,
-                                complete_style=self.complete_style)
+            user_input = prompt(
+                HTML(f" <b>{self.label}</b>: "),
+                completer=self.completer,
+                validator=self.validator,
+                complete_style=self.complete_style,
+            )
 
         return user_input
 
@@ -641,14 +674,14 @@ class InteractiveField:
         final value
             The converted value.
         """
-        if (user_input == '' or user_input == []) and self.field_type == 'optional':
+        if (user_input == "" or user_input == []) and self.field_type == "optional":
             final_value = DEFAULTS.get(self.field_name)
         else:
             # boolean fields need to be converted to actual booleans
-            if self.data_type == 'boolean':
-                final_value = False if user_input == 'false' else True
+            if self.data_type == "boolean":
+                final_value = False if user_input == "false" else True
             # and integer fields to integers/None
-            elif self.data_type == 'integer':
+            elif self.data_type == "integer":
                 final_value = int(user_input)
             else:
                 final_value = user_input
@@ -706,11 +739,9 @@ class ConfigurationGenerator:
         Defaults to ``False``.
     """
 
-    def __init__(self,
-                 context,
-                 as_string=False,
-                 suppress_warnings=False,
-                 use_subgroups=False):  # noqa
+    def __init__(
+        self, context, as_string=False, suppress_warnings=False, use_subgroups=False
+    ):  # noqa
         self.context = context
         self.use_subgroups = use_subgroups
         self.suppress_warnings = suppress_warnings
@@ -719,57 +750,69 @@ class ConfigurationGenerator:
 
         # we need to save the first required and first optional field we will
         # insert since we will use them as sign posts to insert comments later
-        self._required_fields = CHECK_FIELDS[self.context]['required']
-        self._optional_fields = sorted(CHECK_FIELDS[self.context]['optional'])
+        self._required_fields = CHECK_FIELDS[self.context]["required"]
+        self._optional_fields = sorted(CHECK_FIELDS[self.context]["optional"])
         self._first_required_field = self._required_fields[0]
         self._first_optional_field = self._optional_fields[0]
 
-    def _convert_to_string(self,
-                           config_object,
-                           insert_url_comment=True,
-                           insert_required_comment=True,
-                           insert_optional_comment=True):
+    def _convert_to_string(
+        self,
+        config_object,
+        insert_url_comment=True,
+        insert_required_comment=True,
+        insert_optional_comment=True,
+    ):
         configuration = str(config_object)
 
         # insert the URL comment first, right above the first required field
         if insert_url_comment:
-            base_url = 'https://rsmtool.readthedocs.io/en/stable'
+            base_url = "https://rsmtool.readthedocs.io/en/stable"
             doc_slug = CONFIGURATION_DOCUMENTATION_SLUGS[self.context]
             doc_url = f"{base_url}/{doc_slug}"
-            configuration = re.sub(fr'([ ]+)("{self._first_required_field}": [^,]+,\n)',
-                                   fr'\1// Reference: {doc_url}\n\1\2',
-                                   configuration)
+            configuration = re.sub(
+                fr'([ ]+)("{self._first_required_field}": [^,]+,\n)',
+                fr"\1// Reference: {doc_url}\n\1\2",
+                configuration,
+            )
 
         # insert first comment right above the first required field
         if insert_required_comment:
-            configuration = re.sub(fr'([ ]+)("{self._first_required_field}": [^,]+,\n)',
-                                   fr'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
-                                   configuration)
+            configuration = re.sub(
+                fr'([ ]+)("{self._first_required_field}": [^,]+,\n)',
+                fr'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
+                configuration,
+            )
 
         # insert second comment right above the first optional field
         if insert_optional_comment:
-            configuration = re.sub(fr'([ ]+)("{self._first_optional_field}": [^,]+,\n)',
-                                   r'\1// OPTIONAL: replace default values below based on your data.\n\1\2',
-                                   configuration)
+            configuration = re.sub(
+                fr'([ ]+)("{self._first_optional_field}": [^,]+,\n)',
+                r"\1// OPTIONAL: replace default values below based on your data.\n\1\2",
+                configuration,
+            )
 
         return configuration
 
     def _get_all_general_section_names(self):
 
         reporter = Reporter()
-        default_general_sections_value = DEFAULTS.get('general_sections', '')
-        default_special_sections_value = DEFAULTS.get('special_sections', '')
-        default_custom_sections_value = DEFAULTS.get('custom_sections', '')
+        default_general_sections_value = DEFAULTS.get("general_sections", "")
+        default_special_sections_value = DEFAULTS.get("special_sections", "")
+        default_custom_sections_value = DEFAULTS.get("custom_sections", "")
 
         # if we are told ot use subgroups then just make up a dummy subgroup
         # value so that the subgroup-based sections will be included in the
         # section list. This value is not actually used in configuration file.
-        subgroups_value = ['GROUP'] if self.use_subgroups else DEFAULTS.get('subgroups', '')
-        return reporter.determine_chosen_sections(default_general_sections_value,
-                                                  default_special_sections_value,
-                                                  default_custom_sections_value,
-                                                  subgroups_value,
-                                                  context=self.context)
+        subgroups_value = (
+            ["GROUP"] if self.use_subgroups else DEFAULTS.get("subgroups", "")
+        )
+        return reporter.determine_chosen_sections(
+            default_general_sections_value,
+            default_special_sections_value,
+            default_custom_sections_value,
+            subgroups_value,
+            context=self.context,
+        )
 
     def interact(self):
         """
@@ -793,15 +836,23 @@ class ConfigurationGenerator:
         sys.stderr.write("\n")
         sys.stderr.write("Entering interactive mode:\n")
         sys.stderr.write(" - press ctrl-d to exit without generating a configuration\n")
-        sys.stderr.write(" - press tab or start typing when choosing files/directories/models\n")
-        sys.stderr.write(" - press enter to accept the default value for a field (underlined)\n")
-        sys.stderr.write(" - press ctrl-c to cancel current entry for a field and enter again\n")
+        sys.stderr.write(
+            " - press tab or start typing when choosing files/directories/models\n"
+        )
+        sys.stderr.write(
+            " - press enter to accept the default value for a field (underlined)\n"
+        )
+        sys.stderr.write(
+            " - press ctrl-c to cancel current entry for a field and enter again\n"
+        )
         sys.stderr.write(" - you may still need to edit the generated configuration\n")
         sys.stderr.write("\n")
 
         if not self.use_subgroups:
-            sys.stderr.write("IMPORTANT: If you have subgroups and didn't specify the '-g' "
-                             "option, exit now (ctrl-d) and re-run!\n")
+            sys.stderr.write(
+                "IMPORTANT: If you have subgroups and didn't specify the '-g' "
+                "option, exit now (ctrl-d) and re-run!\n"
+            )
             sys.stderr.write("\n")
 
         # instantiate a blank dictionary
@@ -809,43 +860,47 @@ class ConfigurationGenerator:
 
         # iterate over the required fields first, and then the (sorted) optional fields
         # keep track of which field type we are currently dealing with
-        for field_type, field_name in chain(product(['required'], self._required_fields),
-                                            product(['optional'], self._optional_fields)):
+        for field_type, field_name in chain(
+            product(["required"], self._required_fields),
+            product(["optional"], self._optional_fields),
+        ):
 
             # skip the subgroups field unless we were told to use subgroups
-            if field_name == 'subgroups' and not self.use_subgroups:
-                configdict['subgroups'] = DEFAULTS.get('subgroups')
+            if field_name == "subgroups" and not self.use_subgroups:
+                configdict["subgroups"] = DEFAULTS.get("subgroups")
                 continue
 
             # if the field is not one that is meant to be filled interactively,
             # then just use its default value; for "general_sections", expand it
             # so that it is easy for the user to remove sections
             if field_name not in INTERACTIVE_MODE_METADATA:
-                non_interactive_field_value = DEFAULTS.get(field_name, '')
-                if field_name == 'general_sections':
+                non_interactive_field_value = DEFAULTS.get(field_name, "")
+                if field_name == "general_sections":
                     non_interactive_field_value = self._get_all_general_section_names()
                 configdict[field_name] = non_interactive_field_value
             else:
                 # instantiate the interactive field first
                 try:
-                    interactive_field = InteractiveField(field_name,
-                                                         field_type,
-                                                         INTERACTIVE_MODE_METADATA[field_name])
+                    interactive_field = InteractiveField(
+                        field_name, field_type, INTERACTIVE_MODE_METADATA[field_name]
+                    )
                     configdict[field_name] = interactive_field.get_value()
                 # if the user pressed Ctrl-D, then exit out of interactive mode
                 # without generating anything and return an empty string
                 except EOFError:
                     sys.stderr.write("\n")
-                    sys.stderr.write("You exited interactive mode without a configuration.")
+                    sys.stderr.write(
+                        "You exited interactive mode without a configuration."
+                    )
                     sys.stderr.write("\n")
-                    return ''
+                    return ""
                 # otherwise get the field value and save it
 
         # create a Configuration instance from the dictionary we just generated
         sys.stderr.write("\n")
-        config_object = Configuration(configdict,
-                                      configdir=os.getcwd(),
-                                      context=self.context)
+        config_object = Configuration(
+            configdict, configdir=os.getcwd(), context=self.context
+        )
         # convert the Configuration object to a string - we are using
         # a special wrapper method since we also want to insert comments
         return self._convert_to_string(config_object, insert_required_comment=False)
@@ -865,7 +920,7 @@ class ConfigurationGenerator:
 
         # insert the required fields first and give them a dummy value
         for required_field in self._required_fields:
-            configdict[required_field] = 'ENTER_VALUE_HERE'
+            configdict[required_field] = "ENTER_VALUE_HERE"
 
         # insert the optional fields in alphabetical order
         for optional_field in self._optional_fields:
@@ -874,15 +929,15 @@ class ConfigurationGenerator:
             # populate the `general_sections` field with an explicit list
             # instead of the default value which is simply ``['all']``. To
             # do this, we can use the reporter class.
-            if optional_field == 'general_sections':
-                configdict['general_sections'] = self._get_all_general_section_names()
+            if optional_field == "general_sections":
+                configdict["general_sections"] = self._get_all_general_section_names()
             else:
-                configdict[optional_field] = DEFAULTS.get(optional_field, '')
+                configdict[optional_field] = DEFAULTS.get(optional_field, "")
 
         # create a Configuration object
-        config_object = Configuration(configdict,
-                                      configdir=os.getcwd(),
-                                      context=self.context)
+        config_object = Configuration(
+            configdict, configdir=os.getcwd(), context=self.context
+        )
 
         # if we were asked for string output, then convert this dictionary to
         # a string that will also insert some useful comments
@@ -894,9 +949,11 @@ class ConfigurationGenerator:
 
         # print out a warning to make it clear that it cannot be used as is
         if not self.suppress_warnings:
-            self.logger.warning("Automatically generated configuration files MUST "
-                                "be edited to add values for required fields and "
-                                "even for optional ones depending on your data.")
+            self.logger.warning(
+                "Automatically generated configuration files MUST "
+                "be edited to add values for required fields and "
+                "even for optional ones depending on your data."
+            )
 
         # return either the Configuration object or the string
         return configuration

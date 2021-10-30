@@ -100,7 +100,7 @@ class DataContainer:
         container_names : str
             A comma-separated list of dataset names from the container.
         """
-        return ', '.join(self._names)
+        return ", ".join(self._names)
 
     def __add__(self, other):
         """
@@ -129,13 +129,14 @@ class DataContainer:
 
         """
         if not isinstance(other, DataContainer):
-            raise ValueError(f'Object must be a `DataContainer`, not {type(other)}.')
+            raise ValueError(f"Object must be a `DataContainer`, not {type(other)}.")
 
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)
         if common_keys:
-            raise KeyError('The key(s) `{}` already exist in the '
-                           'container.'.format(', '.join(common_keys)))
+            raise KeyError(
+                f"The key(s) `{', '.join(common_keys)}` already exist in the container."
+            )
 
         dicts = DataContainer.to_datasets(self)
         dicts.extend(DataContainer.to_datasets(other))
@@ -173,9 +174,11 @@ class DataContainer:
         """
         dataset_dicts = []
         for name in data_container.keys():
-            dataset_dict = {'name': name,
-                            'path': data_container.get_path(name),
-                            'frame': data_container.get_frame(name)}
+            dataset_dict = {
+                "name": name,
+                "path": data_container.get_path(name),
+                "frame": data_container.get_frame(name),
+            }
             dataset_dicts.append(dataset_dict)
         return dataset_dicts
 
@@ -192,14 +195,15 @@ class DataContainer:
             Update an existing DataFrame, if ``True``.
             Defaults to ``False``.
         """
-        name = dataset_dict['name']
-        data_frame = dataset_dict['frame']
-        path = dataset_dict.get('path')
+        name = dataset_dict["name"]
+        data_frame = dataset_dict["frame"]
+        path = dataset_dict.get("path")
 
         if not update:
             if name in self._names:
-                raise KeyError('The name {} already exists in the '
-                               'container dictionary.'.format(name))
+                raise KeyError(
+                    f"The name {name} already exists in the container dictionary."
+                )
 
         if name not in self._names:
             self._names.append(name)
@@ -276,14 +280,16 @@ class DataContainer:
             are the keys and the frames are the values.
         """
         if prefix is None:
-            prefix = ''
+            prefix = ""
 
         if suffix is None:
-            suffix = ''
+            suffix = ""
 
-        names = [name for name in self._names if
-                 name.lower().startswith(prefix) and
-                 name.lower().endswith(suffix)]
+        names = [
+            name
+            for name in self._names
+            if name.lower().startswith(prefix) and name.lower().endswith(suffix)
+        ]
 
         frames = {}
         for name in names:
@@ -337,9 +343,9 @@ class DataContainer:
         self
         """
         if name not in self:
-            warnings.warn('The name `{}` is not in the '
-                          'container. No datasets will '
-                          'be dropped.'.format(name))
+            warnings.warn(
+                f"The name `{name}` is not in the container. No datasets will be dropped."
+            )
         else:
             self._names.remove(name)
             self._dataframes.pop(name)
@@ -362,14 +368,15 @@ class DataContainer:
         self
         """
         if name not in self:
-            warnings.warn('The name `{}` is not in the '
-                          'container and cannot '
-                          'be renamed.'.format(name))
+            warnings.warn(
+                f"The name `{name}` is not in the container and cannot be renamed."
+            )
         else:
             frame = self._dataframes[name]
             path = self._data_paths[name]
-            self.add_dataset({'name': new_name, 'frame': frame, 'path': path},
-                             update=True)
+            self.add_dataset(
+                {"name": new_name, "frame": frame, "path": path}, update=True
+            )
             self.drop(name)
         return self
 

@@ -19,11 +19,13 @@ from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
 
 from .container import DataContainer
-from .utils.metrics import (agreement,
-                            difference_of_standardized_means,
-                            partial_correlations,
-                            quadratic_weighted_kappa,
-                            standardized_mean_difference)
+from .utils.metrics import (
+    agreement,
+    difference_of_standardized_means,
+    partial_correlations,
+    quadratic_weighted_kappa,
+    standardized_mean_difference,
+)
 from .utils.prmse import get_true_score_evaluations
 
 
@@ -53,8 +55,9 @@ class Analyzer:
         """
         for dataframe_name in dataframe_names:
             if dataframe_name not in data_container:
-                raise KeyError('The DataFrame `{}` does not exist in the '
-                               'DataContainer object.'.format(dataframe_name))
+                raise KeyError(
+                    f"The DataFrame `{dataframe_name}` does not exist in the DataContainer object."
+                )
 
     @staticmethod
     def check_param_names(configuration_obj, parameter_names):
@@ -79,15 +82,14 @@ class Analyzer:
         """
         for parameter_name in parameter_names:
             if parameter_name not in configuration_obj:
-                raise KeyError('The parameter `{}` does not exist in the '
-                               'Configuration object.'.format(parameter_name))
+                raise KeyError(
+                    f"The parameter `{parameter_name}` does not exist in the Configuration object."
+                )
 
     @staticmethod
-    def analyze_excluded_responses(df,
-                                   features,
-                                   header,
-                                   exclude_zero_scores=True,
-                                   exclude_listwise=False):
+    def analyze_excluded_responses(
+        df, features, header, exclude_zero_scores=True, exclude_listwise=False
+    ):
         """
         Compute statistics for responses excluded from analyses.
 
@@ -121,30 +123,36 @@ class Analyzer:
             exclusion statistics.
         """
         # create an empty output data frame
-        df_full_crosstab = pd.DataFrame({'all features numeric': [0, 0, 0],
-                                         'non-numeric feature values': [0, 0, 0]},
-                                        index=['numeric non-zero human score',
-                                               'zero human score',
-                                               'non-numeric human score'])
+        df_full_crosstab = pd.DataFrame(
+            {
+                "all features numeric": [0, 0, 0],
+                "non-numeric feature values": [0, 0, 0],
+            },
+            index=[
+                "numeric non-zero human score",
+                "zero human score",
+                "non-numeric human score",
+            ],
+        )
 
         if not df.empty:
             # re-code human scores into numeric, missing or zero
-            df['score_category'] = 'numeric non-zero human score'
-            df.loc[df['sc1'].isnull(), 'score_category'] = 'non-numeric human score'
-            df.loc[df['sc1'].astype(float) == 0, 'score_category'] = 'zero human score'
+            df["score_category"] = "numeric non-zero human score"
+            df.loc[df["sc1"].isnull(), "score_category"] = "non-numeric human score"
+            df.loc[df["sc1"].astype(float) == 0, "score_category"] = "zero human score"
 
             # recode feature values: a response with at least one
             # missing feature is assigned 'non-numeric feature values'
-            df_features_only = df[features + ['spkitemid']]
+            df_features_only = df[features + ["spkitemid"]]
             null_feature_rows = df_features_only.isnull().any(axis=1)
             df_null_features = df_features_only[null_feature_rows]
-            df['feat_category'] = 'all features numeric'
-            df.loc[df['spkitemid'].isin(df_null_features['spkitemid']),
-                   'feat_category'] = 'non-numeric feature values'
+            df["feat_category"] = "all features numeric"
+            df.loc[
+                df["spkitemid"].isin(df_null_features["spkitemid"]), "feat_category"
+            ] = "non-numeric feature values"
 
             # crosstabulate
-            df_crosstab = pd.crosstab(df['score_category'],
-                                      df['feat_category'])
+            df_crosstab = pd.crosstab(df["score_category"], df["feat_category"])
             df_full_crosstab.update(df_crosstab)
             # convert back to integers as these are all counts
             df_full_crosstab = df_full_crosstab.astype(int)
@@ -153,18 +161,24 @@ class Analyzer:
         if not exclude_listwise:
             # if we are not excluding listwise, rename the first cell so
             # that it is not set to zero
-            assert(df_full_crosstab.loc['numeric non-zero human score',
-                                        'all features numeric'] == 0)
-            df_full_crosstab.loc['numeric non-zero human score',
-                                 'all features numeric'] = '-'
+            assert (
+                df_full_crosstab.loc[
+                    "numeric non-zero human score", "all features numeric"
+                ]
+                == 0
+            )
+            df_full_crosstab.loc[
+                "numeric non-zero human score", "all features numeric"
+            ] = "-"
 
             # if we are not excluding the zeros, rename the corresponding cells
             # so that they are not set to zero. We do not do this for listwise exclusion
             if not exclude_zero_scores:
-                assert(df_full_crosstab.loc['zero human score',
-                                            'all features numeric'] == 0)
-                df_full_crosstab.loc['zero human score',
-                                     'all features numeric'] = '-'
+                assert (
+                    df_full_crosstab.loc["zero human score", "all features numeric"]
+                    == 0
+                )
+                df_full_crosstab.loc["zero human score", "all features numeric"] = "-"
 
         return df_full_crosstab
 
@@ -199,33 +213,44 @@ class Analyzer:
             responses.
         """
         # create a basic data frame for responses only
-        train_responses = set(df_train['spkitemid'])
-        test_responses = set(df_test['spkitemid'])
+        train_responses = set(df_train["spkitemid"])
+        test_responses = set(df_test["spkitemid"])
 
-        rows = [{'partition': 'Training', 'responses': len(train_responses)},
-                {'partition': 'Evaluation', 'responses': len(test_responses)},
-                {'partition': 'Overlapping', 'responses': len(train_responses & test_responses)},
-                {'partition': 'Total', 'responses': len(train_responses | test_responses)}]
+        rows = [
+            {"partition": "Training", "responses": len(train_responses)},
+            {"partition": "Evaluation", "responses": len(test_responses)},
+            {
+                "partition": "Overlapping",
+                "responses": len(train_responses & test_responses),
+            },
+            {"partition": "Total", "responses": len(train_responses | test_responses)},
+        ]
 
         df_analysis = pd.DataFrame.from_dict(rows)
 
-        columns = ['partition', 'responses'] + subgroups
+        columns = ["partition", "responses"] + subgroups
 
         if candidate_column:
-            train_candidates = set(df_train['candidate'])
-            test_candidates = set(df_test['candidate'])
-            df_analysis['candidates'] = [len(train_candidates), len(test_candidates),
-                                         len(train_candidates & test_candidates),
-                                         len(train_candidates | test_candidates)]
+            train_candidates = set(df_train["candidate"])
+            test_candidates = set(df_test["candidate"])
+            df_analysis["candidates"] = [
+                len(train_candidates),
+                len(test_candidates),
+                len(train_candidates & test_candidates),
+                len(train_candidates | test_candidates),
+            ]
 
-            columns = ['partition', 'responses', 'candidates'] + subgroups
+            columns = ["partition", "responses", "candidates"] + subgroups
 
         for group in subgroups:
             train_group = set(df_train[group])
             test_group = set(df_test[group])
-            df_analysis[group] = [len(train_group), len(test_group),
-                                  len(train_group & test_group),
-                                  len(train_group | test_group)]
+            df_analysis[group] = [
+                len(train_group),
+                len(test_group),
+                len(train_group & test_group),
+                len(train_group | test_group),
+            ]
 
         df_analysis = df_analysis[columns]
         return df_analysis
@@ -252,14 +277,14 @@ class Analyzer:
             Data frame containing information about the used
             predictions.
         """
-        rows = [{'partition': 'Evaluation', 'responses': df_test['spkitemid'].size}]
+        rows = [{"partition": "Evaluation", "responses": df_test["spkitemid"].size}]
 
         df_analysis = pd.DataFrame.from_dict(rows)
-        df_columns = ['partition', 'responses'] + subgroups
+        df_columns = ["partition", "responses"] + subgroups
 
         if candidate_column:
-            df_analysis['candidates'] = [df_test['candidate'].unique().size]
-            df_columns = ['partition', 'responses', 'candidates'] + subgroups
+            df_analysis["candidates"] = [df_test["candidate"].unique().size]
+            df_columns = ["partition", "responses", "candidates"] + subgroups
 
         for group in subgroups:
             df_analysis[group] = [df_test[group].unique().size]
@@ -290,7 +315,7 @@ class Analyzer:
         df_desc = df[selected_features]
 
         # get the H1 scores
-        scores = df['sc1']
+        scores = df["sc1"]
 
         # compute correlations and p-values separately for efficiency
         cor_series = df_desc.apply(lambda s: pearsonr(s, scores))
@@ -298,26 +323,39 @@ class Analyzer:
         pvalues = cor_series.apply(lambda t: t[1])
 
         # create a data frame with all the descriptives
-        df_output = pd.DataFrame({'mean': df_desc.mean(),
-                                  'min': df_desc.min(),
-                                  'max': df_desc.max(),
-                                  'std. dev.': df_desc.std(),
-                                  'skewness': df_desc.skew(),
-                                  'kurtosis': df_desc.apply(lambda s: kurtosis(s, fisher=False)),
-                                  'Correlation': cors,
-                                  'p': pvalues,
-                                  'N': len(df_desc)})
+        df_output = pd.DataFrame(
+            {
+                "mean": df_desc.mean(),
+                "min": df_desc.min(),
+                "max": df_desc.max(),
+                "std. dev.": df_desc.std(),
+                "skewness": df_desc.skew(),
+                "kurtosis": df_desc.apply(lambda s: kurtosis(s, fisher=False)),
+                "Correlation": cors,
+                "p": pvalues,
+                "N": len(df_desc),
+            }
+        )
 
         # reorder the columns to make it look better
-        df_output = df_output[['mean', 'std. dev.', 'min', 'max', 'skewness',
-                               'kurtosis', 'Correlation', 'p', 'N']]
+        df_output = df_output[
+            [
+                "mean",
+                "std. dev.",
+                "min",
+                "max",
+                "skewness",
+                "kurtosis",
+                "Correlation",
+                "p",
+                "N",
+            ]
+        ]
 
         return df_output
 
     @staticmethod
-    def compute_percentiles(df,
-                            selected_features,
-                            percentiles=None):
+    def compute_percentiles(df, selected_features, percentiles=None):
         """
         Compute percentiles and outliers for columns in the given data frame.
 
@@ -346,38 +384,44 @@ class Analyzer:
         if percentiles is None:
             percentiles = [1, 5, 25, 50, 75, 95, 99]
 
-        df_output = df_desc.apply(lambda series: pd.Series(np.percentile(series,
-                                                                         percentiles,
-                                                                         interpolation='lower')))
+        df_output = df_desc.apply(
+            lambda series: pd.Series(
+                np.percentile(series, percentiles, interpolation="lower")
+            )
+        )
         df_output = df_output.transpose()
 
         # change the column names to be more readable
-        df_output.columns = [f'{p}%' for p in percentiles]
+        df_output.columns = [f"{p}%" for p in percentiles]
 
         # add the inter-quartile range column
-        df_output['IQR'] = df_output['75%'] - df_output['25%']
+        df_output["IQR"] = df_output["75%"] - df_output["25%"]
 
         # compute the various outlier statistics
-        mild_upper = df_output['75%'] + 1.5 * df_output['IQR']
-        mild_bottom = df_output['25%'] - 1.5 * df_output['IQR']
+        mild_upper = df_output["75%"] + 1.5 * df_output["IQR"]
+        mild_bottom = df_output["25%"] - 1.5 * df_output["IQR"]
 
-        extreme_upper = df_output['75%'] + 3 * df_output['IQR']
-        extreme_bottom = df_output['25%'] - 3 * df_output['IQR']
+        extreme_upper = df_output["75%"] + 3 * df_output["IQR"]
+        extreme_bottom = df_output["25%"] - 3 * df_output["IQR"]
 
         # compute the mild and extreme outliers
         num_mild_outliers = {}
         num_extreme_outliers = {}
         for c in df_desc.columns:
-            is_extreme = (df_desc[c] <= extreme_bottom[c]) | (df_desc[c] >= extreme_upper[c])
+            is_extreme = (df_desc[c] <= extreme_bottom[c]) | (
+                df_desc[c] >= extreme_upper[c]
+            )
 
-            is_mild = ((df_desc[c] > extreme_bottom[c]) & (df_desc[c] <= mild_bottom[c]))
-            is_mild = is_mild | ((df_desc[c] >= mild_upper[c]) & (df_desc[c] < extreme_upper[c]))
+            is_mild = (df_desc[c] > extreme_bottom[c]) & (df_desc[c] <= mild_bottom[c])
+            is_mild = is_mild | (
+                (df_desc[c] >= mild_upper[c]) & (df_desc[c] < extreme_upper[c])
+            )
             num_mild_outliers[c] = len(df_desc[is_mild])
             num_extreme_outliers[c] = len(df_desc[is_extreme])
 
         # add those to the output data frame
-        df_output['Mild outliers'] = pd.Series(num_mild_outliers)
-        df_output['Extreme outliers'] = pd.Series(num_extreme_outliers)
+        df_output["Mild outliers"] = pd.Series(num_mild_outliers)
+        df_output["Extreme outliers"] = pd.Series(num_extreme_outliers)
 
         return df_output
 
@@ -422,12 +466,16 @@ class Analyzer:
         lower_s = pd.Series(lower_outliers)
         upper_s = pd.Series(upper_outliers)
         both_s = lower_s + upper_s
-        df_output = pd.DataFrame({'lower': lower_s,
-                                  'upper': upper_s,
-                                  'both': both_s,
-                                  'lowerperc': round(lower_s / len(df_desc) * 100, 2),
-                                  'upperperc': round(upper_s / len(df_desc) * 100, 2),
-                                  'bothperc': round(both_s / len(df_desc) * 100, 2)})
+        df_output = pd.DataFrame(
+            {
+                "lower": lower_s,
+                "upper": upper_s,
+                "both": both_s,
+                "lowerperc": round(lower_s / len(df_desc) * 100, 2),
+                "upperperc": round(upper_s / len(df_desc) * 100, 2),
+                "bothperc": round(both_s / len(df_desc) * 100, 2),
+            }
+        )
 
         return df_output
 
@@ -466,33 +514,38 @@ class Analyzer:
         df_components = pd.DataFrame(pca.components_)
         n_components = len(df_components)
         df_components.columns = selected_features
-        df_components.index = [f'PC{i}' for i in range(1, n_components + 1)]
+        df_components.index = [f"PC{i}" for i in range(1, n_components + 1)]
         df_components = df_components.transpose()
 
         # compute the variance data frame
-        df_variance = {'Eigenvalues': pca.explained_variance_,
-                       'Percentage of variance': pca.explained_variance_ratio_,
-                       'Cumulative percentage of '
-                       'variance': np.cumsum(pca.explained_variance_ratio_)
-                       }
+        df_variance = {
+            "Eigenvalues": pca.explained_variance_,
+            "Percentage of variance": pca.explained_variance_ratio_,
+            "Cumulative percentage of "
+            "variance": np.cumsum(pca.explained_variance_ratio_),
+        }
 
         df_variance = pd.DataFrame(df_variance)
 
         # reorder the columns
-        df_variance = df_variance[['Eigenvalues', 'Percentage of variance',
-                                   'Cumulative percentage of variance']]
+        df_variance = df_variance[
+            [
+                "Eigenvalues",
+                "Percentage of variance",
+                "Cumulative percentage of variance",
+            ]
+        ]
 
         # set the row names and take the transpose
-        df_variance.index = [f'PC{i}' for i in range(1, n_components + 1)]
+        df_variance.index = [f"PC{i}" for i in range(1, n_components + 1)]
         df_variance = df_variance.transpose()
 
         return df_components, df_variance
 
     @staticmethod
-    def correlation_helper(df,
-                           target_variable,
-                           grouping_variable,
-                           include_length=False):
+    def correlation_helper(
+        df, target_variable, grouping_variable, include_length=False
+    ):
         """
         Compute marginal and partial correlations for all columns.
 
@@ -546,35 +599,43 @@ class Analyzer:
 
             # first check if we have at least 2 cases and return np.nan otherwise
             if len(df_group) == 1:
-                df_target_cors[group] = pd.Series(data=np.nan,
-                                                  index=df_group.columns)
-                df_target_pcorr[group] = pd.Series(data=np.nan,
-                                                   index=df_group.columns)
-                df_target_pcorr_no_length[group] = pd.Series(data=np.nan,
-                                                             index=df_group.columns)
+                df_target_cors[group] = pd.Series(data=np.nan, index=df_group.columns)
+                df_target_pcorr[group] = pd.Series(data=np.nan, index=df_group.columns)
+                df_target_pcorr_no_length[group] = pd.Series(
+                    data=np.nan, index=df_group.columns
+                )
             else:
                 # if we are asked to include length, that means 'length' is
                 # in the data frame which means that we want to exclude that
                 # before computing the regular marginal and partial correlations
                 if not include_length:
-                    df_target_cors[group] = df_group.apply(lambda s:
-                                                           pearsonr(s,
-                                                                    df_group[target_variable])[0])
-                    df_target_pcorr[group] = partial_correlations(df_group)[target_variable]
+                    df_target_cors[group] = df_group.apply(
+                        lambda s: pearsonr(s, df_group[target_variable])[0]
+                    )
+                    df_target_pcorr[group] = partial_correlations(df_group)[
+                        target_variable
+                    ]
                 else:
-                    df_group_no_length = df_group.drop('length', axis=1)
+                    df_group_no_length = df_group.drop("length", axis=1)
 
-                    partial_pearsonr = partial(pearsonr, y=df_group_no_length[target_variable])
-                    df_target_cors[group] = df_group_no_length.apply(lambda s:
-                                                                     partial_pearsonr(s)[0])
+                    partial_pearsonr = partial(
+                        pearsonr, y=df_group_no_length[target_variable]
+                    )
+                    df_target_cors[group] = df_group_no_length.apply(
+                        lambda s: partial_pearsonr(s)[0]
+                    )
 
-                    df_target_pcorr[group] = partial_correlations(df_group_no_length)[target_variable]
+                    df_target_pcorr[group] = partial_correlations(df_group_no_length)[
+                        target_variable
+                    ]
                     pcor_dict = {}
-                    columns = [c for c in df_group.columns if c not in ['sc1', 'length']]
+                    columns = [
+                        c for c in df_group.columns if c not in ["sc1", "length"]
+                    ]
                     for c in columns:
-                        pcor_dict[c] = partial_correlations(df_group[[c,
-                                                                      'sc1',
-                                                                      'length']])['sc1'][c]
+                        pcor_dict[c] = partial_correlations(
+                            df_group[[c, "sc1", "length"]]
+                        )["sc1"][c]
                     df_target_pcorr_no_length[group] = pd.Series(pcor_dict)
 
         # remove the row containing the correlation of the target variable
@@ -583,19 +644,19 @@ class Analyzer:
         df_target_pcorr = df_target_pcorr.drop(target_variable).transpose()
         df_target_pcorr_no_length = df_target_pcorr_no_length.transpose()
 
-        return (df_target_cors,
-                df_target_pcorr,
-                df_target_pcorr_no_length)
+        return (df_target_cors, df_target_pcorr, df_target_pcorr_no_length)
 
     @staticmethod
-    def metrics_helper(human_scores,
-                       system_scores,
-                       population_human_score_sd=None,
-                       population_system_score_sd=None,
-                       population_human_score_mn=None,
-                       population_system_score_mn=None,
-                       smd_method='unpooled',
-                       use_diff_std_means=False):
+    def metrics_helper(
+        human_scores,
+        system_scores,
+        population_human_score_sd=None,
+        population_system_score_sd=None,
+        population_human_score_mn=None,
+        population_system_score_mn=None,
+        smd_method="unpooled",
+        use_diff_std_means=False,
+    ):
         """
         Compute basic association metrics between system and human scores.
 
@@ -702,27 +763,29 @@ class Analyzer:
         """
         # compute the kappas
         unweighted_kappa = kappa(human_scores, system_scores)
-        weighted_kappa = quadratic_weighted_kappa(human_scores,
-                                                  system_scores)
+        weighted_kappa = quadratic_weighted_kappa(human_scores, system_scores)
 
         # compute the agreement statistics
         human_system_agreement = agreement(human_scores, system_scores)
-        human_system_adjacent_agreement = agreement(human_scores,
-                                                    system_scores,
-                                                    tolerance=1)
+        human_system_adjacent_agreement = agreement(
+            human_scores, system_scores, tolerance=1
+        )
 
         # compute the Pearson correlation after removing
         # any cases where either of the scores are NaNs.
-        df = pd.DataFrame({'human': human_scores,
-                           'system': system_scores}).dropna(how='any')
+        df = pd.DataFrame({"human": human_scores, "system": system_scores}).dropna(
+            how="any"
+        )
 
-        if (len(df) == 1 or
-                len(df['human'].unique()) == 1 or
-                len(df['system'].unique()) == 1):
+        if (
+            len(df) == 1
+            or len(df["human"].unique()) == 1
+            or len(df["system"].unique()) == 1
+        ):
             # set correlations to 1 if we have a single instance or zero variance
             correlations = np.nan
         else:
-            correlations = pearsonr(df['human'], df['system'])[0]
+            correlations = pearsonr(df["human"], df["system"])[0]
 
         # compute the min/max/mean/std. dev. for the system and human scores
         min_system_score = np.min(system_scores)
@@ -740,23 +803,27 @@ class Analyzer:
         if use_diff_std_means:
 
             # calculate the difference of standardized means
-            smd_name = 'DSM'
-            smd = difference_of_standardized_means(human_scores,
-                                                   system_scores,
-                                                   population_human_score_mn,
-                                                   population_system_score_mn,
-                                                   population_human_score_sd,
-                                                   population_system_score_sd)
+            smd_name = "DSM"
+            smd = difference_of_standardized_means(
+                human_scores,
+                system_scores,
+                population_human_score_mn,
+                population_system_score_mn,
+                population_human_score_sd,
+                population_system_score_sd,
+            )
 
         else:
 
             # calculate the standardized mean difference
-            smd_name = 'SMD'
-            smd = standardized_mean_difference(human_scores,
-                                               system_scores,
-                                               population_human_score_sd,
-                                               population_system_score_sd,
-                                               method=smd_method)
+            smd_name = "SMD"
+            smd = standardized_mean_difference(
+                human_scores,
+                system_scores,
+                population_human_score_sd,
+                population_system_score_sd,
+                method=smd_method,
+            )
 
         # compute r2
         if len(df) == 1:
@@ -769,29 +836,32 @@ class Analyzer:
         rmse = np.sqrt(mse)
 
         # return everything as a series
-        metrics = pd.Series({'kappa': unweighted_kappa,
-                             'wtkappa': weighted_kappa,
-                             'exact_agr': human_system_agreement,
-                             'adj_agr': human_system_adjacent_agreement,
-                             smd_name: smd,
-                             'corr': correlations,
-                             'R2': r2,
-                             'RMSE': rmse,
-                             'sys_min': min_system_score,
-                             'sys_max': max_system_score,
-                             'sys_mean': mean_system_score,
-                             'sys_sd': system_score_sd,
-                             'h_min': min_human_score,
-                             'h_max': max_human_score,
-                             'h_mean': mean_human_score,
-                             'h_sd': human_score_sd,
-                             'N': len(system_scores)})
+        metrics = pd.Series(
+            {
+                "kappa": unweighted_kappa,
+                "wtkappa": weighted_kappa,
+                "exact_agr": human_system_agreement,
+                "adj_agr": human_system_adjacent_agreement,
+                smd_name: smd,
+                "corr": correlations,
+                "R2": r2,
+                "RMSE": rmse,
+                "sys_min": min_system_score,
+                "sys_max": max_system_score,
+                "sys_mean": mean_system_score,
+                "sys_sd": system_score_sd,
+                "h_min": min_human_score,
+                "h_max": max_human_score,
+                "h_mean": mean_human_score,
+                "h_sd": human_score_sd,
+                "N": len(system_scores),
+            }
+        )
 
         return metrics
 
     @staticmethod
-    def compute_disattenuated_correlations(human_system_corr,
-                                           human_human_corr):
+    def compute_disattenuated_correlations(human_system_corr, human_human_corr):
         """
         Compute disattenuated correlations between human and system scores.
 
@@ -817,33 +887,42 @@ class Analyzer:
         """
         # if we only have a single value for human correlation and the index
         # is not in human-system values, we use the same HH value in all cases
-        if (len(human_human_corr) == 1 and
-                not human_human_corr.index[0] in human_system_corr.index):
-            human_human_corr = pd.Series(human_human_corr.values.repeat(len(human_system_corr)),
-                                         index=human_system_corr.index)
+        if (
+            len(human_human_corr) == 1
+            and not human_human_corr.index[0] in human_system_corr.index
+        ):
+            human_human_corr = pd.Series(
+                human_human_corr.values.repeat(len(human_system_corr)),
+                index=human_system_corr.index,
+            )
 
         # we now concatenate the two series on index
-        df_correlations = pd.concat([human_system_corr, human_human_corr],
-                                    axis=1,
-                                    sort=True,
-                                    keys=['corr_HM', 'corr_HH'])
+        df_correlations = pd.concat(
+            [human_system_corr, human_human_corr],
+            axis=1,
+            sort=True,
+            keys=["corr_HM", "corr_HH"],
+        )
 
         # if any of the HH correlations are negative, we will ignore these
         # and treat them as Nones
-        with np.errstate(invalid='ignore'):
-            df_correlations['sqrt_HH'] = np.sqrt(df_correlations['corr_HH'])
+        with np.errstate(invalid="ignore"):
+            df_correlations["sqrt_HH"] = np.sqrt(df_correlations["corr_HH"])
 
-        df_correlations['corr_disattenuated'] = (df_correlations['corr_HM'] /
-                                                 df_correlations['sqrt_HH'])
+        df_correlations["corr_disattenuated"] = (
+            df_correlations["corr_HM"] / df_correlations["sqrt_HH"]
+        )
 
         return df_correlations
 
-    def compute_correlations_by_group(self,
-                                      df,
-                                      selected_features,
-                                      target_variable,
-                                      grouping_variable,
-                                      include_length=False):
+    def compute_correlations_by_group(
+        self,
+        df,
+        selected_features,
+        target_variable,
+        grouping_variable,
+        include_length=False,
+    ):
         """
         Compute marginal and partial correlations against target variable.
 
@@ -877,30 +956,31 @@ class Analyzer:
 
         columns = selected_features + [target_variable, grouping_variable]
         if include_length:
-            columns.append('length')
+            columns.append("length")
         df_desc = df_desc[columns]
 
         # create a duplicate data frame to compute correlations
         # over the whole data, i.e., across all grouping variables
         df_desc_all = df_desc.copy()
-        df_desc_all[grouping_variable] = 'All data'
+        df_desc_all[grouping_variable] = "All data"
 
         # combine the two data frames
         df_desc_combined = pd.concat([df_desc, df_desc_all], sort=True)
         df_desc_combined.reset_index(drop=True, inplace=True)
 
         # compute the various (marginal and partial) correlations with score
-        ret = self.correlation_helper(df_desc_combined,
-                                      target_variable,
-                                      grouping_variable,
-                                      include_length=include_length)
+        ret = self.correlation_helper(
+            df_desc_combined,
+            target_variable,
+            grouping_variable,
+            include_length=include_length,
+        )
 
         return ret
 
-    def filter_metrics(self,
-                       df_metrics,
-                       use_scaled_predictions=False,
-                       chosen_metric_dict=None):
+    def filter_metrics(
+        self, df_metrics, use_scaled_predictions=False, chosen_metric_dict=None
+    ):
         """
         Filter data frame to retain only the given metrics.
 
@@ -956,51 +1036,62 @@ class Analyzer:
         ``use_scaled_predictions`` is ``False`` or ``True``, respectively.
         """
         # do we want the raw or the scaled metrics
-        score_prefix = 'scale' if use_scaled_predictions else 'raw'
+        score_prefix = "scale" if use_scaled_predictions else "raw"
 
         # what metrics are we choosing to include?
         if chosen_metric_dict:
             chosen_metrics = chosen_metric_dict
         else:
-            smd_name = 'DSM' if 'DSM' in df_metrics else 'SMD'
-            chosen_metrics = {f'{score_prefix}_trim': ['N',
-                                                               'h_mean',
-                                                               'h_sd',
-                                                               'sys_mean',
-                                                               'sys_sd',
-                                                               'wtkappa',
-                                                               'corr',
-                                                               smd_name,
-                                                               'RMSE',
-                                                               'R2'],
-                              f'{score_prefix}_trim_round': ['sys_mean',
-                                                                     'sys_sd',
-                                                                     'kappa',
-                                                                     'exact_agr',
-                                                                     'adj_agr',
-                                                                     smd_name]}
+            smd_name = "DSM" if "DSM" in df_metrics else "SMD"
+            chosen_metrics = {
+                f"{score_prefix}_trim": [
+                    "N",
+                    "h_mean",
+                    "h_sd",
+                    "sys_mean",
+                    "sys_sd",
+                    "wtkappa",
+                    "corr",
+                    smd_name,
+                    "RMSE",
+                    "R2",
+                ],
+                f"{score_prefix}_trim_round": [
+                    "sys_mean",
+                    "sys_sd",
+                    "kappa",
+                    "exact_agr",
+                    "adj_agr",
+                    smd_name,
+                ],
+            }
 
         # extract the metrics we need from the given metrics frame
         metricdict = {}
         for score_type in chosen_metrics:
             for metric in chosen_metrics[score_type]:
-                colname = (metric if metric in ['h_mean', 'h_sd', 'N']
-                           else f'{metric}.{score_type}')
+                colname = (
+                    metric
+                    if metric in ["h_mean", "h_sd", "N"]
+                    else f"{metric}.{score_type}"
+                )
                 values = df_metrics[metric][score_type]
                 metricdict[colname] = values
 
         df_filtered_metrics = pd.DataFrame([metricdict])
         return df_filtered_metrics
 
-    def compute_metrics(self,
-                        df,
-                        compute_shortened=False,
-                        use_scaled_predictions=False,
-                        include_second_score=False,
-                        population_sd_dict=None,
-                        population_mn_dict=None,
-                        smd_method='unpooled',
-                        use_diff_std_means=False):
+    def compute_metrics(
+        self,
+        df,
+        compute_shortened=False,
+        use_scaled_predictions=False,
+        include_second_score=False,
+        population_sd_dict=None,
+        population_mn_dict=None,
+        smd_method="unpooled",
+        use_diff_std_means=False,
+    ):
         """
         Compute association metrics for scores in the given data frame.
 
@@ -1076,7 +1167,7 @@ class Analyzer:
         use_scaled = use_scaled_predictions
 
         # are we using DSM or SMD?
-        smd_name = 'DSM' if use_diff_std_means else 'SMD'
+        smd_name = "DSM" if use_diff_std_means else "SMD"
 
         # get the population standard deviations for SMD if none were supplied
         if not population_sd_dict:
@@ -1094,100 +1185,146 @@ class Analyzer:
         df_human_human = pd.DataFrame()
         if include_second_score:
 
-            df_single = df.drop('sc2', axis=1)
+            df_single = df.drop("sc2", axis=1)
 
-            df_human_system = df_single.apply(lambda s:
-                                              self.metrics_helper(df_single['sc1'],
-                                                                  s,
-                                                                  population_sd_dict['sc1'],
-                                                                  population_sd_dict[s.name],
-                                                                  population_mn_dict['sc1'],
-                                                                  population_mn_dict[s.name],
-                                                                  smd_method,
-                                                                  use_diff_std_means))
-            df_double = df[df['sc2'].notnull()][['sc1', 'sc2']]
-            df_human_human = df_double.apply(lambda s:
-                                             self.metrics_helper(df_double['sc1'],
-                                                                 s,
-                                                                 population_sd_dict['sc1'],
-                                                                 population_sd_dict[s.name],
-                                                                 population_mn_dict['sc1'],
-                                                                 population_mn_dict[s.name],
-                                                                 'pooled',
-                                                                 use_diff_std_means))
+            df_human_system = df_single.apply(
+                lambda s: self.metrics_helper(
+                    df_single["sc1"],
+                    s,
+                    population_sd_dict["sc1"],
+                    population_sd_dict[s.name],
+                    population_mn_dict["sc1"],
+                    population_mn_dict[s.name],
+                    smd_method,
+                    use_diff_std_means,
+                )
+            )
+            df_double = df[df["sc2"].notnull()][["sc1", "sc2"]]
+            df_human_human = df_double.apply(
+                lambda s: self.metrics_helper(
+                    df_double["sc1"],
+                    s,
+                    population_sd_dict["sc1"],
+                    population_sd_dict[s.name],
+                    population_mn_dict["sc1"],
+                    population_mn_dict[s.name],
+                    "pooled",
+                    use_diff_std_means,
+                )
+            )
             # drop the sc1 column from the human-human agreement frame
-            df_human_human = df_human_human.drop('sc1', axis=1)
+            df_human_human = df_human_human.drop("sc1", axis=1)
 
             # sort the rows in the correct order
-            df_human_human = df_human_human.reindex(['N', 'h_mean', 'h_sd',
-                                                          'h_min', 'h_max',
-                                                          'sys_mean', 'sys_sd',
-                                                          'sys_min', 'sys_max',
-                                                          'corr', 'wtkappa', 'R2',
-                                                          'kappa', 'exact_agr',
-                                                          'adj_agr', smd_name, 'RMSE'])
+            df_human_human = df_human_human.reindex(
+                [
+                    "N",
+                    "h_mean",
+                    "h_sd",
+                    "h_min",
+                    "h_max",
+                    "sys_mean",
+                    "sys_sd",
+                    "sys_min",
+                    "sys_max",
+                    "corr",
+                    "wtkappa",
+                    "R2",
+                    "kappa",
+                    "exact_agr",
+                    "adj_agr",
+                    smd_name,
+                    "RMSE",
+                ]
+            )
             # rename `h_*` -> `h1_*` and `sys_*` -> `h2_*`
-            df_human_human.rename(lambda c: c.replace('h_', 'h1_').replace('sys_', 'h2_'),
-                                  inplace=True)
+            df_human_human.rename(
+                lambda c: c.replace("h_", "h1_").replace("sys_", "h2_"), inplace=True
+            )
             # drop RMSE and R2 because they are not meaningful for human raters
-            df_human_human.drop(['R2', 'RMSE'], inplace=True)
+            df_human_human.drop(["R2", "RMSE"], inplace=True)
             df_human_human = df_human_human.transpose()
             # convert N to integer if it's not empty else set to 0
             try:
-                df_human_human['N'] = df_human_human['N'].astype(int)
+                df_human_human["N"] = df_human_human["N"].astype(int)
             except ValueError:
-                df_human_human['N'] = 0
-            df_human_human.index = ['']
+                df_human_human["N"] = 0
+            df_human_human.index = [""]
         else:
-            df_human_system = df.apply(lambda s: self.metrics_helper(df['sc1'],
-                                                                     s,
-                                                                     population_sd_dict['sc1'],
-                                                                     population_sd_dict[s.name],
-                                                                     population_mn_dict['sc1'],
-                                                                     population_mn_dict[s.name],
-                                                                     smd_method,
-                                                                     use_diff_std_means))
+            df_human_system = df.apply(
+                lambda s: self.metrics_helper(
+                    df["sc1"],
+                    s,
+                    population_sd_dict["sc1"],
+                    population_sd_dict[s.name],
+                    population_mn_dict["sc1"],
+                    population_mn_dict[s.name],
+                    smd_method,
+                    use_diff_std_means,
+                )
+            )
 
         # drop 'sc1' column from the human-system frame and transpose
-        df_human_system = df_human_system.drop('sc1', axis=1)
+        df_human_system = df_human_system.drop("sc1", axis=1)
         df_human_system = df_human_system.transpose()
 
         # sort the columns and rows in the correct order
-        df_human_system = df_human_system[['N',
-                                           'h_mean', 'h_sd',
-                                           'h_min', 'h_max',
-                                           'sys_mean', 'sys_sd',
-                                           'sys_min', 'sys_max',
-                                           'corr',
-                                           'wtkappa', 'R2', 'kappa',
-                                           'exact_agr', 'adj_agr',
-                                           smd_name, 'RMSE']]
+        df_human_system = df_human_system[
+            [
+                "N",
+                "h_mean",
+                "h_sd",
+                "h_min",
+                "h_max",
+                "sys_mean",
+                "sys_sd",
+                "sys_min",
+                "sys_max",
+                "corr",
+                "wtkappa",
+                "R2",
+                "kappa",
+                "exact_agr",
+                "adj_agr",
+                smd_name,
+                "RMSE",
+            ]
+        ]
 
         # make N column an integer if it's not NaN else set it to 0
-        df_human_system['N'] = df_human_system['N'].astype(int)
-        all_rows_order = ['raw', 'raw_trim', 'raw_trim_round',
-                          'scale', 'scale_trim', 'scale_trim_round']
-        existing_rows_index = [row for row in all_rows_order if row in df_human_system.index]
+        df_human_system["N"] = df_human_system["N"].astype(int)
+        all_rows_order = [
+            "raw",
+            "raw_trim",
+            "raw_trim_round",
+            "scale",
+            "scale_trim",
+            "scale_trim_round",
+        ]
+        existing_rows_index = [
+            row for row in all_rows_order if row in df_human_system.index
+        ]
         df_human_system = df_human_system.reindex(existing_rows_index)
 
         # extract some default metrics for a shorter version of this data frame
         # if we were asked to do so
         if compute_shortened:
-            df_human_system_filtered = self.filter_metrics(df_human_system,
-                                                           use_scaled_predictions=use_scaled)
+            df_human_system_filtered = self.filter_metrics(
+                df_human_system, use_scaled_predictions=use_scaled
+            )
         else:
             df_human_system_filtered = pd.DataFrame()
 
         # return all data frames
-        return (df_human_system,
-                df_human_system_filtered,
-                df_human_human)
+        return (df_human_system, df_human_system_filtered, df_human_human)
 
-    def compute_metrics_by_group(self,
-                                 df_test,
-                                 grouping_variable,
-                                 use_scaled_predictions=False,
-                                 include_second_score=False):
+    def compute_metrics_by_group(
+        self,
+        df_test,
+        grouping_variable,
+        use_scaled_predictions=False,
+        include_second_score=False,
+    ):
         """
         Compute a subset of evaluation metrics by subgroups.
 
@@ -1223,29 +1360,34 @@ class Analyzer:
         """
         # get the population standard deviation that we will need to compute SMD for all columns
         # other than id and subgroup
-        population_sd_dict = {col: df_test[col].std(ddof=1)
-                              for col in df_test.columns if col not in ['spkitemid',
-                                                                        grouping_variable]}
+        population_sd_dict = {
+            col: df_test[col].std(ddof=1)
+            for col in df_test.columns
+            if col not in ["spkitemid", grouping_variable]
+        }
 
-        population_mn_dict = {col: df_test[col].mean()
-                              for col in df_test.columns if col not in ['spkitemid',
-                                                                        grouping_variable]}
+        population_mn_dict = {
+            col: df_test[col].mean()
+            for col in df_test.columns
+            if col not in ["spkitemid", grouping_variable]
+        }
 
         # check if any of the standard deviations is zero and
         # tell user to expect to see many warnings.
-        zero_sd_scores = [score for (score, sd) in population_sd_dict.items() if
-                          np.isclose(sd, 0, atol=1e-07)]
+        zero_sd_scores = [
+            score
+            for (score, sd) in population_sd_dict.items()
+            if np.isclose(sd, 0, atol=1e-07)
+        ]
         if len(zero_sd_scores) > 0:
-            warnings.warn("The standard deviation for {} scores "
-                          "is zero (all values are the same). You "
-                          "will see multiple warnings about DSM computation "
-                          "since this metric is computed separately for "
-                          "each subgroup.".format(', '.join(zero_sd_scores)))
+            warnings.warn(
+                f"The standard deviation for {', '.join(zero_sd_scores)} scores is zero (all values are the same). You will see multiple warnings about DSM computation since this metric is computed separately for each subgroup."
+            )
 
         # create a duplicate data frame to compute evaluations
         # over the whole data, i.e., across groups
         df_preds_all = df_test.copy()
-        df_preds_all[grouping_variable] = 'All data'
+        df_preds_all[grouping_variable] = "All data"
 
         # combine the two data frames
         df_preds_combined = pd.concat([df_test, df_preds_all], sort=True)
@@ -1260,16 +1402,19 @@ class Analyzer:
         for group, df_group in grouped:
             df_group = df_group.drop(grouping_variable, axis=1)
 
-            (df_human_system_metrics,
-             df_human_system_metrics_short,
-             df_human_human_metrics
-             ) = self.compute_metrics(df_group,
-                                      compute_shortened=True,
-                                      use_scaled_predictions=use_scaled_predictions,
-                                      include_second_score=include_second_score,
-                                      population_sd_dict=population_sd_dict,
-                                      population_mn_dict=population_mn_dict,
-                                      use_diff_std_means=True)
+            (
+                df_human_system_metrics,
+                df_human_system_metrics_short,
+                df_human_human_metrics,
+            ) = self.compute_metrics(
+                df_group,
+                compute_shortened=True,
+                use_scaled_predictions=use_scaled_predictions,
+                include_second_score=include_second_score,
+                population_sd_dict=population_sd_dict,
+                population_mn_dict=population_mn_dict,
+                use_diff_std_means=True,
+            )
 
             # we need to convert the shortened data frame to a series here
             df_human_system_by_group[group] = df_human_system_metrics_short.iloc[0]
@@ -1278,16 +1423,18 @@ class Analyzer:
             # we have the second score column available
             if include_second_score:
                 df_human_human_metrics.index = [group]
-                df_human_human_by_group = df_human_human_by_group.append(df_human_human_metrics)
+                df_human_human_by_group = df_human_human_by_group.append(
+                    df_human_human_metrics
+                )
 
         # transpose the by group human-system metrics frame
         df_human_system_by_group = df_human_system_by_group.transpose()
 
         return (df_human_system_by_group, df_human_human_by_group)
 
-    def compute_degradation_and_disattenuated_correlations(self,
-                                                           df,
-                                                           use_all_responses=True):
+    def compute_degradation_and_disattenuated_correlations(
+        self, df, use_all_responses=True
+    ):
         """
         Compute the degradation in performance when using system score.
 
@@ -1324,31 +1471,36 @@ class Analyzer:
             df_responses = df
         else:
             # use only double scored data
-            df_responses = df[df['sc2'].notnull()]
+            df_responses = df[df["sc2"].notnull()]
 
         # compute the human-system and human-human metrics
-        (df_human_system_eval,
-         _,
-         df_human_human_eval) = self.compute_metrics(df_responses,
-                                                     include_second_score=True)
+        (df_human_system_eval, _, df_human_human_eval) = self.compute_metrics(
+            df_responses, include_second_score=True
+        )
 
         # compute disattenuated correlations
-        df_correlations = self.compute_disattenuated_correlations(df_human_system_eval['corr'],
-                                                                  df_human_human_eval['corr'])
+        df_correlations = self.compute_disattenuated_correlations(
+            df_human_system_eval["corr"], df_human_human_eval["corr"]
+        )
 
         # Compute degradation. we only care about the degradation in these metrics
-        degradation_metrics = ['corr', 'kappa', 'wtkappa',
-                               'exact_agr', 'adj_agr', 'SMD']
+        degradation_metrics = [
+            "corr",
+            "kappa",
+            "wtkappa",
+            "exact_agr",
+            "adj_agr",
+            "SMD",
+        ]
         df_human_system_eval = df_human_system_eval[degradation_metrics]
         df_human_human_eval = df_human_human_eval[degradation_metrics]
-        df_degradation = df_human_system_eval.apply(lambda row:
-                                                    row - df_human_human_eval.loc[''], axis=1)
+        df_degradation = df_human_system_eval.apply(
+            lambda row: row - df_human_human_eval.loc[""], axis=1
+        )
 
         return (df_degradation, df_correlations)
 
-    def run_training_analyses(self,
-                              data_container,
-                              configuration):
+    def run_training_analyses(self, data_container, configuration):
         """
         Run all analyses on the training data.
 
@@ -1390,11 +1542,15 @@ class Analyzer:
         configuration : configuration_parser.Configuration
             A new Configuration object.
         """
-        frame_names = ['train_features', 'train_metadata',
-                       'train_preprocessed_features', 'train_length',
-                       'train_features']
+        frame_names = [
+            "train_features",
+            "train_metadata",
+            "train_preprocessed_features",
+            "train_length",
+            "train_features",
+        ]
 
-        param_names = ['length_column', 'subgroups', 'selected_features']
+        param_names = ["length_column", "subgroups", "selected_features"]
 
         self.check_frame_names(data_container, frame_names)
 
@@ -1405,17 +1561,22 @@ class Analyzer:
         df_train = data_container.train_features.copy()
         df_train_length = data_container.train_length.copy()
         df_train_metadata = data_container.train_metadata.copy()
-        df_train_preprocessed_features = data_container.train_preprocessed_features.copy()
+        df_train_preprocessed_features = (
+            data_container.train_preprocessed_features.copy()
+        )
 
-        subgroups = configuration['subgroups']
-        selected_features = configuration['selected_features']
+        subgroups = configuration["subgroups"]
+        selected_features = configuration["selected_features"]
 
-        df_train_preprocessed = pd.merge(df_train_preprocessed_features,
-                                         df_train_metadata, on='spkitemid')
+        df_train_preprocessed = pd.merge(
+            df_train_preprocessed_features, df_train_metadata, on="spkitemid"
+        )
 
-        assert (len(df_train_preprocessed.index) ==
-                len(df_train_preprocessed_features.index) ==
-                len(df_train_metadata.index))
+        assert (
+            len(df_train_preprocessed.index)
+            == len(df_train_preprocessed_features.index)
+            == len(df_train_metadata.index)
+        )
 
         # get descriptives, percentiles and outliers for the original feature values
         df_descriptives = self.compute_basic_descriptives(df_train, selected_features)
@@ -1427,32 +1588,35 @@ class Analyzer:
 
         # include length if available
         if include_length:
-            columns = selected_features + ['sc1', 'length']
-            df_train_with_length = df_train.merge(df_train_length, on='spkitemid')
-            df_train_preprocess_length = df_train_preprocessed.merge(df_train_length,
-                                                                     on='spkitemid')
+            columns = selected_features + ["sc1", "length"]
+            df_train_with_length = df_train.merge(df_train_length, on="spkitemid")
+            df_train_preprocess_length = df_train_preprocessed.merge(
+                df_train_length, on="spkitemid"
+            )
         else:
-            columns = selected_features + ['sc1']
+            columns = selected_features + ["sc1"]
             df_train_with_length = df_train
             df_train_preprocess_length = df_train_preprocessed
 
         # get pairwise correlations against the original training features
         # as well as the pre-processed training features
-        df_pairwise_cors_orig = df_train_with_length[columns].corr(method='pearson')
-        df_pairwise_cors_preprocess = df_train_preprocess_length[columns].corr(method='pearson')
+        df_pairwise_cors_orig = df_train_with_length[columns].corr(method="pearson")
+        df_pairwise_cors_preprocess = df_train_preprocess_length[columns].corr(
+            method="pearson"
+        )
 
         # get marginal and partial correlations against sc1 for all data
         # for partial correlations, we partial out all other features
         df_train_with_group_for_all = df_train_preprocess_length.copy()
         df_train_with_group_for_all = df_train_with_group_for_all[columns]
-        df_train_with_group_for_all['all_data'] = 'All data'
+        df_train_with_group_for_all["all_data"] = "All data"
 
-        (df_margcor_sc1,
-         df_pcor_sc1,
-         df_pcor_sc1_no_length) = self.correlation_helper(df_train_with_group_for_all,
-                                                          'sc1',
-                                                          'all_data',
-                                                          include_length=include_length)
+        (df_margcor_sc1, df_pcor_sc1, df_pcor_sc1_no_length) = self.correlation_helper(
+            df_train_with_group_for_all,
+            "sc1",
+            "all_data",
+            include_length=include_length,
+        )
 
         # get marginal and partial correlations against length for all data
         # if the length column is available
@@ -1462,28 +1626,28 @@ class Analyzer:
         if include_length:
 
             df_train_with_group_for_all = df_train_preprocess_length.copy()
-            columns = selected_features + ['length']
+            columns = selected_features + ["length"]
 
             df_train_with_group_for_all = df_train_with_group_for_all[columns]
-            df_train_with_group_for_all['all_data'] = 'All data'
+            df_train_with_group_for_all["all_data"] = "All data"
 
-            (df_margcor_length,
-             df_pcor_length,
-             _) = self.correlation_helper(df_train_with_group_for_all,
-                                          'length',
-                                          'all_data')
+            (df_margcor_length, df_pcor_length, _) = self.correlation_helper(
+                df_train_with_group_for_all, "length", "all_data"
+            )
 
         # get marginal and partial correlations against sc1 by group (preprocessed features)
         # also include partial correlations with length if length is available
         score_corr_by_group_dict = {}
-        include_length = 'length' in df_train_preprocess_length
+        include_length = "length" in df_train_preprocess_length
         for grouping_variable in subgroups:
 
-            corr_by_group = self.compute_correlations_by_group(df_train_preprocess_length,
-                                                               selected_features,
-                                                               'sc1',
-                                                               grouping_variable,
-                                                               include_length=include_length)
+            corr_by_group = self.compute_correlations_by_group(
+                df_train_preprocess_length,
+                selected_features,
+                "sc1",
+                grouping_variable,
+                include_length=include_length,
+            )
 
             score_corr_by_group_dict[grouping_variable] = corr_by_group
 
@@ -1492,65 +1656,73 @@ class Analyzer:
         if include_length:
             for grouping_variable in subgroups:
 
-                corr_by_group = self.compute_correlations_by_group(df_train_preprocess_length,
-                                                                   selected_features,
-                                                                   'length',
-                                                                   grouping_variable)
+                corr_by_group = self.compute_correlations_by_group(
+                    df_train_preprocess_length,
+                    selected_features,
+                    "length",
+                    grouping_variable,
+                )
 
                 length_corr_by_group_dict[grouping_variable] = corr_by_group
 
         # get PCA information
-        df_pca_components, df_pca_variance = self.compute_pca(df_train_preprocessed,
-                                                              selected_features)
+        df_pca_components, df_pca_variance = self.compute_pca(
+            df_train_preprocessed, selected_features
+        )
 
         # Datasets to add
-        datasets = [{'name': 'feature_descriptives', 'frame': df_descriptives},
-                    {'name': 'feature_descriptivesExtra', 'frame': df_percentiles},
-                    {'name': 'feature_outliers', 'frame': df_outliers},
-                    {'name': 'cors_orig', 'frame': df_pairwise_cors_orig},
-                    {'name': 'cors_processed', 'frame': df_pairwise_cors_preprocess},
-                    {'name': 'margcor_score_all_data', 'frame': df_margcor_sc1},
-                    {'name': 'pcor_score_all_data', 'frame': df_pcor_sc1},
-                    {'name': 'pcor_score_no_length_all_data', 'frame': df_pcor_sc1_no_length},
-                    {'name': 'margcor_length_all_data', 'frame': df_margcor_length},
-                    {'name': 'pcor_length_all_data', 'frame': df_pcor_length},
-                    {'name': 'pca', 'frame': df_pca_components},
-                    {'name': 'pcavar', 'frame': df_pca_variance}]
+        datasets = [
+            {"name": "feature_descriptives", "frame": df_descriptives},
+            {"name": "feature_descriptivesExtra", "frame": df_percentiles},
+            {"name": "feature_outliers", "frame": df_outliers},
+            {"name": "cors_orig", "frame": df_pairwise_cors_orig},
+            {"name": "cors_processed", "frame": df_pairwise_cors_preprocess},
+            {"name": "margcor_score_all_data", "frame": df_margcor_sc1},
+            {"name": "pcor_score_all_data", "frame": df_pcor_sc1},
+            {"name": "pcor_score_no_length_all_data", "frame": df_pcor_sc1_no_length},
+            {"name": "margcor_length_all_data", "frame": df_margcor_length},
+            {"name": "pcor_length_all_data", "frame": df_pcor_length},
+            {"name": "pca", "frame": df_pca_components},
+            {"name": "pcavar", "frame": df_pca_variance},
+        ]
 
         # Add length correlation by group datasets
         for group in length_corr_by_group_dict:
 
-            (length_marg_cors,
-             length_part_cors,
-             _) = length_corr_by_group_dict.get(group,
-                                                (pd.DataFrame(),
-                                                 pd.DataFrame(),
-                                                 pd.DataFrame()))
+            (length_marg_cors, length_part_cors, _) = length_corr_by_group_dict.get(
+                group, (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+            )
 
-            datasets.extend([{'name': f'margcor_length_by_{group}',
-                              'frame': length_marg_cors},
-                             {'name': f'pcor_length_by_{group}',
-                              'frame': length_part_cors}])
+            datasets.extend(
+                [
+                    {"name": f"margcor_length_by_{group}", "frame": length_marg_cors},
+                    {"name": f"pcor_length_by_{group}", "frame": length_part_cors},
+                ]
+            )
 
         # Add score correlations by group datasets
         for group in score_corr_by_group_dict:
 
-            (sc1_marg_cors,
-             sc1_part_cors,
-             sc1_part_cors_no_length) = score_corr_by_group_dict[group]
+            (
+                sc1_marg_cors,
+                sc1_part_cors,
+                sc1_part_cors_no_length,
+            ) = score_corr_by_group_dict[group]
 
-            datasets.extend([{'name': f'margcor_score_by_{group}',
-                              'frame': sc1_marg_cors},
-                             {'name': f'pcor_score_by_{group}',
-                              'frame': sc1_part_cors},
-                             {'name': f'pcor_score_no_length_by_{group}',
-                              'frame': sc1_part_cors_no_length}])
+            datasets.extend(
+                [
+                    {"name": f"margcor_score_by_{group}", "frame": sc1_marg_cors},
+                    {"name": f"pcor_score_by_{group}", "frame": sc1_part_cors},
+                    {
+                        "name": f"pcor_score_no_length_by_{group}",
+                        "frame": sc1_part_cors_no_length,
+                    },
+                ]
+            )
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_prediction_analyses(self,
-                                data_container,
-                                configuration):
+    def run_prediction_analyses(self, data_container, configuration):
         """
         Run all analyses on the system scores (predictions).
 
@@ -1587,11 +1759,13 @@ class Analyzer:
         configuration : configuration_parser.Configuration
             A new Configuration object.
         """
-        frame_names = ['pred_test', 'test_metadata', 'test_human_scores']
+        frame_names = ["pred_test", "test_metadata", "test_human_scores"]
 
-        param_names = ['subgroups',
-                       'second_human_score_column',
-                       'use_scaled_predictions']
+        param_names = [
+            "subgroups",
+            "second_human_score_column",
+            "use_scaled_predictions",
+        ]
 
         self.check_frame_names(data_container, frame_names)
 
@@ -1601,10 +1775,10 @@ class Analyzer:
         df_test_metadata = data_container.test_metadata.copy()
         df_test_human_scores = data_container.test_human_scores.copy()
 
-        subgroups = configuration['subgroups']
-        use_scaled_predictions = configuration['use_scaled_predictions']
+        subgroups = configuration["subgroups"]
+        use_scaled_predictions = configuration["use_scaled_predictions"]
 
-        df_preds = pd.merge(df_test, df_test_metadata, on='spkitemid')
+        df_preds = pd.merge(df_test, df_test_metadata, on="spkitemid")
 
         assert len(df_preds.index) == len(df_test.index) == len(df_test_metadata.index)
 
@@ -1613,32 +1787,35 @@ class Analyzer:
         include_second_score = not df_test_human_scores.empty
 
         # extract the columns that contain predictions
-        prediction_columns = [column for column in df_test if column != 'spkitemid']
+        prediction_columns = [column for column in df_test if column != "spkitemid"]
 
         # if a second score is available, use it
         if include_second_score:
-            prediction_columns.append('sc2')
-            df_preds_second_score = df_preds.merge(df_test_human_scores[['spkitemid', 'sc2']],
-                                                   on='spkitemid')
+            prediction_columns.append("sc2")
+            df_preds_second_score = df_preds.merge(
+                df_test_human_scores[["spkitemid", "sc2"]], on="spkitemid"
+            )
         else:
             df_preds_second_score = df_preds
 
         # compute the evaluation metrics over the whole data set
-        (df_human_system,
-         df_human_system_short,
-         df_human_human) = self.compute_metrics(df_preds_second_score[prediction_columns],
-                                                compute_shortened=True,
-                                                use_scaled_predictions=use_scaled_predictions,
-                                                include_second_score=include_second_score)
+        (df_human_system, df_human_system_short, df_human_human) = self.compute_metrics(
+            df_preds_second_score[prediction_columns],
+            compute_shortened=True,
+            use_scaled_predictions=use_scaled_predictions,
+            include_second_score=include_second_score,
+        )
 
         # compute the evaluation metrics by group
         eval_by_group_dict = {}
         for group in subgroups:
             group_columns = prediction_columns + [group]
-            metrics = self.compute_metrics_by_group(df_preds_second_score[group_columns],
-                                                    group,
-                                                    use_scaled_predictions=use_scaled_predictions,
-                                                    include_second_score=include_second_score)
+            metrics = self.compute_metrics_by_group(
+                df_preds_second_score[group_columns],
+                group,
+                use_scaled_predictions=use_scaled_predictions,
+                include_second_score=include_second_score,
+            )
             eval_by_group_dict[group] = metrics
 
         # compute the degradation statistics and disattenuated correlations
@@ -1646,66 +1823,78 @@ class Analyzer:
         df_degradation = pd.DataFrame()
         df_correlations = pd.DataFrame()
         if include_second_score:
-            (df_degradation,
-             df_correlations) = self.compute_degradation_and_disattenuated_correlations(df_preds_second_score[prediction_columns])
+            (
+                df_degradation,
+                df_correlations,
+            ) = self.compute_degradation_and_disattenuated_correlations(
+                df_preds_second_score[prediction_columns]
+            )
 
         # the following two evaluations require rounded human scores
         # we create a column for this
-        df_preds['sc1_round'] = np.round(df_preds['sc1'])
+        df_preds["sc1_round"] = np.round(df_preds["sc1"])
 
         # compute the confusion matrix as a data frame
-        score_type = 'scale' if use_scaled_predictions else 'raw'
-        human_scores = df_preds['sc1_round'].astype('int64')
-        system_scores = df_preds[f'{score_type}_trim_round'].astype('int64')
+        score_type = "scale" if use_scaled_predictions else "raw"
+        human_scores = df_preds["sc1_round"].astype("int64")
+        system_scores = df_preds[f"{score_type}_trim_round"].astype("int64")
         conf_matrix = confusion_matrix(human_scores, system_scores)
         labels = sorted(human_scores.append(system_scores).unique())
-        df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
+        df_confmatrix = pd.DataFrame(
+            conf_matrix, index=labels, columns=labels
+        ).transpose()
 
         # compute the score distributions of the rounded human and system scores
-        df_score_dist = df_preds[['sc1_round',
-                                  f'{score_type}_trim_round']].apply(lambda s:
-                                                                (s.value_counts() /
-                                                                 len(df_test) * 100))
+        df_score_dist = df_preds[["sc1_round", f"{score_type}_trim_round"]].apply(
+            lambda s: (s.value_counts() / len(df_test) * 100)
+        )
 
         # Replace any NaNs, which we might get because our model never
         # predicts a particular score label, with zeros.
         df_score_dist.fillna(0, inplace=True)
 
-        df_score_dist.columns = ['human', f'sys_{score_type}']
-        df_score_dist['difference'] = (df_score_dist[f'sys_{score_type}'] -
-                                       df_score_dist['human'])
-        df_score_dist['score'] = df_score_dist.index
+        df_score_dist.columns = ["human", f"sys_{score_type}"]
+        df_score_dist["difference"] = (
+            df_score_dist[f"sys_{score_type}"] - df_score_dist["human"]
+        )
+        df_score_dist["score"] = df_score_dist.index
 
-        df_score_dist = df_score_dist[['score', 'human',
-                                       f'sys_{score_type}',
-                                       'difference']]
-        df_score_dist.sort_values(by='score', inplace=True)
+        df_score_dist = df_score_dist[
+            ["score", "human", f"sys_{score_type}", "difference"]
+        ]
+        df_score_dist.sort_values(by="score", inplace=True)
 
-        datasets = [{'name': 'eval', 'frame': df_human_system},
-                    {'name': 'eval_short', 'frame': df_human_system_short},
-                    {'name': 'consistency', 'frame': df_human_human},
-                    {'name': 'degradation', 'frame': df_degradation},
-                    {'name': 'disattenuated_correlations', 'frame': df_correlations},
-                    {'name': 'confMatrix', 'frame': df_confmatrix},
-                    {'name': 'score_dist', 'frame': df_score_dist}]
+        datasets = [
+            {"name": "eval", "frame": df_human_system},
+            {"name": "eval_short", "frame": df_human_system_short},
+            {"name": "consistency", "frame": df_human_human},
+            {"name": "degradation", "frame": df_degradation},
+            {"name": "disattenuated_correlations", "frame": df_correlations},
+            {"name": "confMatrix", "frame": df_confmatrix},
+            {"name": "score_dist", "frame": df_score_dist},
+        ]
 
         # compute true-score analyses if we have second score
         # or have been given rater error variance
         rater_error_variance = configuration.get_rater_error_variance()
 
         if include_second_score or rater_error_variance is not None:
-            system_score_columns = [col for col in prediction_columns
-                                    if col not in ['sc1', 'sc2']]
+            system_score_columns = [
+                col for col in prediction_columns if col not in ["sc1", "sc2"]
+            ]
 
-            human_score_columns = [col for col in prediction_columns
-                                   if col in ['sc1', 'sc2']]
+            human_score_columns = [
+                col for col in prediction_columns if col in ["sc1", "sc2"]
+            ]
 
-            df_prmse = get_true_score_evaluations(df_preds_second_score,
-                                                  system_score_columns,
-                                                  human_score_columns,
-                                                  rater_error_variance)
+            df_prmse = get_true_score_evaluations(
+                df_preds_second_score,
+                system_score_columns,
+                human_score_columns,
+                rater_error_variance,
+            )
 
-            datasets.extend([{'name': 'true_score_eval', 'frame': df_prmse}])
+            datasets.extend([{"name": "true_score_eval", "frame": df_prmse}])
 
         for group in eval_by_group_dict:
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
@@ -1713,22 +1902,26 @@ class Analyzer:
             # compute disattenuated correlations if we have the second human score
             if include_second_score:
                 dis_corr_by_group = self.compute_disattenuated_correlations(
-                    eval_by_group[f'corr.{score_type}_trim'], consistency_by_group['corr'])
+                    eval_by_group[f"corr.{score_type}_trim"],
+                    consistency_by_group["corr"],
+                )
             else:
                 dis_corr_by_group = pd.DataFrame()
 
-            datasets.extend([{'name': f'eval_by_{group}',
-                              'frame': eval_by_group},
-                             {'name': f'consistency_by_{group}',
-                              'frame': consistency_by_group},
-                             {'name': f'disattenuated_correlations_by_{group}',
-                              'frame': dis_corr_by_group}])
+            datasets.extend(
+                [
+                    {"name": f"eval_by_{group}", "frame": eval_by_group},
+                    {"name": f"consistency_by_{group}", "frame": consistency_by_group},
+                    {
+                        "name": f"disattenuated_correlations_by_{group}",
+                        "frame": dis_corr_by_group,
+                    },
+                ]
+            )
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_data_composition_analyses_for_rsmtool(self,
-                                                  data_container,
-                                                  configuration):
+    def run_data_composition_analyses_for_rsmtool(self, data_container, configuration):
         """
         Run all data composition analyses for RSMTool.
 
@@ -1756,78 +1949,100 @@ class Analyzer:
         configuration : configuration_parser.Configuration
             A new Configuration object.
         """
-        frame_names = ['train_metadata', 'test_metadata',
-                       'train_excluded', 'test_excluded',
-                       'train_features']
+        frame_names = [
+            "train_metadata",
+            "test_metadata",
+            "train_excluded",
+            "test_excluded",
+            "train_features",
+        ]
 
-        param_names = ['candidate_column', 'subgroups',
-                       'exclude_zero_scores', 'exclude_listwise']
+        param_names = [
+            "candidate_column",
+            "subgroups",
+            "exclude_zero_scores",
+            "exclude_listwise",
+        ]
 
         self.check_frame_names(data_container, frame_names)
 
         self.check_param_names(configuration, param_names)
 
-        features = [column for column in data_container.train_features.columns
-                    if column not in ['spkitemid', 'sc1']]
+        features = [
+            column
+            for column in data_container.train_features.columns
+            if column not in ["spkitemid", "sc1"]
+        ]
 
-        exclude_scores = configuration['exclude_zero_scores']
-        exclude_listwise = configuration['exclude_listwise']
+        exclude_scores = configuration["exclude_zero_scores"]
+        exclude_listwise = configuration["exclude_listwise"]
 
-        subgroups = configuration['subgroups']
-        candidate_column = configuration['candidate_column']
+        subgroups = configuration["subgroups"]
+        candidate_column = configuration["candidate_column"]
 
-        df_train_excluded = self.analyze_excluded_responses(data_container['train_excluded'],
-                                                            features,
-                                                            'Score/Features',
-                                                            exclude_zero_scores=exclude_scores,
-                                                            exclude_listwise=exclude_listwise)
+        df_train_excluded = self.analyze_excluded_responses(
+            data_container["train_excluded"],
+            features,
+            "Score/Features",
+            exclude_zero_scores=exclude_scores,
+            exclude_listwise=exclude_listwise,
+        )
 
-        df_test_excluded = self.analyze_excluded_responses(data_container['test_excluded'],
-                                                           features,
-                                                           'Score/Features',
-                                                           exclude_zero_scores=exclude_scores,
-                                                           exclude_listwise=exclude_listwise)
+        df_test_excluded = self.analyze_excluded_responses(
+            data_container["test_excluded"],
+            features,
+            "Score/Features",
+            exclude_zero_scores=exclude_scores,
+            exclude_listwise=exclude_listwise,
+        )
 
-        df_data_composition = self.analyze_used_responses(data_container['train_metadata'],
-                                                          data_container['test_metadata'],
-                                                          subgroups, candidate_column)
+        df_data_composition = self.analyze_used_responses(
+            data_container["train_metadata"],
+            data_container["test_metadata"],
+            subgroups,
+            candidate_column,
+        )
 
         # do the analysis by subgroups
         # first create a joint data frame with both sets
-        df_train_metadata_with_set = data_container['train_metadata'].copy()
-        df_test_metadata_with_set = data_container['test_metadata'].copy()
+        df_train_metadata_with_set = data_container["train_metadata"].copy()
+        df_test_metadata_with_set = data_container["test_metadata"].copy()
 
-        df_train_metadata_with_set['set'] = 'Training set'
-        df_test_metadata_with_set['set'] = 'Evaluation set'
+        df_train_metadata_with_set["set"] = "Training set"
+        df_test_metadata_with_set["set"] = "Evaluation set"
 
-        df_both_metadata = pd.merge(df_train_metadata_with_set,
-                                    df_test_metadata_with_set,
-                                    how='outer')
+        df_both_metadata = pd.merge(
+            df_train_metadata_with_set, df_test_metadata_with_set, how="outer"
+        )
 
         # create contingency table for each subgroup
         data_composition_by_group_dict = {}
         for grouping_variable in subgroups:
-            df_crosstab_group = pd.crosstab(df_both_metadata[grouping_variable],
-                                            df_both_metadata['set'])
-            df_crosstab_group = df_crosstab_group[['Training set',
-                                                   'Evaluation set']]
+            df_crosstab_group = pd.crosstab(
+                df_both_metadata[grouping_variable], df_both_metadata["set"]
+            )
+            df_crosstab_group = df_crosstab_group[["Training set", "Evaluation set"]]
             df_crosstab_group.insert(0, grouping_variable, df_crosstab_group.index)
             data_composition_by_group_dict[grouping_variable] = df_crosstab_group
 
-        datasets = [{'name': 'test_excluded_composition', 'frame': df_test_excluded},
-                    {'name': 'train_excluded_composition', 'frame': df_train_excluded},
-                    {'name': 'data_composition', 'frame': df_data_composition}]
+        datasets = [
+            {"name": "test_excluded_composition", "frame": df_test_excluded},
+            {"name": "train_excluded_composition", "frame": df_train_excluded},
+            {"name": "data_composition", "frame": df_data_composition},
+        ]
 
         for group in data_composition_by_group_dict:
 
-            datasets.append({'name': f'data_composition_by_{group}',
-                             'frame': data_composition_by_group_dict[group]})
+            datasets.append(
+                {
+                    "name": f"data_composition_by_{group}",
+                    "frame": data_composition_by_group_dict[group],
+                }
+            )
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_data_composition_analyses_for_rsmeval(self,
-                                                  data_container,
-                                                  configuration):
+    def run_data_composition_analyses_for_rsmeval(self, data_container, configuration):
         """
         Run all data composition analyses for RSMEval.
 
@@ -1854,59 +2069,73 @@ class Analyzer:
         configuration : configuration_parser.Configuration
             A new Configuration object.
         """
-        frame_names = ['test_metadata', 'test_excluded']
+        frame_names = ["test_metadata", "test_excluded"]
 
-        param_names = ['candidate_column', 'subgroups',
-                       'exclude_zero_scores', 'exclude_listwise']
+        param_names = [
+            "candidate_column",
+            "subgroups",
+            "exclude_zero_scores",
+            "exclude_listwise",
+        ]
 
         self.check_frame_names(data_container, frame_names)
 
         self.check_param_names(configuration, param_names)
 
-        exclude_scores = configuration['exclude_zero_scores']
-        exclude_listwise = configuration['exclude_listwise']
+        exclude_scores = configuration["exclude_zero_scores"]
+        exclude_listwise = configuration["exclude_listwise"]
 
-        subgroups = configuration['subgroups']
-        candidate_column = configuration['candidate_column']
+        subgroups = configuration["subgroups"]
+        candidate_column = configuration["candidate_column"]
 
         # analyze excluded responses
-        df_test_excluded = self.analyze_excluded_responses(data_container['test_excluded'],
-                                                           ['raw'],
-                                                           'Human/System',
-                                                           exclude_zero_scores=exclude_scores,
-                                                           exclude_listwise=exclude_listwise)
+        df_test_excluded = self.analyze_excluded_responses(
+            data_container["test_excluded"],
+            ["raw"],
+            "Human/System",
+            exclude_zero_scores=exclude_scores,
+            exclude_listwise=exclude_listwise,
+        )
 
         # rename the columns and index in the analysis data frame
-        df_test_excluded.rename(columns={'all features numeric':
-                                         'numeric system score',
-                                         'non-numeric feature values':
-                                         'non-numeric system score'},
-
-                                inplace=True)
-        df_data_composition = self.analyze_used_predictions(data_container['test_metadata'],
-                                                            subgroups,
-                                                            candidate_column)
+        df_test_excluded.rename(
+            columns={
+                "all features numeric": "numeric system score",
+                "non-numeric feature values": "non-numeric system score",
+            },
+            inplace=True,
+        )
+        df_data_composition = self.analyze_used_predictions(
+            data_container["test_metadata"], subgroups, candidate_column
+        )
 
         # create contingency table for each group
         data_composition_by_group_dict = {}
         for grouping_variable in subgroups:
-            series_crosstab_group = pd.pivot_table(data_container['test_metadata'],
-                                                   values='spkitemid',
-                                                   index=[grouping_variable],
-                                                   aggfunc=len)
+            series_crosstab_group = pd.pivot_table(
+                data_container["test_metadata"],
+                values="spkitemid",
+                index=[grouping_variable],
+                aggfunc=len,
+            )
 
             df_crosstab_group = pd.DataFrame(series_crosstab_group)
             df_crosstab_group.insert(0, grouping_variable, df_crosstab_group.index)
-            df_crosstab_group.rename(columns={'spkitemid': 'N responses'},
-                                     inplace=True)
+            df_crosstab_group.rename(columns={"spkitemid": "N responses"}, inplace=True)
             data_composition_by_group_dict[grouping_variable] = df_crosstab_group
 
-        datasets = [{'name': 'test_excluded_composition', 'frame': df_test_excluded},
-                    {'name': 'data_composition', 'frame': df_data_composition}]
+        datasets = [
+            {"name": "test_excluded_composition", "frame": df_test_excluded},
+            {"name": "data_composition", "frame": df_data_composition},
+        ]
 
         for group in data_composition_by_group_dict:
 
-            datasets.append({'name': f'data_composition_by_{group}',
-                             'frame': data_composition_by_group_dict[group]})
+            datasets.append(
+                {
+                    "name": f"data_composition_by_{group}",
+                    "frame": data_composition_by_group_dict[group],
+                }
+            )
 
         return configuration, DataContainer(datasets=datasets)

@@ -62,10 +62,12 @@ def variance_of_errors(human_scores):
     # show a warning and return None
     # if we don't have valid human scores
     if multiple_mask.sum() == 0:
-        warnings.warn("True score evaluations cannot be "
-                      "computed because none of the responses in the "
-                      "evaluation set has valid "
-                      "system scores and 2 human scores.")
+        warnings.warn(
+            "True score evaluations cannot be "
+            "computed because none of the responses in the "
+            "evaluation set has valid "
+            "system scores and 2 human scores."
+        )
         return None
 
     else:
@@ -86,8 +88,7 @@ def variance_of_errors(human_scores):
         return variance_of_errors
 
 
-def true_score_variance(human_scores,
-                        variance_errors_human=None):
+def true_score_variance(human_scores, variance_errors_human=None):
     """
     Compute variance of true scores for multiple raters.
 
@@ -135,7 +136,7 @@ def true_score_variance(human_scores,
         M = n_scores.sum()
 
         # compute squared deviations
-        squared_devs = (mean_scores - mean_human_score)**2
+        squared_devs = (mean_scores - mean_human_score) ** 2
 
         # adjust them by the number of human scores available
         # for each responses: deviations with higher number of
@@ -150,7 +151,7 @@ def true_score_variance(human_scores,
         numerator = sum_of_squares - (N - 1) * variance_errors_human
 
         # compute the denominator as the adjusted total number of scores
-        denominator = M - ((n_scores**2).sum() / M)
+        denominator = M - ((n_scores ** 2).sum() / M)
 
         # finally compute variance of true scores
         variance_true_scores = numerator / denominator
@@ -158,9 +159,7 @@ def true_score_variance(human_scores,
         return variance_true_scores
 
 
-def mse_true(system,
-             human_scores,
-             variance_errors_human=None):
+def mse_true(system, human_scores, variance_errors_human=None):
     """
     Compute mean squared error (MSE) when predicting true score from system score.
 
@@ -200,16 +199,14 @@ def mse_true(system,
 
         N = len(system)
 
-        se = ((mean_scores - system)**2) * n_scores
+        se = ((mean_scores - system) ** 2) * n_scores
 
         # Compute mean squared error when predicting true score
         mse = (se.sum() - N * variance_errors_human) / n_scores.sum()
     return mse
 
 
-def prmse_true(system,
-               human_scores,
-               variance_errors_human=None):
+def prmse_true(system, human_scores, variance_errors_human=None):
     """
     Compute PRMSE when predicting true score from system scores.
 
@@ -266,10 +263,9 @@ def prmse_true(system,
         return prmse
 
 
-def get_true_score_evaluations(df,
-                               system_score_columns,
-                               human_score_columns,
-                               variance_errors_human=None):
+def get_true_score_evaluations(
+    df, system_score_columns, human_score_columns, variance_errors_human=None
+):
     """
     Generate true score evaluations for HTML reports.
 
@@ -316,12 +312,16 @@ def get_true_score_evaluations(df,
     # variance of errors
     if isinstance(human_score_columns, str):
         if variance_errors_human is None:
-            raise(ValueError("True score evaluations require estimating "
-                             "variance of human errors, "
-                             "which can only be computed when a subset "
-                             "of responses has two or more human ratings. "
-                             "If a single human_score_column "
-                             "is supplied, one must also specify variance_errors_human"))
+            raise (
+                ValueError(
+                    "True score evaluations require estimating "
+                    "variance of human errors, "
+                    "which can only be computed when a subset "
+                    "of responses has two or more human ratings. "
+                    "If a single human_score_column "
+                    "is supplied, one must also specify variance_errors_human"
+                )
+            )
 
     if isinstance(system_score_columns, str):
         system_score_columns = [system_score_columns]
@@ -335,8 +335,7 @@ def get_true_score_evaluations(df,
     for system in system_score_columns:
         mse = mse_true(df[system], df[human_score_columns], variance_errors_human)
         prmse = prmse_true(df[system], df[human_score_columns], variance_errors_human)
-        prmse_metrics = pd.Series({'MSE true': mse,
-                                   'PRMSE true': prmse}, name=system)
+        prmse_metrics = pd.Series({"MSE true": mse, "PRMSE true": prmse}, name=system)
         prmse_all.append(prmse_metrics)
 
     df_prmse = pd.concat(prmse_all, axis=1, sort=True).transpose()
@@ -344,12 +343,14 @@ def get_true_score_evaluations(df,
     score_counts = get_n_human_scores(df[human_score_columns])
 
     # compute values that are the same for all scores
-    df_prmse.insert(0, 'N', len(df))
-    df_prmse.insert(1, 'N raters', score_counts.max())
-    df_prmse.insert(2, 'N single', (score_counts == 1).sum()),
-    df_prmse.insert(3, 'N multiple', (score_counts > 1).sum()),
-    df_prmse.insert(4, 'Variance of errors', variance_errors_human)
-    df_prmse.insert(5, 'True score var',
-                    true_score_variance(df[human_score_columns],
-                                        variance_errors_human))
+    df_prmse.insert(0, "N", len(df))
+    df_prmse.insert(1, "N raters", score_counts.max())
+    df_prmse.insert(2, "N single", (score_counts == 1).sum()),
+    df_prmse.insert(3, "N multiple", (score_counts > 1).sum()),
+    df_prmse.insert(4, "Variance of errors", variance_errors_human)
+    df_prmse.insert(
+        5,
+        "True score var",
+        true_score_variance(df[human_score_columns], variance_errors_human),
+    )
     return df_prmse

@@ -18,10 +18,7 @@ class FeatureTransformer:
     """Encapsulate feature transformation methods."""
 
     @classmethod
-    def apply_sqrt_transform(cls,
-                             name,
-                             values,
-                             raise_error=True):
+    def apply_sqrt_transform(cls, name, values, raise_error=True):
         """
         Apply the "sqrt" transform to ``values``.
 
@@ -50,25 +47,20 @@ class FeatureTransformer:
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
-                raise ValueError("The sqrt transformation should not be "
-                                 "applied to feature {} which can have "
-                                 "negative values".format(name))
+                raise ValueError(
+                    f"The sqrt transformation should not be applied to feature {name} which can have negative values"
+                )
             else:
-                logging.warning("The sqrt transformation was "
-                                "applied to feature {} which has "
-                                "negative values for some responses. "
-                                "No system score will be generated "
-                                "for such responses".format(name))
+                logging.warning(
+                    f"The sqrt transformation was applied to feature {name} which has negative values for some responses. No system score will be generated for such responses"
+                )
 
-        with np.errstate(invalid='ignore'):
+        with np.errstate(invalid="ignore"):
             new_data = np.sqrt(values)
         return new_data
 
     @classmethod
-    def apply_log_transform(cls,
-                            name,
-                            values,
-                            raise_error=True):
+    def apply_log_transform(cls, name, values, raise_error=True):
         """
         Apply the "log" transform to ``values``.
 
@@ -98,38 +90,30 @@ class FeatureTransformer:
         # check if the feature has any zeros
         if np.any(values == 0):
             if raise_error:
-                raise ValueError("The log transformation should not be "
-                                 "applied to feature {} which can have a "
-                                 "value of 0".format(name))
+                raise ValueError(
+                    f"The log transformation should not be applied to feature {name} which can have a value of 0"
+                )
             else:
-                logging.warning("The log transformation was "
-                                "applied to feature {} which has a "
-                                "value of 0 for some responses. No system "
-                                "score will "
-                                "be generated for such responses".format(name))
+                logging.warning(
+                    f"The log transformation was applied to feature {name} which has a value of 0 for some responses. No system score will be generated for such responses"
+                )
 
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
-                raise ValueError("The log transformation should not be "
-                                 "applied to feature {} which can have "
-                                 "negative values".format(name))
+                raise ValueError(
+                    f"The log transformation should not be applied to feature {name} which can have negative values"
+                )
             else:
-                logging.warning("The log transformation was "
-                                "applied to feature {} which has "
-                                "negative values for some responses. No system "
-                                "score will "
-                                "be generated for such responses".format(name))
+                logging.warning(
+                    f"The log transformation was applied to feature {name} which has negative values for some responses. No system score will be generated for such responses"
+                )
 
         new_data = np.log(values)
         return new_data
 
     @classmethod
-    def apply_inverse_transform(cls,
-                                name,
-                                values,
-                                raise_error=True,
-                                sd_multiplier=4):
+    def apply_inverse_transform(cls, name, values, raise_error=True, sd_multiplier=4):
         """
         Apply the "inv" (inverse) transform to ``values``.
 
@@ -165,14 +149,13 @@ class FeatureTransformer:
         """
         if np.any(values == 0):
             if raise_error:
-                raise ValueError("The inverse transformation should not be "
-                                 "applied to feature {} which can have a "
-                                 "value of 0".format(name))
+                raise ValueError(
+                    f"The inverse transformation should not be applied to feature {name} which can have a value of 0"
+                )
             else:
-                logging.warning("The inverse transformation was applied to "
-                                "feature {} which has a value of 0 for "
-                                "some responses. No system score will be "
-                                "generated for such responses".format(name))
+                logging.warning(
+                    f"The inverse transformation was applied to feature {name} which has a value of 0 for some responses. No system score will be generated for such responses"
+                )
 
         # check if the floor or ceiling are zero
         data_mean = np.mean(values)
@@ -180,34 +163,30 @@ class FeatureTransformer:
         floor = data_mean - sd_multiplier * data_sd
         ceiling = data_mean + sd_multiplier * data_sd
         if floor == 0 or ceiling == 0:
-            logging.warning("The floor/ceiling for feature {} "
-                            "is zero after applying the inverse "
-                            "transformation".format(name))
+            logging.warning(
+                f"The floor/ceiling for feature {name} is zero after applying the inverse transformation"
+            )
 
         # check if the feature can be both positive and negative
         all_positive = np.all(np.abs(values) == values)
         all_negative = np.all(np.abs(values) == -values)
         if not (all_positive or all_negative):
             if raise_error:
-                raise ValueError("The inverse transformation should not be "
-                                 "applied to feature {} where the values can "
-                                 "have different signs".format(name))
+                raise ValueError(
+                    f"The inverse transformation should not be applied to feature {name} where the values can have different signs"
+                )
             else:
-                logging.warning("The inverse transformation was "
-                                "applied to feature {} where the values can"
-                                "have different signs. This can change "
-                                "the ranking of the responses".format(name))
+                logging.warning(
+                    f"The inverse transformation was applied to feature {name} where the values canhave different signs. This can change the ranking of the responses"
+                )
 
-        with np.errstate(divide='ignore'):
+        with np.errstate(divide="ignore"):
             new_data = 1 / values
 
         return new_data
 
     @classmethod
-    def apply_add_one_inverse_transform(cls,
-                                        name,
-                                        values,
-                                        raise_error=True):
+    def apply_add_one_inverse_transform(cls, name, values, raise_error=True):
         """
         Apply the "addOneInv" (add one and invert) transform to ``values``.
 
@@ -236,24 +215,19 @@ class FeatureTransformer:
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
-                raise ValueError("The addOneInv transformation should not "
-                                 "be applied to feature {} which can have "
-                                 "negative values".format(name))
+                raise ValueError(
+                    f"The addOneInv transformation should not be applied to feature {name} which can have negative values"
+                )
             else:
-                logging.warning("The addOneInv transformation was "
-                                "applied to feature {} which has "
-                                "negative values for some responses. "
-                                "This can change the ranking of the "
-                                "responses".format(name))
+                logging.warning(
+                    f"The addOneInv transformation was applied to feature {name} which has negative values for some responses. This can change the ranking of the responses"
+                )
 
         new_data = 1 / (values + 1)
         return new_data
 
     @classmethod
-    def apply_add_one_log_transform(cls,
-                                    name,
-                                    values,
-                                    raise_error=True):
+    def apply_add_one_log_transform(cls, name, values, raise_error=True):
         """
         Apply the "addOneLn" (add one and log) transform to ``values``.
 
@@ -282,26 +256,19 @@ class FeatureTransformer:
         # check if the feature has any negative values
         if np.any(values < 0):
             if raise_error:
-                raise ValueError("The addOneLn transformation should not "
-                                 "be applied to feature {} which can have "
-                                 "negative values".format(name))
+                raise ValueError(
+                    f"The addOneLn transformation should not be applied to feature {name} which can have negative values"
+                )
             else:
-                logging.warning("The log transformation was "
-                                "applied to feature {} which has "
-                                "negative values for some responses. "
-                                "If the feature value remains negative "
-                                "after adding one, no score will "
-                                "be generated for such responses".format(name))
+                logging.warning(
+                    f"The log transformation was applied to feature {name} which has negative values for some responses. If the feature value remains negative after adding one, no score will be generated for such responses"
+                )
 
         new_data = np.log(values + 1)
         return new_data
 
     @classmethod
-    def transform_feature(cls,
-                          values,
-                          column_name,
-                          transform,
-                          raise_error=True):
+    def transform_feature(cls, values, column_name, transform, raise_error=True):
         """
         Apply given transform to all values in the given numpy array.
 
@@ -337,27 +304,26 @@ class FeatureTransformer:
         span both negative and positive values. Some transformations may
         throw errors for negative feature values.
         """
-        transforms = {'inv': FeatureTransformer.apply_inverse_transform,
-                      'sqrt': FeatureTransformer.apply_sqrt_transform,
-                      'log': FeatureTransformer.apply_log_transform,
-                      'addOneInv': FeatureTransformer.apply_add_one_inverse_transform,
-                      'addOneLn': FeatureTransformer.apply_add_one_log_transform,
-                      'raw': lambda column_name, data, raise_error: data,
-                      'org': lambda column_name, data, raise_error: data}
+        transforms = {
+            "inv": FeatureTransformer.apply_inverse_transform,
+            "sqrt": FeatureTransformer.apply_sqrt_transform,
+            "log": FeatureTransformer.apply_log_transform,
+            "addOneInv": FeatureTransformer.apply_add_one_inverse_transform,
+            "addOneLn": FeatureTransformer.apply_add_one_log_transform,
+            "raw": lambda column_name, data, raise_error: data,
+            "org": lambda column_name, data, raise_error: data,
+        }
 
         # make sure we have a valid transform function
         if transform is None or transform not in transforms:
-            raise ValueError(f'Unrecognized feature transformation:  {transform}')
+            raise ValueError(f"Unrecognized feature transformation:  {transform}")
 
         transformer = transforms.get(transform)
         new_data = transformer(column_name, values, raise_error)
         return new_data
 
     @classmethod
-    def find_feature_transform(cls,
-                               feature_name,
-                               feature_value,
-                               scores):
+    def find_feature_transform(cls, feature_name, feature_value, scores):
         """
         Identify best transformation for feature given correlation with score.
 
@@ -384,19 +350,16 @@ class FeatureTransformer:
         # Do not use sqrt and ln for potential negative features.
         # Do not use inv for positive features.
         if any(feature_value < 0):
-            applicable_transformations = ['org', 'inv']
+            applicable_transformations = ["org", "inv"]
         else:
-            applicable_transformations = ['org',
-                                          'sqrt',
-                                          'addOneInv',
-                                          'addOneLn']
+            applicable_transformations = ["org", "sqrt", "addOneInv", "addOneLn"]
 
         correlations = []
         for trans in applicable_transformations:
             try:
-                transformed_value = FeatureTransformer.transform_feature(feature_value,
-                                                                         feature_name,
-                                                                         trans)
+                transformed_value = FeatureTransformer.transform_feature(
+                    feature_value, feature_name, trans
+                )
 
                 correlations.append(abs(pearsonr(transformed_value, scores)[0]))
             except ValueError:

@@ -35,7 +35,7 @@ def update_model(model_file):
     # get the list of current files so that we can
     # remove them later to ensure there are no stranded
     # .npy files
-    npy_files = glob.glob(join(model_dir, '*.npy'))
+    npy_files = glob.glob(join(model_dir, "*.npy"))
 
     # now load the SKLL model
     model = Learner.from_file(model_file)
@@ -49,9 +49,17 @@ def update_model(model_file):
 
 
 def main():  # noqa: D103
-    model_files = glob.glob(join(TEST_DIR, 'data', 'experiments',
-                                 '*predict*', 'existing_experiment',
-                                 'output', "*.model"))
+    model_files = glob.glob(
+        join(
+            TEST_DIR,
+            "data",
+            "experiments",
+            "*predict*",
+            "existing_experiment",
+            "output",
+            "*.model",
+        )
+    )
     for model_file in model_files:
         print(f"Processing {model_file}")
         update_model(model_file)

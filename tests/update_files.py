@@ -49,28 +49,34 @@ from rsmtool.test_utils import FileUpdater
 
 def main():  # noqa: D103
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='update_test_files.py')
-    parser.add_argument('--tests',
-                        dest='tests_dir',
-                        required=True,
-                        help="The path to the existing RSMTool tests directory")
-    parser.add_argument('--outputs',
-                        dest='outputs_dir',
-                        required=True,
-                        help="The path to the directory containing the updated test "
-                             "outputs (usually `test_outputs`)")
+    parser = argparse.ArgumentParser(prog="update_test_files.py")
+    parser.add_argument(
+        "--tests",
+        dest="tests_dir",
+        required=True,
+        help="The path to the existing RSMTool tests directory",
+    )
+    parser.add_argument(
+        "--outputs",
+        dest="outputs_dir",
+        required=True,
+        help="The path to the directory containing the updated test "
+        "outputs (usually `test_outputs`)",
+    )
 
     # parse given command line arguments
     args = parser.parse_args()
 
     # print out a reminder that the user should have run the test suite
-    run_test_suite = input('Have you already run the whole test suite? (y/n): ')
-    if run_test_suite == 'n':
-        print('Please run the whole test suite using '
-              '`nosetests --nologcapture` before running this script.')
+    run_test_suite = input("Have you already run the whole test suite? (y/n): ")
+    if run_test_suite == "n":
+        print(
+            "Please run the whole test suite using "
+            "`nosetests --nologcapture` before running this script."
+        )
         sys.exit(0)
-    elif run_test_suite != 'y':
-        print('Invalid answer. Exiting.')
+    elif run_test_suite != "y":
+        print("Invalid answer. Exiting.")
         sys.exit(1)
     else:
         print()
@@ -78,13 +84,17 @@ def main():  # noqa: D103
     # iterate over the given tests directory and find all files named
     # `test_experiment_*.py` and get their suffixes for use with the
     # FileUpdater object.
-    suffixes = [re.sub(r'test_experiment_', '', p.stem)
-                for p in Path('tests').glob('test_experiment_*.py')]
+    suffixes = [
+        re.sub(r"test_experiment_", "", p.stem)
+        for p in Path("tests").glob("test_experiment_*.py")
+    ]
 
     # instantiate a FileUpdater object
-    updater = FileUpdater(test_suffixes=suffixes,
-                          tests_directory=args.tests_dir,
-                          updated_outputs_directory=args.outputs_dir)
+    updater = FileUpdater(
+        test_suffixes=suffixes,
+        tests_directory=args.tests_dir,
+        updated_outputs_directory=args.outputs_dir,
+    )
 
     # run the file updates
     updater.run()
@@ -93,5 +103,5 @@ def main():  # noqa: D103
     updater.print_report()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
