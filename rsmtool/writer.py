@@ -144,7 +144,7 @@ class DataWriter:
                 df.to_excel(outfile, index=index, **kwargs)
 
             else:
-                raise print(
+                raise KeyError(
                     f"Please make sure that the `file_format` specified "
                     f"is one of the following:\n{{`csv`, `tsv`, `xlsx`}}\n."
                     f"You specified {file_format}."

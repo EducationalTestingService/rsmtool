@@ -691,19 +691,19 @@ class TestThumbnail:
         title="Click to enlarge">
         </img>
         <style>
-        img {{
+        img {{{{
             border: 1px solid #ddd;
             border-radius: 4px;
             padding: 5px;
             width: 150px;
             cursor: pointer;
-        }}
+        }}}}
         </style>
 
         <script>
-        function getPicture(picpath) {{
+        function getPicture(picpath) {{{{
             window.open(picpath, 'Image', resizable=1);
-        }};
+        }}}};
         </script>"""
         return "".join(result.strip().split())
 

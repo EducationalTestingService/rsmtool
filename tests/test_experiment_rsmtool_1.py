@@ -114,9 +114,7 @@ def test_run_experiment_lr_with_notebook_rerun_fail():
     )
     do_run_experiment(source, experiment_id, config_file)
 
-    report_env = join(
-        "test_outputs", source, "report", ".environ.json".format(experiment_id)
-    )
+    report_env = join("test_outputs", source, "report", ".environ.json")
     report_ipynb = join(
         "test_outputs", source, "report", f"{experiment_id}_report.ipynb"
     )
