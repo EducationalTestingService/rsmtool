@@ -1712,8 +1712,8 @@ class Analyzer:
 
             # compute disattenuated correlations if we have the second human score
             if include_second_score:
-                dis_corr_by_group = self.compute_disattenuated_correlations(eval_by_group[f'corr.{score_type}_trim'],
-                                                                            consistency_by_group['corr'])
+                dis_corr_by_group = self.compute_disattenuated_correlations(
+                    eval_by_group[f'corr.{score_type}_trim'], consistency_by_group['corr'])
             else:
                 dis_corr_by_group = pd.DataFrame()
 

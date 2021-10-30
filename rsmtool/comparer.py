@@ -400,8 +400,9 @@ class Comparer:
                                                                                        file_format))
             if exists(group_dis_corr_file):
                 df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
+                dis_cor_summary_stats = self.make_summary_stat_df(df_dis_cor_group)
                 files[f'df_disattenuated_correlations_by_{group}'] = df_dis_cor_group
-                files[f'df_disattenuated_correlations_by_{group}_overview'] = self.make_summary_stat_df(df_dis_cor_group)
+                files[f'df_disattenuated_correlations_by_{group}_overview'] = dis_cor_summary_stats
 
         # true score evaluations
         true_score_eval_file = join(filedir, "{}_true_score_eval.{}".format(experiment_id,

@@ -765,11 +765,13 @@ class TestExpectedScores:
         X_test = X[500:]
 
         train_ids = list(range(1, len(X_train) + 1))
-        train_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_train.shape[1])], x)) for x in X_train]
+        train_features = [dict(zip([f'FEATURE_{i + 1}'
+                                    for i in range(X_train.shape[1])], x)) for x in X_train]
         train_labels = list(y_train)
 
         test_ids = list(range(1, len(X_test) + 1))
-        test_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_test.shape[1])], x)) for x in X_test]
+        test_features = [dict(zip([f'FEATURE_{i + 1}'
+                                   for i in range(X_test.shape[1])], x)) for x in X_test]
 
         cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
         cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
