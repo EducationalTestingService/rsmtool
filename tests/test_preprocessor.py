@@ -20,7 +20,7 @@ class TestFeaturePreprocessor:
                                              'sc1': [1]})
 
         (df_included,
-         df_excluded) = FeaturePreprocessor.select_candidates(data, 2)
+         df_excluded) = self.fpp.select_candidates(data, 2)
         assert_frame_equal(df_included, df_included_expected)
         assert_frame_equal(df_excluded, df_excluded_expected)
 
@@ -29,7 +29,7 @@ class TestFeaturePreprocessor:
                              'sc1': [2, 3, 1, 5, 6, 1]})
 
         (df_included,
-         df_excluded) = FeaturePreprocessor.select_candidates(data, 2)
+         df_excluded) = self.fpp.select_candidates(data, 2)
         assert_frame_equal(df_included, data)
         assert_equal(len(df_excluded), 0)
 
@@ -38,7 +38,7 @@ class TestFeaturePreprocessor:
                              'sc1': [2, 3, 1, 5, 6, 1]})
 
         (df_included,
-         df_excluded) = FeaturePreprocessor.select_candidates(data, 4)
+         df_excluded) = self.fpp.select_candidates(data, 4)
         assert_frame_equal(df_excluded, data)
         assert_equal(len(df_included), 0)
 
@@ -51,7 +51,7 @@ class TestFeaturePreprocessor:
                                              'sc1': [1]})
 
         (df_included,
-         df_excluded) = FeaturePreprocessor.select_candidates(data, 2, 'ID')
+         df_excluded) = self.fpp.select_candidates(data, 2, 'ID')
         assert_frame_equal(df_included, df_included_expected)
         assert_frame_equal(df_excluded, df_excluded_expected)
 
@@ -126,7 +126,7 @@ class TestFeaturePreprocessor:
         df = pd.DataFrame(columns=['a', 'b', 'c'])
 
         subgroups = ['a', 'd']
-        FeaturePreprocessor.check_subgroups(df, subgroups)
+        self.fpp.check_subgroups(df, subgroups)
 
     def test_check_subgroups_nothing_to_replace(self):
         df = pd.DataFrame({'a': ['1', '2'],
@@ -134,7 +134,7 @@ class TestFeaturePreprocessor:
                            'd': ['abc', 'def']})
 
         subgroups = ['a', 'd']
-        df_out = FeaturePreprocessor.check_subgroups(df, subgroups)
+        df_out = self.fpp.check_subgroups(df, subgroups)
         assert_frame_equal(df_out, df)
 
     def test_check_subgroups_replace_empty(self):
@@ -146,7 +146,7 @@ class TestFeaturePreprocessor:
         df_expected = pd.DataFrame({'a': ['1', 'No info'],
                                     'b': ['   ', '34'],
                                     'd': ['ab c', 'No info']})
-        df_out = FeaturePreprocessor.check_subgroups(df, subgroups)
+        df_out = self.fpp.check_subgroups(df, subgroups)
         assert_frame_equal(df_out, df_expected)
 
     def test_filter_on_column(self):
@@ -643,7 +643,7 @@ class TestFeaturePreprocessor:
         data = [1, 1, 2, 2, 1, 1] * 10 + [10]
         ceiling = np.mean(data) + 4 * np.std(data)
 
-        clamped_data = FeaturePreprocessor.remove_outliers(data)
+        clamped_data = self.fpp.remove_outliers(data)
         assert_almost_equal(clamped_data[-1], ceiling)
 
     def test_generate_feature_names_subset(self):
@@ -702,21 +702,21 @@ class TestFeaturePreprocessor:
 
         values = np.array([1.4, 8.5, 7.4])
         expected = np.array([1.4, 8.4998, 7.4])
-        actual = FeaturePreprocessor.trim(values, 1, 8)
+        actual = self.fpp.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
     def test_trim_with_list(self):
 
         values = [1.4, 8.5, 7.4]
         expected = np.array([1.4, 8.4998, 7.4])
-        actual = FeaturePreprocessor.trim(values, 1, 8)
+        actual = self.fpp.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
     def test_trim_with_custom_tolerance(self):
 
         values = [0.6, 8.4, 7.4]
         expected = np.array([0.75, 8.25, 7.4])
-        actual = FeaturePreprocessor.trim(values, 1, 8, 0.25)
+        actual = self.fpp.trim(values, 1, 8, 0.25)
         assert_array_equal(actual, expected)
 
     def test_preprocess_feature_fail(self):
@@ -1021,9 +1021,12 @@ class TestFeaturePreprocessor:
 
 class TestFeatureSpecsProcessor:
 
+    def setUp(self):
+        self.fsp = FeatureSpecsProcessor()
+
     def test_generate_default_specs(self):
         fnames = ['Grammar', 'Vocabulary', 'Pronunciation']
-        df_specs = FeatureSpecsProcessor.generate_default_specs(fnames)
+        df_specs = self.fsp.generate_default_specs(fnames)
         assert_equal(len(df_specs), 3)
         assert_equal(df_specs['feature'][0], 'Grammar')
         assert_equal(df_specs['transform'][1], 'raw')
@@ -1045,13 +1048,13 @@ class TestFeatureSpecsProcessor:
                 'spkitemlab': ['a-5'] * 10}
         df = pd.DataFrame(data)
 
-        df_specs = FeatureSpecsProcessor.generate_specs(df,
-                                                        ['Grammar',
-                                                         'Fluency',
-                                                         'Discourse'],
-                                                        'r1',
-                                                        feature_subset_specs,
-                                                        'SYS1')
+        df_specs = self.fsp.generate_specs(df,
+                                           ['Grammar',
+                                            'Fluency',
+                                            'Discourse'],
+                                           'r1',
+                                           feature_subset_specs,
+                                           'SYS1')
 
         assert_equal(len(df_specs), 3)
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
@@ -1072,13 +1075,13 @@ class TestFeatureSpecsProcessor:
                 'r1': np.random.choice(4, 10),
                 'spkitemlab': ['a-5'] * 10}
         df = pd.DataFrame(data)
-        df_specs = FeatureSpecsProcessor.generate_specs(df,
-                                                        ['Grammar',
-                                                         'Fluency',
-                                                         'Discourse'],
-                                                        'r1',
-                                                        feature_subset_specs,
-                                                        feature_sign=None)
+        df_specs = self.fsp.generate_specs(df,
+                                           ['Grammar',
+                                            'Fluency',
+                                            'Discourse'],
+                                           'r1',
+                                           feature_subset_specs,
+                                           feature_sign=None)
         assert_equal(len(df_specs), 3)
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
         assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
@@ -1098,13 +1101,13 @@ class TestFeatureSpecsProcessor:
                 'r1': r1,
                 'spkitemlab': ['a-5'] * 10}
         df = pd.DataFrame(data)
-        df_specs = FeatureSpecsProcessor.generate_specs(df,
-                                                        ['Grammar',
-                                                         'Vocabulary',
-                                                         'Discourse'],
-                                                        'r1',
-                                                        feature_subset_specs,
-                                                        'SYS1')
+        df_specs = self.fsp.generate_specs(df,
+                                           ['Grammar',
+                                            'Vocabulary',
+                                            'Discourse'],
+                                           'r1',
+                                           feature_subset_specs,
+                                           'SYS1')
         assert_array_equal(df_specs['feature'], ['Grammar', 'Vocabulary', 'Discourse'])
         assert_equal(df_specs['transform'][1], 'sqrt')
 
@@ -1123,13 +1126,13 @@ class TestFeatureSpecsProcessor:
                 'r1': r1,
                 'spkitemlab': ['a-5'] * 10}
         df = pd.DataFrame(data)
-        df_specs = FeatureSpecsProcessor.generate_specs(df,
-                                                        ['Grammar',
-                                                         'Vocabulary',
-                                                         'Discourse'],
-                                                        'r1',
-                                                        feature_subset_specs,
-                                                        'SYS1')
+        df_specs = self.fsp.generate_specs(df,
+                                           ['Grammar',
+                                            'Vocabulary',
+                                            'Discourse'],
+                                           'r1',
+                                           feature_subset_specs,
+                                           'SYS1')
         assert_equal(df_specs['feature'][1], 'Vocabulary')
         assert_equal(df_specs['transform'][1], 'addOneInv')
         assert_equal(df_specs['sign'][1], -1)
@@ -1142,11 +1145,11 @@ class TestFeatureSpecsProcessor:
                 'r1': np.random.choice(4, 10),
                 'spkitemlab': ['a-5'] * 10}
         df = pd.DataFrame(data)
-        df_specs = FeatureSpecsProcessor.generate_specs(df,
-                                                        ['Grammar',
-                                                         'Fluency',
-                                                         'Discourse'],
-                                                        'r1')
+        df_specs = self.fsp.generate_specs(df,
+                                           ['Grammar',
+                                            'Fluency',
+                                            'Discourse'],
+                                           'r1')
         assert_equal(len(df_specs), 3)
         assert_array_equal(df_specs['feature'], ['Grammar', 'Fluency', 'Discourse'])
         assert_array_equal(df_specs['sign'], [1.0, 1.0, 1.0])
@@ -1157,7 +1160,7 @@ class TestFeatureSpecsProcessor:
                                          'sign': [1.0, 1.0, -1.0],
                                          'transform': ['raw', 'inv', 'sqrt']})
 
-        df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        df_new_feature_specs = self.fsp.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_feature_specs, df_new_feature_specs)
 
     def test_validate_feature_specs_with_Feature_as_column(self):
@@ -1168,7 +1171,7 @@ class TestFeatureSpecsProcessor:
                                                   'sign': [1.0, 1.0, -1.0],
                                                   'transform': ['raw', 'inv', 'sqrt']})
 
-        df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        df_new_feature_specs = self.fsp.validate_feature_specs(df_feature_specs)
 
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
 
@@ -1180,7 +1183,7 @@ class TestFeatureSpecsProcessor:
                                                   'sign': [1.0, 1.0, -1.0],
                                                   'transform': ['raw', 'inv', 'sqrt']})
 
-        df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        df_new_feature_specs = self.fsp.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
 
     def test_validate_feature_specs_add_default_values(self):
@@ -1189,7 +1192,7 @@ class TestFeatureSpecsProcessor:
                                                   'sign': [1, 1, 1],
                                                   'transform': ['raw', 'raw', 'raw']})
 
-        df_new_feature_specs = FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        df_new_feature_specs = self.fsp.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
 
     @raises(ValueError)
@@ -1198,24 +1201,27 @@ class TestFeatureSpecsProcessor:
                                          'sign': ['+', '+', '-'],
                                          'transform': ['raw', 'inv', 'sqrt']})
 
-        FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        self.fsp.validate_feature_specs(df_feature_specs)
 
     @raises(ValueError)
     def test_validate_feature_duplicate_feature(self):
         df_feature_specs = pd.DataFrame({'feature': ['f1', 'f1', 'f3'],
                                          'sign': ['+', '+', '-'],
                                          'transform': ['raw', 'inv', 'sqrt']})
-        FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        self.fsp.validate_feature_specs(df_feature_specs)
 
     @raises(KeyError)
     def test_validate_feature_missing_feature_column(self):
         df_feature_specs = pd.DataFrame({'FeatureName': ['f1', 'f1', 'f3'],
                                          'sign': ['+', '+', '-'],
                                          'transform': ['raw', 'inv', 'sqrt']})
-        FeatureSpecsProcessor.validate_feature_specs(df_feature_specs)
+        self.fsp.validate_feature_specs(df_feature_specs)
 
 
 class TestFeatureSubsetProcessor:
+
+    def setUp(self):
+        self.fsp = FeatureSubsetProcessor()
 
     def test_select_by_subset(self):
         feature_subset_specs = pd.DataFrame({'Feature': ['Grammar',
@@ -1232,9 +1238,9 @@ class TestFeatureSubsetProcessor:
         # This list should also trigger a warning about extra subset features not in the data
         fnames = ['Grammar', 'Vocabulary', 'Pronunciation', 'Content_accuracy']
         high_entropy_fnames = ['Grammar', 'Vocabulary', 'Pronunciation']
-        assert_array_equal(FeatureSubsetProcessor.select_by_subset(fnames,
-                                                                   feature_subset_specs,
-                                                                   'high_entropy'),
+        assert_array_equal(self.fsp.select_by_subset(fnames,
+                                                     feature_subset_specs,
+                                                     'high_entropy'),
                            high_entropy_fnames)
 
     def test_select_by_subset_warnings(self):
@@ -1250,83 +1256,78 @@ class TestFeatureSubsetProcessor:
                                              'low_entropy': [0, 0, 1, 0, 0, 1, 1, 1]})
 
         extra_fnames = ['Grammar', 'Vocabulary', 'Rhythm']
-        assert_array_equal(FeatureSubsetProcessor.select_by_subset(extra_fnames,
-                                                                   feature_subset_specs,
-                                                                   'high_entropy'),
+        assert_array_equal(self.fsp.select_by_subset(extra_fnames,
+                                                     feature_subset_specs,
+                                                     'high_entropy'),
                            ['Grammar', 'Vocabulary'])
 
     def test_check_feature_subset_file_subset_only(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'subset1': [0, 1, 0]})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
+        self.fsp.check_feature_subset_file(feature_specs, 'subset1')
 
 
     def test_check_feature_subset_file_sign_only(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS': ['+', '-', '+']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS')
 
 
     def test_check_feature_subset_file_sign_and_subset(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS': ['+', '-', '+'],
                                       'subset1': [0, 1, 0]})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         subset='subset1',
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs,
+                                           subset='subset1',
+                                           sign='SYS')
 
     def test_check_feature_subset_file_sign_named_with_sign(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS': ['+', '-', '+']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS')
 
     def test_check_feature_subset_file_sign_named_with_Sign(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'Sign_SYS': ['+', '-', '+']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS')
 
     @raises(ValueError)
     def test_check_feature_subset_file_sign_named_something_else(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'SYS_sign': ['+', '-', '+']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS')
 
     @raises(ValueError)
     def test_check_feature_subset_file_multiple_sign_columns(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS': ['+', '-', '+'],
                                       'Sign_SYS': ['-', '+', '-']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs,
-                                                         sign='SYS')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS')
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_feature_column(self):
         feature_specs = pd.DataFrame({'feat': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
+        self.fsp.check_feature_subset_file(feature_specs, 'subset1')
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_subset_column(self):
         feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'], 'subset1': [0, 1, 0]})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset2')
+        self.fsp.check_feature_subset_file(feature_specs, 'subset2')
 
     @raises(ValueError)
     def test_check_feature_subset_file_wrong_values_in_subset(self):
         feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
                                       'subset1': ['yes', 'no', 'yes']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, 'subset1')
+        self.fsp.check_feature_subset_file(feature_specs, 'subset1')
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_sign_column(self):
         feature_specs = pd.DataFrame({'feature': ['f1', 'f2', 'f3'],
                                       'subset1': [0, 1, 0]})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, sign='subset1')
+        self.fsp.check_feature_subset_file(feature_specs, sign='subset1')
 
     @raises(ValueError)
     def test_check_feature_subset_file_wrong_values_in_sign(self):
         feature_specs = pd.DataFrame({'Feature': ['f1', 'f2', 'f3'],
                                       'sign_SYS1': ['+1', '-1', '+1']})
-        FeatureSubsetProcessor.check_feature_subset_file(feature_specs, sign='SYS1')
+        self.fsp.check_feature_subset_file(feature_specs, sign='SYS1')

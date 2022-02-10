@@ -1321,7 +1321,18 @@ class Modeler:
         human_labels_sd = df_train['sc1'].std()
 
         self.logger.info('Processing train set predictions.')
-        df_train_predictions = FeaturePreprocessor.process_predictions(df_train_predictions,
+        feature_preprocessor = FeaturePreprocessor()
+        df_train_predictions = feature_preprocessor.process_predictions(df_train_predictions,
+                                                                        train_predictions_mean,
+                                                                        train_predictions_sd,
+                                                                        human_labels_mean,
+                                                                        human_labels_sd,
+                                                                        trim_min,
+                                                                        trim_max,
+                                                                        trim_tolerance)
+
+        self.logger.info('Processing test set predictions.')
+        df_test_predictions = feature_preprocessor.process_predictions(df_test_predictions,
                                                                        train_predictions_mean,
                                                                        train_predictions_sd,
                                                                        human_labels_mean,
@@ -1329,16 +1340,6 @@ class Modeler:
                                                                        trim_min,
                                                                        trim_max,
                                                                        trim_tolerance)
-
-        self.logger.info('Processing test set predictions.')
-        df_test_predictions = FeaturePreprocessor.process_predictions(df_test_predictions,
-                                                                      train_predictions_mean,
-                                                                      train_predictions_sd,
-                                                                      human_labels_mean,
-                                                                      human_labels_sd,
-                                                                      trim_min,
-                                                                      trim_max,
-                                                                      trim_tolerance)
 
         df_postproc_params = pd.DataFrame([{'trim_min': trim_min,
                                             'trim_max': trim_max,
