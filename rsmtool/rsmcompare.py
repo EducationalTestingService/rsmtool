@@ -144,7 +144,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     subgroups = configuration.get('subgroups')
 
     # Initialize reporter
-    reporter = Reporter()
+    reporter = Reporter(logger=logger)
 
     chosen_notebook_files = reporter.get_ordered_notebook_files(general_report_sections,
                                                                 special_report_sections,

@@ -26,6 +26,9 @@ from .utils.models import is_built_in_model, is_skll_model
 class FeatureSubsetProcessor:
     """Class to encapsulate feature sub-setting methods."""
 
+    def __init__(self, logger=None):
+        self.logger = logger if logger else logging.getLogger(__name__)
+
     @classmethod
     def select_by_subset(cls, feature_columns, feature_subset_specs, subset):
         """
@@ -54,17 +57,17 @@ class FeatureSubsetProcessor:
             feature_subset_specs_set = set(feature_subset_specs['Feature'])
             extra_columns = set(feature_columns).difference(feature_subset_specs_set)
             if extra_columns:
-                logging.warning("No subset information was available for the "
-                                "following columns in the input file. These "
-                                "columns will not be used in the model: "
-                                "{}".format(', '.join(extra_columns)))
+                cls.logger.warning("No subset information was available for the "
+                                   "following columns in the input file. These "
+                                   "columns will not be used in the model: "
+                                   "{}".format(', '.join(extra_columns)))
         if len(feature_subset) != len(feature_names):
             extra_subset_features = set(feature_subset).difference(set(feature_names))
             if extra_subset_features:
-                logging.warning("The following features were included into the {} "
-                                "subset in the feature_subset_file but were not "
-                                "specified in the input data: "
-                                "{}".format(subset, ', '.join(extra_subset_features)))
+                cls.logger.warning("The following features were included into the {} "
+                                   "subset in the feature_subset_file but were not "
+                                   "specified in the input data: "
+                                   "{}".format(subset, ', '.join(extra_subset_features)))
         return feature_names
 
     @classmethod
@@ -134,6 +137,9 @@ class FeatureSubsetProcessor:
 class FeatureSpecsProcessor:
     """Encapsulate feature file processing methods."""
 
+    def __init__(self, logger=None):
+        self.logger = logger if logger else logging.getLogger(__name__)
+
     @classmethod
     def generate_default_specs(cls, feature_names):
         """
@@ -182,9 +188,9 @@ class FeatureSpecsProcessor:
             The signed feature.
         """
         if feature not in sign_dict.keys():
-            logging.warning("No information about sign is available "
-                            "for feature {}. The feature will be assigned "
-                            "the default positive weight.".format(feature))
+            cls.logger.warning("No information about sign is available "
+                               "for feature {}. The feature will be assigned "
+                               "the default positive weight.".format(feature))
             feature_sign_numeric = 1.0
         else:
             feature_sign_string = sign_dict[feature]
@@ -342,6 +348,9 @@ class FeatureSpecsProcessor:
 
 class FeaturePreprocessor:
     """Class to preprocess features in training and testing sets."""
+
+    def __init__(self, logger=None):
+        self.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
     def check_model_name(model_name):
@@ -765,8 +774,8 @@ class FeaturePreprocessor:
 
         # if the column contained only non-numeric values, we need to drop it
         if len(df_bad_rows) == len(df_filter):
-            logging.info(f"Feature {column} was excluded from the model "
-                         f"because it only contains non-numeric values.")
+            self.logger.info(f"Feature {column} was excluded from the model "
+                             f"because it only contains non-numeric values.")
             drop_column = True
 
         # now drop the above bad rows containing NaNs from our data frame
@@ -796,9 +805,9 @@ class FeaturePreprocessor:
         if exclude_zero_sd is True:
             feature_sd = df_filter[column].std()
             if np.isclose(feature_sd, 0, atol=1e-07):
-                logging.info(f"Feature {column} was excluded from the model "
-                             f"because its standard deviation in the "
-                             f"training set is equal to 0.")
+                self.logger.info(f"Feature {column} was excluded from the model "
+                                 f"because its standard deviation in the "
+                                 f"training set is equal to 0.")
                 drop_column = True
 
         # if `drop_column` is true, then we need to drop the column
@@ -1434,8 +1443,8 @@ class FeaturePreprocessor:
             df_filtered = df_responses_with_requested_flags.copy()
             trim_min = given_trim_min if given_trim_min else 1
             trim_max = given_trim_max if given_trim_max else 10
-            logging.info("Generating labels randomly "
-                         "from [{}, {}]".format(trim_min, trim_max))
+            self.logger.info("Generating labels randomly "
+                             "from [{}, {}]".format(trim_min, trim_max))
             randgen = RandomState(seed=1234567890)
             df_filtered[label_column] = randgen.random_integers(trim_min,
                                                                 trim_max,
@@ -1502,11 +1511,11 @@ class FeaturePreprocessor:
         if (length_column and
             (len(df_filtered[df_filtered['length'].isnull()]) != 0 or
                 df_filtered['length'].std() <= 0)):
-            logging.warning("The {} column either has missing values or a standard "
-                            "deviation <= 0. No length-based analysis will be "
-                            "provided. The column will be renamed as ##{}## and "
-                            "saved in *train_other_columns.csv.".format(length_column,
-                                                                        length_column))
+            self.logger.warning("The {} column either has missing values or a standard "
+                                "deviation <= 0. No length-based analysis will be "
+                                "provided. The column will be renamed as ##{}## and "
+                                "saved in *train_other_columns.csv.".format(length_column,
+                                                                            length_column))
             df_filtered.rename(columns={'length': '##{}##'.format(length_column)},
                                inplace=True)
 
@@ -1686,9 +1695,9 @@ class FeaturePreprocessor:
         # if we are excluding zero scores but trim_min
         # is set to 0, then we need to warn the user
         if exclude_zero_scores and spec_trim_min == 0:
-            logging.warning("'exclude_zero_scores' is set to True but "
-                            "'trim_min' is set to 0. This may cause "
-                            " unexpected behavior.")
+            self.logger.warning("'exclude_zero_scores' is set to True but "
+                                "'trim_min' is set to 0. This may cause "
+                                "unexpected behavior.")
 
         # are we filtering on any other columns?
         # is `flag_column` applied to training partition only
@@ -1724,7 +1733,7 @@ class FeaturePreprocessor:
         custom_report_section_paths = config_obj['custom_sections']
 
         if custom_report_section_paths and configdir is not None:
-            logging.info('Locating custom report sections')
+            self.logger.info('Locating custom report sections')
             custom_report_sections = Reporter.locate_custom_sections(custom_report_section_paths,
                                                                      configdir)
         else:
@@ -1864,11 +1873,11 @@ class FeaturePreprocessor:
         # We also allow features with 0 standard deviation in the test file.
         if (test_file_location == train_file_location and
                 train_label_column == test_label_column):
-            logging.warning('The same data file and label '
-                            'column are used for both training '
-                            'and evaluating the model. No second '
-                            'score analysis will be performed, even '
-                            'if requested.')
+            self.logger.warning("The same data file and label "
+                                "column are used for both training "
+                                "and evaluating the model. No second "
+                                "score analysis will be performed, even "
+                                "if requested.")
 
             df_test_features = df_train_features.copy()
             df_test_metadata = df_train_metadata.copy()
@@ -1902,7 +1911,7 @@ class FeaturePreprocessor:
                                          min_candidate_items=min_items,
                                          use_fake_labels=use_fake_test_labels)
 
-        logging.info('Pre-processing training and test set features')
+        self.logger.info('Pre-processing training and test set features')
         (df_train_preprocessed_features,
          df_test_preprocessed_features,
          df_feature_info) = self.preprocess_features(df_train_features,
@@ -2049,7 +2058,7 @@ class FeaturePreprocessor:
         # that they exist, otherwise raise an exception
         custom_report_section_paths = config_obj['custom_sections']
         if custom_report_section_paths:
-            logging.info('Locating custom report sections')
+            self.logger.info('Locating custom report sections')
             custom_report_sections = Reporter.locate_custom_sections(custom_report_section_paths,
                                                                      configpath)
         else:
@@ -2073,9 +2082,9 @@ class FeaturePreprocessor:
         # if we are excluding zero scores but trim_min
         # is set to 0, then we need to warn the user
         if exclude_zero_scores and spec_trim_min == 0:
-            logging.warning("'exclude_zero_scores' is set to True but "
-                            " 'trim_min' is set to 0. This may cause "
-                            " unexpected behavior.")
+            self.logger.warning("'exclude_zero_scores' is set to True but "
+                                " 'trim_min' is set to 0. This may cause "
+                                " unexpected behavior.")
 
         # are we filtering on any other columns?
         flag_column_dict = config_obj.check_flag_column(partition='test')
@@ -2098,7 +2107,7 @@ class FeaturePreprocessor:
             message = ('Assuming given system predictions '
                        'are unscaled and will be scaled before use.')
 
-        logging.info(message)
+        self.logger.info(message)
 
         df_pred = data_container_obj.predictions
 
@@ -2216,7 +2225,7 @@ class FeaturePreprocessor:
                 scale_human_mean, scale_human_sd = (data_container_obj.scale['sc1'].mean(),
                                                     data_container_obj.scale['sc1'].std())
 
-        logging.info('Processing predictions')
+        self.logger.info('Processing predictions')
         df_pred_processed = self.process_predictions(df_filtered_pred,
                                                      scale_pred_mean,
                                                      scale_pred_sd,
@@ -2428,15 +2437,15 @@ class FeaturePreprocessor:
             trim_tolerance = df_postproc_params['trim_tolerance'].values[0]
         else:
             trim_tolerance = 0.4998
-            logging.warning("The tolerance for trimming scores will be assumed to be 0.4998, "
-                            "the default value in previous versions of RSMTool. "
-                            "We recommend re-training the model to ensure future "
-                            "compatibility.")
+            self.logger.warning("The tolerance for trimming scores will be assumed to be 0.4998, "
+                                "the default value in previous versions of RSMTool. "
+                                "We recommend re-training the model to ensure future "
+                                "compatibility.")
 
         # now generate the predictions for the features using this model
         logged_str = 'Generating predictions'
         logged_str += ' (expected scores).' if predict_expected_scores else '.'
-        logging.info(logged_str)
+        self.logger.info(logged_str)
 
         # compute minimum and maximum score for expected predictions
         min_score = int(np.rint(trim_min - trim_tolerance))
@@ -2582,8 +2591,8 @@ class FeaturePreprocessor:
 
         extra_features = set(input_feature_columns).difference(required_features + ['spkitemid'])
         if extra_features:
-            logging.warning('The following extraneous features '
-                            'will be ignored: {}'.format(extra_features))
+            self.logger.warning("The following extraneous features "
+                                "will be ignored: {}".format(extra_features))
 
         # keep the required features plus the id
         features_to_keep = ['spkitemid'] + required_features
@@ -2597,7 +2606,7 @@ class FeaturePreprocessor:
         df_features = df_input[features_to_keep]
 
         # preprocess the feature values
-        logging.info('Pre-processing input features')
+        self.logger.info('Pre-processing input features')
 
         # first we need to filter out NaNs and any other
         # weird features, the same way we did for rsmtool.

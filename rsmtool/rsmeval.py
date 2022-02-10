@@ -28,7 +28,8 @@ from .writer import DataWriter
 
 def run_evaluation(config_file_or_obj_or_dict,
                    output_dir,
-                   overwrite_output=False):
+                   overwrite_output=False,
+                   logger=None):
     """
     Run an rsmeval experiment using the given configuration.
 
@@ -52,6 +53,9 @@ def run_evaluation(config_file_or_obj_or_dict,
     overwrite_output : bool, optional
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
 
     Raises
     ------
@@ -62,7 +66,7 @@ def run_evaluation(config_file_or_obj_or_dict,
         If ``output_dir`` already contains the output of a previous experiment
         and ``overwrite_output`` is ``False``.
     """
-    logger = logging.getLogger(__name__)
+    logger = logger if logger else logging.getLogger(__name__)
 
     # create the 'output' and the 'figure' sub-directories
     # where all the experiment output such as the CSV files
@@ -159,7 +163,7 @@ def run_evaluation(config_file_or_obj_or_dict,
     logger.info('Preprocessing predictions.')
 
     # Initialize the processor
-    processor = FeaturePreprocessor()
+    processor = FeaturePreprocessor(logger=logger)
 
     (processed_config,
      processed_container) = processor.process_data(configuration,
@@ -176,7 +180,7 @@ def run_evaluation(config_file_or_obj_or_dict,
                                    file_format=file_format)
 
     # Initialize the analyzer
-    analyzer = Analyzer()
+    analyzer = Analyzer(logger=logger)
 
     # do the data composition stats
     (analyzed_config,
@@ -201,7 +205,7 @@ def run_evaluation(config_file_or_obj_or_dict,
                                    file_format=file_format)
 
     # Initialize reporter
-    reporter = Reporter()
+    reporter = Reporter(logger=logger)
 
     # generate the report
     logger.info('Starting report generation.')

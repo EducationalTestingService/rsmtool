@@ -29,7 +29,8 @@ from .writer import DataWriter
 
 def run_experiment(config_file_or_obj_or_dict,
                    output_dir,
-                   overwrite_output=False):
+                   overwrite_output=False,
+                   logger=None):
     """
     Run an rsmtool experiment using the given configuration.
 
@@ -55,7 +56,10 @@ def run_experiment(config_file_or_obj_or_dict,
     overwrite_output : bool, optional
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
-
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
+    
     Raises
     ------
     FileNotFoundError
@@ -69,7 +73,7 @@ def run_experiment(config_file_or_obj_or_dict,
         ``output_dir`` already contains the output of a previous
         experiment that used a linear model with the same experiment ID.
     """
-    logger = logging.getLogger(__name__)
+    logger = logger if logger else logging.getLogger(__name__)
 
     # create the 'output' and the 'figure' sub-directories
     # where all the experiment output such as the CSV files
@@ -147,7 +151,7 @@ def run_experiment(config_file_or_obj_or_dict,
     logger.info('Preprocessing all features.')
 
     # Initialize the processor
-    processor = FeaturePreprocessor()
+    processor = FeaturePreprocessor(logger=logger)
 
     (processed_config,
      processed_container) = processor.process_data(configuration,
@@ -184,9 +188,9 @@ def run_experiment(config_file_or_obj_or_dict,
                                    file_format=file_format)
 
     # Initialize the analyzer
-    analyzer = Analyzer()
+    analyzer = Analyzer(logger=logger)
 
-    (analyzed_config,
+    (_,
      analyzed_container) = analyzer.run_data_composition_analyses_for_rsmtool(processed_container,
                                                                               processed_config)
 
@@ -198,7 +202,7 @@ def run_experiment(config_file_or_obj_or_dict,
     logger.info('Training {} model.'.format(processed_config['model_name']))
 
     # Initialize modeler
-    modeler = Modeler()
+    modeler = Modeler(logger=logger)
 
     modeler.train(processed_config,
                   processed_container,
@@ -237,7 +241,7 @@ def run_experiment(config_file_or_obj_or_dict,
 
     logger.info('Running analyses on training set.')
 
-    (train_analyzed_config,
+    (_,
      train_analyzed_container) = analyzer.run_training_analyses(processed_container,
                                                                 processed_config)
 
@@ -312,7 +316,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                    reset_index=True,
                                    file_format=file_format)
     # Initialize reporter
-    reporter = Reporter()
+    reporter = Reporter(logger=logger)
 
     # generate the report
     logger.info('Starting report generation.')

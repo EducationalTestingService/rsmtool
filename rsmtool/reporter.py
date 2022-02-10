@@ -141,6 +141,9 @@ notebook_path_dict = {'general': {'rsmtool': notebook_path,
 class Reporter:
     """Class to generate Jupyter notebook reports and convert them to HTML."""
 
+    def __init__(self, logger=None):
+        self.logger = logger if logger else logging.getLogger(__name__)
+
     @staticmethod
     def locate_custom_sections(custom_report_section_paths, configdir):
         """
@@ -598,8 +601,6 @@ class Reporter:
             If "test_file_location" or "pred_file_location" fields
             are not specified in the configuration.
         """
-        logger = logging.getLogger(__name__)
-
         test_file_location = config.get('test_file_location')
         if test_file_location is None:
             test_file_location = config.get('pred_file_location')
@@ -671,12 +672,12 @@ class Reporter:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        logger.info('Merging sections')
+        self.logger.info('Merging sections')
         self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        logger.info('Exporting HTML')
+        self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
                                    join(reportdir, '{}.html'.format(report_name)))
 
@@ -705,8 +706,6 @@ class Reporter:
         output_dir : str
             The output dir for the new report.
         """
-        logger = logging.getLogger(__name__)
-
         # whether to use scaled predictions for both new and old; default to false
         use_scaled_predictions_old = config.get('use_scaled_predictions_old', False)
         use_scaled_predictions_new = config.get('use_scaled_predictions_new', False)
@@ -741,12 +740,12 @@ class Reporter:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        logger.info('Merging sections')
+        self.logger.info('Merging sections')
         self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        logger.info('Exporting HTML')
+        self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
                                    join(output_dir, '{}.html'.format(report_name)))
 
@@ -766,8 +765,6 @@ class Reporter:
         csvdir : str
             The experiment CSV output directory.
         """
-        logger = logging.getLogger(__name__)
-
         environ_config = {'SUMMARY_ID': config['summary_id'],
                           'DESCRIPTION': config['description'],
                           'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
@@ -792,12 +789,12 @@ class Reporter:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        logger.info('Merging sections')
+        self.logger.info('Merging sections')
         self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        logger.info('Exporting HTML')
+        self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
                                    join(reportdir, '{}.html'.format(report_name)))
 

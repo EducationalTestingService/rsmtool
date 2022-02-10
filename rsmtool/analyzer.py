@@ -10,6 +10,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 
 import warnings
 from functools import partial
+import logging
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,9 @@ from .utils.prmse import get_true_score_evaluations
 
 class Analyzer:
     """Class to perform analysis on all metrics, predictions, etc."""
+
+    def __init__(self, logger=None):
+        self.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
     def check_frame_names(data_container, dataframe_names):

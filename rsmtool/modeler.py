@@ -35,9 +35,10 @@ class Modeler:
     Class to train model and generate predictions with built-in or SKLL models.
     """
 
-    def __init__(self):
-        """Instantiate an empty instance with no learner."""
+    def __init__(self, logger=None):
+        """Instantiate empty instance with no learner and given logger, if any."""
         self.learner = None
+        self.logger = logger if logger else logging.getLogger(__name__)
 
     @classmethod
     def load_from_file(cls, model_path):
@@ -238,11 +239,11 @@ class Modeler:
             else:
                 # exclude NA coefficients
                 if coefficient == np.nan:
-                    logging.warning("No coefficient was estimated for "
-                                    "{}. This is likely due to exact "
-                                    "collinearity in the model. This "
-                                    "feature will not be used for model "
-                                    "building".format(feature))
+                    self.logger.warning("No coefficient was estimated for "
+                                        "{}. This is likely due to exact "
+                                        "collinearity in the model. This "
+                                        "feature will not be used for model "
+                                        "building".format(feature))
                 else:
                     coefdict[feature] = coefficient
 
@@ -1319,7 +1320,7 @@ class Modeler:
         human_labels_mean = df_train['sc1'].mean()
         human_labels_sd = df_train['sc1'].std()
 
-        logging.info('Processing train set predictions.')
+        self.logger.info('Processing train set predictions.')
         df_train_predictions = FeaturePreprocessor.process_predictions(df_train_predictions,
                                                                        train_predictions_mean,
                                                                        train_predictions_sd,
@@ -1329,7 +1330,7 @@ class Modeler:
                                                                        trim_max,
                                                                        trim_tolerance)
 
-        logging.info('Processing test set predictions.')
+        self.logger.info('Processing test set predictions.')
         df_test_predictions = FeaturePreprocessor.process_predictions(df_test_predictions,
                                                                       train_predictions_mean,
                                                                       train_predictions_sd,

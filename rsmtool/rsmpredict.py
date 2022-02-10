@@ -27,7 +27,8 @@ from .writer import DataWriter
 
 def compute_and_save_predictions(config_file_or_obj_or_dict,
                                  output_file,
-                                 feats_file=None):
+                                 feats_file=None,
+                                 logger=None):
     """
     Run rsmpredict using the given configuration.
 
@@ -52,6 +53,9 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         The path to the output file.
     feats_file : str, optional
         Path to the output file for saving preprocessed feature values.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.        
 
     Raises
     ------
@@ -67,7 +71,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         If the name of the output file does not end in
         ".csv", ".tsv", or ".xlsx".
     """
-    logger = logging.getLogger(__name__)
+    logger = logger if logger else logging.getLogger(__name__)
 
     configuration = configure('rsmpredict', config_file_or_obj_or_dict)
 
@@ -150,7 +154,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     configuration['model'] = model
 
     # Initialize the processor
-    processor = FeaturePreprocessor()
+    processor = FeaturePreprocessor(logger=logger)
 
     (processed_config,
      processed_container) = processor.process_data(configuration,
@@ -240,7 +244,7 @@ def main():  # noqa: D103
     stderr_handler.setFormatter(formatter)
 
     # to set up the argument parser, we first need to instantiate options
-    # specific to rsmpredictso we use the `CmdOption` namedtuples
+    # specific to rsmpredict so we use the `CmdOption` namedtuples
     non_standard_options = [CmdOption(dest='output_file',
                                       help="output file where predictions will be saved."),
                             CmdOption(dest='preproc_feats_file',

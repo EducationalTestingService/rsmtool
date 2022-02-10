@@ -756,7 +756,6 @@ class ConfigurationGenerator:
 
     def _get_all_general_section_names(self):
 
-        reporter = Reporter()
         default_general_sections_value = DEFAULTS.get('general_sections', '')
         default_special_sections_value = DEFAULTS.get('special_sections', '')
         default_custom_sections_value = DEFAULTS.get('custom_sections', '')
@@ -765,11 +764,11 @@ class ConfigurationGenerator:
         # value so that the subgroup-based sections will be included in the
         # section list. This value is not actually used in configuration file.
         subgroups_value = ['GROUP'] if self.use_subgroups else DEFAULTS.get('subgroups', '')
-        return reporter.determine_chosen_sections(default_general_sections_value,
-                                                  default_special_sections_value,
-                                                  default_custom_sections_value,
-                                                  subgroups_value,
-                                                  context=self.context)
+        return Reporter().determine_chosen_sections(default_general_sections_value,
+                                                    default_special_sections_value,
+                                                    default_custom_sections_value,
+                                                    subgroups_value,
+                                                    context=self.context)
 
     def interact(self):
         """
