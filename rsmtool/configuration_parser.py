@@ -45,8 +45,8 @@ def configure(context, config_file_or_obj_or_dict):
     ----------
     context : str
         The context that is being configured. Must be one of
-        "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", or
-        "rsmpredict".
+        "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize",
+        "rsmpredict", or "rsmxval".
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
@@ -414,7 +414,9 @@ class Configuration:
         Parameters
         ----------
         output_dir : str
-            The path to the output directory.
+            The path to the output directory. If ``None``, the current
+            directory is used. 
+            Defaults to ``None``.
         """
         # save a copy of the main config into the output directory
         if output_dir is None:
@@ -793,7 +795,7 @@ class ConfigurationParser:
         context : str, optional
             Context of the tool in which we are validating. One of:
             {"rsmtool", "rsmeval", "rsmpredict", "rsmcompare",
-            "rsmsummarize"}.
+            "rsmsummarize", "rsmxval"}.
             Defaults to "rsmtool".
 
         Returns
