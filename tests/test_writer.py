@@ -1,9 +1,12 @@
+from itertools import product
 import os
+from pathlib import Path
 from shutil import rmtree
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import pandas as pd
-from nose.tools import raises
+from nose.tools import ok_, raises
 from pandas.testing import assert_frame_equal
 from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
@@ -11,6 +14,59 @@ from rsmtool.writer import DataWriter
 
 class TestDataWriter:
 
+    def check_write_frame_to_file(self, file_format, include_index):
+
+        # create a dummy data frame for testing
+        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)), 
+                                   columns=['A', 'B', 'C'])
+        
+        # create a temporary directory where the file will be written
+        tempdir = TemporaryDirectory()
+                
+        # create a name prefix for the frame
+        name_prefix = Path(tempdir.name) / "test_frame"
+
+        # write the frame to disk
+        DataWriter.write_frame_to_file(df_to_write,
+                                       str(name_prefix),
+                                       file_format=file_format,
+                                       index=include_index)
+
+        # check that the file was written to disk
+        dir_listing = os.listdir(tempdir.name)
+        assert f"test_frame.{file_format}" in dir_listing
+
+        # read the file and check that the frame was written as expected
+        if file_format == "csv":
+            df_written = pd.read_csv(f"{name_prefix}.{file_format}")
+        elif file_format == "tsv":
+            df_written = pd.read_csv(f"{name_prefix}.{file_format}", sep="\t")
+        elif file_format == "xlsx":
+            df_written = pd.read_excel(f"{name_prefix}.{file_format}")
+        else:
+            df_written = pd.read_json(f"{name_prefix}.{file_format}", 
+                                      orient="records",
+                                      lines=True)
+
+        # check that the index is there if it's supposed to be
+        if include_index and file_format in ["csv", "tsv", "xlsx"]:
+            ok_("Unnamed: 0" in df_written.columns)
+        
+        # check that the data is the same
+        df_written = df_written[["A", "B", "C"]]
+        assert_frame_equal(df_to_write, df_written)
+
+        # clean up the temporary directory
+        tempdir.cleanup()
+
+    def test_write_frame_to_file(self):
+
+        for (file_format,
+             include_index) in product(["csv", "tsv", "xlsx", "jsonlines"], 
+                                       [False, True]):
+
+            yield self.check_write_frame_to_file, file_format, include_index
+                
     def test_data_container_save_files(self):
 
         data_sets = [{'name': 'dataset1', 'frame': pd.DataFrame(np.random.normal(size=(100, 2)),
