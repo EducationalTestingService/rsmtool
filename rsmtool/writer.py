@@ -53,11 +53,11 @@ class DataWriter:
             name_prefix += '.tsv'
             df.to_csv(name_prefix, index=index, sep='\t', **kwargs)
 
-        # Added JSON for experimental purposes, but leaving
+        # Added jsonlines for experimental purposes, but leaving
         # this out of the documentation at this stage
-        elif file_format == 'json':
-            name_prefix += '.json'
-            df.to_json(name_prefix, orient='records', **kwargs)
+        elif file_format == 'jsonlines':
+            name_prefix += '.jsonlines'
+            df.to_json(name_prefix, orient='records', lines=True, **kwargs)
 
         elif file_format == 'xlsx':
             name_prefix += '.xlsx'
