@@ -80,9 +80,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                container,
@@ -95,13 +95,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'), 
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
@@ -118,9 +120,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                data_sets,
@@ -133,13 +135,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
 
         assert_frame_equal(data_sets['dataset1'], aaa_json)
         assert_frame_equal(data_sets['dataset1'], ds_1_csv)
@@ -176,9 +180,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter('test')
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                container,
@@ -191,13 +195,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'test_aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'test_aaa.jsonlines'),
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'test_dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'test_dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['test_aaa.json',
+        assert sorted(output_dir) == sorted(['test_aaa.jsonlines',
                                              'test_dataset1.csv',
                                              'test_dataset1.xlsx'])
 
