@@ -103,28 +103,34 @@ def run_cross_validation(config_file_or_obj_or_dict,
     with open(Path(output_dir) / "rsmxval.json", "w") as outfh:
         outfh.write(str(configuration))
 
-    # check if an explicit folds file is provided
+    # create any cross-validation related files that are needed and
+    # get the final number of folds that are to be used
     num_folds = create_xval_files(configuration, output_dir, logger=logger)
     
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
     with tqdm_joblib(tqdm(desc="Progress", total=num_folds)):
-        Parallel(n_jobs=num_folds)(delayed(process_fold)(fold_num, foldsdir) for fold_num in range(1, num_folds + 1))
+        Parallel(n_jobs=num_folds)(delayed(process_fold)(fold_num, foldsdir)
+                                   for fold_num in range(1, num_folds + 1))
 
     # generate an rsmsummarize configuration file
     logger.info("Creating fold summary")
     given_file_format = configuration.get("file_format")
     fold_summary_configdict = {
         "summary_id": f"{configuration['experiment_id']}_fold_summary",
-        "experiment_dirs": [f"{foldsdir}/{fold_num:02}" for fold_num in range(1, num_folds + 1)],
+        "experiment_dirs": [f"{foldsdir}/{fold_num:02}" 
+                            for fold_num in range(1, num_folds + 1)],
         "description": f"{configuration['description']} (Fold Summary)",
         "file_format": given_file_format,
         "use_thumbnails": f"{configuration['use_thumbnails']}"
     }
-    fold_summary_configuration = Configuration(fold_summary_configdict, configdir=summarydir, context="rsmsummarize")
+    fold_summary_configuration = Configuration(fold_summary_configdict, 
+                                               configdir=summarydir,
+                                               context="rsmsummarize")
 
     # run rsmsummarize on all of the fold directories
-    summary_logger = get_file_logger("fold-summary", Path(summarydir) / "rsmsummarize.log")
+    summary_logger = get_file_logger("fold-summary",
+                                     Path(summarydir) / "rsmsummarize.log")
     run_summary(fold_summary_configuration, summarydir, False, logger=summary_logger)
 
     # combine all of the fold prediction files for evaluation
@@ -163,7 +169,9 @@ def run_cross_validation(config_file_or_obj_or_dict,
         evaluation_configdict[field_name] = configuration[field_name]
 
     # create an rsmeval configuration object with this dictionary
-    evaluation_configuration = Configuration(evaluation_configdict, configdir=evaldir, context="rsmeval")
+    evaluation_configuration = Configuration(evaluation_configdict,
+                                             configdir=evaldir,
+                                             context="rsmeval")
 
     # run rsmeval on the combined predictions file
     logger.info("Evaluating combined fold predictions")
