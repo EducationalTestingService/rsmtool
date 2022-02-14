@@ -1,25 +1,28 @@
 import argparse
-import os
-import tempfile
-import warnings
+import filecmp
 from io import StringIO
 from itertools import count, product
-from os import getcwd, listdir, unlink
+from os import environ, getcwd, listdir, makedirs, unlink
 from os.path import abspath, join, relpath
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from pathlib import Path
+from shutil import rmtree
+from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
 from unittest.mock import patch
+import warnings
 
 import numpy as np
 import pandas as pd
 from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 from pandas.testing import assert_frame_equal
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
-from rsmtool.configuration_parser import Configuration
+from rsmtool.configuration_parser import Configuration, ConfigurationParser
+from rsmtool.reader import DataReader
 from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
 from rsmtool.utils.conversion import convert_to_float, int_to_float
+from rsmtool.utils.cross_validation import create_xval_files
 from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
 from rsmtool.utils.logging import get_file_logger
 from rsmtool.utils.metrics import (compute_expected_scores_from_model,
@@ -44,7 +47,7 @@ from skll.metrics import kappa
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
-TEST_DIR = os.environ.get('TESTDIR', None)
+TEST_DIR = environ.get('TESTDIR', None)
 if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
@@ -149,7 +152,7 @@ def test_parse_json_with_comments_no_comments():
 
 
 def check_parse_json_with_comments(test_json_string, expected_result):
-    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
+    tempf = NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
     filename = tempf.name
     tempf.write(test_json_string)
     tempf.close()
