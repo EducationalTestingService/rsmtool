@@ -615,6 +615,168 @@ class TestLogging:
         unlink(tempfile.name)
 
 
+class TestCrossValidation:
+
+    def check_create_xval_files(self, file_format, with_folds_file, with_feature_subset):
+        """
+        Check that ``create_xval_files()`` functions as expected.
+        
+        Parameters
+        ----------
+        file_format : str
+            The file format to test.
+        with_folds_file : bool
+            Whether to use a pre-specified folds file for testing.
+        with_feature_subset : bool
+            Whether to use feature subset information for testing.
+        """
+        # create an rsmxval configuration dictionary
+        rsmxval_config_dict = {
+            "train_file": join(rsmtool_test_dir,
+                               "data",
+                               "files", 
+                               f"train.{file_format}"),
+            "file_format": file_format,
+            "id_column": "ID",
+            "model": "LinearRegression",
+            "train_label_column": "score",
+            "experiment_id": "test_create_xval_files",
+            "description": "Test Create Xval Files"
+        }
+
+        # use a folds file if asked, otherwise a fixed number of folds
+        if with_folds_file:
+            rsmxval_config_dict["folds_file"] = join(rsmtool_test_dir,
+                                                     "data",
+                                                     "files",
+                                                     "folds.csv")
+        else:        
+            rsmxval_config_dict["num_folds"] = 7
+        
+        # use a feature subset if asked
+        if with_feature_subset:
+            rsmxval_config_dict["feature_subset_file"] = join(rsmtool_test_dir, 
+                                                              "data",
+                                                              "experiments",
+                                                              "lr-with-feature-subset-file-and-feature-file",
+                                                              "feature_file.csv")
+            rsmxval_config_dict["feature_subset"] = "subset1"
+        else:
+            rsmxval_config_dict["features"] = join(rsmtool_test_dir, 
+                                                   "data",
+                                                   "experiments",
+                                                   "lr",
+                                                   "features.csv")
+        
+        # create configuration object from dictionary
+        rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
+
+        # read the original training data file
+        df_full_train = DataReader.read_from_file(rsmxval_config.get("train_file"))
+
+        # create a temporary output directory and any sub-directories
+        # that are needed by the ``create_xval_files()`` function
+        output_dir = mkdtemp(prefix="/tmp/")
+        foldsdir = Path(output_dir) / "folds"
+        modeldir = Path(output_dir) / "final-model"
+        makedirs(foldsdir)
+        makedirs(modeldir)
+
+        # call the function
+        expected_num_folds = create_xval_files(rsmxval_config, output_dir)
+        
+        # check that there are only the expected number of fold subdirectories
+        actual_foldsdir_contents = sorted(listdir(foldsdir))
+        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_num_folds + 1)]
+        eq_(actual_foldsdir_contents, expected_foldsdir_contents)
+
+        # check all the per-fold files/directories
+        for fold_subdir in foldsdir.iterdir():
+            
+            # (a) per-fold subdirectories and configuration files
+            fold_num = fold_subdir.name
+            fold_config = fold_subdir / "rsmtool.json"
+            ok_(fold_subdir.exists() and fold_subdir.is_dir())
+            ok_(fold_config.exists() and fold_config.is_file())
+
+            # (b) per-fold train/test files exist and are subsets of
+            #     the original full training file
+            fold_train_file = fold_subdir / f"train.{file_format}"
+            fold_test_file = fold_subdir / f"test.{file_format}"
+            ok_(fold_train_file.exists() and fold_train_file.is_file())
+            ok_(fold_test_file.exists() and fold_test_file.is_file())
+            df_train = DataReader.read_from_file(fold_train_file)
+            df_test = DataReader.read_from_file(fold_test_file)
+            eq_(len(df_full_train), len(df_train) + len(df_test))
+            id_column = rsmxval_config.get("id_column")
+            assert_array_equal(df_full_train[id_column].values.sort(),
+                               np.concatenate([df_train[id_column].values,
+                                               df_test[id_column].values]).sort())
+
+            # (c) configuration file fields
+            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
+
+            eq_(Path(parsed_fold_config.get("train_file")).relative_to("/tmp"),
+                fold_train_file.relative_to("/tmp"))
+
+            eq_(Path(parsed_fold_config.get("test_file")).relative_to("/tmp"),
+                fold_test_file.relative_to("/tmp"))
+
+            eq_(parsed_fold_config.get("id_column"),
+                rsmxval_config.get("id_column"))
+
+            eq_(parsed_fold_config.get("id_column"),
+                rsmxval_config.get("id_column"))
+
+            eq_(parsed_fold_config.get("train_label_column"),
+                rsmxval_config.get("train_label_column"))
+
+            eq_(parsed_fold_config.get("test_label_column"),
+                rsmxval_config.get("train_label_column"))
+
+            eq_(parsed_fold_config.get("file_format"),
+                rsmxval_config.get("file_format"))
+
+            eq_(parsed_fold_config.get("features"),
+                rsmxval_config.get("features"))
+
+            eq_(parsed_fold_config.get("experiment_id"),
+                f"{rsmxval_config.get('experiment_id')}_fold{fold_num}")
+
+            eq_(parsed_fold_config.get("description"),
+                f"{rsmxval_config.get('description')} (Fold {fold_num})")
+
+            # (d) the per-fold features or feature subset files
+            if with_feature_subset:
+                subset_file = fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
+                subset_name = rsmxval_config.get("feature_subset")
+                ok_(subset_file.exists() and subset_file.is_file())
+                eq_(parsed_fold_config.get("feature_subset"), subset_name)
+                ok_(filecmp.cmp(subset_file, rsmxval_config.get("feature_subset_file")))
+            else:
+                fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
+                ok_(fold_feature_file.exists() and fold_feature_file.is_file())
+                ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
+
+        # (e) the dummy test file for the final model
+        dummy_test_file = modeldir / f"dummy_test.{file_format}"
+        ok_(dummy_test_file.exists() and dummy_test_file.is_file())
+
+        # remove the entire output directory tree
+        rmtree(output_dir)
+
+    def test_create_xval_files(self):
+        for (file_format,
+             with_folds_file,
+             with_feature_subset) in product(["csv", "tsv", "xlsx"],
+                                             [False, True],
+                                             [False, True]):
+            yield (self.check_create_xval_files,
+                   file_format,
+                   with_folds_file,
+                   with_feature_subset)
+
+
 class TestIntermediateFiles:
 
     def get_files(self, file_format='csv'):
