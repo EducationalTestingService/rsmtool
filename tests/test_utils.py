@@ -21,6 +21,7 @@ from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, Interac
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
 from rsmtool.utils.conversion import convert_to_float, int_to_float
 from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
+from rsmtool.utils.logging import get_file_logger
 from rsmtool.utils.metrics import (compute_expected_scores_from_model,
                                    difference_of_standardized_means,
                                    partial_correlations,
@@ -593,6 +594,25 @@ def test_partial_correlations_pinv():
         warnings.simplefilter("always")
         partial_correlations(df_small_det)
         eq_(str(wrn[-1].message), msg)
+
+
+class TestLogging:
+
+    def test_get_file_logger(self):
+
+        # create a temporary file and logger based on that file
+        tempfile = NamedTemporaryFile(suffix=".log", delete=False)
+        test_logger = get_file_logger("testing", tempfile.name)
+        
+        # log message to that file
+        test_logger.info("This is a test.")
+
+        # check that the message was indeed written
+        with open(tempfile.name, "r") as tempfh:
+            ok_(tempfh.read().strip(), "This is a test.")
+
+        # remove temporary file
+        unlink(tempfile.name)
 
 
 class TestIntermediateFiles:
