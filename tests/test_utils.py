@@ -679,7 +679,7 @@ class TestCrossValidation:
 
         # create a temporary output directory and any sub-directories
         # that are needed by the ``create_xval_files()`` function
-        output_dir = mkdtemp(prefix="/tmp/")
+        output_dir = mkdtemp()
         foldsdir = Path(output_dir) / "folds"
         modeldir = Path(output_dir) / "final-model"
         makedirs(foldsdir)
@@ -719,11 +719,9 @@ class TestCrossValidation:
             # (c) configuration file fields
             parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
 
-            eq_(Path(parsed_fold_config.get("train_file")).relative_to("/tmp"),
-                fold_train_file.relative_to("/tmp"))
+            eq_(Path(parsed_fold_config.get("train_file")), fold_train_file)
 
-            eq_(Path(parsed_fold_config.get("test_file")).relative_to("/tmp"),
-                fold_test_file.relative_to("/tmp"))
+            eq_(Path(parsed_fold_config.get("test_file")), fold_test_file)
 
             eq_(parsed_fold_config.get("id_column"),
                 rsmxval_config.get("id_column"))
