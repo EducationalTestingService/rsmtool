@@ -8,6 +8,7 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
 from unittest.mock import patch
+from uuid import uuid4
 import warnings
 
 import numpy as np
@@ -601,21 +602,31 @@ def test_partial_correlations_pinv():
 
 class TestLogging:
 
+    def setUp(self):
+        # create a log file with a random name
+        logname = str(uuid4())
+        self.logpath = Path(rsmtool_test_dir) / f"{logname}.log"
+
+    def tearDown(self):
+        try:
+            unlink(self.logpath)
+        except PermissionError:
+            pass  # sometimes Azure has trouble deleting this file
+
     def test_get_file_logger(self):
 
-        # create a temporary file and logger based on that file
-        tempfile = NamedTemporaryFile(suffix=".log", delete=False)
-        test_logger = get_file_logger("testing", tempfile.name)
+        # create a logger based on our dummy log file
+        test_logger = get_file_logger("testing", self.logpath)
         
         # log message to that file
         test_logger.info("This is a test.")
 
-        # check that the message was indeed written
-        with open(tempfile.name, "r") as tempfh:
-            ok_(tempfh.read().strip(), "This is a test.")
+        # delete the logger
+        del test_logger
 
-        # remove temporary file
-        unlink(tempfile.name)
+        # check that the message was indeed written
+        with open(self.logpath, "r") as tempfh:
+            ok_(tempfh.read().strip(), "This is a test.")
 
 
 class TestCrossValidation:
