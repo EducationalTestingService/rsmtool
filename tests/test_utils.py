@@ -23,7 +23,7 @@ from rsmtool.reader import DataReader
 from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
 from rsmtool.utils.conversion import convert_to_float, int_to_float
-from rsmtool.utils.cross_validation import create_xval_files
+from rsmtool.utils.cross_validation import combine_fold_prediction_files, create_xval_files
 from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
 from rsmtool.utils.logging import get_file_logger
 from rsmtool.utils.metrics import (compute_expected_scores_from_model,
@@ -45,6 +45,8 @@ from sklearn.metrics import cohen_kappa_score
 from skll.data import FeatureSet
 from skll.learner import Learner
 from skll.metrics import kappa
+
+from rsmtool.writer import DataWriter
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -638,7 +640,7 @@ class TestCrossValidation:
         Parameters
         ----------
         file_format : str
-            The file format to test.
+            File format to use for testing. One of {"csv", "tsv", "xlsx"}.
         with_folds_file : bool
             Whether to use a pre-specified folds file for testing.
         with_feature_subset : bool
@@ -787,6 +789,66 @@ class TestCrossValidation:
                    file_format,
                    with_folds_file,
                    with_feature_subset)
+
+    def check_combine_fold_prediction_files(self, file_format):
+        """
+        Check that ``combine_fold_prediction_files()`` functions as expected.
+        
+        Parameters
+        ----------
+        file_format : str
+            File format to use for testing. One of {"csv", "tsv", "xlsx"}.
+        """
+        # create a temporary output directory and any sub-directories
+        # that are needed by the ``combine_fold_prediction_files()`` function
+        output_dir = mkdtemp()
+        foldsdir = Path(output_dir) / "folds"
+        makedirs(foldsdir)
+
+        # create 3 sub-directories simulating 3-fold cross-validation
+        makedirs(foldsdir / "01")
+        makedirs(foldsdir / "02")
+        makedirs(foldsdir / "03")
+
+        # create prediction files in each of the fold sub-directories
+        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+                                      columns=['raw', 'scale'])
+        df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
+        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+                                      columns=['raw', 'scale'])
+        df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
+        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+                                      columns=['raw', 'scale'])
+        df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
+
+        # combine each of the frames in memory
+        df_combined_expected = pd.concat([df_preds_fold1,
+                                          df_preds_fold2,
+                                          df_preds_fold3], keys="spkitemid")
+
+        DataWriter.write_frame_to_file(df_preds_fold1, 
+                                       str(foldsdir / "01" / "pred_processed"),
+                                       file_format=file_format)
+        DataWriter.write_frame_to_file(df_preds_fold2, 
+                                       str(foldsdir / "02" / "pred_processed"),
+                                       file_format=file_format)
+        DataWriter.write_frame_to_file(df_preds_fold3, 
+                                       str(foldsdir / "03" / "pred_processed"),
+                                       file_format=file_format)
+
+        # now call `combine_fold_prediction_files` and check that its output
+        # matches the frame that we manually combined
+        df_combined_actual = combine_fold_prediction_files(str(foldsdir), file_format)
+        assert_frame_equal(df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True), 
+                           df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True))
+
+        # delete the temporary directory and all sub-directories
+        rmtree(output_dir)
+
+    def test_combine_fold_prediction_files(self):
+        yield self.check_combine_fold_prediction_files, "csv"
+        yield self.check_combine_fold_prediction_files, "tsv"
+        yield self.check_combine_fold_prediction_files, "xlsx"
 
 
 class TestIntermediateFiles:
