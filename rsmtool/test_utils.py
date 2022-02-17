@@ -128,7 +128,7 @@ def check_run_experiment(source,
     check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
 
     if not skll:
-        check_scaled_coefficients(source, experiment_id, file_format=file_format)
+        check_scaled_coefficients(output_dir, experiment_id, file_format=file_format)
 
     if subgroups:
         check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
@@ -817,39 +817,31 @@ def check_report(html_file,
         assert_equal(report_warnings, 0)
 
 
-def check_scaled_coefficients(source, experiment_id, file_format='csv'):
+def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
     """
     Check that predictions using scaled coefficients match scaled scores.
-
+    
     Parameters
     ----------
-    source : str
-        Path to the source directory on disk.
+    output_dir : str
+         Path to the experiment output directory for a test.
     experiment_id : str
         The experiment ID.
     file_format : str, optional
         The format of the output files.
         Defaults to "csv".
-    """
-    preprocessed_test_file = join('test_outputs',
-                                  source,
-                                  'output',
+        """
+    preprocessed_test_file = join(output_dir,
                                   '{}_test_preprocessed_features.{}'.format(experiment_id,
                                                                             file_format))
-    scaled_coefficients_file = join('test_outputs',
-                                    source,
-                                    'output',
+    scaled_coefficients_file = join(output_dir,
                                     '{}_coefficients_scaled.{}'.format(experiment_id,
                                                                        file_format))
-    predictions_file = join('test_outputs',
-                            source,
-                            'output',
+    predictions_file = join(output_dir,
                             '{}_pred_processed.{}'.format(experiment_id,
                                                           file_format))
 
-    postprocessing_params_file = join('test_outputs',
-                                      source,
-                                      'output',
+    postprocessing_params_file = join(output_dir,
                                       '{}_postprocessing_params.{}'.format(experiment_id,
                                                                            file_format))
 
