@@ -66,6 +66,11 @@ def run_cross_validation(config_file_or_obj_or_dict,
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
+    silence_tqdm : bool, optional
+        Whether to silence the progress bar that is shown when running
+        rsmtool for each fold. This option should only be used when
+        running the unit tests.
+        Defaults to ``False``.
     
     Raises
     ------
@@ -109,7 +114,7 @@ def run_cross_validation(config_file_or_obj_or_dict,
     
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
-    with tqdm_joblib(tqdm(desc="Progress", total=num_folds)):
+    with tqdm_joblib(tqdm(desc="Progress", total=num_folds, disable=silence_tqdm)):
         Parallel(n_jobs=num_folds)(delayed(process_fold)(fold_num, foldsdir)
                                    for fold_num in range(1, num_folds + 1))
 
