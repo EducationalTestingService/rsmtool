@@ -35,6 +35,8 @@ def create_xval_files(configuration, output_dir, logger=None):
     
     Returns
     -------
+    df_train : pandas DataFrame
+        DataFrame containing the raw training data file.
     num_folds : int
         The number of folds for which the files were created.
     
@@ -86,7 +88,8 @@ def create_xval_files(configuration, output_dir, logger=None):
                                    index=False)
 
     # read the folds file if it exists, otherwise use specified number of folds
-    if "folds_file" in located_filepaths and Path(located_filepaths["folds_file"]).exists():
+    folds_file = located_filepaths.get("folds_file")
+    if folds_file and Path(folds_file).exists():
         cv_folds = load_cv_folds(located_filepaths["folds_file"])
         num_folds = len(set(cv_folds.values()))
         logger.info(f"Using {num_folds} folds specified in {located_filepaths['folds_file']}")
@@ -101,6 +104,11 @@ def create_xval_files(configuration, output_dir, logger=None):
             fold_groups = [cv_folds[train_id] for train_id in train_ids.values]
             fold_generator = logo.split(range(len(df_train)), y=None, groups=fold_groups)
     else:
+        # if we are in this code path but the configuration did 
+        # specify "folds_file", then we must not have found the file
+        # so raise a warning to that effect
+        if configuration.get("folds_file"):
+            logging.warning("Specified folds file not found. Ignoring.")
         num_folds = configuration.get("num_folds")
         logger.info(f"Generating {num_folds} folds after shuffling")
         kfold = KFold(n_splits=num_folds, random_state=1234567890, shuffle=True)
@@ -159,7 +167,7 @@ def create_xval_files(configuration, output_dir, logger=None):
             if filepath := located_filepaths.get(filename):
                 copyfile(filepath, this_fold_dir / Path(filepath).name)
         
-    return num_folds
+    return df_train, num_folds
 
 
 def process_fold(fold_num, foldsdir):
