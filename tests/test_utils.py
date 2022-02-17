@@ -688,7 +688,7 @@ class TestCrossValidation:
         rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
 
         # read the original training data file
-        df_full_train = DataReader.read_from_file(rsmxval_config.get("train_file"))
+        df_train_expected = DataReader.read_from_file(rsmxval_config.get("train_file"))
 
         # create a temporary output directory and any sub-directories
         # that are needed by the ``create_xval_files()`` function
@@ -699,7 +699,10 @@ class TestCrossValidation:
         makedirs(modeldir)
 
         # call the function
-        expected_num_folds = create_xval_files(rsmxval_config, output_dir)
+        df_train_actual, expected_num_folds = create_xval_files(rsmxval_config, output_dir)
+
+        # check that the training data frame is as expected
+        assert_frame_equal(df_train_actual, df_train_expected)
         
         # check that there are only the expected number of fold subdirectories
         actual_foldsdir_contents = sorted(listdir(foldsdir))
@@ -721,13 +724,13 @@ class TestCrossValidation:
             fold_test_file = fold_subdir / f"test.{file_format}"
             ok_(fold_train_file.exists() and fold_train_file.is_file())
             ok_(fold_test_file.exists() and fold_test_file.is_file())
-            df_train = DataReader.read_from_file(fold_train_file)
-            df_test = DataReader.read_from_file(fold_test_file)
-            eq_(len(df_full_train), len(df_train) + len(df_test))
+            df_train_actual_fold = DataReader.read_from_file(fold_train_file)
+            df_test_actual_fold = DataReader.read_from_file(fold_test_file)
+            eq_(len(df_train_expected), len(df_train_actual_fold) + len(df_test_actual_fold))
             id_column = rsmxval_config.get("id_column")
-            assert_array_equal(df_full_train[id_column].values.sort(),
-                               np.concatenate([df_train[id_column].values,
-                                               df_test[id_column].values]).sort())
+            assert_array_equal(df_train_expected[id_column].values.sort(),
+                               np.concatenate([df_train_actual_fold[id_column].values,
+                                               df_test_actual_fold[id_column].values]).sort())
 
             # (c) configuration file fields
             parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
