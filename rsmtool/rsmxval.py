@@ -46,9 +46,18 @@ from .utils.cross_validation import combine_fold_prediction_files, create_xval_f
 from .utils.logging import LogFormatter, tqdm_joblib, get_file_logger
 from .writer import DataWriter
 
+# a constant defining all of the sections we can use when
+# generating the final model report in the last stage
+FINAL_MODEL_SECTION_LIST = ['feature_descriptives',
+                            'features_by_group',
+                            'preprocessed_features',
+                            'dff_by_group',
+                            'model',
+                            'intermediate_file_paths',
+                            'sysinfo']
 
-def run_cross_validation(config_file_or_obj_or_dict,
-                         output_dir):
+
+def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=False):
     """
     Run cross-validation experiment.
     
@@ -109,8 +118,9 @@ def run_cross_validation(config_file_or_obj_or_dict,
         outfh.write(str(configuration))
 
     # create any cross-validation related files that are needed and
-    # get the final number of folds that are to be used
-    num_folds = create_xval_files(configuration, output_dir, logger=logger)
+    # get a data frame containing the training set and the final 
+    # number of folds that are to be used in the experiment
+    df_train, num_folds = create_xval_files(configuration, output_dir, logger=logger)
     
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
@@ -140,6 +150,25 @@ def run_cross_validation(config_file_or_obj_or_dict,
 
     # combine all of the fold prediction files for evaluation
     df_predictions = combine_fold_prediction_files(foldsdir, given_file_format)
+
+    # if there were subgroups and a second human score column specified, then 
+    # we need to add those to the combined predictions file as well
+    id_column = configuration["id_column"]
+    columns_to_use = [id_column]
+    if subgroups := configuration["subgroups"]:
+        columns_to_use.extend(subgroups)
+    if second_human_score_column := configuration["second_human_score_column"]:
+        columns_to_use.append(second_human_score_column)
+    if len(columns_to_use) > 1:
+        df_to_add = df_train[columns_to_use]
+        df_predictions = df_predictions.merge(df_to_add, 
+                                              left_on="spkitemid",
+                                              right_on=id_column)
+        # drop any extra ID column if we have added one
+        if id_column != "spkitemid":
+            df_predictions.drop(id_column, axis=1, inplace=True)
+
+    # write out the predictions file to disk
     predictions_file_prefix = str(Path(evaldir) / "xval_predictions")
     DataWriter.write_frame_to_file(df_predictions,
                                    predictions_file_prefix,
@@ -189,15 +218,17 @@ def run_cross_validation(config_file_or_obj_or_dict,
     logger.info("Training model on full data")
     model_logger = get_file_logger("final_model", Path(modeldir) / "rsmtool.log")
     final_rsmtool_configdict = configuration.to_dict().copy()
+    final_rsmtool_configdict["experiment_id"] = f"{configuration['experiment_id']}_model"
     final_rsmtool_configdict["test_file"] = str(Path(modeldir) / f"dummy_test.{given_file_format}")
     final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict["train_label_column"]
-    final_rsmtool_configdict["general_sections"] = [
-        "feature_descriptives",
-        "preprocessed_features",
-        "model",
-        "intermediate_file_paths",
-        "sysinfo"
-    ]
+    
+    # remove by-group sections if we don't have the info
+    sections_to_use = []
+    for section in FINAL_MODEL_SECTION_LIST:
+        if section.endswith("_by_group") and not subgroups:
+            continue
+        sections_to_use.append(section)
+    final_rsmtool_configdict["general_sections"] = sections_to_use
     final_rsmtool_configuration = Configuration(final_rsmtool_configdict, 
                                                 configdir=configuration.configdir,
                                                 context="rsmtool")
