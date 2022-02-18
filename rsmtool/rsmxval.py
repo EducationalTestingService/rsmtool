@@ -292,7 +292,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        generator = ConfigurationGenerator('rsmtool',
+        generator = ConfigurationGenerator('rsmxval',
                                            as_string=True,
                                            suppress_warnings=args.quiet,
                                            use_subgroups=args.subgroups)
