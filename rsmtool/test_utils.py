@@ -434,7 +434,7 @@ def check_run_summary(source,
 
 def check_run_cross_validation(source,
                                experiment_id,
-                               num_folds=5,
+                               folds=5,
                                subgroups=None,
                                consistency=False,
                                skll=False,
@@ -452,7 +452,7 @@ def check_run_cross_validation(source,
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    num_folds : int, optional
+    folds : int, optional
         Number of folds being used in the cross-validation experiment.
         Defaults to 5.
     subgroups : list of str, optional
@@ -512,7 +512,7 @@ def check_run_cross_validation(source,
     # first check that each fold's rsmtool output is as expected
     actual_folds_dir = join(output_prefix, 'folds')
     expected_folds_dir = join(expected_output_prefix, 'folds')
-    for fold_num in range(1, num_folds + 1):
+    for fold_num in range(1, folds + 1):
         fold_experiment_id = f"{experiment_id}_fold{fold_num:02}"
         fold_output_dir = join(actual_folds_dir, f'{fold_num:02}', 'output')
         fold_output_files = glob(join(fold_output_dir, f'*.{file_format}'))

@@ -9,7 +9,7 @@
     "model": "LinearRegression",
     "experiment_id": "lr_xval_consistency",
     "description": "Cross-validation with two human scores & subgroups using a LinearRegression model.",
-    "num_folds": 3,
+    "folds": 3,
     "subgroups": "L1",
     "second_human_score_column": "score2"
 }

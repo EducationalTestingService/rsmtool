@@ -9,6 +9,6 @@
     "model": "LinearRegression",
     "experiment_id": "lr_xval_subgroups",
     "description": "Cross-validation with subgroups using a LinearRegression model.",
-    "num_folds": 3,
+    "folds": 3,
     "subgroups": "QUESTION, L1"
 }

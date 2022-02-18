@@ -9,6 +9,6 @@
     "model": "LinearRegression",
     "experiment_id": "lr_xval_xlsx",
     "description": "Cross-validation in XLSX format using a LinearRegression model.",
-    "num_folds": 3,
+    "folds": 3,
     "file_format": "xlsx"
 }

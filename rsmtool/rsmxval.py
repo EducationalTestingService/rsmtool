@@ -120,13 +120,13 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     # create any cross-validation related files that are needed and
     # get a data frame containing the training set and the final 
     # number of folds that are to be used in the experiment
-    df_train, num_folds = create_xval_files(configuration, output_dir, logger=logger)
+    df_train, folds = create_xval_files(configuration, output_dir, logger=logger)
     
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
-    with tqdm_joblib(tqdm(desc="Progress", total=num_folds, disable=silence_tqdm)):
-        Parallel(n_jobs=num_folds)(delayed(process_fold)(fold_num, foldsdir)
-                                   for fold_num in range(1, num_folds + 1))
+    with tqdm_joblib(tqdm(desc="Progress", total=folds, disable=silence_tqdm)):
+        Parallel(n_jobs=folds)(delayed(process_fold)(fold_num, foldsdir)
+                               for fold_num in range(1, folds + 1))
 
     # generate an rsmsummarize configuration file
     logger.info("Creating fold summary")
@@ -134,7 +134,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     fold_summary_configdict = {
         "summary_id": f"{configuration['experiment_id']}_fold_summary",
         "experiment_dirs": [f"{foldsdir}/{fold_num:02}" 
-                            for fold_num in range(1, num_folds + 1)],
+                            for fold_num in range(1, folds + 1)],
         "description": f"{configuration['description']} (Fold Summary)",
         "file_format": given_file_format,
         "use_thumbnails": f"{configuration['use_thumbnails']}"

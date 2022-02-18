@@ -53,7 +53,7 @@ DEFAULTS = {'id_column': 'spkitemid',
             'min_items_per_candidate': None,
             'experiment_names': None,
             'folds_file': None,
-            'num_folds': 5}
+            'folds': 5}
 
 LIST_FIELDS = ['general_sections',
                'special_sections',
@@ -115,7 +115,7 @@ CHECK_FIELDS = {'rsmtool': {'required': ['experiment_id',
                                          'model',
                                          'train_file'],
                             'optional': ['description',
-                                         'num_folds',
+                                         'folds',
                                          'folds_file',
                                          'features',
                                          'feature_subset_file',

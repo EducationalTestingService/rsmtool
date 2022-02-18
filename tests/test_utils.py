@@ -667,7 +667,7 @@ class TestCrossValidation:
                                                      "files",
                                                      "folds.csv")
         else:        
-            rsmxval_config_dict["num_folds"] = 7
+            rsmxval_config_dict["folds"] = 7
         
         # use a feature subset if asked
         if with_feature_subset:
@@ -699,14 +699,14 @@ class TestCrossValidation:
         makedirs(modeldir)
 
         # call the function
-        df_train_actual, expected_num_folds = create_xval_files(rsmxval_config, output_dir)
+        df_train_actual, expected_folds = create_xval_files(rsmxval_config, output_dir)
 
         # check that the training data frame is as expected
         assert_frame_equal(df_train_actual, df_train_expected)
         
         # check that there are only the expected number of fold subdirectories
         actual_foldsdir_contents = sorted(listdir(foldsdir))
-        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_num_folds + 1)]
+        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)]
         eq_(actual_foldsdir_contents, expected_foldsdir_contents)
 
         # check all the per-fold files/directories
