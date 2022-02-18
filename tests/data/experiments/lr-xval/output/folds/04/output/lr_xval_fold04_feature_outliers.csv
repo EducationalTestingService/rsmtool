@@ -1,0 +1,9 @@
+,lower,upper,both,lowerperc,upperperc,bothperc
+FEATURE1,0,0,0,0.0,0.0,0.0
+FEATURE2,5,0,5,1.25,0.0,1.25
+FEATURE3,0,0,0,0.0,0.0,0.0
+FEATURE4,0,0,0,0.0,0.0,0.0
+FEATURE5,0,0,0,0.0,0.0,0.0
+FEATURE6,3,0,3,0.75,0.0,0.75
+FEATURE7,0,0,0,0.0,0.0,0.0
+FEATURE8,0,0,0,0.0,0.0,0.0

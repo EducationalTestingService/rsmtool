@@ -1,0 +1,2 @@
+	N	h_mean	h_sd	sys_mean.scale_trim	sys_sd.scale_trim	wtkappa.scale_trim	corr.scale_trim	SMD.scale_trim	RMSE.scale_trim	R2.scale_trim	sys_mean.scale_trim_round	sys_sd.scale_trim_round	kappa.scale_trim_round	exact_agr.scale_trim_round	adj_agr.scale_trim_round	SMD.scale_trim_round
+0	167	3.407185628742515	0.8791814965572287	3.3793113600228466	0.8447880019649345	0.7405217189647572	0.7415010929678141	-0.03170479454904457	0.6193860902896927	0.5006854739434331	3.3592814371257487	0.879632705977005	0.4430898753553465	63.47305389221557	97.0059880239521	-0.05448726094026499

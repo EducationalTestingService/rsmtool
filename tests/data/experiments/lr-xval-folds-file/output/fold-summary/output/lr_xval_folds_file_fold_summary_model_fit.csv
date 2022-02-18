@@ -1,0 +1,3 @@
+,N features,N responses,R2,R2_adjusted
+lr_xval_folds_file_fold01,8,250,0.5188549000606955,0.5028832784859467
+lr_xval_folds_file_fold02,8,250,0.4826953722543651,0.4655234344038875

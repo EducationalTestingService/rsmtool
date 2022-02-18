@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "train_label_column": "score",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_xval_subgroups",
+    "description": "Cross-validation with subgroups using a LinearRegression model.",
+    "num_folds": 3,
+    "subgroups": "QUESTION, L1"
+}

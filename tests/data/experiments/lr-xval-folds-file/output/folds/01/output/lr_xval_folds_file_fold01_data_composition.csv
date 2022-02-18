@@ -1,0 +1,5 @@
+partition,responses
+Training,250
+Evaluation,250
+Overlapping,0
+Total,500
