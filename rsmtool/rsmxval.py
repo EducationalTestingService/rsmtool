@@ -257,8 +257,7 @@ def main():  # noqa: D103
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmxval',
                                  uses_output_directory=True,
-                                 allows_overwriting=False,
-                                 uses_subgroups=True)
+                                 allows_overwriting=False)
 
     # if we have no arguments at all then just show the help message
     if len(sys.argv) < 2:
@@ -294,8 +293,7 @@ def main():  # noqa: D103
         # auto-generate an example configuration and print it to STDOUT
         generator = ConfigurationGenerator('rsmxval',
                                            as_string=True,
-                                           suppress_warnings=args.quiet,
-                                           use_subgroups=args.subgroups)
+                                           suppress_warnings=args.quiet)
         configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
