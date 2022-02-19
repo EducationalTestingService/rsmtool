@@ -1669,11 +1669,11 @@ class TestInteractiveField:
         for (user_input, final_value) in [('/foo/bar', '/foo/bar'), ('foo', 'foo')]:
             yield self.check_dir_field, user_input, final_value
 
-    def check_file_field(self, user_input, final_value):
+    def check_file_field(self, field_type, user_input, final_value):
         """Check that file fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_file',
-                                      'required',
+                                      field_type,
                                       {'label': 'enter file', 'type': 'file'})
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
@@ -1723,13 +1723,17 @@ class TestInteractiveField:
                                      f'train.{extension}')
                 eq_(validator.func(existing_file), True)
 
+            # empty files should are only accepted for optional fields
+            eq_(validator.func(""), field_type == "optional")
+
             # file fields do not use a completion style
             complete_style = mock_prompt.call_args[1]["complete_style"]
             eq_(complete_style, None)
 
     def test_file_field(self):
-        for (user_input, final_value) in [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]:
-            yield self.check_file_field, user_input, final_value
+        for field_type, (user_input, final_value) in product(['required', 'optional'],
+                                                             [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]):
+            yield self.check_file_field, field_type, user_input, final_value
 
     def check_format_field(self, user_input, final_value):
         """Check that file format fields are handled correctly."""
@@ -2052,12 +2056,50 @@ class TestInteractiveGenerate:
                                                       "tsv",               # file_format
                                                       True,                # use_thumbnails
                                                       ]
+        
+        cls.mocked_rsmxval_interactive_values = ["testxval",          # experiment_id
+                                                 "LinearSVC",         # model
+                                                 "train.csv",         # train_file
+                                                 'xval test',         # description
+                                                 True,                # exclude_zero_scores
+                                                 "xlsx",              # file_format
+                                                 3,                   # folds
+                                                 None,                # folds file
+                                                 "ID",                # id_column
+                                                 "length",            # length_column
+                                                 "score2",            # second_human_score_column
+                                                 True,                # standardize_features
+                                                 "score",             # train_label_column
+                                                 1,                   # trim_min
+                                                 5,                   # trim_max,
+                                                 True,                # use_scaled_predictions
+                                                 False                # use_thumbnails
+                                                 ]
 
-    def check_tool_interact(self, context, subgroups=False):
+        cls.mocked_rsmxval_interactive_values_folds_file = ["testxval",          # experiment_id
+                                                            "LinearSVC",         # model
+                                                            "train.csv",         # train_file
+                                                            'xval test',         # description
+                                                            True,                # exclude_zero_scores
+                                                            "xlsx",              # file_format
+                                                            5,                   # default folds
+                                                            "folds.csv",         # folds file
+                                                            "ID",                # id_column
+                                                            "length",            # length_column
+                                                            "score2",            # second_human_score_column
+                                                            True,                # standardize_features
+                                                            "score",             # train_label_column
+                                                            1,                   # trim_min
+                                                            5,                   # trim_max,
+                                                            True,                # use_scaled_predictions
+                                                            False                # use_thumbnails
+                                                            ]
+
+    def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
         A helper method that runs `ConfigurationGenerator.interact()`
         and compares its output to expected output.
-
+        
         Parameters
         ----------
         context : str
@@ -2065,13 +2107,16 @@ class TestInteractiveGenerate:
             One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize"}.
         subgroups : bool, optional
             Whether to include subgroup information in the generated configuration.
+        with_folds_file : bool, optional
+            Whether to use "folds_file" for rsmxval.
         """
         # if we are using subgroups, then define a suffix for the expected file
         groups_suffix = '_groups' if subgroups else ''
+        folds_file_suffix = '_folds_file' if with_folds_file else ''
 
         # get the appropriate list of mocked values for this tool but make
         # a copy since we may need to modify it below
-        mocked_values = getattr(self, f"mocked_{context}_interactive_values")[:]
+        mocked_values = getattr(self, f"mocked_{context}_interactive_values{folds_file_suffix}")[:]
 
         # if we are not using subgroups, delete the subgroup entry
         # from the list of mocked values
@@ -2082,7 +2127,7 @@ class TestInteractiveGenerate:
                 del mocked_values[7]
 
         # point to the right file holding the expected configuration
-        expected_file = f"interactive_{context}_config{groups_suffix}.json"
+        expected_file = f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
         expected_path = join(rsmtool_test_dir, 'data', 'output', expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
@@ -2100,7 +2145,8 @@ class TestInteractiveGenerate:
             generator = ConfigurationGenerator(context, use_subgroups=subgroups)
             configuration_string = generator.interact()
             with open(expected_path, 'r') as expectedfh:
-                eq_(expectedfh.read().strip(), configuration_string)
+                expected_configuration_string = expectedfh.read().strip()
+                eq_(expected_configuration_string, configuration_string)
 
         # stop the stderr and clear patchers now that the test is finished
         sys_stderr_patcher.stop()
@@ -2108,16 +2154,21 @@ class TestInteractiveGenerate:
 
     def test_interactive_generate(self):
 
-        # all tools except rsmpredict and rsmsummarize explicitly support subgroups
-        yield self.check_tool_interact, 'rsmtool', False
-        yield self.check_tool_interact, 'rsmtool', True
+        # all tools except rsmpredict, rsmsummarize, and rsmxval 
+        # explicitly support subgroups; only rsmxval supports
+        # folds file
+        yield self.check_tool_interact, 'rsmtool', False, False
+        yield self.check_tool_interact, 'rsmtool', True, False
 
-        yield self.check_tool_interact, 'rsmeval', False
-        yield self.check_tool_interact, 'rsmeval', True
+        yield self.check_tool_interact, 'rsmeval', False, False
+        yield self.check_tool_interact, 'rsmeval', True, False
 
-        yield self.check_tool_interact, 'rsmcompare', False
-        yield self.check_tool_interact, 'rsmcompare', True
+        yield self.check_tool_interact, 'rsmcompare', False, False
+        yield self.check_tool_interact, 'rsmcompare', True, False
 
-        yield self.check_tool_interact, 'rsmpredict', False
+        yield self.check_tool_interact, 'rsmpredict', False, False
 
         yield self.check_tool_interact, 'rsmsummarize', False
+
+        yield self.check_tool_interact, 'rsmxval', False, False
+        yield self.check_tool_interact, 'rsmxval', False, True

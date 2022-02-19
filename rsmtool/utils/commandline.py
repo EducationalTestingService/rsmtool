@@ -353,8 +353,9 @@ class InteractiveField:
             self.completer = self._make_directory_completer()
             self.validator = self._make_directory_validator()
         elif self.data_type == 'file':
+            allow_empty = field_type == 'optional'
             self.completer = self._make_file_completer()
-            self.validator = self._make_file_validator()
+            self.validator = self._make_file_validator(allow_empty=allow_empty)
         elif self.data_type == 'format':
             self.completer = WordCompleter(POSSIBLE_EXTENSIONS)
             self.validator = self._make_file_format_validator()
@@ -475,12 +476,19 @@ class InteractiveField:
                                                                   'xlsx'])
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
-    def _make_file_validator(self):
+    def _make_file_validator(self, allow_empty=False):
         """
         Create a validator for file fields.
 
         This private method creates a validator for a field
         with ``data_type`` of "file".
+
+        Parameters
+        ----------
+        allow_empty : bool, optional
+            If ``True``, it will allow the user to also just press
+            enter (i.e., input a blank string)
+            Defaults to ``False``.
 
         Returns
         -------
@@ -491,14 +499,19 @@ class InteractiveField:
             extensions are "csv", "jsonlines", "sas7bdat", "tsv",
             and "xlsx".
         """
-        def is_valid(filepath):
-            return (Path(filepath).is_file() and
-                    Path(filepath).suffix.lower().lstrip('.') in ['csv',
-                                                                  'jsonlines',
-                                                                  'sas7bdat',
-                                                                  'tsv',
-                                                                  'xlsx'])
-        validator = Validator.from_callable(is_valid, error_message="invalid file")
+        def is_valid(path):
+            return (Path(path).is_file() and
+                    Path(path).suffix.lower().lstrip('.') in ['csv',
+                                                              'jsonlines',
+                                                              'sas7bdat',
+                                                              'tsv',
+                                                              'xlsx'])
+
+        def is_empty(path):
+            return path == ''
+        
+        validator = Validator.from_callable(lambda path: is_valid(path) or (allow_empty and is_empty(path)),
+                                            error_message="invalid file")
         return validator
 
     def _make_file_format_validator(self):
