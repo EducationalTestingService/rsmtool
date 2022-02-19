@@ -633,7 +633,11 @@ class TestLogging:
 
 class TestCrossValidation:
 
-    def check_create_xval_files(self, file_format, with_folds_file, with_feature_subset):
+    def check_create_xval_files(self, 
+                                file_format,
+                                with_folds_file,
+                                with_feature_subset,
+                                with_feature_list):
         """
         Check that ``create_xval_files()`` functions as expected.
         
@@ -645,6 +649,8 @@ class TestCrossValidation:
             Whether to use a pre-specified folds file for testing.
         with_feature_subset : bool
             Whether to use feature subset information for testing.
+        with_feature_list : bool
+            Whether to specify features as a list instead of a file
         """
         # create an rsmxval configuration dictionary
         rsmxval_config_dict = {
@@ -677,12 +683,16 @@ class TestCrossValidation:
                                                               "lr-with-feature-subset-file-and-feature-file",
                                                               "feature_file.csv")
             rsmxval_config_dict["feature_subset"] = "subset1"
+        # otherwise set "features" depending on whether it should be a list or not
         else:
-            rsmxval_config_dict["features"] = join(rsmtool_test_dir, 
-                                                   "data",
-                                                   "experiments",
-                                                   "lr",
-                                                   "features.csv")
+            if with_feature_list:
+                rsmxval_config_dict["features"] = ["FEATURE1", "FEATURE2"]
+            else:
+                rsmxval_config_dict["features"] = join(rsmtool_test_dir, 
+                                                       "data",
+                                                       "experiments",
+                                                       "lr",
+                                                       "features.csv")
         
         # create configuration object from dictionary
         rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
@@ -771,9 +781,14 @@ class TestCrossValidation:
                 eq_(parsed_fold_config.get("feature_subset"), subset_name)
                 ok_(filecmp.cmp(subset_file, rsmxval_config.get("feature_subset_file")))
             else:
-                fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
-                ok_(fold_feature_file.exists() and fold_feature_file.is_file())
-                ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
+                # if "features" a list, it should be in the config
+                if with_feature_list:
+                    eq_(parsed_fold_config["features"], ["FEATURE1", "FEATURE2"])
+                # otherwise the "features" file should have been copied to the fold directory
+                else:
+                    fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
+                    ok_(fold_feature_file.exists() and fold_feature_file.is_file())
+                    ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
 
         # (e) the dummy test file for the final model
         dummy_test_file = modeldir / f"dummy_test.{file_format}"
@@ -785,13 +800,16 @@ class TestCrossValidation:
     def test_create_xval_files(self):
         for (file_format,
              with_folds_file,
-             with_feature_subset) in product(["csv", "tsv", "xlsx"],
-                                             [False, True],
-                                             [False, True]):
+             with_feature_subset,
+             with_feature_list) in product(["csv", "tsv", "xlsx"],
+                                           [False, True],
+                                           [False, True],
+                                           [False, True]):
             yield (self.check_create_xval_files,
                    file_format,
                    with_folds_file,
-                   with_feature_subset)
+                   with_feature_subset,
+                   with_feature_list)
 
     def check_combine_fold_prediction_files(self, file_format):
         """

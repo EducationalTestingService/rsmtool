@@ -66,7 +66,12 @@ def create_xval_files(configuration, output_dir, logger=None):
         raise FileNotFoundError('The training data file was not found: '
                                 '{}'.format(repr(configuration.get("train_file"))))
 
-    for additional_filename in ["folds_file", "features", "feature_subset_file"]:
+    # "features" could be a list of features so check for that
+    additional_filenames = ["folds_file", "feature_subset_file"]
+    if isinstance(configuration.get("features"), str):
+        additional_filenames.append("features")
+    
+    for additional_filename in additional_filenames:
         if additional_file := configuration.get(additional_filename):
             located_filepaths[additional_filename] = DataReader.locate_files(additional_file, 
                                                                              configuration.configdir)
@@ -162,7 +167,9 @@ def create_xval_files(configuration, output_dir, logger=None):
             fold_config_file.write(str(fold_configuration))
 
         # copy "features" or "features_subset_file" to the
-        # same directory as where the configuration was saved
+        # same directory as where the configuration was saved;
+        # note that if features is a list instead of a file,
+        # it will get ignored automatically
         for filename in ["features", "feature_subset_file"]:
             if filepath := located_filepaths.get(filename):
                 copyfile(filepath, this_fold_dir / Path(filepath).name)
