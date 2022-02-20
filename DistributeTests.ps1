@@ -52,6 +52,7 @@ elseif ($agentNumber -eq 4) {
     $testsToRun = $testsToRun + "tests/test_preprocessor.py"
     $testsToRun = $testsToRun + "tests/test_writer.py"
     $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_3.py"
+    $testsToRun = $testsToRun + "tests/test_experiment_rsmxval.py"
 }
 elseif ($agentNumber -eq 5) {
     $testsToRun = $testsToRun + "tests/test_experiment_rsmpredict.py"
