@@ -20,7 +20,9 @@ else:
     param('lr-xval-subgroups', 'lr_xval_subgroups', folds=3, subgroups=["QUESTION", "L1"]),
     param('lr-xval-consistency', 'lr_xval_consistency', folds=3, consistency=True, subgroups=["L1"]),
     param('lr-xval-skll-model', 'lr_xval_skll_model', folds=2, skll=True),  # uses folds file
-    param('lr-xval-thumbnails', 'lr_xval_thumbnails', folds=3)
+    param('lr-xval-thumbnails', 'lr_xval_thumbnails', folds=3),
+    param('lr-xval-feature-list', 'lr_xval_feature_list', folds=3),
+    param('lr-xval-feature-subset-file', 'lr_xval_feature_subset_file', folds=3)
 ])
 def test_run_cross_validation_parameterized(*args, **kwargs):
     if TEST_DIR:
