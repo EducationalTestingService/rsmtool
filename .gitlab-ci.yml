@@ -51,7 +51,7 @@ testset3:
 testset4:
   extends: ".runtests"
   variables:
-    TESTFILES: "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py tests/test_experiment_rsmxval.py"
+    TESTFILES: "tests/test_experiment_rsmcompare.py tests/test_experiment_rsmsummarize.py tests/test_modeler.py tests/test_preprocessor.py tests/test_writer.py tests/test_experiment_rsmtool_3.py"
   stage: "test"
 
 # fifth set of test files
@@ -59,4 +59,11 @@ testset5:
   extends: ".runtests"
   variables:
     TESTFILES: "tests/test_experiment_rsmpredict.py tests/test_reader.py tests/test_reporter.py tests/test_transformer.py tests/test_utils.py tests/test_experiment_rsmtool_4.py"
+  stage: "test"
+
+# sixth set of test files
+testset6:
+  extends: ".runtests"
+  variables:
+    TESTFILES: "tests/test_experiment_rsmxval.py"
   stage: "test"
