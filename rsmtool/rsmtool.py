@@ -59,7 +59,7 @@ def run_experiment(config_file_or_obj_or_dict,
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    
+
     Raises
     ------
     FileNotFoundError

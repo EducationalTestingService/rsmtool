@@ -522,7 +522,7 @@ class InteractiveField:
         def is_empty(path):
             return path == ''
 
-        validator = Validator.from_callable(lambda path: is_valid(path) 
+        validator = Validator.from_callable(lambda path: is_valid(path)
                                             or (allow_empty and is_empty(path)),
                                             error_message="invalid file")
         return validator

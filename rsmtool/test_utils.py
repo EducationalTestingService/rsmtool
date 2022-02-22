@@ -1116,7 +1116,7 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
 
     # create fake skll objects with new coefficients
     df_coef = DataReader.read_from_file(scaled_coefficients_file)
-    learner = Modeler.create_fake_skll_learner(df_coef)
+    learner = Modeler().create_fake_skll_learner(df_coef)
     modeler = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'

@@ -35,7 +35,7 @@ setup(name='rsmtool',
                      'rsmpredict = rsmtool.rsmpredict:main',
                      'rsmcompare = rsmtool.rsmcompare:main',
                      'rsmsummarize = rsmtool.rsmsummarize:main',
-                     'rsmxval = rsmtool.rsmxval:main',                     
+                     'rsmxval = rsmtool.rsmxval:main',
                      'render_notebook = rsmtool.reporter:main',
                      'convert_feature_json = rsmtool.convert_feature_json:main']
                     },
