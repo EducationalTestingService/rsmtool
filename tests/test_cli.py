@@ -420,6 +420,8 @@ class TestToolCLI:
         # test that the "generate --subgroups" subcommand for all tools works
         # as expected in batch mode
 
-        # this applies to all tools except rsmpredict, rsmsummarize, and rsmxval
+        # this applies to all tools except rsmpredict, rsmsummarize, and 
+        # rsmxval; rsmxval does supportsubgroups but since it has no sections 
+        # fields, it's not relevant for this test
         for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
             yield self.check_tool_cmd, context, "generate --subgroups", None, None

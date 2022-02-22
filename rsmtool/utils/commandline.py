@@ -152,15 +152,27 @@ def setup_rsmcmd_parser(name,
     # Setting up options for the "generate" subparser #
     ###################################################
     if uses_subgroups:
-        parser_generate.add_argument('-g',
-                                     '--subgroups',
-                                     dest='subgroups',
-                                     action='store_true',
-                                     default=False,
-                                     help=f"if specified, the generated {name} "
-                                          f"configuration file will include the "
-                                          f"subgroup sections in the general "
-                                          f"sections list")
+        # we need to display a special help message for ``rsmxval`` 
+        # since its config does not actually contain a sections list
+        if name == "rsmxval":
+            parser_generate.add_argument('-g',
+                                         '--subgroups',
+                                         dest='subgroups',
+                                         action='store_true',
+                                         default=False,
+                                         help=f"if specified, {name} will ensure that "
+                                              f"subgroup sections are included in "
+                                              f"the various reports")
+        else:
+            parser_generate.add_argument('-g',
+                                         '--subgroups',
+                                         dest='subgroups',
+                                         action='store_true',
+                                         default=False,
+                                         help=f"if specified, the generated {name} "
+                                              f"configuration file will include the "
+                                              f"subgroup sections in the general "
+                                              f"sections list")
 
     parser_generate.add_argument('-q',
                                  '--quiet',

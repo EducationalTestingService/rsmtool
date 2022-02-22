@@ -7,7 +7,7 @@ The complete cross-validation workflow is as follows:
 
 - Divide the training data file into folds either by randomly shuffling
   and then using a k-fold split or by using a pre-specified folds file
-  that provides a fold number for each example ID in the data
+  that provides a fold number for each example ID in the data.
 
 - For each fold (in parallel), use rsmtool to run a train/test experiment 
   and save all output in a separate directory for that fold under 
@@ -257,7 +257,8 @@ def main():  # noqa: D103
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser('rsmxval',
                                  uses_output_directory=True,
-                                 allows_overwriting=False)
+                                 allows_overwriting=False,
+                                 uses_subgroups=True)
 
     # if we have no arguments at all then just show the help message
     if len(sys.argv) < 2:
@@ -293,7 +294,8 @@ def main():  # noqa: D103
         # auto-generate an example configuration and print it to STDOUT
         generator = ConfigurationGenerator('rsmxval',
                                            as_string=True,
-                                           suppress_warnings=args.quiet)
+                                           suppress_warnings=args.quiet,
+                                           use_subgroups=True)
         configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 

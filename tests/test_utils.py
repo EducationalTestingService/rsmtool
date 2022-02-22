@@ -2069,6 +2069,7 @@ class TestInteractiveGenerate:
                                                  "length",            # length_column
                                                  "score2",            # second_human_score_column
                                                  True,                # standardize_features
+                                                 ["L1", "QUESTION"],  # subgroups
                                                  "score",             # train_label_column
                                                  1,                   # trim_min
                                                  5,                   # trim_max,
@@ -2088,6 +2089,7 @@ class TestInteractiveGenerate:
                                                             "length",            # length_column
                                                             "score2",            # second_human_score_column
                                                             True,                # standardize_features
+                                                            ["L1"],              # subgroups
                                                             "score",             # train_label_column
                                                             1,                   # trim_min
                                                             5,                   # trim_max,
@@ -2125,6 +2127,8 @@ class TestInteractiveGenerate:
                 del mocked_values[11]
             elif context == 'rsmcompare':
                 del mocked_values[7]
+            elif context == 'rsmxval':
+                del mocked_values[12]
 
         # point to the right file holding the expected configuration
         expected_file = f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
@@ -2154,7 +2158,7 @@ class TestInteractiveGenerate:
 
     def test_interactive_generate(self):
 
-        # all tools except rsmpredict, rsmsummarize, and rsmxval 
+        # all tools except rsmpredict and rsmsummarize 
         # explicitly support subgroups; only rsmxval supports
         # folds file
         yield self.check_tool_interact, 'rsmtool', False, False
@@ -2172,3 +2176,5 @@ class TestInteractiveGenerate:
 
         yield self.check_tool_interact, 'rsmxval', False, False
         yield self.check_tool_interact, 'rsmxval', False, True
+        yield self.check_tool_interact, 'rsmxval', True, False
+        yield self.check_tool_interact, 'rsmxval', True, True
