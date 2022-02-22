@@ -12,7 +12,7 @@ Workflow
 
 1. Create a data file in one of the :ref:`supported formats <input_file_format>` containing the computed system scores and the human scores you want to compare against.
 2. Create an :ref:`experiment configuration file <config_file_rsmeval>` describing the evaluation experiment you would like to run.
-3.  Run that configuration file with :ref:`rsmeval <usage_rsmeval>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmeval>`.
+3. Run that configuration file with :ref:`rsmeval <usage_rsmeval>` and generate the experiment HTML report as well as the :ref:`intermediate CSV files <intermediate_files_rsmeval>`.
 4. Examine the HTML report to check various aspects of model performance.
 
 Note that the above workflow does not use any customization features , e.g., :ref:`choosing which sections to include in the report <general_sections_rsmeval>` or :ref:`adding custom analyses sections <custom_notebooks>` etc. However, we will stick with this workflow for our tutorial since it is likely to be the most common use case.
@@ -29,7 +29,7 @@ Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The next step is to create an :ref:`experiment configuration file <config_file_rsmeval>` in ``.json`` format.
 
-.. _asap_config_rsemeval:
+.. _asap_config_rsmeval:
 
 .. literalinclude:: ../examples/rsmeval/config_rsmeval.json
     :language: javascript

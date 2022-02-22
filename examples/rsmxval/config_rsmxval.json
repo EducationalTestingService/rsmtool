@@ -1,0 +1,13 @@
+{
+    "experiment_id": "ASAP2_xval",
+    "description": "Cross-validation with two human scores using a LinearRegression model.",
+    "train_file": "train.csv",
+    "folds": 3,
+    "train_label_column": "score",
+    "id_column": "ID",
+    "model": "LinearRegression",
+    "trim_min": 1,
+    "trim_max": 6,
+    "second_human_score_column": "score2",
+    "use_scaled_predictions": true
+}
