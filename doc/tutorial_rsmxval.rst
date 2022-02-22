@@ -19,7 +19,7 @@ Note that unlike ``rsmtool`` and ``rsmeval``, ``rsmxval`` currently does not sup
 
 ASAP Example
 ~~~~~~~~~~~~
-We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
+We are going to use the same example from the 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
 
 Extract features
 ~~~~~~~~~~~~~~~~
@@ -74,7 +74,7 @@ This should produce output like::
     Training model on full data
 
 
-Once the run finishes, you will see an ``output`` sub-directory in the current directory. Under this directory you will see multiple other sub-directories, each corresponding to one of the cross-validation steps and described :ref:`here <output_dirs_rsmeval>`. 
+Once the run finishes, you will see an ``output`` sub-directory in the current directory. Under this directory you will see multiple sub-directories, each corresponding to a different cross-validation step, as described :ref:`here <output_dirs_rsmeval>`. 
 
 Examine the reports
 ~~~~~~~~~~~~~~~~~~~

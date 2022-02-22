@@ -19,11 +19,11 @@ The machine learner you want to use to build the scoring model. Possible values 
 
 train_file
 ~~~~~~~~~~
-The path to the training data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to the location of config file.
+The path to the training data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column with a unique identifier (ID) for each response and a column with the human score for each response. The path can be absolute or relative to config file's location.
 
 .. important:: Unlike ``rsmtool``, ``rsmxval`` does not accept an evaluation set and will raise an error if the ``test_file`` field is specified.
 
-Next, we will first describe the two optional fields that are unique to ``rsmxval``. 
+Next, we will describe the two optional fields that are unique to ``rsmxval``. 
 
 folds *(Optional)*
 ~~~~~~~~~~~~~~~~~~
@@ -31,7 +31,7 @@ The number of folds to use for cross-validation. This should be an integer and d
 
 folds_file *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-The path to a file containing custom, pre-specified folds to be used for cross-validation. This should be a ``.csv`` file (no other formats are accepted) and should contain only two columns: ``id`` and ``fold``. The ``id`` column should contain the same IDs of the responses that are contained in ``train_file`` above. The ``fold`` column should contain an integer representing which fold the response with the ``id`` belongs to. IDs not specified in this file will be skipped and not included in the cross-validation at all. Just like ``train_file``, this path can be absolute or relative to the location of config file. Here's an `example of a folds file containing 2 folds <https://github.com/EducationalTestingService/rsmtool/blob/main/tests/data/files/folds.csv>`__. 
+The path to a file containing custom, pre-specified folds to be used for cross-validation. This should be a ``.csv`` file (no other formats are accepted) and should contain only two columns: ``id`` and ``fold``. The ``id`` column should contain the same IDs of the responses that are contained in ``train_file`` above. The ``fold`` column should contain an integer representing which fold the response with the ``id`` belongs to. IDs not specified in this file will be skipped and not included in the cross-validation at all. Just like ``train_file``, this path can be absolute or relative to the config file's location. Here's an `example of a folds file containing 2 folds <https://github.com/EducationalTestingService/rsmtool/blob/main/tests/data/files/folds.csv>`__. 
 
 .. note:: If *both* ``folds_file`` and ``folds`` are specified, then the former will take precedence unless it contains a non-existent path.
 
