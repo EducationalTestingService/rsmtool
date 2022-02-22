@@ -275,7 +275,7 @@ INTERACTIVE_MODE_METADATA = {'experiment_id': {'label': 'Experiment ID',
                              'test_label_column': {'label': 'Name of column in evaluation data that '
                                                             'contains human scores (<u>sc1</u>)'},
                              'length_column': {'label': 'Name of column in training/evaluation data '
-                                                        'that contains repsonse lengths, if any'},
+                                                        'that contains response lengths, if any'},
                              'human_score_column': {'label': 'Name of column in evaluation data '
                                                              'that contains human scores (<u>sc1</u>)'},
                              'second_human_score_column': {'label': 'Name of column in evaluation '
