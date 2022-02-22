@@ -211,8 +211,7 @@ class Modeler:
 
         return df_coef
 
-    @staticmethod
-    def create_fake_skll_learner(df_coefficients):
+    def create_fake_skll_learner(self, df_coefficients):
         """
         Create a fake SKLL linear regression learner from given coefficients.
 

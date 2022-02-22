@@ -444,7 +444,7 @@ def check_run_cross_validation(source,
                                suppress_warnings_for=[]):
     """
     Run a parameterized rsmxval experiment test.
-    
+
     Parameters
     ----------
     source : str
@@ -508,7 +508,7 @@ def check_run_cross_validation(source,
 
     output_prefix = join('test_outputs', source)
     expected_output_prefix = join(test_dir, 'data', 'experiments', source, 'output')
-  
+
     # first check that each fold's rsmtool output is as expected
     actual_folds_dir = join(output_prefix, 'folds')
     expected_folds_dir = join(expected_output_prefix, 'folds')
@@ -518,24 +518,36 @@ def check_run_cross_validation(source,
         fold_output_files = glob(join(fold_output_dir, f'*.{file_format}'))
         for fold_output_file in fold_output_files:
             output_filename = basename(fold_output_file)
-            expected_output_file = join(expected_folds_dir, f'{fold_num:02}', 'output', output_filename)
+            expected_output_file = join(expected_folds_dir,
+                                        f'{fold_num:02}',
+                                        'output',
+                                        output_filename)
 
             if exists(expected_output_file):
-                check_file_output(fold_output_file, expected_output_file, file_format=file_format)
+                check_file_output(fold_output_file,
+                                  expected_output_file,
+                                  file_format=file_format)
 
         check_generated_output(fold_output_files,
-                               fold_experiment_id, 
-                               model_type, 
+                               fold_experiment_id,
+                               model_type,
                                file_format=file_format)
 
         if not skll:
-            check_scaled_coefficients(fold_output_dir, fold_experiment_id, file_format=file_format)
+            check_scaled_coefficients(fold_output_dir,
+                                      fold_experiment_id,
+                                      file_format=file_format)
 
         if subgroups:
-            check_subgroup_outputs(fold_output_dir, fold_experiment_id, subgroups, file_format=file_format)
+            check_subgroup_outputs(fold_output_dir,
+                                   fold_experiment_id,
+                                   subgroups,
+                                   file_format=file_format)
 
         if consistency:
-            check_consistency_files_exist(fold_output_files, fold_experiment_id, file_format=file_format)
+            check_consistency_files_exist(fold_output_files,
+                                          fold_experiment_id,
+                                          file_format=file_format)
 
     # next check that the evaluation output is as expected
     actual_eval_output_dir = join(output_prefix, 'evaluation', 'output')
@@ -578,8 +590,8 @@ def check_run_cross_validation(source,
             check_file_output(output_file, expected_output_file, file_format=file_format)
 
     check_generated_output(output_files,
-                           model_experiment_id, 
-                           model_type, 
+                           model_experiment_id,
+                           model_type,
                            file_format=file_format)
 
     if not skll:
@@ -600,24 +612,24 @@ def check_run_cross_validation(source,
                                       '*',
                                       'report',
                                       '*.html'))
-    
-    evaluation_report = join(output_prefix, 
+
+    evaluation_report = join(output_prefix,
                              'evaluation',
                              'report',
                              f'{experiment_id}_evaluation_report.html')
 
-    summary_report = join(output_prefix, 
+    summary_report = join(output_prefix,
                           'fold-summary',
                           'report',
                           f'{experiment_id}_fold_summary_report.html')
 
-    final_model_report = join(output_prefix, 
+    final_model_report = join(output_prefix,
                               'final-model',
                               'report',
                               f'{experiment_id}_model_report.html')
 
-    for html_report in per_fold_html_reports + [evaluation_report, 
-                                                summary_report, 
+    for html_report in per_fold_html_reports + [evaluation_report,
+                                                summary_report,
                                                 final_model_report]:
         check_report(html_report, raise_warnings=False)
 
@@ -1072,7 +1084,7 @@ def check_report(html_file,
 def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
     """
     Check that predictions using scaled coefficients match scaled scores.
-    
+
     Parameters
     ----------
     output_dir : str

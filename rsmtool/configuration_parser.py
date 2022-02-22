@@ -415,7 +415,7 @@ class Configuration:
         ----------
         output_dir : str
             The path to the output directory. If ``None``, the current
-            directory is used. 
+            directory is used.
             Defaults to ``None``.
         """
         # save a copy of the main config into the output directory

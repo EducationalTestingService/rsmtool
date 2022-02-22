@@ -17,12 +17,12 @@ class TestDataWriter:
     def check_write_frame_to_file(self, file_format, include_index):
 
         # create a dummy data frame for testing
-        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)), 
+        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)),
                                    columns=['A', 'B', 'C'])
-        
+
         # create a temporary directory where the file will be written
         tempdir = TemporaryDirectory()
-                
+
         # create a name prefix for the frame
         name_prefix = Path(tempdir.name) / "test_frame"
 
@@ -44,14 +44,14 @@ class TestDataWriter:
         elif file_format == "xlsx":
             df_written = pd.read_excel(f"{name_prefix}.{file_format}")
         else:
-            df_written = pd.read_json(f"{name_prefix}.{file_format}", 
+            df_written = pd.read_json(f"{name_prefix}.{file_format}",
                                       orient="records",
                                       lines=True)
 
         # check that the index is there if it's supposed to be
         if include_index and file_format in ["csv", "tsv", "xlsx"]:
             ok_("Unnamed: 0" in df_written.columns)
-        
+
         # check that the data is the same
         df_written = df_written[["A", "B", "C"]]
         assert_frame_equal(df_to_write, df_written)
@@ -62,11 +62,11 @@ class TestDataWriter:
     def test_write_frame_to_file(self):
 
         for (file_format,
-             include_index) in product(["csv", "tsv", "xlsx", "jsonlines"], 
+             include_index) in product(["csv", "tsv", "xlsx", "jsonlines"],
                                        [False, True]):
 
             yield self.check_write_frame_to_file, file_format, include_index
-                
+
     def test_data_container_save_files(self):
 
         data_sets = [{'name': 'dataset1', 'frame': pd.DataFrame(np.random.normal(size=(100, 2)),
@@ -95,7 +95,7 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'), 
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
                                 orient="records",
                                 lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))

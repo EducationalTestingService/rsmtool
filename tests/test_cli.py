@@ -132,7 +132,7 @@ class TestToolCLI:
                 evaluation_report = output_dir / "evaluation" / "report" / "lr_xval_evaluation_report.html"
                 summary_report = output_dir / "fold-summary" / "report" / "lr_xval_fold_summary_report.html"
                 final_model_report = output_dir / "final-model" / "report" / "lr_xval_model_report.html"
-                html_reports = per_fold_html_reports + [evaluation_report, 
+                html_reports = per_fold_html_reports + [evaluation_report,
                                                         summary_report,
                                                         final_model_report]
             else:
@@ -169,9 +169,9 @@ class TestToolCLI:
                 check_file_output(str(fold_output_file), str(expected_fold_output_file))
 
         for fold_num in fold_nums:
-            check_generated_output(list(map(str, fold_output_files)), 
+            check_generated_output(list(map(str, fold_output_files)),
                                    f"lr_xval_fold{fold_num}",
-                                   "rsmtool") 
+                                   "rsmtool")
 
         # next check that the evaluation output is as expected
         actual_eval_output_dir = output_dir / "evaluation"
@@ -298,7 +298,7 @@ class TestToolCLI:
         # test that the default subcommand for all contexts is "run"
 
         # this applies to all tools
-        for context in ['rsmtool', 
+        for context in ['rsmtool',
                         'rsmeval',
                         'rsmcompare',
                         'rsmpredict',
@@ -408,8 +408,8 @@ class TestToolCLI:
         # test that the "generate" subcommand for all tools works as expected
         # in batch mode
 
-        for context in ['rsmtool', 
-                        'rsmeval', 
+        for context in ['rsmtool',
+                        'rsmeval',
                         'rsmcompare',
                         'rsmpredict',
                         'rsmsummarize',
@@ -420,8 +420,8 @@ class TestToolCLI:
         # test that the "generate --subgroups" subcommand for all tools works
         # as expected in batch mode
 
-        # this applies to all tools except rsmpredict, rsmsummarize, and 
-        # rsmxval; rsmxval does supportsubgroups but since it has no sections 
+        # this applies to all tools except rsmpredict, rsmsummarize, and
+        # rsmxval; rsmxval does supportsubgroups but since it has no sections
         # fields, it's not relevant for this test
         for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
             yield self.check_tool_cmd, context, "generate --subgroups", None, None

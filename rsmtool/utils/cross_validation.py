@@ -22,7 +22,7 @@ from rsmtool.writer import DataWriter
 def create_xval_files(configuration, output_dir, logger=None):
     """
     Create all files needed for the cross-validation experiment.
-    
+
     Parameters
     ----------
     configuration : rsmtool.configuration_parser.Configuration
@@ -32,14 +32,14 @@ def create_xval_files(configuration, output_dir, logger=None):
         Path to the output directory specified for "rsmxval".
     logger : None, optional
         Logger object used to log messages from this function.
-    
+
     Returns
     -------
     df_train : pandas DataFrame
         DataFrame containing the raw training data file.
     folds : int
         The number of folds for which the files were created.
-    
+
     Raises
     ------
     FileNotFoundError
@@ -50,7 +50,7 @@ def create_xval_files(configuration, output_dir, logger=None):
     logger = logger if logger else logging.getLogger(__name__)
 
     # get the paths to the "<output_dir>/folds" directory as well as to
-    # the "<output_dir>/final-model" directory since those are the two 
+    # the "<output_dir>/final-model" directory since those are the two
     # directories under which we will write files
     foldsdir = Path(output_dir) / "folds"
     modeldir = Path(output_dir) / "final-model"
@@ -60,7 +60,7 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     # locate the training data file, the folds file, and feature file(s)
     located_filepaths = {}
-    located_filepaths["train"] = DataReader.locate_files(configuration.get("train_file"), 
+    located_filepaths["train"] = DataReader.locate_files(configuration.get("train_file"),
                                                          configuration.configdir)
     if not located_filepaths["train"]:
         raise FileNotFoundError('The training data file was not found: '
@@ -70,24 +70,24 @@ def create_xval_files(configuration, output_dir, logger=None):
     additional_filenames = ["folds_file", "feature_subset_file"]
     if isinstance(configuration.get("features"), str):
         additional_filenames.append("features")
-    
+
     for additional_filename in additional_filenames:
         if additional_file := configuration.get(additional_filename):
-            located_filepaths[additional_filename] = DataReader.locate_files(additional_file, 
+            located_filepaths[additional_filename] = DataReader.locate_files(additional_file,
                                                                              configuration.configdir)
 
     # read the training file into a dataframe
     df_train = DataReader.read_from_file(located_filepaths["train"])
 
     # we need to sub-sample the full training data file to create a dummy
-    # test file that we need to use when running RSMTool on the full 
+    # test file that we need to use when running RSMTool on the full
     # training dataset to get the model/feature descriptives; we use 10%
     # of the training data to create this dummy test set
-    df_sampled_test = df_train.sample(frac=0.1, 
+    df_sampled_test = df_train.sample(frac=0.1,
                                       replace=False,
                                       random_state=1234567890,
                                       axis=0)
-    DataWriter.write_frame_to_file(df_sampled_test, 
+    DataWriter.write_frame_to_file(df_sampled_test,
                                    str(modeldir / "dummy_test"),
                                    file_format=given_file_format,
                                    index=False)
@@ -109,7 +109,7 @@ def create_xval_files(configuration, output_dir, logger=None):
             fold_groups = [cv_folds[train_id] for train_id in train_ids.values]
             fold_generator = logo.split(range(len(df_train)), y=None, groups=fold_groups)
     else:
-        # if we are in this code path but the configuration did 
+        # if we are in this code path but the configuration did
         # specify "folds_file", then we must not have found the file
         # so raise a warning to that effect
         if configuration.get("folds_file"):
@@ -121,7 +121,7 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     # iterate over each of the folds and generate an rsmtool configuration file
     # which is then saved to disk in a directory specific to each fold
-    for fold_num, (fold_train_indices, 
+    for fold_num, (fold_train_indices,
                    fold_test_indices) in enumerate(fold_generator, start=1):
 
         # get the train and test files for this fold and
@@ -173,14 +173,14 @@ def create_xval_files(configuration, output_dir, logger=None):
         for filename in ["features", "feature_subset_file"]:
             if filepath := located_filepaths.get(filename):
                 copyfile(filepath, this_fold_dir / Path(filepath).name)
-        
+
     return df_train, folds
 
 
 def process_fold(fold_num, foldsdir):
     """
     Run RSMTool on the specified numbered fold.
-    
+
     Parameters
     ----------
     fold_num : int
@@ -211,8 +211,8 @@ def combine_fold_prediction_files(foldsdir, file_format):
     file_format : str
         The file format (extension) for the file to be written to disk.
         One of {"csv", "xlsx", "tsv"}.
-        Defaults to "csv".        
-    
+        Defaults to "csv".
+
     Returns
     -------
     df_all_predictions : pandas DataFrame
@@ -226,7 +226,7 @@ def combine_fold_prediction_files(foldsdir, file_format):
         df_fold_predictions = DataReader.read_from_file(prediction_file, converters={'spkitemid': str})
         prediction_dfs.append(df_fold_predictions)
 
-    # concatenate all of the predictions into a single frame using 
+    # concatenate all of the predictions into a single frame using
     # "spkitemid" column which must exist since this is the output of RSMTool
     df_all_predictions = concat(prediction_dfs, keys="spkitemid").reset_index(drop=True)
 

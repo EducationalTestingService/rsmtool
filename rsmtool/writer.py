@@ -22,7 +22,7 @@ class DataWriter:
     def write_frame_to_file(df, name_prefix, file_format="csv", index=False, **kwargs):
         """
         Write given data frame to disk with given name and file format.
-        
+
         Parameters
         ----------
         df : pandas DataFrame
@@ -37,7 +37,7 @@ class DataWriter:
         index : bool, optional
             Whether to include the index in the output file.
             Defaults to ``False``.
-        
+
         Raises
         ------
         KeyError
@@ -169,7 +169,7 @@ class DataWriter:
                 outfile = join(csvdir, dataframe_name)
 
             # write out the frame to disk in the given file
-            self.write_frame_to_file(df, 
+            self.write_frame_to_file(df,
                                      outfile,
                                      file_format=file_format,
                                      index=index,

@@ -55,7 +55,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
         Path to the output file for saving preprocessed feature values.
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
-        Defaults to ``None``.        
+        Defaults to ``None``.
 
     Raises
     ------

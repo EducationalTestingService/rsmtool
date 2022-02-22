@@ -77,7 +77,7 @@ def test_parse_json_with_comments():
     {{
         "key1": "{0}", {1}
         {1}
-        "key2": "value2", 
+        "key2": "value2",
         "key3": 5
     }}"""
 
@@ -619,7 +619,7 @@ class TestLogging:
 
         # create a logger based on our dummy log file
         test_logger = get_file_logger("testing", self.logpath)
-        
+
         # log message to that file
         test_logger.info("This is a test.")
 
@@ -633,14 +633,14 @@ class TestLogging:
 
 class TestCrossValidation:
 
-    def check_create_xval_files(self, 
+    def check_create_xval_files(self,
                                 file_format,
                                 with_folds_file,
                                 with_feature_subset,
                                 with_feature_list):
         """
         Check that ``create_xval_files()`` functions as expected.
-        
+
         Parameters
         ----------
         file_format : str
@@ -656,7 +656,7 @@ class TestCrossValidation:
         rsmxval_config_dict = {
             "train_file": join(rsmtool_test_dir,
                                "data",
-                               "files", 
+                               "files",
                                f"train.{file_format}"),
             "file_format": file_format,
             "id_column": "ID",
@@ -672,12 +672,12 @@ class TestCrossValidation:
                                                      "data",
                                                      "files",
                                                      "folds.csv")
-        else:        
+        else:
             rsmxval_config_dict["folds"] = 7
-        
+
         # use a feature subset if asked
         if with_feature_subset:
-            rsmxval_config_dict["feature_subset_file"] = join(rsmtool_test_dir, 
+            rsmxval_config_dict["feature_subset_file"] = join(rsmtool_test_dir,
                                                               "data",
                                                               "experiments",
                                                               "lr-with-feature-subset-file-and-feature-file",
@@ -688,12 +688,12 @@ class TestCrossValidation:
             if with_feature_list:
                 rsmxval_config_dict["features"] = ["FEATURE1", "FEATURE2"]
             else:
-                rsmxval_config_dict["features"] = join(rsmtool_test_dir, 
+                rsmxval_config_dict["features"] = join(rsmtool_test_dir,
                                                        "data",
                                                        "experiments",
                                                        "lr",
                                                        "features.csv")
-        
+
         # create configuration object from dictionary
         rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
 
@@ -713,7 +713,7 @@ class TestCrossValidation:
 
         # check that the training data frame is as expected
         assert_frame_equal(df_train_actual, df_train_expected)
-        
+
         # check that there are only the expected number of fold subdirectories
         actual_foldsdir_contents = sorted(listdir(foldsdir))
         expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)]
@@ -721,7 +721,7 @@ class TestCrossValidation:
 
         # check all the per-fold files/directories
         for fold_subdir in foldsdir.iterdir():
-            
+
             # (a) per-fold subdirectories and configuration files
             fold_num = fold_subdir.name
             fold_config = fold_subdir / "rsmtool.json"
@@ -814,7 +814,7 @@ class TestCrossValidation:
     def check_combine_fold_prediction_files(self, file_format):
         """
         Check that ``combine_fold_prediction_files()`` functions as expected.
-        
+
         Parameters
         ----------
         file_format : str
@@ -832,13 +832,13 @@ class TestCrossValidation:
         makedirs(foldsdir / "03")
 
         # create prediction files in each of the fold sub-directories
-        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)),
                                       columns=['raw', 'scale'])
         df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
-        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)),
                                       columns=['raw', 'scale'])
         df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
-        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)), 
+        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)),
                                       columns=['raw', 'scale'])
         df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
 
@@ -847,20 +847,20 @@ class TestCrossValidation:
                                           df_preds_fold2,
                                           df_preds_fold3], keys="spkitemid")
 
-        DataWriter.write_frame_to_file(df_preds_fold1, 
+        DataWriter.write_frame_to_file(df_preds_fold1,
                                        str(foldsdir / "01" / "pred_processed"),
                                        file_format=file_format)
-        DataWriter.write_frame_to_file(df_preds_fold2, 
+        DataWriter.write_frame_to_file(df_preds_fold2,
                                        str(foldsdir / "02" / "pred_processed"),
                                        file_format=file_format)
-        DataWriter.write_frame_to_file(df_preds_fold3, 
+        DataWriter.write_frame_to_file(df_preds_fold3,
                                        str(foldsdir / "03" / "pred_processed"),
                                        file_format=file_format)
 
         # now call `combine_fold_prediction_files` and check that its output
         # matches the frame that we manually combined
         df_combined_actual = combine_fold_prediction_files(str(foldsdir), file_format)
-        assert_frame_equal(df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True), 
+        assert_frame_equal(df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True),
                            df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True))
 
         # delete the temporary directory and all sub-directories
@@ -2056,7 +2056,7 @@ class TestInteractiveGenerate:
                                                       "tsv",               # file_format
                                                       True,                # use_thumbnails
                                                       ]
-        
+
         cls.mocked_rsmxval_interactive_values = ["testxval",          # experiment_id
                                                  "LinearSVC",         # model
                                                  "train.csv",         # train_file
@@ -2101,7 +2101,7 @@ class TestInteractiveGenerate:
         """
         A helper method that runs `ConfigurationGenerator.interact()`
         and compares its output to expected output.
-        
+
         Parameters
         ----------
         context : str
@@ -2158,7 +2158,7 @@ class TestInteractiveGenerate:
 
     def test_interactive_generate(self):
 
-        # all tools except rsmpredict and rsmsummarize 
+        # all tools except rsmpredict and rsmsummarize
         # explicitly support subgroups; only rsmxval supports
         # folds file
         yield self.check_tool_interact, 'rsmtool', False, False

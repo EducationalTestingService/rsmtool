@@ -152,7 +152,7 @@ def setup_rsmcmd_parser(name,
     # Setting up options for the "generate" subparser #
     ###################################################
     if uses_subgroups:
-        # we need to display a special help message for ``rsmxval`` 
+        # we need to display a special help message for ``rsmxval``
         # since its config does not actually contain a sections list
         if name == "rsmxval":
             parser_generate.add_argument('-g',
@@ -521,8 +521,9 @@ class InteractiveField:
 
         def is_empty(path):
             return path == ''
-        
-        validator = Validator.from_callable(lambda path: is_valid(path) or (allow_empty and is_empty(path)),
+
+        validator = Validator.from_callable(lambda path: is_valid(path) 
+                                            or (allow_empty and is_empty(path)),
                                             error_message="invalid file")
         return validator
 

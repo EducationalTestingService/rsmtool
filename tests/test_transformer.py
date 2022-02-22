@@ -122,7 +122,7 @@ class TestFeatureTransformer:
         # run the test but suppress the expected runtime warnings
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=RuntimeWarning)
-            assert_array_equal(self.ft.transform_feature(data, 
+            assert_array_equal(self.ft.transform_feature(data,
                                                          name,
                                                          'sqrt',
                                                          raise_error=False),
@@ -132,7 +132,7 @@ class TestFeatureTransformer:
                                                          'inv',
                                                          raise_error=False),
                                1 / data)
-            assert_array_equal(self.ft.transform_feature(data, 
+            assert_array_equal(self.ft.transform_feature(data,
                                                          name,
                                                          'addOneInv',
                                                          raise_error=False),

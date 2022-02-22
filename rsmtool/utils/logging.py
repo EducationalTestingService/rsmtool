@@ -78,14 +78,14 @@ def get_file_logger(logger_name, log_file_path):
     Instantiate a logger with the given name and attach a
     file handler that uses the given log file. The logging
     level is set to INFO.
-    
+
     Parameters
     ----------
     logger_name : str
         Name to use for the logger.
     log_file_path : str
         File path to which the logger should output messages.
-    
+
     Returns
     -------
     TYPE
@@ -106,16 +106,16 @@ def get_file_logger(logger_name, log_file_path):
 def tqdm_joblib(tqdm_object):
     """
     Patch joblib to report into tqdm progress bar given as argument.
-    
+
     This function creates a joblib-compatible context manager with
     a progress bar attached.
-    
+
     Adapted from: https://stackoverflow.com/a/58936697
-    
+
     Parameters
     ----------
     tqdm_object : tqdm progress bar
-        The given tqdm progress bar into which joblib should report    
+        The given tqdm progress bar into which joblib should report
     """
     class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
         def __call__(self, *args, **kwargs):

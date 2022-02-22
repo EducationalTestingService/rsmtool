@@ -9,19 +9,19 @@ The complete cross-validation workflow is as follows:
   and then using a k-fold split or by using a pre-specified folds file
   that provides a fold number for each example ID in the data.
 
-- For each fold (in parallel), use rsmtool to run a train/test experiment 
-  and save all output in a separate directory for that fold under 
+- For each fold (in parallel), use rsmtool to run a train/test experiment
+  and save all output in a separate directory for that fold under
   `<outdir>/folds/<num>`.
 
 - Combine the predictions for each fold's test set and run rsmeval on that
-  file. Save all output under `<outdir>/evaluation`. 
+  file. Save all output under `<outdir>/evaluation`.
 
 - Run rsmsummarize on all of the fold directories and save output under
   `<outdir>/fold-summary`.
 
 - Run rsmtool on the full training set to generate a final model along
   with a report including model/feature descriptives, all saved under
-  `<outdir>/final-model`. 
+  `<outdir>/final-model`.
 
 :author: Nitin Madnani (nmadnani@ets.org)
 :organization: ETS
@@ -60,7 +60,7 @@ FINAL_MODEL_SECTION_LIST = ['feature_descriptives',
 def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=False):
     """
     Run cross-validation experiment.
-    
+
     Parameters
     ----------
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
@@ -80,7 +80,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         rsmtool for each fold. This option should only be used when
         running the unit tests.
         Defaults to ``False``.
-    
+
     Raises
     ------
     IOError
@@ -118,10 +118,10 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         outfh.write(str(configuration))
 
     # create any cross-validation related files that are needed and
-    # get a data frame containing the training set and the final 
+    # get a data frame containing the training set and the final
     # number of folds that are to be used in the experiment
     df_train, folds = create_xval_files(configuration, output_dir, logger=logger)
-    
+
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
     with tqdm_joblib(tqdm(desc="Progress", total=folds, disable=silence_tqdm)):
@@ -133,13 +133,13 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     given_file_format = configuration.get("file_format")
     fold_summary_configdict = {
         "summary_id": f"{configuration['experiment_id']}_fold_summary",
-        "experiment_dirs": [f"{foldsdir}/{fold_num:02}" 
+        "experiment_dirs": [f"{foldsdir}/{fold_num:02}"
                             for fold_num in range(1, folds + 1)],
         "description": f"{configuration['description']} (Fold Summary)",
         "file_format": given_file_format,
         "use_thumbnails": f"{configuration['use_thumbnails']}"
     }
-    fold_summary_configuration = Configuration(fold_summary_configdict, 
+    fold_summary_configuration = Configuration(fold_summary_configdict,
                                                configdir=summarydir,
                                                context="rsmsummarize")
 
@@ -151,7 +151,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     # combine all of the fold prediction files for evaluation
     df_predictions = combine_fold_prediction_files(foldsdir, given_file_format)
 
-    # if there were subgroups and a second human score column specified, then 
+    # if there were subgroups and a second human score column specified, then
     # we need to add those to the combined predictions file as well
     id_column = configuration["id_column"]
     columns_to_use = [id_column]
@@ -161,7 +161,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         columns_to_use.append(second_human_score_column)
     if len(columns_to_use) > 1:
         df_to_add = df_train[columns_to_use]
-        df_predictions = df_predictions.merge(df_to_add, 
+        df_predictions = df_predictions.merge(df_to_add,
                                               left_on="spkitemid",
                                               right_on=id_column)
         # drop any extra ID column if we have added one
@@ -194,7 +194,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     for field_name in ["second_human_score_column",
                        "candidate_column",
                        "flag_column",
-                       "exclude_zero_scores", 
+                       "exclude_zero_scores",
                        "min_items_per_candidate",
                        "rater_error_variance",
                        "subgroups",
@@ -213,7 +213,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     run_evaluation(evaluation_configuration, evaldir, False, logger=eval_logger)
 
     # run rsmtool on the full dataset and generate only model/feature
-    # descriptives report; we will use the dummy test set that we 
+    # descriptives report; we will use the dummy test set that we
     # created by calling `create_xval_files()` for this purpose
     logger.info("Training model on full data")
     model_logger = get_file_logger("final_model", Path(modeldir) / "rsmtool.log")
@@ -221,7 +221,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     final_rsmtool_configdict["experiment_id"] = f"{configuration['experiment_id']}_model"
     final_rsmtool_configdict["test_file"] = str(Path(modeldir) / f"dummy_test.{given_file_format}")
     final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict["train_label_column"]
-    
+
     # remove by-group sections if we don't have the info
     sections_to_use = []
     for section in FINAL_MODEL_SECTION_LIST:
@@ -229,7 +229,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
             continue
         sections_to_use.append(section)
     final_rsmtool_configdict["general_sections"] = sections_to_use
-    final_rsmtool_configuration = Configuration(final_rsmtool_configdict, 
+    final_rsmtool_configuration = Configuration(final_rsmtool_configdict,
                                                 configdir=configuration.configdir,
                                                 context="rsmtool")
     run_experiment(final_rsmtool_configuration, modeldir, False, logger=model_logger)
