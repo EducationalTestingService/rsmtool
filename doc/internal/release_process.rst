@@ -7,7 +7,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Make sure any and all tests are passing in ``main``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any warnings in the HTML report that can be fixed before the release.
 
-#. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_.
+#. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`__.
 
     .. note:: 
 
@@ -62,11 +62,11 @@ This process is only meant for the project administrators, not users and develop
 
 #. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
 
-#. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/main.svg>`_ - this should say "passing" in green.
+#. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/main.svg>`__ - this should say "passing" in green.
 
 #. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
 
-#. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release. There are two versions of the documentation, one for the ``stable`` `branch <https://rsmtool.readthedocs.io/>`_ and the other for the ``main`` `branch <https://rsmtool.readthedocs.io/en/main/index.html>`_. The ``stable`` version of the documentation needs to be updated with each new release.
+#. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release. There are two versions of the documentation, one for the ``stable`` `branch <https://rsmtool.readthedocs.io/>`__ and the other for the ``main`` `branch <https://rsmtool.readthedocs.io/en/main/index.html>`__. The ``stable`` version of the documentation needs to be updated with each new release.
 
 #. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 

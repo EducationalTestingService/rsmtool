@@ -20,7 +20,7 @@ RSMTool provides the ``rsmcompare`` command-line utility to compare two models a
 
     It is strongly recommend that the original experiments as well as the comparison experiment are all done using the same version of RSMTool.
 
-.. include:: tutorial_rsmcompare.rst
+.. include:: tutorial_rsmcompare.rst.inc
 
 Input
 """""
@@ -47,7 +47,7 @@ Here are all the arguments to the ``rsmcompare`` command-line script.
 
     Show version number and exit.
 
-.. include:: config_rsmcompare.rst
+.. include:: config_rsmcompare.rst.inc
 
 Output
 """"""
