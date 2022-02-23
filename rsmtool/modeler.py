@@ -862,7 +862,7 @@ class Modeler:
 
         # initialize the coefficient data frame with just the intercept
         df_coef = pd.DataFrame([('Intercept', model.intercept_)])
-        df_coef = pd.concat([df_coef, list(zip(non_zero_features, non_zero_feature_values))],
+        df_coef = pd.concat([df_coef, pd.DataFrame(zip(non_zero_features, non_zero_feature_values))],
                             ignore_index=True)
         df_coef.columns = ['feature', 'coefficient']
 
