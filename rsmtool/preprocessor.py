@@ -1222,7 +1222,7 @@ class FeaturePreprocessor:
                                         "train_transformed_mean": train_transformed_mean,
                                         "train_transformed_sd": train_transformed_sd}])
 
-            df_feature_info = df_feature_info.append(df_feature)
+            df_feature_info = pd.concat([df_feature_info, df_feature])
 
         # reset the index for the feature metadata frame
         # since we built it up row by row

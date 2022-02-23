@@ -352,7 +352,7 @@ class Analyzer:
 
         df_output = df_desc.apply(lambda series: pd.Series(np.percentile(series,
                                                                          percentiles,
-                                                                         interpolation='lower')))
+                                                                         method='lower')))
         df_output = df_output.transpose()
 
         # change the column names to be more readable
@@ -1282,7 +1282,7 @@ class Analyzer:
             # we have the second score column available
             if include_second_score:
                 df_human_human_metrics.index = [group]
-                df_human_human_by_group = df_human_human_by_group.append(df_human_human_metrics)
+                df_human_human_by_group = pd.concat([df_human_human_by_group, df_human_human_metrics])
 
         # transpose the by group human-system metrics frame
         df_human_system_by_group = df_human_system_by_group.transpose()
@@ -1662,7 +1662,7 @@ class Analyzer:
         human_scores = df_preds['sc1_round'].astype('int64')
         system_scores = df_preds['{}_trim_round'.format(score_type)].astype('int64')
         conf_matrix = confusion_matrix(human_scores, system_scores)
-        labels = sorted(human_scores.append(system_scores).unique())
+        labels = sorted(pd.concat([human_scores, system_scores]).unique())
         df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
 
         # compute the score distributions of the rounded human and system scores
