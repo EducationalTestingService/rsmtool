@@ -680,22 +680,29 @@ class Configuration:
 class ConfigurationParser:
     """``ConfigurationParser`` class to create ``Configuration`` objects."""
 
-    def __init__(self, pathlike):
+    # initialize class logger attribute to None
+    logger = None
+
+    def __init__(self, pathlike, logger=None):
         """
         Instantiate a ``ConfigurationParser`` for a given config file path.
-
+        
         Parameters
         ----------
         pathlike : str or pathlib.Path
             A string containing the path to the configuration file
             that is to be parsed. A ``pathlib.Path`` instance is also
             acceptable.
-
+        logger : logging.Logger object, optional
+            Custom logger object to use, if not ``None``. Otherwise
+            a new logger is created.
+            Defaults to ``None``.
+        
         Raises
         ------
         FileNotFoundError
             If the given path does not exist.
-        OSError:
+        OSError
             If the given path is a directory, not a file.
         ValueError
             If the file at the given path does not have
@@ -724,6 +731,10 @@ class ConfigurationParser:
         # set the various attributes to None
         self._filename = pathlike.name
         self._configdir = pathlike.resolve().parent
+
+        # set the `logger` class attribute to the given logger, if provided
+        # or else create a new logger
+        self.__class__.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
     def _fix_json(json_string):
