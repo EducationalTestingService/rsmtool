@@ -65,7 +65,7 @@ class DataWriter:
 
         else:
             raise KeyError("Please make sure that the `file_format` specified "
-                           "is one of the following:\n{`csv`, `tsv`, `xlsx`}\n."
+                           "is one of the following:\n{`csv`, `tsv`, `xlsx`}.\n"
                            f"You specified {file_format}.")
 
     def write_experiment_output(self,

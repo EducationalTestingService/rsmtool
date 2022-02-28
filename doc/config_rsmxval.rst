@@ -5,7 +5,7 @@ Experiment configuration file
 
 This is a file in ``.json`` format that provides overall configuration options for an ``rsmxval`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmxval/config_rsmxval.json>`__ for ``rsmxval``. 
 
-.. note:: To make it easy to get started with  ``rsmxval``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
+.. note:: To make it easy to get started with  ``rsmxval``, we provide a way to **automatically generate** configuration files both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
 
 Configuration files for ``rsmxval`` are almost identical to ``rsmtool`` configuration files with only a few differences. Next, we describe the three required ``rsmxval`` configuration fields in detail. 
 

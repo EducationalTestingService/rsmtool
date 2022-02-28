@@ -38,7 +38,7 @@ The next step is to create an :ref:`experiment configuration file <config_file_r
 Let's take a look at the options in our configuration file.
 
 - **Line 2**: We define an experiment ID used to identify the files produced as part of this experiment.
-- **Line 3**: We also provide a description which will be included in the various reports. 
+- **Line 3**: We provide a description which will be included in the various reports.
 - **Line 4**: We list the path to our training file with the feature values and human scores.  For this tutorial, we used ``.csv`` format, but several other :ref:`input file formats <input_file_format>` are also supported.
 - **Line 5**: This field indicates the number of cross-validation folds we want to use. If this field is not specified, ``rsmxval`` uses 5-fold cross-validation by default.
 - **Line 6**: This field indicates that the human (reference) scores in our ``.csv`` file are located in a column named ``score``.
@@ -78,5 +78,5 @@ Once the run finishes, you will see an ``output`` sub-directory in the current d
 
 Examine the reports
 ~~~~~~~~~~~~~~~~~~~
-The cross-validation experiment produces multiple HTML reports - an ``rsmtool`` report for each of the 3 folds (``output/folds/{01,02,03}/report/ASAP2_xval_fold{01,02,03}.html``), the evaluation report for the cross-validated predictions (``output/evaluation/report/ASAP2_xval_evaluation_report.html``), a report summarizing the salient characteristics of the 3 folds (``output/fold-summary/report/ASAP2_xval_fold_summary_report.html``), a report showing the feature and model descriptives (``output/final-model/report/ASAP2_xval_model_report.html``). Examining these reports will provide a relatively complete picture of how well the predictive performance of the scoring model will generalize to unseen data.
+The cross-validation experiment produces multiple HTML reports -- an ``rsmtool`` report for each of the 3 folds (``output/folds/{01,02,03}/report/ASAP2_xval_fold{01,02,03}.html``), the evaluation report for the cross-validated predictions (``output/evaluation/report/ASAP2_xval_evaluation_report.html``), a report summarizing the salient characteristics of the 3 folds (``output/fold-summary/report/ASAP2_xval_fold_summary_report.html``), and a report showing the feature and model descriptives (``output/final-model/report/ASAP2_xval_model_report.html``). Examining these reports will provide a relatively complete picture of how well the predictive performance of the scoring model will generalize to unseen data.
 

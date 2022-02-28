@@ -686,7 +686,7 @@ class ConfigurationParser:
     def __init__(self, pathlike, logger=None):
         """
         Instantiate a ``ConfigurationParser`` for a given config file path.
-        
+
         Parameters
         ----------
         pathlike : str or pathlib.Path
@@ -697,7 +697,7 @@ class ConfigurationParser:
             Custom logger object to use, if not ``None``. Otherwise
             a new logger is created.
             Defaults to ``None``.
-        
+
         Raises
         ------
         FileNotFoundError
