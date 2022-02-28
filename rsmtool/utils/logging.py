@@ -88,8 +88,8 @@ def get_file_logger(logger_name, log_file_path):
 
     Returns
     -------
-    TYPE
-        Description
+    logger
+        A logging.Logger object attached to a file handler.
     """
     logger = logging.getLogger(logger_name)
     logger.propagate = False

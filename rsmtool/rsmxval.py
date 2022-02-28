@@ -64,7 +64,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     Parameters
     ----------
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
-        Path to the experiment configuration file either a a string
+        Path to the experiment configuration file either a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
         with keys corresponding to fields in the configuration file. Given a

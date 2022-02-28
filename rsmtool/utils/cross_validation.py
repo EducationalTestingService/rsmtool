@@ -1,5 +1,5 @@
 """
-Various utility functions used for cross
+Various utility functions used for cross-validation.
 
 :author: Nitin Madnani (nmadnani@ets.org)
 
@@ -45,7 +45,6 @@ def create_xval_files(configuration, output_dir, logger=None):
     FileNotFoundError
         If the training data file specified in the configuration is not found.
     """
-
     # instantiate a logger if one is not given
     logger = logger if logger else logging.getLogger(__name__)
 
@@ -200,7 +199,7 @@ def process_fold(fold_num, foldsdir):
     run_experiment(config_file, fold_dir, False, logger=logger)
 
 
-def combine_fold_prediction_files(foldsdir, file_format):
+def combine_fold_prediction_files(foldsdir, file_format="csv"):
     """
     Combine predictions from all folds into a single data frame.
 
