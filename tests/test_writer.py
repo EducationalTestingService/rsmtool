@@ -1,15 +1,71 @@
+from itertools import product
 import os
+from pathlib import Path
 from shutil import rmtree
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import pandas as pd
-from nose.tools import raises
+from nose.tools import ok_, raises
 from pandas.testing import assert_frame_equal
 from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
 
 
 class TestDataWriter:
+
+    def check_write_frame_to_file(self, file_format, include_index):
+
+        # create a dummy data frame for testing
+        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)),
+                                   columns=['A', 'B', 'C'])
+
+        # create a temporary directory where the file will be written
+        tempdir = TemporaryDirectory()
+
+        # create a name prefix for the frame
+        name_prefix = Path(tempdir.name) / "test_frame"
+
+        # write the frame to disk
+        DataWriter.write_frame_to_file(df_to_write,
+                                       str(name_prefix),
+                                       file_format=file_format,
+                                       index=include_index)
+
+        # check that the file was written to disk
+        dir_listing = os.listdir(tempdir.name)
+        assert f"test_frame.{file_format}" in dir_listing
+
+        # read the file and check that the frame was written as expected
+        if file_format == "csv":
+            df_written = pd.read_csv(f"{name_prefix}.{file_format}")
+        elif file_format == "tsv":
+            df_written = pd.read_csv(f"{name_prefix}.{file_format}", sep="\t")
+        elif file_format == "xlsx":
+            df_written = pd.read_excel(f"{name_prefix}.{file_format}")
+        else:
+            df_written = pd.read_json(f"{name_prefix}.{file_format}",
+                                      orient="records",
+                                      lines=True)
+
+        # check that the index is there if it's supposed to be
+        if include_index and file_format in ["csv", "tsv", "xlsx"]:
+            ok_("Unnamed: 0" in df_written.columns)
+
+        # check that the data is the same
+        df_written = df_written[["A", "B", "C"]]
+        assert_frame_equal(df_to_write, df_written)
+
+        # clean up the temporary directory
+        tempdir.cleanup()
+
+    def test_write_frame_to_file(self):
+
+        for (file_format,
+             include_index) in product(["csv", "tsv", "xlsx", "jsonlines"],
+                                       [False, True]):
+
+            yield self.check_write_frame_to_file, file_format, include_index
 
     def test_data_container_save_files(self):
 
@@ -24,9 +80,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                container,
@@ -39,13 +95,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
@@ -62,9 +120,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                data_sets,
@@ -77,13 +135,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.json', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
 
         assert_frame_equal(data_sets['dataset1'], aaa_json)
         assert_frame_equal(data_sets['dataset1'], ds_1_csv)
@@ -120,9 +180,9 @@ class TestDataWriter:
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter('test')
-        for file_type in ['json', 'csv', 'xlsx']:
+        for file_type in ['jsonlines', 'csv', 'xlsx']:
 
-            if file_type != 'json':
+            if file_type != 'jsonlines':
 
                 writer.write_experiment_output(directory,
                                                container,
@@ -135,13 +195,15 @@ class TestDataWriter:
                                                dataframe_names=['dataset1'],
                                                file_format=file_type)
 
-        aaa_json = pd.read_json(os.path.join(directory, 'test_aaa.json'))
+        aaa_json = pd.read_json(os.path.join(directory, 'test_aaa.jsonlines'),
+                                orient="records",
+                                lines=True)
         ds_1_csv = pd.read_csv(os.path.join(directory, 'test_dataset1.csv'))
         ds_1_xls = pd.read_excel(os.path.join(directory, 'test_dataset1.xlsx'))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['test_aaa.json',
+        assert sorted(output_dir) == sorted(['test_aaa.jsonlines',
                                              'test_dataset1.csv',
                                              'test_dataset1.xlsx'])
 

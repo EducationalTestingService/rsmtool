@@ -14,5 +14,6 @@ openpyxl
 parameterized
 sphinx
 sphinx_rtd_theme
+tqdm
 xlrd
 xlwt

@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "train_label_column": "score",
+    "trim_max": 6,
+    "feature_subset_file": "feature_file.csv",
+    "feature_subset": "subset1",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_xval_feature_subset_file",
+    "description": "Cross-validation with feature subset file using a LinearRegression model.",
+    "folds": 3
+}

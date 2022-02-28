@@ -1,26 +1,31 @@
 import argparse
-import os
-import tempfile
-import warnings
+import filecmp
 from io import StringIO
 from itertools import count, product
-from os import getcwd, listdir, unlink
+from os import environ, getcwd, listdir, makedirs, unlink
 from os.path import abspath, join, relpath
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from pathlib import Path
+from shutil import rmtree
+from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
 from unittest.mock import patch
+from uuid import uuid4
+import warnings
 
 import numpy as np
 import pandas as pd
 from nose.tools import assert_dict_equal, assert_equal, eq_, ok_, raises
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 from pandas.testing import assert_frame_equal
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
-from rsmtool.configuration_parser import Configuration
+from rsmtool.configuration_parser import Configuration, ConfigurationParser
+from rsmtool.reader import DataReader
 from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
 from rsmtool.utils.conversion import convert_to_float, int_to_float
+from rsmtool.utils.cross_validation import combine_fold_prediction_files, create_xval_files
 from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
+from rsmtool.utils.logging import get_file_logger
 from rsmtool.utils.metrics import (compute_expected_scores_from_model,
                                    difference_of_standardized_means,
                                    partial_correlations,
@@ -41,9 +46,11 @@ from skll.data import FeatureSet
 from skll.learner import Learner
 from skll.metrics import kappa
 
+from rsmtool.writer import DataWriter
+
 # allow test directory to be set via an environment variable
 # which is needed for package testing
-TEST_DIR = os.environ.get('TESTDIR', None)
+TEST_DIR = environ.get('TESTDIR', None)
 if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
@@ -70,7 +77,7 @@ def test_parse_json_with_comments():
     {{
         "key1": "{0}", {1}
         {1}
-        "key2": "value2", 
+        "key2": "value2",
         "key3": 5
     }}"""
 
@@ -148,7 +155,7 @@ def test_parse_json_with_comments_no_comments():
 
 
 def check_parse_json_with_comments(test_json_string, expected_result):
-    tempf = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
+    tempf = NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
     filename = tempf.name
     tempf.write(test_json_string)
     tempf.close()
@@ -593,6 +600,276 @@ def test_partial_correlations_pinv():
         warnings.simplefilter("always")
         partial_correlations(df_small_det)
         eq_(str(wrn[-1].message), msg)
+
+
+class TestLogging:
+
+    def setUp(self):
+        # create a log file with a random name
+        logname = str(uuid4())
+        self.logpath = Path(rsmtool_test_dir) / f"{logname}.log"
+
+    def tearDown(self):
+        try:
+            unlink(self.logpath)
+        except PermissionError:
+            pass  # sometimes Azure has trouble deleting this file
+
+    def test_get_file_logger(self):
+
+        # create a logger based on our dummy log file
+        test_logger = get_file_logger("testing", self.logpath)
+
+        # log message to that file
+        test_logger.info("This is a test.")
+
+        # delete the logger
+        del test_logger
+
+        # check that the message was indeed written
+        with open(self.logpath, "r") as tempfh:
+            ok_(tempfh.read().strip(), "This is a test.")
+
+
+class TestCrossValidation:
+
+    def check_create_xval_files(self,
+                                file_format,
+                                with_folds_file,
+                                with_feature_subset,
+                                with_feature_list):
+        """
+        Check that ``create_xval_files()`` functions as expected.
+
+        Parameters
+        ----------
+        file_format : str
+            File format to use for testing. One of {"csv", "tsv", "xlsx"}.
+        with_folds_file : bool
+            Whether to use a pre-specified folds file for testing.
+        with_feature_subset : bool
+            Whether to use feature subset information for testing.
+        with_feature_list : bool
+            Whether to specify features as a list instead of a file
+        """
+        # create an rsmxval configuration dictionary
+        rsmxval_config_dict = {
+            "train_file": join(rsmtool_test_dir,
+                               "data",
+                               "files",
+                               f"train.{file_format}"),
+            "file_format": file_format,
+            "id_column": "ID",
+            "model": "LinearRegression",
+            "train_label_column": "score",
+            "experiment_id": "test_create_xval_files",
+            "description": "Test Create Xval Files"
+        }
+
+        # use a folds file if asked, otherwise a fixed number of folds
+        if with_folds_file:
+            rsmxval_config_dict["folds_file"] = join(rsmtool_test_dir,
+                                                     "data",
+                                                     "files",
+                                                     "folds.csv")
+        else:
+            rsmxval_config_dict["folds"] = 7
+
+        # use a feature subset if asked
+        if with_feature_subset:
+            rsmxval_config_dict["feature_subset_file"] = join(rsmtool_test_dir,
+                                                              "data",
+                                                              "experiments",
+                                                              "lr-with-feature-subset-file-and-feature-file",
+                                                              "feature_file.csv")
+            rsmxval_config_dict["feature_subset"] = "subset1"
+        # otherwise set "features" depending on whether it should be a list or not
+        else:
+            if with_feature_list:
+                rsmxval_config_dict["features"] = ["FEATURE1", "FEATURE2"]
+            else:
+                rsmxval_config_dict["features"] = join(rsmtool_test_dir,
+                                                       "data",
+                                                       "experiments",
+                                                       "lr",
+                                                       "features.csv")
+
+        # create configuration object from dictionary
+        rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
+
+        # read the original training data file
+        df_train_expected = DataReader.read_from_file(rsmxval_config.get("train_file"))
+
+        # create a temporary output directory and any sub-directories
+        # that are needed by the ``create_xval_files()`` function
+        output_dir = mkdtemp()
+        foldsdir = Path(output_dir) / "folds"
+        modeldir = Path(output_dir) / "final-model"
+        makedirs(foldsdir)
+        makedirs(modeldir)
+
+        # call the function
+        df_train_actual, expected_folds = create_xval_files(rsmxval_config, output_dir)
+
+        # check that the training data frame is as expected
+        assert_frame_equal(df_train_actual, df_train_expected)
+
+        # check that there are only the expected number of fold subdirectories
+        actual_foldsdir_contents = sorted(listdir(foldsdir))
+        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)]
+        eq_(actual_foldsdir_contents, expected_foldsdir_contents)
+
+        # check all the per-fold files/directories
+        for fold_subdir in foldsdir.iterdir():
+
+            # (a) per-fold subdirectories and configuration files
+            fold_num = fold_subdir.name
+            fold_config = fold_subdir / "rsmtool.json"
+            ok_(fold_subdir.exists() and fold_subdir.is_dir())
+            ok_(fold_config.exists() and fold_config.is_file())
+
+            # (b) per-fold train/test files exist and are subsets of
+            #     the original full training file
+            fold_train_file = fold_subdir / f"train.{file_format}"
+            fold_test_file = fold_subdir / f"test.{file_format}"
+            ok_(fold_train_file.exists() and fold_train_file.is_file())
+            ok_(fold_test_file.exists() and fold_test_file.is_file())
+            df_train_actual_fold = DataReader.read_from_file(fold_train_file)
+            df_test_actual_fold = DataReader.read_from_file(fold_test_file)
+            eq_(len(df_train_expected), len(df_train_actual_fold) + len(df_test_actual_fold))
+            id_column = rsmxval_config.get("id_column")
+            assert_array_equal(df_train_expected[id_column].values.sort(),
+                               np.concatenate([df_train_actual_fold[id_column].values,
+                                               df_test_actual_fold[id_column].values]).sort())
+
+            # (c) configuration file fields
+            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
+
+            eq_(Path(parsed_fold_config.get("train_file")), fold_train_file)
+
+            eq_(Path(parsed_fold_config.get("test_file")), fold_test_file)
+
+            eq_(parsed_fold_config.get("id_column"),
+                rsmxval_config.get("id_column"))
+
+            eq_(parsed_fold_config.get("id_column"),
+                rsmxval_config.get("id_column"))
+
+            eq_(parsed_fold_config.get("train_label_column"),
+                rsmxval_config.get("train_label_column"))
+
+            eq_(parsed_fold_config.get("test_label_column"),
+                rsmxval_config.get("train_label_column"))
+
+            eq_(parsed_fold_config.get("file_format"),
+                rsmxval_config.get("file_format"))
+
+            eq_(parsed_fold_config.get("features"),
+                rsmxval_config.get("features"))
+
+            eq_(parsed_fold_config.get("experiment_id"),
+                f"{rsmxval_config.get('experiment_id')}_fold{fold_num}")
+
+            eq_(parsed_fold_config.get("description"),
+                f"{rsmxval_config.get('description')} (Fold {fold_num})")
+
+            # (d) the per-fold features or feature subset files
+            if with_feature_subset:
+                subset_file = fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
+                subset_name = rsmxval_config.get("feature_subset")
+                ok_(subset_file.exists() and subset_file.is_file())
+                eq_(parsed_fold_config.get("feature_subset"), subset_name)
+                ok_(filecmp.cmp(subset_file, rsmxval_config.get("feature_subset_file")))
+            else:
+                # if "features" a list, it should be in the config
+                if with_feature_list:
+                    eq_(parsed_fold_config["features"], ["FEATURE1", "FEATURE2"])
+                # otherwise the "features" file should have been copied to the fold directory
+                else:
+                    fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
+                    ok_(fold_feature_file.exists() and fold_feature_file.is_file())
+                    ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
+
+        # (e) the dummy test file for the final model
+        dummy_test_file = modeldir / f"dummy_test.{file_format}"
+        ok_(dummy_test_file.exists() and dummy_test_file.is_file())
+
+        # remove the entire output directory tree
+        rmtree(output_dir)
+
+    def test_create_xval_files(self):
+        for (file_format,
+             with_folds_file,
+             with_feature_subset,
+             with_feature_list) in product(["csv", "tsv", "xlsx"],
+                                           [False, True],
+                                           [False, True],
+                                           [False, True]):
+            yield (self.check_create_xval_files,
+                   file_format,
+                   with_folds_file,
+                   with_feature_subset,
+                   with_feature_list)
+
+    def check_combine_fold_prediction_files(self, file_format):
+        """
+        Check that ``combine_fold_prediction_files()`` functions as expected.
+
+        Parameters
+        ----------
+        file_format : str
+            File format to use for testing. One of {"csv", "tsv", "xlsx"}.
+        """
+        # create a temporary output directory and any sub-directories
+        # that are needed by the ``combine_fold_prediction_files()`` function
+        output_dir = mkdtemp()
+        foldsdir = Path(output_dir) / "folds"
+        makedirs(foldsdir)
+
+        # create 3 sub-directories simulating 3-fold cross-validation
+        makedirs(foldsdir / "01")
+        makedirs(foldsdir / "02")
+        makedirs(foldsdir / "03")
+
+        # create prediction files in each of the fold sub-directories
+        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)),
+                                      columns=['raw', 'scale'])
+        df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
+        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)),
+                                      columns=['raw', 'scale'])
+        df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
+        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)),
+                                      columns=['raw', 'scale'])
+        df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
+
+        # combine each of the frames in memory
+        df_combined_expected = pd.concat([df_preds_fold1,
+                                          df_preds_fold2,
+                                          df_preds_fold3], keys="spkitemid")
+
+        DataWriter.write_frame_to_file(df_preds_fold1,
+                                       str(foldsdir / "01" / "pred_processed"),
+                                       file_format=file_format)
+        DataWriter.write_frame_to_file(df_preds_fold2,
+                                       str(foldsdir / "02" / "pred_processed"),
+                                       file_format=file_format)
+        DataWriter.write_frame_to_file(df_preds_fold3,
+                                       str(foldsdir / "03" / "pred_processed"),
+                                       file_format=file_format)
+
+        # now call `combine_fold_prediction_files` and check that its output
+        # matches the frame that we manually combined
+        df_combined_actual = combine_fold_prediction_files(str(foldsdir), file_format)
+        assert_frame_equal(df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True),
+                           df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True))
+
+        # delete the temporary directory and all sub-directories
+        rmtree(output_dir)
+
+    def test_combine_fold_prediction_files(self):
+        yield self.check_combine_fold_prediction_files, "csv"
+        yield self.check_combine_fold_prediction_files, "tsv"
+        yield self.check_combine_fold_prediction_files, "xlsx"
 
 
 class TestIntermediateFiles:
@@ -1392,11 +1669,11 @@ class TestInteractiveField:
         for (user_input, final_value) in [('/foo/bar', '/foo/bar'), ('foo', 'foo')]:
             yield self.check_dir_field, user_input, final_value
 
-    def check_file_field(self, user_input, final_value):
+    def check_file_field(self, field_type, user_input, final_value):
         """Check that file fields are handled correctly."""
         with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
             ifield = InteractiveField('test_file',
-                                      'required',
+                                      field_type,
                                       {'label': 'enter file', 'type': 'file'})
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
@@ -1446,13 +1723,17 @@ class TestInteractiveField:
                                      f'train.{extension}')
                 eq_(validator.func(existing_file), True)
 
+            # empty files should are only accepted for optional fields
+            eq_(validator.func(""), field_type == "optional")
+
             # file fields do not use a completion style
             complete_style = mock_prompt.call_args[1]["complete_style"]
             eq_(complete_style, None)
 
     def test_file_field(self):
-        for (user_input, final_value) in [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]:
-            yield self.check_file_field, user_input, final_value
+        for field_type, (user_input, final_value) in product(['required', 'optional'],
+                                                             [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]):
+            yield self.check_file_field, field_type, user_input, final_value
 
     def check_format_field(self, user_input, final_value):
         """Check that file format fields are handled correctly."""
@@ -1776,7 +2057,47 @@ class TestInteractiveGenerate:
                                                       True,                # use_thumbnails
                                                       ]
 
-    def check_tool_interact(self, context, subgroups=False):
+        cls.mocked_rsmxval_interactive_values = ["testxval",          # experiment_id
+                                                 "LinearSVC",         # model
+                                                 "train.csv",         # train_file
+                                                 'xval test',         # description
+                                                 True,                # exclude_zero_scores
+                                                 "xlsx",              # file_format
+                                                 3,                   # folds
+                                                 None,                # folds file
+                                                 "ID",                # id_column
+                                                 "length",            # length_column
+                                                 "score2",            # second_human_score_column
+                                                 True,                # standardize_features
+                                                 ["L1", "QUESTION"],  # subgroups
+                                                 "score",             # train_label_column
+                                                 1,                   # trim_min
+                                                 5,                   # trim_max,
+                                                 True,                # use_scaled_predictions
+                                                 False                # use_thumbnails
+                                                 ]
+
+        cls.mocked_rsmxval_interactive_values_folds_file = ["testxval",          # experiment_id
+                                                            "LinearSVC",         # model
+                                                            "train.csv",         # train_file
+                                                            'xval test',         # description
+                                                            True,                # exclude_zero_scores
+                                                            "xlsx",              # file_format
+                                                            5,                   # default folds
+                                                            "folds.csv",         # folds file
+                                                            "ID",                # id_column
+                                                            "length",            # length_column
+                                                            "score2",            # second_human_score_column
+                                                            True,                # standardize_features
+                                                            ["L1"],              # subgroups
+                                                            "score",             # train_label_column
+                                                            1,                   # trim_min
+                                                            5,                   # trim_max,
+                                                            True,                # use_scaled_predictions
+                                                            False                # use_thumbnails
+                                                            ]
+
+    def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
         A helper method that runs `ConfigurationGenerator.interact()`
         and compares its output to expected output.
@@ -1788,13 +2109,16 @@ class TestInteractiveGenerate:
             One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize"}.
         subgroups : bool, optional
             Whether to include subgroup information in the generated configuration.
+        with_folds_file : bool, optional
+            Whether to use "folds_file" for rsmxval.
         """
         # if we are using subgroups, then define a suffix for the expected file
         groups_suffix = '_groups' if subgroups else ''
+        folds_file_suffix = '_folds_file' if with_folds_file else ''
 
         # get the appropriate list of mocked values for this tool but make
         # a copy since we may need to modify it below
-        mocked_values = getattr(self, f"mocked_{context}_interactive_values")[:]
+        mocked_values = getattr(self, f"mocked_{context}_interactive_values{folds_file_suffix}")[:]
 
         # if we are not using subgroups, delete the subgroup entry
         # from the list of mocked values
@@ -1803,9 +2127,11 @@ class TestInteractiveGenerate:
                 del mocked_values[11]
             elif context == 'rsmcompare':
                 del mocked_values[7]
+            elif context == 'rsmxval':
+                del mocked_values[12]
 
         # point to the right file holding the expected configuration
-        expected_file = f"interactive_{context}_config{groups_suffix}.json"
+        expected_file = f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
         expected_path = join(rsmtool_test_dir, 'data', 'output', expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
@@ -1823,7 +2149,8 @@ class TestInteractiveGenerate:
             generator = ConfigurationGenerator(context, use_subgroups=subgroups)
             configuration_string = generator.interact()
             with open(expected_path, 'r') as expectedfh:
-                eq_(expectedfh.read().strip(), configuration_string)
+                expected_configuration_string = expectedfh.read().strip()
+                eq_(expected_configuration_string, configuration_string)
 
         # stop the stderr and clear patchers now that the test is finished
         sys_stderr_patcher.stop()
@@ -1831,16 +2158,23 @@ class TestInteractiveGenerate:
 
     def test_interactive_generate(self):
 
-        # all tools except rsmpredict and rsmsummarize explicitly support subgroups
-        yield self.check_tool_interact, 'rsmtool', False
-        yield self.check_tool_interact, 'rsmtool', True
+        # all tools except rsmpredict and rsmsummarize
+        # explicitly support subgroups; only rsmxval supports
+        # folds file
+        yield self.check_tool_interact, 'rsmtool', False, False
+        yield self.check_tool_interact, 'rsmtool', True, False
 
-        yield self.check_tool_interact, 'rsmeval', False
-        yield self.check_tool_interact, 'rsmeval', True
+        yield self.check_tool_interact, 'rsmeval', False, False
+        yield self.check_tool_interact, 'rsmeval', True, False
 
-        yield self.check_tool_interact, 'rsmcompare', False
-        yield self.check_tool_interact, 'rsmcompare', True
+        yield self.check_tool_interact, 'rsmcompare', False, False
+        yield self.check_tool_interact, 'rsmcompare', True, False
 
-        yield self.check_tool_interact, 'rsmpredict', False
+        yield self.check_tool_interact, 'rsmpredict', False, False
 
         yield self.check_tool_interact, 'rsmsummarize', False
+
+        yield self.check_tool_interact, 'rsmxval', False, False
+        yield self.check_tool_interact, 'rsmxval', False, True
+        yield self.check_tool_interact, 'rsmxval', True, False
+        yield self.check_tool_interact, 'rsmxval', True, True

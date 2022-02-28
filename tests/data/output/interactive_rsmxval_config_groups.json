@@ -1,0 +1,41 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmxval
+    "experiment_id": "testxval",
+    "model": "LinearSVC",
+    "train_file": "train.csv",
+    // OPTIONAL: replace default values below based on your data.
+    "candidate_column": null,
+    "description": "xval test",
+    "exclude_zero_scores": true,
+    "feature_subset": null,
+    "feature_subset_file": null,
+    "features": null,
+    "file_format": "xlsx",
+    "flag_column": null,
+    "flag_column_test": null,
+    "folds": 3,
+    "folds_file": null,
+    "id_column": "ID",
+    "length_column": "length",
+    "min_items_per_candidate": null,
+    "min_n_per_group": null,
+    "predict_expected_scores": false,
+    "rater_error_variance": null,
+    "second_human_score_column": "score2",
+    "select_transformations": false,
+    "sign": null,
+    "skll_fixed_parameters": {},
+    "skll_objective": null,
+    "standardize_features": true,
+    "subgroups": [
+        "L1",
+        "QUESTION"
+    ],
+    "train_label_column": "score",
+    "trim_max": 1,
+    "trim_min": 5,
+    "trim_tolerance": 0.4998,
+    "use_scaled_predictions": true,
+    "use_thumbnails": false,
+    "use_truncation_thresholds": false
+}

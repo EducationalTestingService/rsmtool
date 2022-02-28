@@ -1,0 +1,4 @@
+,N features,N negative,learner,train_label
+lr_xval_feature_subset_file_fold01,6,0,LinearRegression,score
+lr_xval_feature_subset_file_fold02,6,1,LinearRegression,score
+lr_xval_feature_subset_file_fold03,6,0,LinearRegression,score

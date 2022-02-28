@@ -1,0 +1,9 @@
+	lower	upper	both	lowerperc	upperperc	bothperc
+FEATURE1	1	0	1	0.3	0.0	0.3
+FEATURE2	4	0	4	1.2	0.0	1.2
+FEATURE3	0	0	0	0.0	0.0	0.0
+FEATURE4	0	0	0	0.0	0.0	0.0
+FEATURE5	0	0	0	0.0	0.0	0.0
+FEATURE6	3	0	3	0.9	0.0	0.9
+FEATURE7	0	0	0	0.0	0.0	0.0
+FEATURE8	0	0	0	0.0	0.0	0.0

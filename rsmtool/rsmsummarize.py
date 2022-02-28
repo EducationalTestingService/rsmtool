@@ -92,7 +92,8 @@ def check_experiment_dir(experiment_dir,
 
 def run_summary(config_file_or_obj_or_dict,
                 output_dir,
-                overwrite_output=False):
+                overwrite_output=False,
+                logger=None):
     """
     Run rsmsummarize experiment using the given configuration.
 
@@ -118,6 +119,9 @@ def run_summary(config_file_or_obj_or_dict,
     overwrite_output : bool, optional
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
 
     Raises
     ------
@@ -125,7 +129,7 @@ def run_summary(config_file_or_obj_or_dict,
         If ``output_dir`` already contains the output of a previous experiment
         and ``overwrite_output`` is ``False``.
     """
-    logger = logging.getLogger(__name__)
+    logger = logger if logger else logging.getLogger(__name__)
 
     # create the 'output' and the 'figure' sub-directories
     # where all the experiment output such as the CSV files
@@ -200,7 +204,7 @@ def run_summary(config_file_or_obj_or_dict,
     section_order = configuration['section_order']
 
     # Initialize reporter
-    reporter = Reporter()
+    reporter = Reporter(logger=logger)
 
     # check all sections values and order and get the
     # ordered list of notebook files

@@ -10,8 +10,8 @@ class TestModeler:
     def setUp(self):
 
         series = pd.Series([34, .34, 1.2], index=['const', 'A', 'B'])
-        coef = Modeler.ols_coefficients_to_dataframe(series)
-        learner = Modeler.create_fake_skll_learner(coef)
+        coef = Modeler().ols_coefficients_to_dataframe(series)
+        learner = Modeler().create_fake_skll_learner(coef)
         self.modeler = Modeler.load_from_learner(learner)
 
     def test_get_coefficients(self):

@@ -1,0 +1,13 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "train_label_column": "score",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearSVC",
+    "experiment_id": "lr_xval_skll_model",
+    "description": "Cross-validation with a custom folds file and a LinearSVC model.",
+    "folds_file": "../../files/folds.csv"
+}

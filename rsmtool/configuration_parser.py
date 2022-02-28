@@ -45,8 +45,8 @@ def configure(context, config_file_or_obj_or_dict):
     ----------
     context : str
         The context that is being configured. Must be one of
-        "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", or
-        "rsmpredict".
+        "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize",
+        "rsmpredict", or "rsmxval".
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
@@ -119,7 +119,8 @@ class Configuration:
                  configdict,
                  *,
                  configdir=None,
-                 context='rsmtool'):
+                 context='rsmtool',
+                 logger=None):
         """
         Create an object of the `Configuration` class.
 
@@ -141,9 +142,15 @@ class Configuration:
             The context of the tool. One of {"rsmtool", "rsmeval", "rsmcompare",
             "rsmpredict", "rsmsummarize"}.
             Defaults to "rsmtool".
+        logger : logging object, optional
+            A logging object. If ``None`` is passed, get logger from ``__name__``.
+            Defaults to ``None``.
         """
         if not isinstance(configdict, dict):
             raise TypeError('The input must be a dictionary.')
+
+        # create a logger instance
+        self.logger = logger if logger else logging.getLogger(__name__)
 
         # process and validate the configuration dictionary
         configdict = ConfigurationParser.process_config(configdict)
@@ -152,7 +159,7 @@ class Configuration:
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
             configdir = Path(getcwd())
-            logging.info("Configuration directory will be set to {}".format(configdir))
+            self.logger.info("Configuration directory will be set to {}".format(configdir))
         else:
             configdir = Path(configdir).resolve()
 
@@ -407,7 +414,9 @@ class Configuration:
         Parameters
         ----------
         output_dir : str
-            The path to the output directory.
+            The path to the output directory. If ``None``, the current
+            directory is used.
+            Defaults to ``None``.
         """
         # save a copy of the main config into the output directory
         if output_dir is None:
@@ -514,32 +523,32 @@ class Configuration:
                 # if we were given a single value, convert it to list
                 if not isinstance(original_filter_dict[column], list):
                     new_filter_dict[column] = [original_filter_dict[column]]
-                    logging.warning("The filtering condition {}"
-                                    " for column {} was converted "
-                                    "to list. Only responses where "
-                                    "{} == {} will be used for "
-                                    "{} the "
-                                    "model. You can ignore this "
-                                    "warning if this is the correct "
-                                    "interpretation of your "
-                                    "configuration settings"
-                                    ".".format(original_filter_dict[column],
-                                               column,
-                                               column,
-                                               original_filter_dict[column],
-                                               flag_message[partition])
-                                    )
+                    self.logger.warning("The filtering condition {}"
+                                        " for column {} was converted "
+                                        "to list. Only responses where "
+                                        "{} == {} will be used for "
+                                        "{} the "
+                                        "model. You can ignore this "
+                                        "warning if this is the correct "
+                                        "interpretation of your "
+                                        "configuration settings"
+                                        ".".format(original_filter_dict[column],
+                                                   column,
+                                                   column,
+                                                   original_filter_dict[column],
+                                                   flag_message[partition])
+                                        )
                 else:
                     new_filter_dict[column] = original_filter_dict[column]
 
                     model_eval = ', '.join(map(str,
                                                original_filter_dict[column]))
-                    logging.info("Only responses where "
-                                 "{} equals one of the following values "
-                                 "will be used for {} the model: "
-                                 "{}.".format(column,
-                                              flag_message[partition],
-                                              model_eval))
+                    self.logger.info("Only responses where "
+                                     "{} equals one of the following values "
+                                     "will be used for {} the model: "
+                                     "{}.".format(column,
+                                                  flag_message[partition],
+                                                  model_eval))
         return new_filter_dict
 
     def get_trim_min_max_tolerance(self):
@@ -671,7 +680,10 @@ class Configuration:
 class ConfigurationParser:
     """``ConfigurationParser`` class to create ``Configuration`` objects."""
 
-    def __init__(self, pathlike):
+    # initialize class logger attribute to None
+    logger = None
+
+    def __init__(self, pathlike, logger=None):
         """
         Instantiate a ``ConfigurationParser`` for a given config file path.
 
@@ -681,12 +693,16 @@ class ConfigurationParser:
             A string containing the path to the configuration file
             that is to be parsed. A ``pathlib.Path`` instance is also
             acceptable.
+        logger : logging.Logger object, optional
+            Custom logger object to use, if not ``None``. Otherwise
+            a new logger is created.
+            Defaults to ``None``.
 
         Raises
         ------
         FileNotFoundError
             If the given path does not exist.
-        OSError:
+        OSError
             If the given path is a directory, not a file.
         ValueError
             If the file at the given path does not have
@@ -715,6 +731,10 @@ class ConfigurationParser:
         # set the various attributes to None
         self._filename = pathlike.name
         self._configdir = pathlike.resolve().parent
+
+        # set the `logger` class attribute to the given logger, if provided
+        # or else create a new logger
+        self.__class__.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
     def _fix_json(json_string):
@@ -786,7 +806,7 @@ class ConfigurationParser:
         context : str, optional
             Context of the tool in which we are validating. One of:
             {"rsmtool", "rsmeval", "rsmpredict", "rsmcompare",
-            "rsmsummarize"}.
+            "rsmsummarize", "rsmxval"}.
             Defaults to "rsmtool".
 
         Returns
@@ -897,11 +917,11 @@ class ConfigurationParser:
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
-                logging.warning("You requested feature subsets but did not "
-                                "specify any feature file. "
-                                "The tool will use the default "
-                                "feature file {} available via "
-                                "rsmextra".format(default_basename))
+                cls.logger.warning("You requested feature subsets but did not "
+                                   "specify any feature file. "
+                                   "The tool will use the default "
+                                   "feature file {} available via "
+                                   "rsmextra".format(default_basename))
             else:
                 raise ValueError("If you want to use feature subsets, you "
                                  "must specify a feature subset file")
@@ -912,12 +932,12 @@ class ConfigurationParser:
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
-                logging.warning("You specified the expected sign of "
-                                "correlation but did not specify a feature "
-                                "subset file. The tool will use "
-                                "the default feature subset file {} "
-                                "available via "
-                                "rsmextra".format(default_basename))
+                cls.logger.warning("You specified the expected sign of "
+                                   "correlation but did not specify a feature "
+                                   "subset file. The tool will use "
+                                   "the default feature subset file {} "
+                                   "available via "
+                                   "rsmextra".format(default_basename))
             else:
                 raise ValueError("If you want to specify the expected sign of "
                                  " correlation for each feature, you must "

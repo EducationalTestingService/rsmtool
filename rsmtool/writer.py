@@ -18,6 +18,56 @@ class DataWriter:
     def __init__(self, experiment_id=None):  # noqa: D107
         self._id = experiment_id
 
+    @staticmethod
+    def write_frame_to_file(df, name_prefix, file_format="csv", index=False, **kwargs):
+        """
+        Write given data frame to disk with given name and file format.
+
+        Parameters
+        ----------
+        df : pandas DataFrame
+            Data frame to write to disk
+        name_prefix : str
+            The complete prefix for the file to be written to disk.
+            This includes everything except the extension.
+        file_format : str
+            The file format (extension) for the file to be written to disk.
+            One of {"csv", "xlsx", "tsv"}.
+            Defaults to "csv".
+        index : bool, optional
+            Whether to include the index in the output file.
+            Defaults to ``False``.
+
+        Raises
+        ------
+        KeyError
+            If ``file_format`` is not valid.
+        """
+        file_format = file_format.lower()
+
+        if file_format == 'csv':
+            name_prefix += '.csv'
+            df.to_csv(name_prefix, index=index, **kwargs)
+
+        elif file_format == 'tsv':
+            name_prefix += '.tsv'
+            df.to_csv(name_prefix, index=index, sep='\t', **kwargs)
+
+        # Added jsonlines for experimental purposes, but leaving
+        # this out of the documentation at this stage
+        elif file_format == 'jsonlines':
+            name_prefix += '.jsonlines'
+            df.to_json(name_prefix, orient='records', lines=True, **kwargs)
+
+        elif file_format == 'xlsx':
+            name_prefix += '.xlsx'
+            df.to_excel(name_prefix, index=index, **kwargs)
+
+        else:
+            raise KeyError("Please make sure that the `file_format` specified "
+                           "is one of the following:\n{`csv`, `tsv`, `xlsx`}.\n"
+                           f"You specified {file_format}.")
+
     def write_experiment_output(self,
                                 csvdir,
                                 container_or_dict,
@@ -46,7 +96,7 @@ class DataWriter:
             contain the CSV files corresponding to each of the data frames.
         container_or_dict : container.DataContainer or dict
             A DataContainer object or dict, where keys are data frame
-            names and vales are ``pd.DataFrame`` objects.
+            names and values are ``pd.DataFrame`` objects.
         dataframe_names : list of str, optional
             List of data frame names, one for each of the data frames.
             Defaults to ``None``.
@@ -118,32 +168,12 @@ class DataWriter:
             else:
                 outfile = join(csvdir, dataframe_name)
 
-            # Save a copy of the frame to the output directory
-            # in the specified format
-            file_format = file_format.lower()
-
-            if file_format == 'csv':
-                outfile += '.csv'
-                df.to_csv(outfile, index=index, **kwargs)
-
-            elif file_format == 'tsv':
-                outfile += '.tsv'
-                df.to_csv(outfile, index=index, sep='\t', **kwargs)
-
-            # Added JSON for experimental purposes, but leaving
-            # this out of the documentation at this stage
-            elif file_format == 'json':
-                outfile += '.json'
-                df.to_json(outfile, orient='records', **kwargs)
-
-            elif file_format == 'xlsx':
-                outfile += '.xlsx'
-                df.to_excel(outfile, index=index, **kwargs)
-
-            else:
-                raise KeyError('Please make sure that the `file_format` specified '
-                               'is one of the following:\n{`csv`, `tsv`, `xlsx`}\n.'
-                               'You specified {}.'.format(file_format))
+            # write out the frame to disk in the given file
+            self.write_frame_to_file(df,
+                                     outfile,
+                                     file_format=file_format,
+                                     index=index,
+                                     **kwargs)
 
     def write_feature_csv(self,
                           featuredir,

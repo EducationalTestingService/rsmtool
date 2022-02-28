@@ -35,9 +35,10 @@ class Modeler:
     Class to train model and generate predictions with built-in or SKLL models.
     """
 
-    def __init__(self):
-        """Instantiate an empty instance with no learner."""
+    def __init__(self, logger=None):
+        """Instantiate empty instance with no learner and given logger, if any."""
         self.learner = None
+        self.logger = logger if logger else logging.getLogger(__name__)
 
     @classmethod
     def load_from_file(cls, model_path):
@@ -210,8 +211,7 @@ class Modeler:
 
         return df_coef
 
-    @staticmethod
-    def create_fake_skll_learner(df_coefficients):
+    def create_fake_skll_learner(self, df_coefficients):
         """
         Create a fake SKLL linear regression learner from given coefficients.
 
@@ -238,11 +238,11 @@ class Modeler:
             else:
                 # exclude NA coefficients
                 if coefficient == np.nan:
-                    logging.warning("No coefficient was estimated for "
-                                    "{}. This is likely due to exact "
-                                    "collinearity in the model. This "
-                                    "feature will not be used for model "
-                                    "building".format(feature))
+                    self.logger.warning("No coefficient was estimated for "
+                                        "{}. This is likely due to exact "
+                                        "collinearity in the model. This "
+                                        "feature will not be used for model "
+                                        "building".format(feature))
                 else:
                     coefdict[feature] = coefficient
 
@@ -1319,8 +1319,19 @@ class Modeler:
         human_labels_mean = df_train['sc1'].mean()
         human_labels_sd = df_train['sc1'].std()
 
-        logging.info('Processing train set predictions.')
-        df_train_predictions = FeaturePreprocessor.process_predictions(df_train_predictions,
+        self.logger.info('Processing train set predictions.')
+        feature_preprocessor = FeaturePreprocessor()
+        df_train_predictions = feature_preprocessor.process_predictions(df_train_predictions,
+                                                                        train_predictions_mean,
+                                                                        train_predictions_sd,
+                                                                        human_labels_mean,
+                                                                        human_labels_sd,
+                                                                        trim_min,
+                                                                        trim_max,
+                                                                        trim_tolerance)
+
+        self.logger.info('Processing test set predictions.')
+        df_test_predictions = feature_preprocessor.process_predictions(df_test_predictions,
                                                                        train_predictions_mean,
                                                                        train_predictions_sd,
                                                                        human_labels_mean,
@@ -1328,16 +1339,6 @@ class Modeler:
                                                                        trim_min,
                                                                        trim_max,
                                                                        trim_tolerance)
-
-        logging.info('Processing test set predictions.')
-        df_test_predictions = FeaturePreprocessor.process_predictions(df_test_predictions,
-                                                                      train_predictions_mean,
-                                                                      train_predictions_sd,
-                                                                      human_labels_mean,
-                                                                      human_labels_sd,
-                                                                      trim_min,
-                                                                      trim_max,
-                                                                      trim_tolerance)
 
         df_postproc_params = pd.DataFrame([{'trim_min': trim_min,
                                             'trim_max': trim_max,

@@ -10,7 +10,7 @@ from inspect import getmembers, getsourcelines, isfunction
 from os import remove
 from os.path import basename, exists, join
 from pathlib import Path
-from shutil import copyfile, copytree
+from shutil import copyfile, copytree, rmtree
 
 import numpy as np
 from bs4 import BeautifulSoup
@@ -24,6 +24,7 @@ from .rsmeval import run_evaluation
 from .rsmpredict import compute_and_save_predictions
 from .rsmsummarize import run_summary
 from .rsmtool import run_experiment
+from .rsmxval import run_cross_validation
 
 html_error_regexp = re.compile(r'Traceback \(most recent call last\)')
 html_warning_regexp = re.compile(r'<div class=".*?output_stderr.*?>([^<]+)')
@@ -128,7 +129,7 @@ def check_run_experiment(source,
     check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
 
     if not skll:
-        check_scaled_coefficients(source, experiment_id, file_format=file_format)
+        check_scaled_coefficients(output_dir, experiment_id, file_format=file_format)
 
     if subgroups:
         check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
@@ -431,6 +432,214 @@ def check_run_summary(source,
         assert_equal(len(warning_msgs), 0)
 
 
+def check_run_cross_validation(source,
+                               experiment_id,
+                               folds=5,
+                               subgroups=None,
+                               consistency=False,
+                               skll=False,
+                               file_format='csv',
+                               given_test_dir=None,
+                               config_obj_or_dict=None,
+                               suppress_warnings_for=[]):
+    """
+    Run a parameterized rsmxval experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    folds : int, optional
+        Number of folds being used in the cross-validation experiment.
+        Defaults to 5.
+    subgroups : list of str, optional
+        List of subgroup names used in the experiment. If specified,
+        outputs pertaining to subgroups are also checked as part of the
+        test.
+        Defaults to ``None``.
+    consistency : bool, optional
+        Whether to check consistency files as part of the experiment test.
+        Generally, this should be true if the second human score column is
+        specified.
+        Defaults to ``False``.
+    skll : bool, optional
+        Whether the model being used in the experiment is a SKLL model
+        in which case the coefficients, predictions, etc. will not be
+        checked since they can vary across machines, due to parameter tuning.
+        Defaults to ``False``.
+    file_format : str, optional
+        Which file format is being used for the output files of the experiment.
+        Defaults to "csv".
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+        Defaults to ``None``.
+    config_obj_or_dict : configuration_parser.Configuration or dict, optional
+        Configuration object or dictionary to use as an input, if any.
+        If ``None``, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
+        Defaults to ``[]``.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    if config_obj_or_dict is None:
+        config_input = join(test_dir,
+                            'data',
+                            'experiments',
+                            source,
+                            '{}.json'.format(experiment_id))
+    else:
+        config_input = config_obj_or_dict
+
+    model_type = 'skll' if skll else 'rsmtool'
+
+    do_run_cross_validation(source,
+                            experiment_id,
+                            config_input,
+                            suppress_warnings_for=suppress_warnings_for)
+
+    output_prefix = join('test_outputs', source)
+    expected_output_prefix = join(test_dir, 'data', 'experiments', source, 'output')
+
+    # first check that each fold's rsmtool output is as expected
+    actual_folds_dir = join(output_prefix, 'folds')
+    expected_folds_dir = join(expected_output_prefix, 'folds')
+    for fold_num in range(1, folds + 1):
+        fold_experiment_id = f"{experiment_id}_fold{fold_num:02}"
+        fold_output_dir = join(actual_folds_dir, f'{fold_num:02}', 'output')
+        fold_output_files = glob(join(fold_output_dir, f'*.{file_format}'))
+        for fold_output_file in fold_output_files:
+            output_filename = basename(fold_output_file)
+            expected_output_file = join(expected_folds_dir,
+                                        f'{fold_num:02}',
+                                        'output',
+                                        output_filename)
+
+            if exists(expected_output_file):
+                check_file_output(fold_output_file,
+                                  expected_output_file,
+                                  file_format=file_format)
+
+        check_generated_output(fold_output_files,
+                               fold_experiment_id,
+                               model_type,
+                               file_format=file_format)
+
+        if not skll:
+            check_scaled_coefficients(fold_output_dir,
+                                      fold_experiment_id,
+                                      file_format=file_format)
+
+        if subgroups:
+            check_subgroup_outputs(fold_output_dir,
+                                   fold_experiment_id,
+                                   subgroups,
+                                   file_format=file_format)
+
+        if consistency:
+            check_consistency_files_exist(fold_output_files,
+                                          fold_experiment_id,
+                                          file_format=file_format)
+
+    # next check that the evaluation output is as expected
+    actual_eval_output_dir = join(output_prefix, 'evaluation', 'output')
+    expected_eval_output_dir = join(expected_output_prefix, 'evaluation', 'output')
+
+    output_files = glob(join(actual_eval_output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_eval_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
+
+    if consistency:
+        check_consistency_files_exist(output_files, f"{experiment_id}_evaluation")
+
+    # next check that the summary output is as expected
+    actual_summary_output_dir = join(output_prefix, 'fold-summary', 'output')
+    expected_summary_output_dir = join(expected_output_prefix, 'fold-summary', 'output')
+
+    output_files = glob(join(actual_summary_output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_summary_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file)
+
+    # next check that the final model rsmtool output is as expected
+    actual_final_model_output_dir = join(output_prefix, 'final-model', 'output')
+    expected_final_model_output_dir = join(expected_output_prefix, 'final-model', 'output')
+    model_experiment_id = f"{experiment_id}_model"
+
+    output_files = glob(join(actual_final_model_output_dir, '*.{}'.format(file_format)))
+    for output_file in output_files:
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_final_model_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
+
+    check_generated_output(output_files,
+                           model_experiment_id,
+                           model_type,
+                           file_format=file_format)
+
+    if not skll:
+        check_scaled_coefficients(actual_final_model_output_dir,
+                                  model_experiment_id,
+                                  file_format=file_format)
+
+    if subgroups:
+        check_subgroup_outputs(actual_final_model_output_dir,
+                               model_experiment_id,
+                               subgroups,
+                               file_format=file_format)
+
+    # finally check all the HTML reports for any errors but ignore warnings
+    # which we check below separately
+    per_fold_html_reports = glob(join(output_prefix,
+                                      'folds',
+                                      '*',
+                                      'report',
+                                      '*.html'))
+
+    evaluation_report = join(output_prefix,
+                             'evaluation',
+                             'report',
+                             f'{experiment_id}_evaluation_report.html')
+
+    summary_report = join(output_prefix,
+                          'fold-summary',
+                          'report',
+                          f'{experiment_id}_fold_summary_report.html')
+
+    final_model_report = join(output_prefix,
+                              'final-model',
+                              'report',
+                              f'{experiment_id}_model_report.html')
+
+    for html_report in per_fold_html_reports + [evaluation_report,
+                                                summary_report,
+                                                final_model_report]:
+        check_report(html_report, raise_warnings=False)
+
+        # make sure that there are no warnings in the report
+        # but ignore warnings if appropriate
+        if not IGNORE_WARNINGS:
+            warning_msgs = collect_warning_messages_from_report(html_report)
+            assert_equal(len(warning_msgs), 0)
+
+
 def do_run_experiment(source,
                       experiment_id,
                       config_input,
@@ -657,6 +866,61 @@ def do_run_summary(source,
         run_summary(config_input, experiment_dir)
 
 
+def do_run_cross_validation(source,
+                            experiment_id,
+                            config_input,
+                            suppress_warnings_for=[]):
+    """
+    Run rsmxval experiment automatically.
+
+    Use the given experiment configuration file located in the
+    given source directory and use the given experiment ID.
+
+    Parameters
+    ----------
+    source : str
+        Path to where the test experiment is located on disk.
+    experiment_id : str
+        Experiment ID to use when running.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a ``configuration_parser.Configuration`` object
+        or a dictionary with keys corresponding to fields in the
+        configuration file.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed
+        when running the experiments. Note that ``RuntimeWarning``s
+        are always suppressed.
+        Defaults to ``[]``.
+    """
+    source_output_dir = 'test_outputs'
+    experiment_dir = join(source_output_dir, source)
+
+    # remove all previously created files
+    for output_subdir in ["folds", "fold-summary", "evaluation", "final-model"]:
+        try:
+            rmtree(join(source_output_dir, source, output_subdir))
+        except FileNotFoundError:
+            pass
+    try:
+        remove(join(source_output_dir, source, "rsmxval.json"))
+    except FileNotFoundError:
+        pass
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings('ignore', category=warning_type)
+
+        # call rsmxval but make sure to silence the progress bar
+        # that is displayed for the parallel rsmtool runs
+        run_cross_validation(config_input, experiment_dir, silence_tqdm=True)
+
+
 def check_file_output(file1, file2, file_format='csv'):
     """
     Check if the two given tabular files contain matching values.
@@ -817,39 +1081,31 @@ def check_report(html_file,
         assert_equal(report_warnings, 0)
 
 
-def check_scaled_coefficients(source, experiment_id, file_format='csv'):
+def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
     """
     Check that predictions using scaled coefficients match scaled scores.
 
     Parameters
     ----------
-    source : str
-        Path to the source directory on disk.
+    output_dir : str
+         Path to the experiment output directory for a test.
     experiment_id : str
         The experiment ID.
     file_format : str, optional
         The format of the output files.
         Defaults to "csv".
-    """
-    preprocessed_test_file = join('test_outputs',
-                                  source,
-                                  'output',
+        """
+    preprocessed_test_file = join(output_dir,
                                   '{}_test_preprocessed_features.{}'.format(experiment_id,
                                                                             file_format))
-    scaled_coefficients_file = join('test_outputs',
-                                    source,
-                                    'output',
+    scaled_coefficients_file = join(output_dir,
                                     '{}_coefficients_scaled.{}'.format(experiment_id,
                                                                        file_format))
-    predictions_file = join('test_outputs',
-                            source,
-                            'output',
+    predictions_file = join(output_dir,
                             '{}_pred_processed.{}'.format(experiment_id,
                                                           file_format))
 
-    postprocessing_params_file = join('test_outputs',
-                                      source,
-                                      'output',
+    postprocessing_params_file = join(output_dir,
                                       '{}_postprocessing_params.{}'.format(experiment_id,
                                                                            file_format))
 
@@ -860,7 +1116,7 @@ def check_scaled_coefficients(source, experiment_id, file_format='csv'):
 
     # create fake skll objects with new coefficients
     df_coef = DataReader.read_from_file(scaled_coefficients_file)
-    learner = Modeler.create_fake_skll_learner(df_coef)
+    learner = Modeler().create_fake_skll_learner(df_coef)
     modeler = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'
@@ -1214,7 +1470,8 @@ class FileUpdater(object):
         # We keep these files if we are dealing with input files.
         if file_type == 'output':
             excluded_suffixes.extend(['_rsmtool.json', '_rsmeval.json',
-                                      '_rsmsummarize.json', '_rsmcompare.json'])
+                                      '_rsmsummarize.json', '_rsmcompare.json',
+                                      '_rsmxval.json'])
 
         new_files = [f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)]
 

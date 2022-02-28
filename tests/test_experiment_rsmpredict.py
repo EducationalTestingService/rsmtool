@@ -52,8 +52,8 @@ def test_run_experiment_parameterized(*args, **kwargs):
     check_run_prediction(*args, **kwargs)
 
 
+# Check that both rsmtool and rsmpredict generate the same files
 def test_run_experiment_lr_rsmtool_and_rsmpredict():
-    """Check that both rsmtool and rsmpredict generate the same files."""
     source = 'lr-rsmtool-rsmpredict'
     experiment_id = 'lr_rsmtool_rsmpredict'
     rsmtool_config_file = join(rsmtool_test_dir,
@@ -81,7 +81,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
         if exists(expected_csv_file):
             yield check_file_output, csv_file, expected_csv_file
 
-    yield check_scaled_coefficients, source, experiment_id
+    yield check_scaled_coefficients, output_dir, experiment_id
     yield check_generated_output, csv_files, experiment_id, 'rsmtool'
     yield check_report, html_report, True, False
 

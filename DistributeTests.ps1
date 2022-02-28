@@ -61,6 +61,9 @@ elseif ($agentNumber -eq 5) {
     $testsToRun = $testsToRun + "tests/test_utils.py"
     $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_4.py"
 }
+elseif ($agentNumber -eq 6) {
+    $testsToRun = $testsToRun + "tests/test_experiment_rsmxval.py"
+}
 
 # join all test files seperated by space. pytest runs multiple test files in following format pytest test1.py test2.py test3.py
 $testFiles = $testsToRun -Join " "

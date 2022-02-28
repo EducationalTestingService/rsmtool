@@ -1,0 +1,2 @@
+,N,h_mean,h_sd,sys_mean.scale_trim,sys_sd.scale_trim,wtkappa.scale_trim,corr.scale_trim,SMD.scale_trim,RMSE.scale_trim,R2.scale_trim,sys_mean.scale_trim_round,sys_sd.scale_trim_round,kappa.scale_trim_round,exact_agr.scale_trim_round,adj_agr.scale_trim_round,SMD.scale_trim_round
+0,500,3.42,0.8154323146156515,3.422378876521545,0.805541772017158,0.6877760477006143,0.6878302294467359,0.0029173194131583563,0.6398357097874958,0.3830775534670454,3.408,0.8526370740003744,0.38730445059558993,60.6,97.0,-0.014716120252919004

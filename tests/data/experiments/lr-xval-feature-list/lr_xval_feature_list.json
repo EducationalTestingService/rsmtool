@@ -1,0 +1,13 @@
+{
+    "train_file": "../../files/train.csv",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "train_label_column": "score",
+    "trim_max": 6,
+    "features": ["FEATURE1", "FEATURE2", "FEATURE3", "FEATURE4"],
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_xval_feature_list",
+    "description": "Cross-validation with feature list using a LinearRegression model.",
+    "folds": 3
+}

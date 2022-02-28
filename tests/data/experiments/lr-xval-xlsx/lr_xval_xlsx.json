@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train.xlsx",
+    "id_column": "ID",
+    "use_scaled_predictions": true,
+    "train_label_column": "score",
+    "trim_max": 6,
+    "features": "features.csv",
+    "trim_min": 1,
+    "model": "LinearRegression",
+    "experiment_id": "lr_xval_xlsx",
+    "description": "Cross-validation in XLSX format using a LinearRegression model.",
+    "folds": 3,
+    "file_format": "xlsx"
+}

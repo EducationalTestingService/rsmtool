@@ -39,11 +39,13 @@ class TestToolCLI:
         cls.rsmcompare_config_file = common_dir / 'lr-self-compare' / 'rsmcompare.json'
         cls.rsmpredict_config_file = common_dir / 'lr-predict' / 'rsmpredict.json'
         cls.rsmsummarize_config_file = common_dir / 'lr-self-summary' / 'rsmsummarize.json'
+        cls.rsmxval_config_file = common_dir / 'lr-xval' / 'lr_xval.json'
         cls.expected_rsmtool_output_dir = common_dir / 'lr' / 'output'
         cls.expected_rsmeval_output_dir = common_dir / 'lr-eval' / 'output'
         cls.expected_rsmcompare_output_dir = common_dir / 'lr-self-compare' / 'output'
         cls.expected_rsmpredict_output_dir = common_dir / 'lr-predict' / 'output'
         cls.expected_rsmsummarize_output_dir = common_dir / 'lr-self-summary' / 'output'
+        cls.expected_rsmxval_output_dir = common_dir / 'lr-xval' / 'output'
 
     @classmethod
     def tearDownClass(cls):
@@ -74,7 +76,7 @@ class TestToolCLI:
 
         # this applies to all tools
         for context in ['rsmtool', 'rsmeval', 'rsmsummarize',
-                        'rsmpredict', 'rsmcompare']:
+                        'rsmpredict', 'rsmcompare', 'rsmxval']:
             yield self.check_no_args, context
 
     def validate_run_output(self, name, experiment_dir):
@@ -94,44 +96,120 @@ class TestToolCLI:
         expected_output_dir = getattr(self, f"expected_{name}_output_dir")
 
         # all tools except rsmcompare need to have their output files validated
-        if name in ['rsmtool', 'rsmeval', 'rsmsummarize', 'rsmpredict']:
+        if name in ['rsmtool', 'rsmeval', 'rsmsummarize', 'rsmpredict', 'rsmxval']:
 
             # rsmpredict has its own set of files and it puts them right at the root
-            # of the output directory rather than under the "output" subdirectory
-            if name == 'rsmpredict':
+            # of the output directory rather than under the "output" subdirectory;
+            # rsmxval also needs to be specially handled
+            if name == 'rsmxval':
+                self.validate_run_output_rsmxval(experiment_dir)
+            elif name == 'rsmpredict':
                 output_dir = Path(experiment_dir)
                 output_files = [output_dir / 'predictions_with_metadata.csv']
             else:
                 output_dir = Path(experiment_dir) / 'output'
                 output_files = list(output_dir.glob('*.csv'))
 
-            for output_file in output_files:
-                output_filename = output_file.name
-                expected_output_file = expected_output_dir / output_filename
+                for output_file in output_files:
+                    output_filename = output_file.name
+                    expected_output_file = expected_output_dir / output_filename
 
-                if expected_output_file.exists():
-                    check_file_output(str(output_file), str(expected_output_file))
+                    if expected_output_file.exists():
+                        check_file_output(str(output_file), str(expected_output_file))
 
-            # we need to do an extra check for rsmtool
-            if name == 'rsmtool':
-                check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
+                # we need to do an extra check for rsmtool
+                if name == 'rsmtool':
+                    check_generated_output(list(map(str, output_files)), 'lr', 'rsmtool')
 
         # there's no report for rsmpredict but for the rest we want
-        # the reports to be free of errors and warnings
-        if name != 'rsmpredict':
+        # the reports to be free of errors and warnings; for rsmxval
+        # there are multiple reports to check
+        if name in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize', 'rsmxval']:
             output_dir = Path(experiment_dir)
-            report_dir = output_dir / "report" if name != "rsmcompare" else output_dir
-            html_report = list(report_dir.glob('*_report.html'))[0]
+            if name == "rsmxval":
+                folds_dir = output_dir / "folds"
+                per_fold_html_reports = list(map(str, folds_dir.glob("??/report/lr_xval_fold??.html")))
+                evaluation_report = output_dir / "evaluation" / "report" / "lr_xval_evaluation_report.html"
+                summary_report = output_dir / "fold-summary" / "report" / "lr_xval_fold_summary_report.html"
+                final_model_report = output_dir / "final-model" / "report" / "lr_xval_model_report.html"
+                html_reports = per_fold_html_reports + [evaluation_report,
+                                                        summary_report,
+                                                        final_model_report]
+            else:
+                report_dir = output_dir / "report" if name != "rsmcompare" else output_dir
+                html_reports = report_dir.glob('*_report.html')
 
-            # check report for any errors but ignore warnings
+            # check reports for any errors but ignore warnings
             # which we check below separately
-            check_report(html_report, raise_warnings=False)
+            for html_report in html_reports:
+                check_report(html_report, raise_warnings=False)
 
-            # make sure that there are no warnings in the report
-            # but ignore warnings if in STRICT mode
-            if not IGNORE_WARNINGS:
-                warning_msgs = collect_warning_messages_from_report(html_report)
-                eq_(len(warning_msgs), 0)
+                # make sure that there are no warnings in the report
+                # but ignore warnings if in STRICT mode
+                if not IGNORE_WARNINGS:
+                    warning_msgs = collect_warning_messages_from_report(html_report)
+                    eq_(len(warning_msgs), 0)
+
+    def validate_run_output_rsmxval(self, experiment_dir):
+
+        output_dir = Path(experiment_dir)
+        expected_output_dir = getattr(self, "expected_rsmxval_output_dir")
+
+        # first check that each fold's rsmtool output is as expected
+        actual_folds_dir = output_dir / "folds"
+        expected_folds_dir = expected_output_dir / "folds"
+        fold_output_files = list(actual_folds_dir.glob("??/output/*.csv"))
+        fold_nums = set()
+        for fold_output_file in fold_output_files:
+            fold_output_filename = fold_output_file.relative_to(actual_folds_dir)
+            fold_nums.add(fold_output_filename.parts[0])
+            expected_fold_output_file = expected_folds_dir / fold_output_filename
+
+            if expected_fold_output_file.exists():
+                check_file_output(str(fold_output_file), str(expected_fold_output_file))
+
+        for fold_num in fold_nums:
+            check_generated_output(list(map(str, fold_output_files)),
+                                   f"lr_xval_fold{fold_num}",
+                                   "rsmtool")
+
+        # next check that the evaluation output is as expected
+        actual_eval_output_dir = output_dir / "evaluation"
+        expected_eval_output_dir = expected_output_dir / "evaluation"
+
+        eval_output_files = actual_eval_output_dir.glob("output/*.csv")
+        for eval_output_file in eval_output_files:
+            eval_output_filename = eval_output_file.relative_to(actual_eval_output_dir)
+            expected_eval_output_file = expected_eval_output_dir / eval_output_filename
+
+            if expected_eval_output_file.exists():
+                check_file_output(str(eval_output_file), str(expected_eval_output_file))
+
+        # next check that the summary output is as expected
+        actual_summary_output_dir = output_dir / "fold-summary"
+        expected_summary_output_dir = expected_output_dir / "fold-summary"
+
+        summary_output_files = actual_summary_output_dir.glob("output/*.csv")
+        for summary_output_file in summary_output_files:
+            summary_output_filename = summary_output_file.relative_to(actual_summary_output_dir)
+            expected_summary_output_file = expected_summary_output_dir / summary_output_filename
+
+            if expected_summary_output_file.exists():
+                check_file_output(str(summary_output_file), str(expected_summary_output_file))
+
+        # next check that the final model rsmtool output is as expected
+        actual_final_model_output_dir = output_dir / "final-model"
+        expected_final_model_output_dir = expected_output_dir / "final-model"
+
+        final_model_output_files = list(actual_final_model_output_dir.glob("output/*.csv"))
+        for final_model_output_file in final_model_output_files:
+            final_model_output_filename = final_model_output_file.relative_to(actual_final_model_output_dir)
+            expected_final_model_output_file = expected_final_model_output_dir / final_model_output_filename
+
+            if expected_final_model_output_file.exists():
+                check_file_output(str(final_model_output_file), str(expected_final_model_output_file))
+
+        check_generated_output(final_model_output_files, "lr_xval_model", "rsmtool")
 
     def validate_generate_output(self, name, output, subgroups=False):
         """
@@ -220,7 +298,12 @@ class TestToolCLI:
         # test that the default subcommand for all contexts is "run"
 
         # this applies to all tools
-        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+        for context in ['rsmtool',
+                        'rsmeval',
+                        'rsmcompare',
+                        'rsmpredict',
+                        'rsmsummarize',
+                        'rsmxval']:
 
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
@@ -235,7 +318,11 @@ class TestToolCLI:
         # test that "run" subcommand works without an output directory
 
         # this applies to all tools except rsmpredict
-        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmsummarize']:
+        for context in ['rsmtool',
+                        'rsmeval',
+                        'rsmcompare',
+                        'rsmsummarize',
+                        'rsmxval']:
 
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
@@ -262,7 +349,7 @@ class TestToolCLI:
     def test_run_bad_overwrite(self):
         # test that the "run" command fails to overwrite when "-f" is not specified
 
-        # this applies to all tools except rsmpredict and rsmcompare
+        # this applies to all tools except rsmpredict, rsmcompare, and rsmxval
         for context in ['rsmtool', 'rsmeval', 'rsmsummarize']:
 
             tempdir = TemporaryDirectory()
@@ -288,7 +375,7 @@ class TestToolCLI:
     def test_run_good_overwrite(self):
         #  test that the "run" command does overwrite when "-f" is specified
 
-        # this applies to all tools except rsmpredict and rsmcompare
+        # this applies to all tools except rsmpredict, rsmcompare, and rsmxval
         for context in ['rsmtool', 'rsmeval', 'rsmsummarize']:
 
             tempdir = TemporaryDirectory()
@@ -321,13 +408,20 @@ class TestToolCLI:
         # test that the "generate" subcommand for all tools works as expected
         # in batch mode
 
-        for context in ['rsmtool', 'rsmeval', 'rsmcompare', 'rsmpredict', 'rsmsummarize']:
+        for context in ['rsmtool',
+                        'rsmeval',
+                        'rsmcompare',
+                        'rsmpredict',
+                        'rsmsummarize',
+                        'rsmxval']:
             yield self.check_tool_cmd, context, "generate", None, None
 
     def test_generate_with_groups(self):
         # test that the "generate --subgroups" subcommand for all tools works
         # as expected in batch mode
 
-        # this applies to all tools except rsmpredict and rsmsummarize
+        # this applies to all tools except rsmpredict, rsmsummarize, and
+        # rsmxval; rsmxval does support subgroups but since it has no sections
+        # fields, it's not relevant for this test
         for context in ['rsmtool', 'rsmeval', 'rsmcompare']:
             yield self.check_tool_cmd, context, "generate --subgroups", None, None

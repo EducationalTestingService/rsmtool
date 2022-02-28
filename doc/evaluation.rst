@@ -284,7 +284,7 @@ DSM is computed as follows:
         :math:`z_{M_{i}} = \displaystyle\frac{M_i - \bar{M}}{\sigma_M}`
 
 
-2. For each response :math:i, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
+2. For each response :math:`i`, calculate the difference between machine and human scores: :math:`z_{M_{i}} - z_{H_{i}}`
 
 3. Calculate the mean of the difference :math:`z_{M_{i}} - z_{H_{i}}` by subgroup of interest. 
 

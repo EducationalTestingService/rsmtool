@@ -12,3 +12,5 @@ In addition to providing the ``rsmtool`` utility training and evaluating regress
 .. include:: usage_rsmcompare.rst
 
 .. include:: usage_rsmsummarize.rst
+
+.. include:: usage_rsmxval.rst

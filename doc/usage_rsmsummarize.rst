@@ -49,6 +49,8 @@ Here are all the arguments to the ``rsmsummarize`` command-line script.
 
 .. include:: config_rsmsummarize.rst
 
+.. _output_dirs_rsmsummarize:
+
 Output
 """"""
 
