@@ -157,7 +157,7 @@ class Modeler:
                                       'coefficient': coefs['const']}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = df_intercept.append(df_non_intercept, sort=True, ignore_index=True)
+        df_coef = pd.concat([df_intercept, df_non_intercept], sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[['feature', 'coefficient']]
@@ -204,7 +204,7 @@ class Modeler:
                                       'coefficient': intercept}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = df_intercept.append(df_non_intercept, sort=True, ignore_index=True)
+        df_coef = pd.concat([df_intercept, df_non_intercept], sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[['feature', 'coefficient']]
@@ -862,8 +862,8 @@ class Modeler:
 
         # initialize the coefficient data frame with just the intercept
         df_coef = pd.DataFrame([('Intercept', model.intercept_)])
-        df_coef = df_coef.append(list(zip(non_zero_features,
-                                          non_zero_feature_values)), ignore_index=True)
+        df_coef = pd.concat([df_coef, pd.DataFrame(zip(non_zero_features, non_zero_feature_values))],
+                            ignore_index=True)
         df_coef.columns = ['feature', 'coefficient']
 
         # create a fake SKLL learner with these non-zero weights
