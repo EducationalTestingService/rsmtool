@@ -35,7 +35,7 @@ Here are all the arguments to the ``rsmtool`` command-line script.
     Show version number and exit.
 
 
-.. include:: config_rsmtool.rst
+.. include:: config_rsmtool.rst.inc
 
 .. _output_dirs_rsmtool:
 
@@ -60,8 +60,8 @@ feature
 ^^^^^^^
 This folder contains a ``.csv`` file that lists all features, signs and transformation as used in the `final` model, taking into account any manual or automatic feature selection. See :ref:`feature column selection <column_selection_rsmtool>` for more details.
 
-.. include:: column_selection_rsmtool.rst
+.. include:: column_selection_rsmtool.rst.inc
 
-.. include:: intermediate_files_rsmtool.rst
+.. include:: intermediate_files_rsmtool.rst.inc
 
-.. include:: builtin_models.rst
+.. include:: builtin_models.rst.inc

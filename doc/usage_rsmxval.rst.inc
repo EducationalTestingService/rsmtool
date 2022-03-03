@@ -17,7 +17,7 @@ Cross-validation experiments in RSMTool consist of the following steps:
 
 5. Finally, a scoring model is trained on the complete training data file using ``rsmtool``, which also generates a report that contains only the feature and model descriptives. The model is what will most likely be deployed for inference assuming the analyses produced in this step and Steps 1--4 meet the stakeholders' requirements.
 
-.. include:: tutorial_rsmxval.rst
+.. include:: tutorial_rsmxval.rst.inc
 
 Input
 """""
@@ -44,7 +44,7 @@ Here are all the arguments to the ``rsmxval`` command-line script.
 
     Show version number and exit.
 
-.. include:: config_rsmxval.rst
+.. include:: config_rsmxval.rst.inc
 
 .. _output_dirs_rsmxval:
 

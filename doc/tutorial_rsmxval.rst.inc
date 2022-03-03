@@ -68,7 +68,7 @@ This should produce output like::
     Saving configuration file.
     Generating 3 folds after shuffling
     Running RSMTool on each fold in parallel
-    Progress: 100%|█████████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:08<00:00,  2.76s/it]
+    Progress: 100%|███████████████████████████████████████████████| 3/3 [00:08<00:00,  2.76s/it]
     Creating fold summary
     Evaluating combined fold predictions
     Training model on full data

@@ -3,7 +3,7 @@
 Experiment configuration file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmtool/config_rsmtool.json>`_ for ``rsmtool``.
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmtool`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmtool/config_rsmtool.json>`__ for ``rsmtool``.
 
 .. note:: To make it easy to get started with  ``rsmtool``, we provide a way to **automatically generate** configurations file both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
 
@@ -15,7 +15,7 @@ An identifier for the experiment that will be used to name the report and all :r
 
 model
 """""
-The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#learners>`_. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
+The machine learner you want to use to build the scoring model. Possible values include :ref:`built-in linear regression models <builtin_models>` as well as all of the learners available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#learners>`__. With SKLL learners, you can customize the :ref:`tuning objective <skll_objective>` and also :ref:`compute expected scores as predictions <predict_expected_scores>`.
 
 train_file
 """"""""""
@@ -148,7 +148,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
     - ``evaluation_by_group``: Shows barplots with the main evaluation metrics by each of the subgroups specified in the configuration file.
 
-    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. The notebook shows:
+    - ``fairness_analyses``: Additional :ref:`fairness analyses <fairness_extra>` suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`__. The notebook shows:
 
         - percentage of variance in squared error explained by subgroup membership
         - percentage of variance in raw (signed) error  error explained by subgroup membership
@@ -215,7 +215,6 @@ If a probabilistic SKLL classifier is chosen to build the scoring model, then *e
 
 rater_error_variance *(Optional)*
 """""""""""""""""""""""""""""""""
-```suggestion
 :ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmtool`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmtool``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
 
 .. _second_human_score_column_rsmtool:
@@ -272,7 +271,7 @@ skll_fixed_parameters *(Optional)*
 Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model. 
 This should be a dictionary with the names of the hyperparameters as the keys. To determine
 what hyperparameters are available for the SKLL learner you chose, consult the scikit-learn
-documentation for the learner with the same name as well as the `SKLL documentation <https://skll.readthedocs.io/en/latest/run_experiment.html#fixed-parameters-optional>`_.
+documentation for the learner with the same name as well as the `SKLL documentation <https://skll.readthedocs.io/en/latest/run_experiment.html#fixed-parameters-optional>`__.
 Any values you specify here will override both the scikit-learn and SKLL defaults. 
 The values for a key can be string, integer, float, or boolean depending on what the
 hyperparameter expects. Note that if this option is specified with the
@@ -282,7 +281,7 @@ hyperparameter expects. Note that if this option is specified with the
 
 skll_objective *(Optional)*
 """""""""""""""""""""""""""
-The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`_. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`__. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
 
 .. _special_sections_rsmtool:
 

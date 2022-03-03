@@ -13,7 +13,7 @@ RSMTool provides the ``rsmpredict`` command-line utility to generate predictions
     If the original model specified transformations for some of the features and these transformations led to ``NaN`` or ``Inf`` values when applied to the new data, ``rsmpredict`` will raise a warning. No score will be generated for such responses.
     
 
-.. include:: tutorial_rsmpredict.rst
+.. include:: tutorial_rsmpredict.rst.inc
 
 Input
 """""
@@ -45,7 +45,7 @@ Here are all the arguments to the ``rsmpredict`` command-line script.
 
     Show version number and exit.
 
-.. include:: config_rsmpredict.rst
+.. include:: config_rsmpredict.rst.inc
 
 Output
 """"""
