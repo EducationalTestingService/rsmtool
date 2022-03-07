@@ -295,7 +295,7 @@ def main():  # noqa: D103
         generator = ConfigurationGenerator('rsmxval',
                                            as_string=True,
                                            suppress_warnings=args.quiet,
-                                           use_subgroups=True)
+                                           use_subgroups=args.subgroups)
         configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
