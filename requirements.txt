@@ -6,7 +6,7 @@ notebook
 numpy
 pandas
 seaborn
-skll==2.5.0
+skll==3.0.0
 statsmodels
 coverage
 coveralls

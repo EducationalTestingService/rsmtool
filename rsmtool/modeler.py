@@ -1374,7 +1374,7 @@ class Modeler:
             A list of feature names, or None if no learner was trained.
         """
         if self.learner is not None:
-            return self.learner.feat_vectorizer.get_feature_names()
+            return self.learner.feat_vectorizer.get_feature_names_out().tolist()
         return None
 
     def get_intercept(self):
