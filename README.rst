@@ -11,7 +11,7 @@ Rater Scoring Modeling Tool
 
 .. image:: https://codecov.io/gh/EducationalTestingService/rsmtool/branch/main/graph/badge.svg?token=wMCnQrB49J
    :target: https://codecov.io/gh/EducationalTestingService/rsmtool
-   :alt: Coverage status   
+   :alt: Coverage status
 
 .. image:: https://img.shields.io/conda/v/ets/rsmtool.svg
    :target: https://anaconda.org/ets/rsmtool
@@ -39,11 +39,11 @@ Rater Scoring Modeling Tool
 Introduction
 ------------
 
-Automated scoring of written and spoken test responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `Project Essay Grade <http://pegwriting.com/about>`_ for written responses and `SpeechRater <https://www.ets.org/research/topics/as_nlp/speech/>`_ for spoken responses.
+Automated scoring of written and spoken test responses is a growing field in educational natural language processing. Automated scoring engines employ machine learning models to predict scores for such responses based on features extracted from the text/audio of these responses. Examples of automated scoring engines include `Project Essay Grade <http://pegwriting.com/about>`_ for written responses and `SpeechRater <https://www.ets.org/research/policy_research_reports/publications/report/2008/hukv>`_ for spoken responses.
 
 Rater Scoring Modeling Tool (RSMTool) is a python package which automates and combines in a single pipeline multiple analyses that are commonly conducted when building and evaluating such scoring models.  The output of RSMTool is a comprehensive, customizable HTML statistical report that contains the output of these multiple analyses. While RSMTool does make it really simple to run a set of standard analyses using a single command, it is also fully customizable and allows users to easily exclude unneeded analyses, modify the default analyses, and even include custom analyses in the report.
 
-We expect the primary users of RSMTool to be researchers working on developing new automated scoring engines or on improving existing ones. Note that RSMTool is not a scoring engine by itself but rather a tool for building and evaluating machine learning models that may be used in such engines. 
+We expect the primary users of RSMTool to be researchers working on developing new automated scoring engines or on improving existing ones. Note that RSMTool is not a scoring engine by itself but rather a tool for building and evaluating machine learning models that may be used in such engines.
 
 RSMTool is driven by a configuration file that users have to supply. Given the large number of available options, this can get complicated especially for new users. That's why RSMTool can help users generate configuration files interactively via guided prompts! The video below demonstrates this feature.
 
@@ -59,7 +59,7 @@ To get started with RSMTool, please see the extensive `official documentation <h
 Requirements
 ------------
 
-- Python >=3.7, <3.10
+- Python >=3.8, <3.11
 - ``numpy``
 - ``scipy``
 - ``scikit-learn``
