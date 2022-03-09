@@ -6,6 +6,9 @@ recursive-exclude tests *
 recursive-exclude examples *
 recursive-include rsmtool/notebooks *
 prune test_outputs
+prune rsmtool/__pycache__
+prune rsmtool/utils/__pycache__
 prune rsmtool/rsmtool.egg-info
 prune rsmtool/notebooks/.ipynb_checkpoints
 prune rsmtool/notebooks/comparison/.ipynb_checkpoints
+prune rsmtool/notebooks/summary/.ipynb_checkpoints

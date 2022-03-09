@@ -1,14 +1,13 @@
-{% set data = load_setup_py_data() %}
-
 package:
   name: rsmtool
-  version: {{data.get('version')}}
+  version: 9.0
 
 source:
   path: ../../../rsmtool
 
 build:
   number: 0
+  noarch: python
   script:
     - cd $SRC_DIR
     - "{{ PYTHON }} -m pip install . --no-deps -vv"
@@ -18,24 +17,15 @@ build:
     - rsmeval = rsmtool.rsmeval:main
     - rsmpredict = rsmtool.rsmpredict:main
     - rsmsummarize = rsmtool.rsmsummarize:main
+    - rsmxval = rsmtool.rsmxval:main
     - render_notebook = rsmtool.reporter:main
     - convert_feature_json = rsmtool.convert_feature_json:main
 
 requirements:
   build:
-    - python
-    - jupyter
-    - ipython
-    - notebook
-    - numpy {{ numpy }}
-    - pandas
-    - seaborn
-    - skll==2.5.0
-    - statsmodels
-    - openpyxl
-    - xlrd
-    - xlwt
-
+    - python >=3.8
+    - pip
+    - setuptools
   run:
     - python
     - jupyter
@@ -43,11 +33,12 @@ requirements:
     - nose
     - notebook
     - numpy
+    - openpyxl
     - pandas
     - seaborn
-    - skll==2.5.0
+    - skll==3.0.0
     - statsmodels
-    - openpyxl
+    - tqdm
     - xlrd
     - xlwt
 
@@ -60,6 +51,7 @@ test:
     - rsmtool.configuration_parser
     - rsmtool.container
     - rsmtool.convert_feature_json
+    - rsmtool.fairness_utils
     - rsmtool.modeler
     - rsmtool.preprocessor
     - rsmtool.reader
@@ -75,6 +67,7 @@ test:
     - rsmcompare --help
     - rsmpredict --help
     - rsmsummarize --help
+    - rsmxval --help
     - render_notebook --help
     - convert_feature_json --help
 
