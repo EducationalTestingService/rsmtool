@@ -34,7 +34,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively.
 
-#. Upload the source and wheel distributions to TestPyPI  using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization
+#. Upload the source and wheel distributions to TestPyPI using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization on TestPyPI.
 
 #. Install the TestPyPI package as follows::
 
@@ -58,7 +58,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Once the build for the PR passes and the reviewers approve, merge the release branch into ``main``.
 
-#. Upload source and wheel packages to PyPI using ``python setup.py sdist upload`` and ``python setup.py bdist_wheel upload``
+#. Upload the already-built source and wheel packages to PyPI using ``twine upload dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. You will need to have the appropriate permissions for the ``ets`` organization on PyPI.
 
 #. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/main.svg>`__ - this should say "passing" in green.
 
