@@ -2,7 +2,7 @@
 
 Auto-generating configuration files
 -----------------------------------
-Configuration files for :ref:`rsmtool <config_file_rsmtool>`, :ref:`rsmeval <config_file_rsmeval>`, :ref:`rsmcompare <config_file_rsmcompare>`, :ref:`rsmpredict <config_file_rsmpredict>`, :ref:`rsmsummarize <config_file_rsmsummarize>`, :ref:`rsmxval <config_file_rsmxval>` can be difficult to create manually due to the large number of configuration options supported by these tools. To make this easier for users, all of these tools support *automatic* creation of configuration files, both interactively and non-interactively.
+Configuration files for :ref:`rsmtool <config_file_rsmtool>`, :ref:`rsmeval <config_file_rsmeval>`, :ref:`rsmcompare <config_file_rsmcompare>`, :ref:`rsmpredict <config_file_rsmpredict>`, :ref:`rsmsummarize <config_file_rsmsummarize>`, and :ref:`rsmxval <config_file_rsmxval>` can be difficult to create manually due to the large number of configuration options supported by these tools. To make this easier for users, all of these tools support *automatic* creation of configuration files, both interactively and non-interactively.
 
 Interactive generation
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -16,7 +16,7 @@ For example, to generate an ``rsmtool`` configuration file interactively, run th
 The following screencast shows an example interactive session after the above command is run (click to play):
 
 .. raw:: html
-   
+
    <script id="asciicast-313107" src="https://asciinema.org/a/313107.js" data-autoplay="false" async></script>
 
 
@@ -36,7 +36,7 @@ There are some configuration options that can accept multiple inputs. For exampl
 The following screencast shows the interactive session (click to play):
 
 .. raw:: html
-    
+
    <script id="asciicast-313149" src="https://asciinema.org/a/313149.js" data-autoplay="false" async></script>
 
 And here is the generated configuration file for ``rsmsummarize``:
@@ -44,7 +44,7 @@ And here is the generated configuration file for ``rsmsummarize``:
 .. literalinclude:: assets/example_rsmsummarize.json
     :language: javascript
 
-.. important:: 
+.. important::
 
     If you want to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, ``rsmcompare``, and ``rsmxval``, you should add ``--subgroups`` to the command. For example, when you run ``rsmeval generate --interactive --subgroups`` you would be prompted to enter the subgroup column names and the ``general_sections`` list (if shown [#f1]_) will also include subgroup-based sections.  Since the ``subgroups`` option can accept multiple inputs, it is handled in the same way as the ``experiment_dirs`` option for ``rsmsummarize`` above.
 
@@ -58,7 +58,7 @@ We end with a list of important things to note about interactive generation:
 
 - Required fields will *not* accept a blank input (just pressing enter) and will show an error message in the bottom left until a valid input is provided.
 
-- Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses. 
+- Optional fields will accept blank inputs since they have default values that will be used if no user input is provided. In some cases, default values are shown underlined in parentheses.
 
 - You can also use ``-i`` as an alias for ``--interactive`` and ``-g`` as an alias for ``--subgroups``. So, for example, if you want to interactively generate a configuration file with subgroups for ``rsmtool``, just run ``rsmtool generate -ig`` instead of ``rsmtool generate --interactive --subgroups``.
 
