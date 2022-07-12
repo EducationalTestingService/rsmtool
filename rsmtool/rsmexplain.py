@@ -9,8 +9,11 @@ import sys
 import pandas as pd
 from skll.learner import Learner
 from skll.data import Reader
+
 # for some reason the import here only works like below, but not from .utils.logging import LogFormatter
 from utils.logging import LogFormatter
+from utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
+from utils.constants import VALID_PARSER_SUBCOMMANDS
 
 
 # this is just here for development purposes
@@ -151,6 +154,16 @@ def main():
 
     # setting the logger to stdout
     logging.root.addHandler(stdout_handler)
+
+    # set up an argument parser via our helper function
+    parser = setup_rsmcmd_parser('rsmexplain',
+                                 uses_output_directory=True,
+                                 allows_overwriting=True)
+    # if we have no arguments at all then just show the help message
+    if len(sys.argv) < 2:
+        sys.argv.append("-h")
+
+
     explanation = generate_explanation(test_config_dic)
     generate_report(explanation, '/Users/remonitschke/rsmtool/examples/rsmexplain')
     return None

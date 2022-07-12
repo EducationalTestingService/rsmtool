@@ -42,6 +42,8 @@ from .rsmpredict import compute_and_save_predictions, fast_predict  # noqa
 
 from .rsmsummarize import run_summary  # noqa
 
+from .rsmexplain import generate_explanation  # noqa
+
 __all__ = [
     "run_experiment",
     "run_evaluation",
@@ -49,6 +51,7 @@ __all__ = [
     "compute_and_save_predictions",
     "fast_predict",
     "run_summary",
+    'generate_explanation'
 ]
 
 # Make sure that DeprecationWarnings are always shown
