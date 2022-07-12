@@ -5,12 +5,13 @@ import shap
 import numpy as np
 import os
 import pickle
+import sys
 import pandas as pd
 from skll.learner import Learner
 from skll.data import Reader
-from .utils.logging import LogFormatter
+# for some reason the import here only works like below, but not from .utils.logging import LogFormatter
+from utils.logging import LogFormatter
 
-from skll.data import FeatureSet
 
 # this is just here for development purposes
 test_config_dic = {
@@ -51,7 +52,7 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
     necessary_params = ["model_path", "background_data"]
     for i in necessary_params:
         if i not in config_dic.keys():
-            logger.error('Missing Parameter Error: ', i,' is not specified in your config file')
+            logger.error('Missing Parameter Error: ' + i + ' is not specified in your config file')
 
     # first we load the model
     model = Learner.from_file(config_dic["model_path"])
@@ -91,7 +92,7 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
     # define a shap explainer
     explainer = shap.explainers.Sampling(model.model.predict, background_features, feature_names=feature_names)
 
-    logger.info('Generating shap explanation.')
+    logger.info('Generating shap explanations on ' + str(data_features.shape[0]) + ' rows.')
     explanation = explainer(data_features)
 
     # we're doing some future-proofing here:
@@ -131,6 +132,25 @@ def generate_report(explanation, output_dir):
 
 
 def main():
+    # set up the basic logging configuration
+    formatter = LogFormatter()
+
+    # we need two handlers, one that prints to stdout
+    # for the "run" command and one that prints to stderr
+    # from the "generate" command; the latter is important
+    # because do not want the warning to show up in the
+    # generated configuration file
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(formatter)
+
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
+    logging.root.setLevel(logging.INFO)
+    # logger = logging.getLogger(__name__)
+
+    # setting the logger to stdout
+    logging.root.addHandler(stdout_handler)
     explanation = generate_explanation(test_config_dic)
     generate_report(explanation, '/Users/remonitschke/rsmtool/examples/rsmexplain')
     return None
