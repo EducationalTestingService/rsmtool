@@ -4,8 +4,12 @@ import logging
 import shap
 import numpy as np
 import os
+import pickle
+import pandas as pd
 from skll.learner import Learner
 from skll.data import Reader
+from .utils.logging import LogFormatter
+
 from skll.data import FeatureSet
 
 # this is just here for development purposes
@@ -14,7 +18,7 @@ test_config_dic = {
     "background_data": "/Users/remonitschke/Library/CloudStorage/Box-Box/ETS WORK/Stuff_for_Remo/TOEFL_Primary_writing/all_features.csv",
     "id_column": "id",
     "data": "/Users/remonitschke/Library/CloudStorage/Box-Box/ETS WORK/Stuff_for_Remo/TOEFL_Primary_writing/all_features.csv",
-    "data_size": 5}
+    "data_size": 3}
 
 
 # utility function to get the proper feature name list we can get rid of this once the PR is done
@@ -43,6 +47,12 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
 
     logger = logger if logger else logging.getLogger(__name__)
 
+    # specifying some necessary params, allowing the logger to throw an error if they are not defined
+    necessary_params = ["model_path", "background_data"]
+    for i in necessary_params:
+        if i not in config_dic.keys():
+            logger.error('Missing Parameter Error: ', i,' is not specified in your config file')
+
     # first we load the model
     model = Learner.from_file(config_dic["model_path"])
 
@@ -51,7 +61,7 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
     background = reader.read()
 
     # we load the data for predictions
-    if config_dic["data"]:
+    if "data" in config_dic.keys():
         data_reader = Reader.for_path(config_dic["data"], sparse=False, id_col=config_dic["id_column"])
         data = data_reader.read()
     else:
@@ -71,9 +81,11 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
         background_features = shap.kmeans(mask(model, background), 500)
 
     # in case the user wants a subsample explained
-    if config_dic["data_size"]:
+    if "data_size" in config_dic.keys() and config_dic["data_size"] is not None:
         data_features = shap.sample(mask(model, data), config_dic["data_size"])
     else:
+        logger.warning('data_size unspecified: This will generate explanations on the entire data set'
+                       ' you pass in "data". This may take a while depending on the size of your data set.')
         data_features = mask(model, data)
 
     # define a shap explainer
@@ -83,7 +95,7 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
     explanation = explainer(data_features)
 
     # we're doing some future-proofing here:
-    if explanation.feature_names == None:
+    if explanation.feature_names is None:
         explanation.feature_names = feature_names
 
     # some explainers don't correctly generate base value arrays, we take care of this here:
@@ -99,15 +111,28 @@ def generate_explanation(config_file_or_obj_or_dict, logger=None):
 
 def generate_report(explanation, output_dir):
     """
-    Generates a report and saves the SHAP_values and aexplanation object to disk
+    Generates a report and saves the SHAP_values and explanation object to disk
     :return:
     """
     os.makedirs(output_dir, exist_ok=True)
+
+    # first we write the explanation object to disk, in case we need it later
+    explan_path = os.path.join(output_dir, 'explanation.pkl')
+    with open(explan_path, 'wb') as pickle_out:
+        pickle.dump(explanation, pickle_out)
+
+    # now we generate a dataframe that allows us to write the shap_values to disk
+    csv_path = os.path.join(output_dir, 'shap_values.csv')
+    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist())
+    shap_frame.to_csv(csv_path)
+    # later we want to make some additions here to ensure that the correct indices are exported for these decisions
+
     return None
 
 
 def main():
-    generate_explanation(test_config_dic)
+    explanation = generate_explanation(test_config_dic)
+    generate_report(explanation, '/Users/remonitschke/rsmtool/examples/rsmexplain')
     return None
 
 
