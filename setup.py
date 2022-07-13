@@ -38,6 +38,7 @@ setup(
             "rsmcompare = rsmtool.rsmcompare:main",
             "rsmsummarize = rsmtool.rsmsummarize:main",
             "rsmxval = rsmtool.rsmxval:main",
+            'rsmexplain = rsmtool.rsmexplain:main',
             "render_notebook = rsmtool.reporter:main",
             "convert_feature_json = rsmtool.convert_feature_json:main",
         ]
