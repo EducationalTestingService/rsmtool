@@ -10,7 +10,7 @@ import pandas as pd
 import re
 from skll.learner import Learner
 from skll.data import Reader
-
+from .reporter import Reporter
 from .configuration_parser import configure
 from .utils.logging import LogFormatter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
@@ -160,7 +160,11 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
 
     generate_report(explanation, output_dir, ids)
-    return explanation
+    # Initialize reporter
+    reporter = Reporter(logger=logger)
+
+    reporter.create_explanation_report(config_dic,explanation,ids)
+    return None
 
 
 def generate_report(explanation, output_dir, ids):

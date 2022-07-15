@@ -843,6 +843,12 @@ class Reporter:
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
 
+    def create_explanation_report(self,
+                                  config,
+                                  shap_explanation,
+                                  ids):
+        self.logger.info("stub")
+
 
 def main():  # noqa: D103
 
