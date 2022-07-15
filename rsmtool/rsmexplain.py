@@ -8,6 +8,7 @@ import pickle
 import sys
 import pandas as pd
 import re
+from collections import OrderedDict
 from skll.learner import Learner
 from skll.data import Reader
 from .reporter import Reporter
@@ -34,7 +35,7 @@ def yield_ids(feature_set, range_size=None):
     :param range_size: Either an integer value, or an indexable iterable containing 2 integers.
     :return: A dictionary object containing SKLL IDs as values and array indeces as keys.
     """
-    id_dic = {}
+    id_dic = OrderedDict()
     if range_size is None:
         for i in feature_set.ids:
             id_dic[np.where(feature_set.ids == i)[0][0]] = i
@@ -159,19 +160,17 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     except Exception:
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
 
-    generate_report(explanation, output_dir, ids)
-    # Initialize reporter
-    reporter = Reporter(logger=logger)
+    generate_report(explanation, output_dir, ids, config_dic, logger)
 
-    reporter.create_explanation_report(config_dic,explanation,ids)
     return None
 
 
-def generate_report(explanation, output_dir, ids):
+def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     """
     Generates a report and saves the SHAP_values and explanation object to disk
     :return:
     """
+    logger = logger if logger else logging.getLogger(__name__)
     os.makedirs(output_dir, exist_ok=True)
 
     # first we write the explanation object to disk, in case we need it later
@@ -185,10 +184,14 @@ def generate_report(explanation, output_dir, ids):
 
     # now we generate a dataframe that allows us to write the shap_values to disk
     csv_path = os.path.join(output_dir, 'shap_values.csv')
-    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist(), index=ids.keys())
+    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist(), index=ids.values())
     shap_frame.to_csv(csv_path)
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
+    # Initialize reporter
+    reporter = Reporter(logger=logger)
+
+    reporter.create_explanation_report(config_dic,explanation,ids,output_dir)
     return None
 
 
@@ -239,7 +242,7 @@ def main():
         # run the experiment
         logger.info('Output directory: {}'.format(args.output_dir))
 
-        explanation = generate_explanation(os.path.abspath(args.config_file), os.path.abspath(args.output_dir))
+        generate_explanation(os.path.abspath(args.config_file), os.path.abspath(args.output_dir))
 
     return None
 
