@@ -17,7 +17,6 @@ from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 
 
-
 # utility function to get the proper feature name list we can get rid of this once the PR is done
 def get_feature_names(model):
     if model.feat_selector:
@@ -28,6 +27,13 @@ def get_feature_names(model):
 
 # utility function to get the actual array of data
 def yield_ids(feature_set, range_size=None):
+    """
+    Utility function that returns a dictionary object containing the indices of the data in the range
+    specified.
+    :param feature_set: A SKLL FeatureSet
+    :param range_size: Either an integer value, or an indexable iterable containing 2 integers.
+    :return: A dictionary object containing SKLL IDs as values and array indeces as keys.
+    """
     id_dic = {}
     if range_size is None:
         for i in feature_set.ids:
@@ -38,11 +44,19 @@ def yield_ids(feature_set, range_size=None):
     else:
         for i in feature_set.ids[range_size[0]:range_size[1]]:
             id_dic[np.where(feature_set.ids == i)[0][0]] = i
-
     return id_dic
 
 
 def mask(learner, feature_set, feature_range=None):
+    """
+    Utility function that extracts features from a FeatureSet, or subsamples of those features.
+    :param learner: A SKLL learner.
+    :param feature_set: A SKLL FeatureSet.
+    :param feature_range: Either an integer value, or an indexable iterable containing 2 integers.
+    :return: A dictionary object containing SKLL IDs as values and array indeces as keys. And
+    a dense numpy array of features which correspond to the dictionary row_indices in the original
+    FeatureSet
+    """
     ids = yield_ids(feature_set, feature_range)
     if feature_range:
         features = (learner.feat_selector.transform(
@@ -64,7 +78,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     :return:
     """
     # we will implement an actual config functionality later, for now we just treat this as a dictionary
-   # config_dic = config_file_or_obj_or_dic
+    # config_dic = config_file_or_obj_or_dic
 
     logger = logger if logger else logging.getLogger(__name__)
 
@@ -114,7 +128,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                     logger.info('Your "range" indices have been defined as: ' + str(row_range.groups(1)))
                     index_1 = int(row_range.groups(1)[0])
                     index_2 = int(row_range.groups(1)[1])
-                    ids, data_features = mask(model, data, [index_1,index_2])
+                    ids, data_features = mask(model, data, [index_1, index_2])
                 else:
                     logger.error("Cannot decode the \"range\" param!")
                     raise ValueError("Cannot decode the \"range\" param!")
@@ -211,7 +225,6 @@ def main():
     args = parser.parse_args(args=args_to_pass)
 
     if args.subcommand == 'run':
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -219,7 +232,6 @@ def main():
         logger.info('Output directory: {}'.format(args.output_dir))
 
         explanation = generate_explanation(os.path.abspath(args.config_file), os.path.abspath(args.output_dir))
-
 
     return None
 
