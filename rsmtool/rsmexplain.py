@@ -123,7 +123,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         except ValueError:
             logger.info("\"range\" is not an integer, attempting to define as a range")
             try:
-                row_range = re.match('^(\d+)[,-_:](\d+)$', config_dic["range"])
+                row_range = re.match(r'^(\d+)[,\-\s:](\d+)$', config_dic["range"])
                 if row_range:
                     logger.info('Your "range" indices have been defined as: ' + str(row_range.groups(1)))
                     index_1 = int(row_range.groups(1)[0])
@@ -159,11 +159,11 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     except Exception:
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
 
-    generate_report(explanation, output_dir)
+    generate_report(explanation, output_dir, ids)
     return explanation
 
 
-def generate_report(explanation, output_dir):
+def generate_report(explanation, output_dir, ids):
     """
     Generates a report and saves the SHAP_values and explanation object to disk
     :return:
@@ -175,9 +175,13 @@ def generate_report(explanation, output_dir):
     with open(explan_path, 'wb') as pickle_out:
         pickle.dump(explanation, pickle_out)
 
+    id_path = os.path.join(output_dir, 'ids.pkl')
+    with open(id_path, 'wb') as pickle_out:
+        pickle.dump(ids, pickle_out)
+
     # now we generate a dataframe that allows us to write the shap_values to disk
     csv_path = os.path.join(output_dir, 'shap_values.csv')
-    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist())
+    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist(), index=ids.keys())
     shap_frame.to_csv(csv_path)
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
