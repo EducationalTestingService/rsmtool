@@ -27,11 +27,35 @@ def get_feature_names(model):
 
 
 # utility function to get the actual array of data
-def mask(learner, feature_set):
-    return (learner.feat_selector.transform(
-        learner.feat_vectorizer.transform(
-            feature_set.vectorizer.inverse_transform(
-                feature_set.features)))).toarray()  # most explainers require dense data representations
+def yield_ids(feature_set, range_size=None):
+    id_dic = {}
+    if range_size is None:
+        for i in feature_set.ids:
+            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+    elif type(range_size) is int:
+        for i in shap.sample(feature_set.ids, range_size):
+            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+    else:
+        for i in feature_set.ids[range_size[0]:range_size[1]]:
+            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+
+    return id_dic
+
+
+def mask(learner, feature_set, feature_range=None):
+    ids = yield_ids(feature_set, feature_range)
+    if feature_range:
+        features = (learner.feat_selector.transform(
+            learner.feat_vectorizer.transform(
+                feature_set.vectorizer.inverse_transform(
+                    feature_set.features)))).toarray()[
+                   np.array([i for i in ids.keys()]), :]
+    else:
+        features = (learner.feat_selector.transform(
+            learner.feat_vectorizer.transform(
+                feature_set.vectorizer.inverse_transform(
+                    feature_set.features)))).toarray()
+    return ids, features
 
 
 def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
@@ -70,18 +94,18 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     # we define the background distribution
     if "background_size" in config_dic.keys():
         if config_dic["background_size"] == 'all':
-            background_features = mask(model, background)
+            _, background_features = mask(model, background)
         elif config_dic["background_size"]:
-            background_features = shap.kmeans(mask(model, background), int(config_dic["background_size"]))
+            background_features = shap.kmeans(mask(model, background)[1], int(config_dic["background_size"]))
     else:
         logger.warning('No background sample size specified. Proceeding with a kmeans sample size 500.')
-        background_features = shap.kmeans(mask(model, background), 500)
+        background_features = shap.kmeans(mask(model, background)[1], 500)
 
     # in case the user wants a subsample explained
     if "range" in config_dic.keys() and config_dic["range"] is not None:
         try:
             row_range = int(config_dic["range"])
-            data_features = shap.sample(mask(model, data), row_range)
+            ids, data_features = mask(model, data, row_range)
         except ValueError:
             logger.info("\"range\" is not an integer, attempting to define as a range")
             try:
@@ -90,18 +114,18 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                     logger.info('Your "range" indices have been defined as: ' + str(row_range.groups(1)))
                     index_1 = int(row_range.groups(1)[0])
                     index_2 = int(row_range.groups(1)[1])
-                    data_features = (mask(model, data)[index_1:index_2, :])
+                    ids, data_features = mask(model, data, [index_1,index_2])
                 else:
                     logger.error("Cannot decode the \"range\" param!")
                     raise ValueError("Cannot decode the \"range\" param!")
             except ValueError:
                 logger.warning('range unspecified: This will generate explanations on the entire data set'
                                ' you pass in "explainable_data". This may take a while depending on the size of your data set.')
-                data_features = mask(model, data)
+                ids, data_features = mask(model, data)
     else:
         logger.warning('range unspecified: This will generate explanations on the entire data set'
                        ' you pass in "explainable_data". This may take a while depending on the size of your data set.')
-        data_features = mask(model, data)
+        ids, data_features = mask(model, data)
 
     # define a shap explainer
     explainer = shap.explainers.Sampling(model.model.predict, background_features, feature_names=feature_names)
@@ -118,7 +142,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         explanation.base_values.shape
         if explanation.base_values.shape[0] != explanation.values.shape[0]:
             explanation.base_values = np.repeat(explanation.base_values[0], explanation.values.shape[0])
-    except:
+    except Exception:
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
 
     generate_report(explanation, output_dir)
