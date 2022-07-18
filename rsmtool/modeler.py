@@ -8,17 +8,22 @@ Class for training and predicting with built-in or SKLL models.
 :organization: ETS
 """
 
+import copy
 import logging
 import pickle
 from math import log10, sqrt
 from os.path import join
+import warnings
 
+import joblib
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from numpy.random import RandomState
 from scipy.optimize import nnls
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LassoCV
+from sklearn.pipeline import Pipeline
 from skll.data import FeatureSet
 from skll.learner import Learner
 
@@ -28,6 +33,75 @@ from .preprocessor import FeaturePreprocessor
 from .utils.metrics import compute_expected_scores_from_model
 from .utils.models import is_skll_model
 from .writer import DataWriter
+
+
+class RSMToolFeaturePreprocessor(BaseEstimator, TransformerMixin):
+    """
+    `scikit-learn`-compatible feature processor that uses RSMTool.
+
+    This processor can be fit with some training data and then used to
+    transform new features as part of a pipeline. The input and output
+    of the `transform` function are iterables of JSON feature
+    dictionaries.
+    """
+
+    def __init__(self, standardize_features=True):
+        """
+        Initialize object with list of feature names, etc.
+
+        Parameters
+        ----------
+        standardize_features : bool, optional
+            Whether or not to standardize feature values
+        """
+
+        self.standardize_features = standardize_features
+        self.processor = FeaturePreprocessor()
+
+    def fit(self, X=None, y=None, feature_info=None):
+        """
+        Fit the feature preprocessor with some training data.
+
+        Parameters
+        ----------
+        X : iterable of feature dictionaries
+            Not used, only here for compatibility
+        y : iterable of target variable values
+            Not used, only here for compatibility
+        feature_info : pd.DataFrame
+            Feature info frame
+        """
+
+        self.df_feature_info = feature_info.copy()
+        self.df_feature_info.set_index("feature", inplace=True)
+        return self
+
+    def transform(self, X, y=None):
+        """
+        Parameters
+        ----------
+        X : iterable of feature dictionaries
+            Feature dictionaries
+        y : None
+            This parameter exists only to conform with the API. It is
+            not used.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            iterable of transformed feature dictionaries
+        """
+
+        features = pd.DataFrame([{"spkitemid": i, **x} for i, x in enumerate(X)])
+        with warnings.catch_warnings():
+            warnings.simplefilter(action="ignore", category=FutureWarning)
+            features, _ = self.processor.preprocess_new_data(
+                features,
+                self.df_feature_info,
+                standardize_features=self.standardize_features,
+            )
+        del features["spkitemid"]
+        return features.to_dict(orient="records")
 
 
 class Modeler:
@@ -256,6 +330,13 @@ class Modeler:
         # now create its parameters from the coefficients from the built-in model
         learner.model.coef_ = learner.feat_vectorizer.transform(coefdict).toarray()[0]
         learner.model.intercept_ = intercept
+        learner.pipeline = Pipeline(
+            [
+                ('vectorizer', copy.deepcopy(learner.feat_vectorizer)),
+                ('estimator', copy.deepcopy(learner.model)),
+            ]
+        )
+
         return learner
 
     def train_linear_regression(self, df_train, feature_columns):
@@ -463,7 +544,7 @@ class Modeler:
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
         p_alpha = p_lambda / len(df_train)
-        l_lasso = Learner('Lasso', model_kwargs={'alpha': p_alpha, 'positive': True})
+        l_lasso = Learner('Lasso', model_kwargs={'alpha': p_alpha, 'positive': True}, pipeline=True)
         l_lasso.train(fs_train, grid_search=False)
 
         # get the feature names that have the non-zero coefficients
@@ -716,7 +797,7 @@ class Modeler:
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
         p_alpha = p_lambda / len(df_train)
-        l_lasso = Learner('Lasso', model_kwargs={'alpha': p_alpha, 'positive': True})
+        l_lasso = Learner('Lasso', model_kwargs={'alpha': p_alpha, 'positive': True}, pipeline=True)
         l_lasso.train(fs_train, grid_search=False)
 
         # get the feature names that have the non-zero coefficients
@@ -805,7 +886,7 @@ class Modeler:
         # note that 'alpha' in sklearn is different from this lambda
         # so we need to normalize looking at the sklearn objective equation
         alpha = p_lambda / len(df_train)
-        learner = Learner('Lasso', model_kwargs={'alpha': alpha, 'positive': True})
+        learner = Learner('Lasso', model_kwargs={'alpha': alpha, 'positive': True}, pipeline=True)
         learner.train(fs_train, grid_search=False)
 
         # convert this model's parameters to a data frame
@@ -1112,7 +1193,8 @@ class Modeler:
         model_kwargs = custom_fixed_parameters if custom_fixed_parameters is not None else {}
         learner = Learner(model_name,
                           model_kwargs=model_kwargs,
-                          probability=predict_expected_scores)
+                          probability=predict_expected_scores,
+                          pipeline=True)
 
         # get the features, IDs, and labels from the given data frame
         feature_columns = [c for c in df_train.columns if c not in ['spkitemid', 'sc1']]
@@ -1199,6 +1281,18 @@ class Modeler:
             configuration['skll_objective'] = chosen_objective
         else:
             model = self.train_builtin_model(*args, **kwargs)
+
+        # Generate an `sklearn`-style feature preprocessor to be used
+        # later in the model's pipeline
+        processor = RSMToolFeaturePreprocessor(standardize_features=True)
+        processor.fit(feature_info=data_container.feature_info)
+        pipeline = Pipeline(
+            [("rsmtool_feature_preprocessor", processor)] +
+            list(model.pipeline.named_steps.items())
+        )
+        pipeline_file_path = join(filedir, '{}.pipeline.model'.format(experiment_id))
+        with open(pipeline_file_path, "wb") as pipeline_file:
+            joblib.dump(pipeline, pipeline_file)
 
         return model
 
