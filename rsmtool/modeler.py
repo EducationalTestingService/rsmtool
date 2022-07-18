@@ -45,36 +45,22 @@ class RSMToolFeaturePreprocessor(BaseEstimator, TransformerMixin):
     dictionaries.
     """
 
-    def __init__(self, standardize_features=True):
+    def __init__(self, feature_info, standardize_features=True):
         """
         Initialize object with list of feature names, etc.
 
         Parameters
         ----------
+        feature_info : pd.DataFrame
+            Frame containing RSMTool feature preprocessing information
         standardize_features : bool, optional
             Whether or not to standardize feature values
         """
 
         self.standardize_features = standardize_features
         self.processor = FeaturePreprocessor()
-
-    def fit(self, X=None, y=None, feature_info=None):
-        """
-        Fit the feature preprocessor with some training data.
-
-        Parameters
-        ----------
-        X : iterable of feature dictionaries
-            Not used, only here for compatibility
-        y : iterable of target variable values
-            Not used, only here for compatibility
-        feature_info : pd.DataFrame
-            Feature info frame
-        """
-
         self.df_feature_info = feature_info.copy()
         self.df_feature_info.set_index("feature", inplace=True)
-        return self
 
     def transform(self, X, y=None):
         """
@@ -1284,8 +1270,9 @@ class Modeler:
 
         # Generate an `sklearn`-style feature preprocessor to be used
         # later in the model's pipeline
-        processor = RSMToolFeaturePreprocessor(standardize_features=True)
-        processor.fit(feature_info=data_container.feature_info)
+        processor = RSMToolFeaturePreprocessor(
+            feature_info=data_container.feature_info, standardize_features=True
+        )
         pipeline = Pipeline(
             [("rsmtool_feature_preprocessor", processor)] +
             list(model.pipeline.named_steps.items())
