@@ -120,6 +120,9 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     if "range" in config_dic.keys() and config_dic["range"] is not None:
         try:
             row_range = int(config_dic["range"])
+            if row_range == 1:
+                logger.error('"range" must be > 2. Shutting down.')
+                exit()
             ids, data_features = mask(model, data, row_range)
         except ValueError:
             logger.info("\"range\" is not an integer, attempting to define as a range")
@@ -129,6 +132,9 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                     logger.info('Your "range" indices have been defined as: ' + str(row_range.groups(1)))
                     index_1 = int(row_range.groups(1)[0])
                     index_2 = int(row_range.groups(1)[1])
+                    if np.abs(index_1-index_2) == 1:
+                        logger.error('"range" must be > 2. Shutting down.')
+                        exit()
                     ids, data_features = mask(model, data, [index_1, index_2])
                 else:
                     logger.error("Cannot decode the \"range\" param!")
@@ -171,27 +177,52 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     :return:
     """
     logger = logger if logger else logging.getLogger(__name__)
+
+    # we make sure all necessary directories exist
     os.makedirs(output_dir, exist_ok=True)
+    reportdir = os.path.abspath(os.path.join(output_dir, 'report'))
+    csvdir = os.path.abspath(os.path.join(output_dir, 'csv_files'))
+    figdir = os.path.abspath(os.path.join(output_dir, 'figures'))
+
+    os.makedirs(csvdir, exist_ok=True)
+    os.makedirs(figdir, exist_ok=True)
+    os.makedirs(reportdir, exist_ok=True)
 
     # first we write the explanation object to disk, in case we need it later
     explan_path = os.path.join(output_dir, 'explanation.pkl')
     with open(explan_path, 'wb') as pickle_out:
         pickle.dump(explanation, pickle_out)
+    config_dic['explanation'] = explan_path
 
     id_path = os.path.join(output_dir, 'ids.pkl')
     with open(id_path, 'wb') as pickle_out:
         pickle.dump(ids, pickle_out)
+    config_dic['ids'] = id_path
 
     # now we generate a dataframe that allows us to write the shap_values to disk
-    csv_path = os.path.join(output_dir, 'shap_values.csv')
+    csv_path = os.path.join(csvdir, 'shap_values.csv')
+    csv_path_mean = os.path.join(csvdir, 'mean_shap_values.csv')
+    csv_path_max = os.path.join(csvdir, 'max_shap_values.csv')
+    csv_path_min = os.path.join(csvdir, 'min_shap_values.csv')
     shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist(), index=ids.values())
     shap_frame.to_csv(csv_path)
+    shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(csv_path_mean)
+    shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(csv_path_max)
+    shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(csv_path_min)
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
     # Initialize reporter
     reporter = Reporter(logger=logger)
 
-    reporter.create_explanation_report(config_dic,explanation,ids,output_dir)
+    general_report_sections = config_dic['general_sections']
+
+    chosen_notebook_files = reporter.get_ordered_notebook_files(general_report_sections,
+                                                                context='rsmexplain')
+
+    # add chosen notebook files to configuration
+    config_dic['chosen_notebook_files'] = chosen_notebook_files
+
+    reporter.create_explanation_report(config_dic, explanation, ids, reportdir)
     return None
 
 

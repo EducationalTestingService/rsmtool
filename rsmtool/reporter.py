@@ -24,17 +24,15 @@ from . import HAS_RSMEXTRA
 from .reader import DataReader
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (
-        ordered_section_list_with_special_sections_rsmcompare,
-        ordered_section_list_with_special_sections_rsmeval,
-        ordered_section_list_with_special_sections_rsmsummarize,
-        ordered_section_list_with_special_sections_rsmtool,
-        special_notebook_path,
-        special_section_list_rsmcompare,
-        special_section_list_rsmeval,
-        special_section_list_rsmsummarize,
-        special_section_list_rsmtool,
-    )
+    from rsmextra.settings import (special_section_list_rsmtool, # noqa
+                                   special_section_list_rsmeval,
+                                   special_section_list_rsmcompare,
+                                   special_section_list_rsmsummarize,
+                                   ordered_section_list_with_special_sections_rsmtool,
+                                   ordered_section_list_with_special_sections_rsmeval,
+                                   ordered_section_list_with_special_sections_rsmcompare,
+                                   ordered_section_list_with_special_sections_rsmsummarize,
+                                   special_notebook_path)
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
@@ -96,6 +94,8 @@ else:
         "sysinfo",
     ]
 
+    ordered_section_list_rsmexplain = [ 'data_description', 'shap_values', 'shap_plots']
+
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
@@ -106,10 +106,10 @@ package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, "notebooks"))
 template_path = join(notebook_path, "templates")
 
-javascript_path = join(notebook_path, "javascript")
-comparison_notebook_path = join(notebook_path, "comparison")
-summary_notebook_path = join(notebook_path, "summary")
-
+javascript_path = join(notebook_path, 'javascript')
+comparison_notebook_path = join(notebook_path, 'comparison')
+summary_notebook_path = join(notebook_path, 'summary')
+explanations_notebook_path = join(notebook_path, 'explanations')
 
 # Define the general section list
 
@@ -137,6 +137,7 @@ general_section_list_rsmsummarize = [
     if section not in special_section_list_rsmsummarize
 ]
 
+general_section_list_rsmexplain = [section for section in ordered_section_list_rsmexplain]
 
 # define a mapping from the tool name to the master
 # list for both general and special sections
@@ -146,12 +147,14 @@ master_section_dict = {
         "rsmeval": general_section_list_rsmeval,
         "rsmcompare": general_section_list_rsmcompare,
         "rsmsummarize": general_section_list_rsmsummarize,
+        'rsmexplain': general_section_list_rsmexplain
     },
     "special": {
         "rsmtool": special_section_list_rsmtool,
         "rsmeval": special_section_list_rsmeval,
         "rsmcompare": special_section_list_rsmcompare,
         "rsmsummarize": special_section_list_rsmsummarize,
+        'rsmexplain': special_section_list_rsmexplain
     },
 }
 
@@ -162,6 +165,7 @@ notebook_path_dict = {
         "rsmeval": notebook_path,
         "rsmcompare": comparison_notebook_path,
         "rsmsummarize": summary_notebook_path,
+        'rsmexplain': explanations_notebook_path
     },
     "special": {
         "rsmtool": special_notebook_path,
@@ -603,6 +607,8 @@ class Reporter:
             ordered_section_list = ordered_section_list_rsmcompare
         elif context == "rsmsummarize":
             ordered_section_list = ordered_section_list_rsmsummarize
+        elif context == 'rsmexplain':
+            ordered_section_list = ordered_section_list_rsmexplain
 
         # add all custom sections to the end of the default ordered list
         ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
@@ -846,8 +852,38 @@ class Reporter:
     def create_explanation_report(self,
                                   config,
                                   shap_explanation,
-                                  ids):
-        self.logger.info("stub")
+                                  ids,
+                                  output_dir):
+
+        environ_config = {'EXPERIMENT_ID': config['experiment_id'],
+                          'JAVASCRIPT_PATH': javascript_path,
+                          'DESCRIPTION': config['description'],
+                          'EXPLANATION': config['explanation'],
+                          'BACKGROUND_SIZE' : config['background_size'],
+                          'IDs': config['ids']}
+        report_name = '{}_report'.format(config['experiment_id'])
+        reportdir = abspath(join(output_dir, '..', 'report'))
+
+        merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        environ_config_file = join(reportdir, '.environ.json')
+
+        # set the report directory as an environment variable
+        os.environ['RSM_REPORT_DIR'] = reportdir
+
+        # write out hidden environment JSON file
+        with open(environ_config_file, 'w') as out_environ_config:
+            json.dump(environ_config, out_environ_config)
+
+        # merge all the given sections
+        self.logger.info('Merging sections')
+        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
+
+        # run the merged notebook and save the output as
+        # an HTML file in the report directory
+        self.logger.info('Exporting HTML')
+        self.convert_ipynb_to_html(merged_notebook_file,
+                                   join(reportdir, '{}.html'.format(report_name)))
+        self.logger.info('Success')
 
 
 def main():  # noqa: D103
