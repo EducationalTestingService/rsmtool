@@ -21,9 +21,9 @@ from .utils.constants import VALID_PARSER_SUBCOMMANDS
 # utility function to get the proper feature name list we can get rid of this once the PR is done
 def get_feature_names(model):
     if model.feat_selector:
-        return model.feat_vectorizer.get_feature_names_out()[model.feat_selector.get_support()]
+        return list(model.feat_vectorizer.get_feature_names_out()[model.feat_selector.get_support()])
     else:
-        return model.feat_vectorizer.get_feature_names_out()
+        return list(model.feat_vectorizer.get_feature_names_out())
 
 
 # utility function to get the actual array of data
@@ -132,7 +132,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                     logger.info('Your "range" indices have been defined as: ' + str(row_range.groups(1)))
                     index_1 = int(row_range.groups(1)[0])
                     index_2 = int(row_range.groups(1)[1])
-                    if np.abs(index_1-index_2) == 1:
+                    if np.abs(index_1 - index_2) == 1:
                         logger.error('"range" must be > 2. Shutting down.')
                         exit()
                     ids, data_features = mask(model, data, [index_1, index_2])
@@ -165,6 +165,12 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
             explanation.base_values = np.repeat(explanation.base_values[0], explanation.values.shape[0])
     except Exception:
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
+
+    # we're generating a new explanation here, because manually munging the feature names and base values can break some
+    # plots; this may be changed in newer shap versions, but under shap == 0.41. this is necessary
+
+    explanation = shap.Explanation(explanation.values, base_values=explanation.base_values,
+                                   data=explanation.data, feature_names=explanation.feature_names)
 
     generate_report(explanation, output_dir, ids, config_dic, logger)
 
@@ -204,11 +210,14 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     csv_path_mean = os.path.join(csvdir, 'mean_shap_values.csv')
     csv_path_max = os.path.join(csvdir, 'max_shap_values.csv')
     csv_path_min = os.path.join(csvdir, 'min_shap_values.csv')
-    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names.tolist(), index=ids.values())
+    shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names, index=ids.values())
     shap_frame.to_csv(csv_path)
-    shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(csv_path_mean)
-    shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(csv_path_max)
-    shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(csv_path_min)
+    shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(csv_path_mean, index_label='Feature', header=[
+        'abs. mean shap value'])
+    shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(csv_path_max, index_label='Feature', header=[
+        'abs. max shap value'])
+    shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(csv_path_min, index_label='Feature', header=[
+        'abs. min shap value'])
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
     # Initialize reporter
@@ -222,7 +231,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     # add chosen notebook files to configuration
     config_dic['chosen_notebook_files'] = chosen_notebook_files
 
-    reporter.create_explanation_report(config_dic, explanation, ids, reportdir)
+    reporter.create_explanation_report(config_dic, csvdir, reportdir)
     return None
 
 

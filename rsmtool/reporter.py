@@ -851,8 +851,7 @@ class Reporter:
 
     def create_explanation_report(self,
                                   config,
-                                  shap_explanation,
-                                  ids,
+                                  csv_dir,
                                   output_dir):
 
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
@@ -860,7 +859,10 @@ class Reporter:
                           'DESCRIPTION': config['description'],
                           'EXPLANATION': config['explanation'],
                           'BACKGROUND_SIZE' : config['background_size'],
-                          'IDs': config['ids']}
+                          'IDs': config['ids'],
+                          'CSV_DIR': csv_dir,
+                          'DISPLAY_NUM': config['display_num']
+                          }
         report_name = '{}_report'.format(config['experiment_id'])
         reportdir = abspath(join(output_dir, '..', 'report'))
 
