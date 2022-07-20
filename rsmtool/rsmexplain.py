@@ -213,11 +213,11 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names, index=ids.values())
     shap_frame.to_csv(csv_path)
     shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(csv_path_mean, index_label='Feature', header=[
-        'abs. mean shap value'])
+        'abs. mean shap'])
     shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(csv_path_max, index_label='Feature', header=[
-        'abs. max shap value'])
+        'abs. max shap'])
     shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(csv_path_min, index_label='Feature', header=[
-        'abs. min shap value'])
+        'abs. min shap'])
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
     # Initialize reporter

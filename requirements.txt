@@ -11,6 +11,7 @@ pandas
 parameterized
 pre-commit
 seaborn
+shap==0.41.0
 skll==3.2.0
 sphinx<6.0
 sphinx_rtd_theme
