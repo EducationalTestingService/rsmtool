@@ -230,7 +230,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     # we make sure all necessary directories exist
     os.makedirs(output_dir, exist_ok=True)
     reportdir = os.path.abspath(os.path.join(output_dir, 'report'))
-    csvdir = os.path.abspath(os.path.join(output_dir, 'csv_files'))
+    csvdir = os.path.abspath(os.path.join(output_dir, 'output'))
     figdir = os.path.abspath(os.path.join(output_dir, 'figures'))
 
     os.makedirs(csvdir, exist_ok=True)
@@ -238,12 +238,12 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     os.makedirs(reportdir, exist_ok=True)
 
     # first we write the explanation object to disk, in case we need it later
-    explan_path = os.path.join(output_dir, 'explanation.pkl')
+    explan_path = os.path.join(csvdir, 'explanation.pkl')
     with open(explan_path, 'wb') as pickle_out:
         pickle.dump(explanation, pickle_out)
     config_dic['explanation'] = explan_path
 
-    id_path = os.path.join(output_dir, 'ids.pkl')
+    id_path = os.path.join(csvdir, 'ids.pkl')
     with open(id_path, 'wb') as pickle_out:
         pickle.dump(ids, pickle_out)
     config_dic['ids'] = id_path
