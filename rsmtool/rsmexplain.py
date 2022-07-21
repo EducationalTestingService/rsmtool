@@ -93,7 +93,20 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
     # then we load the background data
     reader = Reader.for_path(config_dic["background_data"], sparse=False, id_col=config_dic["id_column"])
+
+    # we check if the background data is large enough for a meaningful representation:
     background = reader.read()
+    background = background[0:150]
+    try:
+        assert background.features.shape[0] > 300
+    except AssertionError:
+        logger.error("Your background data set is too small. We do not recommend passing less than 300 rows of"
+                     " background data. You have passed " + str(background.features.shape[0]) +
+                     " rows. Shutting down...")
+        sys.exit("Background sample too small, exiting program.")
+
+
+
 
     # we load the data for predictions
     if "data" in config_dic.keys():
