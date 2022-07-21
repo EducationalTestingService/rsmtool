@@ -96,7 +96,6 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
     # we check if the background data is large enough for a meaningful representation:
     background = reader.read()
-    background = background[0:150]
     try:
         assert background.features.shape[0] > 300
     except AssertionError:
