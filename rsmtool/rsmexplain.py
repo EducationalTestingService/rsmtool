@@ -50,21 +50,41 @@ def yield_ids(feature_set, range_size=None):
 
 def mask(learner, feature_set, feature_range=None):
     """
-    Utility function that extracts features from a FeatureSet, or subsamples of those features.
-    :param learner: A SKLL learner.
-    :param feature_set: A SKLL FeatureSet.
-    :param feature_range: Either an integer value, or an indexable iterable containing 2 integers.
-    :return: A dictionary object containing SKLL IDs as values and array indeces as keys. And
-    a dense numpy array of features which correspond to the dictionary row_indices in the original
-    FeatureSet
+    Transform and vectorize features for a given learner.
+
+    Applies the vectorizer and feature-selector step to the features in a Feature Set. Allows selection of a specific
+    range of feature rows by their row-indices or random subsampling.
+
+    Parameters
+    ----------
+    learner : skll.learner.Learner
+    A SKLL Learner object.
+    feature_set : skll.data.FeatureSet
+    A SKLL FeatureSet.
+    feature_range : int or [int, int] or (int, int), optional
+    If feature_range is an integer, mask() will create a random subsample of feature rows. If feature_range is an
+    iterable, mask() will sample a range of feature_rows using the first two integers in the iterable as indices.
+
+    Returns
+    -------
+    ids : dict
+    A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The dictionary contains
+    the new row indices as keys and the original FeatureSet indices as values. If a random sample is created,
+    this allows us to access which rows were sampled from the original set.
+    features : numpy.array
+    A 2D numpy array containing sampled feature rows.
     """
+
     ids = yield_ids(feature_set, feature_range)
     if feature_range:
+        order = range(0, len(ids))
+        feat_ids = [i for i in ids.values()]
         features = (learner.feat_selector.transform(
             learner.feat_vectorizer.transform(
                 feature_set.vectorizer.inverse_transform(
                     feature_set.features)))).toarray()[
-                   np.array([i for i in ids.keys()]), :]
+                   np.array(order), :]
+        ids = dict(zip(order, feat_ids))
     else:
         features = (learner.feat_selector.transform(
             learner.feat_vectorizer.transform(
@@ -75,8 +95,19 @@ def mask(learner, feature_set, feature_range=None):
 
 def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     """
-    Generates the explanation object and returns it.
-    :return:
+
+    Parameters
+    ----------
+    config_file_or_obj_or_dict
+    output_dir
+    logger
+
+    Raises
+    ------
+
+    Returns
+    -------
+
     """
     # we will implement an actual config functionality later, for now we just treat this as a dictionary
     # config_dic = config_file_or_obj_or_dic
