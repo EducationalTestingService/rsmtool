@@ -210,14 +210,28 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     csv_path_mean = os.path.join(csvdir, 'mean_shap_values.csv')
     csv_path_max = os.path.join(csvdir, 'max_shap_values.csv')
     csv_path_min = os.path.join(csvdir, 'min_shap_values.csv')
+    csv_path_abs = os.path.join(csvdir, 'abs_shap_values.csv')
+
+    # we transform the shap values into a dataframe and save it
     shap_frame = pd.DataFrame(explanation.values, columns=explanation.feature_names, index=ids.values())
     shap_frame.to_csv(csv_path)
+
+    # here we calculate the absolute mean shap value, turn that into a dataframe and join it with a series containing
+    # the absolute max shap value
+    # the feature column here serves us as an index that allows the values to be joined correctly
+    # finally we also add the absolute min shap value
+    means = pd.DataFrame(shap_frame.abs().mean(axis=0).sort_values(ascending=False)).join(shap_frame.abs().max(axis=0)
+                                                                    .sort_values(ascending=False).rename('new_series'))
+    abs_all = means.join(shap_frame.abs().min(axis=0).sort_values(ascending=False).rename('second_series'))
+
+    # we store the mean, max, min shap values in seperate .csv files and then one joint .csv file
     shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(csv_path_mean, index_label='Feature', header=[
         'abs. mean shap'])
     shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(csv_path_max, index_label='Feature', header=[
         'abs. max shap'])
     shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(csv_path_min, index_label='Feature', header=[
         'abs. min shap'])
+    abs_all.to_csv(csv_path_abs, index_label='Feature', header=['abs. mean shap', 'abs. max shap', 'abs. min shap'])
     # later we want to make some additions here to ensure that the correct indices are exported for these decisions
 
     # Initialize reporter
