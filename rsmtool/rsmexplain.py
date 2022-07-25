@@ -20,6 +20,20 @@ from .utils.constants import VALID_PARSER_SUBCOMMANDS
 
 # utility function to get the proper feature name list we can get rid of this once the PR is done
 def get_feature_names(model):
+    """
+    Return the features of a SKLL learner
+
+    Parameters
+    ----------
+    model: skll.learner.Learner
+    A SKLL Learner object.
+
+    Returns
+    -------
+    feature_names: list
+    The names of features used at the estimator step.
+
+    """
     if model.feat_selector:
         return list(model.feat_vectorizer.get_feature_names_out()[model.feat_selector.get_support()])
     else:
@@ -29,11 +43,20 @@ def get_feature_names(model):
 # utility function to get the actual array of data
 def yield_ids(feature_set, range_size=None):
     """
-    Utility function that returns a dictionary object containing the indices of the data in the range
-    specified.
-    :param feature_set: A SKLL FeatureSet
-    :param range_size: Either an integer value, or an indexable iterable containing 2 integers.
-    :return: A dictionary object containing SKLL IDs as values and array indeces as keys.
+    Grab the feature ids from from a feature set.
+
+    Parameters
+    ----------
+    feature_set: skll.data.featureset.FeatureSet
+    A SKLL FeatureSet.
+    range_size: int or [int, int] or (int, int), optional
+    A user defined range or sample size for the ids.
+
+    Returns
+    -------
+    id_dic: dict
+    A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The dictionary contains
+    the new row indices as keys and the original FeatureSet indices as values.
     """
     id_dic = OrderedDict()
     if range_size is None:
@@ -59,7 +82,7 @@ def mask(learner, feature_set, feature_range=None):
     ----------
     learner : skll.learner.Learner
     A SKLL Learner object.
-    feature_set : skll.data.FeatureSet
+    feature_set : skll.data.featureset.FeatureSet
     A SKLL FeatureSet.
     feature_range : int or [int, int] or (int, int), optional
     If feature_range is an integer, mask() will create a random subsample of feature rows. If feature_range is an
@@ -98,18 +121,38 @@ def mask(learner, feature_set, feature_range=None):
 
 def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     """
+    Generate a shap.Explanation object.
+    This function does all the heavy lifting. It loads the model, creates an explainer, and generates
+    an explanation object. It then calls generate_report() in order to generate a SHAP report.
 
     Parameters
     ----------
-    config_file_or_obj_or_dict
-    output_dir
-    logger
+    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+        Path to the experiment configuration file either a a string
+        or as a ``pathlib.Path`` object. Users can also pass a
+        ``Configuration`` object that is in memory or a Python dictionary
+        with keys corresponding to fields in the configuration file. Given a
+        configuration file, any relative paths in the configuration file
+        will be interpreted relative to the location of the file. Given a
+        ``Configuration`` object, relative paths will be interpreted
+        relative to the ``configdir`` attribute, that _must_ be set. Given
+        a dictionary, the reference path is set to the current directory.
+    output_dir : str
+        Path to the experiment output directory.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
 
     Raises
     ------
-
-    Returns
-    -------
+    FileNotFoundError
+        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
+        be located.
+    AssertionError
+        If the user passes a background sample of .shape[0] < 300, rsmexplain shuts down in order to avoid inaccurate
+        explanations.
+    ValueError
+        If config_dic["range"] cannot be converted into int or iterable of int.
 
     """
     # we will implement an actual config functionality later, for now we just treat this as a dictionary
@@ -225,8 +268,27 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
 def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     """
-    Generates a report and saves the SHAP_values and explanation object to disk
-    :return:
+    Generates a rsmexplain report.
+    Generates a rsmexplain report and saves a series of files to disk. Including pickle files of the explanation object,
+    and id-dictionary. Saves all shap_values to disk as .csv files.
+
+    Parameters
+    ----------
+    explanation: shap.Explanation
+    A shap explanation object containing shap_values, data points, feature names, base_values.
+    output_dir : str
+        Path to the experiment output directory
+    ids: dict
+    A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The dictionary contains
+    the new row indices as keys and the original FeatureSet indices as values.
+    config_dic : Configuration
+        The Configuration object for the tool.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
+
+    -------
+
     """
     logger = logger if logger else logging.getLogger(__name__)
 
