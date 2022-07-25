@@ -82,14 +82,17 @@ def mask(learner, feature_set, feature_range=None):
         features = (learner.feat_selector.transform(
             learner.feat_vectorizer.transform(
                 feature_set.vectorizer.inverse_transform(
-                    feature_set.features)))).toarray()[
-                   np.array(order), :]
+                    feature_set.features))))
+        if type(features) is not np.ndarray:
+            features = features.toarray()[np.array(order), :]
         ids = dict(zip(order, feat_ids))
     else:
         features = (learner.feat_selector.transform(
             learner.feat_vectorizer.transform(
                 feature_set.vectorizer.inverse_transform(
-                    feature_set.features)))).toarray()
+                    feature_set.features))))
+        if type(features) is not np.ndarray:
+            features = features.toarray()
     return ids, features
 
 
