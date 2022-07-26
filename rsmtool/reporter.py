@@ -868,6 +868,8 @@ class Reporter:
             The directory for the html report
 
         """
+        # we define a directory for the saved figures
+        fig_dir = abspath(join(output_dir, '..', 'figures'))
 
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'JAVASCRIPT_PATH': javascript_path,
@@ -876,7 +878,8 @@ class Reporter:
                           'BACKGROUND_SIZE': config['background_size'],
                           'IDs': config['ids'],
                           'CSV_DIR': csv_dir,  # the report loads some csv files, so we need this parameter
-                          'DISPLAY_NUM': config['display_num']
+                          'DISPLAY_NUM': config['display_num'],
+                          'FIG_DIR' : fig_dir
                           }
         report_name = '{}_report'.format(config['experiment_id'])
         reportdir = abspath(join(output_dir, '..', 'report'))
