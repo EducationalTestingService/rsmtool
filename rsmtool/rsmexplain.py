@@ -106,8 +106,11 @@ def mask(learner, feature_set, feature_range=None):
             learner.feat_vectorizer.transform(
                 feature_set.vectorizer.inverse_transform(
                     feature_set.features))))
+        # we make sure that this is a dense array:
         if type(features) is not np.ndarray:
             features = features.toarray()[np.array(order), :]
+        else:
+            features = features[np.array(order), :]
         ids = dict(zip(order, feat_ids))
     else:
         features = (learner.feat_selector.transform(
@@ -199,9 +202,10 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
 
     # we load the data for predictions
-    if "data" in config_dic.keys():
+    if "explainable_data" in config_dic.keys():
         data_reader = Reader.for_path(config_dic["explainable_data"], sparse=False, id_col=config_dic["id_column"])
         data = data_reader.read()
+        logger.info("Using {} to generate explanations".format(config_dic["explainable_data"]))
     else:
         logger.info('No "explainable_data" specified. Supplementing the background_data instead.')
         data = background
@@ -219,7 +223,8 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         logger.warning('No background sample size specified. Proceeding with a kmeans sample size 500.')
         background_features = shap.kmeans(mask(model, background)[1], 500)
 
-    # in case the user wants a subsample explained
+    # in case the user wants a subsample explained we try and convert the range param into an integer
+    # if it cant be coerced into an integer, we try a regex to see if it can be coerced into an iterable of int
     if "range" in config_dic.keys() and config_dic["range"] is not None:
         try:
             row_range = int(config_dic["range"])
@@ -244,7 +249,8 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                     raise ValueError("Cannot decode the \"range\" param!")
             except ValueError:
                 logger.warning('range unspecified: This will generate explanations on the entire data set'
-                               ' you pass in "explainable_data". This may take a while depending on the size of your data set.')
+                               ' you pass in "explainable_data". '
+                               'This may take a while depending on the size of your data set.')
                 ids, data_features = mask(model, data)
     else:
         logger.warning('range unspecified: This will generate explanations on the entire data set'
@@ -261,7 +267,9 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     if explanation.feature_names is None:
         explanation.feature_names = feature_names
 
-    # some explainers don't correctly generate base value arrays, we take care of this here:
+    # some explainers don't correctly generate base value arrays, sometimes it's a single float,
+    # sometimes it's an array of shape(1,), we want a 1D array of shape[0]== len(explainable_data)
+    # we take care of this here:
     try:
         explanation.base_values.shape
         if explanation.base_values.shape[0] != explanation.values.shape[0]:
@@ -419,6 +427,20 @@ def main():
         logger.info('Output directory: {}'.format(args.output_dir))
 
         generate_explanation(os.path.abspath(args.config_file), os.path.abspath(args.output_dir))
+
+    else:
+        ### THIS DOES NOT CURRENTLY WORK, AS THERE IS NO LINK IN .constants.CONFIGURATION_DOCUMENTATION_SLUGS
+        ### Once we add a key there for rsmexplain, this should generate as expected
+        # when generating, log to stderr
+        logging.root.addHandler(stderr_handler)
+
+        # auto-generate an example configuration and print it to STDOUT
+        generator = ConfigurationGenerator('rsmexplain',
+                                           as_string=True,
+                                           suppress_warnings=args.quiet,
+                                           use_subgroups=False)
+        configuration = generator.interact() if args.interactive else generator.generate()
+        print(configuration)
 
     return None
 
