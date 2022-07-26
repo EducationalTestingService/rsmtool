@@ -94,12 +94,13 @@ else:
         "sysinfo",
     ]
 
-    ordered_section_list_rsmexplain = [ 'data_description', 'shap_values', 'shap_plots']
+    ordered_section_list_rsmexplain = ['data_description', 'shap_values', 'shap_plots']
 
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
     special_section_list_rsmsummarize = []
+    special_section_list_rsmexplain = []
     special_notebook_path = ""
 
 package_path = dirname(__file__)
@@ -137,7 +138,8 @@ general_section_list_rsmsummarize = [
     if section not in special_section_list_rsmsummarize
 ]
 
-general_section_list_rsmexplain = [section for section in ordered_section_list_rsmexplain]
+general_section_list_rsmexplain = [section for section in ordered_section_list_rsmexplain
+                                   if section not in special_section_list_rsmexplain]
 
 # define a mapping from the tool name to the master
 # list for both general and special sections
@@ -870,10 +872,10 @@ class Reporter:
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'JAVASCRIPT_PATH': javascript_path,
                           'DESCRIPTION': config['description'],
-                          'EXPLANATION': config['explanation'], # the path to the explanation object
-                          'BACKGROUND_SIZE' : config['background_size'],
+                          'EXPLANATION': config['explanation'],  # the path to the explanation object
+                          'BACKGROUND_SIZE': config['background_size'],
                           'IDs': config['ids'],
-                          'CSV_DIR': csv_dir, # the report loads some csv files, so we need this parameter
+                          'CSV_DIR': csv_dir,  # the report loads some csv files, so we need this parameter
                           'DISPLAY_NUM': config['display_num']
                           }
         report_name = '{}_report'.format(config['experiment_id'])

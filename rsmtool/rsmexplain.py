@@ -369,7 +369,29 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
 
     general_report_sections = config_dic['general_sections']
 
-    chosen_notebook_files = reporter.get_ordered_notebook_files(general_report_sections,
+    # creating the infrastructure if we ever want to add special sections
+    special_report_sections = config_dic['special_sections']
+
+    # get any custom sections and locate them to make sure
+    # that they exist, otherwise raise an exception
+    custom_report_section_paths = config_dic['custom_sections']
+
+    if custom_report_section_paths:
+        logger.info('Locating custom report sections')
+        custom_report_sections = Reporter.locate_custom_sections(custom_report_section_paths,
+                                                                 config_dic.configdir)
+    else:
+        custom_report_sections = []
+
+    # we leverage the custom sections to allow users to turn auto_cohorts on and off
+    package_path = os.path.dirname(__file__)
+    notebook_path = os.path.abspath(os.path.join(package_path, 'notebooks'))
+    explanation_notebooks = os.path.join(notebook_path, 'explanations')
+    if config_dic['auto_cohorts']:
+        custom_report_sections.append(explanation_notebooks + '/auto_cohorts.ipynb')
+
+    chosen_notebook_files = reporter.get_ordered_notebook_files(general_report_sections, special_report_sections,
+                                                                custom_report_sections,
                                                                 context='rsmexplain')
 
     # add chosen notebook files to configuration
