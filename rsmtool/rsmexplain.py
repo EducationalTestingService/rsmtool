@@ -165,8 +165,22 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     logger.info('Saving configuration file.')
     config_dic.save(output_dir)
 
-    # first we load the model
-    model = Learner.from_file(config_dic["model_path"])
+    # first we load the model, we have a try/catch here for people who pickled their model instead of using the SKLL
+    # save() method. The program will shut down if the loaded object is not a skll Learner
+    try:
+        model = Learner.from_file(config_dic["model_path"])
+        if type(model) is not Learner:
+            sys.exit("The specified model_path does not lead to a skll.Learner")
+    except TypeError:
+        logger.info("Your model path does not lead to a saved SKLL model. Trying to unpickle instead...")
+        try:
+            pickle_model = open(config_dic["model_path"], 'rb')
+            model = pickle.load(pickle_model)
+            if type(model) is not Learner:
+                sys.exit("The specified model_path does not lead to a skll.Learner")
+        except TypeError:
+            sys.exit("Could not load the model from model_path. Exiting program. Please make sure your model is a "
+                     "saved SKLL model.")
 
     # then we load the background data
     reader = Reader.for_path(config_dic["background_data"], sparse=False, id_col=config_dic["id_column"])

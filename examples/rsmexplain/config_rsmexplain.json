@@ -1,0 +1,11 @@
+{
+"model_path": "example_svr.pkl",
+"background_data": "example_features.csv",
+"background_size": "50",
+"explainable_data": "example_features.csv",
+"id_column": "id",
+"range": "all",
+"experiment_id":"Example_1",
+"description": "This is a SVR scoring model for illustration purposes",
+"display_num": "16"
+}

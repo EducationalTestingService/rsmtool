@@ -853,14 +853,27 @@ class Reporter:
                                   config,
                                   csv_dir,
                                   output_dir):
+        """
+        Generate a html report for rsmexplain.
+
+        Parameters
+        ----------
+        config : configuration_parser.Configuration
+            A configuration object
+        csv_dir : str
+            The experiment output directory containing the .csv files of shap values
+        output_dir : str
+            The directory for the html report
+
+        """
 
         environ_config = {'EXPERIMENT_ID': config['experiment_id'],
                           'JAVASCRIPT_PATH': javascript_path,
                           'DESCRIPTION': config['description'],
-                          'EXPLANATION': config['explanation'],
+                          'EXPLANATION': config['explanation'], # the path to the explanation object
                           'BACKGROUND_SIZE' : config['background_size'],
                           'IDs': config['ids'],
-                          'CSV_DIR': csv_dir,
+                          'CSV_DIR': csv_dir, # the report loads some csv files, so we need this parameter
                           'DISPLAY_NUM': config['display_num']
                           }
         report_name = '{}_report'.format(config['experiment_id'])
