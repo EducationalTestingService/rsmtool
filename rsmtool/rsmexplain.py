@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+"""
+Explain a SKLL model through SHAP.
+
+:author: Remo Nitschke (rnitschke@ets.org)
+
+:organization: ETS
+"""
 
 import logging
 import shap
