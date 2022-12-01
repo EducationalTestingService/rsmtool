@@ -7,7 +7,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Make sure any and all tests are passing in ``main``. Make sure you have also run tests locally in strict mode (``STRICT=1 nosetests --nologcapture tests``) to catch any warnings in the HTML report that can be fixed before the release.
 
-#. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`__.
+#. Run the ``tests/update_files.py`` script with the appropriate arguments to make sure that all test data in the new release have correct experiment ids and filenames. If any (non-model) files need to be changed this should be investigated before the branch is released. Please see more details about running this `here <https://rsmtool.readthedocs.io/en/main/contributing.html#writing-new-functional-tests>`__.
 
     .. note::
 
@@ -16,7 +16,7 @@ This process is only meant for the project administrators, not users and develop
             * Fairness test files for `lr-eval-system-score-constant` test
             * Predictions and all evaluation files for `linearsvr` test.
 
-        Note that the full set of outputs from these test files are also used as input for `rsmcompare` and `rsmsummarize` tests. These *input* files need to be updated following the process under **Example 2** in `Writing new functional tests <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information.
+        Note that the full set of outputs from these test files are also used as input for `rsmcompare` and `rsmsummarize` tests. These *input* files need to be updated following the process under **Example 2** in `Writing new functional tests <https://rsmtool.readthedocs.io/en/main/contributing.html#writing-new-functional-tests>`_. You can also see `this pull request <https://github.com/EducationalTestingService/rsmtool/pull/525>`_ for more information.
 
 #. Create a release branch ``release/XX`` on GitHub.
 
@@ -30,7 +30,7 @@ This process is only meant for the project administrators, not users and develop
 
    #. run ``make linkcheck`` on the documentation (i.e. from the ``doc/`` folder) and fix any redirected/broken links.
 
-   #. update the README and this release documentation, if necessary.
+   #. update the README and this release documentation, if necessary. Make sure to update the documentation badge in the README to use the latest release tag. That documentation version will be created in the steps below.
 
 #. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively.
 
@@ -64,7 +64,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
 
-#. Make another PR to merge ``main`` branch into ``stable`` so that the the default ReadTheDocs build (which is ``stable``) always points to the latest release. There are two versions of the documentation, one for the ``stable`` `branch <https://rsmtool.readthedocs.io/>`__ and the other for the ``main`` `branch <https://rsmtool.readthedocs.io/en/main/index.html>`__. The ``stable`` version of the documentation needs to be updated with each new release.
+#. Create a new documentation version in readthedocs.org for this new tag and make it version visible by default.
 
 #. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
 
