@@ -17,6 +17,7 @@ import sys
 from os.path import abspath, basename, dirname, join, splitext
 
 from nbconvert.exporters import HTMLExporter
+from nbconvert.exporters.templateexporter import default_filters
 from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
@@ -326,6 +327,15 @@ class Reporter:
                                 'HTMLExporter': {"template_name": "classic",
                                                  "template_file": join(template_path,
                                                                        'report.tpl')}})
+
+        # newer versions of nbconvert use a "clean_html" filter that
+        # break SVG rendering; so we override that filter here with
+        # a custom function that is essentially a noop. For more
+        # details, please refer to the following issue:
+        # https://github.com/EducationalTestingService/rsmtool/issues/571
+        def custom_clean_html(element):
+            return element.decode() if isinstance(element, bytes) else str(element)
+        default_filters["clean_html"] = custom_clean_html
 
         exportHtml = HTMLExporter(config=report_config)
         output, _ = exportHtml.from_filename(notebook_file)
