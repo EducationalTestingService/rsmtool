@@ -75,8 +75,10 @@ def create_xval_files(configuration, output_dir, logger=None):
             located_filepaths[additional_filename] = DataReader.locate_files(additional_file,
                                                                              configuration.configdir)
 
-    # read the training file into a dataframe
-    df_train = DataReader.read_from_file(located_filepaths["train"])
+    # read the training file into a dataframe making sure that the specified
+    # ID column is read as a string
+    df_train = DataReader.read_from_file(located_filepaths["train"],
+                                         converters={configuration["id_column"]: str})
 
     # we need to sub-sample the full training data file to create a dummy
     # test file that we need to use when running RSMTool on the full
