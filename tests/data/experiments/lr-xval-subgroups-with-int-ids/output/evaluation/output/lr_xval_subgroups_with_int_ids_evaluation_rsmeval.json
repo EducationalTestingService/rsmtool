@@ -1,0 +1,31 @@
+{
+    "experiment_id": "lr_xval_subgroups_with_int_ids_evaluation",
+    "description": "Cross-validation with subgroups using a LinearRegression model. (Evaluating Fold Predictions)",
+    "predictions_file": "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/evaluation/xval_predictions.csv",
+    "system_score_column": "scale",
+    "scale_with": "asis",
+    "trim_min": 1,
+    "trim_max": 6,
+    "file_format": "csv",
+    "second_human_score_column": null,
+    "candidate_column": null,
+    "flag_column": null,
+    "exclude_zero_scores": true,
+    "min_items_per_candidate": null,
+    "rater_error_variance": null,
+    "subgroups": [
+        "QUESTION",
+        "L1"
+    ],
+    "trim_tolerance": 0.4998,
+    "use_thumbnails": false,
+    "id_column": "spkitemid",
+    "human_score_column": "sc1",
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "min_n_per_group": null,
+    "section_order": null
+}

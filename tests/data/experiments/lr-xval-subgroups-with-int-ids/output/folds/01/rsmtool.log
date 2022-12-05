@@ -1,0 +1,15 @@
+Saving configuration file.
+Reading in all data from files.
+Preprocessing all features.
+Pre-processing training and test set features
+Saving training and test set data to disk.
+Training LinearRegression model.
+Running analyses on training set.
+Generating training and test set predictions.
+Processing train set predictions.
+Processing test set predictions.
+Scaling the coefficients and saving them to disk
+Running prediction analyses.
+Starting report generation.
+Merging sections
+Exporting HTML
