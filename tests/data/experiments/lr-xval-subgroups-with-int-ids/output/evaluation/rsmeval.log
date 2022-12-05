@@ -1,0 +1,10 @@
+Saving configuration file.
+Reading predictions: /Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/evaluation/xval_predictions.csv.
+Preprocessing predictions.
+Assuming given system predictions are already scaled and will be used as such.
+Processing predictions
+Saving pre-processed predictions and metadata to disk.
+Running analyses on predictions.
+Starting report generation.
+Merging sections
+Exporting HTML

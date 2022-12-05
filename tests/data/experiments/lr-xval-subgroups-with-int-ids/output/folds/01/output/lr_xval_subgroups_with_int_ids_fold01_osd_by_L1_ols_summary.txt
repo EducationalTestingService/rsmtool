@@ -1,0 +1,27 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  error   R-squared:                       0.013
+Model:                            OLS   Adj. R-squared:                 -0.006
+Method:                 Least Squares   F-statistic:                    0.6920
+Date:                Mon, 05 Dec 2022   Prob (F-statistic):              0.558
+Time:                        10:18:20   Log-Likelihood:                -155.74
+No. Observations:                 167   AIC:                             319.5
+Df Residuals:                     163   BIC:                             332.0
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+====================================================================================
+                       coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------------
+Intercept            0.0606      0.092      0.661      0.510      -0.121       0.242
+group[T.Klingon]    -0.1600      0.133     -1.205      0.230      -0.422       0.102
+group[T.Vulcan]     -0.1535      0.135     -1.141      0.256      -0.419       0.112
+group[T.Navi]       -0.0492      0.135     -0.363      0.717      -0.317       0.218
+==============================================================================
+Omnibus:                        0.968   Durbin-Watson:                   2.200
+Prob(Omnibus):                  0.616   Jarque-Bera (JB):                0.600
+Skew:                           0.048   Prob(JB):                        0.741
+Kurtosis:                       3.278   Cond. No.                         4.60
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.

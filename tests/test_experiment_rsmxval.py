@@ -18,6 +18,7 @@ else:
     param('lr-xval-xlsx', 'lr_xval_xlsx', folds=3, file_format="xlsx"),
     param('lr-xval-folds-file', 'lr_xval_folds_file', folds=2),  # folds file contain 2 folds
     param('lr-xval-subgroups', 'lr_xval_subgroups', folds=3, subgroups=["QUESTION", "L1"]),
+    param('lr-xval-subgroups-with-int-ids', 'lr_xval_subgroups_with_int_ids', folds=3, subgroups=["QUESTION", "L1"]),
     param('lr-xval-consistency', 'lr_xval_consistency', folds=3, consistency=True, subgroups=["L1"]),
     param('lr-xval-skll-model', 'lr_xval_skll_model', folds=2, skll=True),  # uses folds file
     param('lr-xval-thumbnails', 'lr_xval_thumbnails', folds=3),
