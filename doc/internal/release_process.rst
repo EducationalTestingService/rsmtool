@@ -22,15 +22,15 @@ This process is only meant for the project administrators, not users and develop
 
 #. In the release branch:
 
-   #. update the version numbers in ``version.py``.
+   - Update the version numbers in ``version.py``.
 
-   #. update the conda recipe.
+   - Update the conda recipe.
 
-   #. update the documentation with any new features or details about changes.
+   - Update the documentation with any new features or details about changes.
 
-   #. run ``make linkcheck`` on the documentation (i.e. from the ``doc/`` folder) and fix any redirected/broken links.
+   - Run ``make linkcheck`` on the documentation (i.e. from the ``doc/`` folder) and fix any redirected/broken links.
 
-   #. update the README and this release documentation, if necessary. Make sure to update the documentation badge in the README to use the latest release tag. That documentation version will be created in the steps below.
+   - Update the README and this release documentation, if necessary. Make sure to update the documentation badge in the README to use the latest release tag. That documentation version will be created in the steps below.
 
 #. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively.
 
