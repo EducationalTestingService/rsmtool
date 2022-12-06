@@ -22,7 +22,7 @@ from os.path import abspath
 from pathlib import Path
 
 from skll.learner import Learner
-from skll.metrics import SCORERS
+from skll.metrics import _SCORERS
 
 from . import HAS_RSMEXTRA
 from .utils.constants import BOOLEAN_FIELDS, CHECK_FIELDS, DEFAULTS, ID_FIELDS, LIST_FIELDS
@@ -111,7 +111,7 @@ class Configuration:
     """
     Configuration class.
 
-    Encapsulates all of the configuration parameters and methods to 
+    Encapsulates all of the configuration parameters and methods to
     access these parameters.
     """
 
@@ -968,7 +968,7 @@ class ConfigurationParser:
                 warnings.warn("You specified a custom SKLL objective but also chose a "
                               "non-SKLL model. The objective will be ignored.")
             else:
-                if new_config['skll_objective'] not in SCORERS:
+                if new_config['skll_objective'] not in _SCORERS:
                     raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
                                      "documentation and choose a valid tuning objective.")
 
