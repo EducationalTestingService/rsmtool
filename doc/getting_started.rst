@@ -15,7 +15,7 @@ Currently, the recommended way to install RSMTool is by using the ``conda`` pack
 
     conda create -n rsmtool -c conda-forge -c ets python=3.8 rsmtool
 
-3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path. [#]_
+3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path
 
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by RSMTool will not affect other projects.
 
@@ -29,11 +29,6 @@ You can also use ``pip`` to install RSMTool instead of ``conda``. To do so, simp
 
     pip install rsmtool
 
-Note that if you are on macOS, you will need to have the following line in your ``.bashrc`` for RSMTool to work properly::
+However, note that ``pip`` may be quite slow since its dependency resolution is not as good as conda's. Also, note that if you are on macOS, you will need to have the following line in your ``.bashrc`` for RSMTool to work properly::
 
     export MPLBACKEND=Agg
-
-
-.. rubric:: Footnotes
-
-.. [#] For older versions of conda, you may have to do ``source activate rsmtool`` on Linux/macOS and ``activate rsmtool`` on Windows.
