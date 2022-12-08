@@ -1,7 +1,7 @@
 Contributing to RSMTool
 =======================
 
-Contributions to RSMTool are very welcome. You can use the instructions below to get started on developing new features or functionality for RSMTool. When contributing to RSMTool, all of your contributions must come with updates to documentations as well as tests.
+Contributions to RSMTool are very welcome. You can use the instructions below to get started on developing new features or functionality for RSMTool. When contributing to RSMTool, all of your contributions must come with updates to documentation as well as tests.
 
 Setting up
 ----------
