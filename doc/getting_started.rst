@@ -15,7 +15,7 @@ Currently, the recommended way to install RSMTool is by using the ``conda`` pack
 
     conda create -n rsmtool -c conda-forge -c ets python=3.8 rsmtool
 
-3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path
+3. Activate this conda environment by running ``conda activate rsmtool``. You should now have all of the RSMTool command-line utilities in your path.
 
 4. From now on, you will need to activate this conda environment whenever you want to use RSMTool. This will ensure that the packages required by RSMTool will not affect other projects.
 
