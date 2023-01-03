@@ -9,9 +9,9 @@ Classes and functions related to computing fairness evaluations.
 """
 
 import pickle
+import warnings
 from os.path import join
 
-import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 from rsmtool.container import DataContainer
@@ -270,10 +270,10 @@ def get_fairness_analyses(df,
     # we filter warnings for this function because we get
     # runtime warning due to NaNs in the data.
     # these seem to be by design: https://groups.google.com/forum/#!topic/pystatsmodels/-flY0cNnb3k
-    np.warnings.filterwarnings('ignore')
+    warnings.filterwarnings('ignore')
     anova_results = anova_lm(csd_null_fit, csd_fit)
     # we reset warnings
-    np.warnings.resetwarnings()
+    warnings.resetwarnings()
 
     # collect the results. Note that R2 in this case is a difference
     # in R2 between the two models and significance is obtained from anova
