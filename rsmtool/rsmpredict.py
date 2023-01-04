@@ -15,6 +15,9 @@ import os
 import sys
 from os.path import abspath, basename, dirname, exists, join, normpath, split, splitext
 
+import numpy as np
+import pandas as pd
+
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
@@ -23,6 +26,138 @@ from .utils.commandline import CmdOption, ConfigurationGenerator, setup_rsmcmd_p
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
 from .writer import DataWriter
+
+
+def fast_predict(
+    input_features,
+    modeler,
+    df_feature_info,
+    df_postprocessing_params,
+    predict_expected=False,
+    logger=None,
+):
+    """
+    Compute predictions for a single instance against given model.
+
+    The main difference between this function and the ``compute_and_save_predictions()``
+    function is that the former is meant for batch prediction and reads
+    all its inputs from disk and writes its outputs to disk. This function,
+    however, is meant for real-time inference rather than batch. To this end,
+    it operates *entirely* in memory. Note that there is still a bit of overlap
+    between the two computation paths since we want to use the RSMTool API
+    as much as possible.
+
+    This function should only be used when the goal is to generate predictions
+    using RSMTool models in production. The user should everything from disk
+    in a separate thread/function and pass the inputs to this function.
+
+    Parameters
+    ----------
+    input_features : dict[str, float]
+        A dictionary containing the features for the instance for which to
+        generate the model predictions. The keys should be names of the
+        features on which the model was trained and the values should
+        be the *raw* feature values.
+    modeler : rsmtool.modeler.Modeler object
+        The RSMTool modeler object using which the predictions
+        are to be generated. This object should be created from the already
+        existing model file in the "output" directory of the previously run
+        RSMTool experiment.
+    df_feature_info : pandas DataFrame
+        A pandas dataframe containing the information regarding the model features.
+        The index of the dataframe should be the names of the features and
+        the columns should be:
+
+        - "sign" : 1 or -1.  Indicates whether the feature value needs to
+          be multiplied by -1.
+        - "transform" : :ref:`transformation <select_transformations_rsmtool>`
+          that needs to be applied to this feature.
+        - "train_mean", "train_sd" : mean and standard deviation for outlier
+          truncation.
+        - "train_transformed_mean", "train_transformed_sd" : mean and standard
+          deviation for computing z-scores.
+
+        This dataframe should be read from the "feature.csv" file under the
+        "output" directory of the previously run RSMTool experiment.
+    df_postprocessing_params : pandas DataFrame
+        A pandas dataframe containing the parameters needed for
+        post-processing the raw prediction. This dataframe should be read from the
+        "postprocessing_params.csv" file under the "output" directory of the
+        previously run RSMTool experiment.
+    predict_expected : bool, optional
+        Predict expected scores for classifiers that return probability
+        distributions over score. Note also that this assumes that the score
+        range consists of contiguous integers. Defaults to ``False``.
+    logger : logging object, optional
+        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        Defaults to ``None``.
+
+    Returns
+    -------
+    pandas DataFrame
+        A dataframe containing the raw, scaled, trimmed, and rounded
+        predictions for the input features. It contains the following
+        columns: "raw", "scale", "raw_trim", "scale_trim", "raw_trim_round",
+        and "scale_trim_round".
+    """
+    # instantiate a feature preprocessor
+    preprocessor = FeaturePreprocessor(logger=logger)
+
+    # convert the given features to a data frame and add the "spkitemid" column
+    df_input_features = pd.DataFrame([input_features])
+    df_input_features["spkitemid"] = "RESPONSE"
+
+    # preprocess the input features so that they match what the model expects
+    df_processed_features, _ = preprocessor.preprocess_new_data(df_input_features, df_feature_info)
+
+    # read the post-processing parameters
+    trim_min = df_postprocessing_params["trim_min"].values[0]
+    trim_max = df_postprocessing_params["trim_max"].values[0]
+    h1_mean = df_postprocessing_params["h1_mean"].values[0]
+    h1_sd = df_postprocessing_params["h1_sd"].values[0]
+    train_predictions_mean = df_postprocessing_params["train_predictions_mean"].values[0]
+    train_predictions_sd = df_postprocessing_params["train_predictions_sd"].values[0]
+
+    # if we are using a newly trained model, use trim_tolerance from the
+    # df_postprocessing_params. If not, set it to the default value and show
+    # warning
+    if "trim_tolerance" in df_postprocessing_params:
+        trim_tolerance = df_postprocessing_params["trim_tolerance"].values[0]
+    else:
+        trim_tolerance = 0.4998
+        logger.warning(
+            "The tolerance for trimming scores will be assumed to be 0.4998, "
+            "the default value in previous versions of RSMTool. "
+            "We recommend re-training the model to ensure future "
+            "compatibility."
+        )
+
+    # compute minimum and maximum score for expected predictions
+    min_score = int(np.rint(trim_min - trim_tolerance))
+    max_score = int(np.rint(trim_max + trim_tolerance))
+
+    # now compute the raw prediction for the given features
+    df_predictions = modeler.predict(
+        df_processed_features,
+        min_score,
+        max_score,
+        predict_expected=predict_expected,
+    )
+
+    # and post-process them to create the scaled, trimmed and rounded ones
+    df_predictions = preprocessor.process_predictions(
+        df_predictions,
+        train_predictions_mean,
+        train_predictions_sd,
+        h1_mean,
+        h1_sd,
+        trim_min,
+        trim_max,
+        trim_tolerance,
+    )
+
+    # return the predictions without the ID column
+    return df_predictions.drop("spkitemid", axis="columns")
 
 
 def compute_and_save_predictions(config_file_or_obj_or_dict,
