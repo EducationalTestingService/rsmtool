@@ -4,10 +4,14 @@ from glob import glob
 from os import getcwd
 from os.path import basename, exists, join
 
+import pandas as pd
 from nose.tools import raises
+from pandas.testing import assert_frame_equal
 from parameterized import param, parameterized
-from rsmtool import compute_and_save_predictions
+
+from rsmtool import compute_and_save_predictions, fast_predict
 from rsmtool.configuration_parser import Configuration
+from rsmtool.modeler import Modeler
 from rsmtool.test_utils import (check_file_output,
                                 check_generated_output,
                                 check_report,
@@ -320,3 +324,47 @@ def test_run_experiment_predict_expected_scores_non_probablistic_svc():
                        source,
                        'rsmpredict.json')
     do_run_prediction(source, config_file)
+
+
+def test_fast_predict():
+    """Ensure that predictions from `fast_predict()` match expected preditions."""
+    source = "lr-predict"
+    # define the paths to the various files we need
+    test_file = join(rsmtool_test_dir, "data", "files", "test.csv")
+    existing_experiment_dir = join(rsmtool_test_dir,
+                                   "data",
+                                   "experiments",
+                                   source,
+                                   "existing_experiment",
+                                   "output")
+    feature_info_file = join(existing_experiment_dir, "lr_feature.csv")
+    postprocessing_params_file = join(existing_experiment_dir, "lr_postprocessing_params.csv")
+    model_file = join(existing_experiment_dir, "lr.model")
+
+    # read in the files
+    df_test = pd.read_csv(test_file, usecols=[f"FEATURE{i}" for i in range(1, 9)])
+    df_feature_info = pd.read_csv(feature_info_file, index_col=0)
+    df_postprocessing_params = pd.read_csv(postprocessing_params_file)
+
+    # initialize the modelr instance
+    modeler = Modeler.load_from_file(model_file)
+
+    # initialize a variable to hold all the predictions
+    prediction_dfs = []
+    for input_features in df_test.to_dict(orient="records"):
+        df_predictions = fast_predict(
+            input_features, modeler, df_feature_info, df_postprocessing_params
+        )
+        prediction_dfs.append(df_predictions)
+
+    # combine all the computed predictions
+    df_computed_predictions = pd.concat(prediction_dfs).reset_index(drop=True)
+
+    # read in the expected predictions
+    df_expected_predictions = pd.read_csv(
+        join(rsmtool_test_dir, "data", "experiments", source, "output", "predictions.csv")
+    )
+    df_expected_predictions = df_expected_predictions.drop("spkitemid", axis="columns")
+
+    # check that the predictions are equal
+    assert_frame_equal(df_computed_predictions, df_expected_predictions)
