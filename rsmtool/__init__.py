@@ -36,12 +36,12 @@ from .rsmeval import run_evaluation  # noqa
 
 from .rsmtool import run_experiment  # noqa
 
-from .rsmpredict import compute_and_save_predictions  # noqa
+from .rsmpredict import compute_and_save_predictions, fast_predict  # noqa
 
 from .rsmsummarize import run_summary  # noqa
 
 __all__ = ['run_experiment', 'run_evaluation', 'run_comparison',
-           'compute_and_save_predictions', 'run_summary']
+           'compute_and_save_predictions', 'fast_predict', 'run_summary']
 
 # Make sure that DeprecationWarnings are always shown
 # within this package unless we are in test mode in
