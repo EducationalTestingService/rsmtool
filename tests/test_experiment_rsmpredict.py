@@ -326,9 +326,8 @@ def test_run_experiment_predict_expected_scores_non_probablistic_svc():
     do_run_prediction(source, config_file)
 
 
-def test_fast_predict():
+def check_fast_predict(source):
     """Ensure that predictions from `fast_predict()` match expected preditions."""
-    source = "lr-predict"
     # define the paths to the various files we need
     test_file = join(rsmtool_test_dir, "data", "files", "test.csv")
     existing_experiment_dir = join(rsmtool_test_dir,
@@ -368,3 +367,42 @@ def test_fast_predict():
 
     # check that the predictions are equal
     assert_frame_equal(df_computed_predictions, df_expected_predictions)
+
+
+def test_fast_predict():  # noqa: D103
+    yield check_fast_predict, "lr-predict"
+    yield check_fast_predict, "lr-predict-no-tolerance"
+
+
+@raises(ValueError)
+def test_fast_predict_non_numeric():
+    """Check that ``fast_predict()`` raises an error with non-numeric values."""
+    existing_experiment_dir = join(rsmtool_test_dir,
+                                   "data",
+                                   "experiments",
+                                   "lr-predict",
+                                   "existing_experiment",
+                                   "output")
+    feature_info_file = join(existing_experiment_dir, "lr_feature.csv")
+    postprocessing_params_file = join(existing_experiment_dir, "lr_postprocessing_params.csv")
+    model_file = join(existing_experiment_dir, "lr.model")
+
+    # read in the files
+    df_feature_info = pd.read_csv(feature_info_file, index_col=0)
+    df_postprocessing_params = pd.read_csv(postprocessing_params_file)
+
+    # initialize the modelr instance
+    modeler = Modeler.load_from_file(model_file)
+
+    # input features with non-numeric value
+    input_features = {
+        "FEATURE1": 6.0,
+        "FEATURE2": "foobar",
+        "FEATURE3": -0.2,
+        "FEATURE4": 0,
+        "FEATURE5": -0.1,
+        "FEATURE6": 5.0,
+        "FEATURE7": 12,
+        "FEATURE8": -7000
+    }
+    _ = fast_predict(input_features, modeler, df_feature_info, df_postprocessing_params)
