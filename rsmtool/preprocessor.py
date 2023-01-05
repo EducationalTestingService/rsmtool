@@ -2622,7 +2622,7 @@ class FeaturePreprocessor:
         if len(df_filtered) == 0:
             raise ValueError("There are no responses left after "
                              "filtering out non-numeric feature values. No analysis "
-                             "will be run")
+                             "will be run.")
 
         df_features = df_filtered.copy()
         df_features_preprocess = df_features.copy()
