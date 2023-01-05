@@ -99,7 +99,15 @@ def fast_predict(
         predictions for the input features. It contains the following
         columns: "raw", "scale", "raw_trim", "scale_trim", "raw_trim_round",
         and "scale_trim_round".
+
+    Raises
+    ------
+    ValueError
+        If ``input_features`` contains any non-numeric features.
     """
+    # initialize a logger if none provided
+    logger = logger if logger else logging.getLogger(__name__)
+
     # instantiate a feature preprocessor
     preprocessor = FeaturePreprocessor(logger=logger)
 
@@ -108,7 +116,12 @@ def fast_predict(
     df_input_features["spkitemid"] = "RESPONSE"
 
     # preprocess the input features so that they match what the model expects
-    df_processed_features, _ = preprocessor.preprocess_new_data(df_input_features, df_feature_info)
+    try:
+        df_processed_features, _ = preprocessor.preprocess_new_data(
+            df_input_features, df_feature_info
+        )
+    except ValueError:
+        raise ValueError("Input features must not contain non-numeric values.") from None
 
     # read the post-processing parameters
     trim_min = df_postprocessing_params["trim_min"].values[0]
