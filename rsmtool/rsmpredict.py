@@ -32,8 +32,13 @@ def fast_predict(
     input_features,
     modeler,
     df_feature_info,
-    df_postprocessing_params,
-    predict_expected=False,
+    trim_min=None,
+    trim_max=None,
+    trim_tolerance=0.4998,
+    train_predictions_mean=None,
+    train_predictions_sd=None,
+    h1_mean=None,
+    h1_sd=None,
     logger=None,
 ):
     """
@@ -50,6 +55,9 @@ def fast_predict(
     This function should only be used when the goal is to generate predictions
     using RSMTool models in production. The user should read everything from disk
     in a separate thread/function and pass the inputs to this function.
+
+    Note that this function only computes regular predictions, not expected
+    scores.
 
     Parameters
     ----------
@@ -79,15 +87,42 @@ def fast_predict(
 
         This dataframe should be read from the "feature.csv" file under the
         "output" directory of the previously run RSMTool experiment.
-    df_postprocessing_params : pandas DataFrame
-        A pandas dataframe containing the parameters needed for
-        post-processing the raw prediction. This dataframe should be read from the
-        "postprocessing_params.csv" file under the "output" directory of the
-        previously run RSMTool experiment.
-    predict_expected : bool, optional
-        Predict expected scores for classifiers that return probability
-        distributions over score. Note also that this assumes that the score
-        range consists of contiguous integers. Defaults to ``False``.
+    trim_min : int, optional
+        The lowest possible integer score that the machine should predict.
+        If ``None``, raw predictions will not be trimmed.
+        Defaults to ``None``.
+    trim_max : int, optional
+        The highest possible integer score that the machine should predict.
+        If ``None``, raw predictions will not be trimmed.
+        Defaults to ``None``.
+    trim_tolerance : float, optional
+       The single numeric value that will be used to pad the trimming range
+       specified in ``trim_min`` and ``trim_max``.
+       Defaults to 0.4998.
+    train_predictions_mean : float, optional
+       The mean of the predictions on the training set used to re-scale the
+       predictions. May be read from the "postprocessing_params.csv" file
+       under the "output" directory of the RSMTool experiment used to train
+       the model. If ``None``, predictions will not be scaled.
+       Defaults to ``None``.
+    train_predictions_sd : float, optional
+       The standard deviation of the predictions on the training set used to
+       re-scale the predictions. May be read from the "postprocessing_params.csv"
+       file under the "output" directory of the RSMTool experiment used to train
+       the model.If ``None``, predictions will not be scaled.
+       Defaults to ``None``.
+    h1_mean : float, optional
+       The mean of the human scores in the training set also used to re-scale
+       the predictions. May be read from the "postprocessing_params.csv" file
+       under the "output" directory of the RSMTool experiment used to train
+       the model. If ``None``, predictions will not be scaled.
+       Defaults to ``None``.
+    h1_sd : float, optional
+       The standard deviation of the human scores in the training set used to
+       re-scale the predictions. May be read from the "postprocessing_params.csv"
+       file under the "output" directory of the RSMTool experiment used to train
+       the model. If ``None``, predictions will not be scaled.
+       Defaults to ``None``.
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
@@ -96,8 +131,10 @@ def fast_predict(
     -------
     dict[str, float]
         A dictionary containing the raw, scaled, trimmed, and rounded
-        predictions for the input features. It contains the following
-        keys: "raw", "scale", "raw_trim", "scale_trim", "raw_trim_round",
+        predictions for the input features. It always contains the
+        "raw" key and may contain the following additional keys depending
+        on the availability of the various optional arguments:
+        "raw_trim", "raw_trim_round", "scale", "scale_trim",
         and "scale_trim_round".
 
     Raises
@@ -123,51 +160,28 @@ def fast_predict(
     except ValueError:
         raise ValueError("Input features must not contain non-numeric values.") from None
 
-    # read the post-processing parameters
-    trim_min = df_postprocessing_params["trim_min"].values[0]
-    trim_max = df_postprocessing_params["trim_max"].values[0]
-    h1_mean = df_postprocessing_params["h1_mean"].values[0]
-    h1_sd = df_postprocessing_params["h1_sd"].values[0]
-    train_predictions_mean = df_postprocessing_params["train_predictions_mean"].values[0]
-    train_predictions_sd = df_postprocessing_params["train_predictions_sd"].values[0]
-
-    # if we are using a newly trained model, use trim_tolerance from the
-    # df_postprocessing_params. If not, set it to the default value and show
-    # warning
-    if "trim_tolerance" in df_postprocessing_params:
-        trim_tolerance = df_postprocessing_params["trim_tolerance"].values[0]
-    else:
-        trim_tolerance = 0.4998
-        logger.warning(
-            "The tolerance for trimming scores will be assumed to be 0.4998, "
-            "the default value in previous versions of RSMTool. "
-            "We recommend re-training the model to ensure future "
-            "compatibility."
-        )
-
-    # compute minimum and maximum score for expected predictions
-    min_score = int(np.rint(trim_min - trim_tolerance))
-    max_score = int(np.rint(trim_max + trim_tolerance))
-
     # now compute the raw prediction for the given features
-    df_predictions = modeler.predict(
-        df_processed_features,
-        min_score,
-        max_score,
-        predict_expected=predict_expected,
-    )
+    df_predictions = modeler.predict(df_processed_features)
 
-    # and post-process them to create the scaled, trimmed and rounded ones
-    df_predictions = preprocessor.process_predictions(
-        df_predictions,
-        train_predictions_mean,
-        train_predictions_sd,
-        h1_mean,
-        h1_sd,
-        trim_min,
-        trim_max,
-        trim_tolerance,
-    )
+    # trim raw predictions if ``trim_min`` and ``trim_max`` were specified
+    if trim_min and trim_max:
+        df_predictions["raw_trim"] = preprocessor.trim(
+            df_predictions["raw"], trim_min, trim_max, trim_tolerance
+        )
+        df_predictions["raw_trim_round"] = np.rint(df_predictions['raw_trim']).astype("int64")
+
+    # compute scaled predictions if the scaling parameters are available
+    if train_predictions_mean and train_predictions_sd and h1_mean and h1_sd:
+        df_predictions["scale"] = (
+            (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
+        ) * h1_sd + h1_mean
+
+        # apply trimming to scaled scores too, if possible
+        if trim_min and trim_max:
+            df_predictions["scale_trim"] = preprocessor.trim(
+                df_predictions["scale"], trim_min, trim_max, trim_tolerance
+            )
+            df_predictions["scale_trim_round"] = np.rint(df_predictions['scale_trim']).astype("int64")
 
     # return the predictions as a dictionary but without the ID column
     return df_predictions.drop("spkitemid", axis="columns").to_dict(orient="records")[0]
