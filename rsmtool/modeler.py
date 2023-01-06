@@ -1202,7 +1202,7 @@ class Modeler:
 
         return model
 
-    def predict(self, df, min_score, max_score, predict_expected=False):
+    def predict(self, df, min_score=None, max_score=None, predict_expected=False):
         """
         Get raw predictions from given SKLL model on data in given data frame.
 
@@ -1212,17 +1212,24 @@ class Modeler:
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named "spkitemid", and a label column named "sc1".
-        min_score : int
+        min_score : int, optional
             Minimum score level to be used if computing expected scores.
-        max_score : int
+            If ``None``, trying to compute expected scores will raise an
+            exception.
+            Defaults to ``None``.
+        max_score : int, optional
             Maximum score level to be used if computing expected scores.
+            If ``None``, trying to compute expected scores will raise an
+            exception.
+            Defaults to ``None``.
         predict_expected : bool, optional
             Predict expected scores for classifiers that return probability
             distributions over score. This will be ignored with a warning
             if the specified model does not support probability distributions.
             Note also that this assumes that the score range consists of
             contiguous integers - starting at ``min_score`` and ending at
-            ``max_score``. Defaults to ``False``.
+            ``max_score``.
+            Defaults to ``False``.
 
         Returns
         -------
@@ -1236,10 +1243,17 @@ class Modeler:
             If the model cannot predict probability distributions and
             ``predict_expected`` is set to ``True``.
         ValueError
-            If  the score range specified by ``min_score`` and ``max_score``
+            If the score range specified by ``min_score`` and ``max_score``
             does not match what the model predicts in its probability
             distribution.
+        ValueError
+            If ``predict_expected`` is ``True`` but ``min_score`` and
+            ``max_score`` are not specified.
         """
+        # expected scores require specifying ``trim_min`` and ``trim_max``
+        if predict_expected and not (min_score and max_score):
+            raise ValueError("Must specify 'min_score' and 'max_score' for expected scores.")
+
         model = self.learner
 
         feature_columns = [c for c in df.columns if c not in ['spkitemid', 'sc1']]
@@ -1303,12 +1317,12 @@ class Modeler:
         predict_expected_scores = configuration['predict_expected_scores']
 
         df_train_predictions = self.predict(df_train,
-                                            int(trim_min),
-                                            int(trim_max),
+                                            min_score=int(trim_min),
+                                            max_score=int(trim_max),
                                             predict_expected=predict_expected_scores)
         df_test_predictions = self.predict(df_test,
-                                           int(trim_min),
-                                           int(trim_max),
+                                           min_score=int(trim_min),
+                                           max_score=int(trim_max),
                                            predict_expected=predict_expected_scores)
 
         # get the mean and SD of the training set predictions

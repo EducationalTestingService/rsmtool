@@ -1094,7 +1094,7 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
     file_format : str, optional
         The format of the output files.
         Defaults to "csv".
-        """
+    """
     preprocessed_test_file = join(output_dir,
                                   '{}_test_preprocessed_features.{}'.format(experiment_id,
                                                                             file_format))
@@ -1120,9 +1120,7 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format='csv'):
     modeler = Modeler.load_from_learner(learner)
 
     # generate new predictions and rename the prediction column to 'scale'
-    df_new_predictions = modeler.predict(df_preprocessed_test_data,
-                                         postproc_params['trim_min'],
-                                         postproc_params['trim_max'])
+    df_new_predictions = modeler.predict(df_preprocessed_test_data)
     df_new_predictions.rename(columns={'raw': 'scale'}, inplace=True)
 
     # check that new predictions match the scaled old predictions
