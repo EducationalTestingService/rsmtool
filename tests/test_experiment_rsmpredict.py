@@ -1,3 +1,4 @@
+import csv
 import os
 import tempfile
 from glob import glob
@@ -326,7 +327,7 @@ def test_run_experiment_predict_expected_scores_non_probablistic_svc():
     do_run_prediction(source, config_file)
 
 
-def check_fast_predict(source):
+def check_fast_predict(source, do_trim=False, do_scale=False):
     """Ensure that predictions from `fast_predict()` match expected preditions."""
     # define the paths to the various files we need
     test_file = join(rsmtool_test_dir, "data", "files", "test.csv")
@@ -343,16 +344,37 @@ def check_fast_predict(source):
     # read in the files
     df_test = pd.read_csv(test_file, usecols=[f"FEATURE{i}" for i in range(1, 9)])
     df_feature_info = pd.read_csv(feature_info_file, index_col=0)
-    df_postprocessing_params = pd.read_csv(postprocessing_params_file)
+    with open(postprocessing_params_file, "r") as paramfh:
+        reader = csv.DictReader(paramfh)
+        params = next(reader)
 
-    # initialize the modelr instance
+    # initialize the modeler instance
     modeler = Modeler.load_from_file(model_file)
+
+    # initialize the keyword arguments we want to passs
+    kwargs = {}
+    if do_trim:
+        kwargs["trim_min"] = int(params["trim_min"])
+        kwargs["trim_max"] = int(params["trim_max"])
+        if "trim_tolerance" in params:
+            kwargs["trim_tolerance"] = float(params["trim_tolerance"])
+
+    if do_scale:
+        kwargs["train_predictions_mean"] = float(params["train_predictions_mean"])
+        kwargs["train_predictions_sd"] = float(params["train_predictions_sd"])
+        kwargs["h1_mean"] = float(params["h1_mean"])
+        kwargs["h1_sd"] = float(params["h1_sd"])
 
     # initialize a variable to hold all the predictions
     prediction_dicts = []
     for input_features in df_test.to_dict(orient="records"):
+        tolerance = params.get("trim_tolerance")
+        tolerance = float(tolerance) if tolerance else tolerance
         predictions = fast_predict(
-            input_features, modeler, df_feature_info, df_postprocessing_params
+            input_features,
+            modeler,
+            df_feature_info,
+            **kwargs
         )
         prediction_dicts.append(predictions)
 
@@ -365,13 +387,30 @@ def check_fast_predict(source):
     )
     df_expected_predictions = df_expected_predictions.drop("spkitemid", axis="columns")
 
+    # keep only the needed columns for each test
+    if not do_trim:
+        df_expected_predictions = df_expected_predictions.drop([
+            "raw_trim", "scale_trim", "raw_trim_round", "scale_trim_round"
+        ], axis="columns", errors="ignore")
+
+    if not do_scale:
+        df_expected_predictions = df_expected_predictions.drop([
+            "scale", "scale_trim", "scale_trim_round"
+        ], axis="columns", errors="ignore")
+
     # check that the predictions are equal
-    assert_frame_equal(df_computed_predictions, df_expected_predictions)
+    assert_frame_equal(
+        df_computed_predictions.sort_index(axis="columns"),
+        df_expected_predictions.sort_index(axis="columns")
+    )
 
 
 def test_fast_predict():  # noqa: D103
-    yield check_fast_predict, "lr-predict"
-    yield check_fast_predict, "lr-predict-no-tolerance"
+    yield check_fast_predict, "lr-predict",
+    yield check_fast_predict, "lr-predict", True, False
+    yield check_fast_predict, "lr-predict", False, True
+    yield check_fast_predict, "lr-predict", True, True
+    yield check_fast_predict, "lr-predict-no-tolerance", True, True
 
 
 @raises(ValueError)
@@ -384,12 +423,10 @@ def test_fast_predict_non_numeric():
                                    "existing_experiment",
                                    "output")
     feature_info_file = join(existing_experiment_dir, "lr_feature.csv")
-    postprocessing_params_file = join(existing_experiment_dir, "lr_postprocessing_params.csv")
     model_file = join(existing_experiment_dir, "lr.model")
 
     # read in the files
     df_feature_info = pd.read_csv(feature_info_file, index_col=0)
-    df_postprocessing_params = pd.read_csv(postprocessing_params_file)
 
     # initialize the modelr instance
     modeler = Modeler.load_from_file(model_file)
@@ -405,4 +442,4 @@ def test_fast_predict_non_numeric():
         "FEATURE7": 12,
         "FEATURE8": -7000
     }
-    _ = fast_predict(input_features, modeler, df_feature_info, df_postprocessing_params)
+    _ = fast_predict(input_features, modeler, df_feature_info)
