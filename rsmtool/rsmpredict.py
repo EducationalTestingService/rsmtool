@@ -48,7 +48,7 @@ def fast_predict(
     as much as possible.
 
     This function should only be used when the goal is to generate predictions
-    using RSMTool models in production. The user should everything from disk
+    using RSMTool models in production. The user should read everything from disk
     in a separate thread/function and pass the inputs to this function.
 
     Parameters
@@ -94,10 +94,10 @@ def fast_predict(
 
     Returns
     -------
-    pandas DataFrame
-        A dataframe containing the raw, scaled, trimmed, and rounded
+    dict[str, float]
+        A dictionary containing the raw, scaled, trimmed, and rounded
         predictions for the input features. It contains the following
-        columns: "raw", "scale", "raw_trim", "scale_trim", "raw_trim_round",
+        keys: "raw", "scale", "raw_trim", "scale_trim", "raw_trim_round",
         and "scale_trim_round".
 
     Raises
@@ -169,8 +169,8 @@ def fast_predict(
         trim_tolerance,
     )
 
-    # return the predictions without the ID column
-    return df_predictions.drop("spkitemid", axis="columns")
+    # return the predictions as a dictionary but without the ID column
+    return df_predictions.drop("spkitemid", axis="columns").to_dict(orient="records")[0]
 
 
 def compute_and_save_predictions(config_file_or_obj_or_dict,
