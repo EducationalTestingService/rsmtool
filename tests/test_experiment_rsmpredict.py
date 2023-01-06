@@ -349,15 +349,15 @@ def check_fast_predict(source):
     modeler = Modeler.load_from_file(model_file)
 
     # initialize a variable to hold all the predictions
-    prediction_dfs = []
+    prediction_dicts = []
     for input_features in df_test.to_dict(orient="records"):
-        df_predictions = fast_predict(
+        predictions = fast_predict(
             input_features, modeler, df_feature_info, df_postprocessing_params
         )
-        prediction_dfs.append(df_predictions)
+        prediction_dicts.append(predictions)
 
-    # combine all the computed predictions
-    df_computed_predictions = pd.concat(prediction_dfs).reset_index(drop=True)
+    # combine all the computed predictions into a data frame
+    df_computed_predictions = pd.DataFrame(prediction_dicts)
 
     # read in the expected predictions
     df_expected_predictions = pd.read_csv(
