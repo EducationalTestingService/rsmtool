@@ -328,7 +328,7 @@ def test_run_experiment_predict_expected_scores_non_probablistic_svc():
 
 
 def check_fast_predict(source, do_trim=False, do_scale=False):
-    """Ensure that predictions from `fast_predict()` match expected preditions."""
+    """Ensure that predictions from `fast_predict()` match expected predictions."""
     # define the paths to the various files we need
     test_file = join(rsmtool_test_dir, "data", "files", "test.csv")
     existing_experiment_dir = join(rsmtool_test_dir,
@@ -428,7 +428,7 @@ def test_fast_predict_non_numeric():
     # read in the files
     df_feature_info = pd.read_csv(feature_info_file, index_col=0)
 
-    # initialize the modelr instance
+    # initialize the modeler instance
     modeler = Modeler.load_from_file(model_file)
 
     # input features with non-numeric value
