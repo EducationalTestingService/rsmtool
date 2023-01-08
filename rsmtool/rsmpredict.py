@@ -72,7 +72,7 @@ def fast_predict(
         existing model file in the "output" directory of the previously run
         RSMTool experiment.
     df_feature_info : pandas DataFrame
-        A pandas dataframe containing the information regarding the model features.
+        A DataFrame containing the information regarding the model features.
         The index of the dataframe should be the names of the features and
         the columns should be:
 
@@ -163,25 +163,21 @@ def fast_predict(
     # now compute the raw prediction for the given features
     df_predictions = modeler.predict(df_processed_features)
 
-    # trim raw predictions if ``trim_min`` and ``trim_max`` were specified
-    if trim_min and trim_max:
-        df_predictions["raw_trim"] = preprocessor.trim(
-            df_predictions["raw"], trim_min, trim_max, trim_tolerance
-        )
-        df_predictions["raw_trim_round"] = np.rint(df_predictions['raw_trim']).astype("int64")
-
-    # compute scaled predictions if the scaling parameters are available
+    # compute scaled prediction if the scaling parameters are available
     if train_predictions_mean and train_predictions_sd and h1_mean and h1_sd:
         df_predictions["scale"] = (
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
         ) * h1_sd + h1_mean
 
-        # apply trimming to scaled scores too, if possible
-        if trim_min and trim_max:
-            df_predictions["scale_trim"] = preprocessor.trim(
-                df_predictions["scale"], trim_min, trim_max, trim_tolerance
+    # trim both raw and scale predictions if ``trim_min`` and ``trim_max`` were specified
+    if trim_min and trim_max:
+        for column in df_predictions.columns.drop("spkitemid"):
+            df_predictions[f"{column}_trim"] = preprocessor.trim(
+                df_predictions[column], trim_min, trim_max, trim_tolerance
             )
-            df_predictions["scale_trim_round"] = np.rint(df_predictions['scale_trim']).astype("int64")
+            df_predictions[f"{column}_trim_round"] = np.rint(
+                df_predictions[f"{column}_trim"]
+            ).astype("int64")
 
     # return the predictions as a dictionary but without the ID column
     return df_predictions.drop("spkitemid", axis="columns").to_dict(orient="records")[0]
