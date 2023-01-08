@@ -169,9 +169,12 @@ def fast_predict(
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
         ) * h1_sd + h1_mean
 
+    # drop the spkitemid column since it's not needed from this point onwards
+    df_predictions.drop("spkitemid", axis="columns", inplace=True)
+
     # trim both raw and scale predictions if ``trim_min`` and ``trim_max`` were specified
     if trim_min and trim_max:
-        for column in df_predictions.columns.drop("spkitemid"):
+        for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance
             )
@@ -179,8 +182,8 @@ def fast_predict(
                 df_predictions[f"{column}_trim"]
             ).astype("int64")
 
-    # return the predictions as a dictionary but without the ID column
-    return df_predictions.drop("spkitemid", axis="columns").to_dict(orient="records")[0]
+    # return the predictions as a dictionary
+    return df_predictions.to_dict(orient="records")[0]
 
 
 def compute_and_save_predictions(config_file_or_obj_or_dict,
