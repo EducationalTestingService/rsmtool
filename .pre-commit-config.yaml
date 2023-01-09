@@ -6,4 +6,4 @@ repos:
     rev: '0.77'
     hooks:
     -   id: flynt
-        args: [--verbose]
+        args: [--verbose, --line-length=999]
