@@ -1,0 +1,9 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more git_hooks
+
+repos:
+-   repo: https://github.com/ikamensh/flynt/
+    rev: '0.77'
+    hooks:
+    -   id: flynt
+        args: [--verbose]
