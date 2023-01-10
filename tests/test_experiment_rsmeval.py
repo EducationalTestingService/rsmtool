@@ -127,7 +127,7 @@ def test_run_experiment_lr_eval_with_repeated_ids():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -144,7 +144,7 @@ def test_run_experiment_lr_eval_all_non_numeric_scores():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -160,7 +160,7 @@ def test_run_experiment_lr_eval_same_system_human_score():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -177,7 +177,7 @@ def test_run_experiment_lr_eval_all_non_numeric_machine_scores():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -193,7 +193,7 @@ def test_run_experiment_eval_lr_with_missing_h2_column():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -209,7 +209,7 @@ def test_run_experiment_eval_lr_with_missing_candidate_column():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)
 
 
@@ -225,5 +225,5 @@ def test_run_experiment_lr_eval_wrong_path():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_evaluation(source, experiment_id, config_file)

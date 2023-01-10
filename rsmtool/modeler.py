@@ -61,9 +61,8 @@ class Modeler:
             If ``model_path`` does not end with ".model".
         """
         if not model_path.lower().endswith('.model'):
-            raise ValueError('The file `{}` does not end with the '
-                             'proper extension. Please make sure that '
-                             'it is a `.model` file.'.format(model_path))
+            raise ValueError(f'The file `{model_path}` does not end with the proper '
+                             f'extension. Please make sure that it is a `.model` file.')
 
         # Create SKLL learner from file
         learner = Learner.from_file(model_path)
@@ -90,9 +89,8 @@ class Modeler:
             If ``learner`` is not a SKLL Learner instance.
         """
         if not isinstance(learner, Learner):
-            raise TypeError('The `learner` argument must be a '
-                            '` SKLL Learner` instance, not `{}`.'
-                            ''.format(type(learner)))
+            raise TypeError(f'The `learner` argument must be a ` SKLL Learner` instance, '
+                            f'not `{type(learner)}`.')
 
         # Create Modeler instance
         modeler = Modeler()
@@ -238,11 +236,10 @@ class Modeler:
             else:
                 # exclude NA coefficients
                 if coefficient == np.nan:
-                    self.logger.warning("No coefficient was estimated for "
-                                        "{}. This is likely due to exact "
-                                        "collinearity in the model. This "
-                                        "feature will not be used for model "
-                                        "building".format(feature))
+                    self.logger.warning(f"No coefficient was estimated for {feature}. "
+                                        f"This is likely due to exact collinearity in "
+                                        f"the model. This feature will not be used for "
+                                        f"model building")
                 else:
                     coefdict[feature] = coefficient
 
@@ -1034,8 +1031,8 @@ class Modeler:
 
         # save the OLS fit object and its summary to files
         if fit:
-            ols_file = join(filedir, '{}.ols'.format(experiment_id))
-            summary_file = join(filedir, '{}_ols_summary.txt'.format(experiment_id))
+            ols_file = join(filedir, f'{experiment_id}.ols')
+            summary_file = join(filedir, f'{experiment_id}_ols_summary.txt')
             with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
                 pickle.dump(fit, olsf)
                 summf.write(str(fit.summary()))
@@ -1047,7 +1044,7 @@ class Modeler:
             frames.append({'name': 'model_fit', 'frame': df_model_fit})
 
         # save the SKLL model to a file
-        model_file = join(filedir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, f'{experiment_id}.model')
         learner.save(model_file)
 
         container = DataContainer(frames)
@@ -1137,7 +1134,7 @@ class Modeler:
         # TODO: compute betas for linear SKLL models?
 
         # save the SKLL model to disk with the given model name prefix
-        model_file = join(filedir, '{}.model'.format(experiment_id))
+        model_file = join(filedir, f'{experiment_id}.model')
         learner.save(model_file)
 
         self.learner = learner

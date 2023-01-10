@@ -99,10 +99,9 @@ def configure(context, config_file_or_obj_or_dict):
             configuration = config_file_or_obj_or_dict
 
     else:
-        raise ValueError("The input to run_experiment must be "
-                         "a path to the file (str), a dictionary, "
-                         "or a configuration object. You passed "
-                         "{}.".format(type(config_file_or_obj_or_dict)))
+        raise ValueError(f"The input to run_experiment must be a path to the file (str), "
+                         f"a dictionary, or a configuration object. You passed "
+                         f"{type(config_file_or_obj_or_dict)}.")
 
     return configuration
 
@@ -159,7 +158,7 @@ class Configuration:
         # set configdir to `cwd` if not given and let the user know
         if configdir is None:
             configdir = Path(getcwd())
-            self.logger.info("Configuration directory will be set to {}".format(configdir))
+            self.logger.info(f"Configuration directory will be set to {configdir}")
         else:
             configdir = Path(configdir).resolve()
 
@@ -499,9 +498,8 @@ class Configuration:
                         "unknown": "training and/or evaluating"}
 
         if partition not in flag_message:
-            raise ValueError("Unknown value for partition: {} "
-                             "This must be one of the following: {}."
-                             "".format(partition, ','.join(flag_message.keys())))
+            raise ValueError(f"Unknown value for partition: {partition} This must "
+                             f"be one of the following: {','.join(flag_message.keys())}.")
 
         if flag_column == "flag_column_test":
             if partition in ["both", "train"]:
@@ -523,32 +521,20 @@ class Configuration:
                 # if we were given a single value, convert it to list
                 if not isinstance(original_filter_dict[column], list):
                     new_filter_dict[column] = [original_filter_dict[column]]
-                    self.logger.warning("The filtering condition {}"
-                                        " for column {} was converted "
-                                        "to list. Only responses where "
-                                        "{} == {} will be used for "
-                                        "{} the "
-                                        "model. You can ignore this "
-                                        "warning if this is the correct "
-                                        "interpretation of your "
-                                        "configuration settings"
-                                        ".".format(original_filter_dict[column],
-                                                   column,
-                                                   column,
-                                                   original_filter_dict[column],
-                                                   flag_message[partition])
-                                        )
+                    self.logger.warning(f"The filtering condition {original_filter_dict[column]} "
+                                        f"for column {column} was converted to list. Only "
+                                        f"responses where {column} == {original_filter_dict[column]} "
+                                        f"will be used for {flag_message[partition]} the model. "
+                                        f"You can ignore this warning if this is the correct "
+                                        f"interpretation of your configuration settings.")
                 else:
                     new_filter_dict[column] = original_filter_dict[column]
 
                     model_eval = ', '.join(map(str,
                                                original_filter_dict[column]))
-                    self.logger.info("Only responses where "
-                                     "{} equals one of the following values "
-                                     "will be used for {} the model: "
-                                     "{}.".format(column,
-                                                  flag_message[partition],
-                                                  model_eval))
+                    self.logger.info(f"Only responses where {column} equals one of the "
+                                     f"following values will be used for "
+                                     f"{flag_message[partition]} the model: {model_eval}.")
         return new_filter_dict
 
     def get_trim_min_max_tolerance(self):
@@ -648,16 +634,14 @@ class Configuration:
 
         # Make sure keys are not duplicated
         if not len(set(keys)) == len(keys):
-            raise ValueError('The ``keys`` must be unique. However, the '
-                             'following duplicate keys were found: {}.'
-                             ''.format(', '.join([key for key, val in Counter(keys).items()
-                                                  if val > 1])))
+            raise ValueError(f"The ``keys`` must be unique. However, the following "
+                             f"duplicate keys were found: "
+                             f"{', '.join([key for key, val in Counter(keys).items() if val > 1])}.")
         # Make sure names are not duplicated
         if not len(set(names)) == len(names):
-            raise ValueError('The``names`` must be unique. However, the '
-                             'following duplicate names were found: {}.'
-                             ''.format(', '.join([name for name, val in Counter(names).items()
-                                                  if val > 1])))
+            raise ValueError(f"The``names`` must be unique. However, the following "
+                             f"duplicate names were found: "
+                             f"{', '.join([name for name, val in Counter(names).items() if val > 1])}.")
         existing_names = []
         existing_paths = []
         for idx, key in enumerate(keys):
@@ -786,11 +770,10 @@ class ConfigurationParser:
         try:
             configdict = parse_json_with_comments(filepath)
         except ValueError:
-            raise ValueError('The main configuration file `{}` exists but '
-                             'is formatted incorrectly. Please check that '
-                             'each line ends with a comma, there is no comma '
-                             'at the end of the last line, and that all quotes '
-                             'match.'.format(filepath))
+            raise ValueError(f'The main configuration file `{filepath}` exists but '
+                             f'is formatted incorrectly. Please check that each '
+                             f'line ends with a comma, there is no comma at the end '
+                             f'of the last line, and that all quotes match.')
 
         return configdict
 
@@ -864,8 +847,7 @@ class ConfigurationParser:
 
         for field in required_fields:
             if field not in new_config:
-                raise ValueError("The config file must "
-                                 "specify '{}'".format(field))
+                raise ValueError(f"The config file must specify '{field}'")
 
         # 2. Add default values for unspecified optional fields
         # for given RSMTool context
@@ -878,8 +860,7 @@ class ConfigurationParser:
         # 3. Check to make sure no unrecognized fields are specified
         for field in new_config:
             if field not in defaults and field not in required_fields:
-                raise ValueError("Unrecognized field '{}'"
-                                 " in json file".format(field))
+                raise ValueError(f"Unrecognized field '{field}' in json file")
 
         # 4. Check to make sure that the ID fields that will be
         # used as part of filenames are formatted correctly
@@ -889,12 +870,10 @@ class ConfigurationParser:
 
         for id_field, id_field_value in id_field_values.items():
             if len(id_field_value) > 200:
-                raise ValueError("{} is too long (must be "
-                                 "<=200 characters)".format(id_field))
+                raise ValueError(f"{id_field} is too long (must be <=200 characters)")
 
             if re.search(r'\s', id_field_value):
-                raise ValueError("{} cannot contain any "
-                                 "spaces".format(id_field))
+                raise ValueError(f"{id_field} cannot contain any spaces")
 
         # 5. Check that the feature file and feature subset/subset file are not
         # specified together
@@ -917,11 +896,9 @@ class ConfigurationParser:
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
-                cls.logger.warning("You requested feature subsets but did not "
-                                   "specify any feature file. "
-                                   "The tool will use the default "
-                                   "feature file {} available via "
-                                   "rsmextra".format(default_basename))
+                cls.logger.warning(f"You requested feature subsets but did not specify "
+                                   f"any feature file. The tool will use the default "
+                                   f"feature file {default_basename} available via rsmextra.")
             else:
                 raise ValueError("If you want to use feature subsets, you "
                                  "must specify a feature subset file")
@@ -932,12 +909,10 @@ class ConfigurationParser:
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
                 new_config['feature_subset_file'] = default_feature_subset_file
-                cls.logger.warning("You specified the expected sign of "
-                                   "correlation but did not specify a feature "
-                                   "subset file. The tool will use "
-                                   "the default feature subset file {} "
-                                   "available via "
-                                   "rsmextra".format(default_basename))
+                cls.logger.warning(f"You specified the expected sign of correlation "
+                                   f"but did not specify a feature subset file. The "
+                                   f"tool will use the default feature subset file "
+                                   f"{default_basename} available via rsmextra.")
             else:
                 raise ValueError("If you want to specify the expected sign of "
                                  " correlation for each feature, you must "
@@ -992,8 +967,8 @@ class ConfigurationParser:
             model_name = new_config['model']
             dummy_learner = Learner(model_name) if is_skll_model(model_name) else Learner('LinearRegression')
             if not hasattr(dummy_learner.model_type, 'predict_proba'):
-                raise ValueError("{} does not support expected scores "
-                                 "since it is not a probablistic classifier.".format(model_name))
+                raise ValueError(f"{model_name} does not support expected scores "
+                                 f"since it is not a probablistic classifier.")
             del dummy_learner
 
         # 11. Check the fields that requires rsmextra
@@ -1092,8 +1067,7 @@ class ConfigurationParser:
 
         # make sure all boolean values are boolean
         for field in BOOLEAN_FIELDS:
-            error_message = ('Field {} can only be set to '
-                             'True or False.'.format(field))
+            error_message = f'Field {field} can only be set to True or False.'
             if field in new_config and new_config[field] is not None:
                 if not isinstance(new_config[field], bool):
                     # we first convert the value to string to avoid

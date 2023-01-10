@@ -53,8 +53,7 @@ def find_jsons(json_dir):
 
             # check that we don't already have a file with this name
             if filename in json_file_dict:
-                print("Duplicate json file name: {} and {}".format(json_file_dict[filename],
-                                                                   json_full_path))
+                print(f"Duplicate json file name: {json_file_dict[filename]} and {json_full_path}")
 
             json_file_dict[filename] = json_full_path
     return json_file_dict
@@ -80,23 +79,23 @@ def get_dict_differences(ref_json, test_json, ref_file, test_file):
     result : list of str
         List containing comparison results.
     """
-    result = ["REF: {}, TEST: {}".format(ref_file, test_file)]
+    result = [f"REF: {ref_file}, TEST: {test_file}"]
     for key in ref_json:
         if key not in test_json:
-            result.append("Field {} not specified in test json".format(key))
+            result.append(f"Field {key} not specified in test json")
         elif ref_json[key] and test_json[key] is not None:
-            result.append("Field {} is set to None in test json and to {} "
-                          "in reference file".format(key, ref_json[key]))
+            result.append(f"Field {key} is set to None in test json and to "
+                          f"{ref_json[key]} in reference file")
         elif ref_json[key] is not None and test_json[key]:
-            result.append("Field {} is set to None in reference json and to {} "
-                          "in test file".format(key, test_json[key]))
+            result.append(f"Field {key} is set to None in reference json and "
+                          f"to {test_json[key]} in test file")
         elif not ref_json[key] == test_json[key]:
-            result.append("Field {} has different value in test json {} "
-                          "vs {}".format(key, ref_json[key], test_json[key]))
+            result.append(f"Field {key} has different value in test json "
+                          f"{ref_json[key]} vs {test_json[key]}")
     added_fields = set(test_json.keys()).difference(set(ref_json.keys()))
     if len(added_fields) > 0:
-        result.append("The following extra fields are present "
-                      "in test json: {}".format(', '.join(added_fields)))
+        result.append(f"The following extra fields are present in test json: "
+                      f"{', '.join(added_fields)}")
 
     return result
 
@@ -111,9 +110,9 @@ def compare_jsons(ref_dir, test_dir):
         # the tool appends the name of the tool to the output file
         # so we need to account for this since the name will be duplicated
 
-        test_json = '{}_{}.json'.format(ref_json.rstrip('.json'), tool)
+        test_json = f"{ref_json.rstrip('.json')}_{tool}.json"
 
-        print("{} vs. {}".format(ref_json, test_json))
+        print(f"{ref_json} vs. {test_json}")
         if test_json not in test_json_dict:
             result_dict[ref_json] = "missing"
         else:
@@ -157,19 +156,19 @@ def print_result(result_dict):
     missing = sorted([json for (json, result) in result_dict.items() if result == 'missing'])
     discrepant = [json for json in result_dict
                   if json not in matched and json not in missing]
-    print("Total reference files: {}".format(len(result_dict)))
+    print(f"Total reference files: {len(result_dict)}")
     print('------------------------')
-    print("Matched: {} {}".format(linesep, linesep.join(matched)))
+    print(f"Matched: {linesep} {linesep.join(matched)}")
     print('------------------------')
-    print("Missing test files: {} {}".format(linesep, linesep.join(missing)))
+    print(f"Missing test files: {linesep} {linesep.join(missing)}")
     print('------------------------')
     print("Discrepant")
     for json in discrepant:
         print(linesep, json, linesep, linesep.join(result_dict[json]))
-    print("Total reference files: {}".format(len(result_dict)))
-    print("Total matched: {}".format(len(matched)))
-    print("Total missing: {}".format(len(missing)))
-    print("Total discrepant: {}".format(len(discrepant)))
+    print(f"Total reference files: {len(result_dict)}")
+    print(f"Total matched: {len(matched)}")
+    print(f"Total missing: {len(missing)}")
+    print(f"Total discrepant: {len(discrepant)}")
 
 
 def main():  # noqa: D103

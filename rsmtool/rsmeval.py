@@ -87,13 +87,11 @@ def run_evaluation(config_file_or_obj_or_dict,
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError("'{}' already contains a non-empty 'output' "
-                          "directory.".format(output_dir))
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
-            logger.warning("{} already contains a non-empty 'output' directory. "
-                           "The generated report might contain "
-                           "unexpected information from a previous "
-                           "experiment.".format(output_dir))
+            logger.warning(f"{output_dir} already contains a non-empty 'output' directory. "
+                           f"The generated report might contain unexpected information "
+                           f"from a previous experiment.")
 
     configuration = configure('rsmeval', config_file_or_obj_or_dict)
 
@@ -109,8 +107,8 @@ def run_evaluation(config_file_or_obj_or_dict,
     # Make sure prediction file can be located
     if not DataReader.locate_files(configuration['predictions_file'],
                                    configuration.configdir):
-        raise FileNotFoundError('Error: Predictions file {} '
-                                'not found.\n'.format(configuration['predictions_file']))
+        raise FileNotFoundError(f"Error: Predictions file {configuration['predictions_file']} "
+                                f"not found.")
 
     scale_with = configuration.get('scale_with')
 
@@ -140,8 +138,7 @@ def run_evaluation(config_file_or_obj_or_dict,
         scale_file_location = DataReader.locate_files(scale_with,
                                                       configuration.configdir)
         if not scale_file_location:
-            raise FileNotFoundError('Could not find scaling file {}.'
-                                    ''.format(scale_file_location))
+            raise FileNotFoundError(f'Could not find scaling file {scale_file_location}.')
 
         paths.append('scale_with')
         names.append('scale')
@@ -154,7 +151,7 @@ def run_evaluation(config_file_or_obj_or_dict,
 
     converters = {'predictions': configuration.get_default_converter()}
 
-    logger.info('Reading predictions: {}.'.format(configuration['predictions_file']))
+    logger.info(f"Reading predictions: {configuration['predictions_file']}.")
 
     # Initialize the reader
     reader = DataReader(file_paths, file_names, converters)
@@ -262,7 +259,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_evaluation(abspath(args.config_file),
                        abspath(args.output_dir),
                        overwrite_output=args.force_write)

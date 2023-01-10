@@ -52,7 +52,7 @@ def test_run_experiment_lr_length_column_and_feature():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -67,7 +67,7 @@ def test_run_experiment_lr_h2_column_and_feature():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -83,7 +83,7 @@ def test_run_experiment_lr_same_h1_and_h2():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -97,7 +97,7 @@ def test_run_experiment_lr_with_repeated_ids():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -111,7 +111,7 @@ def test_run_experiment_lr_with_sc1_as_feature_name():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -126,7 +126,7 @@ def test_run_experiment_lr_with_length_as_feature_name():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -140,7 +140,7 @@ def test_run_experiment_lr_with_truncations_no_features_field():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -154,5 +154,5 @@ def test_run_experiment_lr_with_truncations_no_features_columns():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)

@@ -161,7 +161,7 @@ def test_run_experiment_lr_with_object_and_filepath():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
 
     config_dict = {"train_file": "../../files/train.csv",
                    "id_column": "ID",
@@ -209,7 +209,7 @@ def test_run_experiment_duplicate_feature_names():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -224,7 +224,7 @@ def test_run_experiment_lr_feature_json():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
 
     # run this experiment but suppress the expected deprecation warnings
     do_run_experiment(source,
@@ -243,7 +243,7 @@ def test_run_experiment_wrong_train_file_path():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -257,7 +257,7 @@ def test_run_experiment_wrong_feature_file_path():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -272,5 +272,5 @@ def test_run_experiment_lr_length_column_and_feature_list():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)

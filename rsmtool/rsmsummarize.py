@@ -58,30 +58,27 @@ def check_experiment_dir(experiment_dir,
     full_path_experiment_dir = DataReader.locate_files(experiment_dir,
                                                        configpath)
     if not full_path_experiment_dir:
-        raise FileNotFoundError("The directory {} "
-                                "does not exist.".format(experiment_dir))
+        raise FileNotFoundError(f"The directory {experiment_dir} does not exist.")
     else:
         # check that there is an output directory
         csvdir = normpath(join(full_path_experiment_dir, 'output'))
         if not exists(csvdir):
-            raise FileNotFoundError("The directory {} does not contain "
-                                    "the output of an rsmtool "
-                                    "experiment.".format(full_path_experiment_dir))
+            raise FileNotFoundError(f"The directory {full_path_experiment_dir} does "
+                                    f"not contain the output of an rsmtool experiment.")
 
         # find the json configuration files for all experiments stored in this directory
         jsons = glob.glob(join(csvdir, '*.json'))
         if len(jsons) == 0:
-            raise FileNotFoundError("The directory {} does not contain "
-                                    "the .json configuration files for rsmtool "
-                                    "experiments.".format(full_path_experiment_dir))
+            raise FileNotFoundError(f"The directory {full_path_experiment_dir} does "
+                                    f"not contain the .json configuration files for "
+                                    f"rsmtool experiments.")
 
         # Raise an error if the user specified a list of experiment names
         # but we found several .jsons in the same directory
         if experiment_name and len(jsons) > 1:
-            raise ValueError("{} seems to contain the output of multiple experiments. "
-                             "In order to use custom experiment names, you must have "
-                             "a separate directory "
-                             "for each experiment".format(full_path_experiment_dir))
+            raise ValueError(f"{full_path_experiment_dir} seems to contain the output "
+                             f"of multiple experiments. In order to use custom experiment "
+                             f"names, you must have a separate directory for each experiment")
 
         # return [(json, experiment_name)] when we have experiment name or
         # [(json, None)] if no experiment name has been specified.
@@ -151,13 +148,11 @@ def run_summary(config_file_or_obj_or_dict,
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError("'{}' already contains a non-empty 'output' "
-                          "directory.".format(output_dir))
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
-            logger.warning("{} already contains a non-empty 'output' directory. "
-                           "The generated report might contain "
-                           "unexpected information from a previous "
-                           "experiment.".format(output_dir))
+            logger.warning(f"{output_dir} already contains a non-empty 'output' directory. "
+                           f"The generated report might contain unexpected information from "
+                           f"a previous experiment.")
 
     configuration = configure('rsmsummarize', config_file_or_obj_or_dict)
 
@@ -272,7 +267,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_summary(abspath(args.config_file),
                     abspath(args.output_dir),
                     overwrite_output=args.force_write)

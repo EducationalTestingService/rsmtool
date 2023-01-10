@@ -99,13 +99,11 @@ def run_experiment(config_file_or_obj_or_dict,
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError("'{}' already contains a non-empty 'output' "
-                          "directory.".format(output_dir))
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
-            logger.warning("{} already contains a non-empty 'output' directory. "
-                           "The generated report might contain "
-                           "unexpected information from a previous "
-                           "experiment.".format(output_dir))
+            logger.warning(f"{output_dir} already contains a non-empty 'output' directory. "
+                           f"The generated report might contain unexpected information from "
+                           f"a previous experiment.")
 
     configuration = configure('rsmtool', config_file_or_obj_or_dict)
 
@@ -135,8 +133,7 @@ def run_experiment(config_file_or_obj_or_dict,
     if None in file_paths:
         missing_file_paths = [file_paths_org[idx] for idx, path in enumerate(file_paths)
                               if path is None]
-        raise FileNotFoundError('The following files were not found: '
-                                '{}'.format(repr(missing_file_paths)))
+        raise FileNotFoundError(f'The following files were not found: {repr(missing_file_paths)}')
 
     # Use the default converter for both train and test
     converters = {'train': configuration.get_default_converter(),
@@ -199,7 +196,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                    analyzed_container,
                                    file_format=file_format)
 
-    logger.info('Training {} model.'.format(processed_config['model_name']))
+    logger.info(f"Training {processed_config['model_name']} model.")
 
     # Initialize modeler
     modeler = Modeler(logger=logger)
@@ -270,8 +267,7 @@ def run_experiment(config_file_or_obj_or_dict,
                                    new_names_dict={'pred_test': 'pred_processed'},
                                    file_format=file_format)
 
-    original_coef_file = join(csvdir, '{}_coefficients.{}'.format(pred_config['experiment_id'],
-                                                                  file_format))
+    original_coef_file = join(csvdir, f"{pred_config['experiment_id']}_coefficients.{file_format}")
 
     # If coefficients file exists, then try to generate the scaled
     # coefficients and save them to a file
@@ -372,7 +368,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_experiment(abspath(args.config_file),
                        abspath(args.output_dir),
                        overwrite_output=args.force_write)

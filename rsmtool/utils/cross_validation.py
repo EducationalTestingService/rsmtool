@@ -62,8 +62,8 @@ def create_xval_files(configuration, output_dir, logger=None):
     located_filepaths["train"] = DataReader.locate_files(configuration.get("train_file"),
                                                          configuration.configdir)
     if not located_filepaths["train"]:
-        raise FileNotFoundError('The training data file was not found: '
-                                '{}'.format(repr(configuration.get("train_file"))))
+        raise FileNotFoundError(f"The training data file was not found: "
+                                f"{repr(configuration.get('train_file'))}")
 
     # "features" could be a list of features so check for that
     additional_filenames = ["folds_file", "feature_subset_file"]

@@ -491,8 +491,7 @@ class TestConfiguration:
 
                 # remove the stream handler and raise error
                 root_logger.handlers = []
-                raise AssertionError('`{}` not in logging output: '
-                                     '`{}`.'.format(expected, logging_text))
+                raise AssertionError(f'`{expected}` not in logging output: `{logging_text}`.')
 
             # remove the stream handler, even if we have no errors
             root_logger.handlers = []

@@ -250,51 +250,46 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     input_features_file = DataReader.locate_files(configuration['input_features_file'],
                                                   configuration.configdir)
     if not input_features_file:
-        raise FileNotFoundError('Input file {} does not exist'
-                                ''.format(configuration['input_features_file']))
+        raise FileNotFoundError(f"Input file {configuration['input_features_file']} does not exist")
 
     experiment_dir = DataReader.locate_files(configuration['experiment_dir'],
                                              configuration.configdir)
     if not experiment_dir:
-        raise FileNotFoundError('The directory {} does not exist.'
-                                ''.format(configuration['experiment_dir']))
+        raise FileNotFoundError(f"The directory {configuration['experiment_dir']} does not exist.")
     else:
         experiment_output_dir = normpath(join(experiment_dir, 'output'))
         if not exists(experiment_output_dir):
-            raise FileNotFoundError('The directory {} does not contain '
-                                    'the output of an rsmtool experiment.'.format(experiment_dir))
+            raise FileNotFoundError(f'The directory {experiment_dir} does not contain '
+                                    f'the output of an rsmtool experiment.')
 
     # find all the .model files in the experiment output directory
     model_files = glob.glob(join(experiment_output_dir, '*.model'))
     if not model_files:
-        raise FileNotFoundError('The directory {} does not contain any rsmtool models.'
-                                ''.format(experiment_output_dir))
+        raise FileNotFoundError(f'The directory {experiment_output_dir} does not '
+                                f'contain any rsmtool models.')
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
     if experiment_id not in experiment_ids:
-        raise FileNotFoundError('{} does not contain a model for the experiment "{}". '
-                                'The following experiments are contained in this '
-                                'directory: {}'.format(experiment_output_dir,
-                                                       experiment_id,
-                                                       experiment_ids))
+        raise FileNotFoundError(f'{experiment_output_dir} does not contain a model '
+                                f'for the experiment "{experiment_id}". The following '
+                                f'experiments are contained in this directory: {experiment_ids}')
 
     # check that the directory contains outher required files
     required_file_types = ['feature', 'postprocessing_params']
     for file_type in required_file_types:
-        expected_file_name = "{}_{}.csv".format(experiment_id, file_type)
+        expected_file_name = f"{experiment_id}_{file_type}.csv"
         if not exists(join(experiment_output_dir, expected_file_name)):
-            raise FileNotFoundError('{} does not contain the required file '
-                                    '{} that was generated during the '
-                                    'original model training'.format(experiment_output_dir,
-                                                                     expected_file_name))
+            raise FileNotFoundError(f'{experiment_output_dir} does not contain the '
+                                    f'required file {expected_file_name} that was '
+                                    f'generated during the original model training.')
 
     logger.info('Reading input files.')
 
     feature_info = join(experiment_output_dir,
-                        '{}_feature.csv'.format(experiment_id))
+                        f'{experiment_id}_feature.csv')
 
     post_processing = join(experiment_output_dir,
-                           '{}_postprocessing_params.csv'.format(experiment_id))
+                           f'{experiment_id}_postprocessing_params.csv')
 
     file_paths = [input_features_file, feature_info, post_processing]
     file_names = ['input_features',
@@ -309,7 +304,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     # load the Modeler to generate the predictions
     model = Modeler.load_from_file(join(experiment_output_dir,
-                                        '{}.model'.format(experiment_id)))
+                                        f'{experiment_id}.model'))
 
     # Add the model to the configuration object
     configuration['model'] = model
@@ -324,7 +319,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
 
     # save the pre-processed features to disk if we were asked to
     if feats_file is not None:
-        logger.info('Saving pre-processed feature values to {}'.format(feats_file))
+        logger.info(f'Saving pre-processed feature values to {feats_file}')
 
         feats_dir = dirname(feats_file)
 
@@ -373,9 +368,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
     if not processed_container.excluded.empty:
 
         # save the predictions to disk
-        logger.info('Saving excluded responses to {}'.format(join(output_dir,
-                                                                  '{}_excluded_responses.csv'
-                                                                  ''.format(filename))))
+        logger.info(f"Saving excluded responses to {join(output_dir, '{}_excluded_responses.csv'.format(filename))}")
 
         # Write out files
         writer.write_experiment_output(output_dir,
@@ -383,8 +376,7 @@ def compute_and_save_predictions(config_file_or_obj_or_dict,
                                        include_experiment_id=False,
                                        dataframe_names=['excluded'],
                                        new_names_dict={'excluded':
-                                                       '{}_excluded_responses'
-                                                       ''.format(filename)},
+                                                       f'{filename}_excluded_responses'},
                                        file_format=file_format)
 
 

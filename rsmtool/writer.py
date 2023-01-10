@@ -135,8 +135,7 @@ class DataWriter:
         else:
             for name in dataframe_names:
                 if name not in container_or_dict:
-                    raise KeyError("The name `{}` is not in the container "
-                                   "or dictionary.".format(name))
+                    raise KeyError(f"The name `{name}` is not in the container or dictionary.")
 
         # Loop through DataFrames, and save
         # output in specified format
@@ -144,7 +143,7 @@ class DataWriter:
 
             df = container_or_dict[dataframe_name]
             if df is None:
-                raise KeyError('The DataFrame `{}` does not exist.'.format(dataframe_name))
+                raise KeyError(f'The DataFrame `{dataframe_name}` does not exist.')
 
             # If the DataFrame is empty, skip it
             if df.empty:
@@ -164,7 +163,7 @@ class DataWriter:
             # If include_experiment_id is True, and the experiment_id exists
             # include it in the file name; otherwise, do not include it.
             if include_experiment_id and self._id is not None:
-                outfile = join(csvdir, '{}_{}'.format(self._id, dataframe_name))
+                outfile = join(csvdir, f'{self._id}_{dataframe_name}')
             else:
                 outfile = join(csvdir, dataframe_name)
 

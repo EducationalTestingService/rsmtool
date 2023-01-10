@@ -25,10 +25,9 @@ from .version import __version__
 
 if HAS_RSMEXTRA:
     from rsmextra.version import __version__ as rsmextra_version # noqa
-    VERSION_STRING = '%(prog)s {}; rsmextra {}'.format(__version__,
-                                                       rsmextra_version)
+    VERSION_STRING = f'%(prog)s {__version__}; rsmextra {rsmextra_version}'
 else:
-    VERSION_STRING = '%(prog)s {}'.format(__version__)
+    VERSION_STRING = f'%(prog)s {__version__}'
 
 from .rsmcompare import run_comparison  # noqa
 

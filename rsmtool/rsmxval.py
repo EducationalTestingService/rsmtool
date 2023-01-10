@@ -108,8 +108,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     # multitude of moving parts
     non_empty_foldsdir = exists(foldsdir) and listdir(foldsdir)
     if non_empty_foldsdir:
-        raise IOError("'{}' already contains a non-empty 'folds' "
-                      "directory.".format(output_dir))
+        raise IOError(f"'{output_dir}' already contains a non-empty 'folds' directory.")
 
     configuration = configure('rsmxval', config_file_or_obj_or_dict)
 
@@ -282,7 +281,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_cross_validation(abspath(args.config_file),
                              abspath(args.output_dir))
 

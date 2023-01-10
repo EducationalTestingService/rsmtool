@@ -162,7 +162,7 @@ class TestComparer:
                            'data',
                            'experiments',
                            source,
-                           '{}.json'.format(experiment_id))
+                           f'{experiment_id}.json')
         do_run_experiment(source, experiment_id, config_file)
         output_dir = join('test_outputs', source, 'output')
         figure_dir = join('test_outputs', source, 'figure')

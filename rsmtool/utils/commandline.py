@@ -123,7 +123,7 @@ def setup_rsmcmd_parser(name,
         if Path(string).exists():
             return string
         else:
-            msg = 'The configuration file %r does not exist.' % string
+            msg = f'The configuration file {string!r} does not exist.'
             raise argparse.ArgumentTypeError(msg)
 
     # initialize an argument parser

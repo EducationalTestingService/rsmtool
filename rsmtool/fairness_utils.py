@@ -62,8 +62,8 @@ def convert_to_ordered_category(group_values, base_group=None):
     if base_group is not None:
         # if we have user-supplied base group, check that it's actually in the data
         if base_group not in group_values.values:
-            raise ValueError("The reference group {} must be one of the existing "
-                             "values for this group".format(base_group))
+            raise ValueError(f"The reference group {base_group} must be one of the "
+                             f"existing values for this group")
         else:
             # move the supplied reference group to the beginning of the list
             base_index = groups_by_size.index(base_group)
@@ -115,7 +115,7 @@ def get_coefficients(fit, base_category):
     # rename the rows
     df_results.index = [v.split('.')[1].strip(']')
                         if not v == 'Intercept'
-                        else 'Intercept ({})'.format(base_category)
+                        else f'Intercept ({base_category})'
                         for v in df_results.index]
 
     return df_results
@@ -150,12 +150,8 @@ def write_fairness_results(fit_dictionary,
     for model in fit_dictionary:
         fit = fit_dictionary[model]
 
-        ols_file = join(output_dir, '{}_{}_by_{}.ols'.format(experiment_id,
-                                                             model,
-                                                             group))
-        summary_file = join(output_dir, '{}_{}_by_{}_ols_summary.txt'.format(experiment_id,
-                                                                             model,
-                                                                             group))
+        ols_file = join(output_dir, f'{experiment_id}_{model}_by_{group}.ols')
+        summary_file = join(output_dir, f'{experiment_id}_{model}_by_{group}_ols_summary.txt')
         with open(ols_file, 'wb') as olsf, open(summary_file, 'w') as summf:
             pickle.dump(fit, olsf)
             summf.write(str(fit.summary()))
@@ -290,13 +286,13 @@ def get_fairness_analyses(df,
 
     # assemble all datasets into a DataContainer
 
-    datasets = [{'name': 'estimates_osa_by_{}'.format(group),
+    datasets = [{'name': f'estimates_osa_by_{group}',
                  'frame': df_coefficients_osa},
-                {'name': 'estimates_osd_by_{}'.format(group),
+                {'name': f'estimates_osd_by_{group}',
                  'frame': df_coefficients_osd},
-                {'name': 'estimates_csd_by_{}'.format(group),
+                {'name': f'estimates_csd_by_{group}',
                  'frame': df_coefficients_csd},
-                {'name': 'fairness_metrics_by_{}'.format(group),
+                {'name': f'fairness_metrics_by_{group}',
                  'frame': df_r2_all}]
 
     # assemble all models into a dictionary
