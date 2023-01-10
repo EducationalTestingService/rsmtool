@@ -284,9 +284,9 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     # on click, open larger image in new window
     script = """
     <script>
-    function getPicture(picpath) {{
+    function getPicture(picpath) {
         window.open(picpath, 'Image', resizable=1);
-    }};
+    };
     </script>"""
 
     # generate image tags
