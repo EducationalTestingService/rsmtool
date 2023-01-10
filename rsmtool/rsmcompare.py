@@ -41,13 +41,12 @@ def check_experiment_id(experiment_dir, experiment_id):
     # list all possible output files which start with experiment_id
     outputs = glob.glob(join(experiment_dir,
                              'output',
-                             '{}_*.*'.format(experiment_id)))
+                             f'{experiment_id}_*.*'))
 
     # raise an error if none exists
     if len(outputs) == 0:
-        raise FileNotFoundError("The directory {} does not contain "
-                                "any outputs of an rsmtool experiment "
-                                "{}".format(experiment_dir, experiment_id))
+        raise FileNotFoundError(f"The directory {experiment_dir} does not contain "
+                                f"any outputs of an rsmtool experiment {experiment_id}")
 
 
 def run_comparison(config_file_or_obj_or_dict, output_dir):
@@ -92,15 +91,14 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     experiment_dir_old = DataReader.locate_files(configuration['experiment_dir_old'],
                                                  configuration.configdir)
     if not experiment_dir_old:
-        raise FileNotFoundError("The directory {} "
-                                "does not exist.".format(configuration['experiment_dir_old']))
+        raise FileNotFoundError(f"The directory {configuration['experiment_dir_old']} "
+                                f"does not exist.")
 
     csvdir_old = normpath(join(experiment_dir_old, 'output'))
     figdir_old = normpath(join(experiment_dir_old, 'figure'))
     if not exists(csvdir_old) or not exists(figdir_old):
-        raise FileNotFoundError("The directory {} does not contain "
-                                "the output of an rsmtool "
-                                "experiment.".format(experiment_dir_old))
+        raise FileNotFoundError(f"The directory {experiment_dir_old} does not contain "
+                                f"the output of an rsmtool experiment.")
 
     check_experiment_id(experiment_dir_old, experiment_id_old)
 
@@ -109,15 +107,14 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     experiment_dir_new = DataReader.locate_files(configuration['experiment_dir_new'],
                                                  configuration.configdir)
     if not experiment_dir_new:
-        raise FileNotFoundError("The directory {} "
-                                "does not exist.".format(configuration['experiment_dir_new']))
+        raise FileNotFoundError(f"The directory {configuration['experiment_dir_new']} "
+                                f"does not exist.")
 
     csvdir_new = normpath(join(experiment_dir_new, 'output'))
     figdir_new = normpath(join(experiment_dir_new, 'figure'))
     if not exists(csvdir_new) or not exists(figdir_new):
-        raise FileNotFoundError("The directory {} does not contain "
-                                "the output of an rsmtool "
-                                "experiment.".format(experiment_dir_new))
+        raise FileNotFoundError(f"The directory {experiment_dir_new} does not contain the "
+                                f"output of an rsmtool experiment.")
 
     check_experiment_id(experiment_dir_new, experiment_id_new)
 
@@ -213,7 +210,7 @@ def main():  # noqa: D103
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info('Output directory: {}'.format(args.output_dir))
+        logger.info(f'Output directory: {args.output_dir}')
         run_comparison(abspath(args.config_file),
                        abspath(args.output_dir))
 

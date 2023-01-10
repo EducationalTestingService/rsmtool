@@ -55,18 +55,16 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         num_score_points_specified = max_score - min_score + 1
         num_score_points_in_learner = probability_distributions.shape[1]
         if num_score_points_specified != num_score_points_in_learner:
-            raise ValueError('The specified number of score points ({}) '
-                             'does not match that from the the learner '
-                             '({}).'.format(num_score_points_specified,
-                                            num_score_points_in_learner))
+            raise ValueError(f'The specified number of score points ({num_score_points_specified}) '
+                             f'does not match that from the learner ({num_score_points_in_learner}).')
         expected_scores = probability_distributions.dot(range(min_score, max_score + 1))
     else:
         if model.model_type.__name__ == 'SVC':
             raise ValueError("Expected scores cannot be computed since the SVC model was "
                              "not originally trained to predict probabilities.")
         else:
-            raise ValueError("Expected scores cannot be computed since {} is not a "
-                             "probabilistic classifier.".format(model.model_type.__name__))
+            raise ValueError(f"Expected scores cannot be computed since "
+                             f"{model.model_type.__name__} is not a probabilistic classifier.")
 
     return expected_scores
 
@@ -282,8 +280,7 @@ def standardized_mean_difference(y_true_observed,
                                population_y_pred_sd**2) / 2)
     else:
         possible_methods = {"'unpooled'", "'pooled'", "'johnson'", "'williamson'"}
-        raise ValueError("The available methods are {{{}}}; you selected {}."
-                         "".format(', '.join(possible_methods), method))
+        raise ValueError(f"The available methods are {{{', '.join(possible_methods)}}}; you selected {method}.")
 
     # if the denominator is zero, then return NaN as the SMD
     smd = np.nan if denominator == 0 else numerator / denominator

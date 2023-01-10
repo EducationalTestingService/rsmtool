@@ -326,12 +326,10 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
     figure_width = 10
     figure_height = 30
     num_rows, num_cols = 5, 1
-    group_names = ['this is a very long string that will '
-                   'ultimately be wrapped I assume {}'.format(i)
+    group_names = [f'this is a very long string that will ultimately be wrapped I assume {i}'
                    for i in range(10)]
 
-    wrapped_group_names = ['this is a very long\nstring that will\n'
-                           'ultimately be\nwrapped I assume {}'.format(i)
+    wrapped_group_names = [f'this is a very long\nstring that will\nultimately be\nwrapped I assume {i}'
                            for i in range(10)]
 
     expected_subgroup_plot_params = (figure_width, figure_height,
@@ -921,9 +919,9 @@ class TestThumbnail:
 
         # get the expected HTML output
 
-        result = """
-        <img id='{}' src='{}'
-        onclick='getPicture("{}")'
+        result = f"""
+        <img id='{id_num}' src='{path}'
+        onclick='getPicture("{other_path}")'
         title="Click to enlarge">
         </img>
         <style>
@@ -940,7 +938,7 @@ class TestThumbnail:
         function getPicture(picpath) {{
             window.open(picpath, 'Image', resizable=1);
         }};
-        </script>""".format(id_num, path, other_path)
+        </script>"""
         return "".join(result.strip().split())
 
     def test_convert_to_html(self):
@@ -1042,11 +1040,11 @@ class TestExpectedScores:
         X_test = X[500:]
 
         train_ids = list(range(1, len(X_train) + 1))
-        train_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_train.shape[1])], x)) for x in X_train]
+        train_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_train.shape[1])], x)) for x in X_train]
         train_labels = list(y_train)
 
         test_ids = list(range(1, len(X_test) + 1))
-        test_features = [dict(zip(['FEATURE_{}'.format(i + 1) for i in range(X_test.shape[1])], x)) for x in X_test]
+        test_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_test.shape[1])], x)) for x in X_test]
 
         cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
         cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)

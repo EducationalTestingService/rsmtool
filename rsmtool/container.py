@@ -129,14 +129,12 @@ class DataContainer:
 
         """
         if not isinstance(other, DataContainer):
-            raise ValueError('Object must be a `DataContainer`, '
-                             'not {}.'.format(type(other)))
+            raise ValueError(f'Object must be a `DataContainer`, not {type(other)}.')
 
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)
         if common_keys:
-            raise KeyError('The key(s) `{}` already exist in the '
-                           'container.'.format(', '.join(common_keys)))
+            raise KeyError(f"The key(s) `{', '.join(common_keys)}` already exist in the container.")
 
         dicts = DataContainer.to_datasets(self)
         dicts.extend(DataContainer.to_datasets(other))
@@ -199,8 +197,7 @@ class DataContainer:
 
         if not update:
             if name in self._names:
-                raise KeyError('The name {} already exists in the '
-                               'container dictionary.'.format(name))
+                raise KeyError(f'The name {name} already exists in the container dictionary.')
 
         if name not in self._names:
             self._names.append(name)
@@ -338,9 +335,8 @@ class DataContainer:
         self
         """
         if name not in self:
-            warnings.warn('The name `{}` is not in the '
-                          'container. No datasets will '
-                          'be dropped.'.format(name))
+            warnings.warn(f'The name `{name}` is not in the container. '
+                          f'No datasets will be dropped.')
         else:
             self._names.remove(name)
             self._dataframes.pop(name)
@@ -363,9 +359,7 @@ class DataContainer:
         self
         """
         if name not in self:
-            warnings.warn('The name `{}` is not in the '
-                          'container and cannot '
-                          'be renamed.'.format(name))
+            warnings.warn(f'The name `{name}` is not in the container and cannot be renamed.')
         else:
             frame = self._dataframes[name]
             path = self._data_paths[name]

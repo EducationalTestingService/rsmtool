@@ -62,7 +62,7 @@ def int_or_float_format_func(num, prec=3):
         The formatted string representing the given number.
     """
     if float.is_integer(num):
-        ans = '{}'.format(int(num))
+        ans = f'{int(num)}'
     else:
         ans = float_format_func(num, prec=prec)
     return ans
@@ -107,7 +107,7 @@ def custom_highlighter(num,
     """
     abs_num = abs(num) if absolute else num
     val = float_format_func(num, prec=prec)
-    ans = ('<span class="highlight_{}">{}</span>'.format(span_class, val)
+    ans = (f'<span class="highlight_{span_class}">{val}</span>'
            if abs_num < low or abs_num > high else val)
     return ans
 
@@ -287,14 +287,12 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     function getPicture(picpath) {{
         window.open(picpath, 'Image', resizable=1);
     }};
-    </script>""".format(image_id)
+    </script>"""
 
     # generate image tags
-    image = ("""<img id='{}' src='{}' onclick='getPicture("{}")' """
-             """title="Click to enlarge">"""
-             """</img>""").format(image_id,
-                                  rel_image_path,
-                                  rel_thumbnail_path)
+    image = (f"""<img id='{image_id}' src='{rel_image_path}' """
+             f"""onclick='getPicture("{rel_thumbnail_path}")' """
+             f"""title="Click to enlarge"></img>""")
 
     # create the image HTML
     image += style
@@ -359,11 +357,11 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     """
     output_dir = Path(output_dir)
     parent_dir = output_dir.parent
-    files = output_dir.glob('*.{}'.format(file_format))
+    files = output_dir.glob(f'*.{file_format}')
     html_string = ''
     for file in sorted(files):
         relative_file = ".." / file.relative_to(parent_dir)
-        relative_name = relative_file.stem.replace('{}_'.format(experiment_id), '')
+        relative_name = relative_file.stem.replace(f'{experiment_id}_', '')
 
         # check if relative name is in the replacement dictionary and,
         # if it is, use the more descriptive name in the replacement

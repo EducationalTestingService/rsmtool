@@ -176,8 +176,7 @@ class Reporter:
         for cs_path in custom_report_section_paths:
             cs_location = DataReader.locate_files(cs_path, configdir)
             if not cs_location:
-                raise FileNotFoundError("Error: custom section not found at "
-                                        "{}.".format(cs_path))
+                raise FileNotFoundError(f"Error: custom section not found at {cs_path}.")
             else:
                 custom_report_sections.append(cs_location)
         return custom_report_sections
@@ -241,13 +240,10 @@ class Reporter:
         master_section_list = master_section_dict[section_type][context]
         invalid_section_names = set(specified_sections).difference(master_section_list)
         if invalid_section_names:
-            raise ValueError("The following {} report section "
-                             "names are invalid or not supported for {}: {}\n"
-                             "The following sections are currently "
-                             "available: {}".format(section_type,
-                                                    context,
-                                                    invalid_section_names,
-                                                    master_section_list))
+            raise ValueError(f"The following {section_type} report section names are "
+                             f"invalid or not supported for {context}: "
+                             f"{invalid_section_names}\nThe following sections are "
+                             f"currently available: {master_section_list}")
 
     @staticmethod
     def check_section_order(chosen_sections, section_order):
@@ -272,19 +268,17 @@ class Reporter:
             # check for discrepancies and create a helpful error message
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
-                error_message_missing = ("'section_order' must list all "
-                                         "sections selected for your experiment: "
-                                         "Please edit section order to include the "
-                                         "following missing sections: "
-                                         "{}".format(', '.join(missing_sections)))
+                error_message_missing = (f"'section_order' must list all sections "
+                                         f"selected for your experiment: Please edit "
+                                         f"section order to include the following missing "
+                                         f"sections: {', '.join(missing_sections)}")
 
             extra_sections = set(section_order).difference(set(chosen_sections))
             if extra_sections:
-                error_message_extra = ("'section order' can only include "
-                                       "sections availabe for this experiment. "
-                                       "The following sections are either unavailable "
-                                       "or were not selected for this experiment "
-                                       "{}".format(', '.join(extra_sections)))
+                error_message_extra = (f"'section order' can only include sections "
+                                       f"available for this experiment. The following "
+                                       f"sections are either unavailable or were not "
+                                       f"selected for this experiment {', '.join(extra_sections)}")
 
             # raise an appropriate error message or a combination of messages
             if missing_sections and not extra_sections:
@@ -292,8 +286,7 @@ class Reporter:
             elif extra_sections and not missing_sections:
                 raise ValueError(error_message_extra)
             else:
-                raise ValueError("{}\n{}".format(error_message_missing,
-                                                 error_message_extra))
+                raise ValueError(f"{error_message_missing}\n{error_message_extra}")
 
     @staticmethod
     def convert_ipynb_to_html(notebook_file, html_file):
@@ -399,12 +392,11 @@ class Reporter:
             # that list included subgroup sections but no subgroups were specified
 
             if not all_general_sections and len(subgroup_sections) != 0:
-                raise ValueError("You requested sections for subgroup analysis "
-                                 "but did not specify any subgroups. "
-                                 "Please amend the config files to define "
-                                 "the subgroups or delete the following "
-                                 "sections from the list of sections: {}"
-                                 .format(', '.join(subgroup_sections)))
+                raise ValueError(f"You requested sections for subgroup analysis "
+                                 f"but did not specify any subgroups. Please amend "
+                                 f"the config files to define the subgroups or delete "
+                                 f"the following sections from the list of sections: "
+                                 f"{', '.join(subgroup_sections)}")
 
             # if we are using the default list, we simply remove the
             # subgroup sections
@@ -465,7 +457,7 @@ class Reporter:
         selected_notebook_path = notebook_path_dict['general'][context]
         general_sections = master_section_dict['general'][context]
 
-        section_file_map = {s: join(selected_notebook_path, '{}.ipynb'.format(s))
+        section_file_map = {s: join(selected_notebook_path, f'{s}.ipynb')
                             for s in general_sections + ['header', 'footer']}
 
         # update the file map to point the 'model section to either the built-in
@@ -473,13 +465,13 @@ class Reporter:
         # was passed in
         if context == 'rsmtool' and model_type:
             section_file_map['model'] = join(selected_notebook_path,
-                                             '{}_model.ipynb'.format(model_type.lower()))
+                                             f'{model_type.lower()}_model.ipynb')
 
         # update the file map to include the special sections
         if special_sections:
             selected_special_notebook_path = notebook_path_dict['special'][context]
             section_file_map.update({ss: join(selected_special_notebook_path,
-                                              "{}.ipynb".format(ss))
+                                              f"{ss}.ipynb")
                                      for ss in special_sections})
 
         # update the file map to include the custom sections with
@@ -670,8 +662,8 @@ class Reporter:
         # get the report directory which is at the same level
         # as the output and the figure directory
         reportdir = abspath(join(csvdir, '..', 'report'))
-        report_name = '{}_report'.format(config['experiment_id'])
-        merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        report_name = f"{config['experiment_id']}_report"
+        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
         environ_config_file = join(reportdir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -689,7 +681,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, '{}.html'.format(report_name)))
+                                   join(reportdir, f'{report_name}.html'))
 
     def create_comparison_report(self,
                                  config,
@@ -738,8 +730,8 @@ class Reporter:
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
-        report_name = '{}_report'.format(config['comparison_id'])
-        merged_notebook_file = join(output_dir, '{}.ipynb'.format(report_name))
+        report_name = f"{config['comparison_id']}_report"
+        merged_notebook_file = join(output_dir, f'{report_name}.ipynb')
         environ_config_file = join(output_dir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -757,7 +749,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(output_dir, '{}.html'.format(report_name)))
+                                   join(output_dir, f'{report_name}.html'))
 
     def create_summary_report(self,
                               config,
@@ -786,9 +778,9 @@ class Reporter:
                           'OUTPUT_DIR': csvdir
                           }
 
-        report_name = '{}_report'.format(config['summary_id'])
+        report_name = f"{config['summary_id']}_report"
         reportdir = abspath(join(csvdir, '..', 'report'))
-        merged_notebook_file = join(reportdir, '{}.ipynb'.format(report_name))
+        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
         environ_config_file = join(reportdir, '.environ.json')
 
         # set the report directory as an environment variable
@@ -806,7 +798,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info('Exporting HTML')
         self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, '{}.html'.format(report_name)))
+                                   join(reportdir, f'{report_name}.html'))
 
 
 def main():  # noqa: D103

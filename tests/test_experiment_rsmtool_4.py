@@ -74,7 +74,7 @@ def test_run_experiment_empwtdropneg():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -88,7 +88,7 @@ def test_run_experiment_requested_feature_zero_sd():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -100,7 +100,7 @@ def test_run_experiment_with_warnings():
                        'data',
                        'experiments',
                        source,
-                       '{}.json'.format(experiment_id))
+                       f'{experiment_id}.json')
 
     do_run_experiment(source, experiment_id, config_file)
 

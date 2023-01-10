@@ -442,7 +442,7 @@ class TestReporter:
                             if not s.endswith('by_group') and s != 'fairness_analyses']
         section_list = ['header'] + no_subgroup_list + ['footer']
 
-        general_section_plus_extension = ['{}.ipynb'.format(s) for s in section_list]
+        general_section_plus_extension = [f'{s}.ipynb' for s in section_list]
         expected_notebook_files = [join(notebook_path_dict['general']['rsmeval'], s)
                                    for s in
                                    general_section_plus_extension]

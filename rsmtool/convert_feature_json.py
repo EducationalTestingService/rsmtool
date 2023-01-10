@@ -41,8 +41,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     # make sure the input file is a valid feature JSON file
     json_dict = json.load(open(json_file, 'r'))
     if not list(json_dict.keys()) == ['features']:
-        raise RuntimeError("{} is not a valid feature JSON "
-                           "file".format(json_file))
+        raise RuntimeError(f"{json_file} is not a valid feature JSON file")
 
     # convert to tabular format
     df_feature = pd.DataFrame(json_dict['features'])
@@ -50,10 +49,9 @@ def convert_feature_json_file(json_file, output_file, delete=False):
     # make sure the output file is in a supported format
     output_extension = splitext(output_file)[1].lower()
     if output_extension not in ['.csv', '.tsv', '.xlsx']:
-        raise RuntimeError("The output file {} has an unsupported "
-                           "extension. It must be a CSV/TSV/XLSX "
-                           "file. RSMTool no longer supports .xls "
-                           "files".format(output_file))
+        raise RuntimeError(f"The output file {output_file} has an unsupported extension. "
+                           f"It must be a CSV/TSV/XLSX file. RSMTool no longer supports "
+                           f".xls files.")
 
     if output_extension == '.csv':
         df_feature.to_csv(output_file, index=False)

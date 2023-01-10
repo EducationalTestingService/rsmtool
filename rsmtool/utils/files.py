@@ -82,7 +82,7 @@ def has_files_with_extension(directory, ext):
         ``True`` if directory contains files with given extension,
         else ``False``.
     """
-    files_with_extension = glob(join(directory, '*.{}'.format(ext)))
+    files_with_extension = glob(join(directory, f'*.{ext}'))
     return len(files_with_extension) > 0
 
 
@@ -122,12 +122,10 @@ def get_output_directory_extension(directory, experiment_id):
                              if has_files_with_extension(directory, ext)}
 
     if len(extensions_identified) > 1:
-        raise ValueError('Some of the files in the experiment output directory (`{}`) '
-                         'for `{}` have different extensions. All files in this directory '
-                         'must have the same extension. The following extensions were '
-                         'identified : {}'.format(directory,
-                                                  experiment_id,
-                                                  ', '.join(extensions_identified)))
+        raise ValueError(f"Some of the files in the experiment output directory (`{directory}`) "
+                         f"for `{experiment_id}` have different extensions. All files in this "
+                         f"directory must have the same extension. The following extensions "
+                         f"were identified : {', '.join(extensions_identified)}")
 
     elif len(extensions_identified) == 1:
         extension = list(extensions_identified)[0]
