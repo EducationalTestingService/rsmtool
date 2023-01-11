@@ -156,14 +156,10 @@ class Modeler:
         df_non_intercept.reset_index(inplace=True)
 
         # now create a data frame that just has the intercept
-        df_intercept = pd.DataFrame(
-            [{"feature": "Intercept", "coefficient": coefs["const"]}]
-        )
+        df_intercept = pd.DataFrame([{"feature": "Intercept", "coefficient": coefs["const"]}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = pd.concat(
-            [df_intercept, df_non_intercept], sort=True, ignore_index=True
-        )
+        df_coef = pd.concat([df_intercept, df_non_intercept], sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[["feature", "coefficient"]]
@@ -201,20 +197,14 @@ class Modeler:
         feature_names = learner.feat_vectorizer.get_feature_names()
 
         # first create a sorted data frame for all the non-intercept features
-        df_non_intercept = pd.DataFrame(
-            {"feature": feature_names, "coefficient": coefficients}
-        )
+        df_non_intercept = pd.DataFrame({"feature": feature_names, "coefficient": coefficients})
         df_non_intercept = df_non_intercept.sort_values(by=["feature"])
 
         # now create a data frame that just has the intercept
-        df_intercept = pd.DataFrame(
-            [{"feature": "Intercept", "coefficient": intercept}]
-        )
+        df_intercept = pd.DataFrame([{"feature": "Intercept", "coefficient": intercept}])
 
         # append the non-intercept frame to the intercept one
-        df_coef = pd.concat(
-            [df_intercept, df_non_intercept], sort=True, ignore_index=True
-        )
+        df_coef = pd.concat([df_intercept, df_non_intercept], sort=True, ignore_index=True)
 
         # we always want to have the feature column first
         df_coef = df_coef[["feature", "coefficient"]]
@@ -337,9 +327,7 @@ class Modeler:
         """
         # we first compute a single feature that is simply the sum of all features
         df_train_eqwt = df_train.copy()
-        df_train_eqwt["sumfeature"] = df_train_eqwt[feature_columns].apply(
-            np.sum, axis=1
-        )
+        df_train_eqwt["sumfeature"] = df_train_eqwt[feature_columns].apply(np.sum, axis=1)
 
         # train a plain Linear Regression model
         X = df_train_eqwt["sumfeature"]
@@ -353,13 +341,9 @@ class Modeler:
         # now we need to assign this coefficient to all of the original
         # features and create a fake SKLL learner with these weights
         original_features = [
-            c
-            for c in df_train_eqwt.columns
-            if c not in ["sc1", "sumfeature", "spkitemid"]
+            c for c in df_train_eqwt.columns if c not in ["sc1", "sumfeature", "spkitemid"]
         ]
-        coefs = pd.Series(
-            dict([(origf, coef) for origf in original_features] + [("const", const)])
-        )
+        coefs = pd.Series(dict([(origf, coef) for origf in original_features] + [("const", const)]))
         df_coef = self.ols_coefficients_to_dataframe(coefs)
 
         # create fake SKLL learner with these coefficients
@@ -411,8 +395,7 @@ class Modeler:
 
         df_train_std = df_train[feature_columns].std()
         df_betas["coefficient"] = (
-            df_weights["coefficient"].multiply(df_train_std, axis="index")
-            / df_train["sc1"].std()
+            df_weights["coefficient"].multiply(df_train_std, axis="index") / df_train["sc1"].std()
         )
 
         # replace each negative beta with delta and adjust
@@ -422,9 +405,7 @@ class Modeler:
         df_negative_betas = df_betas[df_betas["coefficient"] < 0]
         delta = np.sum(df_positive_betas["coefficient"]) * RT / len(df_negative_betas)
         df_betas["coefficient"] = df_betas.apply(
-            lambda row: row["coefficient"] * (1 - RT)
-            if row["coefficient"] > 0
-            else delta,
+            lambda row: row["coefficient"] * (1 - RT) if row["coefficient"] > 0 else delta,
             axis=1,
         )
 
@@ -1016,9 +997,7 @@ class Modeler:
 
         # LassoFixedLambdaThenNNLR
         elif model_name == "LassoFixedLambdaThenNNLR":
-            result = self.train_lasso_fixed_lambda_then_non_negative_lr(
-                df_train, feature_columns
-            )
+            result = self.train_lasso_fixed_lambda_then_non_negative_lr(df_train, feature_columns)
 
         # LassoFixedLambda
         elif model_name == "LassoFixedLambda":
@@ -1045,8 +1024,7 @@ class Modeler:
         # non-intercept features and save to a file
         df_betas = df_coef.set_index("feature").loc[used_features]
         df_betas = (
-            df_betas.multiply(df_train[used_features].std(), axis="index")
-            / df_train["sc1"].std()
+            df_betas.multiply(df_train[used_features].std(), axis="index") / df_train["sc1"].std()
         )
         df_betas.columns = ["standardized"]
         df_betas["relative"] = df_betas / sum(abs(df_betas["standardized"]))
@@ -1134,9 +1112,7 @@ class Modeler:
         """
         # Instantiate the given SKLL learner and set its probability value
         # and fixed parameters appropriately
-        model_kwargs = (
-            custom_fixed_parameters if custom_fixed_parameters is not None else {}
-        )
+        model_kwargs = custom_fixed_parameters if custom_fixed_parameters is not None else {}
         learner = Learner(
             model_name, model_kwargs=model_kwargs, probability=predict_expected_scores
         )
@@ -1155,9 +1131,7 @@ class Modeler:
         # classifier, then the choice is between the user-specified objective
         # and `f1_score_micro`.
         if learner.model_type._estimator_type == "regressor":
-            objective = (
-                "neg_mean_squared_error" if not custom_objective else custom_objective
-            )
+            objective = "neg_mean_squared_error" if not custom_objective else custom_objective
         else:
             objective = "f1_score_micro" if not custom_objective else custom_objective
 
@@ -1280,9 +1254,7 @@ class Modeler:
         """
         # expected scores require specifying ``trim_min`` and ``trim_max``
         if predict_expected and not (min_score and max_score):
-            raise ValueError(
-                "Must specify 'min_score' and 'max_score' for expected scores."
-            )
+            raise ValueError("Must specify 'min_score' and 'max_score' for expected scores.")
 
         model = self.learner
 
@@ -1334,9 +1306,7 @@ class Modeler:
         List of data frames containing predictions and other
         information.
         """
-        Analyzer.check_param_names(
-            configuration, ["trim_max", "trim_min", "trim_tolerance"]
-        )
+        Analyzer.check_param_names(configuration, ["trim_max", "trim_min", "trim_tolerance"])
 
         (
             trim_min,
@@ -1531,8 +1501,6 @@ class Modeler:
             columns=["feature", "coefficient"],
         )
 
-        scaled_dataset = [
-            {"name": "coefficients_scaled", "frame": df_scaled_coefficients}
-        ]
+        scaled_dataset = [{"name": "coefficients_scaled", "frame": df_scaled_coefficients}]
 
         return DataContainer(datasets=scaled_dataset)

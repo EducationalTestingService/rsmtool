@@ -74,9 +74,7 @@ def convert_to_ordered_category(group_values, base_group=None):
 
     # convert to category and reorder
     group_category = group_values.astype("category")
-    group_ordered_category = group_category.cat.reorder_categories(
-        groups_by_size, ordered=True
-    )
+    group_ordered_category = group_category.cat.reorder_categories(groups_by_size, ordered=True)
     return group_ordered_category
 
 
@@ -118,9 +116,7 @@ def get_coefficients(fit, base_category):
 
     # rename the rows
     df_results.index = [
-        v.split(".")[1].strip("]")
-        if not v == "Intercept"
-        else f"Intercept ({base_category})"
+        v.split(".")[1].strip("]") if not v == "Intercept" else f"Intercept ({base_category})"
         for v in df_results.index
     ]
 
@@ -154,9 +150,7 @@ def write_fairness_results(
         fit = fit_dictionary[model]
 
         ols_file = join(output_dir, f"{experiment_id}_{model}_by_{group}.ols")
-        summary_file = join(
-            output_dir, f"{experiment_id}_{model}_by_{group}_ols_summary.txt"
-        )
+        summary_file = join(output_dir, f"{experiment_id}_{model}_by_{group}_ols_summary.txt")
         with open(ols_file, "wb") as olsf, open(summary_file, "w") as summf:
             pickle.dump(fit, olsf)
             summf.write(str(fit.summary()))

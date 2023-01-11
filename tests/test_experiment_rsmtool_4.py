@@ -97,9 +97,7 @@ def test_run_experiment_empwtdropneg():
     # rsmtool experiment with no longer supported empWtDropNeg model
     source = "empwtdropneg"
     experiment_id = "empWtDropNeg"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -109,9 +107,7 @@ def test_run_experiment_requested_feature_zero_sd():
     # rsmtool experiment when a requested feature has zero sd
     source = "lr-with-requested-feature-with-zero-sd"
     experiment_id = "lr_with_requested_feature_with_zero_sd"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -119,9 +115,7 @@ def test_run_experiment_with_warnings():
 
     source = "lr-with-warnings"
     experiment_id = "lr_with_warnings"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
 
     do_run_experiment(source, experiment_id, config_file)
 
@@ -129,9 +123,7 @@ def test_run_experiment_with_warnings():
     report_warnings = collect_warning_messages_from_report(html_file)
 
     syntax_warnings = [msg for msg in report_warnings if "SyntaxWarning:" in msg]
-    deprecation_warnings = [
-        msg for msg in report_warnings if "DeprecationWarning:" in msg
-    ]
+    deprecation_warnings = [msg for msg in report_warnings if "DeprecationWarning:" in msg]
     unicode_warnings = [msg for msg in report_warnings if "UnicodeWarning:" in msg]
     runtime_warnings = [msg for msg in report_warnings if "RuntimeWarning:" in msg]
     user_warnings = [msg for msg in report_warnings if "UserWarning:" in msg]

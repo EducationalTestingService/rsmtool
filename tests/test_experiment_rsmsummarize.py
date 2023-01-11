@@ -76,9 +76,7 @@ def test_run_experiment_lr_summary_dictionary():
     # we will be using getcwd
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
 
-    old_file_dict = {
-        "experiment_dir": "data/experiments/lr-self-summary-dict/lr-subgroups"
-    }
+    old_file_dict = {"experiment_dir": "data/experiments/lr-self-summary-dict/lr-subgroups"}
 
     new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
 
@@ -108,9 +106,7 @@ def test_run_experiment_summary_wrong_directory():
     # rsmsummarize experiment where the specified directory
     # does not exist
     source = "summary-wrong-directory"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json")
     do_run_summary(source, config_file)
 
 
@@ -120,9 +116,7 @@ def test_run_experiment_summary_no_csv_directory():
     # rsmsummarize experiment where the specified directory
     # does not contain any rsmtool experiments
     source = "summary-no-output-dir"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json")
     do_run_summary(source, config_file)
 
 
@@ -132,9 +126,7 @@ def test_run_experiment_summary_no_json():
     # rsmsummarize experiment where the specified directory
     # does not contain any json files
     source = "summary-no-json-file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json")
     do_run_summary(source, config_file)
 
 
@@ -145,7 +137,5 @@ def test_run_experiment_summary_too_many_jsons():
     # does contains several jsons files and the user
     # specified experiment names
     source = "summary-too-many-jsons"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmsummarize.json")
     do_run_summary(source, config_file)

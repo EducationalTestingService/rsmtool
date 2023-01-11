@@ -26,9 +26,7 @@ from .utils.logging import LogFormatter
 from .writer import DataWriter
 
 
-def run_evaluation(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None
-):
+def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None):
     """
     Run an rsmeval experiment using the given configuration.
 
@@ -86,9 +84,7 @@ def run_evaluation(
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError(
-                f"'{output_dir}' already contains a non-empty 'output' directory."
-            )
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
             logger.warning(
                 f"{output_dir} already contains a non-empty 'output' directory. "
@@ -108,12 +104,9 @@ def run_evaluation(
     writer = DataWriter(configuration["experiment_id"])
 
     # Make sure prediction file can be located
-    if not DataReader.locate_files(
-        configuration["predictions_file"], configuration.configdir
-    ):
+    if not DataReader.locate_files(configuration["predictions_file"], configuration.configdir):
         raise FileNotFoundError(
-            f"Error: Predictions file {configuration['predictions_file']} "
-            f"not found."
+            f"Error: Predictions file {configuration['predictions_file']} " f"not found."
         )
 
     scale_with = configuration.get("scale_with")
@@ -140,13 +133,9 @@ def run_evaluation(
     if do_scaling:
 
         # Make sure scale file can be located
-        scale_file_location = DataReader.locate_files(
-            scale_with, configuration.configdir
-        )
+        scale_file_location = DataReader.locate_files(scale_with, configuration.configdir)
         if not scale_file_location:
-            raise FileNotFoundError(
-                f"Could not find scaling file {scale_file_location}."
-            )
+            raise FileNotFoundError(f"Could not find scaling file {scale_file_location}.")
 
         paths.append("scale_with")
         names.append("scale")
@@ -191,9 +180,7 @@ def run_evaluation(
     (
         analyzed_config,
         analyzed_container,
-    ) = analyzer.run_data_composition_analyses_for_rsmeval(
-        processed_container, processed_config
-    )
+    ) = analyzer.run_data_composition_analyses_for_rsmeval(processed_container, processed_config)
     # Write out files
     writer.write_experiment_output(csvdir, analyzed_container, file_format=file_format)
 
@@ -290,9 +277,7 @@ def main():  # noqa: D103
             suppress_warnings=args.quiet,
             use_subgroups=args.subgroups,
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

@@ -32,9 +32,7 @@ class TestComparer:
             Comparer.make_summary_stat_df(df)
 
     def test_process_confusion_matrix(self):
-        in_cm = pd.DataFrame(
-            {1: [2, 3, 5], 2: [2, 5, 7], 3: [1, 3, 6]}, index=[1, 2, 3]
-        )
+        in_cm = pd.DataFrame({1: [2, 3, 5], 2: [2, 5, 7], 3: [1, 3, 6]}, index=[1, 2, 3])
 
         expected_out_cm = pd.DataFrame(
             {"human 1": [2, 3, 5], "human 2": [2, 5, 7], "human 3": [1, 3, 6]},
@@ -45,9 +43,7 @@ class TestComparer:
         assert_frame_equal(out_cm, expected_out_cm)
 
     def test_process_confusion_matrix_with_zero(self):
-        in_cm = pd.DataFrame(
-            {0: [2, 3, 5], 1: [2, 5, 7], 2: [1, 3, 6]}, index=[0, 1, 2]
-        )
+        in_cm = pd.DataFrame({0: [2, 3, 5], 1: [2, 5, 7], 2: [1, 3, 6]}, index=[0, 1, 2])
 
         expected_out_cm = pd.DataFrame(
             {"human 0": [2, 3, 5], "human 1": [2, 5, 7], "human 2": [1, 3, 6]},
@@ -197,9 +193,7 @@ class TestComparer:
         source = "lr-subgroups-with-h2"
         experiment_id = "lr_subgroups_with_h2"
         test_dir = dirname(__file__)
-        config_file = join(
-            test_dir, "data", "experiments", source, f"{experiment_id}.json"
-        )
+        config_file = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
         do_run_experiment(source, experiment_id, config_file)
         output_dir = join("test_outputs", source, "output")
         figure_dir = join("test_outputs", source, "figure")

@@ -47,12 +47,8 @@ class FeatureSubsetProcessor:
         feature_names : list of str
             A list of feature names to include.
         """
-        feature_subset = feature_subset_specs[feature_subset_specs[subset] == 1][
-            "Feature"
-        ]
-        feature_names = [
-            feature for feature in feature_columns if feature in feature_subset.values
-        ]
+        feature_subset = feature_subset_specs[feature_subset_specs[subset] == 1]["Feature"]
+        feature_names = [feature for feature in feature_columns if feature in feature_subset.values]
 
         # check whether there are any features in the data file and raise warning
         if len(feature_columns) != len(feature_names):
@@ -114,15 +110,11 @@ class FeatureSubsetProcessor:
                 raise ValueError(f"Unknown value for feature_subset: {subset}")
 
             if not df_feature_specs[subset].isin([0, 1]).all():
-                raise ValueError(
-                    "The subset columns in feature " "file can only contain 0 or 1"
-                )
+                raise ValueError("The subset columns in feature " "file can only contain 0 or 1")
 
         if sign:
             possible_sign_columns = [f"sign_{sign}", f"Sign_{sign}"]
-            existing_sign_columns = [
-                c for c in possible_sign_columns if c in df_feature_specs
-            ]
+            existing_sign_columns = [c for c in possible_sign_columns if c in df_feature_specs]
             if len(existing_sign_columns) > 1:
                 raise ValueError(
                     f"The feature_subset_file contains multiple columns "
@@ -137,9 +129,7 @@ class FeatureSubsetProcessor:
                 sign_column = existing_sign_columns[0]
 
             if not df_feature_specs[sign_column].isin(["-", "+"]).all():
-                raise ValueError(
-                    "The sign columns in feature " "file can only contain - or +"
-                )
+                raise ValueError("The sign columns in feature " "file can only contain - or +")
 
 
 class FeatureSpecsProcessor:
@@ -270,8 +260,7 @@ class FeatureSpecsProcessor:
                 assert np.all(df_specs_new["sign"].isin([-1, 1]))
             except (ValueError, AssertionError):
                 raise ValueError(
-                    "The `sign` column in the feature"
-                    "file can only contain '1' or '-1'"
+                    "The `sign` column in the feature" "file can only contain '1' or '-1'"
                 )
         else:
             df_specs_new["sign"] = 1
@@ -326,9 +315,7 @@ class FeatureSpecsProcessor:
         # get feature sign information, if available
         if feature_sign:
             # Convert to dictionary {feature:sign}
-            sign_dict = dict(
-                zip(feature_subset.Feature, feature_subset[f"Sign_{feature_sign}"])
-            )
+            sign_dict = dict(zip(feature_subset.Feature, feature_subset[f"Sign_{feature_sign}"]))
         # else create an empty dictionary
         else:
             sign_dict = {}
@@ -385,8 +372,7 @@ class FeaturePreprocessor:
             model_type = "SKLL"
         else:
             raise ValueError(
-                f"The specified model {model_name} was not found. "
-                f"Please check the spelling."
+                f"The specified model {model_name} was not found. " f"Please check the spelling."
             )
 
         return model_type
@@ -679,13 +665,9 @@ class FeaturePreprocessor:
         ]
         # rename these columns
         if columns_with_incorrect_default_names:
-            new_column_names = [
-                f"##{column}##" for column in columns_with_incorrect_default_names
-            ]
+            new_column_names = [f"##{column}##" for column in columns_with_incorrect_default_names]
             df.rename(
-                columns=dict(
-                    zip(columns_with_incorrect_default_names, new_column_names)
-                ),
+                columns=dict(zip(columns_with_incorrect_default_names, new_column_names)),
                 inplace=True,
             )
 
@@ -760,9 +742,7 @@ class FeaturePreprocessor:
 
         # Force convert the label column to numeric and
         # convert whatever can't be converted to a NaN
-        df_filter[column] = pd.to_numeric(df_filter[column], errors="coerce").astype(
-            float
-        )
+        df_filter[column] = pd.to_numeric(df_filter[column], errors="coerce").astype(float)
 
         # Save the values that have been converted to NaNs
         # as a separate data frame. We want to keep them as NaNs
@@ -872,9 +852,7 @@ class FeaturePreprocessor:
         scaled_test_predictions = (
             df_test_predictions["raw"] - train_predictions_mean
         ) / train_predictions_sd
-        scaled_test_predictions = (
-            scaled_test_predictions * human_labels_sd + human_labels_mean
-        )
+        scaled_test_predictions = scaled_test_predictions * human_labels_sd + human_labels_mean
 
         df_pred_process = df_test_predictions.copy()
         df_pred_process["scale"] = scaled_test_predictions
@@ -885,18 +863,14 @@ class FeaturePreprocessor:
         )
 
         df_pred_process["raw_trim_round"] = np.rint(df_pred_process["raw_trim"])
-        df_pred_process["raw_trim_round"] = df_pred_process["raw_trim_round"].astype(
-            "int64"
-        )
+        df_pred_process["raw_trim_round"] = df_pred_process["raw_trim_round"].astype("int64")
 
         df_pred_process["scale_trim"] = self.trim(
             df_pred_process["scale"], trim_min, trim_max, trim_tolerance
         )
 
         df_pred_process["scale_trim_round"] = np.rint(df_pred_process["scale_trim"])
-        df_pred_process["scale_trim_round"] = df_pred_process[
-            "scale_trim_round"
-        ].astype("int64")
+        df_pred_process["scale_trim_round"] = df_pred_process["scale_trim_round"].astype("int64")
 
         return df_pred_process
 
@@ -961,8 +935,7 @@ class FeaturePreprocessor:
             # all the integers to floats.
 
             flag_column_dict_to_float = {
-                key: list(map(convert_to_float, value))
-                for (key, value) in flag_column_dict.items()
+                key: list(map(convert_to_float, value)) for (key, value) in flag_column_dict.items()
             }
 
             # and now convert the the values in the feature column
@@ -1097,9 +1070,7 @@ class FeaturePreprocessor:
         else:
             # clamp any outlier values that are 4 standard deviations
             # away from the mean
-            features_no_outliers = self.remove_outliers(
-                values, mean=feature_mean, sd=feature_sd
-            )
+            features_no_outliers = self.remove_outliers(values, mean=feature_mean, sd=feature_sd)
 
         # apply the requested transformation to the feature
         transformed_feature = FeatureTransformer().transform_feature(
@@ -1184,9 +1155,7 @@ class FeaturePreprocessor:
         # if we are should be using truncations, then we create the truncations
         # set from the feature specifications
         if use_truncations:
-            truncations = df_feature_specs[["feature", "min", "max"]].set_index(
-                "feature"
-            )
+            truncations = df_feature_specs[["feature", "min", "max"]].set_index("feature")
         else:
             truncations = None
 
@@ -1228,27 +1197,15 @@ class FeaturePreprocessor:
 
             if standardize_features:
 
-                df_train_without_mean = (
-                    df_train_preprocessed[feature_name] - train_transformed_mean
-                )
-                df_train_preprocessed[feature_name] = (
-                    df_train_without_mean / train_transformed_sd
-                )
+                df_train_without_mean = df_train_preprocessed[feature_name] - train_transformed_mean
+                df_train_preprocessed[feature_name] = df_train_without_mean / train_transformed_sd
 
-                df_test_without_mean = (
-                    df_test_preprocessed[feature_name] - train_transformed_mean
-                )
-                df_test_preprocessed[feature_name] = (
-                    df_test_without_mean / train_transformed_sd
-                )
+                df_test_without_mean = df_test_preprocessed[feature_name] - train_transformed_mean
+                df_test_preprocessed[feature_name] = df_test_without_mean / train_transformed_sd
 
             # Multiply both train and test feature by sign.
-            df_train_preprocessed[feature_name] = (
-                df_train_preprocessed[feature_name] * feature_sign
-            )
-            df_test_preprocessed[feature_name] = (
-                df_test_preprocessed[feature_name] * feature_sign
-            )
+            df_train_preprocessed[feature_name] = df_train_preprocessed[feature_name] * feature_sign
+            df_test_preprocessed[feature_name] = df_test_preprocessed[feature_name] * feature_sign
 
             # update the feature preprocessing metadata frame
             df_feature = pd.DataFrame(
@@ -1398,8 +1355,7 @@ class FeaturePreprocessor:
         missing_columns = set(columns_to_check).difference(df.columns)
         if missing_columns:
             raise KeyError(
-                f"Columns {missing_columns} from the config file do not "
-                f"exist in the data."
+                f"Columns {missing_columns} from the config file do not " f"exist in the data."
             )
 
         # it is possible for the `id_column` and `candidate_column` to be
@@ -1489,9 +1445,7 @@ class FeaturePreprocessor:
             df_filtered = df_responses_with_requested_flags.copy()
             trim_min = given_trim_min if given_trim_min else 1
             trim_max = given_trim_max if given_trim_max else 10
-            self.logger.info(
-                f"Generating labels randomly from [{trim_min}, {trim_max}]"
-            )
+            self.logger.info(f"Generating labels randomly from [{trim_min}, {trim_max}]")
             randgen = RandomState(seed=1234567890)
             df_filtered[label_column] = randgen.random_integers(
                 trim_min, trim_max, size=len(df_filtered)
@@ -1504,9 +1458,7 @@ class FeaturePreprocessor:
             # and also replace any non-numeric feature values in already
             # excluded data with NaNs for consistency
             for feat in feature_names:
-                df_excluded[feat] = pd.to_numeric(
-                    df_excluded[feat], errors="coerce"
-                ).astype(float)
+                df_excluded[feat] = pd.to_numeric(df_excluded[feat], errors="coerce").astype(float)
                 newdf, newdf_excluded = self.filter_on_column(
                     df_filtered,
                     feat,
@@ -1529,9 +1481,7 @@ class FeaturePreprocessor:
 
             # Raise warning if we excluded features that were
             # specified in the .json file because sd == 0.
-            omitted_features = set(requested_feature_names).difference(
-                df_filtered.columns
-            )
+            omitted_features = set(requested_feature_names).difference(df_filtered.columns)
             if omitted_features:
                 raise ValueError(
                     f"The following requested features were excluded "
@@ -1541,9 +1491,7 @@ class FeaturePreprocessor:
                     f"and re-run the tool"
                 )
             # Update the feature names
-            feature_names = [
-                feature for feature in feature_names if feature in df_filtered
-            ]
+            feature_names = [feature for feature in feature_names if feature in df_filtered]
         else:
             raise KeyError(
                 f"DataFrame does not contain columns for all features "
@@ -1557,9 +1505,7 @@ class FeaturePreprocessor:
         # if ``length_column`` exists, make sure it's converted to numeric;
         # values that cannot be coerced to numeric will be set to ``np.nan``
         if length_column:
-            df_filtered["length"] = pd.to_numeric(
-                df_filtered["length"], errors="coerce"
-            )
+            df_filtered["length"] = pd.to_numeric(df_filtered["length"], errors="coerce")
 
         # check the values for length column. We do this after filtering
         # to make sure we have removed responses that have not been
@@ -1629,9 +1575,7 @@ class FeaturePreprocessor:
                 df_filtered_human_scores["sc2"], errors="coerce"
             ).astype(float)
             if exclude_zero_scores:
-                df_filtered_human_scores["sc2"] = df_filtered_human_scores[
-                    "sc2"
-                ].replace(0, np.nan)
+                df_filtered_human_scores["sc2"] = df_filtered_human_scores["sc2"].replace(0, np.nan)
 
         # we need to make sure that `spkitemid` is the first column
         df_excluded = df_excluded[
@@ -1711,9 +1655,7 @@ class FeaturePreprocessor:
         feature_subset_file = config_obj["feature_subset_file"]
 
         if feature_subset_file is not None:
-            feature_subset_file = DataReader.locate_files(
-                feature_subset_file, configdir
-            )
+            feature_subset_file = DataReader.locate_files(feature_subset_file, configdir)
 
         # get the column name for the labels for the training and testing data
         train_label_column = config_obj["train_label_column"]
@@ -1784,9 +1726,7 @@ class FeaturePreprocessor:
             flag_partition = "both"
 
         flag_column_dict = config_obj.check_flag_column(partition=flag_partition)
-        flag_column_test_dict = config_obj.check_flag_column(
-            "flag_column_test", partition="test"
-        )
+        flag_column_test_dict = config_obj.check_flag_column("flag_column_test", partition="test")
 
         if flag_column_dict and not flag_column_test_dict:
             flag_column_test_dict = flag_column_dict
@@ -1873,10 +1813,7 @@ class FeaturePreprocessor:
                 f"cannot be used as a model feature."
             )
 
-        if (
-            second_human_score_column
-            and second_human_score_column in requested_features
-        ):
+        if second_human_score_column and second_human_score_column in requested_features:
             raise ValueError(
                 f"The value of 'second_human_score_column' "
                 f"('{second_human_score_column}') cannot be used "
@@ -1974,18 +1911,13 @@ class FeaturePreprocessor:
                     feature_sign=feature_sign,
                 )
             else:
-                feature_specs = feature_specs_processor.generate_default_specs(
-                    feature_names
-                )
+                feature_specs = feature_specs_processor.generate_default_specs(feature_names)
 
         # Do the same for the test data except we can ignore the trim min
         # and max since we already have that from the training data and
         # we have the feature_names when no feature file was specified.
         # We also allow features with 0 standard deviation in the test file.
-        if (
-            test_file_location == train_file_location
-            and train_label_column == test_label_column
-        ):
+        if test_file_location == train_file_location and train_label_column == test_label_column:
             self.logger.warning(
                 "The same data file and label "
                 "column are used for both training "
@@ -2135,9 +2067,7 @@ class FeaturePreprocessor:
         """
         # get the directory where the config file lives
         configpath = config_obj.configdir
-        pred_file_location = DataReader.locate_files(
-            config_obj["predictions_file"], configpath
-        )
+        pred_file_location = DataReader.locate_files(config_obj["predictions_file"], configpath)
 
         # get the column name for the labels for the training and testing data
         human_score_column = config_obj["human_score_column"]
@@ -2147,9 +2077,7 @@ class FeaturePreprocessor:
         # system score column, raise an error
         if human_score_column == system_score_column:
             raise ValueError(
-                "'human_score_column' and "
-                "'system_score_column' "
-                "cannot have the same value."
+                "'human_score_column' and " "'system_score_column' " "cannot have the same value."
             )
 
         # get the name of the optional column that
@@ -2241,19 +2169,14 @@ class FeaturePreprocessor:
 
         # log an appropriate message
         if scale_with is None:
-            message = (
-                "Assuming given system predictions "
-                "are unscaled and will be used as such."
-            )
+            message = "Assuming given system predictions " "are unscaled and will be used as such."
         elif scale_with == "asis":
             message = (
-                "Assuming given system predictions "
-                "are already scaled and will be used as such."
+                "Assuming given system predictions " "are already scaled and will be used as such."
             )
         else:
             message = (
-                "Assuming given system predictions "
-                "are unscaled and will be scaled before use."
+                "Assuming given system predictions " "are unscaled and will be scaled before use."
             )
 
         self.logger.info(message)
@@ -2324,9 +2247,7 @@ class FeaturePreprocessor:
         # in column are non-numeric. This is a known bug in
         # pandas: https://github.com/pydata/pandas/issues/9589
         # Therefore, we need add an additional check after this.
-        df_excluded["raw"] = pd.to_numeric(df_excluded["raw"], errors="coerce").astype(
-            float
-        )
+        df_excluded["raw"] = pd.to_numeric(df_excluded["raw"], errors="coerce").astype(float)
 
         # filter out the non-numeric machine scores from the rest of the data
         newdf, newdf_excluded = self.filter_on_column(
@@ -2368,8 +2289,7 @@ class FeaturePreprocessor:
             # update df_excluded
             df_excluded = pd.concat([df_excluded, df_excluded_candidates], sort=True)
             df_excluded = df_excluded[
-                ["spkitemid"]
-                + [column for column in df_excluded if column != "spkitemid"]
+                ["spkitemid"] + [column for column in df_excluded if column != "spkitemid"]
             ]
 
         # set default values for scaling
@@ -2447,9 +2367,7 @@ class FeaturePreprocessor:
                 df_test_human_scores["sc2"], errors="coerce"
             ).astype(float)
             if exclude_zero_scores:
-                df_test_human_scores["sc2"] = df_test_human_scores["sc2"].replace(
-                    0, np.nan
-                )
+                df_test_human_scores["sc2"] = df_test_human_scores["sc2"].replace(0, np.nan)
 
         # remove 'spkitemid' from `not_other_columns`
         # because we want that in the other columns
@@ -2458,9 +2376,7 @@ class FeaturePreprocessor:
 
         # extract all of the other columns in the predictions file
         other_columns = [
-            column
-            for column in df_filtered_pred.columns
-            if column not in not_other_columns
+            column for column in df_filtered_pred.columns if column not in not_other_columns
         ]
 
         df_pred_other_columns = df_filtered_pred[other_columns]
@@ -2500,9 +2416,7 @@ class FeaturePreprocessor:
             "test_responses_with_excluded_flags",
         ]
 
-        new_container = [
-            {"name": name, "frame": frame} for frame, name in zip(frames, names)
-        ]
+        new_container = [{"name": name, "frame": frame} for frame, name in zip(frames, names)]
 
         new_container = DataContainer(new_container)
 
@@ -2596,8 +2510,7 @@ class FeaturePreprocessor:
         missing_columns = set(columns_to_check).difference(df_input.columns)
         if missing_columns:
             raise KeyError(
-                f"Columns {missing_columns} from the config file do not "
-                f"exist in the data."
+                f"Columns {missing_columns} from the config file do not " f"exist in the data."
             )
 
         # rename all columns
@@ -2800,9 +2713,7 @@ class FeaturePreprocessor:
                 f"The input feature file is missing the following features: {missing_features}"
             )
 
-        extra_features = set(input_feature_columns).difference(
-            required_features + ["spkitemid"]
-        )
+        extra_features = set(input_feature_columns).difference(required_features + ["spkitemid"])
         if extra_features:
             self.logger.warning(
                 f"The following extraneous features will be ignored: {extra_features}"
@@ -2860,12 +2771,8 @@ class FeaturePreprocessor:
             train_feature_mean = df_feature_info.loc[feature_name]["train_mean"]
             train_feature_sd = df_feature_info.loc[feature_name]["train_sd"]
 
-            train_transformed_mean = df_feature_info.loc[feature_name][
-                "train_transformed_mean"
-            ]
-            train_transformed_sd = df_feature_info.loc[feature_name][
-                "train_transformed_sd"
-            ]
+            train_transformed_mean = df_feature_info.loc[feature_name]["train_transformed_mean"]
+            train_transformed_sd = df_feature_info.loc[feature_name]["train_transformed_sd"]
 
             # transform the feature values and remove outliers
             df_features_preprocess[feature_name] = self.preprocess_feature(
@@ -2900,14 +2807,10 @@ class FeaturePreprocessor:
                     # add the response(s) with missing values to the excluded responses
                     # but make sure we are adding the original values, not the
                     # preprocessed ones
-                    missing_values = df_features["spkitemid"].isin(
-                        newdf_excluded["spkitemid"]
-                    )
+                    missing_values = df_features["spkitemid"].isin(newdf_excluded["spkitemid"])
 
                     df_excluded_original = df_features[missing_values].copy()
-                    df_excluded = pd.merge(
-                        df_excluded, df_excluded_original, how="outer"
-                    )
+                    df_excluded = pd.merge(df_excluded, df_excluded_original, how="outer")
 
             # print(standardized_features)
             if standardize_features:
@@ -2916,9 +2819,7 @@ class FeaturePreprocessor:
                 df_feature_minus_mean = (
                     df_features_preprocess[feature_name] - train_transformed_mean
                 )
-                df_features_preprocess[feature_name] = (
-                    df_feature_minus_mean / train_transformed_sd
-                )
+                df_features_preprocess[feature_name] = df_feature_minus_mean / train_transformed_sd
 
             # Multiply features by sign.
             df_features_preprocess[feature_name] = (

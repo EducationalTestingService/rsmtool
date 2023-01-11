@@ -33,9 +33,7 @@ class TestCopyData:
             "features": join("temp_test_copy_data_file", "features.csv"),
         }
         self.dirs_to_remove.append("temp_test_copy_data_file")
-        output_dict = copy_data_files(
-            "temp_test_copy_data_file", file_dict, rsmtool_test_dir
-        )
+        output_dict = copy_data_files("temp_test_copy_data_file", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
             eq_(output_dict[file_type], expected_dict[file_type])
             ok_(Path(output_dict[file_type]).exists())
@@ -45,9 +43,7 @@ class TestCopyData:
         file_dict = {"exp_dir": "data/experiments/lr-self-compare/lr-subgroups"}
         expected_dict = {"exp_dir": join("temp_test_copy_dirs", "lr-subgroups")}
         self.dirs_to_remove.append("temp_test_copy_dirs")
-        output_dict = copy_data_files(
-            "temp_test_copy_dirs", file_dict, rsmtool_test_dir
-        )
+        output_dict = copy_data_files("temp_test_copy_dirs", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
             eq_(output_dict[file_type], expected_dict[file_type])
             ok_(Path(output_dict[file_type]).exists())
@@ -63,9 +59,7 @@ class TestCopyData:
             "test": join("temp_test_copy_mixed", "test.csv"),
         }
         self.dirs_to_remove.append("temp_test_copy_mixed")
-        output_dict = copy_data_files(
-            "temp_test_copy_mixed", file_dict, rsmtool_test_dir
-        )
+        output_dict = copy_data_files("temp_test_copy_mixed", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
             eq_(output_dict[file_type], expected_dict[file_type])
             ok_(Path(output_dict[file_type]).exists())

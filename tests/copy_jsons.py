@@ -119,9 +119,7 @@ def copy_jsons(source_dir, target_dir):
         if tool == "rsmcompare":
             new_old_id = f"{experiment_dir}_{tool}"
             json_obj["experiment_id_old"] = new_old_id
-            output_fname = join(
-                target_dir, f"{new_old_id}_vs_{json_obj['experiment_id_new']}.json"
-            )
+            output_fname = join(target_dir, f"{new_old_id}_vs_{json_obj['experiment_id_new']}.json")
 
         # convert paths in reference files to absolute paths and replace
         # My Documents with Documents
@@ -131,9 +129,7 @@ def copy_jsons(source_dir, target_dir):
                 and not json_obj[field] is not None
                 and not json_obj[field] == "asis"
             ):
-                new_ref_path = abspath(
-                    join(source_dir, experiment_dir, json_obj[field])
-                )
+                new_ref_path = abspath(join(source_dir, experiment_dir, json_obj[field]))
                 new_ref_path = re.sub("My Documents", "Documents", new_ref_path)
                 json_obj[field] = new_ref_path
 
@@ -146,12 +142,8 @@ def copy_jsons(source_dir, target_dir):
 def main():  # noqa: D103
     # set up an argument parser
     parser = argparse.ArgumentParser(prog="copy_jsons.py")
-    parser.add_argument(
-        dest="source_dir", help="Parent directory containing .json files"
-    )
-    parser.add_argument(
-        dest="target_dir", help="Target directory", default=getcwd(), nargs="?"
-    )
+    parser.add_argument(dest="source_dir", help="Parent directory containing .json files")
+    parser.add_argument(dest="target_dir", help="Target directory", default=getcwd(), nargs="?")
     # parse given command line arguments
     args = parser.parse_args()
     copy_jsons(args.source_dir, args.target_dir)

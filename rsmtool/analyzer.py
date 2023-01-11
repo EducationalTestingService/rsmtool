@@ -167,23 +167,13 @@ class Analyzer:
         if not exclude_listwise:
             # if we are not excluding listwise, rename the first cell so
             # that it is not set to zero
-            assert (
-                df_full_crosstab.loc[
-                    "numeric non-zero human score", "all features numeric"
-                ]
-                == 0
-            )
-            df_full_crosstab.loc[
-                "numeric non-zero human score", "all features numeric"
-            ] = "-"
+            assert df_full_crosstab.loc["numeric non-zero human score", "all features numeric"] == 0
+            df_full_crosstab.loc["numeric non-zero human score", "all features numeric"] = "-"
 
             # if we are not excluding the zeros, rename the corresponding cells
             # so that they are not set to zero. We do not do this for listwise exclusion
             if not exclude_zero_scores:
-                assert (
-                    df_full_crosstab.loc["zero human score", "all features numeric"]
-                    == 0
-                )
+                assert df_full_crosstab.loc["zero human score", "all features numeric"] == 0
                 df_full_crosstab.loc["zero human score", "all features numeric"] = "-"
 
         return df_full_crosstab
@@ -412,14 +402,10 @@ class Analyzer:
         num_mild_outliers = {}
         num_extreme_outliers = {}
         for c in df_desc.columns:
-            is_extreme = (df_desc[c] <= extreme_bottom[c]) | (
-                df_desc[c] >= extreme_upper[c]
-            )
+            is_extreme = (df_desc[c] <= extreme_bottom[c]) | (df_desc[c] >= extreme_upper[c])
 
             is_mild = (df_desc[c] > extreme_bottom[c]) & (df_desc[c] <= mild_bottom[c])
-            is_mild = is_mild | (
-                (df_desc[c] >= mild_upper[c]) & (df_desc[c] < extreme_upper[c])
-            )
+            is_mild = is_mild | ((df_desc[c] >= mild_upper[c]) & (df_desc[c] < extreme_upper[c]))
             num_mild_outliers[c] = len(df_desc[is_mild])
             num_extreme_outliers[c] = len(df_desc[is_extreme])
 
@@ -525,8 +511,7 @@ class Analyzer:
         df_variance = {
             "Eigenvalues": pca.explained_variance_,
             "Percentage of variance": pca.explained_variance_ratio_,
-            "Cumulative percentage of "
-            "variance": np.cumsum(pca.explained_variance_ratio_),
+            "Cumulative percentage of " "variance": np.cumsum(pca.explained_variance_ratio_),
         }
 
         df_variance = pd.DataFrame(df_variance)
@@ -547,9 +532,7 @@ class Analyzer:
         return df_components, df_variance
 
     @staticmethod
-    def correlation_helper(
-        df, target_variable, grouping_variable, include_length=False
-    ):
+    def correlation_helper(df, target_variable, grouping_variable, include_length=False):
         """
         Compute marginal and partial correlations for all columns.
 
@@ -605,9 +588,7 @@ class Analyzer:
             if len(df_group) == 1:
                 df_target_cors[group] = pd.Series(data=np.nan, index=df_group.columns)
                 df_target_pcorr[group] = pd.Series(data=np.nan, index=df_group.columns)
-                df_target_pcorr_no_length[group] = pd.Series(
-                    data=np.nan, index=df_group.columns
-                )
+                df_target_pcorr_no_length[group] = pd.Series(data=np.nan, index=df_group.columns)
             else:
                 # if we are asked to include length, that means 'length' is
                 # in the data frame which means that we want to exclude that
@@ -616,15 +597,11 @@ class Analyzer:
                     df_target_cors[group] = df_group.apply(
                         lambda s: pearsonr(s, df_group[target_variable])[0]
                     )
-                    df_target_pcorr[group] = partial_correlations(df_group)[
-                        target_variable
-                    ]
+                    df_target_pcorr[group] = partial_correlations(df_group)[target_variable]
                 else:
                     df_group_no_length = df_group.drop("length", axis=1)
 
-                    partial_pearsonr = partial(
-                        pearsonr, y=df_group_no_length[target_variable]
-                    )
+                    partial_pearsonr = partial(pearsonr, y=df_group_no_length[target_variable])
                     df_target_cors[group] = df_group_no_length.apply(
                         lambda s: partial_pearsonr(s)[0]
                     )
@@ -633,13 +610,11 @@ class Analyzer:
                         target_variable
                     ]
                     pcor_dict = {}
-                    columns = [
-                        c for c in df_group.columns if c not in ["sc1", "length"]
-                    ]
+                    columns = [c for c in df_group.columns if c not in ["sc1", "length"]]
                     for c in columns:
-                        pcor_dict[c] = partial_correlations(
-                            df_group[[c, "sc1", "length"]]
-                        )["sc1"][c]
+                        pcor_dict[c] = partial_correlations(df_group[[c, "sc1", "length"]])["sc1"][
+                            c
+                        ]
                     df_target_pcorr_no_length[group] = pd.Series(pcor_dict)
 
         # remove the row containing the correlation of the target variable
@@ -771,21 +746,13 @@ class Analyzer:
 
         # compute the agreement statistics
         human_system_agreement = agreement(human_scores, system_scores)
-        human_system_adjacent_agreement = agreement(
-            human_scores, system_scores, tolerance=1
-        )
+        human_system_adjacent_agreement = agreement(human_scores, system_scores, tolerance=1)
 
         # compute the Pearson correlation after removing
         # any cases where either of the scores are NaNs.
-        df = pd.DataFrame({"human": human_scores, "system": system_scores}).dropna(
-            how="any"
-        )
+        df = pd.DataFrame({"human": human_scores, "system": system_scores}).dropna(how="any")
 
-        if (
-            len(df) == 1
-            or len(df["human"].unique()) == 1
-            or len(df["system"].unique()) == 1
-        ):
+        if len(df) == 1 or len(df["human"].unique()) == 1 or len(df["system"].unique()) == 1:
             # set correlations to 1 if we have a single instance or zero variance
             correlations = np.nan
         else:
@@ -891,10 +858,7 @@ class Analyzer:
         """
         # if we only have a single value for human correlation and the index
         # is not in human-system values, we use the same HH value in all cases
-        if (
-            len(human_human_corr) == 1
-            and not human_human_corr.index[0] in human_system_corr.index
-        ):
+        if len(human_human_corr) == 1 and not human_human_corr.index[0] in human_system_corr.index:
             human_human_corr = pd.Series(
                 human_human_corr.values.repeat(len(human_system_corr)),
                 index=human_system_corr.index,
@@ -982,9 +946,7 @@ class Analyzer:
 
         return ret
 
-    def filter_metrics(
-        self, df_metrics, use_scaled_predictions=False, chosen_metric_dict=None
-    ):
+    def filter_metrics(self, df_metrics, use_scaled_predictions=False, chosen_metric_dict=None):
         """
         Filter data frame to retain only the given metrics.
 
@@ -1074,11 +1036,7 @@ class Analyzer:
         metricdict = {}
         for score_type in chosen_metrics:
             for metric in chosen_metrics[score_type]:
-                colname = (
-                    metric
-                    if metric in ["h_mean", "h_sd", "N"]
-                    else f"{metric}.{score_type}"
-                )
+                colname = metric if metric in ["h_mean", "h_sd", "N"] else f"{metric}.{score_type}"
                 values = df_metrics[metric][score_type]
                 metricdict[colname] = values
 
@@ -1305,9 +1263,7 @@ class Analyzer:
             "scale_trim",
             "scale_trim_round",
         ]
-        existing_rows_index = [
-            row for row in all_rows_order if row in df_human_system.index
-        ]
+        existing_rows_index = [row for row in all_rows_order if row in df_human_system.index]
         df_human_system = df_human_system.reindex(existing_rows_index)
 
         # extract some default metrics for a shorter version of this data frame
@@ -1379,9 +1335,7 @@ class Analyzer:
         # check if any of the standard deviations is zero and
         # tell user to expect to see many warnings.
         zero_sd_scores = [
-            score
-            for (score, sd) in population_sd_dict.items()
-            if np.isclose(sd, 0, atol=1e-07)
+            score for (score, sd) in population_sd_dict.items() if np.isclose(sd, 0, atol=1e-07)
         ]
         if len(zero_sd_scores) > 0:
             warnings.warn(
@@ -1439,9 +1393,7 @@ class Analyzer:
 
         return (df_human_system_by_group, df_human_human_by_group)
 
-    def compute_degradation_and_disattenuated_correlations(
-        self, df, use_all_responses=True
-    ):
+    def compute_degradation_and_disattenuated_correlations(self, df, use_all_responses=True):
         """
         Compute the degradation in performance when using system score.
 
@@ -1568,9 +1520,7 @@ class Analyzer:
         df_train = data_container.train_features.copy()
         df_train_length = data_container.train_length.copy()
         df_train_metadata = data_container.train_metadata.copy()
-        df_train_preprocessed_features = (
-            data_container.train_preprocessed_features.copy()
-        )
+        df_train_preprocessed_features = data_container.train_preprocessed_features.copy()
 
         subgroups = configuration["subgroups"]
         selected_features = configuration["selected_features"]
@@ -1608,9 +1558,7 @@ class Analyzer:
         # get pairwise correlations against the original training features
         # as well as the pre-processed training features
         df_pairwise_cors_orig = df_train_with_length[columns].corr(method="pearson")
-        df_pairwise_cors_preprocess = df_train_preprocess_length[columns].corr(
-            method="pearson"
-        )
+        df_pairwise_cors_preprocess = df_train_preprocess_length[columns].corr(method="pearson")
 
         # get marginal and partial correlations against sc1 for all data
         # for partial correlations, we partial out all other features
@@ -1847,9 +1795,7 @@ class Analyzer:
         system_scores = df_preds[f"{score_type}_trim_round"].astype("int64")
         conf_matrix = confusion_matrix(human_scores, system_scores)
         labels = sorted(pd.concat([human_scores, system_scores]).unique())
-        df_confmatrix = pd.DataFrame(
-            conf_matrix, index=labels, columns=labels
-        ).transpose()
+        df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
 
         # compute the score distributions of the rounded human and system scores
         df_score_dist = df_preds[["sc1_round", f"{score_type}_trim_round"]].apply(
@@ -1861,14 +1807,10 @@ class Analyzer:
         df_score_dist.fillna(0, inplace=True)
 
         df_score_dist.columns = ["human", f"sys_{score_type}"]
-        df_score_dist["difference"] = (
-            df_score_dist[f"sys_{score_type}"] - df_score_dist["human"]
-        )
+        df_score_dist["difference"] = df_score_dist[f"sys_{score_type}"] - df_score_dist["human"]
         df_score_dist["score"] = df_score_dist.index
 
-        df_score_dist = df_score_dist[
-            ["score", "human", f"sys_{score_type}", "difference"]
-        ]
+        df_score_dist = df_score_dist[["score", "human", f"sys_{score_type}", "difference"]]
         df_score_dist.sort_values(by="score", inplace=True)
 
         datasets = [
@@ -1886,13 +1828,9 @@ class Analyzer:
         rater_error_variance = configuration.get_rater_error_variance()
 
         if include_second_score or rater_error_variance is not None:
-            system_score_columns = [
-                col for col in prediction_columns if col not in ["sc1", "sc2"]
-            ]
+            system_score_columns = [col for col in prediction_columns if col not in ["sc1", "sc2"]]
 
-            human_score_columns = [
-                col for col in prediction_columns if col in ["sc1", "sc2"]
-            ]
+            human_score_columns = [col for col in prediction_columns if col in ["sc1", "sc2"]]
 
             df_prmse = get_true_score_evaluations(
                 df_preds_second_score,

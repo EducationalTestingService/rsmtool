@@ -308,29 +308,24 @@ INTERACTIVE_MODE_METADATA = {
         "label": "Format for intermediate files (<u>csv</u>/tsv/xlsx)",
         "type": "format",
     },
-    "id_column": {
-        "label": "Name of column that contains response IDs (<u>spkitemid</u>)"
-    },
+    "id_column": {"label": "Name of column that contains response IDs (<u>spkitemid</u>)"},
     "use_thumbnails": {
         "label": "Use clickable thumbnails in report instead "
         "of full-sized images? (true/<u>false</u>)",
         "type": "boolean",
     },
     "train_label_column": {
-        "label": "Name of column in training data that "
-        "contains human scores (<u>sc1</u>)"
+        "label": "Name of column in training data that " "contains human scores (<u>sc1</u>)"
     },
     "test_label_column": {
-        "label": "Name of column in evaluation data that "
-        "contains human scores (<u>sc1</u>)"
+        "label": "Name of column in evaluation data that " "contains human scores (<u>sc1</u>)"
     },
     "length_column": {
         "label": "Name of column in training/evaluation data "
         "that contains response lengths, if any"
     },
     "human_score_column": {
-        "label": "Name of column in evaluation data "
-        "that contains human scores (<u>sc1</u>)"
+        "label": "Name of column in evaluation data " "that contains human scores (<u>sc1</u>)"
     },
     "second_human_score_column": {
         "label": "Name of column in evaluation "

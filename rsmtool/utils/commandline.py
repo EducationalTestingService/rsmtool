@@ -222,8 +222,7 @@ def setup_rsmcmd_parser(
             "output_dir",
             nargs="?",
             default=os.getcwd(),
-            help="the output directory where all the files "
-            "for this run will be stored",
+            help="the output directory where all the files " "for this run will be stored",
         )
 
     # if it allows overwrting the output directory, let's add that
@@ -505,9 +504,13 @@ class InteractiveField:
         """
 
         def valid_file(filename):
-            return Path(filename).is_dir() or Path(filename).suffix.lower().lstrip(
-                "."
-            ) in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]
+            return Path(filename).is_dir() or Path(filename).suffix.lower().lstrip(".") in [
+                "csv",
+                "jsonlines",
+                "sas7bdat",
+                "tsv",
+                "xlsx",
+            ]
 
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
@@ -834,9 +837,7 @@ class ConfigurationGenerator:
         # if we are told ot use subgroups then just make up a dummy subgroup
         # value so that the subgroup-based sections will be included in the
         # section list. This value is not actually used in configuration file.
-        subgroups_value = (
-            ["GROUP"] if self.use_subgroups else DEFAULTS.get("subgroups", "")
-        )
+        subgroups_value = ["GROUP"] if self.use_subgroups else DEFAULTS.get("subgroups", "")
         return Reporter().determine_chosen_sections(
             default_general_sections_value,
             default_special_sections_value,
@@ -867,15 +868,9 @@ class ConfigurationGenerator:
         sys.stderr.write("\n")
         sys.stderr.write("Entering interactive mode:\n")
         sys.stderr.write(" - press ctrl-d to exit without generating a configuration\n")
-        sys.stderr.write(
-            " - press tab or start typing when choosing files/directories/models\n"
-        )
-        sys.stderr.write(
-            " - press enter to accept the default value for a field (underlined)\n"
-        )
-        sys.stderr.write(
-            " - press ctrl-c to cancel current entry for a field and enter again\n"
-        )
+        sys.stderr.write(" - press tab or start typing when choosing files/directories/models\n")
+        sys.stderr.write(" - press enter to accept the default value for a field (underlined)\n")
+        sys.stderr.write(" - press ctrl-c to cancel current entry for a field and enter again\n")
         sys.stderr.write(" - you may still need to edit the generated configuration\n")
         sys.stderr.write("\n")
 
@@ -920,18 +915,14 @@ class ConfigurationGenerator:
                 # without generating anything and return an empty string
                 except EOFError:
                     sys.stderr.write("\n")
-                    sys.stderr.write(
-                        "You exited interactive mode without a configuration."
-                    )
+                    sys.stderr.write("You exited interactive mode without a configuration.")
                     sys.stderr.write("\n")
                     return ""
                 # otherwise get the field value and save it
 
         # create a Configuration instance from the dictionary we just generated
         sys.stderr.write("\n")
-        config_object = Configuration(
-            configdict, configdir=os.getcwd(), context=self.context
-        )
+        config_object = Configuration(configdict, configdir=os.getcwd(), context=self.context)
         # convert the Configuration object to a string - we are using
         # a special wrapper method since we also want to insert comments
         return self._convert_to_string(config_object, insert_required_comment=False)
@@ -966,9 +957,7 @@ class ConfigurationGenerator:
                 configdict[optional_field] = DEFAULTS.get(optional_field, "")
 
         # create a Configuration object
-        config_object = Configuration(
-            configdict, configdir=os.getcwd(), context=self.context
-        )
+        config_object = Configuration(configdict, configdir=os.getcwd(), context=self.context)
 
         # if we were asked for string output, then convert this dictionary to
         # a string that will also insert some useful comments

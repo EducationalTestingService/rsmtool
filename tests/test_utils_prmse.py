@@ -26,9 +26,7 @@ else:
 
 
 def test_compute_n_human_scores():
-    df = pd.DataFrame(
-        {"h1": [1, 2, 3, 4], "h2": [1, None, 2, None], "h3": [None, None, 1, None]}
-    )
+    df = pd.DataFrame({"h1": [1, 2, 3, 4], "h2": [1, None, 2, None], "h3": [None, None, 1, None]})
     expected_n = pd.Series([2, 1, 3, 1])
     n_scores = get_n_human_scores(df)
     assert_array_equal(expected_n, n_scores)

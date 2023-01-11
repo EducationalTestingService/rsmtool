@@ -84,9 +84,7 @@ def main():  # noqa: D103
                 anchor_name = f"//apple_ref/cpp/{entry_type}/{entry_name}"
 
                 # create a new anchor tag for this subsection
-                anchor_tag = soup.new_tag(
-                    "a", attrs={"name": anchor_name, "class": "dashAnchor"}
-                )
+                anchor_tag = soup.new_tag("a", attrs={"name": anchor_name, "class": "dashAnchor"})
 
                 # insert this new tag right before the section
                 section.insert_before(anchor_tag)

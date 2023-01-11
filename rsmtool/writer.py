@@ -139,9 +139,7 @@ class DataWriter:
         else:
             for name in dataframe_names:
                 if name not in container_or_dict:
-                    raise KeyError(
-                        f"The name `{name}` is not in the container or dictionary."
-                    )
+                    raise KeyError(f"The name `{name}` is not in the container or dictionary.")
 
         # Loop through DataFrames, and save
         # output in specified format
@@ -174,9 +172,7 @@ class DataWriter:
                 outfile = join(csvdir, dataframe_name)
 
             # write out the frame to disk in the given file
-            self.write_frame_to_file(
-                df, outfile, file_format=file_format, index=index, **kwargs
-            )
+            self.write_frame_to_file(df, outfile, file_format=file_format, index=index, **kwargs)
 
     def write_feature_csv(
         self,
@@ -209,14 +205,10 @@ class DataWriter:
         df_feature_specs = data_container["feature_specs"]
 
         # Select specific features used in training
-        df_selected = df_feature_specs[
-            df_feature_specs["feature"].isin(selected_features)
-        ]
+        df_selected = df_feature_specs[df_feature_specs["feature"].isin(selected_features)]
 
         # Replace existing `feature_specs` with selected features specs
-        data_container.add_dataset(
-            {"frame": df_selected, "name": "feature_specs"}, update=True
-        )
+        data_container.add_dataset({"frame": df_selected, "name": "feature_specs"}, update=True)
 
         makedirs(featuredir, exist_ok=True)
         self.write_experiment_output(

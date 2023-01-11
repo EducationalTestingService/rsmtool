@@ -85,9 +85,7 @@ def read_jsonlines(filename, converters=None):
     return df
 
 
-def try_to_load_file(
-    filename, converters=None, raise_error=False, raise_warning=False, **kwargs
-):
+def try_to_load_file(filename, converters=None, raise_error=False, raise_warning=False, **kwargs):
     """
     Read a single file, if it exists.
 
@@ -311,8 +309,7 @@ class DataReader:
         # at the same level as the main config file
         if not (isinstance(filepaths, str) or isinstance(filepaths, list)):
             raise ValueError(
-                f"The 'filepaths' argument must be a string or a list, "
-                f"not {type(filepaths)}."
+                f"The 'filepaths' argument must be a string or a list, " f"not {type(filepaths)}."
             )
 
         if isinstance(filepaths, str):
@@ -381,8 +378,6 @@ class DataReader:
             dataframe = self.read_from_file(set_path, converter, **kwargs)
 
             # Add to list of datasets
-            self.datasets.append(
-                {"name": name.strip(), "path": set_path, "frame": dataframe}
-            )
+            self.datasets.append({"name": name.strip(), "path": set_path, "frame": dataframe})
 
         return DataContainer(self.datasets)

@@ -134,9 +134,7 @@ class DataContainer:
         # Make sure there are no duplicate keys
         common_keys = set(other._names).intersection(self._names)
         if common_keys:
-            raise KeyError(
-                f"The key(s) `{', '.join(common_keys)}` already exist in the container."
-            )
+            raise KeyError(f"The key(s) `{', '.join(common_keys)}` already exist in the container.")
 
         dicts = DataContainer.to_datasets(self)
         dicts.extend(DataContainer.to_datasets(other))
@@ -201,9 +199,7 @@ class DataContainer:
 
         if not update:
             if name in self._names:
-                raise KeyError(
-                    f"The name {name} already exists in the container dictionary."
-                )
+                raise KeyError(f"The name {name} already exists in the container dictionary.")
 
         if name not in self._names:
             self._names.append(name)
@@ -344,8 +340,7 @@ class DataContainer:
         """
         if name not in self:
             warnings.warn(
-                f"The name `{name}` is not in the container. "
-                f"No datasets will be dropped."
+                f"The name `{name}` is not in the container. " f"No datasets will be dropped."
             )
         else:
             self._names.remove(name)
@@ -369,15 +364,11 @@ class DataContainer:
         self
         """
         if name not in self:
-            warnings.warn(
-                f"The name `{name}` is not in the container and cannot be renamed."
-            )
+            warnings.warn(f"The name `{name}` is not in the container and cannot be renamed.")
         else:
             frame = self._dataframes[name]
             path = self._data_paths[name]
-            self.add_dataset(
-                {"name": new_name, "frame": frame, "path": path}, update=True
-            )
+            self.add_dataset({"name": new_name, "frame": frame, "path": path}, update=True)
             self.drop(name)
         return self
 

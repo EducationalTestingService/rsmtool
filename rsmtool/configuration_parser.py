@@ -239,8 +239,7 @@ class Configuration:
             the user.
         """
         expected_fields = (
-            CHECK_FIELDS[self._context]["required"]
-            + CHECK_FIELDS[self._context]["optional"]
+            CHECK_FIELDS[self._context]["required"] + CHECK_FIELDS[self._context]["optional"]
         )
 
         output_config = {k: v for k, v in self._config.items() if k in expected_fields}
@@ -717,22 +716,17 @@ class ConfigurationParser:
 
         # raise an exception if the file does not exist
         if not pathlike.exists():
-            raise FileNotFoundError(
-                f"The configuration file {pathlike} " f"was not found."
-            )
+            raise FileNotFoundError(f"The configuration file {pathlike} " f"was not found.")
 
         # raise an exception if the user specified a directory
         if not pathlike.is_file():
-            raise OSError(
-                f"The given path {pathlike} should be a " f"file, not a directory."
-            )
+            raise OSError(f"The given path {pathlike} should be a " f"file, not a directory.")
 
         # make sure we have a file that ends in ".json"
         extension = pathlike.suffix.lower()
         if extension != ".json":
             raise ValueError(
-                f"The configuration file must be in `.json` "
-                f"format. You specified: {extension}."
+                f"The configuration file must be in `.json` " f"format. You specified: {extension}."
             )
 
         # set the various attributes to None
@@ -927,8 +921,7 @@ class ConfigurationParser:
                 )
             else:
                 raise ValueError(
-                    "If you want to use feature subsets, you "
-                    "must specify a feature subset file"
+                    "If you want to use feature subsets, you " "must specify a feature subset file"
                 )
 
         if new_config["sign"] and not new_config["feature_subset_file"]:
@@ -954,10 +947,7 @@ class ConfigurationParser:
         # and sign has not been specified in the config file
         if HAS_RSMEXTRA:
             default_feature = default_feature_subset_file
-            if (
-                new_config["feature_subset_file"] == default_feature
-                and not new_config["sign"]
-            ):
+            if new_config["feature_subset_file"] == default_feature and not new_config["sign"]:
                 new_config["sign"] = default_feature_sign
 
         # 7. Check for fields that must be specified together
@@ -1007,9 +997,7 @@ class ConfigurationParser:
         if context == "rsmtool" and new_config["predict_expected_scores"]:
             model_name = new_config["model"]
             dummy_learner = (
-                Learner(model_name)
-                if is_skll_model(model_name)
-                else Learner("LinearRegression")
+                Learner(model_name) if is_skll_model(model_name) else Learner("LinearRegression")
             )
             if not hasattr(dummy_learner.model_type, "predict_proba"):
                 raise ValueError(
@@ -1043,9 +1031,7 @@ class ConfigurationParser:
         # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
         if context == "rsmsummarize" and new_config["experiment_names"]:
-            if len(new_config["experiment_names"]) != len(
-                new_config["experiment_dirs"]
-            ):
+            if len(new_config["experiment_names"]) != len(new_config["experiment_dirs"]):
                 raise ValueError(
                     "The number of specified experiment names should be the same"
                     " as the number of specified experiment directories."
@@ -1064,9 +1050,7 @@ class ConfigurationParser:
                 )
             # if we got dictionary, make sure the keys match
             elif isinstance(new_config["min_n_per_group"], dict):
-                if sorted(new_config["min_n_per_group"].keys()) != sorted(
-                    new_config["subgroups"]
-                ):
+                if sorted(new_config["min_n_per_group"].keys()) != sorted(new_config["subgroups"]):
                     raise ValueError(
                         "The keys in `min_n_per_group` must "
                         "match the subgroups in `subgroups` field"
@@ -1074,8 +1058,7 @@ class ConfigurationParser:
             # else convert to dictionary
             else:
                 new_config["min_n_per_group"] = {
-                    group: new_config["min_n_per_group"]
-                    for group in new_config["subgroups"]
+                    group: new_config["min_n_per_group"] for group in new_config["subgroups"]
                 }
 
         # 15. Clean up config dict to keep only context-specific fields
@@ -1083,9 +1066,7 @@ class ConfigurationParser:
             CHECK_FIELDS[context]["optional"] + CHECK_FIELDS[context]["required"]
         )
 
-        new_config = {
-            k: v for k, v in new_config.items() if k in context_relevant_fields
-        }
+        new_config = {k: v for k, v in new_config.items() if k in context_relevant_fields}
 
         return new_config
 

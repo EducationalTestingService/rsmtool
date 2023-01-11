@@ -131,8 +131,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     logger.info("Running RSMTool on each fold in parallel")
     with tqdm_joblib(tqdm(desc="Progress", total=folds, disable=silence_tqdm)):
         Parallel(n_jobs=folds)(
-            delayed(process_fold)(fold_num, foldsdir)
-            for fold_num in range(1, folds + 1)
+            delayed(process_fold)(fold_num, foldsdir) for fold_num in range(1, folds + 1)
         )
 
     # generate an rsmsummarize configuration file
@@ -140,9 +139,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     given_file_format = configuration.get("file_format")
     fold_summary_configdict = {
         "summary_id": f"{configuration['experiment_id']}_fold_summary",
-        "experiment_dirs": [
-            f"{foldsdir}/{fold_num:02}" for fold_num in range(1, folds + 1)
-        ],
+        "experiment_dirs": [f"{foldsdir}/{fold_num:02}" for fold_num in range(1, folds + 1)],
         "description": f"{configuration['description']} (Fold Summary)",
         "file_format": given_file_format,
         "use_thumbnails": f"{configuration['use_thumbnails']}",
@@ -152,9 +149,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     )
 
     # run rsmsummarize on all of the fold directories
-    summary_logger = get_file_logger(
-        "fold-summary", Path(summarydir) / "rsmsummarize.log"
-    )
+    summary_logger = get_file_logger("fold-summary", Path(summarydir) / "rsmsummarize.log")
     run_summary(fold_summary_configuration, summarydir, False, logger=summary_logger)
 
     # combine all of the fold prediction files for evaluation
@@ -170,9 +165,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         columns_to_use.append(second_human_score_column)
     if len(columns_to_use) > 1:
         df_to_add = df_train[columns_to_use]
-        df_predictions = df_predictions.merge(
-            df_to_add, left_on="spkitemid", right_on=id_column
-        )
+        df_predictions = df_predictions.merge(df_to_add, left_on="spkitemid", right_on=id_column)
         # drop any extra ID column if we have added one
         if id_column != "spkitemid":
             df_predictions.drop(id_column, axis=1, inplace=True)
@@ -194,9 +187,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         "experiment_id": f"{configuration['experiment_id']}_evaluation",
         "description": f"{configuration['description']} (Evaluating Fold Predictions)",
         "predictions_file": f"{predictions_file_prefix}.{given_file_format}",
-        "system_score_column": "scale"
-        if configuration["use_scaled_predictions"]
-        else "raw",
+        "system_score_column": "scale" if configuration["use_scaled_predictions"] else "raw",
         "scale_with": "asis" if configuration["use_scaled_predictions"] else "raw",
         "trim_min": int(f"{configuration['trim_min']}"),
         "trim_max": int(f"{configuration['trim_max']}"),
@@ -233,15 +224,9 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     logger.info("Training model on full data")
     model_logger = get_file_logger("final_model", Path(modeldir) / "rsmtool.log")
     final_rsmtool_configdict = configuration.to_dict().copy()
-    final_rsmtool_configdict[
-        "experiment_id"
-    ] = f"{configuration['experiment_id']}_model"
-    final_rsmtool_configdict["test_file"] = str(
-        Path(modeldir) / f"dummy_test.{given_file_format}"
-    )
-    final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict[
-        "train_label_column"
-    ]
+    final_rsmtool_configdict["experiment_id"] = f"{configuration['experiment_id']}_model"
+    final_rsmtool_configdict["test_file"] = str(Path(modeldir) / f"dummy_test.{given_file_format}")
+    final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict["train_label_column"]
 
     # remove by-group sections if we don't have the info
     sections_to_use = []
@@ -324,9 +309,7 @@ def main():  # noqa: D103
             suppress_warnings=args.quiet,
             use_subgroups=args.subgroups,
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

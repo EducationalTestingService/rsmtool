@@ -68,9 +68,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
 
 def main():  # noqa: D103
     parser = argparse.ArgumentParser(prog="convert_feature_json")
-    parser.add_argument(
-        "json_file", help="The feature JSON file to convert " "to tabular format."
-    )
+    parser.add_argument("json_file", help="The feature JSON file to convert " "to tabular format.")
     parser.add_argument(
         "output_file",
         help="The output file containing the features " "in tabular format.",

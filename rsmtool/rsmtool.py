@@ -27,9 +27,7 @@ from .utils.logging import LogFormatter
 from .writer import DataWriter
 
 
-def run_experiment(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None
-):
+def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None):
     """
     Run an rsmtool experiment using the given configuration.
 
@@ -98,9 +96,7 @@ def run_experiment(
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError(
-                f"'{output_dir}' already contains a non-empty 'output' directory."
-            )
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
             logger.warning(
                 f"{output_dir} already contains a non-empty 'output' directory. "
@@ -134,9 +130,7 @@ def run_experiment(
         missing_file_paths = [
             file_paths_org[idx] for idx, path in enumerate(file_paths) if path is None
         ]
-        raise FileNotFoundError(
-            f"The following files were not found: {repr(missing_file_paths)}"
-        )
+        raise FileNotFoundError(f"The following files were not found: {repr(missing_file_paths)}")
 
     # Use the default converter for both train and test
     converters = {
@@ -155,9 +149,7 @@ def run_experiment(
     # Initialize the processor
     processor = FeaturePreprocessor(logger=logger)
 
-    (processed_config, processed_container) = processor.process_data(
-        configuration, data_container
-    )
+    (processed_config, processed_container) = processor.process_data(configuration, data_container)
 
     # Rename certain frames with more descriptive names
     # for writing out experiment files
@@ -227,9 +219,7 @@ def run_experiment(
 
     # Get selected feature info, and write out to file
     df_feature_info = features_data_container.feature_info.copy()
-    df_selected_feature_info = df_feature_info[
-        df_feature_info["feature"].isin(selected_features)
-    ]
+    df_selected_feature_info = df_feature_info[df_feature_info["feature"].isin(selected_features)]
     selected_feature_dataset_dict = {
         "name": "selected_feature_info",
         "frame": df_selected_feature_info,
@@ -258,17 +248,11 @@ def run_experiment(
 
     # Use only selected features for predictions
     columns_for_prediction = ["spkitemid", "sc1"] + selected_features
-    train_for_prediction = processed_container.train_preprocessed_features[
-        columns_for_prediction
-    ]
-    test_for_prediction = processed_container.test_preprocessed_features[
-        columns_for_prediction
-    ]
+    train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
+    test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
 
     logged_str = "Generating training and test set predictions"
-    logged_str += (
-        " (expected scores)." if configuration["predict_expected_scores"] else "."
-    )
+    logged_str += " (expected scores)." if configuration["predict_expected_scores"] else "."
     logger.info(logged_str)
     (pred_config, pred_data_container) = modeler.predict_train_and_test(
         train_for_prediction, test_for_prediction, processed_config
@@ -282,9 +266,7 @@ def run_experiment(
         file_format=file_format,
     )
 
-    original_coef_file = join(
-        csvdir, f"{pred_config['experiment_id']}_coefficients.{file_format}"
-    )
+    original_coef_file = join(csvdir, f"{pred_config['experiment_id']}_coefficients.{file_format}")
 
     # If coefficients file exists, then try to generate the scaled
     # coefficients and save them to a file
@@ -313,9 +295,7 @@ def run_experiment(
         else:
 
             # Write out scaled coefficients to disk
-            writer.write_experiment_output(
-                csvdir, scaled_data_container, file_format=file_format
-            )
+            writer.write_experiment_output(csvdir, scaled_data_container, file_format=file_format)
 
     # Add processed data_container frames to pred_data_container
     new_pred_data_container = pred_data_container + processed_container
@@ -410,9 +390,7 @@ def main():  # noqa: D103
             suppress_warnings=args.quiet,
             use_subgroups=args.subgroups,
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

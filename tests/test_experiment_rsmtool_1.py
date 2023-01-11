@@ -84,14 +84,10 @@ def test_run_experiment_lr_with_notebook_rerun():
 
     source = "lr-with-notebook-rerun"
     experiment_id = "lr"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
-    report_ipynb = join(
-        "test_outputs", source, "report", f"{experiment_id}_report.ipynb"
-    )
+    report_ipynb = join("test_outputs", source, "report", f"{experiment_id}_report.ipynb")
     report_html = join("test_outputs", source, "report", f"{experiment_id}_report.html")
 
     del os.environ["RSM_REPORT_DIR"]
@@ -108,15 +104,11 @@ def test_run_experiment_lr_with_notebook_rerun_fail():
 
     source = "lr-with-notebook-rerun-fail"
     experiment_id = "lr"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
     report_env = join("test_outputs", source, "report", ".environ.json")
-    report_ipynb = join(
-        "test_outputs", source, "report", f"{experiment_id}_report.ipynb"
-    )
+    report_ipynb = join("test_outputs", source, "report", f"{experiment_id}_report.ipynb")
     report_html = join("test_outputs", source, "report", f"{experiment_id}_report.html")
 
     del os.environ["RSM_REPORT_DIR"]
@@ -132,9 +124,7 @@ def test_run_experiment_lr_subset_feature_file_and_feature_file():
 
     source = "lr-with-feature-subset-file-and-feature-file"
     experiment_id = "lr_with_feature_subset_file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -146,9 +136,7 @@ def test_run_experiment_lr_with_sc2_as_feature_name():
     # column
     source = "lr-with-sc2-as-feature-name"
     experiment_id = "lr_with_sc2_as_feature_name"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -160,9 +148,7 @@ def test_run_experiment_lr_with_subgroup_as_feature_name():
 
     source = "lr-with-subgroup-as-feature-name"
     experiment_id = "lr_with_subgroup_as_feature_name"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -175,9 +161,7 @@ def test_run_experiment_lr_all_non_numeric_scores():
 
     source = "lr-with-all-non-numeric-scores"
     experiment_id = "lr_with_all_non_numeric_scores"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -190,9 +174,7 @@ def test_run_experiment_lr_one_fully_non_numeric_feature():
 
     source = "lr-with-one-fully-non-numeric-feature"
     experiment_id = "lr_with_one_fully_non_numeric_feature"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -205,9 +187,7 @@ def test_run_experiment_lr_none_flagged():
 
     source = "lr-with-none-flagged"
     experiment_id = "lr_with_none_flagged"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -217,7 +197,5 @@ def test_run_experiment_wrong_model_name():
     # rsmtool experiment with incorrect model name
     source = "wrong-model-name"
     experiment_id = "wrong_model_name"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)

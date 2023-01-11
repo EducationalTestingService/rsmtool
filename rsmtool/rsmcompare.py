@@ -192,9 +192,7 @@ def main():  # noqa: D103
     logger = logging.getLogger(__name__)
 
     # set up an argument parser via our helper function
-    parser = setup_rsmcmd_parser(
-        "rsmcompare", uses_output_directory=True, uses_subgroups=True
-    )
+    parser = setup_rsmcmd_parser("rsmcompare", uses_output_directory=True, uses_subgroups=True)
 
     # if we have no arguments at all then just show the help message
     if len(sys.argv) < 2:
@@ -237,9 +235,7 @@ def main():  # noqa: D103
             suppress_warnings=args.quiet,
             use_subgroups=args.subgroups,
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

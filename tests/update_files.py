@@ -85,8 +85,7 @@ def main():  # noqa: D103
     # `test_experiment_*.py` and get their suffixes for use with the
     # FileUpdater object.
     suffixes = [
-        re.sub(r"test_experiment_", "", p.stem)
-        for p in Path("tests").glob("test_experiment_*.py")
+        re.sub(r"test_experiment_", "", p.stem) for p in Path("tests").glob("test_experiment_*.py")
     ]
 
     # instantiate a FileUpdater object
