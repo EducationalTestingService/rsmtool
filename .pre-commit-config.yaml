@@ -10,3 +10,19 @@ repos:
     rev: 22.10.0
     hooks:
     -   id: black
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+    - id: flake8
+      args: [--max-line-length=100,--per-file-ignores=tests/update_files.py:E501]
+-   repo: https://github.com/pycqa/pydocstyle
+    rev: 6.2.3
+    hooks:
+    -   id: pydocstyle
+        additional_dependencies: ["toml"]
+        exclude: 'setup.py|rsmtool/utils/__init__.py'
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.11.4
+    hooks:
+    -   id: isort
+        args: ["--profile", "black", "--filter-files"]
