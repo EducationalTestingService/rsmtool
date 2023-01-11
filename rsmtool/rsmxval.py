@@ -42,19 +42,25 @@ from .rsmtool import run_experiment
 from .rsmsummarize import run_summary
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
-from .utils.cross_validation import combine_fold_prediction_files, create_xval_files, process_fold
+from .utils.cross_validation import (
+    combine_fold_prediction_files,
+    create_xval_files,
+    process_fold,
+)
 from .utils.logging import LogFormatter, tqdm_joblib, get_file_logger
 from .writer import DataWriter
 
 # a constant defining all of the sections we can use when
 # generating the final model report in the last stage
-FINAL_MODEL_SECTION_LIST = ['feature_descriptives',
-                            'features_by_group',
-                            'preprocessed_features',
-                            'dff_by_group',
-                            'model',
-                            'intermediate_file_paths',
-                            'sysinfo']
+FINAL_MODEL_SECTION_LIST = [
+    "feature_descriptives",
+    "features_by_group",
+    "preprocessed_features",
+    "dff_by_group",
+    "model",
+    "intermediate_file_paths",
+    "sysinfo",
+]
 
 
 def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=False):
@@ -90,10 +96,10 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     logger = logging.getLogger(__name__)
 
     # Get absolute paths to output directories
-    foldsdir = abspath(join(output_dir, 'folds'))
-    summarydir = abspath(join(output_dir, 'fold-summary'))
-    evaldir = abspath(join(output_dir, 'evaluation'))
-    modeldir = abspath(join(output_dir, 'final-model'))
+    foldsdir = abspath(join(output_dir, "folds"))
+    summarydir = abspath(join(output_dir, "fold-summary"))
+    evaldir = abspath(join(output_dir, "evaluation"))
+    modeldir = abspath(join(output_dir, "final-model"))
 
     # Make directories, if necessary
     makedirs(foldsdir, exist_ok=True)
@@ -110,7 +116,7 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     if non_empty_foldsdir:
         raise IOError(f"'{output_dir}' already contains a non-empty 'folds' directory.")
 
-    configuration = configure('rsmxval', config_file_or_obj_or_dict)
+    configuration = configure("rsmxval", config_file_or_obj_or_dict)
 
     logger.info("Saving configuration file.")
     with open(Path(output_dir) / "rsmxval.json", "w") as outfh:
@@ -124,27 +130,31 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     # run RSMTool in parallel on each fold using joblib
     logger.info("Running RSMTool on each fold in parallel")
     with tqdm_joblib(tqdm(desc="Progress", total=folds, disable=silence_tqdm)):
-        Parallel(n_jobs=folds)(delayed(process_fold)(fold_num, foldsdir)
-                               for fold_num in range(1, folds + 1))
+        Parallel(n_jobs=folds)(
+            delayed(process_fold)(fold_num, foldsdir)
+            for fold_num in range(1, folds + 1)
+        )
 
     # generate an rsmsummarize configuration file
     logger.info("Creating fold summary")
     given_file_format = configuration.get("file_format")
     fold_summary_configdict = {
         "summary_id": f"{configuration['experiment_id']}_fold_summary",
-        "experiment_dirs": [f"{foldsdir}/{fold_num:02}"
-                            for fold_num in range(1, folds + 1)],
+        "experiment_dirs": [
+            f"{foldsdir}/{fold_num:02}" for fold_num in range(1, folds + 1)
+        ],
         "description": f"{configuration['description']} (Fold Summary)",
         "file_format": given_file_format,
-        "use_thumbnails": f"{configuration['use_thumbnails']}"
+        "use_thumbnails": f"{configuration['use_thumbnails']}",
     }
-    fold_summary_configuration = Configuration(fold_summary_configdict,
-                                               configdir=summarydir,
-                                               context="rsmsummarize")
+    fold_summary_configuration = Configuration(
+        fold_summary_configdict, configdir=summarydir, context="rsmsummarize"
+    )
 
     # run rsmsummarize on all of the fold directories
-    summary_logger = get_file_logger("fold-summary",
-                                     Path(summarydir) / "rsmsummarize.log")
+    summary_logger = get_file_logger(
+        "fold-summary", Path(summarydir) / "rsmsummarize.log"
+    )
     run_summary(fold_summary_configuration, summarydir, False, logger=summary_logger)
 
     # combine all of the fold prediction files for evaluation
@@ -160,19 +170,21 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         columns_to_use.append(second_human_score_column)
     if len(columns_to_use) > 1:
         df_to_add = df_train[columns_to_use]
-        df_predictions = df_predictions.merge(df_to_add,
-                                              left_on="spkitemid",
-                                              right_on=id_column)
+        df_predictions = df_predictions.merge(
+            df_to_add, left_on="spkitemid", right_on=id_column
+        )
         # drop any extra ID column if we have added one
         if id_column != "spkitemid":
             df_predictions.drop(id_column, axis=1, inplace=True)
 
     # write out the predictions file to disk
     predictions_file_prefix = str(Path(evaldir) / "xval_predictions")
-    DataWriter.write_frame_to_file(df_predictions,
-                                   predictions_file_prefix,
-                                   file_format=given_file_format,
-                                   index=False)
+    DataWriter.write_frame_to_file(
+        df_predictions,
+        predictions_file_prefix,
+        file_format=given_file_format,
+        index=False,
+    )
 
     # create a new rsmeval configuration dictionary;
     # note that we do not want to set "id_column" and "human_score_column"
@@ -182,29 +194,33 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         "experiment_id": f"{configuration['experiment_id']}_evaluation",
         "description": f"{configuration['description']} (Evaluating Fold Predictions)",
         "predictions_file": f"{predictions_file_prefix}.{given_file_format}",
-        "system_score_column": "scale" if configuration["use_scaled_predictions"] else "raw",
+        "system_score_column": "scale"
+        if configuration["use_scaled_predictions"]
+        else "raw",
         "scale_with": "asis" if configuration["use_scaled_predictions"] else "raw",
         "trim_min": int(f"{configuration['trim_min']}"),
         "trim_max": int(f"{configuration['trim_max']}"),
-        "file_format": given_file_format
+        "file_format": given_file_format,
     }
 
     # copy over the relevant configuration fields from the main configuration
-    for field_name in ["second_human_score_column",
-                       "candidate_column",
-                       "flag_column",
-                       "exclude_zero_scores",
-                       "min_items_per_candidate",
-                       "rater_error_variance",
-                       "subgroups",
-                       "trim_tolerance",
-                       "use_thumbnails"]:
+    for field_name in [
+        "second_human_score_column",
+        "candidate_column",
+        "flag_column",
+        "exclude_zero_scores",
+        "min_items_per_candidate",
+        "rater_error_variance",
+        "subgroups",
+        "trim_tolerance",
+        "use_thumbnails",
+    ]:
         evaluation_configdict[field_name] = configuration[field_name]
 
     # create an rsmeval configuration object with this dictionary
-    evaluation_configuration = Configuration(evaluation_configdict,
-                                             configdir=evaldir,
-                                             context="rsmeval")
+    evaluation_configuration = Configuration(
+        evaluation_configdict, configdir=evaldir, context="rsmeval"
+    )
 
     # run rsmeval on the combined predictions file
     logger.info("Evaluating combined fold predictions")
@@ -217,9 +233,15 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     logger.info("Training model on full data")
     model_logger = get_file_logger("final_model", Path(modeldir) / "rsmtool.log")
     final_rsmtool_configdict = configuration.to_dict().copy()
-    final_rsmtool_configdict["experiment_id"] = f"{configuration['experiment_id']}_model"
-    final_rsmtool_configdict["test_file"] = str(Path(modeldir) / f"dummy_test.{given_file_format}")
-    final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict["train_label_column"]
+    final_rsmtool_configdict[
+        "experiment_id"
+    ] = f"{configuration['experiment_id']}_model"
+    final_rsmtool_configdict["test_file"] = str(
+        Path(modeldir) / f"dummy_test.{given_file_format}"
+    )
+    final_rsmtool_configdict["test_label_column"] = final_rsmtool_configdict[
+        "train_label_column"
+    ]
 
     # remove by-group sections if we don't have the info
     sections_to_use = []
@@ -228,9 +250,9 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
             continue
         sections_to_use.append(section)
     final_rsmtool_configdict["general_sections"] = sections_to_use
-    final_rsmtool_configuration = Configuration(final_rsmtool_configdict,
-                                                configdir=configuration.configdir,
-                                                context="rsmtool")
+    final_rsmtool_configuration = Configuration(
+        final_rsmtool_configdict, configdir=configuration.configdir, context="rsmtool"
+    )
     run_experiment(final_rsmtool_configuration, modeldir, False, logger=model_logger)
 
 
@@ -254,10 +276,12 @@ def main():  # noqa: D103
     logger = logging.getLogger(__name__)
 
     # set up an argument parser via our helper function
-    parser = setup_rsmcmd_parser('rsmxval',
-                                 uses_output_directory=True,
-                                 allows_overwriting=False,
-                                 uses_subgroups=True)
+    parser = setup_rsmcmd_parser(
+        "rsmxval",
+        uses_output_directory=True,
+        allows_overwriting=False,
+        uses_subgroups=True,
+    )
 
     # if we have no arguments at all then just show the help message
     if len(sys.argv) < 2:
@@ -267,23 +291,26 @@ def main():  # noqa: D103
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
-    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ['-h', '--help',
-                                                      '-V', '--version']:
-        args_to_pass = ['run'] + sys.argv[1:]
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + [
+        "-h",
+        "--help",
+        "-V",
+        "--version",
+    ]:
+        args_to_pass = ["run"] + sys.argv[1:]
     else:
         args_to_pass = sys.argv[1:]
     args = parser.parse_args(args=args_to_pass)
 
     # call the appropriate function based on which sub-command was run
-    if args.subcommand == 'run':
+    if args.subcommand == "run":
 
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
         # run the experiment
-        logger.info(f'Output directory: {args.output_dir}')
-        run_cross_validation(abspath(args.config_file),
-                             abspath(args.output_dir))
+        logger.info(f"Output directory: {args.output_dir}")
+        run_cross_validation(abspath(args.config_file), abspath(args.output_dir))
 
     else:
 
@@ -291,13 +318,17 @@ def main():  # noqa: D103
         logging.root.addHandler(stderr_handler)
 
         # auto-generate an example configuration and print it to STDOUT
-        generator = ConfigurationGenerator('rsmxval',
-                                           as_string=True,
-                                           suppress_warnings=args.quiet,
-                                           use_subgroups=args.subgroups)
-        configuration = generator.interact() if args.interactive else generator.generate()
+        generator = ConfigurationGenerator(
+            "rsmxval",
+            as_string=True,
+            suppress_warnings=args.quiet,
+            use_subgroups=args.subgroups,
+        )
+        configuration = (
+            generator.interact() if args.interactive else generator.generate()
+        )
         print(configuration)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

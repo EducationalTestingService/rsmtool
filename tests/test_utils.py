@@ -20,25 +20,41 @@ from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
 from rsmtool.configuration_parser import Configuration, ConfigurationParser
 from rsmtool.reader import DataReader
-from rsmtool.utils.commandline import CmdOption, ConfigurationGenerator, InteractiveField, setup_rsmcmd_parser
+from rsmtool.utils.commandline import (
+    CmdOption,
+    ConfigurationGenerator,
+    InteractiveField,
+    setup_rsmcmd_parser,
+)
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
 from rsmtool.utils.conversion import convert_to_float, int_to_float
-from rsmtool.utils.cross_validation import combine_fold_prediction_files, create_xval_files
-from rsmtool.utils.files import get_output_directory_extension, has_files_with_extension, parse_json_with_comments
+from rsmtool.utils.cross_validation import (
+    combine_fold_prediction_files,
+    create_xval_files,
+)
+from rsmtool.utils.files import (
+    get_output_directory_extension,
+    has_files_with_extension,
+    parse_json_with_comments,
+)
 from rsmtool.utils.logging import get_file_logger
-from rsmtool.utils.metrics import (compute_expected_scores_from_model,
-                                   difference_of_standardized_means,
-                                   partial_correlations,
-                                   quadratic_weighted_kappa,
-                                   standardized_mean_difference)
-from rsmtool.utils.notebook import (bold_highlighter,
-                                    color_highlighter,
-                                    compute_subgroup_plot_params,
-                                    custom_highlighter,
-                                    float_format_func,
-                                    get_files_as_html,
-                                    get_thumbnail_as_html,
-                                    int_or_float_format_func)
+from rsmtool.utils.metrics import (
+    compute_expected_scores_from_model,
+    difference_of_standardized_means,
+    partial_correlations,
+    quadratic_weighted_kappa,
+    standardized_mean_difference,
+)
+from rsmtool.utils.notebook import (
+    bold_highlighter,
+    color_highlighter,
+    compute_subgroup_plot_params,
+    custom_highlighter,
+    float_format_func,
+    get_files_as_html,
+    get_thumbnail_as_html,
+    int_or_float_format_func,
+)
 from sklearn.datasets import make_classification
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import cohen_kappa_score
@@ -50,7 +66,7 @@ from rsmtool.writer import DataWriter
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
-TEST_DIR = environ.get('TESTDIR', None)
+TEST_DIR = environ.get("TESTDIR", None)
 if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
@@ -60,14 +76,14 @@ else:
 def test_int_to_float():
 
     eq_(int_to_float(5), 5.0)
-    eq_(int_to_float('5'), '5')
+    eq_(int_to_float("5"), "5")
     eq_(int_to_float(5.0), 5.0)
 
 
 def test_convert_to_float():
 
     eq_(convert_to_float(5), 5.0)
-    eq_(convert_to_float('5'), 5.0)
+    eq_(convert_to_float("5"), 5.0)
     eq_(convert_to_float(5.0), 5.0)
 
 
@@ -82,10 +98,14 @@ def test_parse_json_with_comments():
     }}"""
 
     # ensure that URLs are not filtered out
-    for value in ['value1', 'http://stash.research.ets.org:8000', 'https://stash.research.ets.org:8000']:
+    for value in [
+        "value1",
+        "http://stash.research.ets.org:8000",
+        "https://stash.research.ets.org:8000",
+    ]:
         for comment in ["/*some comments */", "//some comments "]:
             test_json_string = json_with_comments.format(value, comment)
-            expected_result = {'key1': value, 'key2': 'value2', 'key3': 5}
+            expected_result = {"key1": value, "key2": "value2", "key3": 5}
             yield check_parse_json_with_comments, test_json_string, expected_result
 
 
@@ -124,22 +144,15 @@ def test_parse_json_with_comments_no_comments():
 
     expected_result = {
         "advisories": {},
-        "metadata": {
-            "program": None,
-            "score_max": 5,
-            "score_min": 1
-        },
+        "metadata": {"program": None, "score_max": 5, "score_min": 1},
         "multiple_models": False,
-        "predict": {
-            "trim_max": None,
-            "trim_min": None
-        },
+        "predict": {"trim_max": None, "trim_min": None},
         "read_data": {
             "data_to_plaintext": [
                 "textpipes.pipes.CharFixerDefault",
                 "textpipes.pipes.ReplaceTabsWithSpace",
                 "textpipes.pipes.MultiSpaceToSingleSpace",
-                "textpipes.pipes.Strip"
+                "textpipes.pipes.Strip",
             ]
         },
         "text_to_instance": None,
@@ -148,14 +161,14 @@ def test_parse_json_with_comments_no_comments():
             "repository_commit": "12.2020_model_deployment_1.0",
             "repository_name": "strides-scoring-pt",
             "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
-            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet"
-        }
+            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet",
+        },
     }
     yield check_parse_json_with_comments, test_json_string, expected_result
 
 
 def check_parse_json_with_comments(test_json_string, expected_result):
-    tempf = NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
+    tempf = NamedTemporaryFile(mode="w", suffix=".txt", delete=False)
     filename = tempf.name
     tempf.write(test_json_string)
     tempf.close()
@@ -169,37 +182,37 @@ def check_parse_json_with_comments(test_json_string, expected_result):
 
 def test_float_format_func_default_prec():
     x = 1 / 3
-    ans = '0.333'
+    ans = "0.333"
     assert_equal(float_format_func(x), ans)
 
 
 def test_float_format_func_custom_prec():
     x = 1 / 3
-    ans = '0.3'
+    ans = "0.3"
     assert_equal(float_format_func(x, 1), ans)
 
 
 def test_float_format_func_add_extra_zeros():
     x = 0.5
-    ans = '0.500'
+    ans = "0.500"
     assert_equal(float_format_func(x), ans)
 
 
 def test_int_or_float_format_func_with_integer_as_float():
     x = 3.0
-    ans = '3'
+    ans = "3"
     assert_equal(int_or_float_format_func(x), ans)
 
 
 def test_int_or_float_format_func_with_float_and_custom_precision():
     x = 1 / 3
-    ans = '0.33'
+    ans = "0.33"
     assert_equal(int_or_float_format_func(x, 2), ans)
 
 
 def test_custom_highlighter_not_bold_default_values():
     x = 1 / 3
-    ans = '0.333'
+    ans = "0.333"
     assert_equal(custom_highlighter(x), ans)
 
 
@@ -235,43 +248,43 @@ def test_custom_highlighter_bold_use_absolute():
 
 def test_custom_highlighter_not_bold_custom_low():
     x = -1 / 3
-    ans = '-0.333'
+    ans = "-0.333"
     assert_equal(custom_highlighter(x, low=-1), ans)
 
 
 def test_custom_highlighter_not_bold_custom_high():
     x = 1 / 3
-    ans = '0.333'
+    ans = "0.333"
     assert_equal(custom_highlighter(x, high=0.34), ans)
 
 
 def test_custom_highlighter_not_bold_custom_prec():
     x = 1 / 3
-    ans = '0.3'
+    ans = "0.3"
     assert_equal(custom_highlighter(x, prec=1), ans)
 
 
 def test_custom_highlighter_not_bold_use_absolute():
     x = -1 / 3
-    ans = '-0.333'
+    ans = "-0.333"
     assert_equal(custom_highlighter(x, absolute=True), ans)
 
 
 def test_custom_highlighter_not_colored_default_values():
     x = 1 / 3
-    ans = '0.333'
-    assert_equal(custom_highlighter(x, span_class='color'), ans)
+    ans = "0.333"
+    assert_equal(custom_highlighter(x, span_class="color"), ans)
 
 
 def test_custom_highlighter_color_default_values():
     x = -1 / 3
     ans = '<span class="highlight_color">-0.333</span>'
-    assert_equal(custom_highlighter(x, span_class='color'), ans)
+    assert_equal(custom_highlighter(x, span_class="color"), ans)
 
 
 def test_bold_highlighter_custom_values_not_bold():
     x = -100.33333
-    ans = '-100.3'
+    ans = "-100.3"
     assert_equal(bold_highlighter(x, 100, 101, 1, absolute=True), ans)
 
 
@@ -283,7 +296,7 @@ def test_bold_highlighter_custom_values_bold():
 
 def test_color_highlighter_custom_values_not_color():
     x = -100.33333
-    ans = '-100.3'
+    ans = "-100.3"
     assert_equal(color_highlighter(x, 100, 101, 1, absolute=True), ans)
 
 
@@ -297,11 +310,15 @@ def test_compute_subgroup_params_with_two_groups():
     figure_width = 4
     figure_height = 8
     num_rows, num_cols = 2, 2
-    group_names = ['A', 'B']
+    group_names = ["A", "B"]
 
-    expected_subgroup_plot_params = (figure_width, figure_height,
-                                     num_rows, num_cols,
-                                     group_names)
+    expected_subgroup_plot_params = (
+        figure_width,
+        figure_height,
+        num_rows,
+        num_cols,
+        group_names,
+    )
 
     subgroup_plot_params = compute_subgroup_plot_params(group_names, 3)
     eq_(expected_subgroup_plot_params, subgroup_plot_params)
@@ -314,9 +331,13 @@ def test_compute_subgroup_params_with_10_groups():
     group_names = [i for i in range(10)]
     wrapped_group_names = [str(i) for i in group_names]
 
-    expected_subgroup_plot_params = (figure_width, figure_height,
-                                     num_rows, num_cols,
-                                     wrapped_group_names)
+    expected_subgroup_plot_params = (
+        figure_width,
+        figure_height,
+        num_rows,
+        num_cols,
+        wrapped_group_names,
+    )
 
     subgroup_plot_params = compute_subgroup_plot_params(group_names, 3)
     eq_(expected_subgroup_plot_params, subgroup_plot_params)
@@ -326,49 +347,57 @@ def test_compute_subgroups_with_wrapping_and_five_plots():
     figure_width = 10
     figure_height = 30
     num_rows, num_cols = 5, 1
-    group_names = [f'this is a very long string that will ultimately be wrapped I assume {i}'
-                   for i in range(10)]
+    group_names = [
+        f"this is a very long string that will ultimately be wrapped I assume {i}"
+        for i in range(10)
+    ]
 
-    wrapped_group_names = [f'this is a very long\nstring that will\nultimately be\nwrapped I assume {i}'
-                           for i in range(10)]
+    wrapped_group_names = [
+        f"this is a very long\nstring that will\nultimately be\nwrapped I assume {i}"
+        for i in range(10)
+    ]
 
-    expected_subgroup_plot_params = (figure_width, figure_height,
-                                     num_rows, num_cols,
-                                     wrapped_group_names)
+    expected_subgroup_plot_params = (
+        figure_width,
+        figure_height,
+        num_rows,
+        num_cols,
+        wrapped_group_names,
+    )
 
     subgroup_plot_params = compute_subgroup_plot_params(group_names, 5)
     eq_(expected_subgroup_plot_params, subgroup_plot_params)
 
 
 def test_has_files_with_extension_true():
-    directory = join(rsmtool_test_dir, 'data', 'files')
-    result = has_files_with_extension(directory, 'csv')
+    directory = join(rsmtool_test_dir, "data", "files")
+    result = has_files_with_extension(directory, "csv")
     eq_(result, True)
 
 
 def test_has_files_with_extension_false():
-    directory = join(rsmtool_test_dir, 'data', 'files')
-    result = has_files_with_extension(directory, 'ppt')
+    directory = join(rsmtool_test_dir, "data", "files")
+    result = has_files_with_extension(directory, "ppt")
     eq_(result, False)
 
 
 def test_get_output_directory_extension():
-    directory = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'output')
-    result = get_output_directory_extension(directory, 'id_1')
-    eq_(result, 'csv')
+    directory = join(rsmtool_test_dir, "data", "experiments", "lr", "output")
+    result = get_output_directory_extension(directory, "id_1")
+    eq_(result, "csv")
 
 
 @raises(ValueError)
 def test_get_output_directory_extension_error():
-    directory = join(rsmtool_test_dir, 'data', 'files')
-    get_output_directory_extension(directory, 'id_1')
+    directory = join(rsmtool_test_dir, "data", "files")
+    get_output_directory_extension(directory, "id_1")
 
 
 def test_standardized_mean_difference():
 
     # test SMD
     expected = 1 / 4
-    smd = standardized_mean_difference(8, 9, 4, 4, method='williamson')
+    smd = standardized_mean_difference(8, 9, 4, 4, method="williamson")
     eq_(smd, expected)
 
 
@@ -378,10 +407,7 @@ def test_standardized_mean_difference_zero_denominator_johnson():
     # we pass 0 as standard deviation of population
     # and use Johnson method
     # which uses it as denominator
-    smd = standardized_mean_difference([3.2, 3.5],
-                                       [4.2, 3.1],
-                                       0, 0,
-                                       method='Johnson')
+    smd = standardized_mean_difference([3.2, 3.5], [4.2, 3.1], 0, 0, method="Johnson")
     assert np.isnan(smd)
 
 
@@ -389,7 +415,7 @@ def test_standardized_mean_difference_zero_difference():
 
     # test SMD with zero difference between groups
     expected = 0.0
-    smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method='williamson')
+    smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method="williamson")
     eq_(smd, expected)
 
 
@@ -397,98 +423,96 @@ def test_standardized_mean_difference_zero_difference():
 def test_standardized_mean_difference_fake_method():
 
     # test SMD with fake method
-    standardized_mean_difference(4.2, 4.2, 1.1, 1.1,
-                                 method='foobar')
+    standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method="foobar")
 
 
 def test_standardized_mean_difference_pooled():
 
     expected = 0.8523247028586811
-    smd = standardized_mean_difference([8, 4, 6, 3],
-                                       [9, 4, 5, 12],
-                                       method='pooled',
-                                       ddof=0)
+    smd = standardized_mean_difference(
+        [8, 4, 6, 3], [9, 4, 5, 12], method="pooled", ddof=0
+    )
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_unpooled():
 
     expected = 1.171700198827415
-    smd = standardized_mean_difference([8, 4, 6, 3],
-                                       [9, 4, 5, 12],
-                                       method='unpooled',
-                                       ddof=0)
+    smd = standardized_mean_difference(
+        [8, 4, 6, 3], [9, 4, 5, 12], method="unpooled", ddof=0
+    )
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_johnson():
 
     expected = 0.9782608695652175
-    smd = standardized_mean_difference([8, 4, 6, 3],
-                                       [9, 4, 5, 12],
-                                       method='johnson',
-                                       population_y_true_observed_sd=2.3,
-                                       ddof=0)
+    smd = standardized_mean_difference(
+        [8, 4, 6, 3],
+        [9, 4, 5, 12],
+        method="johnson",
+        population_y_true_observed_sd=2.3,
+        ddof=0,
+    )
     eq_(smd, expected)
 
 
 @raises(ValueError)
 def test_standardized_mean_difference_johnson_error():
 
-    standardized_mean_difference([8, 4, 6, 3],
-                                 [9, 4, 5, 12],
-                                 method='johnson',
-                                 ddof=0)
+    standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="johnson", ddof=0)
 
 
 @raises(AssertionError)
 def test_difference_of_standardized_means_unequal_lengths():
 
-    difference_of_standardized_means([8, 4, 6, 3],
-                                     [9, 4, 5, 12, 17])
+    difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12, 17])
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_mn_but_no_sd():
 
-    difference_of_standardized_means([8, 4, 6, 3],
-                                     [9, 4, 5, 12],
-                                     population_y_true_observed_mn=4.5)
+    difference_of_standardized_means(
+        [8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_mn=4.5
+    )
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_sd_but_no_mn():
 
-    difference_of_standardized_means([8, 4, 6, 3],
-                                     [9, 4, 5, 12],
-                                     population_y_true_observed_sd=1.5)
+    difference_of_standardized_means(
+        [8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_sd=1.5
+    )
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_mn_but_no_sd():
 
-    difference_of_standardized_means([8, 4, 6, 3],
-                                     [9, 4, 5, 12],
-                                     population_y_pred_mn=4.5)
+    difference_of_standardized_means(
+        [8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_mn=4.5
+    )
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_sd_but_no_mn():
 
-    difference_of_standardized_means([8, 4, 6, 3],
-                                     [9, 4, 5, 12],
-                                     population_y_pred_sd=1.5)
+    difference_of_standardized_means(
+        [8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_sd=1.5
+    )
 
 
 def test_difference_of_standardized_means_with_all_values():
 
     expected = 0.7083333333333336
     y_true, y_pred = np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12])
-    diff_std_means = difference_of_standardized_means(y_true, y_pred,
-                                                      population_y_true_observed_mn=4.5,
-                                                      population_y_pred_mn=5.1,
-                                                      population_y_true_observed_sd=1.2,
-                                                      population_y_pred_sd=1.8)
+    diff_std_means = difference_of_standardized_means(
+        y_true,
+        y_pred,
+        population_y_true_observed_mn=4.5,
+        population_y_pred_mn=5.1,
+        population_y_true_observed_sd=1.2,
+        population_y_pred_sd=1.8,
+    )
     eq_(diff_std_means, expected)
 
 
@@ -496,8 +520,10 @@ def test_difference_of_standardized_means_with_no_population_info():
     # this test is expected to raise two UserWarning
     # because we did not pass population means for y_true and y_pred
     expected = -1.7446361815538174e-16
-    y_true, y_pred = (np.array([98, 18, 47, 64, 32, 11, 100]),
-                      np.array([94, 42, 54, 12, 92, 10, 77]))
+    y_true, y_pred = (
+        np.array([98, 18, 47, 64, 32, 11, 100]),
+        np.array([94, 42, 54, 12, 92, 10, 77]),
+    )
     with warnings.catch_warnings(record=True) as warning_list:
         diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
@@ -507,33 +533,45 @@ def test_difference_of_standardized_means_with_no_population_info():
 
 
 def test_difference_of_standardized_means_zero_population_sd_pred():
-    y_true, y_pred = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
-                      np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
+    y_true, y_pred = (
+        np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+        np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]),
+    )
     expected = None
-    diff_std_means = difference_of_standardized_means(y_true, y_pred,
-                                                      population_y_true_observed_mn=2.44,
-                                                      population_y_true_observed_sd=0.54,
-                                                      population_y_pred_mn=2.44,
-                                                      population_y_pred_sd=0)
+    diff_std_means = difference_of_standardized_means(
+        y_true,
+        y_pred,
+        population_y_true_observed_mn=2.44,
+        population_y_true_observed_sd=0.54,
+        population_y_pred_mn=2.44,
+        population_y_pred_sd=0,
+    )
     eq_(diff_std_means, expected)
 
 
 def test_difference_of_standardized_means_zero_population_sd_human():
-    y_true, y_pred = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
-                      np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]))
+    y_true, y_pred = (
+        np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+        np.array([2, 1, 4, 1, 5, 2, 2, 2, 2, 2]),
+    )
     expected = None
-    diff_std_means = difference_of_standardized_means(y_true, y_pred,
-                                                      population_y_pred_mn=2.44,
-                                                      population_y_pred_sd=0.54,
-                                                      population_y_true_observed_mn=2.44,
-                                                      population_y_true_observed_sd=0)
+    diff_std_means = difference_of_standardized_means(
+        y_true,
+        y_pred,
+        population_y_pred_mn=2.44,
+        population_y_pred_sd=0.54,
+        population_y_true_observed_mn=2.44,
+        population_y_true_observed_sd=0,
+    )
     eq_(diff_std_means, expected)
 
 
 def test_difference_of_standardized_means_zero_population_computed():
     # sd is computed from the data and is zero
-    y_pred, y_true = (np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
-                      np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2]))
+    y_pred, y_true = (
+        np.array([3, 5, 1, 2, 2, 3, 1, 4, 1, 2]),
+        np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2]),
+    )
     expected = None
     diff_std_means = difference_of_standardized_means(y_true, y_pred)
     eq_(diff_std_means, expected)
@@ -542,35 +580,32 @@ def test_difference_of_standardized_means_zero_population_computed():
 def test_quadratic_weighted_kappa():
 
     expected_qwk = -0.09210526315789469
-    computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
-                                            np.array([9, 4, 5, 12]))
+    computed_qwk = quadratic_weighted_kappa(
+        np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12])
+    )
     assert_almost_equal(computed_qwk, expected_qwk)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_skll():
-    data = (np.array([8, 4, 6, 3]),
-            np.array([9, 4, 5, 12]))
+    data = (np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
-    qwk_skll = kappa(data[0], data[1], weights='quadratic')
+    qwk_skll = kappa(data[0], data[1], weights="quadratic")
     assert_almost_equal(qwk_rsmtool, qwk_skll)
 
 
 def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
-    data = (np.array([8, 4, 6, 3]),
-            np.array([9, 4, 5, 12]))
+    data = (np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12]))
     qwk_rsmtool = quadratic_weighted_kappa(data[0], data[1])
-    qwk_sklearn = cohen_kappa_score(data[0], data[1],
-                                    weights='quadratic',
-                                    labels=[3, 4, 5, 6, 7,
-                                            8, 9, 10, 11, 12])
+    qwk_sklearn = cohen_kappa_score(
+        data[0], data[1], weights="quadratic", labels=[3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    )
     assert_almost_equal(qwk_rsmtool, qwk_sklearn)
 
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
 
-    quadratic_weighted_kappa(np.array([8, 4, 6, 3]),
-                             np.array([9, 4, 5, 12, 11]))
+    quadratic_weighted_kappa(np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12, 11]))
 
 
 def test_partial_correlations_with_singular_matrix():
@@ -586,13 +621,19 @@ def test_partial_correlations_with_singular_matrix():
 
 def test_partial_correlations_pinv():
 
-    msg = ('When computing partial correlations '
-           'the inverse of the variance-covariance matrix '
-           'was calculated '
-           'using the Moore-Penrose generalized matrix inversion, due to '
-           'its determinant being at or very close to zero.')
-    df_small_det = pd.DataFrame({'X1': [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],
-                                 'X2': [1.3, 1.2, 1.5, 1.7001, 1.8, 1.9, 2.0]})
+    msg = (
+        "When computing partial correlations "
+        "the inverse of the variance-covariance matrix "
+        "was calculated "
+        "using the Moore-Penrose generalized matrix inversion, due to "
+        "its determinant being at or very close to zero."
+    )
+    df_small_det = pd.DataFrame(
+        {
+            "X1": [1.3, 1.2, 1.5, 1.7, 1.8, 1.9, 2.0],
+            "X2": [1.3, 1.2, 1.5, 1.7001, 1.8, 1.9, 2.0],
+        }
+    )
 
     with warnings.catch_warnings(record=True) as wrn:
         warnings.simplefilter("always")
@@ -601,7 +642,6 @@ def test_partial_correlations_pinv():
 
 
 class TestLogging:
-
     def setUp(self):
         # create a log file with a random name
         logname = str(uuid4())
@@ -630,12 +670,9 @@ class TestLogging:
 
 
 class TestCrossValidation:
-
-    def check_create_xval_files(self,
-                                file_format,
-                                with_folds_file,
-                                with_feature_subset,
-                                with_feature_list):
+    def check_create_xval_files(
+        self, file_format, with_folds_file, with_feature_subset, with_feature_list
+    ):
         """
         Check that ``create_xval_files()`` functions as expected.
 
@@ -652,45 +689,43 @@ class TestCrossValidation:
         """
         # create an rsmxval configuration dictionary
         rsmxval_config_dict = {
-            "train_file": join(rsmtool_test_dir,
-                               "data",
-                               "files",
-                               f"train.{file_format}"),
+            "train_file": join(
+                rsmtool_test_dir, "data", "files", f"train.{file_format}"
+            ),
             "file_format": file_format,
             "id_column": "ID",
             "model": "LinearRegression",
             "train_label_column": "score",
             "experiment_id": "test_create_xval_files",
-            "description": "Test Create Xval Files"
+            "description": "Test Create Xval Files",
         }
 
         # use a folds file if asked, otherwise a fixed number of folds
         if with_folds_file:
-            rsmxval_config_dict["folds_file"] = join(rsmtool_test_dir,
-                                                     "data",
-                                                     "files",
-                                                     "folds.csv")
+            rsmxval_config_dict["folds_file"] = join(
+                rsmtool_test_dir, "data", "files", "folds.csv"
+            )
         else:
             rsmxval_config_dict["folds"] = 7
 
         # use a feature subset if asked
         if with_feature_subset:
-            rsmxval_config_dict["feature_subset_file"] = join(rsmtool_test_dir,
-                                                              "data",
-                                                              "experiments",
-                                                              "lr-with-feature-subset-file-and-feature-file",
-                                                              "feature_file.csv")
+            rsmxval_config_dict["feature_subset_file"] = join(
+                rsmtool_test_dir,
+                "data",
+                "experiments",
+                "lr-with-feature-subset-file-and-feature-file",
+                "feature_file.csv",
+            )
             rsmxval_config_dict["feature_subset"] = "subset1"
         # otherwise set "features" depending on whether it should be a list or not
         else:
             if with_feature_list:
                 rsmxval_config_dict["features"] = ["FEATURE1", "FEATURE2"]
             else:
-                rsmxval_config_dict["features"] = join(rsmtool_test_dir,
-                                                       "data",
-                                                       "experiments",
-                                                       "lr",
-                                                       "features.csv")
+                rsmxval_config_dict["features"] = join(
+                    rsmtool_test_dir, "data", "experiments", "lr", "features.csv"
+                )
 
         # create configuration object from dictionary
         rsmxval_config = Configuration(rsmxval_config_dict, context="rsmxval")
@@ -714,7 +749,9 @@ class TestCrossValidation:
 
         # check that there are only the expected number of fold subdirectories
         actual_foldsdir_contents = sorted(listdir(foldsdir))
-        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)]
+        expected_foldsdir_contents = [
+            f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)
+        ]
         eq_(actual_foldsdir_contents, expected_foldsdir_contents)
 
         # check all the per-fold files/directories
@@ -734,46 +771,65 @@ class TestCrossValidation:
             ok_(fold_test_file.exists() and fold_test_file.is_file())
             df_train_actual_fold = DataReader.read_from_file(fold_train_file)
             df_test_actual_fold = DataReader.read_from_file(fold_test_file)
-            eq_(len(df_train_expected), len(df_train_actual_fold) + len(df_test_actual_fold))
+            eq_(
+                len(df_train_expected),
+                len(df_train_actual_fold) + len(df_test_actual_fold),
+            )
             id_column = rsmxval_config.get("id_column")
-            assert_array_equal(df_train_expected[id_column].values.sort(),
-                               np.concatenate([df_train_actual_fold[id_column].values,
-                                               df_test_actual_fold[id_column].values]).sort())
+            assert_array_equal(
+                df_train_expected[id_column].values.sort(),
+                np.concatenate(
+                    [
+                        df_train_actual_fold[id_column].values,
+                        df_test_actual_fold[id_column].values,
+                    ]
+                ).sort(),
+            )
 
             # (c) configuration file fields
-            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
+            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(
+                context="rsmtool"
+            )
 
             eq_(Path(parsed_fold_config.get("train_file")), fold_train_file)
 
             eq_(Path(parsed_fold_config.get("test_file")), fold_test_file)
 
-            eq_(parsed_fold_config.get("id_column"),
-                rsmxval_config.get("id_column"))
+            eq_(parsed_fold_config.get("id_column"), rsmxval_config.get("id_column"))
 
-            eq_(parsed_fold_config.get("id_column"),
-                rsmxval_config.get("id_column"))
+            eq_(parsed_fold_config.get("id_column"), rsmxval_config.get("id_column"))
 
-            eq_(parsed_fold_config.get("train_label_column"),
-                rsmxval_config.get("train_label_column"))
+            eq_(
+                parsed_fold_config.get("train_label_column"),
+                rsmxval_config.get("train_label_column"),
+            )
 
-            eq_(parsed_fold_config.get("test_label_column"),
-                rsmxval_config.get("train_label_column"))
+            eq_(
+                parsed_fold_config.get("test_label_column"),
+                rsmxval_config.get("train_label_column"),
+            )
 
-            eq_(parsed_fold_config.get("file_format"),
-                rsmxval_config.get("file_format"))
+            eq_(
+                parsed_fold_config.get("file_format"), rsmxval_config.get("file_format")
+            )
 
-            eq_(parsed_fold_config.get("features"),
-                rsmxval_config.get("features"))
+            eq_(parsed_fold_config.get("features"), rsmxval_config.get("features"))
 
-            eq_(parsed_fold_config.get("experiment_id"),
-                f"{rsmxval_config.get('experiment_id')}_fold{fold_num}")
+            eq_(
+                parsed_fold_config.get("experiment_id"),
+                f"{rsmxval_config.get('experiment_id')}_fold{fold_num}",
+            )
 
-            eq_(parsed_fold_config.get("description"),
-                f"{rsmxval_config.get('description')} (Fold {fold_num})")
+            eq_(
+                parsed_fold_config.get("description"),
+                f"{rsmxval_config.get('description')} (Fold {fold_num})",
+            )
 
             # (d) the per-fold features or feature subset files
             if with_feature_subset:
-                subset_file = fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
+                subset_file = (
+                    fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
+                )
                 subset_name = rsmxval_config.get("feature_subset")
                 ok_(subset_file.exists() and subset_file.is_file())
                 eq_(parsed_fold_config.get("feature_subset"), subset_name)
@@ -784,7 +840,9 @@ class TestCrossValidation:
                     eq_(parsed_fold_config["features"], ["FEATURE1", "FEATURE2"])
                 # otherwise the "features" file should have been copied to the fold directory
                 else:
-                    fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
+                    fold_feature_file = (
+                        fold_subdir / Path(rsmxval_config.get("features")).name
+                    )
                     ok_(fold_feature_file.exists() and fold_feature_file.is_file())
                     ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
 
@@ -796,18 +854,21 @@ class TestCrossValidation:
         rmtree(output_dir)
 
     def test_create_xval_files(self):
-        for (file_format,
-             with_folds_file,
-             with_feature_subset,
-             with_feature_list) in product(["csv", "tsv", "xlsx"],
-                                           [False, True],
-                                           [False, True],
-                                           [False, True]):
-            yield (self.check_create_xval_files,
-                   file_format,
-                   with_folds_file,
-                   with_feature_subset,
-                   with_feature_list)
+        for (
+            file_format,
+            with_folds_file,
+            with_feature_subset,
+            with_feature_list,
+        ) in product(
+            ["csv", "tsv", "xlsx"], [False, True], [False, True], [False, True]
+        ):
+            yield (
+                self.check_create_xval_files,
+                file_format,
+                with_folds_file,
+                with_feature_subset,
+                with_feature_list,
+            )
 
     def check_combine_fold_prediction_files(self, file_format):
         """
@@ -830,36 +891,47 @@ class TestCrossValidation:
         makedirs(foldsdir / "03")
 
         # create prediction files in each of the fold sub-directories
-        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)),
-                                      columns=['raw', 'scale'])
+        df_preds_fold1 = pd.DataFrame(
+            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
+        )
         df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
-        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)),
-                                      columns=['raw', 'scale'])
+        df_preds_fold2 = pd.DataFrame(
+            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
+        )
         df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
-        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)),
-                                      columns=['raw', 'scale'])
+        df_preds_fold3 = pd.DataFrame(
+            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
+        )
         df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
 
         # combine each of the frames in memory
-        df_combined_expected = pd.concat([df_preds_fold1,
-                                          df_preds_fold2,
-                                          df_preds_fold3], keys="spkitemid")
+        df_combined_expected = pd.concat(
+            [df_preds_fold1, df_preds_fold2, df_preds_fold3], keys="spkitemid"
+        )
 
-        DataWriter.write_frame_to_file(df_preds_fold1,
-                                       str(foldsdir / "01" / "pred_processed"),
-                                       file_format=file_format)
-        DataWriter.write_frame_to_file(df_preds_fold2,
-                                       str(foldsdir / "02" / "pred_processed"),
-                                       file_format=file_format)
-        DataWriter.write_frame_to_file(df_preds_fold3,
-                                       str(foldsdir / "03" / "pred_processed"),
-                                       file_format=file_format)
+        DataWriter.write_frame_to_file(
+            df_preds_fold1,
+            str(foldsdir / "01" / "pred_processed"),
+            file_format=file_format,
+        )
+        DataWriter.write_frame_to_file(
+            df_preds_fold2,
+            str(foldsdir / "02" / "pred_processed"),
+            file_format=file_format,
+        )
+        DataWriter.write_frame_to_file(
+            df_preds_fold3,
+            str(foldsdir / "03" / "pred_processed"),
+            file_format=file_format,
+        )
 
         # now call `combine_fold_prediction_files` and check that its output
         # matches the frame that we manually combined
         df_combined_actual = combine_fold_prediction_files(str(foldsdir), file_format)
-        assert_frame_equal(df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True),
-                           df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True))
+        assert_frame_equal(
+            df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True),
+            df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True),
+        )
 
         # delete the temporary directory and all sub-directories
         rmtree(output_dir)
@@ -871,48 +943,50 @@ class TestCrossValidation:
 
 
 class TestIntermediateFiles:
-
-    def get_files(self, file_format='csv'):
-        directory = join(rsmtool_test_dir, 'data', 'output')
-        files = sorted([f for f in listdir(directory)
-                        if f.endswith(file_format)])
+    def get_files(self, file_format="csv"):
+        directory = join(rsmtool_test_dir, "data", "output")
+        files = sorted([f for f in listdir(directory) if f.endswith(file_format)])
         return files, directory
 
     def test_get_files_as_html(self):
 
         files, directory = self.get_files()
-        html_string = ("""<li><b>Betas</b>: <a href="{}" download>csv</a></li>"""
-                       """<li><b>Eval</b>: <a href="{}" download>csv</a></li>""")
+        html_string = (
+            """<li><b>Betas</b>: <a href="{}" download>csv</a></li>"""
+            """<li><b>Eval</b>: <a href="{}" download>csv</a></li>"""
+        )
 
-        html_expected = html_string.format(join('..', 'output', files[0]),
-                                           join('..', 'output', files[1]))
+        html_expected = html_string.format(
+            join("..", "output", files[0]), join("..", "output", files[1])
+        )
         html_expected = "".join(html_expected.strip().split())
         html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
-        html_result = get_files_as_html(directory, 'lr', 'csv')
+        html_result = get_files_as_html(directory, "lr", "csv")
         html_result = "".join(html_result.strip().split())
         eq_(html_expected, html_result)
 
     def test_get_files_as_html_replace_dict(self):
 
         files, directory = self.get_files()
-        html_string = ("""<li><b>THESE BETAS</b>: <a href="{}" download>csv</a></li>"""
-                       """<li><b>THESE EVALS</b>: <a href="{}" download>csv</a></li>""")
+        html_string = (
+            """<li><b>THESE BETAS</b>: <a href="{}" download>csv</a></li>"""
+            """<li><b>THESE EVALS</b>: <a href="{}" download>csv</a></li>"""
+        )
 
-        replace_dict = {'betas': 'THESE BETAS',
-                        'eval': 'THESE EVALS'}
-        html_expected = html_string.format(join('..', 'output', files[0]),
-                                           join('..', 'output', files[1]))
+        replace_dict = {"betas": "THESE BETAS", "eval": "THESE EVALS"}
+        html_expected = html_string.format(
+            join("..", "output", files[0]), join("..", "output", files[1])
+        )
         html_expected = "".join(html_expected.strip().split())
         html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
-        html_result = get_files_as_html(directory, 'lr', 'csv', replace_dict)
+        html_result = get_files_as_html(directory, "lr", "csv", replace_dict)
         html_result = "".join(item for item in html_result)
         html_result = "".join(html_result.strip().split())
         eq_(html_expected, html_result)
 
 
 class TestThumbnail:
-
-    def get_result(self, path, id_num='1', other_path=None):
+    def get_result(self, path, id_num="1", other_path=None):
 
         if other_path is None:
             other_path = path
@@ -945,7 +1019,7 @@ class TestThumbnail:
 
         # simple test of HTML thumbnail conversion
 
-        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -958,7 +1032,7 @@ class TestThumbnail:
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
-        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure3.png'))
+        path = relpath(join(rsmtool_test_dir, "data", "figures", "figure3.png"))
         image = get_thumbnail_as_html(path, 1)
 
         clean_image = "".join(image.strip().split())
@@ -970,8 +1044,8 @@ class TestThumbnail:
 
         # test converting two images to HTML thumbnails
 
-        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
+        path2 = relpath(join(rsmtool_test_dir, "data", "figures", "figure2.svg"))
 
         counter = count(1)
         image = get_thumbnail_as_html(path1, next(counter))
@@ -986,7 +1060,7 @@ class TestThumbnail:
 
         # test converting image to HTML with absolute path
 
-        path = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
+        path = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
         path_absolute = abspath(path)
 
         image = get_thumbnail_as_html(path_absolute, 1)
@@ -1001,15 +1075,15 @@ class TestThumbnail:
 
         # test FileNotFound error properly raised
 
-        path = 'random/path/asftesfa/to/figure1.svg'
+        path = "random/path/asftesfa/to/figure1.svg"
         get_thumbnail_as_html(path, 1)
 
     def test_convert_to_html_with_different_thumbnail(self):
 
         # test converting image to HTML with different thumbnail
 
-        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure2.svg'))
+        path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
+        path2 = relpath(join(rsmtool_test_dir, "data", "figures", "figure2.svg"))
 
         image = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
@@ -1023,44 +1097,52 @@ class TestThumbnail:
 
         # test FileNotFound error properly raised for thumbnail
 
-        path1 = relpath(join(rsmtool_test_dir, 'data', 'figures', 'figure1.svg'))
-        path2 = 'random/path/asftesfa/to/figure1.svg'
+        path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
+        path2 = "random/path/asftesfa/to/figure1.svg"
         _ = get_thumbnail_as_html(path1, 1, path_to_thumbnail=path2)
 
 
 class TestExpectedScores:
-
     @classmethod
     def setUpClass(cls):
 
         # create a dummy train and test feature set
-        X, y = make_classification(n_samples=525, n_features=10,
-                                   n_classes=5, n_informative=8, random_state=123)
+        X, y = make_classification(
+            n_samples=525, n_features=10, n_classes=5, n_informative=8, random_state=123
+        )
         X_train, y_train = X[:500], y[:500]
         X_test = X[500:]
 
         train_ids = list(range(1, len(X_train) + 1))
-        train_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_train.shape[1])], x)) for x in X_train]
+        train_features = [
+            dict(zip([f"FEATURE_{i + 1}" for i in range(X_train.shape[1])], x))
+            for x in X_train
+        ]
         train_labels = list(y_train)
 
         test_ids = list(range(1, len(X_test) + 1))
-        test_features = [dict(zip([f'FEATURE_{i + 1}' for i in range(X_test.shape[1])], x)) for x in X_test]
+        test_features = [
+            dict(zip([f"FEATURE_{i + 1}" for i in range(X_test.shape[1])], x))
+            for x in X_test
+        ]
 
-        cls.train_fs = FeatureSet('train', ids=train_ids, features=train_features, labels=train_labels)
-        cls.test_fs = FeatureSet('test', ids=test_ids, features=test_features)
+        cls.train_fs = FeatureSet(
+            "train", ids=train_ids, features=train_features, labels=train_labels
+        )
+        cls.test_fs = FeatureSet("test", ids=test_ids, features=test_features)
 
         # train some test SKLL learners that we will use in our tests
 
         # we catch convergence warnings since the model doesn't converge
         with warnings.catch_warnings():
-            warnings.filterwarnings('ignore', category=ConvergenceWarning)
-            cls.linearsvc = Learner('LinearSVC')
+            warnings.filterwarnings("ignore", category=ConvergenceWarning)
+            cls.linearsvc = Learner("LinearSVC")
             _ = cls.linearsvc.train(cls.train_fs, grid_search=False)
 
-        cls.svc = Learner('SVC')
+        cls.svc = Learner("SVC")
         _ = cls.svc.train(cls.train_fs, grid_search=False)
 
-        cls.svc_with_probs = Learner('SVC', probability=True)
+        cls.svc_with_probs = Learner("SVC", probability=True)
         _ = cls.svc_with_probs.train(cls.train_fs, grid_search=False)
 
     @raises(ValueError)
@@ -1076,28 +1158,34 @@ class TestExpectedScores:
         compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 3)
 
     def test_expected_scores(self):
-        computed_predictions = compute_expected_scores_from_model(self.svc_with_probs, self.test_fs, 0, 4)
+        computed_predictions = compute_expected_scores_from_model(
+            self.svc_with_probs, self.test_fs, 0, 4
+        )
         assert len(computed_predictions) == len(self.test_fs)
-        assert np.all([((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions])
+        assert np.all(
+            [
+                ((prediction >= 0) and (prediction <= 4))
+                for prediction in computed_predictions
+            ]
+        )
 
 
 class TestCmdOption:
-
     @raises(TypeError)
     def test_cmd_option_no_help(self):
         """Test that CmdOption with no help raises exception."""
-        _ = CmdOption(longname='foo', dest='blah')
+        _ = CmdOption(longname="foo", dest="blah")
 
     @raises(TypeError)
     def test_cmd_option_no_dest(self):
         """Test that CmdOption with no dest raises exception."""
-        _ = CmdOption(longname='foo', help='this option has no dest')
+        _ = CmdOption(longname="foo", help="this option has no dest")
 
     def test_cmd_option_attributes(self):
         """Test CmdOption attributes."""
-        co = CmdOption(dest='good', help='this option has only dest and help')
-        eq_(co.dest, 'good')
-        eq_(co.help, 'this option has only dest and help')
+        co = CmdOption(dest="good", help="this option has only dest and help")
+        eq_(co.dest, "good")
+        eq_(co.help, "this option has only dest and help")
         ok_(co.action is None)
         ok_(co.longname is None)
         ok_(co.shortname is None)
@@ -1107,397 +1195,446 @@ class TestCmdOption:
 
 
 class TestSetupRsmCmdParser:
-
     def test_run_subparser_no_args(self):
         """Test run subparser with no arguments."""
-        parser = setup_rsmcmd_parser('test')
+        parser = setup_rsmcmd_parser("test")
         # we need to patch sys.exit since --help just exists otherwise
-        with patch('sys.exit') as exit_mock:
-            parsed_namespace = parser.parse_args('run --help'.split())
-        expected_namespace = argparse.Namespace(config_file=None,
-                                                output_dir=getcwd(),
-                                                subcommand='run')
+        with patch("sys.exit") as exit_mock:
+            parsed_namespace = parser.parse_args("run --help".split())
+        expected_namespace = argparse.Namespace(
+            config_file=None, output_dir=getcwd(), subcommand="run"
+        )
         eq_(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
     @raises(SystemExit)
     def test_run_subparser_non_existent_config_file(self):
         """Test run subparser with a non-existent config file."""
-        parser = setup_rsmcmd_parser('test')
-        _ = parser.parse_args('run fake.json'.split())
+        parser = setup_rsmcmd_parser("test")
+        _ = parser.parse_args("run fake.json".split())
 
     def test_run_subparser_with_output_directory(self):
         """Test run subparser with a specified output directory."""
-        parser = setup_rsmcmd_parser('test')
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
-        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir".split())
+        parser = setup_rsmcmd_parser("test")
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
+        parsed_namespace = parser.parse_args(
+            f"run {config_file} /path/to/output/dir".split()
+        )
 
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                output_dir='/path/to/output/dir',
-                                                subcommand='run')
+        expected_namespace = argparse.Namespace(
+            config_file=config_file, output_dir="/path/to/output/dir", subcommand="run"
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_no_output_directory(self):
         """Test run subparser where no output directory is required."""
-        parser = setup_rsmcmd_parser('test', uses_output_directory=False)
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
+        parser = setup_rsmcmd_parser("test", uses_output_directory=False)
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
         parsed_namespace = parser.parse_args(f"run {config_file}".split())
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                subcommand='run')
-        ok_(not hasattr(parsed_namespace, 'output_dir'))
+        expected_namespace = argparse.Namespace(
+            config_file=config_file, subcommand="run"
+        )
+        ok_(not hasattr(parsed_namespace, "output_dir"))
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_overwrite_enabled(self):
         """Test run subparser with overwriting enabled."""
-        parser = setup_rsmcmd_parser('test', allows_overwriting=True)
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
-        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir -f".split())
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                output_dir='/path/to/output/dir',
-                                                force_write=True,
-                                                subcommand='run')
+        parser = setup_rsmcmd_parser("test", allows_overwriting=True)
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
+        parsed_namespace = parser.parse_args(
+            f"run {config_file} /path/to/output/dir -f".split()
+        )
+        expected_namespace = argparse.Namespace(
+            config_file=config_file,
+            output_dir="/path/to/output/dir",
+            force_write=True,
+            subcommand="run",
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_extra_options(self):
         """Test run subparser with extra options."""
-        extra_options = [CmdOption(dest='test_arg',
-                                   help='a test positional argument'),
-                         CmdOption(shortname='t',
-                                   longname='test',
-                                   dest='test_kwarg',
-                                   help='a test optional argument'),
-                         CmdOption(shortname='x',
-                                   dest='extra_kwarg',
-                                   action='store_true',
-                                   default=False,
-                                   help='a boolean optional argument'),
-                         CmdOption(longname='zeta',
-                                   dest='extra_kwargs2',
-                                   nargs='+',
-                                   required=False,
-                                   help='a multiply specified optional argument')]
-        parser = setup_rsmcmd_parser('test',
-                                     allows_overwriting=True,
-                                     extra_run_options=extra_options)
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
-        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir foo --test bar -x --zeta 1 2".split())
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                extra_kwarg=True,
-                                                extra_kwargs2=['1', '2'],
-                                                force_write=False,
-                                                output_dir='/path/to/output/dir',
-                                                subcommand='run',
-                                                test_arg='foo',
-                                                test_kwarg='bar')
+        extra_options = [
+            CmdOption(dest="test_arg", help="a test positional argument"),
+            CmdOption(
+                shortname="t",
+                longname="test",
+                dest="test_kwarg",
+                help="a test optional argument",
+            ),
+            CmdOption(
+                shortname="x",
+                dest="extra_kwarg",
+                action="store_true",
+                default=False,
+                help="a boolean optional argument",
+            ),
+            CmdOption(
+                longname="zeta",
+                dest="extra_kwargs2",
+                nargs="+",
+                required=False,
+                help="a multiply specified optional argument",
+            ),
+        ]
+        parser = setup_rsmcmd_parser(
+            "test", allows_overwriting=True, extra_run_options=extra_options
+        )
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
+        parsed_namespace = parser.parse_args(
+            f"run {config_file} /path/to/output/dir foo --test bar -x --zeta 1 2".split()
+        )
+        expected_namespace = argparse.Namespace(
+            config_file=config_file,
+            extra_kwarg=True,
+            extra_kwargs2=["1", "2"],
+            force_write=False,
+            output_dir="/path/to/output/dir",
+            subcommand="run",
+            test_arg="foo",
+            test_kwarg="bar",
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_run_subparser_with_extra_options_required_true_not_specified(self):
         """Test run subparser with an unspecified required optional."""
-        extra_options = [CmdOption(dest='test_arg',
-                                   help='a test positional argument'),
-                         CmdOption(longname='zeta',
-                                   dest='test_kwargs',
-                                   nargs='+',
-                                   required=True,
-                                   help='a multiply specified optional argument')]
-        parser = setup_rsmcmd_parser('test',
-                                     uses_output_directory=False,
-                                     extra_run_options=extra_options)
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
-        with patch('sys.exit') as exit_mock:
+        extra_options = [
+            CmdOption(dest="test_arg", help="a test positional argument"),
+            CmdOption(
+                longname="zeta",
+                dest="test_kwargs",
+                nargs="+",
+                required=True,
+                help="a multiply specified optional argument",
+            ),
+        ]
+        parser = setup_rsmcmd_parser(
+            "test", uses_output_directory=False, extra_run_options=extra_options
+        )
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
+        with patch("sys.exit") as exit_mock:
             parsed_namespace = parser.parse_args(f"run {config_file} foo".split())
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                subcommand='run',
-                                                test_arg='foo',
-                                                test_kwargs=None)
+        expected_namespace = argparse.Namespace(
+            config_file=config_file, subcommand="run", test_arg="foo", test_kwargs=None
+        )
         eq_(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
     def test_run_subparser_with_extra_options_required_true_and_specified(self):
         """Test run subparser with a specified required optional."""
-        extra_options = [CmdOption(dest='test_arg',
-                                   help='a test positional argument'),
-                         CmdOption(longname='zeta',
-                                   dest='test_kwargs',
-                                   nargs='+',
-                                   required=True,
-                                   help='a multiply specified optional argument')]
-        parser = setup_rsmcmd_parser('test',
-                                     uses_output_directory=False,
-                                     extra_run_options=extra_options)
-        config_file = join(rsmtool_test_dir, 'data', 'experiments', 'lr', 'lr.json')
-        parsed_namespace = parser.parse_args(f"run {config_file} foo --zeta 1 2".split())
-        expected_namespace = argparse.Namespace(config_file=config_file,
-                                                subcommand='run',
-                                                test_arg='foo',
-                                                test_kwargs=['1', '2'])
+        extra_options = [
+            CmdOption(dest="test_arg", help="a test positional argument"),
+            CmdOption(
+                longname="zeta",
+                dest="test_kwargs",
+                nargs="+",
+                required=True,
+                help="a multiply specified optional argument",
+            ),
+        ]
+        parser = setup_rsmcmd_parser(
+            "test", uses_output_directory=False, extra_run_options=extra_options
+        )
+        config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
+        parsed_namespace = parser.parse_args(
+            f"run {config_file} foo --zeta 1 2".split()
+        )
+        expected_namespace = argparse.Namespace(
+            config_file=config_file,
+            subcommand="run",
+            test_arg="foo",
+            test_kwargs=["1", "2"],
+        )
         eq_(parsed_namespace, expected_namespace)
 
     @raises(TypeError)
     def test_run_subparser_with_extra_options_bad_required_value(self):
         """Test run subparser with a non-boolean value for required."""
-        extra_options = [CmdOption(dest='test_arg',
-                                   help='a test positional argument'),
-                         CmdOption(longname='zeta',
-                                   dest='test_kwargs',
-                                   nargs='+',
-                                   required='true',
-                                   help='a multiply specified optional argument')]
-        _ = setup_rsmcmd_parser('test',
-                                uses_output_directory=False,
-                                extra_run_options=extra_options)
+        extra_options = [
+            CmdOption(dest="test_arg", help="a test positional argument"),
+            CmdOption(
+                longname="zeta",
+                dest="test_kwargs",
+                nargs="+",
+                required="true",
+                help="a multiply specified optional argument",
+            ),
+        ]
+        _ = setup_rsmcmd_parser(
+            "test", uses_output_directory=False, extra_run_options=extra_options
+        )
 
     def test_generate_subparser_help_flag(self):
         """Test generate subparser with --help specified."""
-        parser = setup_rsmcmd_parser('test')
+        parser = setup_rsmcmd_parser("test")
         # we need to patch sys.exit since --help just exists otherwise
-        with patch('sys.exit') as exit_mock:
-            parsed_namespace = parser.parse_args('generate --help'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=False)
+        with patch("sys.exit") as exit_mock:
+            parsed_namespace = parser.parse_args("generate --help".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=False
+        )
         eq_(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
     def test_generate_subparser(self):
         """Test generate subparser with no arguments."""
-        parser = setup_rsmcmd_parser('test')
-        parsed_namespace = parser.parse_args('generate'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=False)
+        parser = setup_rsmcmd_parser("test")
+        parsed_namespace = parser.parse_args("generate".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=False
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_flag(self):
         """Test generate subparser with subgroups option and flag."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate --subgroups'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=False,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate --subgroups".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=False, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_option_and_short_flag(self):
         """Test generate subparser with subgroups option and short flag."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate -g'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=False,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate -g".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=False, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_option_but_no_flag(self):
         """Test generate subparser with subgroups option but no flag."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=False,
-                                                subgroups=False)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=False, subgroups=False
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_quiet_flag(self):
         """Test generate subparser with only the quiet flag."""
-        parser = setup_rsmcmd_parser('test')
-        parsed_namespace = parser.parse_args('generate --quiet'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=True)
+        parser = setup_rsmcmd_parser("test")
+        parsed_namespace = parser.parse_args("generate --quiet".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_quiet_flags(self):
         """Test generate subparser with subgroups and quiet flags."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate --subgroups -q'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=False,
-                                                quiet=True,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate --subgroups -q".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=False, quiet=True, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_interactive_flag(self):
         """Test generate subparser with only the interactive flag."""
-        parser = setup_rsmcmd_parser('test')
-        parsed_namespace = parser.parse_args('generate --interactive'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=True,
-                                                quiet=False)
+        parser = setup_rsmcmd_parser("test")
+        parsed_namespace = parser.parse_args("generate --interactive".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=True, quiet=False
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_only_interactive_short_flag(self):
         """Test generate subparser with only the short interactive flag."""
-        parser = setup_rsmcmd_parser('test')
-        parsed_namespace = parser.parse_args('generate -i'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                interactive=True,
-                                                quiet=False)
+        parser = setup_rsmcmd_parser("test")
+        parsed_namespace = parser.parse_args("generate -i".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", interactive=True, quiet=False
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_interactive_flags(self):
         """Test generate subparser with subgroups and interactive flags."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate --interactive --subgroups'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                quiet=False,
-                                                interactive=True,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args(
+            "generate --interactive --subgroups".split()
+        )
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", quiet=False, interactive=True, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
     def test_generate_subparser_with_subgroups_and_interactive_short_flags(self):
         """Test generate subparser with short subgroups and interactive flags."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate -i -g'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                quiet=False,
-                                                interactive=True,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate -i -g".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", quiet=False, interactive=True, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
-    def test_generate_subparser_with_subgroups_and_interactive_short_flags_together(self):
+    def test_generate_subparser_with_subgroups_and_interactive_short_flags_together(
+        self,
+    ):
         """Test generate subparser with short subgroups and interactive flags together."""
-        parser = setup_rsmcmd_parser('test', uses_subgroups=True)
-        parsed_namespace = parser.parse_args('generate -ig'.split())
-        expected_namespace = argparse.Namespace(subcommand='generate',
-                                                quiet=False,
-                                                interactive=True,
-                                                subgroups=True)
+        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
+        parsed_namespace = parser.parse_args("generate -ig".split())
+        expected_namespace = argparse.Namespace(
+            subcommand="generate", quiet=False, interactive=True, subgroups=True
+        )
         eq_(parsed_namespace, expected_namespace)
 
 
 class TestBatchGenerateConfiguration:
-
     @classmethod
     def setUpClass(cls):
-        cls.expected_json_dir = join(rsmtool_test_dir, 'data', 'output')
+        cls.expected_json_dir = join(rsmtool_test_dir, "data", "output")
 
     # a helper method to check that the automatically generated configuration
     # matches what we expect for each tool
-    def check_generated_configuration(self,
-                                      context,
-                                      use_subgroups=False,
-                                      as_string=False,
-                                      suppress_warnings=False):
+    def check_generated_configuration(
+        self, context, use_subgroups=False, as_string=False, suppress_warnings=False
+    ):
 
-        generator = ConfigurationGenerator(context,
-                                           use_subgroups=use_subgroups,
-                                           as_string=as_string,
-                                           suppress_warnings=suppress_warnings)
+        generator = ConfigurationGenerator(
+            context,
+            use_subgroups=use_subgroups,
+            as_string=as_string,
+            suppress_warnings=suppress_warnings,
+        )
 
-        if context == 'rsmtool':
+        if context == "rsmtool":
 
-            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                          'model': 'ENTER_VALUE_HERE',
-                          'train_file': 'ENTER_VALUE_HERE',
-                          'test_file': 'ENTER_VALUE_HERE'}
-
-            if use_subgroups:
-                section_list = ['data_description',
-                                'data_description_by_group',
-                                'feature_descriptives',
-                                'features_by_group',
-                                'preprocessed_features',
-                                'dff_by_group',
-                                'consistency',
-                                'model',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'evaluation_by_group',
-                                'fairness_analyses',
-                                'pca',
-                                'intermediate_file_paths',
-                                'sysinfo']
-            else:
-                section_list = ['data_description',
-                                'feature_descriptives',
-                                'preprocessed_features',
-                                'consistency',
-                                'model',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'pca',
-                                'intermediate_file_paths',
-                                'sysinfo']
-
-        elif context == 'rsmeval':
-
-            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                          'predictions_file': 'ENTER_VALUE_HERE',
-                          'system_score_column': 'ENTER_VALUE_HERE',
-                          'trim_min': 'ENTER_VALUE_HERE',
-                          'trim_max': 'ENTER_VALUE_HERE'}
+            configdict = {
+                "experiment_id": "ENTER_VALUE_HERE",
+                "model": "ENTER_VALUE_HERE",
+                "train_file": "ENTER_VALUE_HERE",
+                "test_file": "ENTER_VALUE_HERE",
+            }
 
             if use_subgroups:
-                section_list = ['data_description',
-                                'data_description_by_group',
-                                'consistency',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'evaluation_by_group',
-                                'fairness_analyses',
-                                'intermediate_file_paths',
-                                'sysinfo']
+                section_list = [
+                    "data_description",
+                    "data_description_by_group",
+                    "feature_descriptives",
+                    "features_by_group",
+                    "preprocessed_features",
+                    "dff_by_group",
+                    "consistency",
+                    "model",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "evaluation_by_group",
+                    "fairness_analyses",
+                    "pca",
+                    "intermediate_file_paths",
+                    "sysinfo",
+                ]
             else:
-                section_list = ['data_description',
-                                'consistency',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'intermediate_file_paths',
-                                'sysinfo']
+                section_list = [
+                    "data_description",
+                    "feature_descriptives",
+                    "preprocessed_features",
+                    "consistency",
+                    "model",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "pca",
+                    "intermediate_file_paths",
+                    "sysinfo",
+                ]
+
+        elif context == "rsmeval":
+
+            configdict = {
+                "experiment_id": "ENTER_VALUE_HERE",
+                "predictions_file": "ENTER_VALUE_HERE",
+                "system_score_column": "ENTER_VALUE_HERE",
+                "trim_min": "ENTER_VALUE_HERE",
+                "trim_max": "ENTER_VALUE_HERE",
+            }
+
+            if use_subgroups:
+                section_list = [
+                    "data_description",
+                    "data_description_by_group",
+                    "consistency",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "evaluation_by_group",
+                    "fairness_analyses",
+                    "intermediate_file_paths",
+                    "sysinfo",
+                ]
+            else:
+                section_list = [
+                    "data_description",
+                    "consistency",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "intermediate_file_paths",
+                    "sysinfo",
+                ]
 
         elif context == "rsmcompare":
 
-            configdict = {'comparison_id': 'ENTER_VALUE_HERE',
-                          'experiment_id_old': 'ENTER_VALUE_HERE',
-                          'experiment_dir_old': 'ENTER_VALUE_HERE',
-                          'experiment_id_new': 'ENTER_VALUE_HERE',
-                          'experiment_dir_new': 'ENTER_VALUE_HERE',
-                          'description_old': 'ENTER_VALUE_HERE',
-                          'description_new': 'ENTER_VALUE_HERE'}
+            configdict = {
+                "comparison_id": "ENTER_VALUE_HERE",
+                "experiment_id_old": "ENTER_VALUE_HERE",
+                "experiment_dir_old": "ENTER_VALUE_HERE",
+                "experiment_id_new": "ENTER_VALUE_HERE",
+                "experiment_dir_new": "ENTER_VALUE_HERE",
+                "description_old": "ENTER_VALUE_HERE",
+                "description_new": "ENTER_VALUE_HERE",
+            }
 
             if use_subgroups:
-                section_list = ['feature_descriptives',
-                                'features_by_group',
-                                'preprocessed_features',
-                                'preprocessed_features_by_group',
-                                'consistency',
-                                'score_distributions',
-                                'model',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'pca',
-                                'notes',
-                                'sysinfo']
+                section_list = [
+                    "feature_descriptives",
+                    "features_by_group",
+                    "preprocessed_features",
+                    "preprocessed_features_by_group",
+                    "consistency",
+                    "score_distributions",
+                    "model",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "pca",
+                    "notes",
+                    "sysinfo",
+                ]
             else:
-                section_list = ['feature_descriptives',
-                                'preprocessed_features',
-                                'consistency',
-                                'score_distributions',
-                                'model',
-                                'evaluation',
-                                'true_score_evaluation',
-                                'pca',
-                                'notes',
-                                'sysinfo']
+                section_list = [
+                    "feature_descriptives",
+                    "preprocessed_features",
+                    "consistency",
+                    "score_distributions",
+                    "model",
+                    "evaluation",
+                    "true_score_evaluation",
+                    "pca",
+                    "notes",
+                    "sysinfo",
+                ]
 
         elif context == "rsmsummarize":
 
-            configdict = {'summary_id': 'ENTER_VALUE_HERE',
-                          'experiment_dirs': ['ENTER_VALUE_HERE']}
+            configdict = {
+                "summary_id": "ENTER_VALUE_HERE",
+                "experiment_dirs": ["ENTER_VALUE_HERE"],
+            }
 
-            section_list = ['preprocessed_features',
-                            'model',
-                            'evaluation',
-                            'true_score_evaluation',
-                            'intermediate_file_paths',
-                            'sysinfo']
+            section_list = [
+                "preprocessed_features",
+                "model",
+                "evaluation",
+                "true_score_evaluation",
+                "intermediate_file_paths",
+                "sysinfo",
+            ]
 
         elif context == "rsmpredict":
 
-            configdict = {'experiment_id': 'ENTER_VALUE_HERE',
-                          'experiment_dir': 'ENTER_VALUE_HERE',
-                          'input_features_file': 'ENTER_VALUE_HERE'}
+            configdict = {
+                "experiment_id": "ENTER_VALUE_HERE",
+                "experiment_dir": "ENTER_VALUE_HERE",
+                "input_features_file": "ENTER_VALUE_HERE",
+            }
 
         # get the generated configuration dictionary
         generated_configuration = generator.generate()
@@ -1507,43 +1644,44 @@ class TestBatchGenerateConfiguration:
         # compare the `_config` dictionaries of the two Configuration objects
         if as_string:
             if use_subgroups:
-                expected_json_file = join(self.expected_json_dir,
-                                          f"autogenerated_{context}_config_groups.json")
+                expected_json_file = join(
+                    self.expected_json_dir,
+                    f"autogenerated_{context}_config_groups.json",
+                )
             else:
-                expected_json_file = join(self.expected_json_dir,
-                                          f"autogenerated_{context}_config.json")
-            expected_json_string = open(expected_json_file, 'r').read().strip()
+                expected_json_file = join(
+                    self.expected_json_dir, f"autogenerated_{context}_config.json"
+                )
+            expected_json_string = open(expected_json_file, "r").read().strip()
             eq_(generated_configuration, expected_json_string)
         else:
             expected_configuration_object = Configuration(configdict, context=context)
-            if 'general_sections' in expected_configuration_object:
-                expected_configuration_object['general_sections'] = section_list
+            if "general_sections" in expected_configuration_object:
+                expected_configuration_object["general_sections"] = section_list
 
-            assert_dict_equal(expected_configuration_object._config,
-                              generated_configuration)
+            assert_dict_equal(
+                expected_configuration_object._config, generated_configuration
+            )
 
     def test_generate_configuration(self):
-        for (context,
-             use_subgroups,
-             as_string,
-             suppress_warnings) in product(['rsmtool',
-                                            'rsmeval',
-                                            'rsmcompare',
-                                            'rsmsummarize',
-                                            'rsmpredict'],
-                                           [True, False],
-                                           [True, False],
-                                           [True, False]):
+        for (context, use_subgroups, as_string, suppress_warnings) in product(
+            ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict"],
+            [True, False],
+            [True, False],
+            [True, False],
+        ):
 
             # rsmpredict and rsmsummarize do not use subgroups
-            if context in ['rsmpredict', 'rsmsummarize'] and use_subgroups:
+            if context in ["rsmpredict", "rsmsummarize"] and use_subgroups:
                 continue
 
-            yield (self.check_generated_configuration,
-                   context,
-                   use_subgroups,
-                   as_string,
-                   suppress_warnings)
+            yield (
+                self.check_generated_configuration,
+                context,
+                use_subgroups,
+                as_string,
+                suppress_warnings,
+            )
 
 
 class TestInteractiveField:
@@ -1556,13 +1694,20 @@ class TestInteractiveField:
 
     def check_boolean_field(self, field_type, user_input, final_value):
         """Check that boolean fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_bool',
-                                      field_type,
-                                      {'label': 'answer the question', 'type': 'boolean'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_bool",
+                field_type,
+                {"label": "answer the question", "type": "boolean"},
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>answer the question</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value,
+                HTML(" <b>answer the question</b>: ").value,
+            )
 
             # make sure the completer is set up correctly
             completer = mock_prompt.call_args[1]["completer"]
@@ -1572,33 +1717,42 @@ class TestInteractiveField:
             validator = mock_prompt.call_args[1]["validator"]
             eq_(validator.func("true"), True)
             eq_(validator.func("false"), True)
-            eq_(validator.func(""), field_type == 'optional')
+            eq_(validator.func(""), field_type == "optional")
 
             # boolean fields do not use a completion style
             complete_style = mock_prompt.call_args[1]["complete_style"]
             eq_(complete_style, None)
 
     def test_boolean_field(self):
-        for field_type, (user_input, final_value) in product(['required', 'optional'],
-                                                             [('true', True), ('false', False)]):
+        for field_type, (user_input, final_value) in product(
+            ["required", "optional"], [("true", True), ("false", False)]
+        ):
             yield self.check_boolean_field, field_type, user_input, final_value
 
     def check_choice_field(self, user_input, final_value):
         """Check that choice fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_choice',
-                                      'required',
-                                      {'label': 'pick a choice',
-                                       'choices': ["one", "two", "three"],
-                                       'type': 'choice'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_choice",
+                "required",
+                {
+                    "label": "pick a choice",
+                    "choices": ["one", "two", "three"],
+                    "type": "choice",
+                },
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>pick a choice</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value, HTML(" <b>pick a choice</b>: ").value
+            )
 
             # make sure the completer is set up correctly
             completer = mock_prompt.call_args[1]["completer"]
             eq_(completer.words, ["one", "two", "three"])
-            ok_(hasattr(completer, 'fuzzy_completer'))
+            ok_(hasattr(completer, "fuzzy_completer"))
 
             # make sure the validator validates the right things
             validator = mock_prompt.call_args[1]["validator"]
@@ -1613,24 +1767,31 @@ class TestInteractiveField:
             eq_(complete_style, CompleteStyle.MULTI_COLUMN)
 
     def test_choice_field(self):
-        for (user_input, final_value) in [('one', 'one'), ('three', 'three')]:
+        for (user_input, final_value) in [("one", "one"), ("three", "three")]:
             yield self.check_choice_field, user_input, final_value
 
     @raises(ValueError)
     def test_choice_field_no_choices(self):
-        _ = InteractiveField('test_choice_no_choices',
-                             'required',
-                             {'label': 'choose one', 'type': 'choice'})
+        _ = InteractiveField(
+            "test_choice_no_choices",
+            "required",
+            {"label": "choose one", "type": "choice"},
+        )
 
     def check_dir_field(self, user_input, final_value):
         """Check that dir fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_file',
-                                      'required',
-                                      {'label': 'enter directory', 'type': 'dir'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_file", "required", {"label": "enter directory", "type": "dir"}
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter directory</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value,
+                HTML(" <b>enter directory</b>: ").value,
+            )
 
             # test that the path completer for files works as expected
             completer = mock_prompt.call_args[1]["completer"]
@@ -1652,11 +1813,10 @@ class TestInteractiveField:
             eq_(validator.func(rsmtool_test_dir), True)
 
             # but existing files should be rejected
-            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
-                existing_file = join(rsmtool_test_dir,
-                                     'data',
-                                     'files',
-                                     f'train.{extension}')
+            for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
+                existing_file = join(
+                    rsmtool_test_dir, "data", "files", f"train.{extension}"
+                )
                 eq_(validator.func(existing_file), False)
 
             # file fields do not use a completion style
@@ -1664,15 +1824,17 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_dir_field(self):
-        for (user_input, final_value) in [('/foo/bar', '/foo/bar'), ('foo', 'foo')]:
+        for (user_input, final_value) in [("/foo/bar", "/foo/bar"), ("foo", "foo")]:
             yield self.check_dir_field, user_input, final_value
 
     def check_file_field(self, field_type, user_input, final_value):
         """Check that file fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_file',
-                                      field_type,
-                                      {'label': 'enter file', 'type': 'file'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_file", field_type, {"label": "enter file", "type": "file"}
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
             eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter file</b>: ").value)
@@ -1686,19 +1848,19 @@ class TestInteractiveField:
             eq_(completer.file_filter(rsmtool_test_dir), True)
 
             # valid file formats are okay
-            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
-                valid_file = join(rsmtool_test_dir,
-                                  'data',
-                                  'files',
-                                  f'train.{extension}')
+            for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
+                valid_file = join(
+                    rsmtool_test_dir, "data", "files", f"train.{extension}"
+                )
                 eq_(completer.file_filter(valid_file), True)
 
-            eq_(completer.file_filter(join(rsmtool_test_dir,
-                                           'data',
-                                           'experiments'
-                                           'lr',
-                                           'lr.json')), False)
-            eq_(completer.file_filter(join(rsmtool_test_dir, 'test_cli.py')), False)
+            eq_(
+                completer.file_filter(
+                    join(rsmtool_test_dir, "data", "experiments" "lr", "lr.json")
+                ),
+                False,
+            )
+            eq_(completer.file_filter(join(rsmtool_test_dir, "test_cli.py")), False)
 
             # make sure the validator validates the right things
 
@@ -1706,7 +1868,7 @@ class TestInteractiveField:
             # so that we know that it doesn't exist but has
             # the right extension
             validator = mock_prompt.call_args[1]["validator"]
-            non_existing_csv_file = NamedTemporaryFile(suffix='.csv')
+            non_existing_csv_file = NamedTemporaryFile(suffix=".csv")
             non_existing_csv_file.close()
             eq_(validator.func(non_existing_csv_file.name), False)
 
@@ -1714,11 +1876,10 @@ class TestInteractiveField:
             eq_(validator.func(rsmtool_test_dir), False)
 
             # existing files should be okay
-            for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
-                existing_file = join(rsmtool_test_dir,
-                                     'data',
-                                     'files',
-                                     f'train.{extension}')
+            for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
+                existing_file = join(
+                    rsmtool_test_dir, "data", "files", f"train.{extension}"
+                )
                 eq_(validator.func(existing_file), True)
 
             # empty files should are only accepted for optional fields
@@ -1729,23 +1890,31 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_file_field(self):
-        for field_type, (user_input, final_value) in product(['required', 'optional'],
-                                                             [('foo.csv', 'foo.csv'), ('c.tsv', 'c.tsv')]):
+        for field_type, (user_input, final_value) in product(
+            ["required", "optional"], [("foo.csv", "foo.csv"), ("c.tsv", "c.tsv")]
+        ):
             yield self.check_file_field, field_type, user_input, final_value
 
     def check_format_field(self, user_input, final_value):
         """Check that file format fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_file_format',
-                                      'optional',
-                                      {'label': 'enter file format', 'type': 'format'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_file_format",
+                "optional",
+                {"label": "enter file format", "type": "format"},
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter file format</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value,
+                HTML(" <b>enter file format</b>: ").value,
+            )
 
             # test that the path completer for files works as expected
             completer = mock_prompt.call_args[1]["completer"]
-            eq_(sorted(completer.words), ['csv', 'tsv', 'xlsx'])
+            eq_(sorted(completer.words), ["csv", "tsv", "xlsx"])
 
             # make sure the validator validates the right things
             validator = mock_prompt.call_args[1]["validator"]
@@ -1763,20 +1932,27 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_format_field(self):
-        for (user_input, final_value) in [('csv', 'csv'),
-                                          ('tsv', 'tsv'),
-                                          ('xlsx', 'xlsx')]:
+        for (user_input, final_value) in [
+            ("csv", "csv"),
+            ("tsv", "tsv"),
+            ("xlsx", "xlsx"),
+        ]:
             yield self.check_format_field, user_input, final_value
 
     def check_id_field(self, user_input, final_value):
         """Check that ID fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_int',
-                                      'required',
-                                      {'label': 'enter experiment ID', 'type': 'id'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_int", "required", {"label": "enter experiment ID", "type": "id"}
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter experiment ID</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value,
+                HTML(" <b>enter experiment ID</b>: ").value,
+            )
 
             # there is no completer for integer field
             completer = mock_prompt.call_args[1]["completer"]
@@ -1794,18 +1970,26 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_id_field(self):
-        for (user_input, final_value) in [('test', 'test'), ('another_id', 'another_id')]:
+        for (user_input, final_value) in [
+            ("test", "test"),
+            ("another_id", "another_id"),
+        ]:
             yield self.check_id_field, user_input, final_value
 
     def check_integer_field(self, field_type, user_input, final_value):
         """Check that integer fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_int',
-                                      field_type,
-                                      {'label': 'enter a number', 'type': 'integer'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_int", field_type, {"label": "enter a number", "type": "integer"}
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>enter a number</b>: ").value)
+            eq_(
+                mock_prompt.call_args[0][0].value,
+                HTML(" <b>enter a number</b>: ").value,
+            )
 
             # there is no completer for integer field
             completer = mock_prompt.call_args[1]["completer"]
@@ -1827,44 +2011,53 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_integer_field(self):
-        for field_type, (user_input, final_value), in product(['required', 'optional'],
-                                                              [('1', 1), ('10', 10), ('0', 0)]):
+        for (
+            field_type,
+            (user_input, final_value),
+        ) in product(["required", "optional"], [("1", 1), ("10", 10), ("0", 0)]):
             yield self.check_integer_field, field_type, user_input, final_value
 
     def check_text_field(self, field_type, user_input, final_value):
         """Check that text fields are handled correctly."""
-        with patch('rsmtool.utils.commandline.prompt', return_value=user_input) as mock_prompt:
-            ifield = InteractiveField('test_text',
-                                      field_type,
-                                      {'label': 'description', 'type': 'text'})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=user_input
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_text", field_type, {"label": "description", "type": "text"}
+            )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
             eq_(mock_prompt.call_args[0][0].value, HTML(" <b>description</b>: ").value)
-            eq_(mock_prompt.call_args[1], {'completer': None,
-                                           'complete_style': None,
-                                           'validator': None})
+            eq_(
+                mock_prompt.call_args[1],
+                {"completer": None, "complete_style": None, "validator": None},
+            )
 
     def test_text_field(self):
-        for field_type, (user_input, final_value) in product(['required', 'optional'],
-                                                             [('test', 'test'),
-                                                              ('test value', 'test value')]):
+        for field_type, (user_input, final_value) in product(
+            ["required", "optional"], [("test", "test"), ("test value", "test value")]
+        ):
             yield self.check_text_field, field_type, user_input, final_value
 
-    def check_multiple_count_field(self, user_input, final_value, num_entries, field_type):
+    def check_multiple_count_field(
+        self, user_input, final_value, num_entries, field_type
+    ):
         """Check that fields that accept multiple values are handled correctly."""
         # int this particular case, we also need to patch the
         # `print_formatted_text()` function since we use that
         # for multiple count fields to print out the label, instead
         # of the `prompt()` function
-        patcher = patch('rsmtool.utils.commandline.print_formatted_text')
+        patcher = patch("rsmtool.utils.commandline.print_formatted_text")
         mock_print_formatted_text = patcher.start()
 
-        with patch('rsmtool.utils.commandline.prompt', return_value=num_entries) as mock_prompt:
-            ifield = InteractiveField('test_multiple',
-                                      'optional',
-                                      {'label': 'label for field',
-                                       'count': 'multiple',
-                                       'type': field_type})
+        with patch(
+            "rsmtool.utils.commandline.prompt", return_value=num_entries
+        ) as mock_prompt:
+            ifield = InteractiveField(
+                "test_multiple",
+                "optional",
+                {"label": "label for field", "count": "multiple", "type": field_type},
+            )
             _ = ifield.get_value()
             # there are N + 1 calls to `prompt()`, one to get the number of entries
             # and one for each entry
@@ -1893,11 +2086,16 @@ class TestInteractiveField:
                     eq_(call_args[0][0], f"   Enter #{entry}: ")
 
                     # now check the completers etc. depending on field type
-                    if field_type == 'text':
+                    if field_type == "text":
                         # for text fields, everythign is None
-                        eq_(call_args[1], {'completer': None,
-                                           'complete_style': None,
-                                           'validator': None})
+                        eq_(
+                            call_args[1],
+                            {
+                                "completer": None,
+                                "complete_style": None,
+                                "validator": None,
+                            },
+                        )
                     else:
                         # for the dir type, the completer only accepts directories
                         completer = call_args[1]["completer"]
@@ -1913,11 +2111,16 @@ class TestInteractiveField:
                         eq_(validator.func(rsmtool_test_dir), True)
 
                         # but existing files should be rejected
-                        for extension in ['csv', 'jsonlines', 'sas7bdat', 'tsv', 'xlsx']:
-                            existing_file = join(rsmtool_test_dir,
-                                                 'data',
-                                                 'files',
-                                                 f'train.{extension}')
+                        for extension in [
+                            "csv",
+                            "jsonlines",
+                            "sas7bdat",
+                            "tsv",
+                            "xlsx",
+                        ]:
+                            existing_file = join(
+                                rsmtool_test_dir, "data", "files", f"train.{extension}"
+                            )
                             eq_(validator.func(existing_file), False)
 
                         complete_style = call_args[1]["complete_style"]
@@ -1927,37 +2130,48 @@ class TestInteractiveField:
         mock_print_formatted_text.stop()
 
     def test_multiple_count_field(self):
-        for ((user_input, final_value),
-             num_entries,
-             field_type) in product([('test', 'test'), ('test value', 'test value')],
-                                    ['0', '3'],
-                                    ['dir', 'text']):
-            yield (self.check_multiple_count_field,
-                   user_input,
-                   final_value,
-                   num_entries,
-                   field_type)
+        for ((user_input, final_value), num_entries, field_type) in product(
+            [("test", "test"), ("test value", "test value")],
+            ["0", "3"],
+            ["dir", "text"],
+        ):
+            yield (
+                self.check_multiple_count_field,
+                user_input,
+                final_value,
+                num_entries,
+                field_type,
+            )
 
     def check_optional_interactive_fields_blanks(self, field_name, field_count):
         """
         Check that blank user input for an optional field is handled correctly
         """
         default_value = DEFAULTS.get(field_name)
-        blank_return_value = '' if field_count == 'single' else []
-        with patch('rsmtool.utils.commandline.prompt', return_value=blank_return_value):
-            ifield = InteractiveField(field_name,
-                                      'optional',
-                                      {'label': 'optional field label'})
+        blank_return_value = "" if field_count == "single" else []
+        with patch("rsmtool.utils.commandline.prompt", return_value=blank_return_value):
+            ifield = InteractiveField(
+                field_name, "optional", {"label": "optional field label"}
+            )
             eq_(ifield.get_value(), default_value)
 
     def test_optional_interactive_fields_blanks(self):
         ALL_REQUIRED_FIELDS = set()
-        for context in ['rsmtool', 'rsmeval', 'rsmpredict', 'rsmsummarize', 'rsmcompare']:
-            ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]['required'])
-        OPTIONAL_INTERACTIVE_FIELDS = [field for field in INTERACTIVE_MODE_METADATA
-                                       if field not in ALL_REQUIRED_FIELDS]
+        for context in [
+            "rsmtool",
+            "rsmeval",
+            "rsmpredict",
+            "rsmsummarize",
+            "rsmcompare",
+        ]:
+            ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]["required"])
+        OPTIONAL_INTERACTIVE_FIELDS = [
+            field
+            for field in INTERACTIVE_MODE_METADATA
+            if field not in ALL_REQUIRED_FIELDS
+        ]
         for field_name in OPTIONAL_INTERACTIVE_FIELDS:
-            field_count = INTERACTIVE_MODE_METADATA[field_name].get('count', 'single')
+            field_count = INTERACTIVE_MODE_METADATA[field_name].get("count", "single")
             yield self.check_optional_interactive_fields_blanks, field_name, field_count
 
 
@@ -1990,110 +2204,115 @@ class TestInteractiveGenerate:
 
         # define lists of mocked up values for each tool in the same order
         # that the interactive fields would have been displayed
-        cls.mocked_rsmtool_interactive_values = ["testtool",          # experiment_id
-                                                 "Lasso",             # model
-                                                 "train.csv",         # train_file
-                                                 "test.csv",          # test_file
-                                                 'an rsmtool test',   # description
-                                                 False,               # exclude_zero_scores
-                                                 "csv",               # file_format
-                                                 "ID",                # id_column
-                                                 None,                # length_column
-                                                 "score2",            # second_human_score_column
-                                                 False,               # standardize_features
-                                                 ["L1", "QUESTION"],  # subgroups
-                                                 "score",             # test_label_column
-                                                 "score",             # train_label_column
-                                                 1,                   # trim_min
-                                                 5,                   # trim_max,
-                                                 True,                # use_scaled_predictions
-                                                 False                # use_thumbnails
-                                                 ]
+        cls.mocked_rsmtool_interactive_values = [
+            "testtool",  # experiment_id
+            "Lasso",  # model
+            "train.csv",  # train_file
+            "test.csv",  # test_file
+            "an rsmtool test",  # description
+            False,  # exclude_zero_scores
+            "csv",  # file_format
+            "ID",  # id_column
+            None,  # length_column
+            "score2",  # second_human_score_column
+            False,  # standardize_features
+            ["L1", "QUESTION"],  # subgroups
+            "score",  # test_label_column
+            "score",  # train_label_column
+            1,  # trim_min
+            5,  # trim_max,
+            True,  # use_scaled_predictions
+            False,  # use_thumbnails
+        ]
 
-        cls.mocked_rsmeval_interactive_values = ["testeval",          # experiment_id
-                                                 "preds.csv",         # predictions_file
-                                                 "pred",              # system_score_column
-                                                 1,                   # trim_min
-                                                 6,                   # trim_max
-                                                 "an rsmeval test",   # description
-                                                 True,                # exclude_zeros
-                                                 "xlsx",              # file_format
-                                                 "score",             # human_score_column
-                                                 "ID",                # id_column
-                                                 "score2",            # second_human_score_column
-                                                 ["L1"],              # subgroups
-                                                 True                 # use_thumbnails
-                                                 ]
+        cls.mocked_rsmeval_interactive_values = [
+            "testeval",  # experiment_id
+            "preds.csv",  # predictions_file
+            "pred",  # system_score_column
+            1,  # trim_min
+            6,  # trim_max
+            "an rsmeval test",  # description
+            True,  # exclude_zeros
+            "xlsx",  # file_format
+            "score",  # human_score_column
+            "ID",  # id_column
+            "score2",  # second_human_score_column
+            ["L1"],  # subgroups
+            True,  # use_thumbnails
+        ]
 
-        cls.mocked_rsmcompare_interactive_values = ["testcompare",       # comparison_id
-                                                    "rsmtool1",          # experiment_id_old
-                                                    "/a/b/c",            # experiment_dir_old
-                                                    "rsmtool2",          # experiment_id_new
-                                                    '/d/e',              # experiment_dir_new
-                                                    "rsmtool expt 1",    # description_old
-                                                    "rsmtool expt 2",    # description_new
-                                                    [],                  # subgroups
-                                                    True                 # use_thumbnails
-                                                    ]
+        cls.mocked_rsmcompare_interactive_values = [
+            "testcompare",  # comparison_id
+            "rsmtool1",  # experiment_id_old
+            "/a/b/c",  # experiment_dir_old
+            "rsmtool2",  # experiment_id_new
+            "/d/e",  # experiment_dir_new
+            "rsmtool expt 1",  # description_old
+            "rsmtool expt 2",  # description_new
+            [],  # subgroups
+            True,  # use_thumbnails
+        ]
 
-        cls.mocked_rsmpredict_interactive_values = ["testpred",          # experiment_id
-                                                    "/a/b",              # experiment_dir_new
-                                                    "features.csv",      # input_features_file
-                                                    "csv",               # file_format
-                                                    "score",             # human_score_column
-                                                    "spkitemid",         # id_column
-                                                    None,                # second_human_score_column
-                                                    True,                # standardize_features
-                                                    ]
+        cls.mocked_rsmpredict_interactive_values = [
+            "testpred",  # experiment_id
+            "/a/b",  # experiment_dir_new
+            "features.csv",  # input_features_file
+            "csv",  # file_format
+            "score",  # human_score_column
+            "spkitemid",  # id_column
+            None,  # second_human_score_column
+            True,  # standardize_features
+        ]
 
-        cls.mocked_rsmsummarize_interactive_values = ["testsumm",          # summary_id
-                                                      ["/a/b",
-                                                       "/d",
-                                                       "/e/f/g"],          # experiment_dirs
-                                                      'summary test',      # description
-                                                      "tsv",               # file_format
-                                                      True,                # use_thumbnails
-                                                      ]
+        cls.mocked_rsmsummarize_interactive_values = [
+            "testsumm",  # summary_id
+            ["/a/b", "/d", "/e/f/g"],  # experiment_dirs
+            "summary test",  # description
+            "tsv",  # file_format
+            True,  # use_thumbnails
+        ]
 
-        cls.mocked_rsmxval_interactive_values = ["testxval",          # experiment_id
-                                                 "LinearSVC",         # model
-                                                 "train.csv",         # train_file
-                                                 'xval test',         # description
-                                                 True,                # exclude_zero_scores
-                                                 "xlsx",              # file_format
-                                                 3,                   # folds
-                                                 None,                # folds file
-                                                 "ID",                # id_column
-                                                 "length",            # length_column
-                                                 "score2",            # second_human_score_column
-                                                 True,                # standardize_features
-                                                 ["L1", "QUESTION"],  # subgroups
-                                                 "score",             # train_label_column
-                                                 1,                   # trim_min
-                                                 5,                   # trim_max,
-                                                 True,                # use_scaled_predictions
-                                                 False                # use_thumbnails
-                                                 ]
+        cls.mocked_rsmxval_interactive_values = [
+            "testxval",  # experiment_id
+            "LinearSVC",  # model
+            "train.csv",  # train_file
+            "xval test",  # description
+            True,  # exclude_zero_scores
+            "xlsx",  # file_format
+            3,  # folds
+            None,  # folds file
+            "ID",  # id_column
+            "length",  # length_column
+            "score2",  # second_human_score_column
+            True,  # standardize_features
+            ["L1", "QUESTION"],  # subgroups
+            "score",  # train_label_column
+            1,  # trim_min
+            5,  # trim_max,
+            True,  # use_scaled_predictions
+            False,  # use_thumbnails
+        ]
 
-        cls.mocked_rsmxval_interactive_values_folds_file = ["testxval",          # experiment_id
-                                                            "LinearSVC",         # model
-                                                            "train.csv",         # train_file
-                                                            'xval test',         # description
-                                                            True,                # exclude_zero_scores
-                                                            "xlsx",              # file_format
-                                                            5,                   # default folds
-                                                            "folds.csv",         # folds file
-                                                            "ID",                # id_column
-                                                            "length",            # length_column
-                                                            "score2",            # second_human_score_column
-                                                            True,                # standardize_features
-                                                            ["L1"],              # subgroups
-                                                            "score",             # train_label_column
-                                                            1,                   # trim_min
-                                                            5,                   # trim_max,
-                                                            True,                # use_scaled_predictions
-                                                            False                # use_thumbnails
-                                                            ]
+        cls.mocked_rsmxval_interactive_values_folds_file = [
+            "testxval",  # experiment_id
+            "LinearSVC",  # model
+            "train.csv",  # train_file
+            "xval test",  # description
+            True,  # exclude_zero_scores
+            "xlsx",  # file_format
+            5,  # default folds
+            "folds.csv",  # folds file
+            "ID",  # id_column
+            "length",  # length_column
+            "score2",  # second_human_score_column
+            True,  # standardize_features
+            ["L1"],  # subgroups
+            "score",  # train_label_column
+            1,  # trim_min
+            5,  # trim_max,
+            True,  # use_scaled_predictions
+            False,  # use_thumbnails
+        ]
 
     def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
@@ -2111,42 +2330,46 @@ class TestInteractiveGenerate:
             Whether to use "folds_file" for rsmxval.
         """
         # if we are using subgroups, then define a suffix for the expected file
-        groups_suffix = '_groups' if subgroups else ''
-        folds_file_suffix = '_folds_file' if with_folds_file else ''
+        groups_suffix = "_groups" if subgroups else ""
+        folds_file_suffix = "_folds_file" if with_folds_file else ""
 
         # get the appropriate list of mocked values for this tool but make
         # a copy since we may need to modify it below
-        mocked_values = getattr(self, f"mocked_{context}_interactive_values{folds_file_suffix}")[:]
+        mocked_values = getattr(
+            self, f"mocked_{context}_interactive_values{folds_file_suffix}"
+        )[:]
 
         # if we are not using subgroups, delete the subgroup entry
         # from the list of mocked values
         if not subgroups:
-            if context in ['rsmtool', 'rsmeval']:
+            if context in ["rsmtool", "rsmeval"]:
                 del mocked_values[11]
-            elif context == 'rsmcompare':
+            elif context == "rsmcompare":
                 del mocked_values[7]
-            elif context == 'rsmxval':
+            elif context == "rsmxval":
                 del mocked_values[12]
 
         # point to the right file holding the expected configuration
-        expected_file = f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
-        expected_path = join(rsmtool_test_dir, 'data', 'output', expected_file)
+        expected_file = (
+            f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
+        )
+        expected_path = join(rsmtool_test_dir, "data", "output", expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
         # that calling 'interact()' doesn't actually print out anything
         # to stderr and doesn't clear the screen
-        sys_stderr_patcher = patch('sys.stderr', new_callable=StringIO)
-        clear_patcher = patch('rsmtool.utils.commandline.clear')
+        sys_stderr_patcher = patch("sys.stderr", new_callable=StringIO)
+        clear_patcher = patch("rsmtool.utils.commandline.clear")
         _ = clear_patcher.start()
         _ = sys_stderr_patcher.start()
 
         # mock the `InteractiveField.get_value()` method to return the
         # pre-determined mocked values in order and check that the
         # configuration generated by `interact()` is what we expect it to be
-        with patch.object(InteractiveField, 'get_value', side_effect=mocked_values):
+        with patch.object(InteractiveField, "get_value", side_effect=mocked_values):
             generator = ConfigurationGenerator(context, use_subgroups=subgroups)
             configuration_string = generator.interact()
-            with open(expected_path, 'r') as expectedfh:
+            with open(expected_path, "r") as expectedfh:
                 expected_configuration_string = expectedfh.read().strip()
                 eq_(expected_configuration_string, configuration_string)
 
@@ -2159,20 +2382,20 @@ class TestInteractiveGenerate:
         # all tools except rsmpredict and rsmsummarize
         # explicitly support subgroups; only rsmxval supports
         # folds file
-        yield self.check_tool_interact, 'rsmtool', False, False
-        yield self.check_tool_interact, 'rsmtool', True, False
+        yield self.check_tool_interact, "rsmtool", False, False
+        yield self.check_tool_interact, "rsmtool", True, False
 
-        yield self.check_tool_interact, 'rsmeval', False, False
-        yield self.check_tool_interact, 'rsmeval', True, False
+        yield self.check_tool_interact, "rsmeval", False, False
+        yield self.check_tool_interact, "rsmeval", True, False
 
-        yield self.check_tool_interact, 'rsmcompare', False, False
-        yield self.check_tool_interact, 'rsmcompare', True, False
+        yield self.check_tool_interact, "rsmcompare", False, False
+        yield self.check_tool_interact, "rsmcompare", True, False
 
-        yield self.check_tool_interact, 'rsmpredict', False, False
+        yield self.check_tool_interact, "rsmpredict", False, False
 
-        yield self.check_tool_interact, 'rsmsummarize', False
+        yield self.check_tool_interact, "rsmsummarize", False
 
-        yield self.check_tool_interact, 'rsmxval', False, False
-        yield self.check_tool_interact, 'rsmxval', False, True
-        yield self.check_tool_interact, 'rsmxval', True, False
-        yield self.check_tool_interact, 'rsmxval', True, True
+        yield self.check_tool_interact, "rsmxval", False, False
+        yield self.check_tool_interact, "rsmxval", False, True
+        yield self.check_tool_interact, "rsmxval", True, False
+        yield self.check_tool_interact, "rsmxval", True, True

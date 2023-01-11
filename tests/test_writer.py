@@ -13,12 +13,12 @@ from rsmtool.writer import DataWriter
 
 
 class TestDataWriter:
-
     def check_write_frame_to_file(self, file_format, include_index):
 
         # create a dummy data frame for testing
-        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)),
-                                   columns=['A', 'B', 'C'])
+        df_to_write = pd.DataFrame(
+            np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
+        )
 
         # create a temporary directory where the file will be written
         tempdir = TemporaryDirectory()
@@ -27,10 +27,9 @@ class TestDataWriter:
         name_prefix = Path(tempdir.name) / "test_frame"
 
         # write the frame to disk
-        DataWriter.write_frame_to_file(df_to_write,
-                                       str(name_prefix),
-                                       file_format=file_format,
-                                       index=include_index)
+        DataWriter.write_frame_to_file(
+            df_to_write, str(name_prefix), file_format=file_format, index=include_index
+        )
 
         # check that the file was written to disk
         dir_listing = os.listdir(tempdir.name)
@@ -44,9 +43,9 @@ class TestDataWriter:
         elif file_format == "xlsx":
             df_written = pd.read_excel(f"{name_prefix}.{file_format}")
         else:
-            df_written = pd.read_json(f"{name_prefix}.{file_format}",
-                                      orient="records",
-                                      lines=True)
+            df_written = pd.read_json(
+                f"{name_prefix}.{file_format}", orient="records", lines=True
+            )
 
         # check that the index is there if it's supposed to be
         if include_index and file_format in ["csv", "tsv", "xlsx"]:
@@ -61,49 +60,65 @@ class TestDataWriter:
 
     def test_write_frame_to_file(self):
 
-        for (file_format,
-             include_index) in product(["csv", "tsv", "xlsx", "jsonlines"],
-                                       [False, True]):
+        for (file_format, include_index) in product(
+            ["csv", "tsv", "xlsx", "jsonlines"], [False, True]
+        ):
 
             yield self.check_write_frame_to_file, file_format, include_index
 
     def test_data_container_save_files(self):
 
-        data_sets = [{'name': 'dataset1', 'frame': pd.DataFrame(np.random.normal(size=(100, 2)),
-                                                                columns=['A', 'B'])},
-                     {'name': 'dataset2', 'frame': pd.DataFrame(np.random.normal(size=(120, 3)),
-                                                                columns=['A', 'B', 'C'])}]
+        data_sets = [
+            {
+                "name": "dataset1",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(100, 2)), columns=["A", "B"]
+                ),
+            },
+            {
+                "name": "dataset2",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
+                ),
+            },
+        ]
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_data_container_save_files_xyz'
+        directory = "temp_directory_data_container_save_files_xyz"
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['jsonlines', 'csv', 'xlsx']:
+        for file_type in ["jsonlines", "csv", "xlsx"]:
 
-            if file_type != 'jsonlines':
+            if file_type != "jsonlines":
 
-                writer.write_experiment_output(directory,
-                                               container,
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    container,
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
             else:
-                writer.write_experiment_output(directory,
-                                               container,
-                                               new_names_dict={'dataset1': 'aaa'},
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    container,
+                    new_names_dict={"dataset1": "aaa"},
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
-                                orient="records",
-                                lines=True)
-        ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
-        ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
+        aaa_json = pd.read_json(
+            os.path.join(directory, "aaa.jsonlines"), orient="records", lines=True
+        )
+        ds_1_csv = pd.read_csv(os.path.join(directory, "dataset1.csv"))
+        ds_1_xls = pd.read_excel(os.path.join(directory, "dataset1.xlsx"))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(
+            ["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"]
+        )
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
@@ -111,101 +126,134 @@ class TestDataWriter:
 
     def test_dictionary_save_files(self):
 
-        data_sets = {'dataset1': pd.DataFrame(np.random.normal(size=(100, 2)),
-                                              columns=['A', 'B']),
-                     'dataset2': pd.DataFrame(np.random.normal(size=(120, 3)),
-                                              columns=['A', 'B', 'C'])}
+        data_sets = {
+            "dataset1": pd.DataFrame(
+                np.random.normal(size=(100, 2)), columns=["A", "B"]
+            ),
+            "dataset2": pd.DataFrame(
+                np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
+            ),
+        }
 
-        directory = 'temp_directory_dictionary_save_files_xyz'
+        directory = "temp_directory_dictionary_save_files_xyz"
         os.makedirs(directory, exist_ok=True)
 
         writer = DataWriter()
-        for file_type in ['jsonlines', 'csv', 'xlsx']:
+        for file_type in ["jsonlines", "csv", "xlsx"]:
 
-            if file_type != 'jsonlines':
+            if file_type != "jsonlines":
 
-                writer.write_experiment_output(directory,
-                                               data_sets,
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    data_sets,
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
             else:
-                writer.write_experiment_output(directory,
-                                               data_sets,
-                                               new_names_dict={'dataset1': 'aaa'},
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    data_sets,
+                    new_names_dict={"dataset1": "aaa"},
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
 
-        aaa_json = pd.read_json(os.path.join(directory, 'aaa.jsonlines'),
-                                orient="records",
-                                lines=True)
-        ds_1_csv = pd.read_csv(os.path.join(directory, 'dataset1.csv'))
-        ds_1_xls = pd.read_excel(os.path.join(directory, 'dataset1.xlsx'))
+        aaa_json = pd.read_json(
+            os.path.join(directory, "aaa.jsonlines"), orient="records", lines=True
+        )
+        ds_1_csv = pd.read_csv(os.path.join(directory, "dataset1.csv"))
+        ds_1_xls = pd.read_excel(os.path.join(directory, "dataset1.xlsx"))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['aaa.jsonlines', 'dataset1.csv', 'dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(
+            ["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"]
+        )
 
-        assert_frame_equal(data_sets['dataset1'], aaa_json)
-        assert_frame_equal(data_sets['dataset1'], ds_1_csv)
-        assert_frame_equal(data_sets['dataset1'], ds_1_xls)
+        assert_frame_equal(data_sets["dataset1"], aaa_json)
+        assert_frame_equal(data_sets["dataset1"], ds_1_csv)
+        assert_frame_equal(data_sets["dataset1"], ds_1_xls)
 
     @raises(KeyError)
     def test_data_container_save_wrong_format(self):
 
-        data_sets = [{'name': 'dataset1', 'frame': pd.DataFrame(np.random.normal(size=(100, 2)),
-                                                                columns=['A', 'B'])},
-                     {'name': 'dataset2', 'frame': pd.DataFrame(np.random.normal(size=(120, 3)),
-                                                                columns=['A', 'B', 'C'])}]
+        data_sets = [
+            {
+                "name": "dataset1",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(100, 2)), columns=["A", "B"]
+                ),
+            },
+            {
+                "name": "dataset2",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
+                ),
+            },
+        ]
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_container_save_wrong_format_xyz'
+        directory = "temp_directory_container_save_wrong_format_xyz"
 
         writer = DataWriter()
-        writer.write_experiment_output(directory,
-                                       container,
-                                       dataframe_names=['dataset1'],
-                                       file_format='html')
+        writer.write_experiment_output(
+            directory, container, dataframe_names=["dataset1"], file_format="html"
+        )
 
     def test_data_container_save_files_with_id(self):
 
-        data_sets = [{'name': 'dataset1', 'frame': pd.DataFrame(np.random.normal(size=(100, 2)),
-                                                                columns=['A', 'B'])},
-                     {'name': 'dataset2', 'frame': pd.DataFrame(np.random.normal(size=(120, 3)),
-                                                                columns=['A', 'B', 'C'])}]
+        data_sets = [
+            {
+                "name": "dataset1",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(100, 2)), columns=["A", "B"]
+                ),
+            },
+            {
+                "name": "dataset2",
+                "frame": pd.DataFrame(
+                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
+                ),
+            },
+        ]
 
         container = DataContainer(data_sets)
 
-        directory = 'temp_directory_save_files_with_id_xyz'
+        directory = "temp_directory_save_files_with_id_xyz"
         os.makedirs(directory, exist_ok=True)
 
-        writer = DataWriter('test')
-        for file_type in ['jsonlines', 'csv', 'xlsx']:
+        writer = DataWriter("test")
+        for file_type in ["jsonlines", "csv", "xlsx"]:
 
-            if file_type != 'jsonlines':
+            if file_type != "jsonlines":
 
-                writer.write_experiment_output(directory,
-                                               container,
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    container,
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
             else:
-                writer.write_experiment_output(directory,
-                                               container,
-                                               new_names_dict={'dataset1': 'aaa'},
-                                               dataframe_names=['dataset1'],
-                                               file_format=file_type)
+                writer.write_experiment_output(
+                    directory,
+                    container,
+                    new_names_dict={"dataset1": "aaa"},
+                    dataframe_names=["dataset1"],
+                    file_format=file_type,
+                )
 
-        aaa_json = pd.read_json(os.path.join(directory, 'test_aaa.jsonlines'),
-                                orient="records",
-                                lines=True)
-        ds_1_csv = pd.read_csv(os.path.join(directory, 'test_dataset1.csv'))
-        ds_1_xls = pd.read_excel(os.path.join(directory, 'test_dataset1.xlsx'))
+        aaa_json = pd.read_json(
+            os.path.join(directory, "test_aaa.jsonlines"), orient="records", lines=True
+        )
+        ds_1_csv = pd.read_csv(os.path.join(directory, "test_dataset1.csv"))
+        ds_1_xls = pd.read_excel(os.path.join(directory, "test_dataset1.xlsx"))
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(['test_aaa.jsonlines',
-                                             'test_dataset1.csv',
-                                             'test_dataset1.xlsx'])
+        assert sorted(output_dir) == sorted(
+            ["test_aaa.jsonlines", "test_dataset1.csv", "test_dataset1.xlsx"]
+        )
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)

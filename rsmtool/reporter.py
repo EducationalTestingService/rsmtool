@@ -24,67 +24,81 @@ from . import HAS_RSMEXTRA
 from .reader import DataReader
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (special_section_list_rsmtool, # noqa
-                                   special_section_list_rsmeval,
-                                   special_section_list_rsmcompare,
-                                   special_section_list_rsmsummarize,
-                                   ordered_section_list_with_special_sections_rsmtool,
-                                   ordered_section_list_with_special_sections_rsmeval,
-                                   ordered_section_list_with_special_sections_rsmcompare,
-                                   ordered_section_list_with_special_sections_rsmsummarize,
-                                   special_notebook_path)
+    from rsmextra.settings import (
+        special_section_list_rsmtool,  # noqa
+        special_section_list_rsmeval,
+        special_section_list_rsmcompare,
+        special_section_list_rsmsummarize,
+        ordered_section_list_with_special_sections_rsmtool,
+        ordered_section_list_with_special_sections_rsmeval,
+        ordered_section_list_with_special_sections_rsmcompare,
+        ordered_section_list_with_special_sections_rsmsummarize,
+        special_notebook_path,
+    )
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
-    ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
-    ordered_section_list_rsmsummarize = ordered_section_list_with_special_sections_rsmsummarize
+    ordered_section_list_rsmcompare = (
+        ordered_section_list_with_special_sections_rsmcompare
+    )
+    ordered_section_list_rsmsummarize = (
+        ordered_section_list_with_special_sections_rsmsummarize
+    )
 
 else:
-    ordered_section_list_rsmtool = ['data_description',
-                                    'data_description_by_group',
-                                    'feature_descriptives',
-                                    'features_by_group',
-                                    'preprocessed_features',
-                                    'dff_by_group',
-                                    'consistency',
-                                    'model',
-                                    'evaluation',
-                                    'true_score_evaluation',
-                                    'evaluation_by_group',
-                                    'fairness_analyses',
-                                    'pca',
-                                    'intermediate_file_paths',
-                                    'sysinfo']
+    ordered_section_list_rsmtool = [
+        "data_description",
+        "data_description_by_group",
+        "feature_descriptives",
+        "features_by_group",
+        "preprocessed_features",
+        "dff_by_group",
+        "consistency",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "evaluation_by_group",
+        "fairness_analyses",
+        "pca",
+        "intermediate_file_paths",
+        "sysinfo",
+    ]
 
-    ordered_section_list_rsmeval = ['data_description',
-                                    'data_description_by_group',
-                                    'consistency',
-                                    'evaluation',
-                                    'true_score_evaluation',
-                                    'evaluation_by_group',
-                                    'fairness_analyses',
-                                    'intermediate_file_paths',
-                                    'sysinfo']
+    ordered_section_list_rsmeval = [
+        "data_description",
+        "data_description_by_group",
+        "consistency",
+        "evaluation",
+        "true_score_evaluation",
+        "evaluation_by_group",
+        "fairness_analyses",
+        "intermediate_file_paths",
+        "sysinfo",
+    ]
 
-    ordered_section_list_rsmcompare = ['feature_descriptives',
-                                       'features_by_group',
-                                       'preprocessed_features',
-                                       'preprocessed_features_by_group',
-                                       'consistency',
-                                       'score_distributions',
-                                       'model',
-                                       'evaluation',
-                                       'true_score_evaluation',
-                                       'pca',
-                                       'notes',
-                                       'sysinfo']
+    ordered_section_list_rsmcompare = [
+        "feature_descriptives",
+        "features_by_group",
+        "preprocessed_features",
+        "preprocessed_features_by_group",
+        "consistency",
+        "score_distributions",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "pca",
+        "notes",
+        "sysinfo",
+    ]
 
-    ordered_section_list_rsmsummarize = ['preprocessed_features',
-                                         'model',
-                                         'evaluation',
-                                         'true_score_evaluation',
-                                         'intermediate_file_paths',
-                                         'sysinfo']
+    ordered_section_list_rsmsummarize = [
+        "preprocessed_features",
+        "model",
+        "evaluation",
+        "true_score_evaluation",
+        "intermediate_file_paths",
+        "sysinfo",
+    ]
 
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
@@ -93,50 +107,73 @@ else:
     special_notebook_path = ""
 
 package_path = dirname(__file__)
-notebook_path = abspath(join(package_path, 'notebooks'))
-template_path = join(notebook_path, 'templates')
+notebook_path = abspath(join(package_path, "notebooks"))
+template_path = join(notebook_path, "templates")
 
-javascript_path = join(notebook_path, 'javascript')
-comparison_notebook_path = join(notebook_path, 'comparison')
-summary_notebook_path = join(notebook_path, 'summary')
+javascript_path = join(notebook_path, "javascript")
+comparison_notebook_path = join(notebook_path, "comparison")
+summary_notebook_path = join(notebook_path, "summary")
 
 
 # Define the general section list
 
-general_section_list_rsmtool = [section for section in ordered_section_list_rsmtool
-                                if section not in special_section_list_rsmtool]
+general_section_list_rsmtool = [
+    section
+    for section in ordered_section_list_rsmtool
+    if section not in special_section_list_rsmtool
+]
 
-general_section_list_rsmeval = [section for section in ordered_section_list_rsmeval
-                                if section not in special_section_list_rsmeval]
+general_section_list_rsmeval = [
+    section
+    for section in ordered_section_list_rsmeval
+    if section not in special_section_list_rsmeval
+]
 
-general_section_list_rsmcompare = [section for section in ordered_section_list_rsmcompare
-                                   if section not in special_section_list_rsmcompare]
+general_section_list_rsmcompare = [
+    section
+    for section in ordered_section_list_rsmcompare
+    if section not in special_section_list_rsmcompare
+]
 
-general_section_list_rsmsummarize = [section for section
-                                     in ordered_section_list_rsmsummarize
-                                     if section not in special_section_list_rsmsummarize]
+general_section_list_rsmsummarize = [
+    section
+    for section in ordered_section_list_rsmsummarize
+    if section not in special_section_list_rsmsummarize
+]
 
 
 # define a mapping from the tool name to the master
 # list for both general and special sections
-master_section_dict = {'general': {'rsmtool': general_section_list_rsmtool,
-                                   'rsmeval': general_section_list_rsmeval,
-                                   'rsmcompare': general_section_list_rsmcompare,
-                                   'rsmsummarize': general_section_list_rsmsummarize},
-                       'special': {'rsmtool': special_section_list_rsmtool,
-                                   'rsmeval': special_section_list_rsmeval,
-                                   'rsmcompare': special_section_list_rsmcompare,
-                                   'rsmsummarize': special_section_list_rsmsummarize}}
+master_section_dict = {
+    "general": {
+        "rsmtool": general_section_list_rsmtool,
+        "rsmeval": general_section_list_rsmeval,
+        "rsmcompare": general_section_list_rsmcompare,
+        "rsmsummarize": general_section_list_rsmsummarize,
+    },
+    "special": {
+        "rsmtool": special_section_list_rsmtool,
+        "rsmeval": special_section_list_rsmeval,
+        "rsmcompare": special_section_list_rsmcompare,
+        "rsmsummarize": special_section_list_rsmsummarize,
+    },
+}
 
 # define the mapping for section paths
-notebook_path_dict = {'general': {'rsmtool': notebook_path,
-                                  'rsmeval': notebook_path,
-                                  'rsmcompare': comparison_notebook_path,
-                                  'rsmsummarize': summary_notebook_path},
-                      'special': {'rsmtool': special_notebook_path,
-                                  'rsmeval': special_notebook_path,
-                                  'rsmcompare': special_notebook_path,
-                                  'rsmsummarize': special_notebook_path}}
+notebook_path_dict = {
+    "general": {
+        "rsmtool": notebook_path,
+        "rsmeval": notebook_path,
+        "rsmcompare": comparison_notebook_path,
+        "rsmsummarize": summary_notebook_path,
+    },
+    "special": {
+        "rsmtool": special_notebook_path,
+        "rsmeval": special_notebook_path,
+        "rsmcompare": special_notebook_path,
+        "rsmsummarize": special_notebook_path,
+    },
+}
 
 
 class Reporter:
@@ -176,7 +213,9 @@ class Reporter:
         for cs_path in custom_report_section_paths:
             cs_location = DataReader.locate_files(cs_path, configdir)
             if not cs_location:
-                raise FileNotFoundError(f"Error: custom section not found at {cs_path}.")
+                raise FileNotFoundError(
+                    f"Error: custom section not found at {cs_path}."
+                )
             else:
                 custom_report_sections.append(cs_location)
         return custom_report_sections
@@ -201,19 +240,19 @@ class Reporter:
         # metadata from the "first" notebook and then add in the cells
         # from all the other notebooks.
         first_notebook = notebook_files[0]
-        merged_notebook = json.loads(open(first_notebook, 'r', encoding='utf-8').read())
+        merged_notebook = json.loads(open(first_notebook, "r", encoding="utf-8").read())
         for notebook in notebook_files[1:]:
-            section_cells = json.loads(open(notebook, 'r', encoding='utf-8').read())["cells"]
-            merged_notebook['cells'].extend(section_cells)
+            section_cells = json.loads(open(notebook, "r", encoding="utf-8").read())[
+                "cells"
+            ]
+            merged_notebook["cells"].extend(section_cells)
 
         # output the merged cells into a report
-        with open(output_file, 'w') as outf:
+        with open(output_file, "w") as outf:
             json.dump(merged_notebook, outf, indent=1)
 
     @staticmethod
-    def check_section_names(specified_sections,
-                            section_type,
-                            context='rsmtool'):
+    def check_section_names(specified_sections, section_type, context="rsmtool"):
         """
         Validate the specified section names.
 
@@ -240,10 +279,12 @@ class Reporter:
         master_section_list = master_section_dict[section_type][context]
         invalid_section_names = set(specified_sections).difference(master_section_list)
         if invalid_section_names:
-            raise ValueError(f"The following {section_type} report section names are "
-                             f"invalid or not supported for {context}: "
-                             f"{invalid_section_names}\nThe following sections are "
-                             f"currently available: {master_section_list}")
+            raise ValueError(
+                f"The following {section_type} report section names are "
+                f"invalid or not supported for {context}: "
+                f"{invalid_section_names}\nThe following sections are "
+                f"currently available: {master_section_list}"
+            )
 
     @staticmethod
     def check_section_order(chosen_sections, section_order):
@@ -268,17 +309,21 @@ class Reporter:
             # check for discrepancies and create a helpful error message
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
-                error_message_missing = (f"'section_order' must list all sections "
-                                         f"selected for your experiment: Please edit "
-                                         f"section order to include the following missing "
-                                         f"sections: {', '.join(missing_sections)}")
+                error_message_missing = (
+                    f"'section_order' must list all sections "
+                    f"selected for your experiment: Please edit "
+                    f"section order to include the following missing "
+                    f"sections: {', '.join(missing_sections)}"
+                )
 
             extra_sections = set(section_order).difference(set(chosen_sections))
             if extra_sections:
-                error_message_extra = (f"'section order' can only include sections "
-                                       f"available for this experiment. The following "
-                                       f"sections are either unavailable or were not "
-                                       f"selected for this experiment {', '.join(extra_sections)}")
+                error_message_extra = (
+                    f"'section order' can only include sections "
+                    f"available for this experiment. The following "
+                    f"sections are either unavailable or were not "
+                    f"selected for this experiment {', '.join(extra_sections)}"
+                )
 
             # raise an appropriate error message or a combination of messages
             if missing_sections and not extra_sections:
@@ -309,17 +354,23 @@ class Reporter:
         # implemention of the event loop on Windows for Cpython 3.8
         # which breaks the report generation unless we include the
         # following workaround
-        if (sys.version_info[0] == 3 and
-                sys.version_info[1] >= 8 and
-                sys.platform.startswith('win')):
+        if (
+            sys.version_info[0] == 3
+            and sys.version_info[1] >= 8
+            and sys.platform.startswith("win")
+        ):
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
         # set a high timeout for datasets with a large number of features
-        report_config = Config({'ExecutePreprocessor': {'enabled': True,
-                                                        'timeout': 3600},
-                                'HTMLExporter': {"template_name": "classic",
-                                                 "template_file": join(template_path,
-                                                                       'report.tpl')}})
+        report_config = Config(
+            {
+                "ExecutePreprocessor": {"enabled": True, "timeout": 3600},
+                "HTMLExporter": {
+                    "template_name": "classic",
+                    "template_file": join(template_path, "report.tpl"),
+                },
+            }
+        )
 
         # newer versions of nbconvert use a "clean_html" filter that
         # break SVG rendering; so we override that filter here with
@@ -328,18 +379,21 @@ class Reporter:
         # https://github.com/EducationalTestingService/rsmtool/issues/571
         def custom_clean_html(element):
             return element.decode() if isinstance(element, bytes) else str(element)
+
         default_filters["clean_html"] = custom_clean_html
 
         exportHtml = HTMLExporter(config=report_config)
         output, _ = exportHtml.from_filename(notebook_file)
-        open(html_file, mode='w', encoding='utf-8').write(output)
+        open(html_file, mode="w", encoding="utf-8").write(output)
 
-    def determine_chosen_sections(self,
-                                  general_sections,
-                                  special_sections,
-                                  custom_sections,
-                                  subgroups,
-                                  context='rsmtool'):
+    def determine_chosen_sections(
+        self,
+        general_sections,
+        special_sections,
+        custom_sections,
+        subgroups,
+        context="rsmtool",
+    ):
         """
         Compile a combined list of section names to be included in the report.
 
@@ -373,61 +427,71 @@ class Reporter:
         """
         # 1. Include all general sections unless we are asked to include
         # a specific (and valid) subset.
-        general_section_list = master_section_dict['general'][context]
+        general_section_list = master_section_dict["general"][context]
         chosen_general_sections = general_section_list
         all_general_sections = True
 
-        if general_sections != ['all']:
-            self.check_section_names(general_sections, 'general', context)
-            chosen_general_sections = [s for s in general_sections
-                                       if s in general_section_list]
+        if general_sections != ["all"]:
+            self.check_section_names(general_sections, "general", context)
+            chosen_general_sections = [
+                s for s in general_sections if s in general_section_list
+            ]
             all_general_sections = False
 
         # 2. Exclude the subgroup sections if we do not have subgroup information.
 
         if len(subgroups) == 0:
-            subgroup_sections = [section for section in chosen_general_sections
-                                 if section.endswith('by_group') or section == 'fairness_analyses']
+            subgroup_sections = [
+                section
+                for section in chosen_general_sections
+                if section.endswith("by_group") or section == "fairness_analyses"
+            ]
             # if we were given a list of general sections, raise an error if
             # that list included subgroup sections but no subgroups were specified
 
             if not all_general_sections and len(subgroup_sections) != 0:
-                raise ValueError(f"You requested sections for subgroup analysis "
-                                 f"but did not specify any subgroups. Please amend "
-                                 f"the config files to define the subgroups or delete "
-                                 f"the following sections from the list of sections: "
-                                 f"{', '.join(subgroup_sections)}")
+                raise ValueError(
+                    f"You requested sections for subgroup analysis "
+                    f"but did not specify any subgroups. Please amend "
+                    f"the config files to define the subgroups or delete "
+                    f"the following sections from the list of sections: "
+                    f"{', '.join(subgroup_sections)}"
+                )
 
             # if we are using the default list, we simply remove the
             # subgroup sections
-            chosen_general_sections = [section for section in chosen_general_sections
-                                       if section not in subgroup_sections]
+            chosen_general_sections = [
+                section
+                for section in chosen_general_sections
+                if section not in subgroup_sections
+            ]
 
         # 3. Include the specified (and valid) subset of the special sections
         chosen_special_sections = []
         if special_sections:
-            special_section_list = master_section_dict['special'][context]
-            self.check_section_names(special_sections, 'special', context=context)
-            chosen_special_sections = [s for s in special_sections
-                                       if s in special_section_list]
+            special_section_list = master_section_dict["special"][context]
+            self.check_section_names(special_sections, "special", context=context)
+            chosen_special_sections = [
+                s for s in special_sections if s in special_section_list
+            ]
 
         # 4. For the custom sections use the basename and strip off the `.ipynb` extension
         chosen_custom_sections = []
         if custom_sections:
-            chosen_custom_sections = [splitext(basename(cs))[0] for cs in custom_sections]
+            chosen_custom_sections = [
+                splitext(basename(cs))[0] for cs in custom_sections
+            ]
 
         # return the final list of chosen sections
-        chosen_sections = (chosen_general_sections +
-                           chosen_special_sections +
-                           chosen_custom_sections)
+        chosen_sections = (
+            chosen_general_sections + chosen_special_sections + chosen_custom_sections
+        )
 
         return chosen_sections
 
-    def get_section_file_map(self,
-                             special_sections,
-                             custom_sections,
-                             model_type=None,
-                             context='rsmtool'):
+    def get_section_file_map(
+        self, special_sections, custom_sections, model_type=None, context="rsmtool"
+    ):
         """
         Map section names to IPython notebook filenames.
 
@@ -454,43 +518,52 @@ class Reporter:
             corresponding IPython notebook filename.
         """
         # create the original section file map for general sections
-        selected_notebook_path = notebook_path_dict['general'][context]
-        general_sections = master_section_dict['general'][context]
+        selected_notebook_path = notebook_path_dict["general"][context]
+        general_sections = master_section_dict["general"][context]
 
-        section_file_map = {s: join(selected_notebook_path, f'{s}.ipynb')
-                            for s in general_sections + ['header', 'footer']}
+        section_file_map = {
+            s: join(selected_notebook_path, f"{s}.ipynb")
+            for s in general_sections + ["header", "footer"]
+        }
 
         # update the file map to point the 'model section to either the built-in
         # or the SKLL model notebook depending on the model type that
         # was passed in
-        if context == 'rsmtool' and model_type:
-            section_file_map['model'] = join(selected_notebook_path,
-                                             f'{model_type.lower()}_model.ipynb')
+        if context == "rsmtool" and model_type:
+            section_file_map["model"] = join(
+                selected_notebook_path, f"{model_type.lower()}_model.ipynb"
+            )
 
         # update the file map to include the special sections
         if special_sections:
-            selected_special_notebook_path = notebook_path_dict['special'][context]
-            section_file_map.update({ss: join(selected_special_notebook_path,
-                                              f"{ss}.ipynb")
-                                     for ss in special_sections})
+            selected_special_notebook_path = notebook_path_dict["special"][context]
+            section_file_map.update(
+                {
+                    ss: join(selected_special_notebook_path, f"{ss}.ipynb")
+                    for ss in special_sections
+                }
+            )
 
         # update the file map to include the custom sections with
         # the file names (without the `.ipynb` extension) as the
         # names (keys) and full paths as values
         if custom_sections:
-            section_file_map.update({splitext(basename(cs))[0]: cs
-                                     for cs in custom_sections})
+            section_file_map.update(
+                {splitext(basename(cs))[0]: cs for cs in custom_sections}
+            )
 
         return section_file_map
 
-    def get_ordered_notebook_files(self,
-                                   general_sections,
-                                   special_sections=[],
-                                   custom_sections=[],
-                                   section_order=None,
-                                   subgroups=[],
-                                   model_type=None,
-                                   context='rsmtool'):
+    def get_ordered_notebook_files(
+        self,
+        general_sections,
+        special_sections=[],
+        custom_sections=[],
+        section_order=None,
+        subgroups=[],
+        model_type=None,
+        context="rsmtool",
+    ):
         """
         Check all section names and the order of the sections.
 
@@ -532,11 +605,13 @@ class Reporter:
             List of the IPython notebook files that have
             to be rendered into the HTML report.
         """
-        chosen_sections = self.determine_chosen_sections(general_sections,
-                                                         special_sections,
-                                                         custom_sections,
-                                                         subgroups,
-                                                         context=context)
+        chosen_sections = self.determine_chosen_sections(
+            general_sections,
+            special_sections,
+            custom_sections,
+            subgroups,
+            context=context,
+        )
 
         # check to make sure that if a custom section ordering is
         # specified by the user, that it actually contains
@@ -546,23 +621,24 @@ class Reporter:
             self.check_section_order(chosen_sections, section_order)
 
         # determine which order to use by default
-        if context == 'rsmtool':
+        if context == "rsmtool":
             ordered_section_list = ordered_section_list_rsmtool
-        elif context == 'rsmeval':
+        elif context == "rsmeval":
             ordered_section_list = ordered_section_list_rsmeval
-        elif context == 'rsmcompare':
+        elif context == "rsmcompare":
             ordered_section_list = ordered_section_list_rsmcompare
-        elif context == 'rsmsummarize':
+        elif context == "rsmsummarize":
             ordered_section_list = ordered_section_list_rsmsummarize
 
         # add all custom sections to the end of the default ordered list
-        ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
+        ordered_section_list.extend(
+            [splitext(basename(cs))[0] for cs in custom_sections]
+        )
 
         # get the section file map
-        section_file_map = self.get_section_file_map(special_sections,
-                                                     custom_sections,
-                                                     model_type,
-                                                     context=context)
+        section_file_map = self.get_section_file_map(
+            special_sections, custom_sections, model_type, context=context
+        )
 
         # order the section list either according to the default
         # order in `ordered_section_list` or according to the custom
@@ -571,16 +647,12 @@ class Reporter:
         chosen_sections = [s for s in order_to_use if s in chosen_sections]
 
         # add the header and the footer to the chosen sections
-        chosen_sections = ['header'] + chosen_sections + ['footer']
+        chosen_sections = ["header"] + chosen_sections + ["footer"]
         chosen_notebook_files = [section_file_map[cs] for cs in chosen_sections]
 
         return chosen_notebook_files
 
-    def create_report(self,
-                      config,
-                      csvdir,
-                      figdir,
-                      context='rsmtool'):
+    def create_report(self, config, csvdir, figdir, context="rsmtool"):
         """
         Generate HTML report for an rsmtool/rsmeval experiment.
 
@@ -603,93 +675,101 @@ class Reporter:
             If "test_file_location" or "pred_file_location" fields
             are not specified in the configuration.
         """
-        test_file_location = config.get('test_file_location')
+        test_file_location = config.get("test_file_location")
         if test_file_location is None:
-            test_file_location = config.get('pred_file_location')
+            test_file_location = config.get("pred_file_location")
 
         # raise error if location is still None
         if test_file_location is None:
-            raise KeyError('Could not find `test_file_location` or `pred_file_location` '
-                           'in Configuration object. Please make sure you have included '
-                           'one of these parameters in the configuration object.')
+            raise KeyError(
+                "Could not find `test_file_location` or `pred_file_location` "
+                "in Configuration object. Please make sure you have included "
+                "one of these parameters in the configuration object."
+            )
 
         # if the features subset file is None, just use empty string
-        feature_subset_file = ('' if config.get('feature_subset_file') is None
-                               else config['feature_subset_file'])
+        feature_subset_file = (
+            ""
+            if config.get("feature_subset_file") is None
+            else config["feature_subset_file"]
+        )
 
         # if the min items is None, just set it to zero
-        min_items = (0 if config['min_items_per_candidate'] is None
-                     else config['min_items_per_candidate'])
+        min_items = (
+            0
+            if config["min_items_per_candidate"] is None
+            else config["min_items_per_candidate"]
+        )
 
         # determine minimum and maximum scores for trimming
-        (used_trim_min,
-         used_trim_max,
-         trim_tolerance) = config.get_trim_min_max_tolerance()
+        (
+            used_trim_min,
+            used_trim_max,
+            trim_tolerance,
+        ) = config.get_trim_min_max_tolerance()
         min_score = used_trim_min - trim_tolerance
         max_score = used_trim_max + trim_tolerance
 
-        environ_config = {'EXPERIMENT_ID': config['experiment_id'],
-                          'DESCRIPTION': config['description'],
-                          'MODEL_TYPE': config.get('model_type', ''),
-                          'MODEL_NAME': config.get('model_name', ''),
-                          'TRAIN_FILE_LOCATION': config.get('train_file_location', ''),
-                          'TEST_FILE_LOCATION': test_file_location,
-                          'SUBGROUPS': config.get('subgroups', []),
-                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
-                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
-                          'MIN_N_PER_GROUP': config.get('min_n_per_group', {}),
-                          'LENGTH_COLUMN': config.get('length_column', None),
-                          'H2_COLUMN': config['second_human_score_column'],
-                          'MIN_ITEMS': min_items,
-                          'FEATURE_SUBSET_FILE': feature_subset_file,
-                          'EXCLUDE_ZEROS': config.get('exclude_zero_scores', True),
-                          'SCALED': config.get('use_scaled_predictions', False),
-                          'MIN_SCORE': min_score,
-                          'MAX_SCORE': max_score,
-                          'STANDARDIZE_FEATURES': config.get('standardize_features', True),
-                          'FILE_FORMAT': config.get('file_format', 'csv'),
-                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
-                          'SKLL_FIXED_PARAMETERS': config.get('skll_fixed_parameters', {}),
-                          'SKLL_OBJECTIVE': config.get('skll_objective', ''),
-                          'PREDICT_EXPECTED_SCORES': config.get('predict_expected_scores', False),
-                          'RATER_ERROR_VARIANCE': config.get('rater_error_variance', None),
-                          'CONTEXT': context,
-                          'JAVASCRIPT_PATH': javascript_path,
-                          'OUTPUT_DIR': csvdir,
-                          'FIGURE_DIR': figdir
-                          }
+        environ_config = {
+            "EXPERIMENT_ID": config["experiment_id"],
+            "DESCRIPTION": config["description"],
+            "MODEL_TYPE": config.get("model_type", ""),
+            "MODEL_NAME": config.get("model_name", ""),
+            "TRAIN_FILE_LOCATION": config.get("train_file_location", ""),
+            "TEST_FILE_LOCATION": test_file_location,
+            "SUBGROUPS": config.get("subgroups", []),
+            "GROUPS_FOR_DESCRIPTIVES": config.get("subgroups", []),
+            "GROUPS_FOR_EVALUATIONS": config.get("subgroups", []),
+            "MIN_N_PER_GROUP": config.get("min_n_per_group", {}),
+            "LENGTH_COLUMN": config.get("length_column", None),
+            "H2_COLUMN": config["second_human_score_column"],
+            "MIN_ITEMS": min_items,
+            "FEATURE_SUBSET_FILE": feature_subset_file,
+            "EXCLUDE_ZEROS": config.get("exclude_zero_scores", True),
+            "SCALED": config.get("use_scaled_predictions", False),
+            "MIN_SCORE": min_score,
+            "MAX_SCORE": max_score,
+            "STANDARDIZE_FEATURES": config.get("standardize_features", True),
+            "FILE_FORMAT": config.get("file_format", "csv"),
+            "USE_THUMBNAILS": config.get("use_thumbnails", False),
+            "SKLL_FIXED_PARAMETERS": config.get("skll_fixed_parameters", {}),
+            "SKLL_OBJECTIVE": config.get("skll_objective", ""),
+            "PREDICT_EXPECTED_SCORES": config.get("predict_expected_scores", False),
+            "RATER_ERROR_VARIANCE": config.get("rater_error_variance", None),
+            "CONTEXT": context,
+            "JAVASCRIPT_PATH": javascript_path,
+            "OUTPUT_DIR": csvdir,
+            "FIGURE_DIR": figdir,
+        }
 
         # get the report directory which is at the same level
         # as the output and the figure directory
-        reportdir = abspath(join(csvdir, '..', 'report'))
+        reportdir = abspath(join(csvdir, "..", "report"))
         report_name = f"{config['experiment_id']}_report"
-        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
-        environ_config_file = join(reportdir, '.environ.json')
+        merged_notebook_file = join(reportdir, f"{report_name}.ipynb")
+        environ_config_file = join(reportdir, ".environ.json")
 
         # set the report directory as an environment variable
-        os.environ['RSM_REPORT_DIR'] = reportdir
+        os.environ["RSM_REPORT_DIR"] = reportdir
 
         # write out hidden environment JSON file
-        with open(environ_config_file, 'w') as out_environ_config:
+        with open(environ_config_file, "w") as out_environ_config:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        self.logger.info('Merging sections')
-        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
+        self.logger.info("Merging sections")
+        self.merge_notebooks(config["chosen_notebook_files"], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        self.logger.info('Exporting HTML')
-        self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, f'{report_name}.html'))
+        self.logger.info("Exporting HTML")
+        self.convert_ipynb_to_html(
+            merged_notebook_file, join(reportdir, f"{report_name}.html")
+        )
 
-    def create_comparison_report(self,
-                                 config,
-                                 csvdir_old,
-                                 figdir_old,
-                                 csvdir_new,
-                                 figdir_new,
-                                 output_dir):
+    def create_comparison_report(
+        self, config, csvdir_old, figdir_old, csvdir_new, figdir_new, output_dir
+    ):
         """
         Generate an HTML report for comparing two rsmtool experiments.
 
@@ -709,52 +789,51 @@ class Reporter:
             The output dir for the new report.
         """
         # whether to use scaled predictions for both new and old; default to false
-        use_scaled_predictions_old = config.get('use_scaled_predictions_old', False)
-        use_scaled_predictions_new = config.get('use_scaled_predictions_new', False)
+        use_scaled_predictions_old = config.get("use_scaled_predictions_old", False)
+        use_scaled_predictions_new = config.get("use_scaled_predictions_new", False)
 
-        environ_config = {'EXPERIMENT_ID_OLD': config['experiment_id_old'],
-                          'EXPERIMENT_ID_NEW': config['experiment_id_new'],
-                          'DESCRIPTION_OLD': config['description_old'],
-                          'DESCRIPTION_NEW': config['description_new'],
-                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
-                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
-                          'SCALED_OLD': use_scaled_predictions_old,
-                          'SCALED_NEW': use_scaled_predictions_new,
-                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
-                          'JAVASCRIPT_PATH': javascript_path,
-                          'OUTPUT_DIR_NEW': csvdir_new,
-                          'FIGURE_DIR_NEW': figdir_new,
-                          'OUTPUT_DIR_OLD': csvdir_old,
-                          'FIGURE_DIR_OLD': figdir_old,
-                          }
+        environ_config = {
+            "EXPERIMENT_ID_OLD": config["experiment_id_old"],
+            "EXPERIMENT_ID_NEW": config["experiment_id_new"],
+            "DESCRIPTION_OLD": config["description_old"],
+            "DESCRIPTION_NEW": config["description_new"],
+            "GROUPS_FOR_DESCRIPTIVES": config.get("subgroups", []),
+            "GROUPS_FOR_EVALUATIONS": config.get("subgroups", []),
+            "SCALED_OLD": use_scaled_predictions_old,
+            "SCALED_NEW": use_scaled_predictions_new,
+            "USE_THUMBNAILS": config.get("use_thumbnails", False),
+            "JAVASCRIPT_PATH": javascript_path,
+            "OUTPUT_DIR_NEW": csvdir_new,
+            "FIGURE_DIR_NEW": figdir_new,
+            "OUTPUT_DIR_OLD": csvdir_old,
+            "FIGURE_DIR_OLD": figdir_old,
+        }
 
         # create the output directory
         os.makedirs(output_dir, exist_ok=True)
         report_name = f"{config['comparison_id']}_report"
-        merged_notebook_file = join(output_dir, f'{report_name}.ipynb')
-        environ_config_file = join(output_dir, '.environ.json')
+        merged_notebook_file = join(output_dir, f"{report_name}.ipynb")
+        environ_config_file = join(output_dir, ".environ.json")
 
         # set the report directory as an environment variable
-        os.environ['RSM_REPORT_DIR'] = abspath(output_dir)
+        os.environ["RSM_REPORT_DIR"] = abspath(output_dir)
 
         # write out hidden environment JSON file
-        with open(environ_config_file, 'w') as out_environ_config:
+        with open(environ_config_file, "w") as out_environ_config:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        self.logger.info('Merging sections')
-        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
+        self.logger.info("Merging sections")
+        self.merge_notebooks(config["chosen_notebook_files"], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        self.logger.info('Exporting HTML')
-        self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(output_dir, f'{report_name}.html'))
+        self.logger.info("Exporting HTML")
+        self.convert_ipynb_to_html(
+            merged_notebook_file, join(output_dir, f"{report_name}.html")
+        )
 
-    def create_summary_report(self,
-                              config,
-                              all_experiments,
-                              csvdir):
+    def create_summary_report(self, config, all_experiments, csvdir):
         """
         Generate an HTML report for summarizing the given rsmtool experiments.
 
@@ -767,46 +846,48 @@ class Reporter:
         csvdir : str
             The experiment CSV output directory.
         """
-        environ_config = {'SUMMARY_ID': config['summary_id'],
-                          'DESCRIPTION': config['description'],
-                          'GROUPS_FOR_DESCRIPTIVES': config.get('subgroups', []),
-                          'GROUPS_FOR_EVALUATIONS': config.get('subgroups', []),
-                          'USE_THUMBNAILS': config.get('use_thumbnails', False),
-                          'FILE_FORMAT': config.get('file_format', 'csv'),
-                          'JSONS': all_experiments,
-                          'JAVASCRIPT_PATH': javascript_path,
-                          'OUTPUT_DIR': csvdir
-                          }
+        environ_config = {
+            "SUMMARY_ID": config["summary_id"],
+            "DESCRIPTION": config["description"],
+            "GROUPS_FOR_DESCRIPTIVES": config.get("subgroups", []),
+            "GROUPS_FOR_EVALUATIONS": config.get("subgroups", []),
+            "USE_THUMBNAILS": config.get("use_thumbnails", False),
+            "FILE_FORMAT": config.get("file_format", "csv"),
+            "JSONS": all_experiments,
+            "JAVASCRIPT_PATH": javascript_path,
+            "OUTPUT_DIR": csvdir,
+        }
 
         report_name = f"{config['summary_id']}_report"
-        reportdir = abspath(join(csvdir, '..', 'report'))
-        merged_notebook_file = join(reportdir, f'{report_name}.ipynb')
-        environ_config_file = join(reportdir, '.environ.json')
+        reportdir = abspath(join(csvdir, "..", "report"))
+        merged_notebook_file = join(reportdir, f"{report_name}.ipynb")
+        environ_config_file = join(reportdir, ".environ.json")
 
         # set the report directory as an environment variable
-        os.environ['RSM_REPORT_DIR'] = reportdir
+        os.environ["RSM_REPORT_DIR"] = reportdir
 
         # write out hidden environment JSON file
-        with open(environ_config_file, 'w') as out_environ_config:
+        with open(environ_config_file, "w") as out_environ_config:
             json.dump(environ_config, out_environ_config)
 
         # merge all the given sections
-        self.logger.info('Merging sections')
-        self.merge_notebooks(config['chosen_notebook_files'], merged_notebook_file)
+        self.logger.info("Merging sections")
+        self.merge_notebooks(config["chosen_notebook_files"], merged_notebook_file)
 
         # run the merged notebook and save the output as
         # an HTML file in the report directory
-        self.logger.info('Exporting HTML')
-        self.convert_ipynb_to_html(merged_notebook_file,
-                                   join(reportdir, f'{report_name}.html'))
+        self.logger.info("Exporting HTML")
+        self.convert_ipynb_to_html(
+            merged_notebook_file, join(reportdir, f"{report_name}.html")
+        )
 
 
 def main():  # noqa: D103
 
     # set up an argument parser
-    parser = argparse.ArgumentParser(prog='render_notebook')
-    parser.add_argument('ipynb_file', help="IPython notebook file")
-    parser.add_argument('html_file', help="output HTML file")
+    parser = argparse.ArgumentParser(prog="render_notebook")
+    parser.add_argument("ipynb_file", help="IPython notebook file")
+    parser.add_argument("html_file", help="output HTML file")
 
     # parse given command line arguments
     args = parser.parse_args()
@@ -815,5 +896,5 @@ def main():  # noqa: D103
     Reporter.convert_ipynb_to_html(args.ipynb_file, args.html_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

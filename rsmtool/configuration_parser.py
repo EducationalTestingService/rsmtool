@@ -25,13 +25,21 @@ from skll.learner import Learner
 from skll.metrics import _SCORERS
 
 from . import HAS_RSMEXTRA
-from .utils.constants import BOOLEAN_FIELDS, CHECK_FIELDS, DEFAULTS, ID_FIELDS, LIST_FIELDS
+from .utils.constants import (
+    BOOLEAN_FIELDS,
+    CHECK_FIELDS,
+    DEFAULTS,
+    ID_FIELDS,
+    LIST_FIELDS,
+)
 from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (default_feature_subset_file, # noqa
-                                   default_feature_sign)
+    from rsmextra.settings import (
+        default_feature_subset_file,  # noqa
+        default_feature_sign,
+    )
 
 
 def configure(context, config_file_or_obj_or_dict):
@@ -82,8 +90,7 @@ def configure(context, config_file_or_obj_or_dict):
     elif isinstance(config_file_or_obj_or_dict, dict):
 
         # directly instantiate the Configuration from the dictionary
-        configuration = Configuration(config_file_or_obj_or_dict,
-                                      context=context)
+        configuration = Configuration(config_file_or_obj_or_dict, context=context)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
 
@@ -99,9 +106,11 @@ def configure(context, config_file_or_obj_or_dict):
             configuration = config_file_or_obj_or_dict
 
     else:
-        raise ValueError(f"The input to run_experiment must be a path to the file (str), "
-                         f"a dictionary, or a configuration object. You passed "
-                         f"{type(config_file_or_obj_or_dict)}.")
+        raise ValueError(
+            f"The input to run_experiment must be a path to the file (str), "
+            f"a dictionary, or a configuration object. You passed "
+            f"{type(config_file_or_obj_or_dict)}."
+        )
 
     return configuration
 
@@ -114,12 +123,7 @@ class Configuration:
     access these parameters.
     """
 
-    def __init__(self,
-                 configdict,
-                 *,
-                 configdir=None,
-                 context='rsmtool',
-                 logger=None):
+    def __init__(self, configdict, *, configdir=None, context="rsmtool", logger=None):
         """
         Create an object of the `Configuration` class.
 
@@ -146,7 +150,7 @@ class Configuration:
             Defaults to ``None``.
         """
         if not isinstance(configdict, dict):
-            raise TypeError('The input must be a dictionary.')
+            raise TypeError("The input must be a dictionary.")
 
         # create a logger instance
         self.logger = logger if logger else logging.getLogger(__name__)
@@ -234,11 +238,13 @@ class Configuration:
             includes the configuration options that can be set by
             the user.
         """
-        expected_fields = (CHECK_FIELDS[self._context]['required'] +
-                           CHECK_FIELDS[self._context]['optional'])
+        expected_fields = (
+            CHECK_FIELDS[self._context]["required"]
+            + CHECK_FIELDS[self._context]["optional"]
+        )
 
         output_config = {k: v for k, v in self._config.items() if k in expected_fields}
-        return json.dumps(output_config, indent=4, separators=(',', ': '))
+        return json.dumps(output_config, indent=4, separators=(",", ": "))
 
     def __iter__(self):
         """
@@ -422,7 +428,7 @@ class Configuration:
             output_dir = Path(getcwd())
 
         # Create output directory, if it does not exist
-        output_dir = Path(output_dir).resolve() / 'output'
+        output_dir = Path(output_dir).resolve() / "output"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
@@ -430,7 +436,7 @@ class Configuration:
         context = self._context
         outjson = output_dir / f"{experiment_id}_{context}.json"
 
-        with outjson.open(mode='w') as outfile:
+        with outjson.open(mode="w") as outfile:
             outfile.write(str(self))
 
     def check_exclude_listwise(self):
@@ -446,13 +452,11 @@ class Configuration:
             Whether to exclude list-wise.
         """
         exclude_listwise = False
-        if self._config.get('min_items_per_candidate'):
+        if self._config.get("min_items_per_candidate"):
             exclude_listwise = True
         return exclude_listwise
 
-    def check_flag_column(self,
-                          flag_column='flag_column',
-                          partition='unknown'):
+    def check_flag_column(self, flag_column="flag_column", partition="unknown"):
         """
         Make sure the column name in ``flag_column`` is correctly specified.
 
@@ -492,19 +496,25 @@ class Configuration:
 
         new_filter_dict = {}
 
-        flag_message = {"train": "training",
-                        "test": "evaluating",
-                        "both": "training and evaluating",
-                        "unknown": "training and/or evaluating"}
+        flag_message = {
+            "train": "training",
+            "test": "evaluating",
+            "both": "training and evaluating",
+            "unknown": "training and/or evaluating",
+        }
 
         if partition not in flag_message:
-            raise ValueError(f"Unknown value for partition: {partition} This must "
-                             f"be one of the following: {','.join(flag_message.keys())}.")
+            raise ValueError(
+                f"Unknown value for partition: {partition} This must "
+                f"be one of the following: {','.join(flag_message.keys())}."
+            )
 
         if flag_column == "flag_column_test":
             if partition in ["both", "train"]:
-                raise ValueError("Conditions specified in 'flag_column_test' "
-                                 "can only be applied to the evaluation partition.")
+                raise ValueError(
+                    "Conditions specified in 'flag_column_test' "
+                    "can only be applied to the evaluation partition."
+                )
 
         if config.get(flag_column):
 
@@ -512,29 +522,34 @@ class Configuration:
 
             # first check that the value is a dictionary
             if not isinstance(original_filter_dict, dict):
-                raise ValueError("`flag_column` must be a dictionary. "
-                                 "Please refer to the documentation for "
-                                 "further information.")
+                raise ValueError(
+                    "`flag_column` must be a dictionary. "
+                    "Please refer to the documentation for "
+                    "further information."
+                )
 
             for column in original_filter_dict:
 
                 # if we were given a single value, convert it to list
                 if not isinstance(original_filter_dict[column], list):
                     new_filter_dict[column] = [original_filter_dict[column]]
-                    self.logger.warning(f"The filtering condition {original_filter_dict[column]} "
-                                        f"for column {column} was converted to list. Only "
-                                        f"responses where {column} == {original_filter_dict[column]} "
-                                        f"will be used for {flag_message[partition]} the model. "
-                                        f"You can ignore this warning if this is the correct "
-                                        f"interpretation of your configuration settings.")
+                    self.logger.warning(
+                        f"The filtering condition {original_filter_dict[column]} "
+                        f"for column {column} was converted to list. Only "
+                        f"responses where {column} == {original_filter_dict[column]} "
+                        f"will be used for {flag_message[partition]} the model. "
+                        f"You can ignore this warning if this is the correct "
+                        f"interpretation of your configuration settings."
+                    )
                 else:
                     new_filter_dict[column] = original_filter_dict[column]
 
-                    model_eval = ', '.join(map(str,
-                                               original_filter_dict[column]))
-                    self.logger.info(f"Only responses where {column} equals one of the "
-                                     f"following values will be used for "
-                                     f"{flag_message[partition]} the model: {model_eval}.")
+                    model_eval = ", ".join(map(str, original_filter_dict[column]))
+                    self.logger.info(
+                        f"Only responses where {column} equals one of the "
+                        f"following values will be used for "
+                        f"{flag_message[partition]} the model: {model_eval}."
+                    )
         return new_filter_dict
 
     def get_trim_min_max_tolerance(self):
@@ -555,9 +570,9 @@ class Configuration:
         """
         config = self._config
 
-        spec_trim_min = config.get('trim_min', None)
-        spec_trim_max = config.get('trim_max', None)
-        spec_trim_tolerance = config.get('trim_tolerance', None)
+        spec_trim_min = config.get("trim_min", None)
+        spec_trim_max = config.get("trim_max", None)
+        spec_trim_tolerance = config.get("trim_tolerance", None)
 
         if spec_trim_min:
             spec_trim_min = float(spec_trim_min)
@@ -578,7 +593,7 @@ class Configuration:
         """
         config = self._config
 
-        rater_error_variance = config.get('rater_error_variance', None)
+        rater_error_variance = config.get("rater_error_variance", None)
 
         if rater_error_variance:
             rater_error_variance = float(rater_error_variance)
@@ -594,13 +609,13 @@ class Configuration:
         default_converter : dict
             The default converter for a train or test file.
         """
-        string_columns = [self._config['id_column']]
+        string_columns = [self._config["id_column"]]
 
-        candidate = self._config.get('candidate_column')
+        candidate = self._config.get("candidate_column")
         if candidate is not None:
             string_columns.append(candidate)
 
-        subgroups = self._config.get('subgroups')
+        subgroups = self._config.get("subgroups")
         if subgroups:
             string_columns.extend(subgroups)
 
@@ -634,14 +649,18 @@ class Configuration:
 
         # Make sure keys are not duplicated
         if not len(set(keys)) == len(keys):
-            raise ValueError(f"The ``keys`` must be unique. However, the following "
-                             f"duplicate keys were found: "
-                             f"{', '.join([key for key, val in Counter(keys).items() if val > 1])}.")
+            raise ValueError(
+                f"The ``keys`` must be unique. However, the following "
+                f"duplicate keys were found: "
+                f"{', '.join([key for key, val in Counter(keys).items() if val > 1])}."
+            )
         # Make sure names are not duplicated
         if not len(set(names)) == len(names):
-            raise ValueError(f"The``names`` must be unique. However, the following "
-                             f"duplicate names were found: "
-                             f"{', '.join([name for name, val in Counter(names).items() if val > 1])}.")
+            raise ValueError(
+                f"The``names`` must be unique. However, the following "
+                f"duplicate names were found: "
+                f"{', '.join([name for name, val in Counter(names).items() if val > 1])}."
+            )
         existing_names = []
         existing_paths = []
         for idx, key in enumerate(keys):
@@ -650,7 +669,7 @@ class Configuration:
 
             # if the `features` field is a list,
             # do not include it in the container
-            if key == 'features':
+            if key == "features":
                 if isinstance(path, list):
                     continue
 
@@ -698,19 +717,23 @@ class ConfigurationParser:
 
         # raise an exception if the file does not exist
         if not pathlike.exists():
-            raise FileNotFoundError(f"The configuration file {pathlike} "
-                                    f"was not found.")
+            raise FileNotFoundError(
+                f"The configuration file {pathlike} " f"was not found."
+            )
 
         # raise an exception if the user specified a directory
         if not pathlike.is_file():
-            raise OSError(f"The given path {pathlike} should be a "
-                          f"file, not a directory.")
+            raise OSError(
+                f"The given path {pathlike} should be a " f"file, not a directory."
+            )
 
         # make sure we have a file that ends in ".json"
         extension = pathlike.suffix.lower()
-        if extension != '.json':
-            raise ValueError(f"The configuration file must be in `.json` "
-                             f"format. You specified: {extension}.")
+        if extension != ".json":
+            raise ValueError(
+                f"The configuration file must be in `.json` "
+                f"format. You specified: {extension}."
+            )
 
         # set the various attributes to None
         self._filename = pathlike.name
@@ -738,8 +761,8 @@ class ConfigurationParser:
         json_string : str
             The updated string.
         """
-        json_string = json_string.replace('True', 'true')
-        json_string = json_string.replace('False', 'false')
+        json_string = json_string.replace("True", "true")
+        json_string = json_string.replace("False", "false")
         json_string = json_string.replace("'", '"')
         return json_string
 
@@ -770,14 +793,16 @@ class ConfigurationParser:
         try:
             configdict = parse_json_with_comments(filepath)
         except ValueError:
-            raise ValueError(f'The main configuration file `{filepath}` exists but '
-                             f'is formatted incorrectly. Please check that each '
-                             f'line ends with a comma, there is no comma at the end '
-                             f'of the last line, and that all quotes match.')
+            raise ValueError(
+                f"The main configuration file `{filepath}` exists but "
+                f"is formatted incorrectly. Please check that each "
+                f"line ends with a comma, there is no comma at the end "
+                f"of the last line, and that all quotes match."
+            )
 
         return configdict
 
-    def parse(self, context='rsmtool'):
+    def parse(self, context="rsmtool"):
         """
         Parse configuration file.
 
@@ -804,12 +829,10 @@ class ConfigurationParser:
         # create a new Configuration object which will automatically
         # process and validate the configuration
         # dictionary being passed in
-        return Configuration(configdict,
-                             configdir=self._configdir,
-                             context=context)
+        return Configuration(configdict, configdir=self._configdir, context=context)
 
     @classmethod
-    def validate_config(cls, config, context='rsmtool'):
+    def validate_config(cls, config, context="rsmtool"):
         """
         Validate configuration file.
 
@@ -843,7 +866,7 @@ class ConfigurationParser:
         new_config = deepcopy(config)
 
         # 1. Check to make sure all required fields are specified
-        required_fields = CHECK_FIELDS[context]['required']
+        required_fields = CHECK_FIELDS[context]["required"]
 
         for field in required_fields:
             if field not in new_config:
@@ -872,155 +895,197 @@ class ConfigurationParser:
             if len(id_field_value) > 200:
                 raise ValueError(f"{id_field} is too long (must be <=200 characters)")
 
-            if re.search(r'\s', id_field_value):
+            if re.search(r"\s", id_field_value):
                 raise ValueError(f"{id_field} cannot contain any spaces")
 
         # 5. Check that the feature file and feature subset/subset file are not
         # specified together
-        msg = ("You cannot specify BOTH \"features\" and \"{}\". "
-               "Please refer to the \"Selecting Feature Columns\" "
-               "section in the documentation for more details.")
-        if new_config['features'] and new_config['feature_subset_file']:
+        msg = (
+            'You cannot specify BOTH "features" and "{}". '
+            'Please refer to the "Selecting Feature Columns" '
+            "section in the documentation for more details."
+        )
+        if new_config["features"] and new_config["feature_subset_file"]:
             msg = msg.format("feature_subset_file")
             raise ValueError(msg)
-        if new_config['features'] and new_config['feature_subset']:
+        if new_config["features"] and new_config["feature_subset"]:
             msg = msg.format("feature_subset")
             raise ValueError(msg)
 
         # 6. Check for fields that require feature_subset_file and try
         # to use the default feature file
-        if (new_config['feature_subset'] and
-                not new_config['feature_subset_file']):
+        if new_config["feature_subset"] and not new_config["feature_subset_file"]:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
-                new_config['feature_subset_file'] = default_feature_subset_file
-                cls.logger.warning(f"You requested feature subsets but did not specify "
-                                   f"any feature file. The tool will use the default "
-                                   f"feature file {default_basename} available via rsmextra.")
+                new_config["feature_subset_file"] = default_feature_subset_file
+                cls.logger.warning(
+                    f"You requested feature subsets but did not specify "
+                    f"any feature file. The tool will use the default "
+                    f"feature file {default_basename} available via rsmextra."
+                )
             else:
-                raise ValueError("If you want to use feature subsets, you "
-                                 "must specify a feature subset file")
+                raise ValueError(
+                    "If you want to use feature subsets, you "
+                    "must specify a feature subset file"
+                )
 
-        if new_config['sign'] and not new_config['feature_subset_file']:
+        if new_config["sign"] and not new_config["feature_subset_file"]:
 
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
-                new_config['feature_subset_file'] = default_feature_subset_file
-                cls.logger.warning(f"You specified the expected sign of correlation "
-                                   f"but did not specify a feature subset file. The "
-                                   f"tool will use the default feature subset file "
-                                   f"{default_basename} available via rsmextra.")
+                new_config["feature_subset_file"] = default_feature_subset_file
+                cls.logger.warning(
+                    f"You specified the expected sign of correlation "
+                    f"but did not specify a feature subset file. The "
+                    f"tool will use the default feature subset file "
+                    f"{default_basename} available via rsmextra."
+                )
             else:
-                raise ValueError("If you want to specify the expected sign of "
-                                 " correlation for each feature, you must "
-                                 "specify a feature subset file")
+                raise ValueError(
+                    "If you want to specify the expected sign of "
+                    " correlation for each feature, you must "
+                    "specify a feature subset file"
+                )
 
         # Use the default sign if we are using the default feature file
         # and sign has not been specified in the config file
         if HAS_RSMEXTRA:
             default_feature = default_feature_subset_file
-            if (new_config['feature_subset_file'] == default_feature and
-                    not new_config['sign']):
-                new_config['sign'] = default_feature_sign
+            if (
+                new_config["feature_subset_file"] == default_feature
+                and not new_config["sign"]
+            ):
+                new_config["sign"] = default_feature_sign
 
         # 7. Check for fields that must be specified together
-        if (new_config['min_items_per_candidate'] and
-                not new_config['candidate_column']):
-            raise ValueError("If you want to filter out candidates with "
-                             "responses to less than X items, you need "
-                             "to specify the name of the column which "
-                             "contains candidate IDs.")
+        if new_config["min_items_per_candidate"] and not new_config["candidate_column"]:
+            raise ValueError(
+                "If you want to filter out candidates with "
+                "responses to less than X items, you need "
+                "to specify the name of the column which "
+                "contains candidate IDs."
+            )
 
         # 8. Check that if "skll_objective" is specified, it's
         # one of the metrics that SKLL allows for AND that it is
         # specified for a SKLL model and _not_ a built-in
         # linear regression model
-        if new_config['skll_objective']:
-            if not is_skll_model(new_config['model']):
-                warnings.warn("You specified a custom SKLL objective but also chose a "
-                              "non-SKLL model. The objective will be ignored.")
+        if new_config["skll_objective"]:
+            if not is_skll_model(new_config["model"]):
+                warnings.warn(
+                    "You specified a custom SKLL objective but also chose a "
+                    "non-SKLL model. The objective will be ignored."
+                )
             else:
-                if new_config['skll_objective'] not in _SCORERS:
-                    raise ValueError("Invalid SKLL objective. Please refer to the SKLL "
-                                     "documentation and choose a valid tuning objective.")
+                if new_config["skll_objective"] not in _SCORERS:
+                    raise ValueError(
+                        "Invalid SKLL objective. Please refer to the SKLL "
+                        "documentation and choose a valid tuning objective."
+                    )
 
         # 9. Check that if "skll_fixed_parameters" is specified,
         # it's specified for SKLL model and _not_ a built-in linear
         # regression model; we cannot check whether the parameters
         # are valid at parse time but SKLL will raise an error
         # at run time for any invalid parameters
-        if new_config['skll_fixed_parameters']:
-            if not is_skll_model(new_config['model']):
-                warnings.warn("You specified custom SKLL fixed parameters but "
-                              "also chose a non-SKLL model. The parameters will "
-                              "be ignored.")
+        if new_config["skll_fixed_parameters"]:
+            if not is_skll_model(new_config["model"]):
+                warnings.warn(
+                    "You specified custom SKLL fixed parameters but "
+                    "also chose a non-SKLL model. The parameters will "
+                    "be ignored."
+                )
 
         # 10. Check that if we are running rsmtool to ask for
         # expected scores then the SKLL model type must actually
         # support probabilistic classification. If it's not a SKLL
         # model at all, we just treat it as a LinearRegression model
         # which is basically what they all are in the end.
-        if context == 'rsmtool' and new_config['predict_expected_scores']:
-            model_name = new_config['model']
-            dummy_learner = Learner(model_name) if is_skll_model(model_name) else Learner('LinearRegression')
-            if not hasattr(dummy_learner.model_type, 'predict_proba'):
-                raise ValueError(f"{model_name} does not support expected scores "
-                                 f"since it is not a probablistic classifier.")
+        if context == "rsmtool" and new_config["predict_expected_scores"]:
+            model_name = new_config["model"]
+            dummy_learner = (
+                Learner(model_name)
+                if is_skll_model(model_name)
+                else Learner("LinearRegression")
+            )
+            if not hasattr(dummy_learner.model_type, "predict_proba"):
+                raise ValueError(
+                    f"{model_name} does not support expected scores "
+                    f"since it is not a probablistic classifier."
+                )
             del dummy_learner
 
         # 11. Check the fields that requires rsmextra
         if not HAS_RSMEXTRA:
-            if new_config['special_sections']:
-                raise ValueError("Special sections are only available to ETS"
-                                 " users by installing the rsmextra package.")
+            if new_config["special_sections"]:
+                raise ValueError(
+                    "Special sections are only available to ETS"
+                    " users by installing the rsmextra package."
+                )
 
         # 12. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
-        if new_config['features'] and new_config['select_transformations']:
+        if new_config["features"] and new_config["select_transformations"]:
             # Show a warning unless a user passed a list of features.
-            if not isinstance(new_config['features'], list):
-                warnings.warn("You specified a feature file but also set "
-                              "`select_transformations` to True. Any "
-                              "transformations or signs specified in "
-                              "the feature file will be overwritten by "
-                              "the automatically selected transformations "
-                              "and signs.")
+            if not isinstance(new_config["features"], list):
+                warnings.warn(
+                    "You specified a feature file but also set "
+                    "`select_transformations` to True. Any "
+                    "transformations or signs specified in "
+                    "the feature file will be overwritten by "
+                    "the automatically selected transformations "
+                    "and signs."
+                )
 
         # 13. If we have `experiment_names`, check that the length of the list
         # matches the list of experiment_dirs.
-        if context == 'rsmsummarize' and new_config['experiment_names']:
-            if len(new_config['experiment_names']) != len(new_config['experiment_dirs']):
-                raise ValueError("The number of specified experiment names should be the same"
-                                 " as the number of specified experiment directories.")
+        if context == "rsmsummarize" and new_config["experiment_names"]:
+            if len(new_config["experiment_names"]) != len(
+                new_config["experiment_dirs"]
+            ):
+                raise ValueError(
+                    "The number of specified experiment names should be the same"
+                    " as the number of specified experiment directories."
+                )
 
         # 14. Check that if the user specified min_n_per_group, they also
         # specified subgroups. If they supplied a dictionary, make
         # sure the keys match
-        if new_config['min_n_per_group']:
+        if new_config["min_n_per_group"]:
             # make sure we have subgroups
-            if 'subgroups' not in new_config:
-                raise ValueError("You must specify a list of subgroups in "
-                                 "in the `subgroups` field if "
-                                 "you want to use the `min_n_per_group` field")
+            if "subgroups" not in new_config:
+                raise ValueError(
+                    "You must specify a list of subgroups in "
+                    "in the `subgroups` field if "
+                    "you want to use the `min_n_per_group` field"
+                )
             # if we got dictionary, make sure the keys match
-            elif isinstance(new_config['min_n_per_group'], dict):
-                if sorted(new_config['min_n_per_group'].keys()) != sorted(new_config['subgroups']):
-                    raise ValueError("The keys in `min_n_per_group` must "
-                                     "match the subgroups in `subgroups` field")
+            elif isinstance(new_config["min_n_per_group"], dict):
+                if sorted(new_config["min_n_per_group"].keys()) != sorted(
+                    new_config["subgroups"]
+                ):
+                    raise ValueError(
+                        "The keys in `min_n_per_group` must "
+                        "match the subgroups in `subgroups` field"
+                    )
             # else convert to dictionary
             else:
-                new_config['min_n_per_group'] = {group: new_config['min_n_per_group']
-                                                 for group in new_config['subgroups']}
+                new_config["min_n_per_group"] = {
+                    group: new_config["min_n_per_group"]
+                    for group in new_config["subgroups"]
+                }
 
         # 15. Clean up config dict to keep only context-specific fields
-        context_relevant_fields = (CHECK_FIELDS[context]['optional'] +
-                                   CHECK_FIELDS[context]['required'])
+        context_relevant_fields = (
+            CHECK_FIELDS[context]["optional"] + CHECK_FIELDS[context]["required"]
+        )
 
-        new_config = {k: v for k, v in new_config.items()
-                      if k in context_relevant_fields}
+        new_config = {
+            k: v for k, v in new_config.items() if k in context_relevant_fields
+        }
 
         return new_config
 
@@ -1061,19 +1126,18 @@ class ConfigurationParser:
         for field in LIST_FIELDS:
             if field in new_config and new_config[field] is not None:
                 if not isinstance(new_config[field], list):
-                    new_config[field] = new_config[field].split(',')
-                    new_config[field] = [prefix.strip() for prefix
-                                         in new_config[field]]
+                    new_config[field] = new_config[field].split(",")
+                    new_config[field] = [prefix.strip() for prefix in new_config[field]]
 
         # make sure all boolean values are boolean
         for field in BOOLEAN_FIELDS:
-            error_message = f'Field {field} can only be set to True or False.'
+            error_message = f"Field {field} can only be set to True or False."
             if field in new_config and new_config[field] is not None:
                 if not isinstance(new_config[field], bool):
                     # we first convert the value to string to avoid
                     # attribute errors in case the user supplied an integer.
                     given_value = str(new_config[field]).strip()
-                    m = re.match(r'^(true|false)$', given_value, re.I)
+                    m = re.match(r"^(true|false)$", given_value, re.I)
                     if not m:
                         raise ValueError(error_message)
                     else:

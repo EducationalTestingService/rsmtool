@@ -16,7 +16,7 @@ from textwrap import wrap
 
 from IPython.display import HTML, display
 
-HTML_STRING = ("""<li><b>{}</b>: <a href="{}" download>{}</a></li>""")
+HTML_STRING = """<li><b>{}</b>: <a href="{}" download>{}</a></li>"""
 
 
 def float_format_func(num, prec=3):
@@ -36,7 +36,7 @@ def float_format_func(num, prec=3):
     ans : str
         The formatted string representing the given number.
     """
-    formatter_string = Template('{:.${prec}f}').substitute(prec=prec)
+    formatter_string = Template("{:.${prec}f}").substitute(prec=prec)
     ans = formatter_string.format(num)
     return ans
 
@@ -62,18 +62,13 @@ def int_or_float_format_func(num, prec=3):
         The formatted string representing the given number.
     """
     if float.is_integer(num):
-        ans = f'{int(num)}'
+        ans = f"{int(num)}"
     else:
         ans = float_format_func(num, prec=prec)
     return ans
 
 
-def custom_highlighter(num,
-                       low=0,
-                       high=1,
-                       prec=3,
-                       absolute=False,
-                       span_class='bold'):
+def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="bold"):
     """
     Convert float to an HTML <span> element with given class.
 
@@ -107,8 +102,11 @@ def custom_highlighter(num,
     """
     abs_num = abs(num) if absolute else num
     val = float_format_func(num, prec=prec)
-    ans = (f'<span class="highlight_{span_class}">{val}</span>'
-           if abs_num < low or abs_num > high else val)
+    ans = (
+        f'<span class="highlight_{span_class}">{val}</span>'
+        if abs_num < low or abs_num > high
+        else val
+    )
     return ans
 
 
@@ -138,7 +136,7 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     ans : str
         The formatted highlighter with bold class as default.
     """
-    ans = custom_highlighter(num, low, high, prec, absolute, 'bold')
+    ans = custom_highlighter(num, low, high, prec, absolute, "bold")
     return ans
 
 
@@ -168,7 +166,7 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     ans : str
         The formatted highlighter with color class as default.
     """
-    ans = custom_highlighter(num, low, high, prec, absolute, 'color')
+    ans = custom_highlighter(num, low, high, prec, absolute, "color")
     return ans
 
 
@@ -199,7 +197,7 @@ def compute_subgroup_plot_params(group_names, num_plots):
     wrapped_group_names : list of str
         A list of group names for plots.
     """
-    wrapped_group_names = ['\n'.join(wrap(str(gn), 20)) for gn in group_names]
+    wrapped_group_names = ["\n".join(wrap(str(gn), 20)) for gn in group_names]
     plot_height = 4 if wrapped_group_names == group_names else 6
     num_groups = len(group_names)
     if num_groups <= 6:
@@ -249,7 +247,7 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     FileNotFoundError
         If the image file cannot be located.
     """
-    error_message = 'The file `{}` could not be located.'
+    error_message = "The file `{}` could not be located."
     if not exists(path_to_image):
         raise FileNotFoundError(error_message.format(path_to_image))
 
@@ -290,9 +288,11 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     </script>"""
 
     # generate image tags
-    image = (f"""<img id='{image_id}' src='{rel_image_path}' """
-             f"""onclick='getPicture("{rel_thumbnail_path}")' """
-             f"""title="Click to enlarge"></img>""")
+    image = (
+        f"""<img id='{image_id}' src='{rel_image_path}' """
+        f"""onclick='getPicture("{rel_thumbnail_path}")' """
+        f"""title="Click to enlarge"></img>"""
+    )
 
     # create the image HTML
     image += style
@@ -326,9 +326,7 @@ def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     display : IPython.core.display.HTML
         The HTML for the thumbnail image.
     """
-    display(HTML(get_thumbnail_as_html(path_to_image,
-                                       image_id,
-                                       path_to_thumbnail)))
+    display(HTML(get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail)))
 
 
 def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
@@ -357,11 +355,11 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     """
     output_dir = Path(output_dir)
     parent_dir = output_dir.parent
-    files = output_dir.glob(f'*.{file_format}')
-    html_string = ''
+    files = output_dir.glob(f"*.{file_format}")
+    html_string = ""
     for file in sorted(files):
         relative_file = ".." / file.relative_to(parent_dir)
-        relative_name = relative_file.stem.replace(f'{experiment_id}_', '')
+        relative_name = relative_file.stem.replace(f"{experiment_id}_", "")
 
         # check if relative name is in the replacement dictionary and,
         # if it is, use the more descriptive name in the replacement
@@ -370,12 +368,10 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
         if relative_name in replace_dict:
             descriptive_name = replace_dict[relative_name]
         else:
-            descriptive_name_components = relative_name.split('_')
-            descriptive_name = ' '.join(descriptive_name_components).title()
+            descriptive_name_components = relative_name.split("_")
+            descriptive_name = " ".join(descriptive_name_components).title()
 
-        html_string += HTML_STRING.format(descriptive_name,
-                                          relative_file,
-                                          file_format)
+        html_string += HTML_STRING.format(descriptive_name, relative_file, file_format)
 
     return """<ul><html>""" + html_string + """</ul></html>"""
 
@@ -401,8 +397,7 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
     display : IPython.core.display.HTML
         The HTML file descriptions and links.
     """
-    html_string = get_files_as_html(output_dir,
-                                    experiment_id,
-                                    file_format,
-                                    replace_dict)
+    html_string = get_files_as_html(
+        output_dir, experiment_id, file_format, replace_dict
+    )
     display(HTML(html_string))
