@@ -6,7 +6,6 @@ repos:
     rev: '0.77'
     hooks:
     -   id: flynt
-        args: [--verbose, --line-length=999]
 -   repo: https://github.com/psf/black
     rev: 22.10.0
     hooks:
