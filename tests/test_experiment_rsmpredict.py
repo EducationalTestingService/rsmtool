@@ -74,9 +74,7 @@ def test_run_experiment_lr_rsmtool_and_rsmpredict():
     )
     do_run_prediction(source, rsmpredict_config_file)
     output_dir = join("test_outputs", source, "output")
-    expected_output_dir = join(
-        rsmtool_test_dir, "data", "experiments", source, "output"
-    )
+    expected_output_dir = join(rsmtool_test_dir, "data", "experiments", source, "output")
     csv_files = glob(join(output_dir, "*.csv"))
     html_report = join("test_outputs", source, "report", f"{experiment_id}_report.html")
 
@@ -121,9 +119,7 @@ def test_run_experiment_lr_predict_with_object():
 
     config_obj = Configuration(config_dict, context="rsmpredict", configdir=configdir)
 
-    check_run_prediction(
-        source, given_test_dir=rsmtool_test_dir, config_obj_or_dict=config_obj
-    )
+    check_run_prediction(source, given_test_dir=rsmtool_test_dir, config_obj_or_dict=config_obj)
 
 
 def test_run_experiment_lr_predict_with_dictionary():
@@ -148,9 +144,7 @@ def test_run_experiment_lr_predict_with_dictionary():
         "experiment_id": "lr",
     }
 
-    check_run_prediction(
-        source, given_test_dir=rsmtool_test_dir, config_obj_or_dict=config_dict
-    )
+    check_run_prediction(source, given_test_dir=rsmtool_test_dir, config_obj_or_dict=config_dict)
 
 
 @raises(ValueError)
@@ -158,9 +152,7 @@ def test_run_experiment_lr_predict_with_repeated_ids():
 
     # rsmpredict experiment with non-unique ids
     source = "lr-predict-with-repeated-ids"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -175,9 +167,7 @@ def test_compute_predictions_wrong_input_format():
 def test_run_experiment_lr_predict_missing_model_file():
     """Run rsmpredict experiment with missing model file."""
     source = "lr-predict-missing-model-file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -185,9 +175,7 @@ def test_run_experiment_lr_predict_missing_model_file():
 def test_run_experiment_lr_predict_missing_feature_file():
     """Run rsmpredict experiment with missing feature file."""
     source = "lr-predict-missing-feature-file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -195,9 +183,7 @@ def test_run_experiment_lr_predict_missing_feature_file():
 def test_run_experiment_lr_predict_missing_postprocessing_file():
     """Run rsmpredict experiment with missing post-processing file."""
     source = "lr-predict-missing-postprocessing-file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -205,9 +191,7 @@ def test_run_experiment_lr_predict_missing_postprocessing_file():
 def test_run_experiment_predict_no_input_feature_file():
     """Run rsmpredict experiment with missing feature file."""
     source = "lr-predict-no-input-feature-file"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -215,9 +199,7 @@ def test_run_experiment_predict_no_input_feature_file():
 def test_run_experiment_predict_no_experiment_dir():
     """Run rsmpredict experiment with missing experiment dir."""
     source = "lr-predict-no-experiment-dir"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -225,9 +207,7 @@ def test_run_experiment_predict_no_experiment_dir():
 def test_run_experiment_predict_no_output_dir():
     """Run rsmpredict experiment with a missing "output" directory."""
     source = "lr-predict-no-output-dir"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -235,9 +215,7 @@ def test_run_experiment_predict_no_output_dir():
 def test_run_experiment_predict_no_experiment_id():
     """Run rsmpredict experiment with no experiment ID."""
     source = "lr-predict-no-experiment-id"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -245,9 +223,7 @@ def test_run_experiment_predict_no_experiment_id():
 def test_run_experiment_lr_predict_missing_columns():
     """Run rsmpredict experiment with missing columns from the config file."""
     source = "lr-predict-missing-columns"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -255,9 +231,7 @@ def test_run_experiment_lr_predict_missing_columns():
 def test_run_experiment_lr_predict_missing_feature():
     """Run rsmpredict experiment with missing features."""
     source = "lr-predict-missing-feature"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -265,9 +239,7 @@ def test_run_experiment_lr_predict_missing_feature():
 def test_run_experiment_lr_predict_no_numeric_feature_values():
     """Run rsmpredict experiment with missing post-processing file."""
     source = "lr-predict-no-numeric-feature-values"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -275,9 +247,7 @@ def test_run_experiment_lr_predict_no_numeric_feature_values():
 def test_run_experiment_predict_expected_scores_builtin_model():
     """Run rsmpredict experiment for expected scores with unsupported built-in model."""
     source = "lr-predict-expected-scores-builtin-model"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -285,9 +255,7 @@ def test_run_experiment_predict_expected_scores_builtin_model():
 def test_run_experiment_predict_expected_scores_wrong_skll_model():
     """Run rsmpredict experiment for expected scores with an unsupported SKLL learner."""
     source = "predict-expected-scores-wrong-skll-model"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -295,9 +263,7 @@ def test_run_experiment_predict_expected_scores_wrong_skll_model():
 def test_run_experiment_predict_expected_scores_non_probablistic_svc():
     """Run rsmpredict experiment for expected scores with a non-probabilistic learner."""
     source = "predict-expected-scores-non-probabilistic-svc"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json")
     do_run_prediction(source, config_file)
 
 
@@ -309,9 +275,7 @@ def check_fast_predict(source, do_trim=False, do_scale=False):
         rsmtool_test_dir, "data", "experiments", source, "existing_experiment", "output"
     )
     feature_info_file = join(existing_experiment_dir, "lr_feature.csv")
-    postprocessing_params_file = join(
-        existing_experiment_dir, "lr_postprocessing_params.csv"
-    )
+    postprocessing_params_file = join(existing_experiment_dir, "lr_postprocessing_params.csv")
     model_file = join(existing_experiment_dir, "lr.model")
 
     # read in the files
@@ -351,9 +315,7 @@ def check_fast_predict(source, do_trim=False, do_scale=False):
 
     # read in the expected predictions
     df_expected_predictions = pd.read_csv(
-        join(
-            rsmtool_test_dir, "data", "experiments", source, "output", "predictions.csv"
-        )
+        join(rsmtool_test_dir, "data", "experiments", source, "output", "predictions.csv")
     )
     df_expected_predictions = df_expected_predictions.drop("spkitemid", axis="columns")
 

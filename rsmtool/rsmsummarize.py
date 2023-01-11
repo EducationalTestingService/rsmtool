@@ -90,9 +90,7 @@ def check_experiment_dir(experiment_dir, experiment_name, configpath):
         return list(zip(jsons, [experiment_name] * len(jsons)))
 
 
-def run_summary(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None
-):
+def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None):
     """
     Run rsmsummarize experiment using the given configuration.
 
@@ -150,9 +148,7 @@ def run_summary(
     non_empty_csvdir = exists(csvdir) and listdir(csvdir)
     if non_empty_csvdir:
         if not overwrite_output:
-            raise IOError(
-                f"'{output_dir}' already contains a non-empty 'output' directory."
-            )
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
         else:
             logger.warning(
                 f"{output_dir} already contains a non-empty 'output' directory. "
@@ -170,17 +166,13 @@ def run_summary(
 
     # Get experiment names if any
     experiment_names = configuration.get("experiment_names")
-    experiment_names = (
-        experiment_names if experiment_names else [None] * len(experiment_dirs)
-    )
+    experiment_names = experiment_names if experiment_names else [None] * len(experiment_dirs)
     dirs_with_names = zip(experiment_dirs, experiment_names)
 
     # check the experiment dirs and assemble the list of csvdir and jsons
     all_experiments = []
     for (experiment_dir, experiment_name) in dirs_with_names:
-        experiments = check_experiment_dir(
-            experiment_dir, experiment_name, configuration.configdir
-        )
+        experiments = check_experiment_dir(experiment_dir, experiment_name, configuration.configdir)
         all_experiments.extend(experiments)
 
     # get the subgroups if any
@@ -296,9 +288,7 @@ def main():  # noqa: D103
         generator = ConfigurationGenerator(
             "rsmsummarize", as_string=True, suppress_warnings=args.quiet
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

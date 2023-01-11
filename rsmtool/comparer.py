@@ -147,9 +147,7 @@ class Comparer:
         # also set `smd_name` equal to 'DSM'
         if any(col.startswith("DSM") for col in df):
             smd_name = "DSM"
-            existing_eval_cols_new = [
-                col.replace("SMD", "DSM") for col in existing_eval_cols_new
-            ]
+            existing_eval_cols_new = [col.replace("SMD", "DSM") for col in existing_eval_cols_new]
             rename_dict_new = {
                 key.replace("SMD", "DSM"): val.replace("SMD", "DSM")
                 for key, val in rename_dict_new.items()
@@ -231,19 +229,13 @@ class Comparer:
             If there are no shared responses between the two sets.
         """
         # Only use features that appear in both datasets
-        features_old = [
-            column for column in df_old if column not in [id_column, human_score]
-        ]
-        features_new = [
-            column for column in df_new if column not in [id_column, human_score]
-        ]
+        features_old = [column for column in df_old if column not in [id_column, human_score]]
+        features_new = [column for column in df_new if column not in [id_column, human_score]]
 
         features = list(set(features_old).intersection(features_new))
 
         if len(features) == 0:
-            raise ValueError(
-                "There are no matching features " "in these two data sets."
-            )
+            raise ValueError("There are no matching features " "in these two data sets.")
 
         columns = features + [id_column, human_score]
 
@@ -359,9 +351,7 @@ class Comparer:
         figs = {}
 
         # feature distributions and the inter-feature correlations
-        feature_train_file = join(
-            filedir, f"{experiment_id}_train_features.{file_format}"
-        )
+        feature_train_file = join(filedir, f"{experiment_id}_train_features.{file_format}")
         if exists(feature_train_file):
             files["df_train_features"] = DataReader.read_from_file(feature_train_file)
 
@@ -369,20 +359,14 @@ class Comparer:
         if exists(feature_distplots_file):
             figs["feature_distplots"] = feature_distplots_file
 
-        feature_cors_file = join(
-            filedir, f"{experiment_id}_cors_processed.{file_format}"
-        )
+        feature_cors_file = join(filedir, f"{experiment_id}_cors_processed.{file_format}")
         if exists(feature_cors_file):
-            files["df_feature_cors"] = DataReader.read_from_file(
-                feature_cors_file, index_col=0
-            )
+            files["df_feature_cors"] = DataReader.read_from_file(feature_cors_file, index_col=0)
 
         # df_scores
         scores_file = join(filedir, f"{experiment_id}_pred_processed.{file_format}")
         if exists(scores_file):
-            df_scores = DataReader.read_from_file(
-                scores_file, converters={"spkitemid": str}
-            )
+            df_scores = DataReader.read_from_file(scores_file, converters={"spkitemid": str})
             files["df_scores"] = df_scores[["spkitemid", "sc1", prefix]]
 
         # model coefficients if present
@@ -413,9 +397,7 @@ class Comparer:
             files["df_degradation"] = df_degradation
 
         # disattenuated correlations
-        dis_corr_file = join(
-            filedir, f"{experiment_id}_disattenuated_correlations.{file_format}"
-        )
+        dis_corr_file = join(filedir, f"{experiment_id}_disattenuated_correlations.{file_format}")
 
         # load if disattenuated correlations is present
         if exists(dis_corr_file):
@@ -430,32 +412,24 @@ class Comparer:
                 f"{experiment_id}_disattenuated_correlations_by_{group}.{file_format}",
             )
             if exists(group_dis_corr_file):
-                df_dis_cor_group = DataReader.read_from_file(
-                    group_dis_corr_file, index_col=0
-                )
+                df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
                 files[f"df_disattenuated_correlations_by_{group}"] = df_dis_cor_group
                 files[
                     f"df_disattenuated_correlations_by_{group}_overview"
                 ] = self.make_summary_stat_df(df_dis_cor_group)
 
         # true score evaluations
-        true_score_eval_file = join(
-            filedir, f"{experiment_id}_true_score_eval.{file_format}"
-        )
+        true_score_eval_file = join(filedir, f"{experiment_id}_true_score_eval.{file_format}")
 
         # load true score evaluations if present
         if exists(true_score_eval_file):
-            df_true_score_eval = DataReader.read_from_file(
-                true_score_eval_file, index_col=0
-            )
+            df_true_score_eval = DataReader.read_from_file(true_score_eval_file, index_col=0)
             # we only use the row for raw_trim or scale_trim score
             files["df_true_score_eval"] = df_true_score_eval.loc[[f"{prefix}_trim"]]
 
         # use the raw columns or the scale columns depending on the prefix
         existing_eval_cols = (
-            _df_eval_columns_existing_raw
-            if prefix == "raw"
-            else _df_eval_columns_existing_scale
+            _df_eval_columns_existing_raw if prefix == "raw" else _df_eval_columns_existing_scale
         )
         rename_dict = raw_rename_dict if prefix == "raw" else scale_rename_dict
 
@@ -491,15 +465,11 @@ class Comparer:
 
         eval_file = join(filedir, f"{experiment_id}_eval.{file_format}")
         if exists(eval_file):
-            files["df_eval_for_degradation"] = DataReader.read_from_file(
-                eval_file, index_col=0
-            )
+            files["df_eval_for_degradation"] = DataReader.read_from_file(eval_file, index_col=0)
 
         # read in the evaluation metrics by subgroup, if we are asked to
         for group in groups_eval:
-            group_eval_file = join(
-                filedir, f"{experiment_id}_eval_by_{group}.{file_format}"
-            )
+            group_eval_file = join(filedir, f"{experiment_id}_eval_by_{group}.{file_format}")
             if exists(group_eval_file):
                 df_eval = DataReader.read_from_file(group_eval_file, index_col=0)
 
@@ -522,9 +492,7 @@ class Comparer:
                 files[f"df_eval_by_{group}"].index.name = None
 
                 series = files[f"df_eval_by_{group}"]
-                files[f"df_eval_by_{group}_overview"] = self.make_summary_stat_df(
-                    series
-                )
+                files[f"df_eval_by_{group}_overview"] = self.make_summary_stat_df(series)
 
                 # set the ordering of mean/SD/SMD statistics
                 files[f"df_eval_by_{group}_m_sd"] = df_eval[
@@ -543,43 +511,27 @@ class Comparer:
                 files[f"df_eval_by_{group}_m_sd"].index.name = None
 
         # read in the partial correlations vs. score for all data
-        pcor_score_file = join(
-            filedir, f"{experiment_id}_pcor_score_all_data.{file_format}"
-        )
+        pcor_score_file = join(filedir, f"{experiment_id}_pcor_score_all_data.{file_format}")
         if exists(pcor_score_file):
-            files["df_pcor_sc1"] = DataReader.read_from_file(
-                pcor_score_file, index_col=0
-            )
-            files["df_pcor_sc1_overview"] = self.make_summary_stat_df(
-                files["df_pcor_sc1"]
-            )
+            files["df_pcor_sc1"] = DataReader.read_from_file(pcor_score_file, index_col=0)
+            files["df_pcor_sc1_overview"] = self.make_summary_stat_df(files["df_pcor_sc1"])
 
         # read in the partial correlations by subgroups, if we are asked to
         for group in groups_eval:
-            group_pcor_file = join(
-                filedir, f"{experiment_id}_pcor_score_by_{group}.{file_format}"
-            )
+            group_pcor_file = join(filedir, f"{experiment_id}_pcor_score_by_{group}.{file_format}")
             if exists(group_pcor_file):
                 files[f"df_pcor_sc1_by_{group}"] = DataReader.read_from_file(
                     group_pcor_file, index_col=0
                 )
 
                 series = files[f"df_pcor_sc1_by_{group}"]
-                files[f"df_pcor_sc1_{group}_overview"] = self.make_summary_stat_df(
-                    series
-                )
+                files[f"df_pcor_sc1_{group}_overview"] = self.make_summary_stat_df(series)
 
         # read in the marginal correlations vs. score for all data
-        mcor_score_file = join(
-            filedir, f"{experiment_id}_margcor_score_all_data.{file_format}"
-        )
+        mcor_score_file = join(filedir, f"{experiment_id}_margcor_score_all_data.{file_format}")
         if exists(mcor_score_file):
-            files["df_mcor_sc1"] = DataReader.read_from_file(
-                mcor_score_file, index_col=0
-            )
-            files["df_mcor_sc1_overview"] = self.make_summary_stat_df(
-                files["df_mcor_sc1"]
-            )
+            files["df_mcor_sc1"] = DataReader.read_from_file(mcor_score_file, index_col=0)
+            files["df_mcor_sc1_overview"] = self.make_summary_stat_df(files["df_mcor_sc1"])
 
         # read in the partial correlations by subgroups, if we are asked to
         for group in groups_eval:
@@ -592,9 +544,7 @@ class Comparer:
                 )
 
                 series = files[f"df_mcor_sc1_by_{group}"]
-                files[f"df_mcor_sc1_{group}_overview"] = self.make_summary_stat_df(
-                    series
-                )
+                files[f"df_mcor_sc1_{group}_overview"] = self.make_summary_stat_df(series)
 
         pca_file = join(filedir, f"{experiment_id}_pca.{file_format}")
         if exists(pca_file):
@@ -603,15 +553,11 @@ class Comparer:
                 join(filedir, f"{experiment_id}_pcavar.{file_format}"), index_col=0
             )
 
-        descriptives_file = join(
-            filedir, f"{experiment_id}_feature_descriptives.{file_format}"
-        )
+        descriptives_file = join(filedir, f"{experiment_id}_feature_descriptives.{file_format}")
         if exists(descriptives_file):
             # we read all files pertaining to the descriptive analysis together
             # since we merge the outputs
-            files["df_descriptives"] = DataReader.read_from_file(
-                descriptives_file, index_col=0
-            )
+            files["df_descriptives"] = DataReader.read_from_file(descriptives_file, index_col=0)
 
             # this df contains only the number of features. this is used later
             # for another two tables to show the number of features
@@ -621,9 +567,7 @@ class Comparer:
                 ["N", "mean", "std. dev.", "skewness", "kurtosis"]
             ]
 
-            outliers_file = join(
-                filedir, f"{experiment_id}_feature_outliers.{file_format}"
-            )
+            outliers_file = join(filedir, f"{experiment_id}_feature_outliers.{file_format}")
             df_outliers = DataReader.read_from_file(outliers_file, index_col=0)
             df_outliers = df_outliers.rename(
                 columns={
@@ -651,9 +595,7 @@ class Comparer:
                 filedir, f"{experiment_id}_feature_descriptivesExtra.{file_format}"
             )
 
-            files["df_percentiles"] = DataReader.read_from_file(
-                percentiles_file, index_col=0
-            )
+            files["df_percentiles"] = DataReader.read_from_file(percentiles_file, index_col=0)
             files["df_percentiles"] = pd.merge(
                 files["df_percentiles"],
                 df_features_n_values,
@@ -710,9 +652,7 @@ class Comparer:
 
         # read in the feature boxplots by subgroup, if we were asked to
         for group in groups_eval:
-            feature_boxplot_prefix = join(
-                figdir, f"{experiment_id}_feature_boxplot_by_{group}"
-            )
+            feature_boxplot_prefix = join(figdir, f"{experiment_id}_feature_boxplot_by_{group}")
             svg_file = join(feature_boxplot_prefix + ".svg")
             png_file = join(feature_boxplot_prefix + ".png")
             if exists(svg_file):

@@ -397,7 +397,5 @@ def show_files(output_dir, experiment_id, file_format, replace_dict={}):
     display : IPython.core.display.HTML
         The HTML file descriptions and links.
     """
-    html_string = get_files_as_html(
-        output_dir, experiment_id, file_format, replace_dict
-    )
+    html_string = get_files_as_html(output_dir, experiment_id, file_format, replace_dict)
     display(HTML(html_string))

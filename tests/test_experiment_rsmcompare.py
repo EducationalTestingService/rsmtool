@@ -87,9 +87,7 @@ def test_run_experiment_lr_compare_with_dictionary():
     # we will be using getcwd
     temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
 
-    old_file_dict = {
-        "experiment_dir": "data/experiments/lr-self-compare-dict/lr-subgroups"
-    }
+    old_file_dict = {"experiment_dir": "data/experiments/lr-self-compare-dict/lr-subgroups"}
 
     new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
 
@@ -122,9 +120,7 @@ def test_run_experiment_lr_compare_wrong_directory():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = "lr-self-compare-wrong-directory"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmcompare.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmcompare.json")
     do_run_comparison(source, config_file)
 
 
@@ -134,7 +130,5 @@ def test_run_experiment_lr_compare_wrong_experiment_id():
     # basic rsmcompare experiment comparing a LinearRegression
     # experiment to itself
     source = "lr-self-compare-wrong-id"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, "rsmcompare.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, "rsmcompare.json")
     do_run_comparison(source, config_file)

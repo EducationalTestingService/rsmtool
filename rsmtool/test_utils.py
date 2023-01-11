@@ -100,9 +100,7 @@ def check_run_experiment(
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(
-            test_dir, "data", "experiments", source, f"{experiment_id}.json"
-        )
+        config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
         config_input = config_obj_or_dict
 
@@ -122,26 +120,18 @@ def check_run_experiment(
         expected_output_file = join(expected_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(
-                output_file, expected_output_file, file_format=file_format
-            )
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
-    check_generated_output(
-        output_files, experiment_id, model_type, file_format=file_format
-    )
+    check_generated_output(output_files, experiment_id, model_type, file_format=file_format)
 
     if not skll:
         check_scaled_coefficients(output_dir, experiment_id, file_format=file_format)
 
     if subgroups:
-        check_subgroup_outputs(
-            output_dir, experiment_id, subgroups, file_format=file_format
-        )
+        check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format=file_format)
 
     if consistency:
-        check_consistency_files_exist(
-            output_files, experiment_id, file_format=file_format
-        )
+        check_consistency_files_exist(output_files, experiment_id, file_format=file_format)
 
     # check report for any errors but ignore warnings
     # which we check below separately
@@ -206,9 +196,7 @@ def check_run_evaluation(
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(
-            test_dir, "data", "experiments", source, f"{experiment_id}.json"
-        )
+        config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
         config_input = config_obj_or_dict
 
@@ -226,9 +214,7 @@ def check_run_evaluation(
         expected_output_file = join(expected_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(
-                output_file, expected_output_file, file_format=file_format
-            )
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
     if consistency:
         check_consistency_files_exist(output_files, experiment_id)
@@ -399,9 +385,7 @@ def check_run_summary(
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(
-            test_dir, "data", "experiments", source, "rsmsummarize.json"
-        )
+        config_input = join(test_dir, "data", "experiments", source, "rsmsummarize.json")
     else:
         config_input = config_obj_or_dict
 
@@ -492,9 +476,7 @@ def check_run_cross_validation(
     test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
 
     if config_obj_or_dict is None:
-        config_input = join(
-            test_dir, "data", "experiments", source, f"{experiment_id}.json"
-        )
+        config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
         config_input = config_obj_or_dict
 
@@ -521,18 +503,14 @@ def check_run_cross_validation(
             )
 
             if exists(expected_output_file):
-                check_file_output(
-                    fold_output_file, expected_output_file, file_format=file_format
-                )
+                check_file_output(fold_output_file, expected_output_file, file_format=file_format)
 
         check_generated_output(
             fold_output_files, fold_experiment_id, model_type, file_format=file_format
         )
 
         if not skll:
-            check_scaled_coefficients(
-                fold_output_dir, fold_experiment_id, file_format=file_format
-            )
+            check_scaled_coefficients(fold_output_dir, fold_experiment_id, file_format=file_format)
 
         if subgroups:
             check_subgroup_outputs(
@@ -554,9 +532,7 @@ def check_run_cross_validation(
         expected_output_file = join(expected_eval_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(
-                output_file, expected_output_file, file_format=file_format
-            )
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
     if consistency:
         check_consistency_files_exist(output_files, f"{experiment_id}_evaluation")
@@ -575,9 +551,7 @@ def check_run_cross_validation(
 
     # next check that the final model rsmtool output is as expected
     actual_final_model_output_dir = join(output_prefix, "final-model", "output")
-    expected_final_model_output_dir = join(
-        expected_output_prefix, "final-model", "output"
-    )
+    expected_final_model_output_dir = join(expected_output_prefix, "final-model", "output")
     model_experiment_id = f"{experiment_id}_model"
 
     output_files = glob(join(actual_final_model_output_dir, f"*.{file_format}"))
@@ -586,13 +560,9 @@ def check_run_cross_validation(
         expected_output_file = join(expected_final_model_output_dir, output_filename)
 
         if exists(expected_output_file):
-            check_file_output(
-                output_file, expected_output_file, file_format=file_format
-            )
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
-    check_generated_output(
-        output_files, model_experiment_id, model_type, file_format=file_format
-    )
+    check_generated_output(output_files, model_experiment_id, model_type, file_format=file_format)
 
     if not skll:
         check_scaled_coefficients(
@@ -854,9 +824,7 @@ def do_run_summary(source, config_input, suppress_warnings_for=[]):
         run_summary(config_input, experiment_dir)
 
 
-def do_run_cross_validation(
-    source, experiment_id, config_input, suppress_warnings_for=[]
-):
+def do_run_cross_validation(source, experiment_id, config_input, suppress_warnings_for=[]):
     """
     Run rsmxval experiment automatically.
 
@@ -967,9 +935,7 @@ def check_file_output(file1, file2, file_format="csv"):
 
     # for pca and factor correlations convert all values to absolutes
     # because the sign may not always be the same
-    if file1.endswith(f"pca.{file_format}") or file1.endswith(
-        f"factor_correlations.{file_format}"
-    ):
+    if file1.endswith(f"pca.{file_format}") or file1.endswith(f"factor_correlations.{file_format}"):
         for df in [df1, df2]:
             msk = df.dtypes == np.float64
             df.loc[:, msk] = df.loc[:, msk].abs()
@@ -1113,9 +1079,7 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
     )
 
 
-def check_generated_output(
-    generated_files, experiment_id, model_source, file_format="csv"
-):
+def check_generated_output(generated_files, experiment_id, model_source, file_format="csv"):
     """
     Check that all necessary output files have been generated.
 
@@ -1209,14 +1173,10 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
         The format of the output files.
         Defaults to "csv".
     """
-    train_preprocessed_file = join(
-        output_dir, f"{experiment_id}_train_metadata.{file_format}"
-    )
+    train_preprocessed_file = join(output_dir, f"{experiment_id}_train_metadata.{file_format}")
     train_preprocessed = DataReader.read_from_file(train_preprocessed_file, index_col=0)
 
-    test_preprocessed_file = join(
-        output_dir, f"{experiment_id}_test_metadata.{file_format}"
-    )
+    test_preprocessed_file = join(output_dir, f"{experiment_id}_test_metadata.{file_format}")
     test_preprocessed = DataReader.read_from_file(test_preprocessed_file, index_col=0)
     for group in subgroups:
         ok_(group in train_preprocessed.columns)
@@ -1225,9 +1185,7 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
     # check that the total sum of N per category matches the total N
     # in data composition and the total N categories matches what is
     # in overall data composition
-    file_data_composition_all = join(
-        output_dir, f"{experiment_id}_data_composition.{file_format}"
-    )
+    file_data_composition_all = join(output_dir, f"{experiment_id}_data_composition.{file_format}")
     df_data_composition_all = DataReader.read_from_file(file_data_composition_all)
     for group in subgroups:
         file_composition_by_group = join(
@@ -1242,9 +1200,7 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
             summation = sum(composition_by_group[f"{partition} set"])
             ok_(summation == partition_info.iloc[0]["responses"])
 
-            length = len(
-                composition_by_group.loc[composition_by_group[f"{partition} set"] != 0]
-            )
+            length = len(composition_by_group.loc[composition_by_group[f"{partition} set"] != 0])
             ok_(length == partition_info.iloc[0][group])
 
 
@@ -1401,21 +1357,12 @@ class FileUpdater(object):
         # and define how we will refer to the test
         if file_type == "output":
             updated_output_path = self.updated_outputs_directory / source / "output"
-            existing_output_path = (
-                self.tests_directory / "data" / "experiments" / source / "output"
-            )
+            existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
             test_name = source
         else:
-            updated_output_path = (
-                self.updated_outputs_directory / input_source / "output"
-            )
+            updated_output_path = self.updated_outputs_directory / input_source / "output"
             existing_output_path = (
-                self.tests_directory
-                / "data"
-                / "experiments"
-                / source
-                / input_source
-                / "output"
+                self.tests_directory / "data" / "experiments" / source / input_source / "output"
             )
             test_name = f"{source}/{input_source}"
 
@@ -1431,9 +1378,7 @@ class FileUpdater(object):
         try:
             assert existing_output_path.exists()
         except AssertionError:
-            sys.stderr.write(
-                f'\nNo existing output for "{test_name}". Creating directory ...\n'
-            )
+            sys.stderr.write(f'\nNo existing output for "{test_name}". Creating directory ...\n')
             existing_output_path.mkdir(parents=True)
 
         # get a comparison betwen the two directories
@@ -1472,9 +1417,7 @@ class FileUpdater(object):
             )
 
         new_files = [
-            f
-            for f in new_files
-            if not any(f.endswith(suffix) for suffix in excluded_suffixes)
+            f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)
         ]
 
         # 3. We also exclude files related to model evaluations for SKLL models.
@@ -1514,9 +1457,7 @@ class FileUpdater(object):
             copyfile(updated_output_path / file, existing_output_path / file)
 
         # Update the lists with files that were changed for this source
-        self.deleted_files.extend(
-            [(test_name, file) for file in existing_output_only_files]
-        )
+        self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
         self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
 
     def update_test_data(self, source, test_tool, skll=False):
@@ -1533,9 +1474,7 @@ class FileUpdater(object):
             Whether the given source is for a SKLL-based test.
             Defaults to ``False``.
         """
-        existing_output_path = (
-            self.tests_directory / "data" / "experiments" / source / "output"
-        )
+        existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
         # if we have a tool without with output
         # we update the outputs
         if test_tool in tools_with_output:
@@ -1558,12 +1497,8 @@ class FileUpdater(object):
         # import all the test_suffix experiment files using SourceFileLoader
         # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
         for test_suffix in self.test_suffixes:
-            test_module_path = join(
-                self.tests_directory, f"test_experiment_{test_suffix}.py"
-            )
-            test_module = SourceFileLoader(
-                f"loaded_{test_suffix}", test_module_path
-            ).load_module()
+            test_module_path = join(self.tests_directory, f"test_experiment_{test_suffix}.py")
+            test_module = SourceFileLoader(f"loaded_{test_suffix}", test_module_path).load_module()
             test_tool = test_suffix.split("_")[0]
 
             # skip the module if it tells us that it doesn't want the data for its tests updated
@@ -1578,9 +1513,7 @@ class FileUpdater(object):
             # For the rest, try to get the source since that's what we need to update
             # the test files.
             for member_name, member_object in getmembers(test_module):
-                if isfunction(member_object) and member_name.startswith(
-                    "test_run_experiment"
-                ):
+                if isfunction(member_object) and member_name.startswith("test_run_experiment"):
                     function = member_object
 
                     # get the qualified name of the member function
@@ -1605,9 +1538,7 @@ class FileUpdater(object):
                     else:
                         function_code_lines = getsourcelines(function)
                         source_line = [
-                            line
-                            for line in function_code_lines[0]
-                            if re.search(r"source = ", line)
+                            line for line in function_code_lines[0] if re.search(r"source = ", line)
                         ]
                         source_name = eval(source_line[0].strip().split(" = ")[1])
                         self.update_test_data(source_name, test_tool)
@@ -1623,9 +1554,7 @@ class FileUpdater(object):
         # find added/updated input files: in this case the source # will consist of
         # the test name and the input test name separated by '/'.
         updated_input_files = [
-            (source, updated_file)
-            for (source, updated_file) in self.updated_files
-            if "/" in source
+            (source, updated_file) for (source, updated_file) in self.updated_files if "/" in source
         ]
 
         # print out the number and list of overall added/updated non-model files
@@ -1635,9 +1564,7 @@ class FileUpdater(object):
         print()
 
         # now print out missing and/or empty updated output directories
-        print(
-            f"{len(self.missing_or_empty_sources)} missing/empty sources in updated outputs:"
-        )
+        print(f"{len(self.missing_or_empty_sources)} missing/empty sources in updated outputs:")
         for source in self.missing_or_empty_sources:
             print(f"{source}")
         print()

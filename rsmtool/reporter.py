@@ -38,12 +38,8 @@ if HAS_RSMEXTRA:
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
     ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
-    ordered_section_list_rsmcompare = (
-        ordered_section_list_with_special_sections_rsmcompare
-    )
-    ordered_section_list_rsmsummarize = (
-        ordered_section_list_with_special_sections_rsmsummarize
-    )
+    ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
+    ordered_section_list_rsmsummarize = ordered_section_list_with_special_sections_rsmsummarize
 
 else:
     ordered_section_list_rsmtool = [
@@ -213,9 +209,7 @@ class Reporter:
         for cs_path in custom_report_section_paths:
             cs_location = DataReader.locate_files(cs_path, configdir)
             if not cs_location:
-                raise FileNotFoundError(
-                    f"Error: custom section not found at {cs_path}."
-                )
+                raise FileNotFoundError(f"Error: custom section not found at {cs_path}.")
             else:
                 custom_report_sections.append(cs_location)
         return custom_report_sections
@@ -242,9 +236,7 @@ class Reporter:
         first_notebook = notebook_files[0]
         merged_notebook = json.loads(open(first_notebook, "r", encoding="utf-8").read())
         for notebook in notebook_files[1:]:
-            section_cells = json.loads(open(notebook, "r", encoding="utf-8").read())[
-                "cells"
-            ]
+            section_cells = json.loads(open(notebook, "r", encoding="utf-8").read())["cells"]
             merged_notebook["cells"].extend(section_cells)
 
         # output the merged cells into a report
@@ -354,11 +346,7 @@ class Reporter:
         # implemention of the event loop on Windows for Cpython 3.8
         # which breaks the report generation unless we include the
         # following workaround
-        if (
-            sys.version_info[0] == 3
-            and sys.version_info[1] >= 8
-            and sys.platform.startswith("win")
-        ):
+        if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith("win"):
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
         # set a high timeout for datasets with a large number of features
@@ -433,9 +421,7 @@ class Reporter:
 
         if general_sections != ["all"]:
             self.check_section_names(general_sections, "general", context)
-            chosen_general_sections = [
-                s for s in general_sections if s in general_section_list
-            ]
+            chosen_general_sections = [s for s in general_sections if s in general_section_list]
             all_general_sections = False
 
         # 2. Exclude the subgroup sections if we do not have subgroup information.
@@ -461,9 +447,7 @@ class Reporter:
             # if we are using the default list, we simply remove the
             # subgroup sections
             chosen_general_sections = [
-                section
-                for section in chosen_general_sections
-                if section not in subgroup_sections
+                section for section in chosen_general_sections if section not in subgroup_sections
             ]
 
         # 3. Include the specified (and valid) subset of the special sections
@@ -471,21 +455,15 @@ class Reporter:
         if special_sections:
             special_section_list = master_section_dict["special"][context]
             self.check_section_names(special_sections, "special", context=context)
-            chosen_special_sections = [
-                s for s in special_sections if s in special_section_list
-            ]
+            chosen_special_sections = [s for s in special_sections if s in special_section_list]
 
         # 4. For the custom sections use the basename and strip off the `.ipynb` extension
         chosen_custom_sections = []
         if custom_sections:
-            chosen_custom_sections = [
-                splitext(basename(cs))[0] for cs in custom_sections
-            ]
+            chosen_custom_sections = [splitext(basename(cs))[0] for cs in custom_sections]
 
         # return the final list of chosen sections
-        chosen_sections = (
-            chosen_general_sections + chosen_special_sections + chosen_custom_sections
-        )
+        chosen_sections = chosen_general_sections + chosen_special_sections + chosen_custom_sections
 
         return chosen_sections
 
@@ -538,19 +516,14 @@ class Reporter:
         if special_sections:
             selected_special_notebook_path = notebook_path_dict["special"][context]
             section_file_map.update(
-                {
-                    ss: join(selected_special_notebook_path, f"{ss}.ipynb")
-                    for ss in special_sections
-                }
+                {ss: join(selected_special_notebook_path, f"{ss}.ipynb") for ss in special_sections}
             )
 
         # update the file map to include the custom sections with
         # the file names (without the `.ipynb` extension) as the
         # names (keys) and full paths as values
         if custom_sections:
-            section_file_map.update(
-                {splitext(basename(cs))[0]: cs for cs in custom_sections}
-            )
+            section_file_map.update({splitext(basename(cs))[0]: cs for cs in custom_sections})
 
         return section_file_map
 
@@ -631,9 +604,7 @@ class Reporter:
             ordered_section_list = ordered_section_list_rsmsummarize
 
         # add all custom sections to the end of the default ordered list
-        ordered_section_list.extend(
-            [splitext(basename(cs))[0] for cs in custom_sections]
-        )
+        ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
 
         # get the section file map
         section_file_map = self.get_section_file_map(
@@ -689,16 +660,12 @@ class Reporter:
 
         # if the features subset file is None, just use empty string
         feature_subset_file = (
-            ""
-            if config.get("feature_subset_file") is None
-            else config["feature_subset_file"]
+            "" if config.get("feature_subset_file") is None else config["feature_subset_file"]
         )
 
         # if the min items is None, just set it to zero
         min_items = (
-            0
-            if config["min_items_per_candidate"] is None
-            else config["min_items_per_candidate"]
+            0 if config["min_items_per_candidate"] is None else config["min_items_per_candidate"]
         )
 
         # determine minimum and maximum scores for trimming
@@ -763,9 +730,7 @@ class Reporter:
         # run the merged notebook and save the output as
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
-        self.convert_ipynb_to_html(
-            merged_notebook_file, join(reportdir, f"{report_name}.html")
-        )
+        self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
 
     def create_comparison_report(
         self, config, csvdir_old, figdir_old, csvdir_new, figdir_new, output_dir
@@ -829,9 +794,7 @@ class Reporter:
         # run the merged notebook and save the output as
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
-        self.convert_ipynb_to_html(
-            merged_notebook_file, join(output_dir, f"{report_name}.html")
-        )
+        self.convert_ipynb_to_html(merged_notebook_file, join(output_dir, f"{report_name}.html"))
 
     def create_summary_report(self, config, all_experiments, csvdir):
         """
@@ -877,9 +840,7 @@ class Reporter:
         # run the merged notebook and save the output as
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
-        self.convert_ipynb_to_html(
-            merged_notebook_file, join(reportdir, f"{report_name}.html")
-        )
+        self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
 
 
 def main():  # noqa: D103

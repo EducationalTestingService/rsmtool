@@ -420,9 +420,7 @@ class TestConfigurationParser:
 
         newdata = ConfigurationParser.process_config(data)
 
-        assert_array_equal(
-            newdata["experiment_dirs"], ["home/dir1", "home/dir2", "home/dir3"]
-        )
+        assert_array_equal(newdata["experiment_dirs"], ["home/dir1", "home/dir2", "home/dir3"])
         assert_array_equal(newdata["experiment_names"], ["exp1", "exp2", "exp3"])
 
     @raises(ValueError)
@@ -546,9 +544,7 @@ class TestConfiguration:
 
                 # remove the stream handler and raise error
                 root_logger.handlers = []
-                raise AssertionError(
-                    f"`{expected}` not in logging output: `{logging_text}`."
-                )
+                raise AssertionError(f"`{expected}` not in logging output: `{logging_text}`.")
 
             # remove the stream handler, even if we have no errors
             root_logger.handlers = []
@@ -770,9 +766,7 @@ class TestConfiguration:
             }
         )
 
-        self.check_logging_output(
-            "training", config.check_flag_column, partition="test"
-        )
+        self.check_logging_output("training", config.check_flag_column, partition="test")
 
     def test_check_flag_column_convert_to_list_keep_numeric(self):
         config = Configuration(
@@ -1299,12 +1293,8 @@ class TestConfiguration:
 
 class TestJSONFeatureConversion:
     def test_json_feature_conversion(self):
-        json_feature_file = join(
-            _MY_DIR, "data", "experiments", "lr-feature-json", "features.json"
-        )
-        expected_feature_csv = join(
-            _MY_DIR, "data", "experiments", "lr", "features.csv"
-        )
+        json_feature_file = join(_MY_DIR, "data", "experiments", "lr-feature-json", "features.json")
+        expected_feature_csv = join(_MY_DIR, "data", "experiments", "lr", "features.csv")
 
         # convert the feature json file and write to a temporary location
         tempf = tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False)
@@ -1318,15 +1308,11 @@ class TestJSONFeatureConversion:
         # get rid of the file now that have read it into memory
         os.unlink(tempf.name)
 
-        assert_frame_equal(
-            df_expected.sort_index(axis=1), df_converted.sort_index(axis=1)
-        )
+        assert_frame_equal(df_expected.sort_index(axis=1), df_converted.sort_index(axis=1))
 
     @raises(RuntimeError)
     def test_json_feature_conversion_bad_json(self):
-        json_feature_file = join(
-            _MY_DIR, "data", "experiments", "lr-feature-json", "lr.json"
-        )
+        json_feature_file = join(_MY_DIR, "data", "experiments", "lr-feature-json", "lr.json")
 
         # convert the feature json file and write to a temporary location
         tempf = tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False)
@@ -1334,9 +1320,7 @@ class TestJSONFeatureConversion:
 
     @raises(RuntimeError)
     def test_json_feature_conversion_bad_output_file(self):
-        json_feature_file = join(
-            _MY_DIR, "data", "experiments", "lr-feature-json", "features.json"
-        )
+        json_feature_file = join(_MY_DIR, "data", "experiments", "lr-feature-json", "features.json")
 
         # convert the feature json file and write to a temporary location
         tempf = tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False)

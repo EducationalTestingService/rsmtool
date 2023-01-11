@@ -188,9 +188,7 @@ def agreement(score1, score2, tolerance=0):
     # are for the same number of items
     assert len(score1) == len(score2)
 
-    num_agreements = sum(
-        [int(abs(s1 - s2) <= tolerance) for s1, s2 in zip(score1, score2)]
-    )
+    num_agreements = sum([int(abs(s1 - s2) <= tolerance) for s1, s2 in zip(score1, score2)])
 
     agreement_value = (float(num_agreements) / len(score1)) * 100
     return agreement_value
@@ -277,14 +275,12 @@ def standardized_mean_difference(
         denominator = np.std(y_true_observed, ddof=ddof)
     elif method == "pooled":
         denominator = np.sqrt(
-            (np.std(y_true_observed, ddof=ddof) ** 2 + np.std(y_pred, ddof=ddof) ** 2)
-            / 2
+            (np.std(y_true_observed, ddof=ddof) ** 2 + np.std(y_pred, ddof=ddof) ** 2) / 2
         )
     elif method == "johnson":
         if population_y_true_observed_sd is None:
             raise ValueError(
-                "If `method='johnson'`, then `population_y_true_observed_sd` "
-                "must be provided."
+                "If `method='johnson'`, then `population_y_true_observed_sd` " "must be provided."
             )
         denominator = population_y_true_observed_sd
     elif method == "williamson":
@@ -293,9 +289,7 @@ def standardized_mean_difference(
                 "If `method='williamson'`, both `population_y_true_observed_sd` "
                 "and `population_y_pred_sd` must be provided."
             )
-        denominator = np.sqrt(
-            (population_y_true_observed_sd**2 + population_y_pred_sd**2) / 2
-        )
+        denominator = np.sqrt((population_y_true_observed_sd**2 + population_y_pred_sd**2) / 2)
     else:
         possible_methods = {"'unpooled'", "'pooled'", "'johnson'", "'williamson'"}
         raise ValueError(
@@ -384,10 +378,7 @@ def difference_of_standardized_means(
     ]
     y_pred_population_params = [population_y_pred_mn, population_y_pred_sd]
 
-    if (
-        len([param for param in y_true_observed_population_params if param is None])
-        == 1
-    ):
+    if len([param for param in y_true_observed_population_params if param is None]) == 1:
         raise ValueError(
             "You must pass both `population_y_true_observed_mn` and "
             "`population_y_true_observed_sd` or neither."
@@ -395,8 +386,7 @@ def difference_of_standardized_means(
 
     if len([param for param in y_pred_population_params if param is None]) == 1:
         raise ValueError(
-            "You must pass both `population_y_pred_mn` and "
-            "`population_y_pred_sd` or neither."
+            "You must pass both `population_y_pred_mn` and " "`population_y_pred_sd` or neither."
         )
 
     warning_msg = (
@@ -503,8 +493,6 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
     y_pred_var, y_pred_avg = (np.var(y_pred, ddof=ddof), np.mean(y_pred))
 
     numerator = 2 * np.cov(y_true_observed, y_pred, ddof=ddof)[0][1]
-    denominator = (
-        y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg) ** 2
-    )
+    denominator = y_true_observed_var + y_pred_var + (y_true_observed_avg - y_pred_avg) ** 2
     kappa = numerator / denominator
     return kappa

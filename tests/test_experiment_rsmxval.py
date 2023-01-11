@@ -17,9 +17,7 @@ else:
         param("lr-xval", "lr_xval"),  # uses 5 folds if not specified
         param("lr-xval-tsv", "lr_xval_tsv", folds=3, file_format="tsv"),
         param("lr-xval-xlsx", "lr_xval_xlsx", folds=3, file_format="xlsx"),
-        param(
-            "lr-xval-folds-file", "lr_xval_folds_file", folds=2
-        ),  # folds file contain 2 folds
+        param("lr-xval-folds-file", "lr_xval_folds_file", folds=2),  # folds file contain 2 folds
         param(
             "lr-xval-subgroups",
             "lr_xval_subgroups",
@@ -39,9 +37,7 @@ else:
             consistency=True,
             subgroups=["L1"],
         ),
-        param(
-            "lr-xval-skll-model", "lr_xval_skll_model", folds=2, skll=True
-        ),  # uses folds file
+        param("lr-xval-skll-model", "lr_xval_skll_model", folds=2, skll=True),  # uses folds file
         param("lr-xval-thumbnails", "lr_xval_thumbnails", folds=3),
         param("lr-xval-feature-list", "lr_xval_feature_list", folds=3),
         param("lr-xval-feature-subset-file", "lr_xval_feature_subset_file", folds=3),

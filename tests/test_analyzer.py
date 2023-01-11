@@ -33,9 +33,7 @@ class TestAnalyzer:
         self.df_features_with_groups["group"] = ["group1"] * 5 + ["group2"] * 5
 
         self.df_features_with_groups_and_length = self.df_features_with_groups.copy()
-        self.df_features_with_groups_and_length["length"] = self.prng.normal(
-            50, 250, 10
-        )
+        self.df_features_with_groups_and_length["length"] = self.prng.normal(50, 250, 10)
 
         self.human_scores = pd.Series(self.prng.randint(1, 5, size=10))
         self.system_scores = pd.Series(self.prng.random_sample(10) * 5)
@@ -82,17 +80,13 @@ class TestAnalyzer:
         assert issubclass(warning_list[-1].category, UserWarning)
 
     def test_correlation_helper_for_data_with_groups(self):
-        retval = Analyzer.correlation_helper(
-            self.df_features_with_groups, "sc1", "group"
-        )
+        retval = Analyzer.correlation_helper(self.df_features_with_groups, "sc1", "group")
         assert_equal(len(retval[0]), 2)
         assert_equal(len(retval[1]), 2)
 
     def test_correlation_helper_for_one_group_with_one_row(self):
         # this should return a data frames with nans for group with 1 row
-        retval = Analyzer.correlation_helper(
-            self.df_features_with_groups[:6], "sc1", "group"
-        )
+        retval = Analyzer.correlation_helper(self.df_features_with_groups[:6], "sc1", "group")
         assert_equal(len(retval[0]), 2)
         assert_equal(len(retval[1]), 2)
         assert_equal(retval[0].isnull().values.sum(), 3)
@@ -123,9 +117,7 @@ class TestAnalyzer:
         # variance of human scores is 0.
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.filterwarnings("ignore", category=RuntimeWarning)
-            retval = Analyzer.correlation_helper(
-                self.df_features_same_score, "sc1", "group"
-            )
+            retval = Analyzer.correlation_helper(self.df_features_same_score, "sc1", "group")
             assert_equal(retval[0].isnull().values.sum(), 3)
             assert_equal(retval[1].isnull().values.sum(), 3)
             assert issubclass(warning_list[-1].category, UserWarning)
@@ -136,9 +128,7 @@ class TestAnalyzer:
         # dividing by N and not N-1
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
-            evals = Analyzer.metrics_helper(
-                self.human_scores[0:1], self.system_scores[0:1]
-            )
+            evals = Analyzer.metrics_helper(self.human_scores[0:1], self.system_scores[0:1])
             assert_equal(evals.isnull().values.sum(), 5)
 
     def test_that_metrics_helper_works_for_data_with_the_same_label(self):
@@ -190,12 +180,8 @@ class TestAnalyzer:
         expected_metrics2 = expected_metrics1.copy()
         expected_metrics2["SMD"] = 0.066259
 
-        assert_series_equal(
-            computed_metrics1.sort_index(), expected_metrics1.sort_index()
-        )
-        assert_series_equal(
-            computed_metrics2.sort_index(), expected_metrics2.sort_index()
-        )
+        assert_series_equal(computed_metrics1.sort_index(), expected_metrics1.sort_index())
+        assert_series_equal(computed_metrics2.sort_index(), expected_metrics2.sort_index())
 
     def test_metrics_helper_zero_system_sd(self):
         human_scores = [1, 3, 4, 2, 3, 1, 3, 4, 2, 1]
@@ -258,9 +244,7 @@ class TestAnalyzer:
         assert_equal(len(variance.columns), 50)
 
     def test_compute_disattenuated_correlations_single_human(self):
-        hm_corr = pd.Series(
-            [0.9, 0.8, 0.6], index=["raw", "raw_trim", "raw_trim_round"]
-        )
+        hm_corr = pd.Series([0.9, 0.8, 0.6], index=["raw", "raw_trim", "raw_trim_round"])
         hh_corr = pd.Series([0.81], index=[""])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
         assert_equal(len(df_dis_corr), 3)

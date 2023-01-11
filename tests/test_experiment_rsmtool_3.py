@@ -172,9 +172,7 @@ def test_run_experiment_lr_with_object_and_filepath():
     source = "lr-object"
     experiment_id = "lr_object"
 
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
 
     config_dict = {
         "train_file": "../../files/train.csv",
@@ -217,9 +215,7 @@ def test_run_experiment_duplicate_feature_names():
     # rsmtool experiment with duplicate feature names
     source = "lr-with-duplicate-feature-names"
     experiment_id = "lr_with_duplicate_feature_names"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -230,9 +226,7 @@ def test_run_experiment_lr_feature_json():
 
     source = "lr-feature-json"
     experiment_id = "lr"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
 
     # run this experiment but suppress the expected deprecation warnings
     do_run_experiment(
@@ -246,9 +240,7 @@ def test_run_experiment_wrong_train_file_path():
     # a non-existing file
     source = "lr-wrong-path"
     experiment_id = "lr"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -258,9 +250,7 @@ def test_run_experiment_wrong_feature_file_path():
     # a non-existing file
     source = "lr-wrong-path-features"
     experiment_id = "lr"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)
 
 
@@ -271,7 +261,5 @@ def test_run_experiment_lr_length_column_and_feature_list():
 
     source = "lr-with-length-and-feature-list"
     experiment_id = "lr_with_length_and_feature"
-    config_file = join(
-        rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
-    )
+    config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
     do_run_experiment(source, experiment_id, config_file)

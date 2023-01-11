@@ -16,9 +16,7 @@ class TestDataWriter:
     def check_write_frame_to_file(self, file_format, include_index):
 
         # create a dummy data frame for testing
-        df_to_write = pd.DataFrame(
-            np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
-        )
+        df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"])
 
         # create a temporary directory where the file will be written
         tempdir = TemporaryDirectory()
@@ -43,9 +41,7 @@ class TestDataWriter:
         elif file_format == "xlsx":
             df_written = pd.read_excel(f"{name_prefix}.{file_format}")
         else:
-            df_written = pd.read_json(
-                f"{name_prefix}.{file_format}", orient="records", lines=True
-            )
+            df_written = pd.read_json(f"{name_prefix}.{file_format}", orient="records", lines=True)
 
         # check that the index is there if it's supposed to be
         if include_index and file_format in ["csv", "tsv", "xlsx"]:
@@ -71,15 +67,11 @@ class TestDataWriter:
         data_sets = [
             {
                 "name": "dataset1",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(100, 2)), columns=["A", "B"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(100, 2)), columns=["A", "B"]),
             },
             {
                 "name": "dataset2",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"]),
             },
         ]
 
@@ -116,9 +108,7 @@ class TestDataWriter:
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(
-            ["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"]
-        )
+        assert sorted(output_dir) == sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
@@ -127,12 +117,8 @@ class TestDataWriter:
     def test_dictionary_save_files(self):
 
         data_sets = {
-            "dataset1": pd.DataFrame(
-                np.random.normal(size=(100, 2)), columns=["A", "B"]
-            ),
-            "dataset2": pd.DataFrame(
-                np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
-            ),
+            "dataset1": pd.DataFrame(np.random.normal(size=(100, 2)), columns=["A", "B"]),
+            "dataset2": pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"]),
         }
 
         directory = "temp_directory_dictionary_save_files_xyz"
@@ -166,9 +152,7 @@ class TestDataWriter:
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(
-            ["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"]
-        )
+        assert sorted(output_dir) == sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
 
         assert_frame_equal(data_sets["dataset1"], aaa_json)
         assert_frame_equal(data_sets["dataset1"], ds_1_csv)
@@ -180,15 +164,11 @@ class TestDataWriter:
         data_sets = [
             {
                 "name": "dataset1",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(100, 2)), columns=["A", "B"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(100, 2)), columns=["A", "B"]),
             },
             {
                 "name": "dataset2",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"]),
             },
         ]
 
@@ -206,15 +186,11 @@ class TestDataWriter:
         data_sets = [
             {
                 "name": "dataset1",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(100, 2)), columns=["A", "B"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(100, 2)), columns=["A", "B"]),
             },
             {
                 "name": "dataset2",
-                "frame": pd.DataFrame(
-                    np.random.normal(size=(120, 3)), columns=["A", "B", "C"]
-                ),
+                "frame": pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"]),
             },
         ]
 

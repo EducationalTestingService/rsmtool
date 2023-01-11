@@ -15,9 +15,7 @@ class TestFeaturePreprocessor:
         self.fpp = FeaturePreprocessor()
 
     def test_select_candidates_with_N_or_more_items(self):
-        data = pd.DataFrame(
-            {"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]}
-        )
+        data = pd.DataFrame({"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
         df_included_expected = pd.DataFrame(
             {"candidate": ["a"] * 3 + ["b"] * 2, "sc1": [2, 3, 1, 5, 6]}
         )
@@ -37,21 +35,15 @@ class TestFeaturePreprocessor:
         assert_equal(len(df_excluded), 0)
 
     def test_select_candidates_with_N_or_more_items_all_excluded(self):
-        data = pd.DataFrame(
-            {"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]}
-        )
+        data = pd.DataFrame({"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
 
         (df_included, df_excluded) = self.fpp.select_candidates(data, 4)
         assert_frame_equal(df_excluded, data)
         assert_equal(len(df_included), 0)
 
     def test_select_candidates_with_N_or_more_items_custom_name(self):
-        data = pd.DataFrame(
-            {"ID": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]}
-        )
-        df_included_expected = pd.DataFrame(
-            {"ID": ["a"] * 3 + ["b"] * 2, "sc1": [2, 3, 1, 5, 6]}
-        )
+        data = pd.DataFrame({"ID": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
+        df_included_expected = pd.DataFrame({"ID": ["a"] * 3 + ["b"] * 2, "sc1": [2, 3, 1, 5, 6]})
         df_excluded_expected = pd.DataFrame({"ID": ["c"], "sc1": [1]})
 
         (df_included, df_excluded) = self.fpp.select_candidates(data, 2, "ID")
@@ -92,60 +84,40 @@ class TestFeaturePreprocessor:
     def test_rename_no_columns_some_values_none(self):
         df = pd.DataFrame(columns=["spkitemid", "sc1", "sc2", "feature1", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, [], "spkitemid", "sc1", "sc2", None, None, None
-        )
-        assert_array_equal(
-            df.columns, ["spkitemid", "sc1", "sc2", "feature1", "feature2"]
-        )
+        df = self.fpp.rename_default_columns(df, [], "spkitemid", "sc1", "sc2", None, None, None)
+        assert_array_equal(df.columns, ["spkitemid", "sc1", "sc2", "feature1", "feature2"])
 
     def test_rename_no_used_columns_but_unused_columns_with_default_names(self):
-        df = pd.DataFrame(
-            columns=["spkitemid", "sc1", "sc2", "length", "feature1", "feature2"]
-        )
+        df = pd.DataFrame(columns=["spkitemid", "sc1", "sc2", "length", "feature1", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, [], "spkitemid", "sc1", "sc2", None, None, None
-        )
+        df = self.fpp.rename_default_columns(df, [], "spkitemid", "sc1", "sc2", None, None, None)
         assert_array_equal(
             df.columns,
             ["spkitemid", "sc1", "sc2", "##length##", "feature1", "feature2"],
         )
 
     def test_rename_used_columns(self):
-        df = pd.DataFrame(
-            columns=["id", "r1", "r2", "words", "SR", "feature1", "feature2"]
-        )
+        df = pd.DataFrame(columns=["id", "r1", "r2", "words", "SR", "feature1", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, [], "id", "r1", "r2", "words", "SR", None
-        )
+        df = self.fpp.rename_default_columns(df, [], "id", "r1", "r2", "words", "SR", None)
         assert_array_equal(
             df.columns,
             ["spkitemid", "sc1", "sc2", "length", "raw", "feature1", "feature2"],
         )
 
     def test_rename_used_columns_and_unused_columns_with_default_names(self):
-        df = pd.DataFrame(
-            columns=["id", "r1", "r2", "words", "raw", "feature1", "feature2"]
-        )
+        df = pd.DataFrame(columns=["id", "r1", "r2", "words", "raw", "feature1", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, [], "id", "r1", "r2", "words", None, None
-        )
+        df = self.fpp.rename_default_columns(df, [], "id", "r1", "r2", "words", None, None)
         assert_array_equal(
             df.columns,
             ["spkitemid", "sc1", "sc2", "length", "##raw##", "feature1", "feature2"],
         )
 
     def test_rename_used_columns_with_swapped_names(self):
-        df = pd.DataFrame(
-            columns=["id", "sc1", "sc2", "raw", "words", "feature1", "feature2"]
-        )
+        df = pd.DataFrame(columns=["id", "sc1", "sc2", "raw", "words", "feature1", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, [], "id", "sc2", "sc1", "words", None, None
-        )
+        df = self.fpp.rename_default_columns(df, [], "id", "sc2", "sc1", "words", None, None)
         assert_array_equal(
             df.columns,
             ["spkitemid", "sc2", "sc1", "##raw##", "length", "feature1", "feature2"],
@@ -154,12 +126,8 @@ class TestFeaturePreprocessor:
     def test_rename_used_columns_but_not_features(self):
         df = pd.DataFrame(columns=["id", "sc1", "sc2", "length", "feature2"])
 
-        df = self.fpp.rename_default_columns(
-            df, ["length"], "id", "sc1", "sc2", None, None, None
-        )
-        assert_array_equal(
-            df.columns, ["spkitemid", "sc1", "sc2", "length", "feature2"]
-        )
+        df = self.fpp.rename_default_columns(df, ["length"], "id", "sc1", "sc2", None, None, None)
+        assert_array_equal(df.columns, ["spkitemid", "sc1", "sc2", "length", "feature2"])
 
     def test_rename_candidate_column(self):
         df = pd.DataFrame(
@@ -250,9 +218,7 @@ class TestFeaturePreprocessor:
 
     def test_filter_on_column_all_non_numeric(self):
 
-        bad_df = pd.DataFrame(
-            {"sc1": ["A", "I", "TD", "TD"] * 2, "spkitemlab": range(1, 9)}
-        )
+        bad_df = pd.DataFrame({"sc1": ["A", "I", "TD", "TD"] * 2, "spkitemlab": range(1, 9)})
 
         expected_df_excluded = bad_df.copy()
         expected_df_excluded.drop("sc1", axis=1, inplace=True)
@@ -285,9 +251,7 @@ class TestFeaturePreprocessor:
 
     def test_filter_on_column_with_inf(self):
         # Test that the function exclude columns where feature value is 'inf'
-        data = pd.DataFrame(
-            {"feature_1": [1.5601, 0, 2.33, 11.32], "feature_ok": np.arange(1, 5)}
-        )
+        data = pd.DataFrame({"feature_1": [1.5601, 0, 2.33, 11.32], "feature_ok": np.arange(1, 5)})
 
         data["feature_with_inf"] = 1 / data["feature_1"]
         data["id"] = np.arange(1, 5, dtype="int64")
@@ -1039,9 +1003,7 @@ class TestFeaturePreprocessor:
         expected = values.copy()
         expected[-1] = mean + 4 * std
 
-        actual = self.fpp.preprocess_feature(
-            values, "A", "raw", mean, std, exclude_zero_sd=True
-        )
+        actual = self.fpp.preprocess_feature(values, "A", "raw", mean, std, exclude_zero_sd=True)
 
         assert_array_equal(actual, expected)
 
@@ -1076,15 +1038,9 @@ class TestFeaturePreprocessor:
             info_processed,
         ) = self.fpp.preprocess_features(train, test, specs)
 
-        assert_frame_equal(
-            train_processed.sort_index(axis=1), train_expected.sort_index(axis=1)
-        )
-        assert_frame_equal(
-            test_processed.sort_index(axis=1), test_expected.sort_index(axis=1)
-        )
-        assert_frame_equal(
-            info_processed.sort_index(axis=1), info_expected.sort_index(axis=1)
-        )
+        assert_frame_equal(train_processed.sort_index(axis=1), train_expected.sort_index(axis=1))
+        assert_frame_equal(test_processed.sort_index(axis=1), test_expected.sort_index(axis=1))
+        assert_frame_equal(info_processed.sort_index(axis=1), info_expected.sort_index(axis=1))
 
     def test_filter_data_features(self):
 
@@ -1143,18 +1099,7 @@ class TestFeaturePreprocessor:
 
         data = pd.DataFrame(data)
 
-        (
-            _,
-            _,
-            df_filtered_other_columns,
-            _,
-            _,
-            _,
-            _,
-            _,
-            _,
-            feature_names,
-        ) = self.fpp.filter_data(
+        (_, _, df_filtered_other_columns, _, _, _, _, _, _, feature_names,) = self.fpp.filter_data(
             data,
             "h1",
             "ID",
@@ -1186,18 +1131,7 @@ class TestFeaturePreprocessor:
 
         data = pd.DataFrame(data)
 
-        (
-            _,
-            _,
-            df_filtered_other_columns,
-            _,
-            _,
-            _,
-            _,
-            _,
-            _,
-            feature_names,
-        ) = self.fpp.filter_data(
+        (_, _, df_filtered_other_columns, _, _, _, _, _, _, feature_names,) = self.fpp.filter_data(
             data,
             "h1",
             "ID",
@@ -1480,9 +1414,7 @@ class TestFeatureSpecsProcessor:
             "spkitemlab": ["a-5"] * 10,
         }
         df = pd.DataFrame(data)
-        df_specs = self.fsp.generate_specs(
-            df, ["Grammar", "Fluency", "Discourse"], "r1"
-        )
+        df_specs = self.fsp.generate_specs(df, ["Grammar", "Fluency", "Discourse"], "r1")
         assert_equal(len(df_specs), 3)
         assert_array_equal(df_specs["feature"], ["Grammar", "Fluency", "Discourse"])
         assert_array_equal(df_specs["sign"], [1.0, 1.0, 1.0])
@@ -1636,22 +1568,16 @@ class TestFeatureSubsetProcessor:
 
         extra_fnames = ["Grammar", "Vocabulary", "Rhythm"]
         assert_array_equal(
-            self.fsp.select_by_subset(
-                extra_fnames, feature_subset_specs, "high_entropy"
-            ),
+            self.fsp.select_by_subset(extra_fnames, feature_subset_specs, "high_entropy"),
             ["Grammar", "Vocabulary"],
         )
 
     def test_check_feature_subset_file_subset_only(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
         self.fsp.check_feature_subset_file(feature_specs, "subset1")
 
     def test_check_feature_subset_file_sign_only(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "sign_SYS": ["+", "-", "+"]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "sign_SYS": ["+", "-", "+"]})
         self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
     def test_check_feature_subset_file_sign_and_subset(self):
@@ -1665,22 +1591,16 @@ class TestFeatureSubsetProcessor:
         self.fsp.check_feature_subset_file(feature_specs, subset="subset1", sign="SYS")
 
     def test_check_feature_subset_file_sign_named_with_sign(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "sign_SYS": ["+", "-", "+"]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "sign_SYS": ["+", "-", "+"]})
         self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
     def test_check_feature_subset_file_sign_named_with_Sign(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "Sign_SYS": ["+", "-", "+"]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "Sign_SYS": ["+", "-", "+"]})
         self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
     @raises(ValueError)
     def test_check_feature_subset_file_sign_named_something_else(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "SYS_sign": ["+", "-", "+"]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "SYS_sign": ["+", "-", "+"]})
         self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
     @raises(ValueError)
@@ -1701,9 +1621,7 @@ class TestFeatureSubsetProcessor:
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_subset_column(self):
-        feature_specs = pd.DataFrame(
-            {"Feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]}
-        )
+        feature_specs = pd.DataFrame({"Feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
         self.fsp.check_feature_subset_file(feature_specs, "subset2")
 
     @raises(ValueError)
@@ -1715,9 +1633,7 @@ class TestFeatureSubsetProcessor:
 
     @raises(ValueError)
     def test_check_feature_subset_file_no_sign_column(self):
-        feature_specs = pd.DataFrame(
-            {"feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]}
-        )
+        feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
         self.fsp.check_feature_subset_file(feature_specs, sign="subset1")
 
     @raises(ValueError)

@@ -63,9 +63,7 @@ class TestDataReader:
             }
         )
 
-        self.df_other = pd.DataFrame(
-            {"random": ["a", "b", "c"], "things": [1241, 45332, 3252]}
-        )
+        self.df_other = pd.DataFrame({"random": ["a", "b", "c"], "things": [1241, 45332, 3252]})
 
     def tearDown(self):
         for path in self.filepaths:
@@ -117,9 +115,7 @@ class TestDataReader:
         name = TestDataReader.make_file_from_ext(self.df_train, extension)
 
         # now read in the file using `read_data_file()`
-        df_read = DataReader.read_from_file(
-            name, converters={"id": str, "candidate": str}
-        )
+        df_read = DataReader.read_from_file(name, converters={"id": str, "candidate": str})
 
         # Make sure we get rid of the file at the end,
         # at least if we get to this point (i.e. no errors raised)

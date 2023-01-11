@@ -158,9 +158,7 @@ def fast_predict(
             df_input_features, df_feature_info
         )
     except ValueError:
-        raise ValueError(
-            "Input features must not contain non-numeric values."
-        ) from None
+        raise ValueError("Input features must not contain non-numeric values.") from None
 
     # now compute the raw prediction for the given features
     df_predictions = modeler.predict(df_processed_features)
@@ -252,17 +250,13 @@ def compute_and_save_predictions(
         configuration["input_features_file"], configuration.configdir
     )
     if not input_features_file:
-        raise FileNotFoundError(
-            f"Input file {configuration['input_features_file']} does not exist"
-        )
+        raise FileNotFoundError(f"Input file {configuration['input_features_file']} does not exist")
 
     experiment_dir = DataReader.locate_files(
         configuration["experiment_dir"], configuration.configdir
     )
     if not experiment_dir:
-        raise FileNotFoundError(
-            f"The directory {configuration['experiment_dir']} does not exist."
-        )
+        raise FileNotFoundError(f"The directory {configuration['experiment_dir']} does not exist.")
     else:
         experiment_output_dir = normpath(join(experiment_dir, "output"))
         if not exists(experiment_output_dir):
@@ -275,8 +269,7 @@ def compute_and_save_predictions(
     model_files = glob.glob(join(experiment_output_dir, "*.model"))
     if not model_files:
         raise FileNotFoundError(
-            f"The directory {experiment_output_dir} does not "
-            f"contain any rsmtool models."
+            f"The directory {experiment_output_dir} does not " f"contain any rsmtool models."
         )
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
@@ -302,9 +295,7 @@ def compute_and_save_predictions(
 
     feature_info = join(experiment_output_dir, f"{experiment_id}_feature.csv")
 
-    post_processing = join(
-        experiment_output_dir, f"{experiment_id}_postprocessing_params.csv"
-    )
+    post_processing = join(experiment_output_dir, f"{experiment_id}_postprocessing_params.csv")
 
     file_paths = [input_features_file, feature_info, post_processing]
     file_names = ["input_features", "feature_info", "postprocessing_params"]
@@ -316,9 +307,7 @@ def compute_and_save_predictions(
     data_container = reader.read(kwargs_dict={"feature_info": {"index_col": 0}})
 
     # load the Modeler to generate the predictions
-    model = Modeler.load_from_file(
-        join(experiment_output_dir, f"{experiment_id}.model")
-    )
+    model = Modeler.load_from_file(join(experiment_output_dir, f"{experiment_id}.model"))
 
     # Add the model to the configuration object
     configuration["model"] = model
@@ -416,13 +405,10 @@ def main():  # noqa: D103
     # to set up the argument parser, we first need to instantiate options
     # specific to rsmpredict so we use the `CmdOption` namedtuples
     non_standard_options = [
-        CmdOption(
-            dest="output_file", help="output file where predictions will be saved."
-        ),
+        CmdOption(dest="output_file", help="output file where predictions will be saved."),
         CmdOption(
             dest="preproc_feats_file",
-            help="if specified, the preprocessed features "
-            "will be saved in this file",
+            help="if specified, the preprocessed features " "will be saved in this file",
             longname="features",
             required=False,
         ),
@@ -479,9 +465,7 @@ def main():  # noqa: D103
         generator = ConfigurationGenerator(
             "rsmpredict", as_string=True, suppress_warnings=args.quiet
         )
-        configuration = (
-            generator.interact() if args.interactive else generator.generate()
-        )
+        configuration = generator.interact() if args.interactive else generator.generate()
         print(configuration)
 
 

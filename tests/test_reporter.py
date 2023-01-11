@@ -68,9 +68,7 @@ class TestReporter:
         special_sections = ["placeholder_special_section"]
         custom_sections = ["custom.ipynb"]
         subgroups = []
-        section_order = (
-            general_sections + special_sections + custom_sections + ["extra_section"]
-        )
+        section_order = general_sections + special_sections + custom_sections + ["extra_section"]
         self.reporter.get_ordered_notebook_files(
             general_sections,
             special_sections=special_sections,
@@ -123,16 +121,12 @@ class TestReporter:
 
     def test_check_general_section_names_rsmcompare(self):
         specified_list = ["feature_descriptives", "evaluation"]
-        self.reporter.check_section_names(
-            specified_list, "general", context="rsmcompare"
-        )
+        self.reporter.check_section_names(specified_list, "general", context="rsmcompare")
 
     @raises(ValueError)
     def test_check_general_section_names_wrong_names_2(self):
         specified_list = ["data_description", "evaluation"]
-        self.reporter.check_section_names(
-            specified_list, "general", context="rsmcompare"
-        )
+        self.reporter.check_section_names(specified_list, "general", context="rsmcompare")
 
     def test_determine_chosen_sections_default_general(self):
         general_sections = ["all"]
@@ -444,9 +438,7 @@ class TestReporter:
             "skll_" + sname if sname == "model" else sname for sname in section_list
         ]
         general_section_plus_extension = [s + ".ipynb" for s in updated_section_list]
-        expected_notebook_files = [
-            join(notebook_path, s) for s in general_section_plus_extension
-        ]
+        expected_notebook_files = [join(notebook_path, s) for s in general_section_plus_extension]
         eq_(notebook_files, expected_notebook_files)
 
     def test_get_ordered_notebook_files_custom_rsmtool(self):

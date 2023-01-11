@@ -377,9 +377,7 @@ class FeatureTransformer:
         correlations = []
         for trans in applicable_transformations:
             try:
-                transformed_value = self.transform_feature(
-                    feature_value, feature_name, trans
-                )
+                transformed_value = self.transform_feature(feature_value, feature_name, trans)
 
                 correlations.append(abs(pearsonr(transformed_value, scores)[0]))
             except ValueError:

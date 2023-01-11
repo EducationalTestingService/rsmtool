@@ -57,9 +57,7 @@ def find_jsons(json_dir):
 
             # check that we don't already have a file with this name
             if filename in json_file_dict:
-                print(
-                    f"Duplicate json file name: {json_file_dict[filename]} and {json_full_path}"
-                )
+                print(f"Duplicate json file name: {json_file_dict[filename]} and {json_full_path}")
 
             json_file_dict[filename] = json_full_path
     return json_file_dict
@@ -107,8 +105,7 @@ def get_dict_differences(ref_json, test_json, ref_file, test_file):
     added_fields = set(test_json.keys()).difference(set(ref_json.keys()))
     if len(added_fields) > 0:
         result.append(
-            f"The following extra fields are present in test json: "
-            f"{', '.join(added_fields)}"
+            f"The following extra fields are present in test json: " f"{', '.join(added_fields)}"
         )
 
     return result
@@ -171,12 +168,8 @@ def compare_jsons(ref_dir, test_dir):
 def print_result(result_dict):
     """Print overall comparison results."""
     matched = sorted([json for (json, result) in result_dict.items() if result == "OK"])
-    missing = sorted(
-        [json for (json, result) in result_dict.items() if result == "missing"]
-    )
-    discrepant = [
-        json for json in result_dict if json not in matched and json not in missing
-    ]
+    missing = sorted([json for (json, result) in result_dict.items() if result == "missing"])
+    discrepant = [json for json in result_dict if json not in matched and json not in missing]
     print(f"Total reference files: {len(result_dict)}")
     print("------------------------")
     print(f"Matched: {linesep} {linesep.join(matched)}")

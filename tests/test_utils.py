@@ -429,18 +429,14 @@ def test_standardized_mean_difference_fake_method():
 def test_standardized_mean_difference_pooled():
 
     expected = 0.8523247028586811
-    smd = standardized_mean_difference(
-        [8, 4, 6, 3], [9, 4, 5, 12], method="pooled", ddof=0
-    )
+    smd = standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="pooled", ddof=0)
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_unpooled():
 
     expected = 1.171700198827415
-    smd = standardized_mean_difference(
-        [8, 4, 6, 3], [9, 4, 5, 12], method="unpooled", ddof=0
-    )
+    smd = standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="unpooled", ddof=0)
     eq_(smd, expected)
 
 
@@ -472,33 +468,25 @@ def test_difference_of_standardized_means_unequal_lengths():
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_mn_but_no_sd():
 
-    difference_of_standardized_means(
-        [8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_mn=4.5
-    )
+    difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_mn=4.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_sd_but_no_mn():
 
-    difference_of_standardized_means(
-        [8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_sd=1.5
-    )
+    difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_sd=1.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_mn_but_no_sd():
 
-    difference_of_standardized_means(
-        [8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_mn=4.5
-    )
+    difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_mn=4.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_sd_but_no_mn():
 
-    difference_of_standardized_means(
-        [8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_sd=1.5
-    )
+    difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_sd=1.5)
 
 
 def test_difference_of_standardized_means_with_all_values():
@@ -580,9 +568,7 @@ def test_difference_of_standardized_means_zero_population_computed():
 def test_quadratic_weighted_kappa():
 
     expected_qwk = -0.09210526315789469
-    computed_qwk = quadratic_weighted_kappa(
-        np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12])
-    )
+    computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12]))
     assert_almost_equal(computed_qwk, expected_qwk)
 
 
@@ -689,9 +675,7 @@ class TestCrossValidation:
         """
         # create an rsmxval configuration dictionary
         rsmxval_config_dict = {
-            "train_file": join(
-                rsmtool_test_dir, "data", "files", f"train.{file_format}"
-            ),
+            "train_file": join(rsmtool_test_dir, "data", "files", f"train.{file_format}"),
             "file_format": file_format,
             "id_column": "ID",
             "model": "LinearRegression",
@@ -702,9 +686,7 @@ class TestCrossValidation:
 
         # use a folds file if asked, otherwise a fixed number of folds
         if with_folds_file:
-            rsmxval_config_dict["folds_file"] = join(
-                rsmtool_test_dir, "data", "files", "folds.csv"
-            )
+            rsmxval_config_dict["folds_file"] = join(rsmtool_test_dir, "data", "files", "folds.csv")
         else:
             rsmxval_config_dict["folds"] = 7
 
@@ -749,9 +731,7 @@ class TestCrossValidation:
 
         # check that there are only the expected number of fold subdirectories
         actual_foldsdir_contents = sorted(listdir(foldsdir))
-        expected_foldsdir_contents = [
-            f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)
-        ]
+        expected_foldsdir_contents = [f"{fold_num:02}" for fold_num in range(1, expected_folds + 1)]
         eq_(actual_foldsdir_contents, expected_foldsdir_contents)
 
         # check all the per-fold files/directories
@@ -787,9 +767,7 @@ class TestCrossValidation:
             )
 
             # (c) configuration file fields
-            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(
-                context="rsmtool"
-            )
+            parsed_fold_config = ConfigurationParser(str(fold_config)).parse(context="rsmtool")
 
             eq_(Path(parsed_fold_config.get("train_file")), fold_train_file)
 
@@ -809,9 +787,7 @@ class TestCrossValidation:
                 rsmxval_config.get("train_label_column"),
             )
 
-            eq_(
-                parsed_fold_config.get("file_format"), rsmxval_config.get("file_format")
-            )
+            eq_(parsed_fold_config.get("file_format"), rsmxval_config.get("file_format"))
 
             eq_(parsed_fold_config.get("features"), rsmxval_config.get("features"))
 
@@ -827,9 +803,7 @@ class TestCrossValidation:
 
             # (d) the per-fold features or feature subset files
             if with_feature_subset:
-                subset_file = (
-                    fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
-                )
+                subset_file = fold_subdir / Path(rsmxval_config.get("feature_subset_file")).name
                 subset_name = rsmxval_config.get("feature_subset")
                 ok_(subset_file.exists() and subset_file.is_file())
                 eq_(parsed_fold_config.get("feature_subset"), subset_name)
@@ -840,9 +814,7 @@ class TestCrossValidation:
                     eq_(parsed_fold_config["features"], ["FEATURE1", "FEATURE2"])
                 # otherwise the "features" file should have been copied to the fold directory
                 else:
-                    fold_feature_file = (
-                        fold_subdir / Path(rsmxval_config.get("features")).name
-                    )
+                    fold_feature_file = fold_subdir / Path(rsmxval_config.get("features")).name
                     ok_(fold_feature_file.exists() and fold_feature_file.is_file())
                     ok_(filecmp.cmp(fold_feature_file, rsmxval_config.get("features")))
 
@@ -859,9 +831,7 @@ class TestCrossValidation:
             with_folds_file,
             with_feature_subset,
             with_feature_list,
-        ) in product(
-            ["csv", "tsv", "xlsx"], [False, True], [False, True], [False, True]
-        ):
+        ) in product(["csv", "tsv", "xlsx"], [False, True], [False, True], [False, True]):
             yield (
                 self.check_create_xval_files,
                 file_format,
@@ -891,17 +861,11 @@ class TestCrossValidation:
         makedirs(foldsdir / "03")
 
         # create prediction files in each of the fold sub-directories
-        df_preds_fold1 = pd.DataFrame(
-            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
-        )
+        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
         df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
-        df_preds_fold2 = pd.DataFrame(
-            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
-        )
+        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
         df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
-        df_preds_fold3 = pd.DataFrame(
-            np.random.normal(size=(30, 2)), columns=["raw", "scale"]
-        )
+        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
         df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
 
         # combine each of the frames in memory
@@ -1115,15 +1079,13 @@ class TestExpectedScores:
 
         train_ids = list(range(1, len(X_train) + 1))
         train_features = [
-            dict(zip([f"FEATURE_{i + 1}" for i in range(X_train.shape[1])], x))
-            for x in X_train
+            dict(zip([f"FEATURE_{i + 1}" for i in range(X_train.shape[1])], x)) for x in X_train
         ]
         train_labels = list(y_train)
 
         test_ids = list(range(1, len(X_test) + 1))
         test_features = [
-            dict(zip([f"FEATURE_{i + 1}" for i in range(X_test.shape[1])], x))
-            for x in X_test
+            dict(zip([f"FEATURE_{i + 1}" for i in range(X_test.shape[1])], x)) for x in X_test
         ]
 
         cls.train_fs = FeatureSet(
@@ -1163,10 +1125,7 @@ class TestExpectedScores:
         )
         assert len(computed_predictions) == len(self.test_fs)
         assert np.all(
-            [
-                ((prediction >= 0) and (prediction <= 4))
-                for prediction in computed_predictions
-            ]
+            [((prediction >= 0) and (prediction <= 4)) for prediction in computed_predictions]
         )
 
 
@@ -1217,9 +1176,7 @@ class TestSetupRsmCmdParser:
         """Test run subparser with a specified output directory."""
         parser = setup_rsmcmd_parser("test")
         config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
-        parsed_namespace = parser.parse_args(
-            f"run {config_file} /path/to/output/dir".split()
-        )
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir".split())
 
         expected_namespace = argparse.Namespace(
             config_file=config_file, output_dir="/path/to/output/dir", subcommand="run"
@@ -1231,9 +1188,7 @@ class TestSetupRsmCmdParser:
         parser = setup_rsmcmd_parser("test", uses_output_directory=False)
         config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
         parsed_namespace = parser.parse_args(f"run {config_file}".split())
-        expected_namespace = argparse.Namespace(
-            config_file=config_file, subcommand="run"
-        )
+        expected_namespace = argparse.Namespace(config_file=config_file, subcommand="run")
         ok_(not hasattr(parsed_namespace, "output_dir"))
         eq_(parsed_namespace, expected_namespace)
 
@@ -1241,9 +1196,7 @@ class TestSetupRsmCmdParser:
         """Test run subparser with overwriting enabled."""
         parser = setup_rsmcmd_parser("test", allows_overwriting=True)
         config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
-        parsed_namespace = parser.parse_args(
-            f"run {config_file} /path/to/output/dir -f".split()
-        )
+        parsed_namespace = parser.parse_args(f"run {config_file} /path/to/output/dir -f".split())
         expected_namespace = argparse.Namespace(
             config_file=config_file,
             output_dir="/path/to/output/dir",
@@ -1336,9 +1289,7 @@ class TestSetupRsmCmdParser:
             "test", uses_output_directory=False, extra_run_options=extra_options
         )
         config_file = join(rsmtool_test_dir, "data", "experiments", "lr", "lr.json")
-        parsed_namespace = parser.parse_args(
-            f"run {config_file} foo --zeta 1 2".split()
-        )
+        parsed_namespace = parser.parse_args(f"run {config_file} foo --zeta 1 2".split())
         expected_namespace = argparse.Namespace(
             config_file=config_file,
             subcommand="run",
@@ -1451,9 +1402,7 @@ class TestSetupRsmCmdParser:
     def test_generate_subparser_with_subgroups_and_interactive_flags(self):
         """Test generate subparser with subgroups and interactive flags."""
         parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args(
-            "generate --interactive --subgroups".split()
-        )
+        parsed_namespace = parser.parse_args("generate --interactive --subgroups".split())
         expected_namespace = argparse.Namespace(
             subcommand="generate", quiet=False, interactive=True, subgroups=True
         )
@@ -1659,9 +1608,7 @@ class TestBatchGenerateConfiguration:
             if "general_sections" in expected_configuration_object:
                 expected_configuration_object["general_sections"] = section_list
 
-            assert_dict_equal(
-                expected_configuration_object._config, generated_configuration
-            )
+            assert_dict_equal(expected_configuration_object._config, generated_configuration)
 
     def test_generate_configuration(self):
         for (context, use_subgroups, as_string, suppress_warnings) in product(
@@ -1694,9 +1641,7 @@ class TestInteractiveField:
 
     def check_boolean_field(self, field_type, user_input, final_value):
         """Check that boolean fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_bool",
                 field_type,
@@ -1731,9 +1676,7 @@ class TestInteractiveField:
 
     def check_choice_field(self, user_input, final_value):
         """Check that choice fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_choice",
                 "required",
@@ -1745,9 +1688,7 @@ class TestInteractiveField:
             )
             eq_(ifield.get_value(), final_value)
             eq_(mock_prompt.call_count, 1)
-            eq_(
-                mock_prompt.call_args[0][0].value, HTML(" <b>pick a choice</b>: ").value
-            )
+            eq_(mock_prompt.call_args[0][0].value, HTML(" <b>pick a choice</b>: ").value)
 
             # make sure the completer is set up correctly
             completer = mock_prompt.call_args[1]["completer"]
@@ -1780,9 +1721,7 @@ class TestInteractiveField:
 
     def check_dir_field(self, user_input, final_value):
         """Check that dir fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_file", "required", {"label": "enter directory", "type": "dir"}
             )
@@ -1814,9 +1753,7 @@ class TestInteractiveField:
 
             # but existing files should be rejected
             for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
-                existing_file = join(
-                    rsmtool_test_dir, "data", "files", f"train.{extension}"
-                )
+                existing_file = join(rsmtool_test_dir, "data", "files", f"train.{extension}")
                 eq_(validator.func(existing_file), False)
 
             # file fields do not use a completion style
@@ -1829,9 +1766,7 @@ class TestInteractiveField:
 
     def check_file_field(self, field_type, user_input, final_value):
         """Check that file fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_file", field_type, {"label": "enter file", "type": "file"}
             )
@@ -1849,9 +1784,7 @@ class TestInteractiveField:
 
             # valid file formats are okay
             for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
-                valid_file = join(
-                    rsmtool_test_dir, "data", "files", f"train.{extension}"
-                )
+                valid_file = join(rsmtool_test_dir, "data", "files", f"train.{extension}")
                 eq_(completer.file_filter(valid_file), True)
 
             eq_(
@@ -1877,9 +1810,7 @@ class TestInteractiveField:
 
             # existing files should be okay
             for extension in ["csv", "jsonlines", "sas7bdat", "tsv", "xlsx"]:
-                existing_file = join(
-                    rsmtool_test_dir, "data", "files", f"train.{extension}"
-                )
+                existing_file = join(rsmtool_test_dir, "data", "files", f"train.{extension}")
                 eq_(validator.func(existing_file), True)
 
             # empty files should are only accepted for optional fields
@@ -1897,9 +1828,7 @@ class TestInteractiveField:
 
     def check_format_field(self, user_input, final_value):
         """Check that file format fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_file_format",
                 "optional",
@@ -1941,9 +1870,7 @@ class TestInteractiveField:
 
     def check_id_field(self, user_input, final_value):
         """Check that ID fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_int", "required", {"label": "enter experiment ID", "type": "id"}
             )
@@ -1978,9 +1905,7 @@ class TestInteractiveField:
 
     def check_integer_field(self, field_type, user_input, final_value):
         """Check that integer fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_int", field_type, {"label": "enter a number", "type": "integer"}
             )
@@ -2019,9 +1944,7 @@ class TestInteractiveField:
 
     def check_text_field(self, field_type, user_input, final_value):
         """Check that text fields are handled correctly."""
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=user_input
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=user_input) as mock_prompt:
             ifield = InteractiveField(
                 "test_text", field_type, {"label": "description", "type": "text"}
             )
@@ -2039,9 +1962,7 @@ class TestInteractiveField:
         ):
             yield self.check_text_field, field_type, user_input, final_value
 
-    def check_multiple_count_field(
-        self, user_input, final_value, num_entries, field_type
-    ):
+    def check_multiple_count_field(self, user_input, final_value, num_entries, field_type):
         """Check that fields that accept multiple values are handled correctly."""
         # int this particular case, we also need to patch the
         # `print_formatted_text()` function since we use that
@@ -2050,9 +1971,7 @@ class TestInteractiveField:
         patcher = patch("rsmtool.utils.commandline.print_formatted_text")
         mock_print_formatted_text = patcher.start()
 
-        with patch(
-            "rsmtool.utils.commandline.prompt", return_value=num_entries
-        ) as mock_prompt:
+        with patch("rsmtool.utils.commandline.prompt", return_value=num_entries) as mock_prompt:
             ifield = InteractiveField(
                 "test_multiple",
                 "optional",
@@ -2150,9 +2069,7 @@ class TestInteractiveField:
         default_value = DEFAULTS.get(field_name)
         blank_return_value = "" if field_count == "single" else []
         with patch("rsmtool.utils.commandline.prompt", return_value=blank_return_value):
-            ifield = InteractiveField(
-                field_name, "optional", {"label": "optional field label"}
-            )
+            ifield = InteractiveField(field_name, "optional", {"label": "optional field label"})
             eq_(ifield.get_value(), default_value)
 
     def test_optional_interactive_fields_blanks(self):
@@ -2166,9 +2083,7 @@ class TestInteractiveField:
         ]:
             ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]["required"])
         OPTIONAL_INTERACTIVE_FIELDS = [
-            field
-            for field in INTERACTIVE_MODE_METADATA
-            if field not in ALL_REQUIRED_FIELDS
+            field for field in INTERACTIVE_MODE_METADATA if field not in ALL_REQUIRED_FIELDS
         ]
         for field_name in OPTIONAL_INTERACTIVE_FIELDS:
             field_count = INTERACTIVE_MODE_METADATA[field_name].get("count", "single")
@@ -2335,9 +2250,7 @@ class TestInteractiveGenerate:
 
         # get the appropriate list of mocked values for this tool but make
         # a copy since we may need to modify it below
-        mocked_values = getattr(
-            self, f"mocked_{context}_interactive_values{folds_file_suffix}"
-        )[:]
+        mocked_values = getattr(self, f"mocked_{context}_interactive_values{folds_file_suffix}")[:]
 
         # if we are not using subgroups, delete the subgroup entry
         # from the list of mocked values
@@ -2350,9 +2263,7 @@ class TestInteractiveGenerate:
                 del mocked_values[12]
 
         # point to the right file holding the expected configuration
-        expected_file = (
-            f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
-        )
+        expected_file = f"interactive_{context}_config{groups_suffix}{folds_file_suffix}.json"
         expected_path = join(rsmtool_test_dir, "data", "output", expected_file)
 
         # we need to patch stderr and `prompt_toolkit.shortcuts.clear()`` so
