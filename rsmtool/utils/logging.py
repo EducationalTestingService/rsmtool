@@ -93,7 +93,7 @@ def get_file_logger(logger_name, log_file_path):
     """
     logger = logging.getLogger(logger_name)
     logger.propagate = False
-    formatter = logging.Formatter('%(message)s')
+    formatter = logging.Formatter("%(message)s")
     file_handler = logging.FileHandler(log_file_path, mode="w")
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
@@ -117,6 +117,7 @@ def tqdm_joblib(tqdm_object):
     tqdm_object : tqdm progress bar
         The given tqdm progress bar into which joblib should report
     """
+
     class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
         def __call__(self, *args, **kwargs):
             tqdm_object.update(n=self.batch_size)

@@ -45,39 +45,43 @@ class DataWriter:
         """
         file_format = file_format.lower()
 
-        if file_format == 'csv':
-            name_prefix += '.csv'
+        if file_format == "csv":
+            name_prefix += ".csv"
             df.to_csv(name_prefix, index=index, **kwargs)
 
-        elif file_format == 'tsv':
-            name_prefix += '.tsv'
-            df.to_csv(name_prefix, index=index, sep='\t', **kwargs)
+        elif file_format == "tsv":
+            name_prefix += ".tsv"
+            df.to_csv(name_prefix, index=index, sep="\t", **kwargs)
 
         # Added jsonlines for experimental purposes, but leaving
         # this out of the documentation at this stage
-        elif file_format == 'jsonlines':
-            name_prefix += '.jsonlines'
-            df.to_json(name_prefix, orient='records', lines=True, **kwargs)
+        elif file_format == "jsonlines":
+            name_prefix += ".jsonlines"
+            df.to_json(name_prefix, orient="records", lines=True, **kwargs)
 
-        elif file_format == 'xlsx':
-            name_prefix += '.xlsx'
+        elif file_format == "xlsx":
+            name_prefix += ".xlsx"
             df.to_excel(name_prefix, index=index, **kwargs)
 
         else:
-            raise KeyError("Please make sure that the `file_format` specified "
-                           "is one of the following:\n{`csv`, `tsv`, `xlsx`}.\n"
-                           f"You specified {file_format}.")
+            raise KeyError(
+                "Please make sure that the `file_format` specified "
+                "is one of the following:\n{`csv`, `tsv`, `xlsx`}.\n"
+                f"You specified {file_format}."
+            )
 
-    def write_experiment_output(self,
-                                csvdir,
-                                container_or_dict,
-                                dataframe_names=None,
-                                new_names_dict=None,
-                                include_experiment_id=True,
-                                reset_index=False,
-                                file_format='csv',
-                                index=False,
-                                **kwargs):
+    def write_experiment_output(
+        self,
+        csvdir,
+        container_or_dict,
+        dataframe_names=None,
+        new_names_dict=None,
+        include_experiment_id=True,
+        reset_index=False,
+        file_format="csv",
+        index=False,
+        **kwargs,
+    ):
         """
         Write out each of the named frames to disk.
 
@@ -135,7 +139,9 @@ class DataWriter:
         else:
             for name in dataframe_names:
                 if name not in container_or_dict:
-                    raise KeyError(f"The name `{name}` is not in the container or dictionary.")
+                    raise KeyError(
+                        f"The name `{name}` is not in the container or dictionary."
+                    )
 
         # Loop through DataFrames, and save
         # output in specified format
@@ -143,7 +149,7 @@ class DataWriter:
 
             df = container_or_dict[dataframe_name]
             if df is None:
-                raise KeyError(f'The DataFrame `{dataframe_name}` does not exist.')
+                raise KeyError(f"The DataFrame `{dataframe_name}` does not exist.")
 
             # If the DataFrame is empty, skip it
             if df.empty:
@@ -157,29 +163,29 @@ class DataWriter:
 
             # Reset the index, if desired
             if reset_index:
-                df.index.name = ''
+                df.index.name = ""
                 df.reset_index(inplace=True)
 
             # If include_experiment_id is True, and the experiment_id exists
             # include it in the file name; otherwise, do not include it.
             if include_experiment_id and self._id is not None:
-                outfile = join(csvdir, f'{self._id}_{dataframe_name}')
+                outfile = join(csvdir, f"{self._id}_{dataframe_name}")
             else:
                 outfile = join(csvdir, dataframe_name)
 
             # write out the frame to disk in the given file
-            self.write_frame_to_file(df,
-                                     outfile,
-                                     file_format=file_format,
-                                     index=index,
-                                     **kwargs)
+            self.write_frame_to_file(
+                df, outfile, file_format=file_format, index=index, **kwargs
+            )
 
-    def write_feature_csv(self,
-                          featuredir,
-                          data_container,
-                          selected_features,
-                          include_experiment_id=True,
-                          file_format='csv'):
+    def write_feature_csv(
+        self,
+        featuredir,
+        data_container,
+        selected_features,
+        include_experiment_id=True,
+        file_format="csv",
+    ):
         """
         Write out the selected features to disk.
 
@@ -200,19 +206,24 @@ class DataWriter:
             One of {"csv", "tsv", "xlsx"}.
             Defaults to "csv".
         """
-        df_feature_specs = data_container['feature_specs']
+        df_feature_specs = data_container["feature_specs"]
 
         # Select specific features used in training
-        df_selected = df_feature_specs[df_feature_specs['feature'].isin(selected_features)]
+        df_selected = df_feature_specs[
+            df_feature_specs["feature"].isin(selected_features)
+        ]
 
         # Replace existing `feature_specs` with selected features specs
-        data_container.add_dataset({'frame': df_selected,
-                                    'name': 'feature_specs'}, update=True)
+        data_container.add_dataset(
+            {"frame": df_selected, "name": "feature_specs"}, update=True
+        )
 
         makedirs(featuredir, exist_ok=True)
-        self.write_experiment_output(featuredir,
-                                     data_container,
-                                     ['feature_specs'],
-                                     {'feature_specs': 'selected'},
-                                     include_experiment_id=include_experiment_id,
-                                     file_format=file_format)
+        self.write_experiment_output(
+            featuredir,
+            data_container,
+            ["feature_specs"],
+            {"feature_specs": "selected"},
+            include_experiment_id=include_experiment_id,
+            file_format=file_format,
+        )

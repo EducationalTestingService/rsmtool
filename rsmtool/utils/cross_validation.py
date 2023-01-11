@@ -59,11 +59,14 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     # locate the training data file, the folds file, and feature file(s)
     located_filepaths = {}
-    located_filepaths["train"] = DataReader.locate_files(configuration.get("train_file"),
-                                                         configuration.configdir)
+    located_filepaths["train"] = DataReader.locate_files(
+        configuration.get("train_file"), configuration.configdir
+    )
     if not located_filepaths["train"]:
-        raise FileNotFoundError(f"The training data file was not found: "
-                                f"{repr(configuration.get('train_file'))}")
+        raise FileNotFoundError(
+            f"The training data file was not found: "
+            f"{repr(configuration.get('train_file'))}"
+        )
 
     # "features" could be a list of features so check for that
     additional_filenames = ["folds_file", "feature_subset_file"]
@@ -72,43 +75,52 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     for additional_filename in additional_filenames:
         if additional_file := configuration.get(additional_filename):
-            located_filepaths[additional_filename] = DataReader.locate_files(additional_file,
-                                                                             configuration.configdir)
+            located_filepaths[additional_filename] = DataReader.locate_files(
+                additional_file, configuration.configdir
+            )
 
     # read the training file into a dataframe making sure that the specified
     # ID column is read as a string
-    df_train = DataReader.read_from_file(located_filepaths["train"],
-                                         converters={configuration["id_column"]: str})
+    df_train = DataReader.read_from_file(
+        located_filepaths["train"], converters={configuration["id_column"]: str}
+    )
 
     # we need to sub-sample the full training data file to create a dummy
     # test file that we need to use when running RSMTool on the full
     # training dataset to get the model/feature descriptives; we use 10%
     # of the training data to create this dummy test set
-    df_sampled_test = df_train.sample(frac=0.1,
-                                      replace=False,
-                                      random_state=1234567890,
-                                      axis=0)
-    DataWriter.write_frame_to_file(df_sampled_test,
-                                   str(modeldir / "dummy_test"),
-                                   file_format=given_file_format,
-                                   index=False)
+    df_sampled_test = df_train.sample(
+        frac=0.1, replace=False, random_state=1234567890, axis=0
+    )
+    DataWriter.write_frame_to_file(
+        df_sampled_test,
+        str(modeldir / "dummy_test"),
+        file_format=given_file_format,
+        index=False,
+    )
 
     # read the folds file if it exists, otherwise use specified number of folds
     folds_file = located_filepaths.get("folds_file")
     if folds_file and Path(folds_file).exists():
         cv_folds = load_cv_folds(located_filepaths["folds_file"])
         folds = len(set(cv_folds.values()))
-        logger.info(f"Using {folds} folds specified in {located_filepaths['folds_file']}")
+        logger.info(
+            f"Using {folds} folds specified in {located_filepaths['folds_file']}"
+        )
         logo = LeaveOneGroupOut()
         id_column = configuration.get("id_column")
         try:
             train_ids = df_train[id_column]
         except KeyError:
-            logger.error("Column f{id_column} not found! Check the value of "
-                         "'id_column' in the configuration file.")
+            logger.error(
+                "Column f{id_column} not found! Check the value of "
+                "'id_column' in the configuration file."
+            )
         else:
             fold_groups = [cv_folds[train_id] for train_id in train_ids.values]
-            fold_generator = logo.split(range(len(df_train)), y=None, groups=fold_groups)
+            fold_generator = logo.split(
+                range(len(df_train)), y=None, groups=fold_groups
+            )
     else:
         # if we are in this code path but the configuration did
         # specify "folds_file", then we must not have found the file
@@ -122,8 +134,9 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     # iterate over each of the folds and generate an rsmtool configuration file
     # which is then saved to disk in a directory specific to each fold
-    for fold_num, (fold_train_indices,
-                   fold_test_indices) in enumerate(fold_generator, start=1):
+    for fold_num, (fold_train_indices, fold_test_indices) in enumerate(
+        fold_generator, start=1
+    ):
 
         # get the train and test files for this fold and
         # write them out to disk
@@ -132,20 +145,26 @@ def create_xval_files(configuration, output_dir, logger=None):
         this_fold_dir = Path(foldsdir) / f"{fold_num:02}"
         this_fold_dir.mkdir()
         fold_train_file_prefix = str(this_fold_dir / "train")
-        DataWriter.write_frame_to_file(df_fold_train,
-                                       fold_train_file_prefix,
-                                       file_format=given_file_format,
-                                       index=False)
+        DataWriter.write_frame_to_file(
+            df_fold_train,
+            fold_train_file_prefix,
+            file_format=given_file_format,
+            index=False,
+        )
         fold_test_file_prefix = str(this_fold_dir / "test")
-        DataWriter.write_frame_to_file(df_fold_test,
-                                       fold_test_file_prefix,
-                                       file_format=given_file_format,
-                                       index=False)
+        DataWriter.write_frame_to_file(
+            df_fold_test,
+            fold_test_file_prefix,
+            file_format=given_file_format,
+            index=False,
+        )
 
         # update the value of "train_file" and add "test_file"
         # & "test_label_column" in the configuration file
         fold_configuration = configuration.copy(deep=True)
-        fold_configuration["train_file"] = f"{fold_train_file_prefix}.{given_file_format}"
+        fold_configuration[
+            "train_file"
+        ] = f"{fold_train_file_prefix}.{given_file_format}"
         fold_configuration["test_file"] = f"{fold_test_file_prefix}.{given_file_format}"
         fold_configuration["test_label_column"] = configuration["train_label_column"]
 
@@ -153,8 +172,12 @@ def create_xval_files(configuration, output_dir, logger=None):
         fold_configuration["file_format"] = given_file_format
 
         # update "experiment_id" and "description" in configuration file
-        fold_configuration["experiment_id"] = f"{configuration['experiment_id']}_fold{fold_num:02}"
-        fold_configuration["description"] = f"{configuration['description']} (Fold {fold_num:02})"
+        fold_configuration[
+            "experiment_id"
+        ] = f"{configuration['experiment_id']}_fold{fold_num:02}"
+        fold_configuration[
+            "description"
+        ] = f"{configuration['description']} (Fold {fold_num:02})"
 
         # if "feature_subset" was specified in the original configuration,
         # then we need it in the fold configuration as well
@@ -224,7 +247,9 @@ def combine_fold_prediction_files(foldsdir, file_format="csv"):
 
     # iterate over each fold in the given directory & read and save predictions
     for prediction_file in Path(foldsdir).glob(f"**/*pred_processed*.{file_format}"):
-        df_fold_predictions = DataReader.read_from_file(prediction_file, converters={'spkitemid': str})
+        df_fold_predictions = DataReader.read_from_file(
+            prediction_file, converters={"spkitemid": str}
+        )
         prediction_dfs.append(df_fold_predictions)
 
     # concatenate all of the predictions into a single frame using
