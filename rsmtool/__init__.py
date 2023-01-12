@@ -1,4 +1,6 @@
 """
+Set up RSMTool version and global imports.
+
 :author: Jeremy Biggs {jbiggs@ets.org)}
 :author: Anastassia Loukina (aloukina@ets.org)
 :author: Nitin Madnani (nmadnani@ets.org)

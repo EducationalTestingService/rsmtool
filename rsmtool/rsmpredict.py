@@ -372,7 +372,8 @@ def compute_and_save_predictions(
 
         # save the predictions to disk
         logger.info(
-            f"Saving excluded responses to {join(output_dir, '{}_excluded_responses.csv'.format(filename))}"
+            f"Saving excluded responses to "
+            f"{join(output_dir, '{}_excluded_responses.csv'.format(filename))}"
         )
 
         # Write out files

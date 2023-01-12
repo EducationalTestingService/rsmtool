@@ -1,4 +1,6 @@
 """
+Versioning information.
+
 This module exists solely for version information so we only have to change it
 in one place. Based on the suggestion `here. <http://bit.ly/16LbuJF>`_
 """

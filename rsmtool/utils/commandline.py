@@ -21,6 +21,7 @@ from prompt_toolkit.completion import FuzzyWordCompleter, PathCompleter, WordCom
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle, clear, print_formatted_text, prompt
 from prompt_toolkit.validation import Validator
+
 from rsmtool import VERSION_STRING
 from rsmtool.configuration_parser import Configuration
 from rsmtool.reporter import Reporter
@@ -814,7 +815,7 @@ class ConfigurationGenerator:
         if insert_required_comment:
             configuration = re.sub(
                 rf'([ ]+)("{self._first_required_field}": [^,]+,\n)',
-                rf'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',
+                rf'\1// REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!\n\1\2',  # noqa
                 configuration,
             )
 

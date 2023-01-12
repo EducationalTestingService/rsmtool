@@ -8,9 +8,9 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 :organization: ETS
 """
 
+import logging
 import warnings
 from functools import partial
-import logging
 
 import numpy as np
 import pandas as pd
@@ -34,6 +34,7 @@ class Analyzer:
     """Class to perform analysis on all metrics, predictions, etc."""
 
     def __init__(self, logger=None):
+        """Initialize the Analyzer object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod

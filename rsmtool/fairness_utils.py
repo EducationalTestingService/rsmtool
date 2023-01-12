@@ -14,9 +14,10 @@ from os.path import join
 
 import pandas as pd
 import statsmodels.formula.api as smf
+from statsmodels.stats.anova import anova_lm
+
 from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
-from statsmodels.stats.anova import anova_lm
 
 
 def convert_to_ordered_category(group_values, base_group=None):
@@ -166,7 +167,7 @@ def get_fairness_analyses(
     df, group, system_score_column, human_score_column="sc1", base_group=None
 ):
     """
-    Compute fairness analyses described in `Loukina et al. 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
+    Compute analyses from `Loukina et al. 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
 
     The function computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),

@@ -1,6 +1,7 @@
 from os.path import join, normpath
 
 from nose.tools import eq_, ok_, raises
+
 from rsmtool.reporter import (
     Reporter,
     comparison_notebook_path,

@@ -25,15 +25,15 @@ from .reader import DataReader
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import (
-        special_section_list_rsmtool,  # noqa
-        special_section_list_rsmeval,
-        special_section_list_rsmcompare,
-        special_section_list_rsmsummarize,
-        ordered_section_list_with_special_sections_rsmtool,
-        ordered_section_list_with_special_sections_rsmeval,
         ordered_section_list_with_special_sections_rsmcompare,
+        ordered_section_list_with_special_sections_rsmeval,
         ordered_section_list_with_special_sections_rsmsummarize,
+        ordered_section_list_with_special_sections_rsmtool,
         special_notebook_path,
+        special_section_list_rsmcompare,
+        special_section_list_rsmeval,
+        special_section_list_rsmsummarize,
+        special_section_list_rsmtool,
     )
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
@@ -176,6 +176,7 @@ class Reporter:
     """Class to generate Jupyter notebook reports and convert them to HTML."""
 
     def __init__(self, logger=None):
+        """Initialize the Reporter object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod

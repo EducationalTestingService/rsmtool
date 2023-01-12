@@ -36,10 +36,7 @@ from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
 
 if HAS_RSMEXTRA:
-    from rsmextra.settings import (
-        default_feature_subset_file,  # noqa
-        default_feature_sign,
-    )
+    from rsmextra.settings import default_feature_sign, default_feature_subset_file
 
 
 def configure(context, config_file_or_obj_or_dict):

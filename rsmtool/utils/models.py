@@ -1,3 +1,13 @@
+"""
+Utility functions for SKLL and built-in models.
+
+:author: Jeremy Biggs (jbiggs@ets.org)
+:author: Anastassia Loukina (aloukina@ets.org)
+:author: Nitin Madnani (nmadnani@ets.org)
+
+:organization: ETS
+"""
+
 from importlib import import_module
 from inspect import getmembers, isclass
 

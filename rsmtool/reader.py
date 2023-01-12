@@ -36,7 +36,7 @@ def read_jsonlines(filename, converters=None):
     converters : dict, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+        format as for ``pandas.read_csv()``.
         Defaults to ``None``.
 
     Returns
@@ -99,7 +99,7 @@ def try_to_load_file(filename, converters=None, raise_error=False, raise_warning
     converters : dict, optional
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
-        format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+        format as for ``pandas.read_csv()``.
         Defaults to ``None``.
     raise_error : bool, optional
         Raise an error if the file cannot be located.
@@ -220,7 +220,7 @@ class DataReader:
         converters : dict, optional
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
-            format as for `pd.read_csv() <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_.
+            format as for `pandas.read_csv()``.
             Defaults to ``None``.
 
         Returns

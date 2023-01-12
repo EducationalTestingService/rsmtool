@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Configure sphinx settings."""
 # -*- coding: utf-8 -*-
 #
 # rsmtool documentation build configuration file, created by
@@ -22,7 +23,7 @@ from datetime import datetime
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath(".."))
 
-from rsmtool.version import __version__ as version  # isort:skip
+from rsmtool.version import __version__ as version  # isort:skip # noqa
 
 
 # -- General configuration ------------------------------------------------

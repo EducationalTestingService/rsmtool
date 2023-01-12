@@ -20,7 +20,7 @@ def requirements():
 
 setup(
     name="rsmtool",
-    version=__version__,
+    version=__version__,  # noqa
     description="Rater scoring modeling tool",
     long_description=readme(),
     keywords="scoring modeling",

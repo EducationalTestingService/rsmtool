@@ -27,6 +27,7 @@ class FeatureSubsetProcessor:
     """Class to encapsulate feature sub-setting methods."""
 
     def __init__(self, logger=None):
+        """Initialize the FeatureSubsetProcessor object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     def select_by_subset(self, feature_columns, feature_subset_specs, subset):
@@ -136,6 +137,7 @@ class FeatureSpecsProcessor:
     """Encapsulate feature file processing methods."""
 
     def __init__(self, logger=None):
+        """Initialize the FeatureSpecsProcessor object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     def generate_default_specs(self, feature_names):
@@ -345,6 +347,7 @@ class FeaturePreprocessor:
     """Class to preprocess features in training and testing sets."""
 
     def __init__(self, logger=None):
+        """Initialize the FeaturePreprocessor object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     def check_model_name(self, model_name):
