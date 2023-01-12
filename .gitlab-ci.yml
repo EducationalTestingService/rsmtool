@@ -11,8 +11,7 @@ variables:
 # set up basic job
 .runtests:
   before_script:
-    - "conda create --prefix /root/rsmenv -c conda-forge -c defaults -c ets --file requirements.txt python=${PYVERSION} codecov --yes --quiet"
-    - /root/rsmenv/bin/pip install nose-cov
+    - "conda create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} codecov --yes --quiet"
     - /root/rsmenv/bin/pip install -e .
     - echo "import os" > sitecustomize.py
     - echo "try:" >> sitecustomize.py
@@ -22,7 +21,7 @@ variables:
     - echo "except ImportError:" >> sitecustomize.py
     - echo "    pass" >> sitecustomize.py
   script:
-    - "/root/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool --cov-config .coveragerc ${TESTFILES}"
+    - "/root/rsmenv/bin/nosetests --nologcapture --with-coverage --cover-package=rsmtool ${TESTFILES}"
   after_script:
     - /root/rsmenv/bin/codecov
 
