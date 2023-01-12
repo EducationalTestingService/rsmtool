@@ -1,6 +1,7 @@
 import os
 
 from parameterized import param, parameterized
+
 from rsmtool.test_utils import check_run_cross_validation
 
 # allow test directory to be set via an environment variable
@@ -9,7 +10,7 @@ TEST_DIR = os.environ.get("TESTDIR", None)
 if TEST_DIR:
     rsmtool_test_dir = TEST_DIR
 else:
-    from rsmtool.test_utils import rsmtool_test_dir
+    from rsmtool.test_utils import rsmtool_test_dir  # noqa
 
 
 @parameterized(

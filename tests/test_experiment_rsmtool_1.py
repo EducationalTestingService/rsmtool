@@ -4,6 +4,7 @@ from os.path import join
 from nbconvert.preprocessors import CellExecutionError
 from nose.tools import raises
 from parameterized import param, parameterized
+
 from rsmtool.reporter import Reporter
 from rsmtool.test_utils import check_report, check_run_experiment, do_run_experiment
 
@@ -32,8 +33,8 @@ else:
             "lr_with_id_with_leading_zeros",
             subgroups=["ITEM", "QUESTION"],
         ),
-        # we suppress UserWarnings for this test since we expect to get a warning in partial correlations
-        # due to edge cases
+        # we suppress UserWarnings for this test since we expect to get a warnin
+        # in partial correlations due to edge cases
         param(
             "lr-subgroups-with-edge-cases",
             "lr_subgroups_with_edge_cases",

@@ -1,5 +1,6 @@
 import argparse
 import filecmp
+import warnings
 from io import StringIO
 from itertools import count, product
 from os import environ, getcwd, listdir, makedirs, unlink
@@ -9,7 +10,6 @@ from shutil import rmtree
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
 from unittest.mock import patch
 from uuid import uuid4
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,13 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from pandas.testing import assert_frame_equal
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.shortcuts import CompleteStyle
+from sklearn.datasets import make_classification
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.metrics import cohen_kappa_score
+from skll.data import FeatureSet
+from skll.learner import Learner
+from skll.metrics import kappa
+
 from rsmtool.configuration_parser import Configuration, ConfigurationParser
 from rsmtool.reader import DataReader
 from rsmtool.utils.commandline import (
@@ -55,13 +62,6 @@ from rsmtool.utils.notebook import (
     get_thumbnail_as_html,
     int_or_float_format_func,
 )
-from sklearn.datasets import make_classification
-from sklearn.exceptions import ConvergenceWarning
-from sklearn.metrics import cohen_kappa_score
-from skll.data import FeatureSet
-from skll.learner import Learner
-from skll.metrics import kappa
-
 from rsmtool.writer import DataWriter
 
 # allow test directory to be set via an environment variable
@@ -134,11 +134,11 @@ def test_parse_json_with_comments_no_comments():
         },
         "text_to_instance": null,
         "train": {
-            "notes": "The training process was recorded here: https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
+            "notes": "The training process was recorded here: https://foobar.org/blah",
             "repository_commit": "12.2020_model_deployment_1.0",
             "repository_name": "strides-scoring-pt",
-            "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
-            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet"
+            "repository_url": "https://stash.research.ets.org:7994/BR/repos/strides/browse",
+            "train_cmd": "futil.run_experiment --config foo.jsonnnet"
         }
     }"""
 
@@ -157,11 +157,11 @@ def test_parse_json_with_comments_no_comments():
         },
         "text_to_instance": None,
         "train": {
-            "notes": r"The training process was recorded here: https://etsorg1-my.sharepoint.com/personal/briordan_ets_org/_layouts/15/Doc.aspx?sourcedoc={f3190115-91e2-4aac-bf28-3556a1669636}&action=edit&wd=target%28predict-scores-operational.one%7C3642acf5-3099-db40-9ddd-dc564ccc8dfb%2Fiteration-3%7C6b4bfc6b-5d8a-9e43-a382-9cc84884662b%2F%29",
+            "notes": r"The training process was recorded here: https://foobar.org/blah",
             "repository_commit": "12.2020_model_deployment_1.0",
             "repository_name": "strides-scoring-pt",
-            "repository_url": "https://stash.research.ets.org:7994/projects/BR/repos/strides-scoring-pt/browse",
-            "train_cmd": "futil.run_experiment --config /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_run_config.jsonnet --config_changes /home/research/mmulholland/text-dynamic/strides-scoring-pt/strides_scoring_pt/training_config/expt-3/expt-3_all_config_changes.jsonnet",
+            "repository_url": "https://stash.research.ets.org:7994/BR/repos/strides/browse",
+            "train_cmd": "futil.run_experiment --config foo.jsonnnet",
         },
     }
     yield check_parse_json_with_comments, test_json_string, expected_result

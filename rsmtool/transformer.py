@@ -18,6 +18,7 @@ class FeatureTransformer:
     """Encapsulate feature transformation methods."""
 
     def __init__(self, logger=None):
+        """Initialize the FeatureTransformer object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     def apply_sqrt_transform(self, name, values, raise_error=True):

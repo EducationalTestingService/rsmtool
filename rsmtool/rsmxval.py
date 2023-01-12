@@ -28,8 +28,8 @@ The complete cross-validation workflow is as follows:
 """
 
 import logging
-from os import listdir, makedirs
 import sys
+from os import listdir, makedirs
 from os.path import abspath, exists, join
 from pathlib import Path
 
@@ -38,8 +38,8 @@ from tqdm import tqdm
 
 from .configuration_parser import Configuration, configure
 from .rsmeval import run_evaluation
-from .rsmtool import run_experiment
 from .rsmsummarize import run_summary
+from .rsmtool import run_experiment
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.cross_validation import (
@@ -47,7 +47,7 @@ from .utils.cross_validation import (
     create_xval_files,
     process_fold,
 )
-from .utils.logging import LogFormatter, tqdm_joblib, get_file_logger
+from .utils.logging import LogFormatter, get_file_logger, tqdm_joblib
 from .writer import DataWriter
 
 # a constant defining all of the sections we can use when

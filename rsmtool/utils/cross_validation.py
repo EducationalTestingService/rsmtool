@@ -6,12 +6,12 @@ Various utility functions used for cross-validation.
 :organization: ETS
 """
 import logging
-from shutil import copyfile
 from pathlib import Path
+from shutil import copyfile
 
 from pandas import concat
-from skll.config.utils import load_cv_folds
 from sklearn.model_selection import KFold, LeaveOneGroupOut
+from skll.config.utils import load_cv_folds
 
 from rsmtool.reader import DataReader
 from rsmtool.rsmtool import run_experiment

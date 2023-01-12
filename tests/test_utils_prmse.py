@@ -7,6 +7,7 @@ import pandas as pd
 from nose.tools import assert_almost_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
+
 from rsmtool.utils.prmse import (
     get_n_human_scores,
     get_true_score_evaluations,

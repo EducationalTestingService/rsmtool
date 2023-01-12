@@ -59,7 +59,7 @@ def parse_json_with_comments(pathlike):
         while match:
 
             # single line comment
-            content = content[: match.start()] + content[match.end() :]
+            content = content[: match.start()] + content[match.end() :]  # noqa
             match = comment_re.search(content)
 
         # Return JSON object

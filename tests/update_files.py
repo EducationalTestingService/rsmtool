@@ -27,7 +27,7 @@ Note: If running this script results in changes to the inputs for rsmcompare
 or rsmsummarize tests, you will need to first re-run the tests for those two
 tools and then, potentially, run this script again to update their test outputs.
 
-See `documentation <https://rsmtool.readthedocs.io/en/stable/contributing.html#writing-new-functional-tests>`_
+See `documentation <https://rsmtool.readthedocs.io/en/main/contributing.html#writing-new-functional-tests>`_
 for a further explanation of this process.
 
 The script prints a log detailing the changes made for each experiment test.

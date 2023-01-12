@@ -1052,11 +1052,6 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
     )
     predictions_file = join(output_dir, f"{experiment_id}_pred_processed.{file_format}")
 
-    postprocessing_params_file = join(
-        output_dir, f"{experiment_id}_postprocessing_params.{file_format}"
-    )
-
-    postproc_params = DataReader.read_from_file(postprocessing_params_file).loc[0]
     df_preprocessed_test_data = DataReader.read_from_file(preprocessed_test_file)
     df_old_predictions = DataReader.read_from_file(predictions_file)
     df_old_predictions = df_old_predictions[["spkitemid", "sc1", "scale"]]
@@ -1495,7 +1490,7 @@ class FileUpdater(object):
     def run(self):
         """Update test data in files given by the ``test_suffixes`` attribute."""
         # import all the test_suffix experiment files using SourceFileLoader
-        # adapted from: http://stackoverflow.com/questions/67631/how-to-import-a-module-given-the-full-path
+        # adapted from: https://stackoverflow.com/a/67692
         for test_suffix in self.test_suffixes:
             test_module_path = join(self.tests_directory, f"test_experiment_{test_suffix}.py")
             test_module = SourceFileLoader(f"loaded_{test_suffix}", test_module_path).load_module()

@@ -31,9 +31,7 @@ from .writer import DataWriter
 
 
 class Modeler:
-    """
-    Class to train model and generate predictions with built-in or SKLL models.
-    """
+    """Class to train model and generate predictions with built-in or SKLL models."""
 
     def __init__(self, logger=None):
         """Instantiate empty instance with no learner and given logger, if any."""
@@ -960,9 +958,8 @@ class Modeler:
         Returns
         -------
         learner : skll.learner.Learner
-            SKLL ``LinearRegression`` `Learner <https://skll.readthedocs.io/en/latest/api/learner.html#skll.learner.Learner>`_
-            object containing the coefficients learned by training
-            the built-in model.
+            SKLL ``LinearRegression`` Learner object containing the coefficients
+            learned by training the built-in model.
         """
         # get the columns that actually contain the feature values
         feature_columns = [c for c in df_train.columns if c not in ["spkitemid", "sc1"]]

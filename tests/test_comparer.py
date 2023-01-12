@@ -5,9 +5,10 @@ import numpy as np
 import pandas as pd
 from nose.tools import assert_almost_equal, assert_equal, raises
 from pandas.testing import assert_frame_equal
+from scipy.stats import pearsonr
+
 from rsmtool.comparer import Comparer
 from rsmtool.test_utils import do_run_experiment
-from scipy.stats import pearsonr
 
 
 class TestComparer:

@@ -15,8 +15,8 @@ the sections are displayed in a Dash TOC on the right.
 
 import argparse
 import logging
-import re
 import pathlib
+import re
 import unicodedata
 from urllib.parse import quote
 

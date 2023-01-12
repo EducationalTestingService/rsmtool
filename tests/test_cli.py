@@ -6,6 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from nose.tools import assert_raises, eq_, ok_
+
 from rsmtool.test_utils import (
     check_file_output,
     check_generated_output,

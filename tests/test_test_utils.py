@@ -4,6 +4,7 @@ from os.path import join
 from pathlib import Path
 
 from nose.tools import eq_, ok_
+
 from rsmtool.test_utils import copy_data_files
 
 # allow test directory to be set via an environment variable
