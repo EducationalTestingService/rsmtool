@@ -10,6 +10,7 @@ repos:
     rev: 22.10.0
     hooks:
     -   id: black
+        args: [--line-length=100]
 -   repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
@@ -25,4 +26,4 @@ repos:
     rev: 5.11.4
     hooks:
     -   id: isort
-        args: ["--profile", "black", "--filter-files"]
+        args: ["--profile", "black", "--filter-files", "--multi-line", "3", "--trailing-comma", "--use-parentheses", "--ensure-newline-before-comments"]
