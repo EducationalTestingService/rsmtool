@@ -3,6 +3,7 @@ import logging
 import os
 import tempfile
 import warnings
+from functools import partial
 from io import StringIO
 from os import getcwd
 from os.path import abspath, dirname, join
@@ -1293,23 +1294,50 @@ class TestConfiguration:
 
 
 class TestJSONFeatureConversion:
-    def test_json_feature_conversion(self):
+    def check_json_feature_conversion(self, input_file_format):
         json_feature_file = join(_MY_DIR, "data", "experiments", "lr-feature-json", "features.json")
-        expected_feature_csv = join(_MY_DIR, "data", "experiments", "lr", "features.csv")
+        if input_file_format == "csv":
+            expected_feature_csv = join(
+                _MY_DIR, "data", "experiments", "lr", f"features.{input_file_format}"
+            )
+            readfn = pd.read_csv
+        elif input_file_format == "tsv":
+            expected_feature_csv = join(
+                _MY_DIR,
+                "data",
+                "experiments",
+                "lr-tsv-input-files",
+                f"features.{input_file_format}",
+            )
+            readfn = partial(pd.read_csv, sep="\t")
+        elif input_file_format == "xlsx":
+            expected_feature_csv = join(
+                _MY_DIR,
+                "data",
+                "experiments",
+                "lr-xlsx-input-files",
+                f"features.{input_file_format}",
+            )
+            readfn = pd.read_excel
 
         # convert the feature json file and write to a temporary location
-        tempf = tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False)
+        tempf = tempfile.NamedTemporaryFile(mode="w", suffix=f".{input_file_format}", delete=False)
         convert_feature_json_file(json_feature_file, tempf.name, delete=False)
 
         # read the expected and converted files into data frames
-        df_expected = pd.read_csv(expected_feature_csv)
-        df_converted = pd.read_csv(tempf.name)
+        df_expected = readfn(expected_feature_csv)
+        df_converted = readfn(tempf.name)
         tempf.close()
 
         # get rid of the file now that have read it into memory
         os.unlink(tempf.name)
 
         assert_frame_equal(df_expected.sort_index(axis=1), df_converted.sort_index(axis=1))
+
+    def test_json_feature_conversion(self):
+        yield self.check_json_feature_conversion, "csv"
+        yield self.check_json_feature_conversion, "tsv"
+        yield self.check_json_feature_conversion, "xlsx"
 
     @raises(RuntimeError)
     def test_json_feature_conversion_bad_json(self):
