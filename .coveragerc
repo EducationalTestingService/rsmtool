@@ -1,6 +1,5 @@
 [run]
 source=rsmtool
-concurrency=multiprocessing
 parallel=true
 omit =
     *rsmtool/notebooks/templates/report.tpl
