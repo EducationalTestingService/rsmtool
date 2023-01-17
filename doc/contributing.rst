@@ -16,9 +16,11 @@ To set up a local development environment, follow the steps below:
 
     conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
 
-#. Activate the environment using ``conda activate rsmdev``. [#]_
+#. Activate the environment using ``conda activate rsmdev``.
 
 #. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
+
+#. Run ``pre-commit install`` to install the git hooks for pre-commit checks.
 
 #. Create a new git branch with a useful and descriptive name.
 
@@ -35,9 +37,15 @@ If you are on macOS and use the `Dash <https://kapeli.com/dash>`_ app, follow st
 
 Code style
 ----------
-The RSMTool codebase follows certain best practices when it comes to the code style and we expect any contributed code to do the same. These best practices are:
+The RSMTool codebase enforces a certain code style via pre-commit checks and this style is automatically applied to any new contributions. This code style consists of:
 
-#. The imports at the top of any Python files should be grouped and sorted as follows: STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER. As an example, consider the imports at the top of ``reporter.py`` which look like this:
+#. All Python code is formatted via the `black <https://black.readthedocs.io/en/stable/>`_ pre-commit check.
+
+#. The f-string specification is used for all format strings in the Python code as enforced by the `flynt <https://pypi.org/project/flynt/>`_ pre-commit check.
+
+#. Any `PEP 8 <https://peps.python.org/pep-0008/>`_ code style violations are checked using the `flake8 <https://flake8.pycqa.org/en/latest/>`_ pre-commit check.
+
+#. The imports at the top of any Python files are grouped and sorted as follows: STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER. As an example, consider the imports at the top of ``reporter.py`` which look like this:
 
     .. code-block:: python
 
@@ -50,16 +58,15 @@ The RSMTool codebase follows certain best practices when it comes to the code st
         from os.path import abspath, basename, dirname, join, splitext
 
         from nbconvert.exporters import HTMLExporter
+        from nbconvert.exporters.templateexporter import default_filters
         from traitlets.config import Config
 
         from . import HAS_RSMEXTRA
         from .reader import DataReader
 
-    Rather than doing this grouping and sorting manually, we recommend to use the `isort <https://pycqa.github.io/isort/>`_ Python library to do this. The best way to use ``isort`` is via plugins for your favorite editor, e.g., `Sublime Text <https://packagecontrol.io/packages/isort>`_, `VS Code <https://code.visualstudio.com/docs/python/editing#_sort-imports>`_, and `PyCharm <https://github.com/PyCQA/isort/issues/258>`_.
+    Rather than doing this grouping and sorting manually, we use the `isort <https://pycqa.github.io/isort/>`_ pre-commit hook to achieve this.
 
-#. All classes, functions, and methods in the main code files should have `numpy-formatted docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_ that comply with `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_. For Sublime Text, this can be done using the `AutoDocstring <https://packagecontrol.io/packages/AutoDocstring>`_ and `SublimeLinter-pydocstyle <https://packagecontrol.io/packages/SublimeLinter-pydocstyle>`_ plugins. For VS Code, these `two <https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring>`_ `links <https://code.visualstudio.com/docs/python/linting#_specific-linters>`_ may be relevant. PyCharm does not seem to support automatic numpy-format docstrings out of the box.
-
-#. When writing docstrings, make sure to use the appropriate quotes when referring to argument names vs. argument values. As an example, consider the docstring for the `train_skll_model <https://rsmtool.readthedocs.io/en/main/api.html#rsmtool.modeler.Modeler.train_skll_model>`_  method of the ``rsmtool.modeler.Modeler`` class. Note that string argument values are enclosed in double quotes (e.g., "csv", "neg_mean_squared_error") whereas values of other built-in types are written as literals (e.g., ``True``, ``False``, ``None``). Note also that if one had to refer to an argument name in the docstring, this referent should be written as a literal. In general, we strongly encourage looking at the docstrings in the existing code to make sure that new docstrings follow the same practices.
+#. All classes, functions, and methods in the main code files have `numpy-formatted docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_ that comply with `PEP 257 <https://www.python.org/dev/peps/pep-0257/>`_. This is enforced via the `pydocstyle <http://www.pydocstyle.org/en/stable/>`_ pre-commit check. Additionally, when writing docstrings, make sure to use the appropriate quotes when referring to argument names vs. argument values. As an example, consider the docstring for the `train_skll_model <https://rsmtool.readthedocs.io/en/main/api.html#rsmtool.modeler.Modeler.train_skll_model>`_  method of the ``rsmtool.modeler.Modeler`` class. Note that string argument values are enclosed in double quotes (e.g., "csv", "neg_mean_squared_error") whereas values of other built-in types are written as literals (e.g., ``True``, ``False``, ``None``). Note also that if one had to refer to an argument name in the docstring, this referent should be written as a literal. In general, we strongly encourage looking at the docstrings in the existing code to make sure that new docstrings follow the same practices.
 
 RSMTool tests
 -------------
@@ -208,7 +215,3 @@ Here are some advanced tips and tricks when working with RSMTool tests.
 #. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nosetests`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nosetests`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
 
 #. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nosetests --nologcapture tests``).
-
-.. rubric:: Footnotes
-
-.. [#] For older versions of conda, you may have to do ``source activate rsmtool`` on Linux/macOS and ``activate rsmtool`` on Windows.
