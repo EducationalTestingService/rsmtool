@@ -66,4 +66,4 @@ Evaluation metrics
 Evaluations based on test theory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variance of human rater error, estimated true score variance, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score using system score. 
+- ``true_score_eval``: evaluations of system scores against estimated true score. Contains total counts of single and double-scored response, variance of human rater error, estimated true score variance, and mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score using system score.
