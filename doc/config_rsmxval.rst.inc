@@ -3,11 +3,11 @@
 Experiment configuration file
 """""""""""""""""""""""""""""
 
-This is a file in ``.json`` format that provides overall configuration options for an ``rsmxval`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmxval/config_rsmxval.json>`__ for ``rsmxval``. 
+This is a file in ``.json`` format that provides overall configuration options for an ``rsmxval`` experiment. Here's an `example configuration file <https://github.com/EducationalTestingService/rsmtool/blob/main/examples/rsmxval/config_rsmxval.json>`__ for ``rsmxval``.
 
 .. note:: To make it easy to get started with  ``rsmxval``, we provide a way to **automatically generate** configuration files both interactively as well as non-interactively. Novice users will find interactive generation more helpful while more advanced users will prefer non-interactive generation. See :ref:`this page <autogen_configuration>` for more details.
 
-Configuration files for ``rsmxval`` are almost identical to ``rsmtool`` configuration files with only a few differences. Next, we describe the three required ``rsmxval`` configuration fields in detail. 
+Configuration files for ``rsmxval`` are almost identical to ``rsmtool`` configuration files with only a few differences. Next, we describe the three required ``rsmxval`` configuration fields in detail.
 
 experiment_id
 ~~~~~~~~~~~~~
@@ -23,15 +23,15 @@ The path to the training data feature file in one of the :ref:`supported formats
 
 .. important:: Unlike ``rsmtool``, ``rsmxval`` does not accept an evaluation set and will raise an error if the ``test_file`` field is specified.
 
-Next, we will describe the two optional fields that are unique to ``rsmxval``. 
+Next, we will describe the two optional fields that are unique to ``rsmxval``.
 
 folds *(Optional)*
 ~~~~~~~~~~~~~~~~~~
-The number of folds to use for cross-validation. This should be an integer and defaults to 5. 
+The number of folds to use for cross-validation. This should be an integer and defaults to 5.
 
 folds_file *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-The path to a file containing custom, pre-specified folds to be used for cross-validation. This should be a ``.csv`` file (no other formats are accepted) and should contain only two columns: ``id`` and ``fold``. The ``id`` column should contain the same IDs of the responses that are contained in ``train_file`` above. The ``fold`` column should contain an integer representing which fold the response with the ``id`` belongs to. IDs not specified in this file will be skipped and not included in the cross-validation at all. Just like ``train_file``, this path can be absolute or relative to the config file's location. Here's an `example of a folds file containing 2 folds <https://github.com/EducationalTestingService/rsmtool/blob/main/tests/data/files/folds.csv>`__. 
+The path to a file containing custom, pre-specified folds to be used for cross-validation. This should be a ``.csv`` file (no other formats are accepted) and should contain only two columns: ``id`` and ``fold``. The ``id`` column should contain the same IDs of the responses that are contained in ``train_file`` above. The ``fold`` column should contain an integer representing which fold the response with the ``id`` belongs to. IDs not specified in this file will be skipped and not included in the cross-validation at all. Just like ``train_file``, this path can be absolute or relative to the config file's location. Here's an `example of a folds file containing 2 folds <https://github.com/EducationalTestingService/rsmtool/blob/main/tests/data/files/folds.csv>`__.
 
 .. note:: If *both* ``folds_file`` and ``folds`` are specified, then the former will take precedence unless it contains a non-existent path.
 

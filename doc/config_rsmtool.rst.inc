@@ -29,8 +29,8 @@ The path to the evaluation data feature file in one of the :ref:`supported forma
 
 .. note ::
 
-    1. For both the training and evaluation files, the default behavior of ``rsmtool`` is to look for a column named ``spkitemid`` in order to get the unique IDs for each response and a column named ``sc1`` to get train/test labels. The optional fields :ref:`id_column <id_column_rsmtool>` and  :ref:`train_label_column <train_label_column_rsmtool>` can be used to specify different names for these columns. 
-    2. ``rsmtool`` also assumes that all other columns present in these files (other than those containing IDs and labels) contain feature values. If this is not the case, one can use other configuration file fields to identify columns containing non-feature information useful for various analyses, e.g., :ref:`second_human_score_column <second_human_score_column_rsmtool>`, :ref:`flag_column <flag_column_rsmtool>`, :ref:`subgroups <subgroups_rsmtool>` et cetera below. 
+    1. For both the training and evaluation files, the default behavior of ``rsmtool`` is to look for a column named ``spkitemid`` in order to get the unique IDs for each response and a column named ``sc1`` to get train/test labels. The optional fields :ref:`id_column <id_column_rsmtool>` and  :ref:`train_label_column <train_label_column_rsmtool>` can be used to specify different names for these columns.
+    2. ``rsmtool`` also assumes that all other columns present in these files (other than those containing IDs and labels) contain feature values. If this is not the case, one can use other configuration file fields to identify columns containing non-feature information useful for various analyses, e.g., :ref:`second_human_score_column <second_human_score_column_rsmtool>`, :ref:`flag_column <flag_column_rsmtool>`, :ref:`subgroups <subgroups_rsmtool>` et cetera below.
     3. Any columns not explicitly identified in (1) and (2) will be considered feature columns and used by ``rsmtool`` in the model. To use only a *subset* of these remaining columns as features, one can employ the four optional fields :ref:`features <feature_file_rsmtool>`, :ref:`feature_subset_file <feature_subset_file>`, :ref:`feature_subset <feature_subset>`, and :ref:`sign <sign>`. See :ref:`selecting feature columns <column_selection_rsmtool>` for more details on how to achieve this.
 
 candidate_column *(Optional)*
@@ -81,8 +81,8 @@ The format of the :ref:`intermediate files <intermediate_files_rsmtool>`. Option
 
 flag_column *(Optional)*
 """"""""""""""""""""""""
-This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0. 
-If this field is used without ``flag_column_test``, the conditions will be applied to *both* training and evaluation set and the specified columns must be present in both sets. 
+This field makes it possible to only use responses with particular values in a given column (e.g. only responses with a value of ``0`` in a column called ``ADVISORY``). The field takes a dictionary in Python format where the keys are the names of the columns and the values are lists of values for responses that will be used to train the model. For example, a value of ``{"ADVISORY": 0}`` will mean that ``rsmtool`` will *only* use responses for which the ``ADVISORY`` column has the value 0.
+If this field is used without ``flag_column_test``, the conditions will be applied to *both* training and evaluation set and the specified columns must be present in both sets.
 When this field is used in conjunction with ``flag_column_test``, the conditions will be applied to *training set only* and the specified columns must be present in the training set.
 Defaults to ``None``.
 
@@ -100,15 +100,15 @@ Defaults to ``None``.
 
 flag_column_test *(Optional)*
 """""""""""""""""""""""""""""
-This field makes it possible to only use a separate Python flag dictionary for the evaluation set. If this field is not passed, and ``flag_column`` is passed, then the same advisories will be used for both training and evaluation sets. 
+This field makes it possible to only use a separate Python flag dictionary for the evaluation set. If this field is not passed, and ``flag_column`` is passed, then the same advisories will be used for both training and evaluation sets.
 
 
-When this field is used, the specified columns must be present in the evaluation set. 
+When this field is used, the specified columns must be present in the evaluation set.
 Defaults to ``None`` or `flag_column``, if ``flag_column`` is present. Use ``flag_column_test`` only if you want filtering of the test set.
 
 .. note::
-    
-    When used, ``flag_column_test`` field determines *all* filtering conditions for the evaluation set. If it is used in conjunction with ``flag_column`` field, the filtering conditions defined in ``flag_column`` will *only* be applied to the training set. If you want to apply a subset of conditions to both partitions with additional conditions applied to the evaluation set only, you will need to specify the overlapping conditions separately for each partition.  
+
+    When used, ``flag_column_test`` field determines *all* filtering conditions for the evaluation set. If it is used in conjunction with ``flag_column`` field, the filtering conditions defined in ``flag_column`` will *only* be applied to the training set. If you want to apply a subset of conditions to both partitions with additional conditions applied to the evaluation set only, you will need to specify the overlapping conditions separately for each partition.
 
 .. _general_sections_rsmtool:
 
@@ -134,7 +134,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the correlation matrix between all features and the human score;
         - a barplot showing marginal and partial correlations between all features and the human score, and, optionally, response length if :ref:`length_column <length_column_rsmtool>` is specified in the config file.
 
-    - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score. 
+    - ``dff_by_group``: Differential feature functioning by group. The plots in this section show average feature values for each of the :ref:`subgroups <subgroups_rsmtool>` conditioned on human score.
 
      - ``consistency``: Shows metrics for :ref:`human-human agreement <consistency_metrics>`, the difference ("degradation") between the human-human and human-system agreement, and the disattenuated human-machine correlations. This notebook is only generated if the config file specifies :ref:`second_human_score_column <second_human_score_column_rsmtool>`.
 
@@ -157,7 +157,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
 
 
     - ``true_score_evaluation``: evaluation of system scores against the :ref:`true scores <true_score_evaluation>`  estimated according to test theory. The notebook shows:
-    
+
         - Number of single and double-scored responses.
         - Variance of human rater errors and estimated variance of true scores
         - Mean squared error (MSE) and proportional reduction in mean squared error (PRMSE) when predicting true score with system score.
@@ -168,7 +168,7 @@ RSMTool provides pre-defined sections for ``rsmtool`` (listed below) and, by def
         - the variances; and
         - a Scree plot.
 
-      The analysis keeps all components. The total number of components usually equals the total number of features. In cases where the total number of responses is smaller than the number of features, the number of components is the same as the number of responses.  
+      The analysis keeps all components. The total number of components usually equals the total number of features. In cases where the total number of responses is smaller than the number of features, the number of components is the same as the number of responses.
 
     - ``intermediate_file_paths``: Shows links to all of the intermediate files that were generated while running the experiment.
 
@@ -192,14 +192,14 @@ An integer value for the minimum number of responses expected from each candidat
 
 min_n_per_group *(Optional)*
 """""""""""""""""""""""""""""""
-A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmtool>` will still show the results for *all* groups. 
+A single numeric value or a dictionary with keys as the group names listed in the `subgroups` field and values as the thresholds for the groups. When specified, only groups with *at least* this number of instances will be displayed in the tables and plots contained **in the report**. Note that this parameter *only* affects the HTML report and the figures. For all analyses -- including the computation of the population parameters -- data from *all* groups will be used. In addition, the  :ref:`intermediate files <intermediate_files_rsmtool>` will still show the results for *all* groups.
 
 .. note::
 
-    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary. 
+    If you supply a dictionary, it *must* contain a key for *every* subgroup listed in `subgroups` field. If no threshold is to be applied for some of the groups, set the threshold value for this group to 0 in the dictionary.
 
 .. note::
-    Any provided thresholds will be applied when displaying the feature descriptive analyses conducted on the training set *and* the results of the performance analyses computed on the evaluation set. 
+    Any provided thresholds will be applied when displaying the feature descriptive analyses conducted on the training set *and* the results of the performance analyses computed on the evaluation set.
 
 .. _predict_expected_scores:
 
@@ -215,7 +215,7 @@ If a probabilistic SKLL classifier is chosen to build the scoring model, then *e
 
 rater_error_variance *(Optional)*
 """""""""""""""""""""""""""""""""
-:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmtool`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmtool``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline. 
+:ref:`True score evaluations<true_score_evaluation>` require an estimate of rater error variance. By default, ``rsmtool`` will compute this variance from double-scored responses in the data. However, in some cases, one may wish to compute the variance on a different sample of responses. In such cases, this field can be used to set the rater error variance to a precomputed value which is then used as-is by ``rsmtool``. You can use the :ref:`rsmtool.utils.variance_of_errors <ve_api>` function to compute rater error variance outside the main evaluation pipeline.
 
 .. _second_human_score_column_rsmtool:
 
@@ -268,20 +268,20 @@ Name of the column containing expected correlation sign between each feature and
 
 skll_fixed_parameters *(Optional)*
 """"""""""""""""""""""""""""""""""
-Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model. 
+Any fixed hyperparameters to be used if a SKLL model is chosen to build the scoring model.
 This should be a dictionary with the names of the hyperparameters as the keys. To determine
 what hyperparameters are available for the SKLL learner you chose, consult the scikit-learn
 documentation for the learner with the same name as well as the `SKLL documentation <https://skll.readthedocs.io/en/latest/run_experiment.html#fixed-parameters-optional>`__.
-Any values you specify here will override both the scikit-learn and SKLL defaults. 
+Any values you specify here will override both the scikit-learn and SKLL defaults.
 The values for a key can be string, integer, float, or boolean depending on what the
 hyperparameter expects. Note that if this option is specified with the
-:ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+:ref:`built-in linear regression models <builtin_models>`, it will simply be ignored.
 
 .. _skll_objective:
 
 skll_objective *(Optional)*
 """""""""""""""""""""""""""
-The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`__. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored. 
+The tuning objective to use if a SKLL model is chosen to build the scoring model. Possible values are the objectives available via `SKLL <https://skll.readthedocs.io/en/latest/run_experiment.html#objectives>`__. Defaults to ``neg_mean_squared_error`` for SKLL regressors and ``f1_score_micro`` for SKLL classifiers. Note that if this option is specified with the :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored.
 
 .. _special_sections_rsmtool:
 
@@ -341,8 +341,8 @@ The single numeric value that will be used to pad the trimming range specified i
 Defaults to 0.4998.
 
 .. note::
-    
-    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.  
+
+    For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.
 
 .. _use_scaled_predictions_rsmtool:
 

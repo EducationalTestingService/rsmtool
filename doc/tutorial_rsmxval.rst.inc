@@ -74,9 +74,8 @@ This should produce output like::
     Training model on full data
 
 
-Once the run finishes, you will see an ``output`` sub-directory in the current directory. Under this directory you will see multiple sub-directories, each corresponding to a different cross-validation step, as described :ref:`here <output_dirs_rsmeval>`. 
+Once the run finishes, you will see an ``output`` sub-directory in the current directory. Under this directory you will see multiple sub-directories, each corresponding to a different cross-validation step, as described :ref:`here <output_dirs_rsmeval>`.
 
 Examine the reports
 ~~~~~~~~~~~~~~~~~~~
 The cross-validation experiment produces multiple HTML reports -- an ``rsmtool`` report for each of the 3 folds (``output/folds/{01,02,03}/report/ASAP2_xval_fold{01,02,03}.html``), the evaluation report for the cross-validated predictions (``output/evaluation/report/ASAP2_xval_evaluation_report.html``), a report summarizing the salient characteristics of the 3 folds (``output/fold-summary/report/ASAP2_xval_fold_summary_report.html``), and a report showing the feature and model descriptives (``output/final-model/report/ASAP2_xval_model_report.html``). Examining these reports will provide a relatively complete picture of how well the predictive performance of the scoring model will generalize to unseen data.
-

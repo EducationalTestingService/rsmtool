@@ -135,4 +135,3 @@ The ``figure`` sub-directory under the experiment output directory that contains
 	All data frames except the ``df_*_other_columns`` contain an ``sc1`` column which contains the human score for the responses.
 
 	``df_train_orig`` and ``df_test_orig`` will contain the response IDs and human scores under columns with the original names, *not* ``spkitemid`` and ``sc1``.
-
