@@ -192,7 +192,7 @@ class Modeler:
         # get the intercept, coefficients, and feature names
         intercept = learner.model.intercept_
         coefficients = learner.model.coef_
-        feature_names = learner.feat_vectorizer.get_feature_names()
+        feature_names = learner.feat_vectorizer.get_feature_names_out()
 
         # first create a sorted data frame for all the non-intercept features
         df_non_intercept = pd.DataFrame({"feature": feature_names, "coefficient": coefficients})
