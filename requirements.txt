@@ -11,7 +11,7 @@ pandas
 parameterized
 pre-commit
 seaborn
-skll==3.1.0
+skll==3.2.0
 sphinx<6.0
 sphinx_rtd_theme
 statsmodels
