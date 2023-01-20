@@ -32,17 +32,17 @@ This process is only meant for the project administrators, not users and develop
 
    - Update the README and this release documentation, if necessary. Make sure to update the documentation badge in the README to use the latest release tag. That documentation version will be created in the steps below.
 
-#. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively.
+#. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively. Note that you should delete the ``build`` directory after running the ``sdist`` command and before running the ``bdist_wheel`` command.
 
 #. Upload the source and wheel distributions to TestPyPI using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization on TestPyPI.
 
 #. Install the TestPyPI package as follows::
 
-    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rsmtool
+    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rsmtool "pandas>=1.5" "numpy>=1.24" "matplotlib>=3.6" "jupyter_server>=2.0" "notebook-shim>=0.2.0"
 
 #. Then run some tests from a RSMTool working copy. If the TestPyPI package works, then move on to the next step. If it doesn't, figure out why and rebuild and re-upload the package.
 
-#. Build the new conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool``). Note that you may need to comment out lines in your `$HOME/.condarc` file if you are using ETS Artifactory and you get conflicts::
+#. Build the new conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool``). You should delete the ``build`` directory before running the command below. Note that you may need to comment out lines in your `$HOME/.condarc` file if you are using ETS Artifactory and you get conflicts::
 
     conda build -c conda-forge -c ets .
 
