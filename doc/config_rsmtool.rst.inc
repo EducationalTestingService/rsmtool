@@ -299,7 +299,7 @@ If this option is set to ``false`` features will not be standardized by subtract
 
 subgroups *(Optional)*
 """"""""""""""""""""""
-A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. These subgroup columns need to be present in both training *and* evaluation data. If subgroups are specified, ``rsmtool`` will generate:
+A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt", "gender", "native_language", "test_country"]``. These subgroup columns need to be present in both training *and* evaluation data. If subgroups are specified, ``rsmtool`` will generate:
 
     - description of the data by each subgroup;
     - boxplots showing the feature distribution for each subgroup on the training set; and

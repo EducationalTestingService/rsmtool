@@ -202,7 +202,7 @@ Evaluation metrics
 
 - ``eval_by_<SUBGROUP>``: the same information as in `*_eval.csv` computed separately for each subgroup. However, rather than SMD, a difference of standardized means (DSM) will be calculated using z-scores.
 
-- ``eval_short`` -  a shortened version of ``eval`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
+- ``eval_short``:  a shortened version of ``eval`` that contains specific descriptives for predicted and human scores (mean, std.dev etc.) and association metrics (correlation, quadartic weighted kappa, SMD etc.) for specific score types chosen based on recommendations by Williamson (2012). Specifically, the following columns are included (the ``raw`` or ``scale`` version is chosen depending on the value of the ``use_scaled_predictions`` in the configuration file).
 
     - h_mean
     - h_sd
@@ -228,7 +228,7 @@ Evaluation metrics
 
     Please note that for raw scores, SMD values are likely to be affected by possible differences in scale.
 
-- ``true_score_eval`` - evaluation of how well system scores can predict true scores.
+- ``true_score_eval``: evaluation of how well system scores can predict true scores.
 
 .. _rsmtool_consistency_files:
 
