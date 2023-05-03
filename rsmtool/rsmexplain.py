@@ -35,12 +35,12 @@ def get_feature_names(model):
     Parameters
     ----------
     model: skll.learner.Learner
-    A SKLL Learner object.
+        A SKLL Learner object.
 
     Returns
     -------
-    feature_names: list
-    The names of features used at the estimator step.
+    feature_names: List[str]
+        The names of features used at the estimator step.
 
     """
     if model.feat_selector:
@@ -60,26 +60,26 @@ def yield_ids(feature_set, range_size=None):
     ----------
     feature_set: skll.data.featureset.FeatureSet
         A SKLL FeatureSet.
-    range_size: int or [int, int] or (int, int), optional
+    range_size: Optional[int, Optional[int]]
         A user defined range or sample size for the ids.
 
     Returns
     -------
-    id_dic: dict
+    id_dic: Dict[int, str]
         A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The
         dictionary contains the new row indices as keys and the original FeatureSet indices as
         values.
     """
     id_dic = OrderedDict()
     if range_size is None:
-        for i in feature_set.ids:
-            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+        for idx in feature_set.ids:
+            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
     elif type(range_size) is int:
-        for i in shap.sample(feature_set.ids, range_size):
-            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+        for idx in shap.sample(feature_set.ids, range_size):
+            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
     else:
-        for i in feature_set.ids[range_size[0] : range_size[1]]:  # noqa: E203
-            id_dic[np.where(feature_set.ids == i)[0][0]] = i
+        for idx in feature_set.ids[range_size[0] : range_size[1]]:  # noqa: E203
+            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
     return id_dic
 
 
@@ -96,14 +96,14 @@ def mask(learner, feature_set, feature_range=None):
         A SKLL Learner object.
     feature_set : skll.data.featureset.FeatureSet
         A SKLL FeatureSet.
-    feature_range : int or [int, int] or (int, int), optional
+    feature_range : Optional[int, Optional[int]]
         If feature_range is an integer, mask() will create a random subsample of feature rows. If
         feature_range is an iterable, mask() will sample a range of feature_rows using the first two
         integers in the iterable as indices.
 
     Returns
     -------
-    ids : dict
+    ids : Dict[int, str]
         A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The
         dictionary contains the new row indices as keys and the original FeatureSet indices as
         values. If a random sample is created, this allows us to access which rows were sampled
@@ -114,13 +114,13 @@ def mask(learner, feature_set, feature_range=None):
     ids = yield_ids(feature_set, feature_range)
     if feature_range:
         order = range(0, len(ids))
-        feat_ids = [i for i in ids.values()]
+        feat_ids = [idx for idx in ids.values()]
         features = learner.feat_selector.transform(
             learner.feat_vectorizer.transform(
                 feature_set.vectorizer.inverse_transform(feature_set.features)
             )
         )
-        # we make sure that this is a dense array:
+        # make sure that this is a dense array
         if type(features) is not np.ndarray:
             features = features.toarray()[np.array(order), :]
         else:
@@ -159,7 +159,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    logger : logging object, optional
+    logger : Optional[logging object]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
 
@@ -185,7 +185,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     logger.info("Saving configuration file.")
     config_dic.save(output_dir)
 
-    # first we load the model, we have a try/catch here for people who pickled their model instead
+    # first load the model, then have a try/catch here for people who pickled their model instead
     # of using the SKLL save() method. The program will shut down if the loaded object is not a
     # skll Learner
     try:
@@ -207,12 +207,12 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                  model is a saved SKLL model."
             )
 
-    # then we load the background data
+    # load the background data
     reader = Reader.for_path(
         config_dic["background_data"], sparse=False, id_col=config_dic["id_column"]
     )
 
-    # we check if the background data is large enough for a meaningful representation:
+    # check if the background data is large enough for a meaningful representation:
     background = reader.read()
     try:
         assert background.features.shape[0] > 300
@@ -225,7 +225,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         )
         sys.exit("Background sample too small, exiting program.")
 
-    # we load the data for predictions
+    # load the data for predictions
     if "explainable_data" in config_dic.keys():
         data_reader = Reader.for_path(
             config_dic["explainable_data"], sparse=False, id_col=config_dic["id_column"]
@@ -236,10 +236,10 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         logger.info('No "explainable_data" specified. Supplementing the background_data instead.')
         data = background
 
-    # we grab the feature names
+    # grab the feature names
     feature_names = get_feature_names(model)
 
-    # we define the background distribution
+    # define the background distribution
     if "background_size" in config_dic.keys():
         if config_dic["background_size"] == "all":
             _, background_features = mask(model, background)
@@ -253,8 +253,8 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         )
         background_features = shap.kmeans(mask(model, background)[1], 500)
 
-    # in case the user wants a subsample explained we try and convert the range param into an
-    # integer. if it cant be coerced into an integer, we try a regex to see if it can be coerced
+    # in case the user wants a subsample explained, try and convert the range param into an
+    # integer. if it cant be coerced into an integer, try a regex to see if it can be coerced
     # into an iterable of int
     if "range" in config_dic.keys() and config_dic["range"] is not None:
         try:
@@ -308,8 +308,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         explanation.feature_names = feature_names
 
     # some explainers don't correctly generate base value arrays, sometimes it's a single float,
-    # sometimes it's an array of shape(1,), we want a 1D array of shape[0]== len(explainable_data)
-    # we take care of this here:
+    # sometimes it's an array of shape(1,), convert a 1D array of shape[0] == len(explainable_data)
     try:
         explanation.base_values.shape
         if explanation.base_values.shape[0] != explanation.values.shape[0]:
@@ -319,7 +318,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     except Exception:
         explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
 
-    # we're generating a new explanation here, because manually munging the feature names and base
+    # generate a new explanation here, because manually munging the feature names and base
     # values can break some plots; this may be changed in newer shap versions, but under
     # shap == 0.41. this is necessary
 
@@ -359,7 +358,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     """
     logger = logger if logger else logging.getLogger(__name__)
 
-    # we make sure all necessary directories exist
+    # make sure all necessary directories exist
     os.makedirs(output_dir, exist_ok=True)
     reportdir = os.path.abspath(os.path.join(output_dir, "report"))
     csvdir = os.path.abspath(os.path.join(output_dir, "output"))
@@ -369,7 +368,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     os.makedirs(figdir, exist_ok=True)
     os.makedirs(reportdir, exist_ok=True)
 
-    # first we write the explanation object to disk, in case we need it later
+    # first write the explanation object to disk, in case need it later
     explan_path = os.path.join(csvdir, "explanation.pkl")
     with open(explan_path, "wb") as pickle_out:
         pickle.dump(explanation, pickle_out)
@@ -380,22 +379,22 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
         pickle.dump(ids, pickle_out)
     config_dic["ids"] = id_path
 
-    # now we generate a dataframe that allows us to write the shap_values to disk
+    # generate a dataframe that allows us to write the shap_values to disk
     csv_path = os.path.join(csvdir, "shap_values.csv")
     csv_path_mean = os.path.join(csvdir, "mean_shap_values.csv")
     csv_path_max = os.path.join(csvdir, "max_shap_values.csv")
     csv_path_min = os.path.join(csvdir, "min_shap_values.csv")
     csv_path_abs = os.path.join(csvdir, "abs_shap_values.csv")
 
-    # we transform the shap values into a dataframe and save it
+    # transform the shap values into a dataframe and save it
     shap_frame = pd.DataFrame(
         explanation.values, columns=explanation.feature_names, index=ids.values()
     )
     shap_frame.to_csv(csv_path)
 
-    # here we calculate the absolute mean shap value, turn that into a dataframe and join it with
-    # a series containing the absolute max shap value. The feature column here serves us as an
-    # index that allows the values to be joined correctly finally we also add the absolute min shap
+    # calculate the absolute mean shap value, turn that into a dataframe and join it with
+    # a series containing the absolute max shap value. The feature column here serves as an
+    # index that allows the values to be joined correctly finall add the absolute min shap
     # value.
     means = pd.DataFrame(shap_frame.abs().mean(axis=0).sort_values(ascending=False)).join(
         shap_frame.abs().max(axis=0).sort_values(ascending=False).rename("new_series")
@@ -404,7 +403,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
         shap_frame.abs().min(axis=0).sort_values(ascending=False).rename("second_series")
     )
 
-    # we store the mean, max, min shap values in seperate .csv files and then one joint .csv file
+    # store the mean, max, min shap values in seperate .csv files and then one joint .csv file
     shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(
         csv_path_mean, index_label="Feature", header=["abs. mean shap"]
     )
@@ -419,7 +418,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
         index_label="Feature",
         header=["abs. mean shap", "abs. max shap", "abs. min shap"],
     )
-    # later we want to make some additions here to ensure that the correct indices are exported
+    # make some additions to ensure that the correct indices are exported
     # for these decisions.
 
     # Initialize reporter
@@ -427,7 +426,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
 
     general_report_sections = config_dic["general_sections"]
 
-    # creating the infrastructure if we ever want to add special sections
+    # creating the infrastructure if need to add special sections
     special_report_sections = config_dic["special_sections"]
 
     # get any custom sections and locate them to make sure
@@ -442,7 +441,7 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     else:
         custom_report_sections = []
 
-    # we leverage the custom sections to allow users to turn auto_cohorts on and off
+    # leverage the custom sections to allow users to turn auto_cohorts on and off
     package_path = os.path.dirname(__file__)
     notebook_path = os.path.abspath(os.path.join(package_path, "notebooks"))
     explanation_notebooks = os.path.join(notebook_path, "explanations")
@@ -467,11 +466,9 @@ def main():
     # set up the basic logging configuration
     formatter = LogFormatter()
 
-    # we need two handlers, one that prints to stdout
-    # for the "run" command and one that prints to stderr
-    # from the "generate" command; the latter is important
-    # because do not want the warning to show up in the
-    # generated configuration file
+    # need two handlers, one that prints to stdout for the "run" command and one that prints to
+    # stderr from the "generate" command; the latter is important because do not want the warning
+    # to show up in the generated configuration file
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setFormatter(formatter)
 
@@ -486,7 +483,7 @@ def main():
 
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser("rsmexplain", uses_output_directory=True, allows_overwriting=True)
-    # if we have no arguments at all then just show the help message
+    # if no arguments provided then just show the help message
     if len(sys.argv) < 2:
         sys.argv.append("-h")
 
@@ -512,7 +509,7 @@ def main():
     else:
         # THIS DOES NOT CURRENTLY WORK, AS THERE IS NO LINK IN
         # .constants.CONFIGURATION_DOCUMENTATION_SLUGS
-        # Once we add a key there for rsmexplain, this should generate as expected
+        # Once add a key there for rsmexplain, this should generate as expected
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
