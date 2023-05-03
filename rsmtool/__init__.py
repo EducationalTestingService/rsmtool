@@ -51,7 +51,7 @@ __all__ = [
     "compute_and_save_predictions",
     "fast_predict",
     "run_summary",
-    'generate_explanation'
+    "generate_explanation",
 ]
 
 # Make sure that DeprecationWarnings are always shown

@@ -55,11 +55,11 @@ DEFAULTS = {
     "experiment_names": None,
     "folds_file": None,
     "folds": 5,
-    'explainable_data': None, # data to be explained by rsmtool
-    'range': None, # size of sample for explainable data
-    'background_size': None, # size of kmean sample for background
-    'display_num': 16, # parameter to define how many features are displayed in rsmexplain plots
-    'auto_cohorts': False # enables auto cohort plots for rsmexplain
+    "explainable_data": None,  # data to be explained by rsmtool
+    "range": None,  # size of sample for explainable data
+    "background_size": None,  # size of kmean sample for background
+    "display_num": 16,  # parameter to define how many features are displayed in rsmexplain plots
+    "auto_cohorts": False,  # enables auto cohort plots for rsmexplain
 }
 
 LIST_FIELDS = [
@@ -239,30 +239,34 @@ CHECK_FIELDS = {
             "section_order",
         ],
     },
-    'rsmexplain': {'required': ['model_path',
-                                'background_data',
-                                'experiment_id'],
-                   'optional': ['description',
-                                'background_size',
-                                'explainable_data',
-                                'id_column',
-                                'range',
-                                'display_num',
-                                'general_sections',
-                                'auto_cohorts',
-                                'custom_sections',
-                                'special_sections']}
+    "rsmexplain": {
+        "required": ["model_path", "background_data", "experiment_id"],
+        "optional": [
+            "description",
+            "background_size",
+            "explainable_data",
+            "id_column",
+            "range",
+            "display_num",
+            "general_sections",
+            "auto_cohorts",
+            "custom_sections",
+            "special_sections",
+        ],
+    },
 }
 
 POSSIBLE_EXTENSIONS = ["csv", "xlsx", "tsv"]
 
-ID_FIELDS = {'rsmtool': 'experiment_id',
-             'rsmeval': 'experiment_id',
-             'rsmcompare': 'comparison_id',
-             'rsmsummarize': 'summary_id',
-             'rsmpredict': 'experiment_id',
-             'rsmxval': 'experiment_id',
-             'rsmexplain': 'experiment_id'}
+ID_FIELDS = {
+    "rsmtool": "experiment_id",
+    "rsmeval": "experiment_id",
+    "rsmcompare": "comparison_id",
+    "rsmsummarize": "summary_id",
+    "rsmpredict": "experiment_id",
+    "rsmxval": "experiment_id",
+    "rsmexplain": "experiment_id",
+}
 
 CONFIGURATION_DOCUMENTATION_SLUGS = {
     "rsmtool": "usage_rsmtool.html#experiment-configuration-file",
