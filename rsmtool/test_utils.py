@@ -21,6 +21,7 @@ from .modeler import Modeler
 from .reader import DataReader
 from .rsmcompare import run_comparison
 from .rsmeval import run_evaluation
+from .rsmexplain import generate_explanation
 from .rsmpredict import compute_and_save_predictions
 from .rsmsummarize import run_summary
 from .rsmtool import run_experiment
@@ -222,6 +223,74 @@ def check_run_evaluation(
     # check report for any errors but ignore warnings
     # which we check below separately
     check_report(html_report, raise_warnings=False)
+
+    # make sure that there are no warnings in the report
+    # but ignore warnings if appropriate
+    if not IGNORE_WARNINGS:
+        warning_msgs = collect_warning_messages_from_report(html_report)
+        assert_equal(len(warning_msgs), 0)
+
+
+def check_run_explain(
+    source,
+    experiment_id,
+    file_format="csv",
+    given_test_dir=None,
+    config_obj_or_dict=None,
+    suppress_warnings_for=[],
+):
+    """
+    Run a parameterized rsmexplain experiment test.
+
+    Parameters
+    ----------
+    source : str
+        The name of the source directory containing the experiment
+        configuration.
+    experiment_id : str
+        The experiment ID of the experiment.
+    given_test_dir : str, optional
+        Path where the test experiments are located. Unless specified, the
+        rsmtool test directory is used. This can be useful when using these
+        experiments to run tests for RSMExtra.
+        Defaults to ``None``.
+    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+        Configuration object or dictionary to use as an input.
+        If ``None``, the function will construct a path to the config file
+        using ``source`` and ``experiment_id``.
+        Defaults to ``None``.
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
+        Defaults to ```[]``.
+    """
+    # use the test directory from this file unless it's been overridden
+    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+
+    if config_obj_or_dict is None:
+        config_input = join(test_dir, "data", "experiments", source, "rsmexplain.json")
+    else:
+        config_input = config_obj_or_dict
+
+    do_run_explain(source, config_input, suppress_warnings_for=suppress_warnings_for)
+
+    html_report = join("test_outputs", source, "report", f"{experiment_id}_report.html")
+
+    # check report for any errors but ignore warnings
+    # which we check below separately
+    check_report(html_report, raise_warnings=False)
+
+    output_dir = join("test_outputs", source, "output")
+    expected_output_dir = join(test_dir, "data", "experiments", source, "output")
+
+    output_files = glob(join(output_dir, f"*.{file_format}"))
+    for output_file in output_files:
+
+        output_filename = basename(output_file)
+        expected_output_file = join(expected_output_dir, output_filename)
+
+        if exists(expected_output_file):
+            check_file_output(output_file, expected_output_file, file_format=file_format)
 
     # make sure that there are no warnings in the report
     # but ignore warnings if appropriate
@@ -698,6 +767,48 @@ def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for
             warnings.filterwarnings("ignore", category=warning_type)
 
         run_evaluation(config_input, experiment_dir)
+
+
+def do_run_explain(source, config_input, suppress_warnings_for=[]):
+    """
+    Run rsmexplain experiment automatically.
+
+    Use the given experiment configuration file located in the given
+    source directory.
+
+    Parameters
+    ----------
+    source : str
+        Path to where the test experiment is located on disk.
+    config_input : str or Configuration or dict
+        Path to the experiment configuration file,
+        or a ``configuration_parser.Configuration`` object,
+        or a dictionary with keys corresponding to fields in the
+        configuration file
+    suppress_warnings_for : list, optional
+        Categories for which warnings should be suppressed when running the
+        experiments.
+        Defaults to ``[]``.
+    """
+    source_output_dir = "test_outputs"
+    experiment_dir = join(source_output_dir, source)
+
+    # remove all previously created files
+    for output_subdir in ["output", "figure", "report"]:
+        files = glob(join(source_output_dir, source, output_subdir, "*"))
+        for f in files:
+            remove(f)
+
+    with warnings.catch_warnings():
+
+        # always suppress runtime warnings
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+        # suppress additional warning types if specified
+        for warning_type in suppress_warnings_for:
+            warnings.filterwarnings("ignore", category=warning_type)
+
+        generate_explanation(config_input, experiment_dir)
 
 
 def do_run_prediction(source, config_input, suppress_warnings_for=[]):

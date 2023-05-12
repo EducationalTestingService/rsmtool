@@ -1,0 +1,16 @@
+{
+    "model_path": "../../files/explain_svc.model",
+    // a representative background data set for your model
+    "background_data": "../../files/explain_features.csv",
+    "background_size": "50",
+    // the file you wish to run explanations on
+    "explainable_data": "../../files/explain_features.csv",
+    // the id column has to be the same for your background_data and your explainable_data
+    "id_column": "id",
+    "range": 10,
+    "experiment_id": "svc_explain",
+    "description": "This is a SVR scoring model for illustration purposes",
+    "display_num": "16",
+    // auto_cohorts will enable an extra report section
+    "auto_cohorts": "True"
+}

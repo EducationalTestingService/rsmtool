@@ -21,34 +21,11 @@ from skll.data import Reader
 from skll.learner import Learner
 
 from .configuration_parser import configure
+from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
-
-
-# utility function to get the proper feature name list we can get rid of this once the PR is done
-def get_feature_names(model):
-    """
-    Return the features of a SKLL learner.
-
-    Parameters
-    ----------
-    model: skll.learner.Learner
-        A SKLL Learner object.
-
-    Returns
-    -------
-    feature_names: List[str]
-        The names of features used at the estimator step.
-
-    """
-    if model.feat_selector:
-        return list(
-            model.feat_vectorizer.get_feature_names_out()[model.feat_selector.get_support()]
-        )
-    else:
-        return list(model.feat_vectorizer.get_feature_names_out())
 
 
 # utility function to get the actual array of data
@@ -60,7 +37,7 @@ def yield_ids(feature_set, range_size=None):
     ----------
     feature_set: skll.data.featureset.FeatureSet
         A SKLL FeatureSet.
-    range_size: Optional[int, Optional[int]]
+    range_size: Optional[int | str]
         A user defined range or sample size for the ids.
 
     Returns
@@ -96,7 +73,7 @@ def mask(learner, feature_set, feature_range=None):
         A SKLL Learner object.
     feature_set : skll.data.featureset.FeatureSet
         A SKLL FeatureSet.
-    feature_range : Optional[int, Optional[int]]
+    feature_range : Optional[int | str]
         If feature_range is an integer, mask() will create a random subsample of feature rows. If
         feature_range is an iterable, mask() will sample a range of feature_rows using the first two
         integers in the iterable as indices.
@@ -175,9 +152,6 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         If config_dic["range"] cannot be converted into int or iterable of int.
 
     """
-    # will implement an actual config functionality later, for now just treat this as a dictionary
-    # config_dic = config_file_or_obj_or_dic
-
     logger = logger if logger else logging.getLogger(__name__)
 
     config_dic = configure("rsmexplain", config_file_or_obj_or_dict)
@@ -189,7 +163,12 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
     # of using the SKLL save() method. The program will shut down if the loaded object is not a
     # skll Learner
     try:
-        model = Learner.from_file(config_dic["model_path"])
+        # get the absolute path
+        model_path = DataReader.locate_files(config_dic["model_path"], config_dic.configdir)
+        if not model_path:
+            raise FileNotFoundError(f"Input file {config_dic['model_path']} does not exist")
+
+        model = Learner.from_file(model_path)
         if type(model) is not Learner:
             sys.exit("The specified model_path does not lead to a skll.Learner")
     except TypeError:
@@ -197,7 +176,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
             "Your model path does not lead to a saved SKLL model. Trying to unpickle instead..."
         )
         try:
-            pickle_model = open(config_dic["model_path"], "rb")
+            pickle_model = open(model_path, "rb")
             model = pickle.load(pickle_model)
             if type(model) is not Learner:
                 sys.exit("The specified model_path does not lead to a skll.Learner")
@@ -207,10 +186,15 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
                  model is a saved SKLL model."
             )
 
-    # load the background data
-    reader = Reader.for_path(
-        config_dic["background_data"], sparse=False, id_col=config_dic["id_column"]
+    # get the absolute path
+    background_data_path = DataReader.locate_files(
+        config_dic["background_data"], config_dic.configdir
     )
+    if not background_data_path:
+        raise FileNotFoundError(f"Input file {config_dic['background_data']} does not exist")
+
+    # load the background data
+    reader = Reader.for_path(background_data_path, sparse=False, id_col=config_dic["id_column"])
 
     # check if the background data is large enough for a meaningful representation:
     background = reader.read()
@@ -227,8 +211,15 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
     # load the data for predictions
     if "explainable_data" in config_dic.keys():
+        # get the absolute path
+        explainable_data_path = DataReader.locate_files(
+            config_dic["explainable_data"], config_dic.configdir
+        )
+        if not explainable_data_path:
+            raise FileNotFoundError(f"Input file {config_dic['explainable_data']} does not exist")
+
         data_reader = Reader.for_path(
-            config_dic["explainable_data"], sparse=False, id_col=config_dic["id_column"]
+            explainable_data_path, sparse=False, id_col=config_dic["id_column"]
         )
         data = data_reader.read()
         logger.info(f"Using {config_dic['explainable_data']} to generate explanations")
@@ -237,7 +228,7 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         data = background
 
     # grab the feature names
-    feature_names = get_feature_names(model)
+    feature_names = list(model.get_feature_names_out())
 
     # define the background distribution
     if "background_size" in config_dic.keys():
@@ -297,7 +288,10 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
     # define a shap explainer
     explainer = shap.explainers.Sampling(
-        model.model.predict, background_features, feature_names=feature_names
+        model.model.predict,
+        background_features,
+        feature_names=feature_names,
+        seed=np.random.seed(42),
     )
 
     logger.info("Generating shap explanations on " + str(data_features.shape[0]) + " rows.")
