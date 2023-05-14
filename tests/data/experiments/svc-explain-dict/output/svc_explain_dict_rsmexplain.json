@@ -1,0 +1,17 @@
+{
+    "model_path": "/Users/zxie/Documents/Workplace/open_source/rsmtool/testsb4hsfn2r/explain_svc.model",
+    "background_data": "/Users/zxie/Documents/Workplace/open_source/rsmtool/testsb4hsfn2r/explain_features.csv",
+    "background_size": "50",
+    "explainable_data": "/Users/zxie/Documents/Workplace/open_source/rsmtool/testsb4hsfn2r/explain_features.csv",
+    "id_column": "id",
+    "range": 10,
+    "experiment_id": "svc_explain_dict",
+    "description": "This is a SVR scoring model for illustration purposes",
+    "display_num": "16",
+    "auto_cohorts": "True",
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null
+}
