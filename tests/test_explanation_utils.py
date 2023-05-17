@@ -82,7 +82,7 @@ class TestYieldIds:
 
 def test_mask_from_pickle():
     """Test mask with a saved model"""
-    model_path = join(rsmtool_test_dir, "data", "files", "explain_svr.pkl")
+    model_path = join(rsmtool_test_dir, "data", "files", "explain_svc.model")
     data_path = join(rsmtool_test_dir, "data", "files", "explain_features.csv")
     output_path = join(rsmtool_test_dir, "data", "output", "explain_mask_from_pickle.json")
 
