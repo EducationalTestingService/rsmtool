@@ -1,16 +1,16 @@
 {
-"model_path": "example_svr.pkl",
+"model_path": "svr.model",
 // a representative background data set for your model
-"background_data": "example_features.csv",
+"background_data": "features.csv",
 "background_size": "50",
 // the file you wish to run explanations on
-"explainable_data": "example_features.csv",
+"explainable_data": "features.csv",
 // the id column has to be the same for your background_data and your explainable_data
 "id_column": "id",
 "range": "0-55",
 "experiment_id":"Example_1",
 "description": "This is a SVR scoring model for illustration purposes",
-"display_num": "16",
+"num_features_to_display": "16",
 // auto_cohorts will enable an extra report section
-"auto_cohorts": "True"
+"show_auto_cohorts": "True"
 }
