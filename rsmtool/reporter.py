@@ -14,10 +14,13 @@ import json
 import logging
 import os
 import sys
+import warnings
 from os.path import abspath, basename, dirname, join, splitext
 
-from nbconvert.exporters import HTMLExporter
+import nbformat
+from nbconvert.exporters import HTMLExporter, NotebookExporter
 from nbconvert.exporters.templateexporter import default_filters
+from nbformat.warnings import MissingIDFieldWarning
 from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
@@ -237,23 +240,30 @@ class Reporter:
             List of paths to the input Jupyter notebook files.
         output_file : str
             Path to output Jupyter notebook file
-
-        Note
-        ----
-        Adapted from: https://stackoverflow.com/q/20454668.
         """
-        # Merging ipython notebooks basically means that we keep the
-        # metadata from the "first" notebook and then add in the cells
-        # from all the other notebooks.
-        first_notebook = notebook_files[0]
-        merged_notebook = json.loads(open(first_notebook, "r", encoding="utf-8").read())
-        for notebook in notebook_files[1:]:
-            section_cells = json.loads(open(notebook, "r", encoding="utf-8").read())["cells"]
-            merged_notebook["cells"].extend(section_cells)
+        # create a new blank notebook
+        merged_notebook = nbformat.v4.new_notebook()
 
-        # output the merged cells into a report
-        with open(output_file, "w") as outf:
-            json.dump(merged_notebook, outf, indent=1)
+        # append the cells from all of the notebooks to this notebook
+        for nbfile in notebook_files:
+            with open(nbfile, "r") as nbfh:
+                nb = nbformat.read(nbfh, as_version=4)
+
+            for cell in nb.cells:
+                merged_notebook.cells.append(cell)
+
+        # normalize the merged notebook to fix any issues with metadata
+        # especially missing IDs in code cells which seems to happen a lot
+        # for rsmtool sections
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=MissingIDFieldWarning)
+            _, merged_notebook = nbformat.validator.normalize(merged_notebook.dict())
+
+        # write out the merged notebook to disk
+        exporter = NotebookExporter()
+        output, _ = exporter.from_notebook_node(merged_notebook)
+        with open(output_file, "w") as outfh:
+            outfh.write(output)
 
     @staticmethod
     def check_section_names(specified_sections, section_type, context="rsmtool"):
@@ -309,7 +319,6 @@ class Reporter:
             from the list of chosen sections or vice versa.
         """
         if sorted(chosen_sections) != sorted(section_order):
-
             # check for discrepancies and create a helpful error message
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
@@ -881,7 +890,7 @@ class Reporter:
             "BACKGROUND_SIZE": config["background_size"],
             "IDs": config["ids"],
             "CSV_DIR": csv_dir,  # the report loads some csv files, so we need this parameter
-            "DISPLAY_NUM": config["display_num"],
+            "NUM_FEATURES_TO_DISPLAY": config["num_features_to_display"],
             "FIG_DIR": fig_dir,
         }
         report_name = f"{config['experiment_id']}_report"
@@ -909,7 +918,6 @@ class Reporter:
 
 
 def main():  # noqa: D103
-
     # set up an argument parser
     parser = argparse.ArgumentParser(prog="render_notebook")
     parser.add_argument("ipynb_file", help="IPython notebook file")
