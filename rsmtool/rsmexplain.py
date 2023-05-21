@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 """
-Explain a SKLL model through SHAP.
+Explain a SKLL model using SHAP explainers.
 
 :author: Remo Nitschke (rnitschke@ets.org)
+:author: Zhaoyang Xie (zxie@etscanada.ca)
+:author: Nitin Madnani (nmadnani@ets.org)
 
 :organization: ETS
 """
@@ -10,9 +12,10 @@ Explain a SKLL model through SHAP.
 import logging
 import os
 import pickle
-import re
 import sys
-from collections import OrderedDict
+from os import listdir
+from os.path import abspath, exists, join
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -25,96 +28,99 @@ from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
+from .utils.conversion import parse_range
 from .utils.logging import LogFormatter
 
 
-# utility function to get the actual array of data
-def yield_ids(feature_set, range_size=None):
+def select_features(featureset, range_size=None):
     """
-    Grab the feature ids from from a feature set.
+    Sample examples from the given featureset and return indices.
 
     Parameters
     ----------
-    feature_set: skll.data.featureset.FeatureSet
-        A SKLL FeatureSet.
-    range_size: Optional[int | str]
-        A user defined range or sample size for the ids.
+    featureset: skll.data.FeatureSet
+        The SKLL FeatureSet object from which we are sampling.
+    range_size: Optional[int, Tuple[int, int]]
+        A user defined sample size or range. If ``None``, all examples in the
+        featureset are selected. If it's a size (int), that many examples are
+        randomly selected. If it's a tuple, the two integers in the tuple
+        define the size of the range of examples that is selected.
 
     Returns
     -------
-    id_dic: Dict[int, str]
-        A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The
-        dictionary contains the new row indices as keys and the original FeatureSet indices as
-        values.
+    Dict[int, str]
+        Dictionary mapping the position of the selected examples to their IDs.
     """
-    id_dic = OrderedDict()
+    fs_ids = featureset.ids
     if range_size is None:
-        for idx in feature_set.ids:
-            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
-    elif type(range_size) is int:
-        for idx in shap.sample(feature_set.ids, range_size):
-            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
+        selected_ids = fs_ids
+    elif isinstance(range_size, int):
+        selected_ids = shap.sample(fs_ids, range_size)
     else:
-        for idx in feature_set.ids[range_size[0] : range_size[1]]:  # noqa: E203
-            id_dic[np.where(feature_set.ids == idx)[0][0]] = idx
-    return id_dic
+        start, end = range_size
+        # NOTE: include the end index in the selected examples since it's more intuitive
+        selected_ids = fs_ids[start : end + 1]  # noqa: E203
+
+    # find the positions of the selected ids in the original featureset
+    selected_positions = [np.where(fs_ids == id_)[0][0] for id_ in selected_ids]
+
+    # create and return a dictionary mapping the position to the IDs
+    return dict(zip(selected_positions, selected_ids))
 
 
-def mask(learner, feature_set, feature_range=None):
+def mask(learner, featureset, feature_range=None):
     """
-    Transform and vectorize features for a given learner.
+    Sample examples from feaatureset used by learner.
 
-    Applies the vectorizer and feature-selector step to the features in a Feature Set. Allows
-    selection of a specific range of feature rows by their row-indices or random subsampling.
+    An example refers to a specific data instance in the data set.
+    Selects examples based on either sub-sampling specific indices or randomly
+    of a fixed size. Return the feature values for the selected examples as
+    a numpy array.
 
     Parameters
     ----------
     learner : skll.learner.Learner
-        A SKLL Learner object.
-    feature_set : skll.data.featureset.FeatureSet
-        A SKLL FeatureSet.
-    feature_range : Optional[int | str]
-        If feature_range is an integer, mask() will create a random subsample of feature rows. If
-        feature_range is an iterable, mask() will sample a range of feature_rows using the first two
-        integers in the iterable as indices.
+        SKLL Learner object that we wish to explain the predictions of.
+    featureset : skll.data.FeatureSet
+        SKLL FeatureSet object from which to sample examples.
+    feature_range : Optional[int, Tuple[int, int]]
+        If this is an integer, create a random sub-sample of that size. If this
+        is a tuple, sub-sample the range of examples using the two values
+        in the tuple. If this is ``None``, use all of the examples without
+        any sub-sampling.
 
     Returns
     -------
-    ids : Dict[int, str]
-        A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The
-        dictionary contains the new row indices as keys and the original FeatureSet indices as
-        values. If a random sample is created, this allows us to access which rows were sampled
-        from the original set.
-    features : numpy.array
+    Dict[int, str]
+        Dictionary mapping the position of the selected examples to their IDs.
+        This is useful for figuring out which specific examples were selected.
+    numpy.ndarray
         A 2D numpy array containing sampled feature rows.
     """
-    ids = yield_ids(feature_set, feature_range)
+    # get a sparse matrix with the features that were actually used
+    features = learner.feat_selector.transform(
+        learner.feat_vectorizer.transform(
+            featureset.vectorizer.inverse_transform(featureset.features)
+        )
+    )
+
+    # sample exampeles from the featureset
+    selected_feature_map = select_features(featureset, range_size=feature_range)
+
+    # if the user specified a sample size or a range, use it; otherwise all
+    # features will be selected
     if feature_range:
-        order = range(0, len(ids))
-        feat_ids = [idx for idx in ids.values()]
-        features = learner.feat_selector.transform(
-            learner.feat_vectorizer.transform(
-                feature_set.vectorizer.inverse_transform(feature_set.features)
-            )
-        )
-        # make sure that this is a dense array
-        if type(features) is not np.ndarray:
-            features = features.toarray()[np.array(order), :]
-        else:
-            features = features[np.array(order), :]
-        ids = dict(zip(order, feat_ids))
-    else:
-        features = learner.feat_selector.transform(
-            learner.feat_vectorizer.transform(
-                feature_set.vectorizer.inverse_transform(feature_set.features)
-            )
-        )
-        if type(features) is not np.ndarray:
-            features = features.toarray()
-    return ids, features
+        positions = list(selected_feature_map.keys())
+        features = features[positions, :]
+
+    # convert to a dense array if not already one
+    features = features.toarray() if not isinstance(features, np.ndarray) else features
+    return selected_feature_map, features
 
 
-def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
+def generate_explanation(
+    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None
+):
     """
     Generate a shap.Explanation object.
 
@@ -142,180 +148,152 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
 
     Raises
     ------
-    FileNotFoundError
-        If any of the files contained in ``config_file_or_obj_or_dict`` cannot
-        be located.
     AssertionError
-        If the user passes a background sample of .shape[0] < 300, rsmexplain shuts down in order
-        to avoid inaccurate explanations.
+        If the size of the background sample is < 300, to avoid inaccurate explanations.
+    FileNotFoundError
+        If any file contained in ``config_file_or_obj_or_dict`` cannot be located.
     ValueError
-        If config_dic["range"] cannot be converted into int or iterable of int.
+        If range is not an integer of list of integer.
 
     """
     logger = logger if logger else logging.getLogger(__name__)
 
-    config_dic = configure("rsmexplain", config_file_or_obj_or_dict)
+    # make sure all necessary directories exist
+    os.makedirs(output_dir, exist_ok=True)
+    csvdir = abspath(join(output_dir, "output"))
+    figdir = abspath(join(output_dir, "figures"))
+    reportdir = abspath(join(output_dir, "report"))
 
-    logger.info("Saving configuration file.")
-    config_dic.save(output_dir)
+    os.makedirs(csvdir, exist_ok=True)
+    os.makedirs(figdir, exist_ok=True)
+    os.makedirs(reportdir, exist_ok=True)
 
-    # first load the model, then have a try/catch here for people who pickled their model instead
-    # of using the SKLL save() method. The program will shut down if the loaded object is not a
-    # skll Learner
-    try:
-        # get the absolute path
-        model_path = DataReader.locate_files(config_dic["model_path"], config_dic.configdir)
-        if not model_path:
-            raise FileNotFoundError(f"Input file {config_dic['model_path']} does not exist")
-
-        model = Learner.from_file(model_path)
-        if type(model) is not Learner:
-            sys.exit("The specified model_path does not lead to a skll.Learner")
-    except TypeError:
-        logger.info(
-            "Your model path does not lead to a saved SKLL model. Trying to unpickle instead..."
-        )
-        try:
-            pickle_model = open(model_path, "rb")
-            model = pickle.load(pickle_model)
-            if type(model) is not Learner:
-                sys.exit("The specified model_path does not lead to a skll.Learner")
-        except TypeError:
-            sys.exit(
-                "Could not load the model from model_path. Exiting program. Please make sure your \
-                 model is a saved SKLL model."
+    # Raise an error if the specified output directory
+    # already contains a non-empty `output` directory, unless
+    # `overwrite_output` was specified, in which case we assume
+    # that the user knows what she is doing and simply
+    # output a warning saying that the report might
+    # not be correct.
+    non_empty_csvdir = exists(csvdir) and listdir(csvdir)
+    if non_empty_csvdir:
+        if not overwrite_output:
+            raise IOError(f"'{output_dir}' already contains a non-empty 'output' directory.")
+        else:
+            logger.warning(
+                f"{output_dir} already contains a non-empty 'output' directory. "
+                f"The generated report might contain unexpected information from "
+                f"a previous experiment."
             )
 
-    # get the absolute path
+    configuration = configure("rsmexplain", config_file_or_obj_or_dict)
+
+    logger.info("Saving configuration file.")
+    configuration.save(output_dir)
+
+    # check that only one of `sample_range` or `sample_size` is specified
+    has_sample_range = configuration.get("sample_range") is not None
+    has_sample_size = configuration.get("sample_size") is not None
+    if has_sample_size and has_sample_range:
+        raise ValueError(
+            "You must specify either 'sample_range' or 'sample_size'. "
+            "Please refer to the RSMExplain documentation for more details. "
+        )
+
+    # load the model from the configuration directory using its absolute path
+    model_path = DataReader.locate_files(configuration["model_path"], configuration.configdir)
+    if not model_path:
+        raise FileNotFoundError(f"Input file {configuration['model_path']} does not exist")
+    model = Learner.from_file(model_path)
+
+    # load the background data using its absolute path
     background_data_path = DataReader.locate_files(
-        config_dic["background_data"], config_dic.configdir
+        configuration["background_data"], configuration.configdir
     )
     if not background_data_path:
-        raise FileNotFoundError(f"Input file {config_dic['background_data']} does not exist")
+        raise FileNotFoundError(f"Input file {configuration['background_data']} does not exist")
+    bg_reader = Reader.for_path(
+        background_data_path, sparse=False, id_col=configuration["id_column"]
+    )
 
-    # load the background data
-    reader = Reader.for_path(background_data_path, sparse=False, id_col=config_dic["id_column"])
-
-    # check if the background data is large enough for a meaningful representation:
-    background = reader.read()
+    # ensure that the background data is large enough for meaningful explanations
+    background = bg_reader.read()
+    background_data_size = len(background)
     try:
-        assert background.features.shape[0] > 300
+        assert background_data_size > 300
     except AssertionError:
         logger.error(
-            "Your background data set is too small. We do not recommend passing less than 300 \
-            rows of background data. You have passed "
-            + str(background.features.shape[0])
-            + " rows. Shutting down..."
+            f"The background data {background_data_path} contains only "
+            f"{background_data_size} examples. It must contain at least 300 examples "
+            "to ensure meaningful explanations."
         )
-        sys.exit("Background sample too small, exiting program.")
+        sys.exit(1)
 
-    # load the data for predictions
-    if "explainable_data" in config_dic.keys():
-        # get the absolute path
+    # define the background distribution
+    _, all_background_features = mask(model, background)
+    background_distribution = shap.kmeans(all_background_features, configuration["background_size"])
+
+    # load the data that we want to explain using its absolute path
+    if "explainable_data" in configuration:
         explainable_data_path = DataReader.locate_files(
-            config_dic["explainable_data"], config_dic.configdir
+            configuration["explainable_data"], configuration.configdir
         )
         if not explainable_data_path:
-            raise FileNotFoundError(f"Input file {config_dic['explainable_data']} does not exist")
-
+            raise FileNotFoundError(
+                f"Input file {configuration['explainable_data']} does not exist"
+            )
         data_reader = Reader.for_path(
-            explainable_data_path, sparse=False, id_col=config_dic["id_column"]
+            explainable_data_path, sparse=False, id_col=configuration["id_column"]
         )
         data = data_reader.read()
-        logger.info(f"Using {config_dic['explainable_data']} to generate explanations")
+        logger.info(f"Generating explanations for {configuration['explainable_data']}")
     else:
-        logger.info('No "explainable_data" specified. Supplementing the background_data instead.')
+        logger.info('"explainable_data" was not specified; explaining background_data.')
         data = background
 
     # grab the feature names
     feature_names = list(model.get_feature_names_out())
 
-    # define the background distribution
-    if "background_size" in config_dic.keys():
-        if config_dic["background_size"] == "all":
-            _, background_features = mask(model, background)
-        elif config_dic["background_size"]:
-            background_features = shap.kmeans(
-                mask(model, background)[1], int(config_dic["background_size"])
-            )
+    # get and parse the value of either the sample range or the sample size
+    if has_sample_size:
+        range_size = int(configuration.get("sample_size"))
+    elif has_sample_range:
+        range_size = parse_range(configuration.get("sample_range"))
     else:
+        range_size = None
         logger.warning(
-            "No background sample size specified. Proceeding with a kmeans sample size 500."
+            "Since 'sample_range' and 'sample_size' are both unspecified, "
+            "explanations will be generated for the *entire* data set which "
+            "could be very slow, depending on its size. "
         )
-        background_features = shap.kmeans(mask(model, background)[1], 500)
 
-    # in case the user wants a subsample explained, try and convert the range param into an
-    # integer. if it cant be coerced into an integer, try a regex to see if it can be coerced
-    # into an iterable of int
-    if "range" in config_dic.keys() and config_dic["range"] is not None:
-        try:
-            row_range = int(config_dic["range"])
-            if row_range == 1:
-                logger.error('"range" must be > 2. Shutting down.')
-                exit()
-            ids, data_features = mask(model, data, row_range)
-        except ValueError:
-            logger.info('"range" is not an integer, attempting to define as a range')
-            try:
-                row_range = re.match(r"^(\d+)[,\-\s:](\d+)$", config_dic["range"])
-                if row_range:
-                    logger.info(
-                        'Your "range" indices have been defined as: ' + str(row_range.groups(1))
-                    )
-                    index_1 = int(row_range.groups(1)[0])
-                    index_2 = int(row_range.groups(1)[1])
-                    if np.abs(index_1 - index_2) == 1:
-                        logger.error('"range" must be > 2. Shutting down.')
-                        exit()
-                    ids, data_features = mask(model, data, [index_1, index_2])
-                else:
-                    logger.error('Cannot decode the "range" param!')
-                    raise ValueError('Cannot decode the "range" param!')
-            except ValueError:
-                logger.warning(
-                    "range unspecified: This will generate explanations on the entire data set"
-                    ' you pass in "explainable_data". '
-                    "This may take a while depending on the size of your data set."
-                )
-                ids, data_features = mask(model, data)
-    else:
-        logger.warning(
-            'range unspecified: This will generate explanations on the entire data set \
-             you pass in "explainable_data". This may take a while depending on the size of your \
-             data set.'
-        )
-        ids, data_features = mask(model, data)
+    # get the features we want to explain
+    ids, data_features = mask(model, data, feature_range=range_size)
 
     # define a shap explainer
     explainer = shap.explainers.Sampling(
         model.model.predict,
-        background_features,
+        background_distribution,
         feature_names=feature_names,
         seed=np.random.seed(42),
     )
 
-    logger.info("Generating shap explanations on " + str(data_features.shape[0]) + " rows.")
+    logger.info(f"Generating shap explanations for {len(ids)} examples")
     explanation = explainer(data_features)
 
-    # we're doing some future-proofing here:
+    # add feature names if they aren't already specified
     if explanation.feature_names is None:
         explanation.feature_names = feature_names
 
-    # some explainers don't correctly generate base value arrays, sometimes it's a single float,
-    # sometimes it's an array of shape(1,), convert a 1D array of shape[0] == len(explainable_data)
-    try:
-        explanation.base_values.shape
-        if explanation.base_values.shape[0] != explanation.values.shape[0]:
-            explanation.base_values = np.repeat(
-                explanation.base_values[0], explanation.values.shape[0]
-            )
-    except Exception:
-        explanation.base_values = np.repeat(explanation.base_values, explanation.values.shape[0])
+    # the explainer does not correctly generate base value arrays sometimes;
+    # sometimes it's a single float or sometimes an array with a (1,) shape
+    # so let's fix it if that happens
+    base_values = explanation.base_values
+    if not isinstance(base_values, np.ndarray):
+        explanation.base_values = np.repeat(base_values, explanation.values.shape[0])
 
-    # generate a new explanation here, because manually munging the feature names and base
-    # values can break some plots; this may be changed in newer shap versions, but under
-    # shap == 0.41. this is necessary
-
+    # re-generate the explanation here, because manually munging the feature
+    # names and base values can break some plots
+    # TODO: check if this is still necessary in future versions of shap
     explanation = shap.Explanation(
         explanation.values,
         base_values=explanation.base_values,
@@ -323,28 +301,29 @@ def generate_explanation(config_file_or_obj_or_dict, output_dir, logger=None):
         feature_names=explanation.feature_names,
     )
 
-    generate_report(explanation, output_dir, ids, config_dic, logger)
+    # generate the HTML report
+    generate_report(explanation, output_dir, ids, configuration, logger)
 
 
-def generate_report(explanation, output_dir, ids, config_dic, logger=None):
+def generate_report(explanation, output_dir, ids, configuration, logger=None):
     """
-    Generate a rsmexplain report.
+    Generate an rsmexplain report.
 
-    Generate a rsmexplain report and saves a series of files to disk. Including pickle files of the
-    explanation object. and id-dictionary. Saves all shap_values to disk as .csv files.
+    This function also saves a series of files to disk, including
+    pickled versions of the explanation object and the ID dictionary.
+    All SHAP values are also saved as CSV files.
 
     Parameters
     ----------
     explanation: shap.Explanation
-        A shap explanation object containing shap_values, data points, feature names, base_values.
+        SHAP explanation object containing shap values, data points, feature
+        names and base values.
     output_dir : str
-        Path to the experiment output directory
+        Path to the experiment output directory.
     ids: dict
-        A dictionary containing the original row-IDs for the rows sampled from the FeatureSet. The
-        dictionary contains the new row indices as keys and the original FeatureSet indices as
-        values.
-    config_dic : Configuration
-        The Configuration object for the tool.
+        Dictionary mapping new row indices to original FeatureSet indices.
+    configuration: rsmtool.configuration_parser.Configuration
+        The Configuration object for rsmexplain.
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
@@ -352,96 +331,62 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
     """
     logger = logger if logger else logging.getLogger(__name__)
 
-    # make sure all necessary directories exist
-    os.makedirs(output_dir, exist_ok=True)
-    reportdir = os.path.abspath(os.path.join(output_dir, "report"))
-    csvdir = os.path.abspath(os.path.join(output_dir, "output"))
-    figdir = os.path.abspath(os.path.join(output_dir, "figures"))
-
-    os.makedirs(csvdir, exist_ok=True)
-    os.makedirs(figdir, exist_ok=True)
-    os.makedirs(reportdir, exist_ok=True)
+    # get the various output sub-directories which should already exist
+    csvdir = abspath(join(output_dir, "output"))
+    reportdir = abspath(join(output_dir, "report"))
 
     # first write the explanation object to disk, in case need it later
-    explan_path = os.path.join(csvdir, "explanation.pkl")
-    with open(explan_path, "wb") as pickle_out:
+    explanation_path = join(csvdir, "explanation.pkl")
+    with open(explanation_path, "wb") as pickle_out:
         pickle.dump(explanation, pickle_out)
-    config_dic["explanation"] = explan_path
+    configuration["explanation"] = explanation_path
 
-    id_path = os.path.join(csvdir, "ids.pkl")
+    id_path = join(csvdir, "ids.pkl")
     with open(id_path, "wb") as pickle_out:
         pickle.dump(ids, pickle_out)
-    config_dic["ids"] = id_path
+    configuration["ids"] = id_path
 
-    # generate a dataframe that allows us to write the shap_values to disk
-    csv_path = os.path.join(csvdir, "shap_values.csv")
-    csv_path_mean = os.path.join(csvdir, "mean_shap_values.csv")
-    csv_path_max = os.path.join(csvdir, "max_shap_values.csv")
-    csv_path_min = os.path.join(csvdir, "min_shap_values.csv")
-    csv_path_abs = os.path.join(csvdir, "abs_shap_values.csv")
-
-    # transform the shap values into a dataframe and save it
+    # create various versions of the shap values to write to disk
+    csv_path = join(csvdir, "shap_values.csv")
     shap_frame = pd.DataFrame(
         explanation.values, columns=explanation.feature_names, index=ids.values()
     )
     shap_frame.to_csv(csv_path)
 
-    # calculate the absolute mean shap value, turn that into a dataframe and join it with
-    # a series containing the absolute max shap value. The feature column here serves as an
-    # index that allows the values to be joined correctly finall add the absolute min shap
-    # value.
-    means = pd.DataFrame(shap_frame.abs().mean(axis=0).sort_values(ascending=False)).join(
-        shap_frame.abs().max(axis=0).sort_values(ascending=False).rename("new_series")
-    )
-    abs_all = means.join(
-        shap_frame.abs().min(axis=0).sort_values(ascending=False).rename("second_series")
-    )
+    # compute the various absolute value variants of the SHAP values and
+    # write out that dataframe to disk.
+    csv_path_abs = join(csvdir, "absolute_shap_values.csv")
+    df_abs = pd.DataFrame(
+        [shap_frame.abs().mean(), shap_frame.abs().max(), shap_frame.abs().min()],
+        index=["abs. mean shap", "abs. max shap", "abs. min shap"],
+    ).transpose()
+    df_abs.to_csv(csv_path_abs, index_label="Feature")
 
-    # store the mean, max, min shap values in seperate .csv files and then one joint .csv file
-    shap_frame.abs().mean(axis=0).sort_values(ascending=False).to_csv(
-        csv_path_mean, index_label="Feature", header=["abs. mean shap"]
-    )
-    shap_frame.abs().max(axis=0).sort_values(ascending=False).to_csv(
-        csv_path_max, index_label="Feature", header=["abs. max shap"]
-    )
-    shap_frame.abs().min(axis=0).sort_values(ascending=False).to_csv(
-        csv_path_min, index_label="Feature", header=["abs. min shap"]
-    )
-    abs_all.to_csv(
-        csv_path_abs,
-        index_label="Feature",
-        header=["abs. mean shap", "abs. max shap", "abs. min shap"],
-    )
-    # make some additions to ensure that the correct indices are exported
-    # for these decisions.
-
-    # Initialize reporter
+    # Initialize a reporter instance and add the sections:
     reporter = Reporter(logger=logger)
-
-    general_report_sections = config_dic["general_sections"]
-
-    # creating the infrastructure if need to add special sections
-    special_report_sections = config_dic["special_sections"]
+    general_report_sections = configuration["general_sections"]
+    special_report_sections = configuration["special_sections"]
 
     # get any custom sections and locate them to make sure
     # that they exist, otherwise raise an exception
-    custom_report_section_paths = config_dic["custom_sections"]
+    custom_report_section_paths = configuration["custom_sections"]
 
     if custom_report_section_paths:
         logger.info("Locating custom report sections")
         custom_report_sections = Reporter.locate_custom_sections(
-            custom_report_section_paths, config_dic.configdir
+            custom_report_section_paths, configuration.configdir
         )
     else:
         custom_report_sections = []
 
-    # leverage the custom sections to allow users to turn auto_cohorts on and off
-    package_path = os.path.dirname(__file__)
-    notebook_path = os.path.abspath(os.path.join(package_path, "notebooks"))
-    explanation_notebooks = os.path.join(notebook_path, "explanations")
-    if config_dic["auto_cohorts"]:
-        custom_report_sections.append(explanation_notebooks + "/auto_cohorts.ipynb")
+    # leverage custom sections to allow users to turn `show_auto_cohorts` on and off
+    notebooks_path = Path(__file__).parent / "notebooks"
+    notebooks_path = notebooks_path.resolve()
+    explanation_notebooks_path = notebooks_path / "explanations"
+    if configuration["show_auto_cohorts"]:
+        custom_report_sections.append(f"{explanation_notebooks_path}/auto_cohorts.ipynb")
 
+    # define all of the chosen notebook sections
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
         special_report_sections,
@@ -449,14 +394,13 @@ def generate_report(explanation, output_dir, ids, config_dic, logger=None):
         context="rsmexplain",
     )
 
-    # add chosen notebook files to configuration
-    config_dic["chosen_notebook_files"] = chosen_notebook_files
-
-    reporter.create_explanation_report(config_dic, csvdir, reportdir)
+    # add chosen notebook files to configuration and generate the report
+    configuration["chosen_notebook_files"] = chosen_notebook_files
+    reporter.create_explanation_report(configuration, csvdir, reportdir)
 
 
 def main():
-    """Run rsmexplain and generate explainable reports."""
+    """Run rsmexplain and generate explanation reports."""
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -477,6 +421,7 @@ def main():
 
     # set up an argument parser via our helper function
     parser = setup_rsmcmd_parser("rsmexplain", uses_output_directory=True, allows_overwriting=True)
+
     # if no arguments provided then just show the help message
     if len(sys.argv) < 2:
         sys.argv.append("-h")
@@ -498,7 +443,9 @@ def main():
         # run the experiment
         logger.info(f"Output directory: {args.output_dir}")
 
-        generate_explanation(os.path.abspath(args.config_file), os.path.abspath(args.output_dir))
+        generate_explanation(
+            abspath(args.config_file), abspath(args.output_dir), overwrite_output=args.force_write
+        )
 
     else:
         # THIS DOES NOT CURRENTLY WORK, AS THERE IS NO LINK IN
