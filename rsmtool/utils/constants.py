@@ -8,6 +8,8 @@ Various RSMTool constants used across the codebase.
 :organization: ETS
 """
 
+import re
+
 from .models import BUILTIN_MODELS, VALID_SKLL_MODELS
 
 DEFAULTS = {
@@ -56,10 +58,11 @@ DEFAULTS = {
     "folds_file": None,
     "folds": 5,
     "explainable_data": None,  # data to be explained by rsmtool
-    "range": None,  # size of sample for explainable data
-    "background_size": None,  # size of kmean sample for background
-    "display_num": 16,  # parameter to define how many features are displayed in rsmexplain plots
-    "auto_cohorts": False,  # enables auto cohort plots for rsmexplain
+    "sample_range": None,  # range of specific sample IDs to be explained
+    "sample_size": None,  # size of random sample to be explained
+    "background_size": 500,  # size of k-means sample for background
+    "num_features_to_display": 15,  # how many features should be  displayed in rsmexplain plots
+    "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
 }
 
 LIST_FIELDS = [
@@ -246,10 +249,11 @@ CHECK_FIELDS = {
             "background_size",
             "explainable_data",
             "id_column",
-            "range",
-            "display_num",
+            "num_features_to_display",
+            "sample_range",
+            "sample_size",
+            "show_auto_cohorts",
             "general_sections",
-            "auto_cohorts",
             "custom_sections",
             "special_sections",
         ],
@@ -374,3 +378,6 @@ INTERACTIVE_MODE_METADATA = {
         "count": "multiple",
     },
 }
+
+# regular expression used to parse rsmexplain range values
+RSMEXPLAIN_RANGE_REGEXP = re.compile(r"^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$")
