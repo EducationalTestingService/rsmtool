@@ -57,10 +57,9 @@ DEFAULTS = {
     "experiment_names": None,
     "folds_file": None,
     "folds": 5,
-    "explainable_data": None,  # data to be explained by rsmtool
     "sample_range": None,  # range of specific sample IDs to be explained
     "sample_size": None,  # size of random sample to be explained
-    "background_size": 500,  # size of k-means sample for background
+    "background_kmeans_size": 500,  # size of k-means sample for background
     "num_features_to_display": 15,  # how many features should be  displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
 }
@@ -243,16 +242,16 @@ CHECK_FIELDS = {
         ],
     },
     "rsmexplain": {
-        "required": ["model_path", "background_data", "experiment_id"],
+        "required": ["background_data", "explainable_data", "experiment_id", "experiment_dir"],
         "optional": [
             "description",
-            "background_size",
-            "explainable_data",
+            "background_kmeans_size",
             "id_column",
             "num_features_to_display",
             "sample_range",
             "sample_size",
             "show_auto_cohorts",
+            "standardize_features",
             "general_sections",
             "custom_sections",
             "special_sections",

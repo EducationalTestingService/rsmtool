@@ -4,11 +4,11 @@
     "background_size": "50",
     "explainable_data": "../../files/explain_features.csv",
     "id_column": "id",
-    "range": "1-55",
     "experiment_id": "bay_explain",
     "description": "This is a BayesianRidge scoring model for illustration purposes",
-    "display_num": "16",
-    "auto_cohorts": "True",
+    "num_features_to_display": 16,
+    "sample_range": "1-55",
+    "show_auto_cohorts": "True",
     "general_sections": [
         "all"
     ],
