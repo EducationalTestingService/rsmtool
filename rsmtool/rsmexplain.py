@@ -9,21 +9,23 @@ Explain a SKLL model using SHAP explainers.
 :organization: ETS
 """
 
+import glob
 import logging
 import os
 import pickle
 import sys
 from os import listdir
-from os.path import abspath, exists, join
+from os.path import abspath, basename, exists, join, normpath, splitext
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import shap
-from skll.data import Reader
-from skll.learner import Learner
+from skll.data import FeatureSet
 
 from .configuration_parser import configure
+from .modeler import Modeler
+from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
@@ -70,7 +72,7 @@ def select_features(featureset, range_size=None):
 
 def mask(learner, featureset, feature_range=None):
     """
-    Sample examples from feaatureset used by learner.
+    Sample examples from featureset used by learner.
 
     An example refers to a specific data instance in the data set.
     Selects examples based on either sub-sampling specific indices or randomly
@@ -161,7 +163,7 @@ def generate_explanation(
     # make sure all necessary directories exist
     os.makedirs(output_dir, exist_ok=True)
     csvdir = abspath(join(output_dir, "output"))
-    figdir = abspath(join(output_dir, "figures"))
+    figdir = abspath(join(output_dir, "figure"))
     reportdir = abspath(join(output_dir, "report"))
 
     os.makedirs(csvdir, exist_ok=True)
@@ -190,6 +192,9 @@ def generate_explanation(
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
+    # get the experiment ID
+    experiment_id = configuration["experiment_id"]
+
     # check that only one of `sample_range` or `sample_size` is specified
     has_sample_range = configuration.get("sample_range") is not None
     has_sample_size = configuration.get("sample_size") is not None
@@ -199,25 +204,67 @@ def generate_explanation(
             "Please refer to the RSMExplain documentation for more details. "
         )
 
-    # load the model from the configuration directory using its absolute path
-    model_path = DataReader.locate_files(configuration["model_path"], configuration.configdir)
-    if not model_path:
-        raise FileNotFoundError(f"Input file {configuration['model_path']} does not exist")
-    model = Learner.from_file(model_path)
+    # find the rsmtool experiment directory
+    experiment_dir = DataReader.locate_files(
+        configuration["experiment_dir"], configuration.configdir
+    )
+    if not experiment_dir:
+        raise FileNotFoundError(f"The directory {configuration['experiment_dir']} does not exist.")
+    else:
+        experiment_output_dir = normpath(join(experiment_dir, "output"))
+        if not exists(experiment_output_dir):
+            raise FileNotFoundError(
+                f"The directory {experiment_dir} does not contain "
+                f"the output of an rsmtool experiment."
+            )
 
-    # load the background data using its absolute path
-    background_data_path = DataReader.locate_files(
-        configuration["background_data"], configuration.configdir
+    # find all the .model files in the experiment output directory
+    model_files = glob.glob(join(experiment_output_dir, "*.model"))
+    if not model_files:
+        raise FileNotFoundError(
+            f"The directory {experiment_output_dir} does not contain any rsmtool models."
+        )
+
+    experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
+    if experiment_id not in experiment_ids:
+        raise FileNotFoundError(
+            f"{experiment_output_dir} does not contain a model "
+            f'for the experiment "{experiment_id}". The following '
+            f"experiments are contained in this directory: {experiment_ids}"
+        )
+
+    # check that the directory contains outher required files
+    expected_feature_file_name = f"{experiment_id}_feature.csv"
+    if not exists(join(experiment_output_dir, expected_feature_file_name)):
+        raise FileNotFoundError(
+            f"{experiment_output_dir} does not contain the "
+            f"required file {expected_feature_file_name} that was "
+            f"generated during model training."
+        )
+
+    # load the background and explainable data sets
+    (background_data_path, explainable_data_path) = DataReader.locate_files(
+        [configuration["background_data"], configuration["explainable_data"]],
+        configuration.configdir,
     )
     if not background_data_path:
         raise FileNotFoundError(f"Input file {configuration['background_data']} does not exist")
-    bg_reader = Reader.for_path(
-        background_data_path, sparse=False, id_col=configuration["id_column"]
-    )
+    if not explainable_data_path:
+        raise FileNotFoundError(f"Input file {configuration['explainable_data']} does not exist")
+
+    # read the background data, explainable data, and feature info files
+    feature_info = join(experiment_output_dir, f"{experiment_id}_feature.csv")
+    file_paths = [background_data_path, explainable_data_path, feature_info]
+    file_names = [
+        "background_features",
+        "explainable_features",
+        "feature_info",
+    ]
+    reader = DataReader(file_paths, file_names)
+    container = reader.read(kwargs_dict={"feature_info": {"index_col": 0}})
 
     # ensure that the background data is large enough for meaningful explanations
-    background = bg_reader.read()
-    background_data_size = len(background)
+    background_data_size = len(container.background_features)
     try:
         assert background_data_size > 300
     except AssertionError:
@@ -228,30 +275,32 @@ def generate_explanation(
         )
         sys.exit(1)
 
-    # define the background distribution
-    _, all_background_features = mask(model, background)
-    background_distribution = shap.kmeans(all_background_features, configuration["background_size"])
+    # now pre-process the background and explainable data features to match
+    # what the model expects
+    processor = FeaturePreprocessor(logger=logger)
 
-    # load the data that we want to explain using its absolute path
-    if "explainable_data" in configuration:
-        explainable_data_path = DataReader.locate_files(
-            configuration["explainable_data"], configuration.configdir
-        )
-        if not explainable_data_path:
-            raise FileNotFoundError(
-                f"Input file {configuration['explainable_data']} does not exist"
-            )
-        data_reader = Reader.for_path(
-            explainable_data_path, sparse=False, id_col=configuration["id_column"]
-        )
-        data = data_reader.read()
-        logger.info(f"Generating explanations for {configuration['explainable_data']}")
-    else:
-        logger.info('"explainable_data" was not specified; explaining background_data.')
-        data = background
+    (_, processed_container) = processor.process_data(
+        configuration, container, context="rsmexplain"
+    )
 
-    # grab the feature names
-    feature_names = list(model.get_feature_names_out())
+    # create featuresets from pre-processed background and explainable features
+    background_fs = FeatureSet.from_data_frame(
+        processed_container.background_features_preprocessed, "background"
+    )
+    explainable_fs = FeatureSet.from_data_frame(
+        processed_container.explainable_features_preprocessed, "explainable"
+    )
+
+    # get the SKLL learner object for the rsmtool experiment and its feature names
+    modeler = Modeler.load_from_file(join(experiment_output_dir, f"{experiment_id}.model"))
+    learner = modeler.learner
+    feature_names = list(learner.get_feature_names_out())
+
+    # compute the background kmeans distribution
+    _, all_background_features = mask(learner, background_fs)
+    background_distribution = shap.kmeans(
+        all_background_features, configuration["background_kmeans_size"]
+    )
 
     # get and parse the value of either the sample range or the sample size
     if has_sample_size:
@@ -267,17 +316,20 @@ def generate_explanation(
         )
 
     # get the features we want to explain
-    ids, data_features = mask(model, data, feature_range=range_size)
+    ids, data_features = mask(learner, explainable_fs, feature_range=range_size)
 
     # define a shap explainer
     explainer = shap.explainers.Sampling(
-        model.model.predict,
+        learner.model.predict,
         background_distribution,
         feature_names=feature_names,
         seed=np.random.seed(42),
     )
 
-    logger.info(f"Generating shap explanations for {len(ids)} examples")
+    logger.info(
+        f"Generating shap explanations for {len(ids)} "
+        f"examples from {configuration['explainable_data']}"
+    )
     explanation = explainer(data_features)
 
     # add feature names if they aren't already specified
@@ -335,19 +387,22 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     csvdir = abspath(join(output_dir, "output"))
     reportdir = abspath(join(output_dir, "report"))
 
+    # get the experiment ID
+    experiment_id = configuration["experiment_id"]
+
     # first write the explanation object to disk, in case need it later
-    explanation_path = join(csvdir, "explanation.pkl")
+    explanation_path = join(csvdir, f"{experiment_id}_explanation.pkl")
     with open(explanation_path, "wb") as pickle_out:
         pickle.dump(explanation, pickle_out)
     configuration["explanation"] = explanation_path
 
-    id_path = join(csvdir, "ids.pkl")
+    id_path = join(csvdir, f"{experiment_id}_ids.pkl")
     with open(id_path, "wb") as pickle_out:
         pickle.dump(ids, pickle_out)
     configuration["ids"] = id_path
 
     # create various versions of the shap values to write to disk
-    csv_path = join(csvdir, "shap_values.csv")
+    csv_path = join(csvdir, f"{experiment_id}_shap_values.csv")
     shap_frame = pd.DataFrame(
         explanation.values, columns=explanation.feature_names, index=ids.values()
     )
@@ -355,7 +410,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
 
     # compute the various absolute value variants of the SHAP values and
     # write out that dataframe to disk.
-    csv_path_abs = join(csvdir, "absolute_shap_values.csv")
+    csv_path_abs = join(csvdir, f"{experiment_id}_absolute_shap_values.csv")
     df_abs = pd.DataFrame(
         [shap_frame.abs().mean(), shap_frame.abs().max(), shap_frame.abs().min()],
         index=["abs. mean shap", "abs. max shap", "abs. min shap"],
