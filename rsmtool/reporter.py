@@ -15,7 +15,7 @@ import logging
 import os
 import sys
 import warnings
-from os.path import abspath, basename, dirname, join, splitext
+from os.path import abspath, basename, dirname, join, normpath, splitext
 
 import nbformat
 from nbconvert.exporters import HTMLExporter, NotebookExporter
@@ -880,20 +880,20 @@ class Reporter:
 
         """
         # we define a directory for the saved figures
-        fig_dir = abspath(join(output_dir, "..", "figures"))
+        fig_dir = normpath(join(output_dir, "..", "figure"))
 
         environ_config = {
             "EXPERIMENT_ID": config["experiment_id"],
             "JAVASCRIPT_PATH": javascript_path,
             "DESCRIPTION": config["description"],
             "EXPLANATION": config["explanation"],  # the path to the explanation object
-            "BACKGROUND_SIZE": config["background_size"],
+            "BACKGROUND_KMEANS_SIZE": config["background_kmeans_size"],
             "IDs": config["ids"],
             "CSV_DIR": csv_dir,  # the report loads some csv files, so we need this parameter
             "NUM_FEATURES_TO_DISPLAY": config["num_features_to_display"],
             "FIG_DIR": fig_dir,
         }
-        report_name = f"{config['experiment_id']}_report"
+        report_name = f"{config['experiment_id']}_explain_report"
         reportdir = abspath(join(output_dir, "..", "report"))
 
         merged_notebook_file = join(reportdir, f"{report_name}.ipynb")
