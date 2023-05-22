@@ -1,0 +1,19 @@
+{
+    "description": "Explaning an SVR model trained on all features.",
+    "experiment_dir": "existing_experiment",
+    "experiment_id": "svr",
+    "background_data": "../../files/train.csv",
+    "background_kmeans_size": 50,
+    "explainable_data": "../../files/test.csv",
+    "id_column": "ID",
+    "sample_size": 10,
+    "num_features_to_display": 15,
+    "show_auto_cohorts": true,
+    "standardize_features": true,
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "sample_range": null
+}

@@ -19,7 +19,7 @@ else:
 
 @parameterized(
     [
-        param("svc-explain", "svc_explain"),
+        param("svr-explain", "svr"),
         param("knn-explain", "knn_explain"),
         param("bay-explain", "bay_explain"),
     ]
@@ -43,11 +43,11 @@ def test_run_experiment_svc_explain_with_object():
         "background_size": "50",
         "explainable_data": "../../files/explain_features.csv",
         "id_column": "id",
-        "range": 10,
         "experiment_id": "svc_explain_object",
         "description": "This is a SVR scoring model for illustration purposes",
-        "display_num": "16",
-        "auto_cohorts": "True",
+        "num_features_to_display": 16,
+        "sample_size": 10,
+        "show_auto_cohorts": "True",
     }
 
     config_obj = Configuration(config_dict, context="rsmexplain", configdir=configdir)
@@ -77,11 +77,11 @@ def test_run_experiment_svc_explain_with_dictionary():
         "background_size": "50",
         "explainable_data": new_file_dict["background_data"],
         "id_column": "id",
-        "range": 10,
         "experiment_id": "svc_explain_dict",
         "description": "This is a SVR scoring model for illustration purposes",
-        "display_num": "16",
-        "auto_cohorts": "True",
+        "num_features_to_display": 16,
+        "sample_size": 10,
+        "show_auto_cohorts": "True",
     }
 
     check_run_explain(source, experiment_id, config_obj_or_dict=config_dict)

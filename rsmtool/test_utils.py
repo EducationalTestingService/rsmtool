@@ -274,7 +274,7 @@ def check_run_explain(
 
     do_run_explain(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
-    html_report = join("test_outputs", source, "report", f"{experiment_id}_report.html")
+    html_report = join("test_outputs", source, "report", f"{experiment_id}_explain_report.html")
 
     # check report for any errors but ignore warnings
     # which we check below separately
@@ -285,7 +285,6 @@ def check_run_explain(
 
     output_files = glob(join(output_dir, f"*.{file_format}"))
     for output_file in output_files:
-
         output_filename = basename(output_file)
         expected_output_file = join(expected_output_dir, output_filename)
 
@@ -713,7 +712,6 @@ def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for
             remove(f)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -758,7 +756,6 @@ def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for
             remove(f)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -800,7 +797,6 @@ def do_run_explain(source, config_input, suppress_warnings_for=[]):
             remove(f)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -845,7 +841,6 @@ def do_run_prediction(source, config_input, suppress_warnings_for=[]):
         remove(f)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -882,7 +877,6 @@ def do_run_comparison(source, config_input, suppress_warnings_for=[]):
     experiment_dir = join(source_output_dir, source)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -924,7 +918,6 @@ def do_run_summary(source, config_input, suppress_warnings_for=[]):
             remove(f)
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -974,7 +967,6 @@ def do_run_cross_validation(source, experiment_id, config_input, suppress_warnin
         pass
 
     with warnings.catch_warnings():
-
         # always suppress runtime warnings
         warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -1079,7 +1071,6 @@ def collect_warning_messages_from_report(html_file):
 
     warnings_text = []
     for div in soup.findAll("div", {"class": "output_stderr"}):
-
         # we collect the text in the <pre> tags after the standard error,
         # and split the lines; we only keep the lines that contain 'Warning:'
         for pre in div.findAll("pre"):
