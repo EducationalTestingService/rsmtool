@@ -269,7 +269,7 @@ def compute_and_save_predictions(
     model_files = glob.glob(join(experiment_output_dir, "*.model"))
     if not model_files:
         raise FileNotFoundError(
-            f"The directory {experiment_output_dir} does not " f"contain any rsmtool models."
+            f"The directory {experiment_output_dir} does not contain any rsmtool models."
         )
 
     experiment_ids = [splitext(basename(mf))[0] for mf in model_files]
@@ -342,7 +342,6 @@ def compute_and_save_predictions(
         )
 
     if output_file.lower().endswith(".csv") or output_file.lower().endswith(".xlsx"):
-
         output_dir = dirname(output_file)
         _, filename = split(output_file)
         filename, _ = splitext(filename)
@@ -369,7 +368,6 @@ def compute_and_save_predictions(
 
     # save excluded responses to disk
     if not processed_container.excluded.empty:
-
         # save the predictions to disk
         logger.info(
             f"Saving excluded responses to "
@@ -388,7 +386,6 @@ def compute_and_save_predictions(
 
 
 def main():  # noqa: D103
-
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -443,7 +440,6 @@ def main():  # noqa: D103
 
     # call the appropriate function based on which sub-command was run
     if args.subcommand == "run":
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -458,7 +454,6 @@ def main():  # noqa: D103
         )
 
     else:
-
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
