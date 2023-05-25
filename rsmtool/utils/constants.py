@@ -278,6 +278,7 @@ CONFIGURATION_DOCUMENTATION_SLUGS = {
     "rsmpredict": "advanced_usage.html#config-file-rsmpredict",
     "rsmsummarize": "advanced_usage.html#config-file-rsmsummarize",
     "rsmxval": "advanced_usage.html#config-file-rsmxval",
+    "rsmexplain": "advanced_usage.html#config-file-rsmexplain",
 }
 
 VALID_PARSER_SUBCOMMANDS = ["generate", "run"]
@@ -376,6 +377,22 @@ INTERACTIVE_MODE_METADATA = {
         "label": "List of column names containing subgroup variables",
         "count": "multiple",
     },
+    "background_kmeans_size": {
+        "label": "size of k-means sample for background (<u>500</u>)",
+        "type": "integer",
+    },
+    "num_features_to_display": {
+        "label": "how many features should be displayed in rsmexplain plots (<u>15</u>)",
+        "type": "integer",
+    },
+    "sample_range": {"label": "range of specific sample IDs to be explained "},
+    "sample_size": {"label": "size of random sample to be explained ", "type": "integer"},
+    "background_data": {
+        "label": "Path to file for use as the background distribution ",
+        "type": "file",
+    },
+    "explainable_data": {"label": "Path to file to explain ", "type": "file"},
+    "show_auto_cohorts": {"label": "Show auto cohorts (true/<u>false</u>)", "type": "boolean"},
 }
 
 # regular expression used to parse rsmexplain range values
