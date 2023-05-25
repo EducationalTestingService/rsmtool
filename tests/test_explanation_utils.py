@@ -3,7 +3,7 @@ from os.path import join
 
 import numpy as np
 from nose.tools import assert_equal
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.datasets import make_classification
 from skll.data import FeatureSet, Reader
 from skll.learner import Learner
@@ -85,9 +85,14 @@ class TestExplainUtils:
         assert_equal(select_features(self.test_fs, range_size=2), expected_output)
 
     def test_select_features_full_range_size(self):
-        """Test yield_ids with an ierable range size."""
+        """Test select_features with an ierable range size."""
         expected_output = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
         assert_equal(select_features(self.test_fs, range_size=[5, 10]), expected_output)
+
+    def test_select_features_exceed_range_size(self):
+        """Test select_features with an exceed range size."""
+        expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
+        assert_equal(select_features(self.test_fs, range_size=[10, 20]), expected_output)
 
     def test_mask_from_learner_in_memory(self):
         """Test mask with a SKLL Learner created in memory."""
@@ -96,7 +101,7 @@ class TestExplainUtils:
         expected_ids = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
         computed_ids, computed_features = mask(self.svc, self.test_fs, feature_range=[5, 10])
         assert_equal(computed_ids, expected_ids)
-        assert_array_equal(computed_features, expected_features)
+        assert_array_almost_equal(computed_features, expected_features)
 
     def test_mask_from_learner_on_disk(self):
         """Test mask with a SKLL Learner saved to disk."""

@@ -8,5 +8,12 @@
     "id_column": "ID",
     "sample_size": 10,
     "num_features_to_display": 15,
-    "show_auto_cohorts": true
+    "show_auto_cohorts": true,
+    "standardize_features": true,
+    "general_sections": [
+        "all"
+    ],
+    "special_sections": null,
+    "custom_sections": null,
+    "sample_range": null
 }

@@ -2633,8 +2633,6 @@ class FeaturePreprocessor:
 
         Raises
         ------
-        KeyError
-            If columns specified in the configuration do not exist in the data.
         ValueError
             If data contains duplicate response IDs.
         """
