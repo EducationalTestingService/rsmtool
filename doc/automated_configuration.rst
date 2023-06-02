@@ -2,7 +2,7 @@
 
 Auto-generating configuration files
 -----------------------------------
-Configuration files for :ref:`rsmtool <config_file_rsmtool>`, :ref:`rsmeval <config_file_rsmeval>`, :ref:`rsmcompare <config_file_rsmcompare>`, :ref:`rsmpredict <config_file_rsmpredict>`, :ref:`rsmsummarize <config_file_rsmsummarize>`, and :ref:`rsmxval <config_file_rsmxval>` can be difficult to create manually due to the large number of configuration options supported by these tools. To make this easier for users, all of these tools support *automatic* creation of configuration files, both interactively and non-interactively.
+Configuration files for :ref:`rsmtool <config_file_rsmtool>`, :ref:`rsmeval <config_file_rsmeval>`, :ref:`rsmexplain <config_file_rsmexplain>`, :ref:`rsmcompare <config_file_rsmcompare>`, :ref:`rsmpredict <config_file_rsmpredict>`, :ref:`rsmsummarize <config_file_rsmsummarize>` and :ref:`rsmxval <config_file_rsmxval>`  can be difficult to create manually due to the large number of configuration options supported by these tools. To make this easier for users, all of these tools support *automatic* creation of configuration files, both interactively and non-interactively.
 
 Interactive generation
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -87,13 +87,13 @@ This warning explains that the generated file *cannot* be used directly as input
 
 Note the two comments demarcating the locations of the required and optional fields. Note also that the required fields are filled with the dummy value "ENTER_VALUE_HERE" that *must* be manually edited by the user. The optional fields are filled with default values that may also need to be further edited depending on the data being used.
 
-Just like interactive generation, non-interactive generation is supported by all 6 tools: ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, ``rsmsummarize``, and ``rsmxval``.
+Just like interactive generation, non-interactive generation is supported by all 6 tools: ``rsmtool``, ``rsmeval``, ``rsmexplain``, ``rsmcompare``, ``rsmpredict``, ``rsmsummarize``, and ``rsmxval``.
 
 Similarly, to include subgroup information in the reports for ``rsmtool``, ``rsmeval``, and ``rsmcompare``, just add ``--subgroups`` (or ``-g``) to the command. Note that unlike in interactive mode, this would *only* add subgroup-based sections to the ``general_sections`` list in the output file. You will need to manually edit the ``subgroups`` option in the configuration file to enter the subgroup column names.
 
 Generation API
 ~~~~~~~~~~~~~~
-Interactive generation is only meant for end users and can only be used via the 6 command-line tools ``rsmtool``, ``rsmeval``, ``rsmcompare``, ``rsmpredict``, ``rsmsummarize``, and ``rsmxval``. It cannot be used via the RSMTool API.
+Interactive generation is only meant for end users and can only be used via the 6 command-line tools ``rsmtool``, ``rsmeval``, ``rsmexplain``, ``rsmcompare``, ``rsmpredict``, ``rsmsummarize``, and ``rsmxval``. It cannot be used via the RSMTool API.
 
 However, the non-interactive generation *can* be used via the API which can be useful for more advanced RSMTool users. To illustrate, here's some example Python code to generate a configuration for ``rsmtool`` in the form of a dictionary:
 
