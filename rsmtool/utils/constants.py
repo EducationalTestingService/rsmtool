@@ -60,7 +60,7 @@ DEFAULTS = {
     "sample_range": None,  # range of specific sample IDs to be explained
     "sample_size": None,  # size of random sample to be explained
     "background_kmeans_size": 500,  # size of k-means sample for background
-    "num_features_to_display": 15,  # how many features should be  displayed in rsmexplain plots
+    "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
 }
 
@@ -242,11 +242,16 @@ CHECK_FIELDS = {
         ],
     },
     "rsmexplain": {
-        "required": ["background_data", "explainable_data", "experiment_id", "experiment_dir"],
+        "required": [
+            "background_data",
+            "explainable_data",
+            "experiment_id",
+            "experiment_dir",
+            "id_column",
+        ],
         "optional": [
             "description",
             "background_kmeans_size",
-            "id_column",
             "num_features_to_display",
             "sample_range",
             "sample_size",

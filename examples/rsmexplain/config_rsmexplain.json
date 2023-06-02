@@ -1,16 +1,11 @@
 {
-"model_path": "svr.model",
-// a representative background data set for your model
-"background_data": "features.csv",
-"background_size": "50",
-// the file you wish to run explanations on
-"explainable_data": "features.csv",
-// the id column has to be the same for your background_data and your explainable_data
-"id_column": "id",
-"range": "0-55",
-"experiment_id":"Example_1",
-"description": "This is a SVR scoring model for illustration purposes",
-"num_features_to_display": "16",
-// auto_cohorts will enable an extra report section
-"show_auto_cohorts": "True"
+    "description": "Explaning an linear regression model trained on all features.",
+    "experiment_dir": "../rsmtool",
+    "experiment_id": "ASAP2",
+    "background_data": "../rsmtool/train.csv",
+    "explainable_data": "../rsmtool/test.csv",
+    "id_column": "ID",
+    "sample_size": 10,
+    "num_features_to_display": 15,
+    "show_auto_cohorts": true
 }

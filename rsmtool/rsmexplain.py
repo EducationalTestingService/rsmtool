@@ -503,9 +503,6 @@ def main():
         )
 
     else:
-        # THIS DOES NOT CURRENTLY WORK, AS THERE IS NO LINK IN
-        # .constants.CONFIGURATION_DOCUMENTATION_SLUGS
-        # Once add a key there for rsmexplain, this should generate as expected
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
