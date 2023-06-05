@@ -247,10 +247,10 @@ CHECK_FIELDS = {
             "explainable_data",
             "experiment_id",
             "experiment_dir",
-            "id_column",
         ],
         "optional": [
             "description",
+            "id_column",
             "background_kmeans_size",
             "num_features_to_display",
             "sample_range",
@@ -382,22 +382,22 @@ INTERACTIVE_MODE_METADATA = {
         "label": "List of column names containing subgroup variables",
         "count": "multiple",
     },
+    "background_data": {
+        "label": "Path to file to be used as background distribution ",
+        "type": "file",
+    },
     "background_kmeans_size": {
         "label": "size of k-means sample for background (<u>500</u>)",
         "type": "integer",
     },
+    "explainable_data": {"label": "Path to file to be explained ", "type": "file"},
+    "sample_range": {"label": "Range of specific row IDs to explain "},
+    "sample_size": {"label": "Size of random sample to be explained ", "type": "integer"},
     "num_features_to_display": {
-        "label": "how many features should be displayed in rsmexplain plots (<u>15</u>)",
+        "label": "Number of features to be displayed in plots (<u>15</u>)",
         "type": "integer",
     },
-    "sample_range": {"label": "range of specific sample IDs to be explained "},
-    "sample_size": {"label": "size of random sample to be explained ", "type": "integer"},
-    "background_data": {
-        "label": "Path to file for use as the background distribution ",
-        "type": "file",
-    },
-    "explainable_data": {"label": "Path to file to explain ", "type": "file"},
-    "show_auto_cohorts": {"label": "Show auto cohorts (true/<u>false</u>)", "type": "boolean"},
+    "show_auto_cohorts": {"label": "Show auto cohorts plot (true/<u>false</u>)", "type": "boolean"},
 }
 
 # regular expression used to parse rsmexplain range values
