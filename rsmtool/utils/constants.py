@@ -59,6 +59,7 @@ DEFAULTS = {
     "folds": 5,
     "sample_range": None,  # range of specific sample IDs to be explained
     "sample_size": None,  # size of random sample to be explained
+    "sample_ids": None,  # specific sample IDs to be explained
     "background_kmeans_size": 500,  # size of k-means sample for background
     "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
@@ -255,6 +256,7 @@ CHECK_FIELDS = {
             "num_features_to_display",
             "sample_range",
             "sample_size",
+            "sample_ids",
             "show_auto_cohorts",
             "standardize_features",
             "general_sections",

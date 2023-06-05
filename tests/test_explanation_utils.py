@@ -94,6 +94,11 @@ class TestExplainUtils:
         expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
         assert_equal(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
 
+    def test_select_features_range_ids_size(self):
+        """Test select_features with specified range ids."""
+        expected_output = {5: 6, 10: 11, 12: 13}
+        assert_equal(select_examples(self.test_fs, range_size=(5, 10, 12)), expected_output)
+
     def test_mask_from_learner_in_memory(self):
         """Test mask with a SKLL Learner created in memory."""
         output_path = join(rsmtool_test_dir, "data", "output", "explain_mask_from_learner.out")

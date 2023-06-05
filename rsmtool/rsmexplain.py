@@ -66,6 +66,9 @@ def select_examples(featureset, range_size=None):
         selected_ids = fs_ids
     elif isinstance(range_size, int):
         selected_ids = shap.sample(fs_ids, range_size)
+    elif isinstance(range_size, tuple):
+        array_index = np.array(range_size)
+        selected_ids = fs_ids[array_index]
     else:
         start, end = range_size
         # NOTE: include the end index in the selected examples since it's more intuitive
@@ -203,12 +206,13 @@ def generate_explanation(
     # get the experiment ID
     experiment_id = configuration["experiment_id"]
 
-    # check that only one of `sample_range` or `sample_size` is specified
+    # check that only one of `sample_range`, `sample_size` or `sample_range` is specified
     has_sample_range = configuration.get("sample_range") is not None
     has_sample_size = configuration.get("sample_size") is not None
-    if has_sample_size and has_sample_range:
+    has_sample_ids = configuration.get("sample_ids") is not None
+    if sum([has_sample_range, has_sample_size, has_sample_ids]) > 1:
         raise ValueError(
-            "You must specify either 'sample_range' or 'sample_size'. "
+            "You must specify either 'sample_range', 'sample_size' or 'sample_ids'. "
             "Please refer to the `rsmexplain` documentation for more details. "
         )
 
@@ -345,10 +349,13 @@ def generate_explanation(
         range_size = int(configuration.get("sample_size"))
     elif has_sample_range:
         range_size = parse_range(configuration.get("sample_range"))
+    elif has_sample_ids:
+        range_size = configuration.get("sample_ids").split(",")
+        range_size = tuple([int(id) for id in range_size])
     else:
         range_size = None
         logger.warning(
-            "Since 'sample_range' and 'sample_size' are both unspecified, "
+            "Since 'sample_range', 'sample_size' and 'sample_ids' are all unspecified, "
             "explanations will be generated for the *entire* data set which "
             "could be very slow, depending on its size. "
         )
