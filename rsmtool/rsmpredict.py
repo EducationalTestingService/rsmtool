@@ -315,7 +315,7 @@ def compute_and_save_predictions(
     # Initialize the processor
     processor = FeaturePreprocessor(logger=logger)
 
-    (processed_config, processed_container) = processor.process_data(
+    (_, processed_container) = processor.process_data(
         configuration, data_container, context="rsmpredict"
     )
 
