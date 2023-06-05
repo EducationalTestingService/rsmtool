@@ -20,7 +20,7 @@ from os.path import abspath, basename, dirname, join, normpath, splitext
 import nbformat
 from nbconvert.exporters import HTMLExporter, NotebookExporter
 from nbconvert.exporters.templateexporter import default_filters
-from nbformat.warnings import MissingIDFieldWarning
+from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
@@ -253,10 +253,11 @@ class Reporter:
                 merged_notebook.cells.append(cell)
 
         # normalize the merged notebook to fix any issues with metadata
-        # especially missing IDs in code cells which seems to happen a lot
-        # for rsmtool sections
+        # especially missing or duplicate IDs in code cells which seems to
+        # happen a lot for our sections
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=MissingIDFieldWarning)
+            warnings.filterwarnings("ignore", category=DuplicateCellId)
             _, merged_notebook = nbformat.validator.normalize(merged_notebook.dict())
 
         # write out the merged notebook to disk
