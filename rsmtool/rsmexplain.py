@@ -14,13 +14,20 @@ import logging
 import os
 import pickle
 import sys
+import warnings
 from os import listdir
 from os.path import abspath, basename, exists, join, normpath, splitext
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import shap
+
+# TODO: remove this context manager around shap import when switching to
+# new version of SHAP that is properly numba-compliant
+with warnings.catch_warnings(record=False) as w:
+    warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
+    import shap
+
 from skll.data import FeatureSet
 
 from .configuration_parser import configure
