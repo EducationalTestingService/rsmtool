@@ -94,7 +94,6 @@ def test_run_experiment_parameterized(*args, **kwargs):
 
 @raises(ValueError)
 def test_run_experiment_empwtdropneg():
-
     # rsmtool experiment with no longer supported empWtDropNeg model
     source = "empwtdropneg"
     experiment_id = "empWtDropNeg"
@@ -104,7 +103,6 @@ def test_run_experiment_empwtdropneg():
 
 @raises(ValueError)
 def test_run_experiment_requested_feature_zero_sd():
-
     # rsmtool experiment when a requested feature has zero sd
     source = "lr-with-requested-feature-with-zero-sd"
     experiment_id = "lr_with_requested_feature_with_zero_sd"
@@ -113,7 +111,6 @@ def test_run_experiment_requested_feature_zero_sd():
 
 
 def test_run_experiment_with_warnings():
-
     source = "lr-with-warnings"
     experiment_id = "lr_with_warnings"
     config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
@@ -123,11 +120,11 @@ def test_run_experiment_with_warnings():
     html_file = join("test_outputs", source, "report", experiment_id + "_report.html")
     report_warnings = collect_warning_messages_from_report(html_file)
 
-    syntax_warnings = [msg for msg in report_warnings if "SyntaxWarning:" in msg]
-    deprecation_warnings = [msg for msg in report_warnings if "DeprecationWarning:" in msg]
-    unicode_warnings = [msg for msg in report_warnings if "UnicodeWarning:" in msg]
-    runtime_warnings = [msg for msg in report_warnings if "RuntimeWarning:" in msg]
-    user_warnings = [msg for msg in report_warnings if "UserWarning:" in msg]
+    syntax_warnings = [msg for msg in report_warnings if "syntax warning" in msg]
+    deprecation_warnings = [msg for msg in report_warnings if "deprecation warning" in msg]
+    unicode_warnings = [msg for msg in report_warnings if "unicode warning" in msg]
+    runtime_warnings = [msg for msg in report_warnings if "runtime warning" in msg]
+    user_warnings = [msg for msg in report_warnings if "user warning" in msg]
 
     assert_equal(len(syntax_warnings), 1)
     assert_equal(len(deprecation_warnings), 2)
@@ -138,7 +135,6 @@ def test_run_experiment_with_warnings():
 
 @raises(ValueError)
 def test_same_id_linear_then_non_linear_raises_error():
-
     experiment_path = join(rsmtool_test_dir, "data", "experiments", "lr")
     configpath = join(experiment_path, "lr.json")
     configdict = json.load(open(configpath, "r"))

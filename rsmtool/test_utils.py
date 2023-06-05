@@ -1075,7 +1075,7 @@ def collect_warning_messages_from_report(html_file):
         # and split the lines; we only keep the lines that contain 'Warning:'
         for pre in div.findAll("pre"):
             warnings_msgs = pre.text.splitlines()
-            warnings_msgs = [msg for msg in warnings_msgs if "Warning:" in msg]
+            warnings_msgs = [msg for msg in warnings_msgs if "warning" in msg]
             warnings_text.extend(warnings_msgs)
 
     return warnings_text
