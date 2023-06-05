@@ -5,7 +5,7 @@ ipython
 jupyter
 nose
 notebook
-numpy
+numpy<1.24
 openpyxl
 pandas
 parameterized
