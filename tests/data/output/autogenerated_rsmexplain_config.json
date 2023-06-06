@@ -1,0 +1,24 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmexplain
+    // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
+    "background_data": "ENTER_VALUE_HERE",
+    "explainable_data": "ENTER_VALUE_HERE",
+    "experiment_id": "ENTER_VALUE_HERE",
+    "experiment_dir": "ENTER_VALUE_HERE",
+    // OPTIONAL: replace default values below based on your data.
+    "background_kmeans_size": 500,
+    "custom_sections": null,
+    "description": "",
+    "general_sections": [
+        "data_description",
+        "shap_values",
+        "shap_plots"
+    ],
+    "id_column": "spkitemid",
+    "num_features_to_display": 15,
+    "sample_range": null,
+    "sample_size": null,
+    "show_auto_cohorts": false,
+    "special_sections": null,
+    "standardize_features": true
+}

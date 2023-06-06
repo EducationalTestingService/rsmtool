@@ -1570,6 +1570,20 @@ class TestBatchGenerateConfiguration:
                 "input_features_file": "ENTER_VALUE_HERE",
             }
 
+        elif context == "rsmexplain":
+            configdict = {
+                "experiment_id": "ENTER_VALUE_HERE",
+                "background_data": "ENTER_VALUE_HERE",
+                "explainable_data": "ENTER_VALUE_HERE",
+                "experiment_dir": "ENTER_VALUE_HERE",
+            }
+
+            section_list = [
+                "data_description",
+                "shap_values",
+                "shap_plots",
+            ]
+
         # get the generated configuration dictionary
         generated_configuration = generator.generate()
 
@@ -1597,13 +1611,13 @@ class TestBatchGenerateConfiguration:
 
     def test_generate_configuration(self):
         for context, use_subgroups, as_string, suppress_warnings in product(
-            ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict"],
+            ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict", "rsmexplain"],
             [True, False],
             [True, False],
             [True, False],
         ):
-            # rsmpredict and rsmsummarize do not use subgroups
-            if context in ["rsmpredict", "rsmsummarize"] and use_subgroups:
+            # rsmpredict, rsmsummarize and rsmexplain do not use subgroups
+            if context in ["rsmpredict", "rsmsummarize", "rsmexplain"] and use_subgroups:
                 continue
 
             yield (
@@ -2063,6 +2077,7 @@ class TestInteractiveField:
             "rsmpredict",
             "rsmsummarize",
             "rsmcompare",
+            "rsmexplain",
         ]:
             ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]["required"])
         OPTIONAL_INTERACTIVE_FIELDS = [
@@ -2210,6 +2225,21 @@ class TestInteractiveGenerate:
             False,  # use_thumbnails
         ]
 
+        cls.mocked_rsmexplain_interactive_values = [
+            "train.csv",  # background_file
+            "test.csv",  # explanable_file
+            "testexplain",  # experiment_id
+            "/a/b",  # RSMTool experiment_dir
+            500,  # size of k-means sample for background
+            "explain test",  # description
+            "ID",  # id_column
+            15,  # Number of features to be displayed
+            None,  # Range of specific row IDs
+            None,  # Size of random sample
+            False,  # Show auto cohorts plot
+            True,  # Standardize all features
+        ]
+
     def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
         A helper method that runs `ConfigurationGenerator.interact()`
@@ -2219,7 +2249,7 @@ class TestInteractiveGenerate:
         ----------
         context : str
             Name of the tool being tested.
-            One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize"}.
+            One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize", "rsmexplain"}.
         subgroups : bool, optional
             Whether to include subgroup information in the generated configuration.
         with_folds_file : bool, optional
@@ -2270,7 +2300,7 @@ class TestInteractiveGenerate:
         clear_patcher.stop()
 
     def test_interactive_generate(self):
-        # all tools except rsmpredict and rsmsummarize
+        # all tools except rsmpredict, rsmsummarize and rsmexplain
         # explicitly support subgroups; only rsmxval supports
         # folds file
         yield self.check_tool_interact, "rsmtool", False, False
@@ -2285,6 +2315,8 @@ class TestInteractiveGenerate:
         yield self.check_tool_interact, "rsmpredict", False, False
 
         yield self.check_tool_interact, "rsmsummarize", False
+
+        yield self.check_tool_interact, "rsmexplain", False, False
 
         yield self.check_tool_interact, "rsmxval", False, False
         yield self.check_tool_interact, "rsmxval", False, True

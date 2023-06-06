@@ -1,0 +1,23 @@
+{
+    // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmexplain
+    "background_data": "train.csv",
+    "explainable_data": "test.csv",
+    "experiment_id": "testexplain",
+    "experiment_dir": "/a/b",
+    // OPTIONAL: replace default values below based on your data.
+    "background_kmeans_size": 500,
+    "custom_sections": null,
+    "description": "explain test",
+    "general_sections": [
+        "data_description",
+        "shap_values",
+        "shap_plots"
+    ],
+    "id_column": "ID",
+    "num_features_to_display": 15,
+    "sample_range": null,
+    "sample_size": null,
+    "show_auto_cohorts": false,
+    "special_sections": null,
+    "standardize_features": true
+}
