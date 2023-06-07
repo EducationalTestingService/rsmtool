@@ -1,3 +1,4 @@
+WARNING: Automatically generated configuration files MUST be edited to add values for required fields and even for optional ones depending on your data.
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmexplain
     // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!

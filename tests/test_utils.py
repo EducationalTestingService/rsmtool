@@ -1611,7 +1611,7 @@ class TestBatchGenerateConfiguration:
 
     def test_generate_configuration(self):
         for context, use_subgroups, as_string, suppress_warnings in product(
-            ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict", "rsmexplain"],
+            ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict"],
             [True, False],
             [True, False],
             [True, False],

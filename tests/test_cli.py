@@ -42,12 +42,14 @@ class TestToolCLI:
         cls.rsmpredict_config_file = common_dir / "lr-predict" / "rsmpredict.json"
         cls.rsmsummarize_config_file = common_dir / "lr-self-summary" / "rsmsummarize.json"
         cls.rsmxval_config_file = common_dir / "lr-xval" / "lr_xval.json"
+        cls.rsmexplain_config_file = common_dir / "svr-explain" / "rsmexplain.json"
         cls.expected_rsmtool_output_dir = common_dir / "lr" / "output"
         cls.expected_rsmeval_output_dir = common_dir / "lr-eval" / "output"
         cls.expected_rsmcompare_output_dir = common_dir / "lr-self-compare" / "output"
         cls.expected_rsmpredict_output_dir = common_dir / "lr-predict" / "output"
         cls.expected_rsmsummarize_output_dir = common_dir / "lr-self-summary" / "output"
         cls.expected_rsmxval_output_dir = common_dir / "lr-xval" / "output"
+        cls.expected_rsmexplain_output_dir = common_dir / "svr-explain" / "output"
 
     @classmethod
     def tearDownClass(cls):
@@ -86,6 +88,7 @@ class TestToolCLI:
             "rsmpredict",
             "rsmcompare",
             "rsmxval",
+            "rsmexplain",
         ]:
             yield self.check_no_args, context
 
@@ -106,8 +109,7 @@ class TestToolCLI:
         expected_output_dir = getattr(self, f"expected_{name}_output_dir")
 
         # all tools except rsmcompare need to have their output files validated
-        if name in ["rsmtool", "rsmeval", "rsmsummarize", "rsmpredict", "rsmxval"]:
-
+        if name in ["rsmtool", "rsmeval", "rsmsummarize", "rsmpredict", "rsmxval", "rsmexplain"]:
             # rsmpredict has its own set of files and it puts them right at the root
             # of the output directory rather than under the "output" subdirectory;
             # rsmxval also needs to be specially handled
@@ -134,7 +136,7 @@ class TestToolCLI:
         # there's no report for rsmpredict but for the rest we want
         # the reports to be free of errors and warnings; for rsmxval
         # there are multiple reports to check
-        if name in ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmxval"]:
+        if name in ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmxval", "rsmexplain"]:
             output_dir = Path(experiment_dir)
             if name == "rsmxval":
                 folds_dir = output_dir / "folds"
@@ -171,7 +173,6 @@ class TestToolCLI:
                     eq_(len(warning_msgs), 0)
 
     def validate_run_output_rsmxval(self, experiment_dir):
-
         output_dir = Path(experiment_dir)
         expected_output_dir = getattr(self, "expected_rsmxval_output_dir")
 
@@ -331,8 +332,8 @@ class TestToolCLI:
             "rsmpredict",
             "rsmsummarize",
             "rsmxval",
+            "rsmexplain",
         ]:
-
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
@@ -346,8 +347,14 @@ class TestToolCLI:
         # test that "run" subcommand works without an output directory
 
         # this applies to all tools except rsmpredict
-        for context in ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmxval"]:
-
+        for context in [
+            "rsmtool",
+            "rsmeval",
+            "rsmcompare",
+            "rsmsummarize",
+            "rsmxval",
+            "rsmexplain",
+        ]:
             # create a temporary dirextory
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
@@ -376,8 +383,7 @@ class TestToolCLI:
         # test that the "run" command fails to overwrite when "-f" is not specified
 
         # this applies to all tools except rsmpredict, rsmcompare, and rsmxval
-        for context in ["rsmtool", "rsmeval", "rsmsummarize"]:
-
+        for context in ["rsmtool", "rsmeval", "rsmsummarize", "rsmexplain"]:
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
 
@@ -402,8 +408,7 @@ class TestToolCLI:
         #  test that the "run" command does overwrite when "-f" is specified
 
         # this applies to all tools except rsmpredict, rsmcompare, and rsmxval
-        for context in ["rsmtool", "rsmeval", "rsmsummarize"]:
-
+        for context in ["rsmtool", "rsmeval", "rsmsummarize", "rsmexplain"]:
             tempdir = TemporaryDirectory()
             self.temporary_directories.append(tempdir)
 
@@ -443,6 +448,7 @@ class TestToolCLI:
             "rsmpredict",
             "rsmsummarize",
             "rsmxval",
+            "rsmexplain",
         ]:
             yield self.check_tool_cmd, context, "generate", None, None
 
@@ -450,8 +456,8 @@ class TestToolCLI:
         # test that the "generate --subgroups" subcommand for all tools works
         # as expected in batch mode
 
-        # this applies to all tools except rsmpredict, rsmsummarize, and
-        # rsmxval; rsmxval does support subgroups but since it has no sections
+        # this applies to all tools except rsmpredict, rsmsummarize,
+        # rsmxval and rsmexplain; rsmxval does support subgroups but since it has no sections
         # fields, it's not relevant for this test
         for context in ["rsmtool", "rsmeval", "rsmcompare"]:
             yield self.check_tool_cmd, context, "generate --subgroups", None, None
