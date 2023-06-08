@@ -27,7 +27,7 @@ The directory containing the rsmtool models we want to explain. This directory s
 
 background_kmeans_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The size of k-means sample for background. Defaults to ``500``.
+The size of the k-means sample for background. Defaults to ``500``. A dataset is summarized with k mean samples weighted by the number of data points they each represent.
 
 custom_sections *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,11 +35,11 @@ A list of custom, user-defined sections to be included into the final report. Th
 
 description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-A brief description of the explanation. The description can contain spaces and punctuation.
+A brief description of the ``rsmexplain`` experiment that will be shown at the top of the report. The description can contain spaces and punctuation.
 
 num_features_to_display *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Number of top features should be displayed in rsmexplain plots. Defaults to ``15``.
+Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to ``15``.
 
 id_column *(Optional)*
 ~~~~~~~~~
@@ -47,20 +47,20 @@ The name of the column containing the response IDs. Defaults to ``spkitemid``, i
 
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-Range of specific sample IDs to be explained. i.e., ``"1-50"`` indicates instances from the first to the 50th. Defaults to ``None``.
+If we want to explain a specific range of responses from the ``explainable_data``, we can specify that range here. Note that the range is specified in terms of the *location* of the responses in the ``explainable_data`` file and that the locations are zero-indexed. So, for example, to explain only the first 50 responses in the file, we should set a value of ``"0-49"`` for this option. Defaults to ``None``.
 
 sample_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-Size of random sample to be explained. i.e., ``10`` indicates to randomly sample 10 instances from the explainable data. Defaults to ``None``.
+If we want to explain a random sample of the responses in explainable_data, we can specify the size of that random sample here. For example, to explain a random sample of 10 responses, we would set this to 10. Defaults to None.
 
 .. note ::
 
-    If neither ``sample_range`` nor ``sample_size`` is specified, explanations will be generated for the entire explainable_data which could be very slow, depending on its size.
+    Only one of ``sample_range`` or ``sample_size`` must be specified. If neither is specified, explanations will be generated for the entire set of responses in ``explainable_data`` which could be very slow, depending on its size.
 
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``True``, auto cohort bar plots will be displayed. These plots can be useful to detect interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``False``.
+If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful to detect interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``.
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``false`` features will not be standardized by dividing by the mean and multiplying by the standard deviation. Defaults to ``true``.
+If this option is set to ``false``, the feature values for the responses in ``background_data`` and ``explainable_data`` will *not* be standardized using the mean and standard deviation parameters from the rsmtool experiment from ``<experiment_dir>/output/<experiment_id>_feature.csv``. This should only be set to ``false`` if the same option was also set to ``false`` when running the original rsmtool experiment. Defaults to ``true``.

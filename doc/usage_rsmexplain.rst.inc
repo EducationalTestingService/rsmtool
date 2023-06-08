@@ -3,15 +3,9 @@
 ``rsmexplain`` - Explain non-linear models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmexplain`` command-line utility to generate explanation report for explain data using a model already trained using the ``rsmtool`` utility. This can be useful how the model decision have been impacted by each feature and weight of each feature in the final target.
+RSMTool provides the ``rsmexplain`` command-line utility to generate a report to explain the predictions made by a model trained using the ``rsmtool`` utility. These explanations contain useful information about the contribution of each feature to the final score, even if the model is non-linear or black-box in nature.
 
-``rsmexplain`` The sampling explainer is model agnostic and should, in principle, work for any type of model. RSMExplain currently only supports regressors.
-
-.. note::
-    No score is generated for responses with non-numeric values for any of the features included into the model.
-
-    If the original model specified transformations for some of the features and these transformations lead to ``NaN`` or ``Inf`` values when applied to the new data, ``rsmexplain`` will raise a warning.
-
+``rsmexplain`` uses the sampling explainer which is model agnostic and should, in principle, work for any type of model. However, ``rsmexplain`` currently only supports regressors since they are the most popular model type used for automated scoring.
 
 .. include:: tutorial_rsmexplain.rst.inc
 
