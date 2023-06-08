@@ -10,14 +10,14 @@ RSMTool provides the ``rsmexplain`` command-line utility to generate explanation
 .. note::
     No score is generated for responses with non-numeric values for any of the features included into the model.
 
-    If the original model specified transformations for some of the features and these transformations led to ``NaN`` or ``Inf`` values when applied to the new data, ``rsmexplain`` will raise a warning.
+    If the original model specified transformations for some of the features and these transformations lead to ``NaN`` or ``Inf`` values when applied to the new data, ``rsmexplain`` will raise a warning.
 
 
 .. include:: tutorial_rsmexplain.rst.inc
 
 Input
 """""
-``rsmexplain`` requires one arguments to generate predictions: the path to :ref:`a configuration file <config_file_rsmexplain>`.
+``rsmexplain`` requires only one argument to generate the explanation report: the path to :ref:`a configuration file <config_file_rsmexplain>`.
 
 Here are all the arguments to the ``rsmexplain`` command-line script.
 
@@ -54,12 +54,12 @@ Output
 
 report
 ~~~~~~
-This folder contains the final RSMExplain report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
+This folder contains the final explanation report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file).
 
 output
 ~~~~~~
-This folder contains various shap values and absolute value variants of the SHAP values, saved as ``.csv`` files. ``rsmexplain`` will also save in this folder a copy of the :ref:`configuration file <config_file_rsmexplain>`. Fields not specified in the original configuration file will be pre-populated with default values. The shap explanation object is saved as ``<Experiment_id>_explanation.pkl`` and a mapping between the position of the example in the dataset and the ID of the example is saved as ``<Experiment_id>_ids.pkl``
+This folder contains various SHAP values and their absolute value variants. ``rsmexplain`` also saves  a copy of the :ref:`configuration file <config_file_rsmexplain>` in this folder. Fields not specified in the original configuration file will be pre-populated with default values. The SHAP explanation object is saved as ``<experiment_id>_explanation.pkl`` and a mapping between the position of each explained response in the data file and its unique ID is saved in ``<experiment_id>_ids.pkl``.
 
 figure
 ~~~~~~
-This folder contains all of the figures generated as part of the various shap plots, saved as ``.svg`` files.
+This folder contains all of the figures containing the various SHAP plots, saved as ``.svg`` files.
