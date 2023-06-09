@@ -681,7 +681,6 @@ class FeaturePreprocessor:
 
         # rename the custom-named columns to default values
         for column in columns_with_custom_names:
-
             # if the column has already been renamed because it used a
             # default name, then use the updated name
             if column in columns_with_incorrect_default_names:
@@ -1164,7 +1163,6 @@ class FeaturePreprocessor:
 
         # now iterate over each feature
         for feature_name in df_feature_specs["feature"]:
-
             feature_transformation = df_feature_specs.at[feature_name, "transform"]
             feature_sign = df_feature_specs.at[feature_name, "sign"]
 
@@ -1199,7 +1197,6 @@ class FeaturePreprocessor:
             train_transformed_sd = df_train_preprocessed[feature_name].std()
 
             if standardize_features:
-
                 df_train_without_mean = df_train_preprocessed[feature_name] - train_transformed_mean
                 df_train_preprocessed[feature_name] = df_train_without_mean / train_transformed_sd
 
@@ -1905,7 +1902,6 @@ class FeaturePreprocessor:
         # Generate feature specifications now that we know what features to use
         if generate_feature_specs_automatically:
             if select_transformations:
-
                 feature_specs = feature_specs_processor.generate_specs(
                     df_train_features,
                     feature_names,
@@ -1936,7 +1932,6 @@ class FeaturePreprocessor:
             df_test_flagged_responses = df_train_flagged_responses.copy()
             df_test_human_scores = pd.DataFrame()
         else:
-
             (
                 df_test_features,
                 df_test_metadata,
@@ -2513,7 +2508,7 @@ class FeaturePreprocessor:
         missing_columns = set(columns_to_check).difference(df_input.columns)
         if missing_columns:
             raise KeyError(
-                f"Columns {missing_columns} from the config file do not " f"exist in the data."
+                f"Columns {missing_columns} from the config file do not exist in the data."
             )
 
         # rename all columns
@@ -2614,6 +2609,105 @@ class FeaturePreprocessor:
 
         return config_obj, DataContainer(datasets)
 
+    def process_data_rsmexplain(self, config_obj, data_container_obj):
+        """
+        Process data for rsmexplain experiments.
+
+        This function takes a configuration object and a container object
+        as input and returns the same types of objects as output after
+        the loading, normalizing, and preprocessing.
+
+        Parameters
+        ----------
+        config_obj : configuration_parser.Configuration
+            A configuration object.
+        data_container_obj : container.DataContainer
+            A data container object.
+
+        Returns
+        -------
+        config_obj : configuration_parser.Configuration
+            A new configuration object.
+        data_congtainer : container.DataContainer
+            A new data container object.
+
+        Raises
+        ------
+        ValueError
+            If data contains duplicate response IDs.
+        """
+        df_background_features = data_container_obj.background_features
+        df_explainable_features = data_container_obj.explainable_features
+        df_feature_info = data_container_obj.feature_info
+
+        # get the column name that holds the IDs
+        id_column = config_obj["id_column"]
+
+        # should features be standardized?
+        standardize_features = config_obj.get("standardize_features", True)
+
+        # rename the ID columns in both frames
+        df_background_preprocessed = self.rename_default_columns(
+            df_background_features,
+            [],
+            id_column,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+
+        df_explainable_preprocessed = self.rename_default_columns(
+            df_explainable_features,
+            [],
+            id_column,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+
+        # check that the default ID column in both frames contains unique values
+        if (
+            df_background_preprocessed["spkitemid"].size
+            != df_background_preprocessed["spkitemid"].unique().size
+        ):
+            raise ValueError(
+                f"The background data contains repeated response IDs in {id_column}. "
+                f"Please make sure all response IDs are unique and re-run the tool."
+            )
+        if (
+            df_explainable_preprocessed["spkitemid"].size
+            != df_explainable_preprocessed["spkitemid"].unique().size
+        ):
+            raise ValueError(
+                f"The explainable data contains repeated response IDs in {id_column}. "
+                f"Please make sure all response IDs are unique and re-run the tool."
+            )
+
+        # now pre-process all the features that go into the model
+        (df_background_preprocessed, _) = self.preprocess_new_data(
+            df_background_preprocessed, df_feature_info, standardize_features
+        )
+        (df_explainable_preprocessed, _) = self.preprocess_new_data(
+            df_explainable_preprocessed, df_feature_info, standardize_features
+        )
+
+        # set ID column as index for the background and explainable feature frames
+        # since we are going to convert these to featuresets in rsmexplain
+        df_background_preprocessed.set_index("spkitemid", inplace=True)
+        df_explainable_preprocessed.set_index("spkitemid", inplace=True)
+
+        # return the container with the pre-processed features
+        datasets = [
+            {"name": "background_features_preprocessed", "frame": df_background_preprocessed},
+            {"name": "explainable_features_preprocessed", "frame": df_explainable_preprocessed},
+        ]
+
+        return config_obj, DataContainer(datasets)
+
     def process_data(self, config_obj, data_container_obj, context="rsmtool"):
         """
         Process and setup the data for an experiment in the given context.
@@ -2646,10 +2740,12 @@ class FeaturePreprocessor:
             return self.process_data_rsmeval(config_obj, data_container_obj)
         elif context == "rsmpredict":
             return self.process_data_rsmpredict(config_obj, data_container_obj)
+        elif context == "rsmexplain":
+            return self.process_data_rsmexplain(config_obj, data_container_obj)
         else:
             raise ValueError(
                 f"The 'context' argument must be in the set: ['rsmtool', "
-                f"'rsmeval', 'rsmpredict']. You specified `{context}`."
+                f"'rsmeval', 'rsmpredict', 'rsmexplain']. You specified `{context}`."
             )
 
     def preprocess_new_data(self, df_input, df_feature_info, standardize_features=True):
@@ -2765,7 +2861,6 @@ class FeaturePreprocessor:
         df_features = df_filtered.copy()
         df_features_preprocess = df_features.copy()
         for feature_name in required_features:
-
             feature_values = df_features_preprocess[feature_name].values
 
             feature_transformation = df_feature_info.loc[feature_name]["transform"]
@@ -2817,7 +2912,6 @@ class FeaturePreprocessor:
 
             # print(standardized_features)
             if standardize_features:
-
                 # now standardize the feature values
                 df_feature_minus_mean = (
                     df_features_preprocess[feature_name] - train_transformed_mean

@@ -64,5 +64,5 @@ testset5:
 testset6:
   extends: ".runtests"
   variables:
-    TESTFILES: "tests/test_experiment_rsmxval.py"
+    TESTFILES: "tests/test_experiment_rsmxval.py tests/test_experiment_rsmexplain.py tests/test_explanation_utils.py"
   stage: "test"

@@ -8,6 +8,8 @@ Various RSMTool constants used across the codebase.
 :organization: ETS
 """
 
+import re
+
 from .models import BUILTIN_MODELS, VALID_SKLL_MODELS
 
 DEFAULTS = {
@@ -55,6 +57,11 @@ DEFAULTS = {
     "experiment_names": None,
     "folds_file": None,
     "folds": 5,
+    "sample_range": None,  # range of specific sample IDs to be explained
+    "sample_size": None,  # size of random sample to be explained
+    "background_kmeans_size": 500,  # size of k-means sample for background
+    "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
+    "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
 }
 
 LIST_FIELDS = [
@@ -234,6 +241,27 @@ CHECK_FIELDS = {
             "section_order",
         ],
     },
+    "rsmexplain": {
+        "required": [
+            "background_data",
+            "explainable_data",
+            "experiment_id",
+            "experiment_dir",
+        ],
+        "optional": [
+            "description",
+            "id_column",
+            "background_kmeans_size",
+            "num_features_to_display",
+            "sample_range",
+            "sample_size",
+            "show_auto_cohorts",
+            "standardize_features",
+            "general_sections",
+            "custom_sections",
+            "special_sections",
+        ],
+    },
 }
 
 POSSIBLE_EXTENSIONS = ["csv", "xlsx", "tsv"]
@@ -245,6 +273,7 @@ ID_FIELDS = {
     "rsmsummarize": "summary_id",
     "rsmpredict": "experiment_id",
     "rsmxval": "experiment_id",
+    "rsmexplain": "experiment_id",
 }
 
 CONFIGURATION_DOCUMENTATION_SLUGS = {
@@ -254,6 +283,7 @@ CONFIGURATION_DOCUMENTATION_SLUGS = {
     "rsmpredict": "advanced_usage.html#config-file-rsmpredict",
     "rsmsummarize": "advanced_usage.html#config-file-rsmsummarize",
     "rsmxval": "advanced_usage.html#config-file-rsmxval",
+    "rsmexplain": "advanced_usage.html#config-file-rsmexplain",
 }
 
 VALID_PARSER_SUBCOMMANDS = ["generate", "run"]
@@ -352,4 +382,23 @@ INTERACTIVE_MODE_METADATA = {
         "label": "List of column names containing subgroup variables",
         "count": "multiple",
     },
+    "background_data": {
+        "label": "Path to file to be used as background distribution ",
+        "type": "file",
+    },
+    "background_kmeans_size": {
+        "label": "size of k-means sample for background (<u>500</u>)",
+        "type": "integer",
+    },
+    "explainable_data": {"label": "Path to file to be explained ", "type": "file"},
+    "sample_range": {"label": "Range of specific row IDs to explain "},
+    "sample_size": {"label": "Size of random sample to be explained ", "type": "integer"},
+    "num_features_to_display": {
+        "label": "Number of features to be displayed in plots (<u>15</u>)",
+        "type": "integer",
+    },
+    "show_auto_cohorts": {"label": "Show auto cohorts plot (true/<u>false</u>)", "type": "boolean"},
 }
+
+# regular expression used to parse rsmexplain range values
+RSMEXPLAIN_RANGE_REGEXP = re.compile(r"^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$")

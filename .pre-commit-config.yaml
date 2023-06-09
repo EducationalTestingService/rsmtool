@@ -2,36 +2,36 @@
 # See https://pre-commit.com/hooks.html for more git_hooks
 
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
         exclude: .(tsv|csv|json)$
-    -   id: check-ast
-    -   id: debug-statements
--   repo: https://github.com/ikamensh/flynt/
-    rev: '0.77'
+      - id: check-ast
+      - id: debug-statements
+  - repo: https://github.com/ikamensh/flynt/
+    rev: '0.78'
     hooks:
-    -   id: flynt
--   repo: https://github.com/psf/black
-    rev: 22.10.0
+      - id: flynt
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
     hooks:
-    -   id: black
+      - id: black
         args: [--line-length=100]
--   repo: https://github.com/pycqa/flake8
+  - repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
-    - id: flake8
-      args: [--max-line-length=100,--per-file-ignores=tests/update_files.py:E501]
--   repo: https://github.com/pycqa/pydocstyle
-    rev: 6.2.3
+      - id: flake8
+        args: [--max-line-length=100, '--per-file-ignores=tests/update_files.py:E501']
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
     hooks:
-    -   id: pydocstyle
+      - id: pydocstyle
         additional_dependencies: ["toml"]
         exclude: 'setup.py|rsmtool/utils/__init__.py'
--   repo: https://github.com/PyCQA/isort
-    rev: 5.11.4
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
     hooks:
-    -   id: isort
+      - id: isort
         args: ["--profile", "black", "--filter-files", "--multi-line", "3", "--trailing-comma", "--use-parentheses", "--ensure-newline-before-comments"]

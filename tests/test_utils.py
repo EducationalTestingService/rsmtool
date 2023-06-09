@@ -34,7 +34,7 @@ from rsmtool.utils.commandline import (
     setup_rsmcmd_parser,
 )
 from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
-from rsmtool.utils.conversion import convert_to_float, int_to_float
+from rsmtool.utils.conversion import convert_to_float, int_to_float, parse_range
 from rsmtool.utils.cross_validation import (
     combine_fold_prediction_files,
     create_xval_files,
@@ -74,21 +74,43 @@ else:
 
 
 def test_int_to_float():
-
     eq_(int_to_float(5), 5.0)
     eq_(int_to_float("5"), "5")
     eq_(int_to_float(5.0), 5.0)
 
 
 def test_convert_to_float():
-
     eq_(convert_to_float(5), 5.0)
     eq_(convert_to_float("5"), 5.0)
     eq_(convert_to_float(5.0), 5.0)
 
 
-def test_parse_json_with_comments():
+def test_parse_range():
+    eq_(parse_range("5-10"), [5, 10])
+    eq_(parse_range("0-100"), [0, 100])
 
+
+@raises(ValueError)
+def test_parse_range_invalid_1():
+    parse_range("10")
+
+
+@raises(ValueError)
+def test_parse_range_invalid_2():
+    parse_range("10-")
+
+
+@raises(ValueError)
+def test_parse_range_invalid_3():
+    parse_range("10-1")
+
+
+@raises(ValueError)
+def test_parse_range_invalid_4():
+    parse_range("-10")
+
+
+def test_parse_json_with_comments():
     json_with_comments = """
     {{
         "key1": "{0}", {1}
@@ -110,7 +132,6 @@ def test_parse_json_with_comments():
 
 
 def test_parse_json_with_comments_no_comments():
-
     test_json_string = r"""
     {
         "advisories": {},
@@ -394,7 +415,6 @@ def test_get_output_directory_extension_error():
 
 
 def test_standardized_mean_difference():
-
     # test SMD
     expected = 1 / 4
     smd = standardized_mean_difference(8, 9, 4, 4, method="williamson")
@@ -402,7 +422,6 @@ def test_standardized_mean_difference():
 
 
 def test_standardized_mean_difference_zero_denominator_johnson():
-
     # test SMD with zero denominator
     # we pass 0 as standard deviation of population
     # and use Johnson method
@@ -412,7 +431,6 @@ def test_standardized_mean_difference_zero_denominator_johnson():
 
 
 def test_standardized_mean_difference_zero_difference():
-
     # test SMD with zero difference between groups
     expected = 0.0
     smd = standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method="williamson")
@@ -421,27 +439,23 @@ def test_standardized_mean_difference_zero_difference():
 
 @raises(ValueError)
 def test_standardized_mean_difference_fake_method():
-
     # test SMD with fake method
     standardized_mean_difference(4.2, 4.2, 1.1, 1.1, method="foobar")
 
 
 def test_standardized_mean_difference_pooled():
-
     expected = 0.8523247028586811
     smd = standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="pooled", ddof=0)
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_unpooled():
-
     expected = 1.171700198827415
     smd = standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="unpooled", ddof=0)
     eq_(smd, expected)
 
 
 def test_standardized_mean_difference_johnson():
-
     expected = 0.9782608695652175
     smd = standardized_mean_difference(
         [8, 4, 6, 3],
@@ -455,42 +469,35 @@ def test_standardized_mean_difference_johnson():
 
 @raises(ValueError)
 def test_standardized_mean_difference_johnson_error():
-
     standardized_mean_difference([8, 4, 6, 3], [9, 4, 5, 12], method="johnson", ddof=0)
 
 
 @raises(AssertionError)
 def test_difference_of_standardized_means_unequal_lengths():
-
     difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12, 17])
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_mn_but_no_sd():
-
     difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_mn=4.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_true_sd_but_no_mn():
-
     difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_true_observed_sd=1.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_mn_but_no_sd():
-
     difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_mn=4.5)
 
 
 @raises(ValueError)
 def test_difference_of_standardized_means_with_y_pred_sd_but_no_mn():
-
     difference_of_standardized_means([8, 4, 6, 3], [9, 4, 5, 12], population_y_pred_sd=1.5)
 
 
 def test_difference_of_standardized_means_with_all_values():
-
     expected = 0.7083333333333336
     y_true, y_pred = np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12])
     diff_std_means = difference_of_standardized_means(
@@ -566,7 +573,6 @@ def test_difference_of_standardized_means_zero_population_computed():
 
 
 def test_quadratic_weighted_kappa():
-
     expected_qwk = -0.09210526315789469
     computed_qwk = quadratic_weighted_kappa(np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12]))
     assert_almost_equal(computed_qwk, expected_qwk)
@@ -590,7 +596,6 @@ def test_quadratic_weighted_kappa_discrete_values_match_sklearn():
 
 @raises(AssertionError)
 def test_quadratic_weighted_kappa_error():
-
     quadratic_weighted_kappa(np.array([8, 4, 6, 3]), np.array([9, 4, 5, 12, 11]))
 
 
@@ -606,7 +611,6 @@ def test_partial_correlations_with_singular_matrix():
 
 
 def test_partial_correlations_pinv():
-
     msg = (
         "When computing partial correlations "
         "the inverse of the variance-covariance matrix "
@@ -640,7 +644,6 @@ class TestLogging:
             pass  # sometimes Azure has trouble deleting this file
 
     def test_get_file_logger(self):
-
         # create a logger based on our dummy log file
         test_logger = get_file_logger("testing", self.logpath)
 
@@ -736,7 +739,6 @@ class TestCrossValidation:
 
         # check all the per-fold files/directories
         for fold_subdir in foldsdir.iterdir():
-
             # (a) per-fold subdirectories and configuration files
             fold_num = fold_subdir.name
             fold_config = fold_subdir / "rsmtool.json"
@@ -913,7 +915,6 @@ class TestIntermediateFiles:
         return files, directory
 
     def test_get_files_as_html(self):
-
         files, directory = self.get_files()
         html_string = (
             """<li><b>Betas</b>: <a href="{}" download>csv</a></li>"""
@@ -930,7 +931,6 @@ class TestIntermediateFiles:
         eq_(html_expected, html_result)
 
     def test_get_files_as_html_replace_dict(self):
-
         files, directory = self.get_files()
         html_string = (
             """<li><b>THESE BETAS</b>: <a href="{}" download>csv</a></li>"""
@@ -951,7 +951,6 @@ class TestIntermediateFiles:
 
 class TestThumbnail:
     def get_result(self, path, id_num="1", other_path=None):
-
         if other_path is None:
             other_path = path
 
@@ -980,7 +979,6 @@ class TestThumbnail:
         return "".join(result.strip().split())
 
     def test_convert_to_html(self):
-
         # simple test of HTML thumbnail conversion
 
         path = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
@@ -992,7 +990,6 @@ class TestThumbnail:
         eq_(clean_image, clean_thumb)
 
     def test_convert_to_html_with_png(self):
-
         # simple test of HTML thumbnail conversion
         # with a PNG file instead of SVG
 
@@ -1005,7 +1002,6 @@ class TestThumbnail:
         eq_(clean_image, clean_thumb)
 
     def test_convert_to_html_with_two_images(self):
-
         # test converting two images to HTML thumbnails
 
         path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
@@ -1021,7 +1017,6 @@ class TestThumbnail:
         eq_(clean_image, clean_thumb)
 
     def test_convert_to_html_with_absolute_path(self):
-
         # test converting image to HTML with absolute path
 
         path = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
@@ -1036,14 +1031,12 @@ class TestThumbnail:
 
     @raises(FileNotFoundError)
     def test_convert_to_html_file_not_found_error(self):
-
         # test FileNotFound error properly raised
 
         path = "random/path/asftesfa/to/figure1.svg"
         get_thumbnail_as_html(path, 1)
 
     def test_convert_to_html_with_different_thumbnail(self):
-
         # test converting image to HTML with different thumbnail
 
         path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
@@ -1058,7 +1051,6 @@ class TestThumbnail:
 
     @raises(FileNotFoundError)
     def test_convert_to_html_thumbnail_not_found_error(self):
-
         # test FileNotFound error properly raised for thumbnail
 
         path1 = relpath(join(rsmtool_test_dir, "data", "figures", "figure1.svg"))
@@ -1069,7 +1061,6 @@ class TestThumbnail:
 class TestExpectedScores:
     @classmethod
     def setUpClass(cls):
-
         # create a dummy train and test feature set
         X, y = make_classification(
             n_samples=525, n_features=10, n_classes=5, n_informative=8, random_state=123
@@ -1439,7 +1430,6 @@ class TestBatchGenerateConfiguration:
     def check_generated_configuration(
         self, context, use_subgroups=False, as_string=False, suppress_warnings=False
     ):
-
         generator = ConfigurationGenerator(
             context,
             use_subgroups=use_subgroups,
@@ -1448,7 +1438,6 @@ class TestBatchGenerateConfiguration:
         )
 
         if context == "rsmtool":
-
             configdict = {
                 "experiment_id": "ENTER_VALUE_HERE",
                 "model": "ENTER_VALUE_HERE",
@@ -1489,7 +1478,6 @@ class TestBatchGenerateConfiguration:
                 ]
 
         elif context == "rsmeval":
-
             configdict = {
                 "experiment_id": "ENTER_VALUE_HERE",
                 "predictions_file": "ENTER_VALUE_HERE",
@@ -1521,7 +1509,6 @@ class TestBatchGenerateConfiguration:
                 ]
 
         elif context == "rsmcompare":
-
             configdict = {
                 "comparison_id": "ENTER_VALUE_HERE",
                 "experiment_id_old": "ENTER_VALUE_HERE",
@@ -1562,7 +1549,6 @@ class TestBatchGenerateConfiguration:
                 ]
 
         elif context == "rsmsummarize":
-
             configdict = {
                 "summary_id": "ENTER_VALUE_HERE",
                 "experiment_dirs": ["ENTER_VALUE_HERE"],
@@ -1578,12 +1564,25 @@ class TestBatchGenerateConfiguration:
             ]
 
         elif context == "rsmpredict":
-
             configdict = {
                 "experiment_id": "ENTER_VALUE_HERE",
                 "experiment_dir": "ENTER_VALUE_HERE",
                 "input_features_file": "ENTER_VALUE_HERE",
             }
+
+        elif context == "rsmexplain":
+            configdict = {
+                "experiment_id": "ENTER_VALUE_HERE",
+                "background_data": "ENTER_VALUE_HERE",
+                "explainable_data": "ENTER_VALUE_HERE",
+                "experiment_dir": "ENTER_VALUE_HERE",
+            }
+
+            section_list = [
+                "data_description",
+                "shap_values",
+                "shap_plots",
+            ]
 
         # get the generated configuration dictionary
         generated_configuration = generator.generate()
@@ -1611,15 +1610,14 @@ class TestBatchGenerateConfiguration:
             assert_dict_equal(expected_configuration_object._config, generated_configuration)
 
     def test_generate_configuration(self):
-        for (context, use_subgroups, as_string, suppress_warnings) in product(
+        for context, use_subgroups, as_string, suppress_warnings in product(
             ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize", "rsmpredict"],
             [True, False],
             [True, False],
             [True, False],
         ):
-
-            # rsmpredict and rsmsummarize do not use subgroups
-            if context in ["rsmpredict", "rsmsummarize"] and use_subgroups:
+            # rsmpredict, rsmsummarize and rsmexplain do not use subgroups
+            if context in ["rsmpredict", "rsmsummarize", "rsmexplain"] and use_subgroups:
                 continue
 
             yield (
@@ -1632,7 +1630,6 @@ class TestBatchGenerateConfiguration:
 
 
 class TestInteractiveField:
-
     # class to test the InteractiveField class; note that we
     # are mocking the prompt_toolkit functionality
     # as per unit test best practices that recommend
@@ -1708,7 +1705,7 @@ class TestInteractiveField:
             eq_(complete_style, CompleteStyle.MULTI_COLUMN)
 
     def test_choice_field(self):
-        for (user_input, final_value) in [("one", "one"), ("three", "three")]:
+        for user_input, final_value in [("one", "one"), ("three", "three")]:
             yield self.check_choice_field, user_input, final_value
 
     @raises(ValueError)
@@ -1761,7 +1758,7 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_dir_field(self):
-        for (user_input, final_value) in [("/foo/bar", "/foo/bar"), ("foo", "foo")]:
+        for user_input, final_value in [("/foo/bar", "/foo/bar"), ("foo", "foo")]:
             yield self.check_dir_field, user_input, final_value
 
     def check_file_field(self, field_type, user_input, final_value):
@@ -1861,7 +1858,7 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_format_field(self):
-        for (user_input, final_value) in [
+        for user_input, final_value in [
             ("csv", "csv"),
             ("tsv", "tsv"),
             ("xlsx", "xlsx"),
@@ -1897,7 +1894,7 @@ class TestInteractiveField:
             eq_(complete_style, None)
 
     def test_id_field(self):
-        for (user_input, final_value) in [
+        for user_input, final_value in [
             ("test", "test"),
             ("another_id", "another_id"),
         ]:
@@ -2049,7 +2046,7 @@ class TestInteractiveField:
         mock_print_formatted_text.stop()
 
     def test_multiple_count_field(self):
-        for ((user_input, final_value), num_entries, field_type) in product(
+        for (user_input, final_value), num_entries, field_type in product(
             [("test", "test"), ("test value", "test value")],
             ["0", "3"],
             ["dir", "text"],
@@ -2080,6 +2077,7 @@ class TestInteractiveField:
             "rsmpredict",
             "rsmsummarize",
             "rsmcompare",
+            "rsmexplain",
         ]:
             ALL_REQUIRED_FIELDS.update(CHECK_FIELDS[context]["required"])
         OPTIONAL_INTERACTIVE_FIELDS = [
@@ -2091,7 +2089,6 @@ class TestInteractiveField:
 
 
 class TestInteractiveGenerate:
-
     # class to test the interactive generation ; note that we
     # are mocking the prompt_toolkit functionality
     # as per unit test best practices that recommend
@@ -2116,7 +2113,6 @@ class TestInteractiveGenerate:
 
     @classmethod
     def setUpClass(cls):
-
         # define lists of mocked up values for each tool in the same order
         # that the interactive fields would have been displayed
         cls.mocked_rsmtool_interactive_values = [
@@ -2229,6 +2225,21 @@ class TestInteractiveGenerate:
             False,  # use_thumbnails
         ]
 
+        cls.mocked_rsmexplain_interactive_values = [
+            "train.csv",  # background_file
+            "test.csv",  # explanable_file
+            "testexplain",  # experiment_id
+            "/a/b",  # RSMTool experiment_dir
+            500,  # size of k-means sample for background
+            "explain test",  # description
+            "ID",  # id_column
+            15,  # Number of features to be displayed
+            None,  # Range of specific row IDs
+            None,  # Size of random sample
+            False,  # Show auto cohorts plot
+            True,  # Standardize all features
+        ]
+
     def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
         A helper method that runs `ConfigurationGenerator.interact()`
@@ -2238,7 +2249,7 @@ class TestInteractiveGenerate:
         ----------
         context : str
             Name of the tool being tested.
-            One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize"}.
+            One of {"rsmtool", "rsmeval", "rsmcompare", "rsmpredict", "rsmsummarize", "rsmexplain"}.
         subgroups : bool, optional
             Whether to include subgroup information in the generated configuration.
         with_folds_file : bool, optional
@@ -2289,8 +2300,7 @@ class TestInteractiveGenerate:
         clear_patcher.stop()
 
     def test_interactive_generate(self):
-
-        # all tools except rsmpredict and rsmsummarize
+        # all tools except rsmpredict, rsmsummarize and rsmexplain
         # explicitly support subgroups; only rsmxval supports
         # folds file
         yield self.check_tool_interact, "rsmtool", False, False
@@ -2305,6 +2315,8 @@ class TestInteractiveGenerate:
         yield self.check_tool_interact, "rsmpredict", False, False
 
         yield self.check_tool_interact, "rsmsummarize", False
+
+        yield self.check_tool_interact, "rsmexplain", False, False
 
         yield self.check_tool_interact, "rsmxval", False, False
         yield self.check_tool_interact, "rsmxval", False, True

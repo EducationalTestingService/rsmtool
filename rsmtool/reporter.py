@@ -14,16 +14,20 @@ import json
 import logging
 import os
 import sys
-from os.path import abspath, basename, dirname, join, splitext
+import warnings
+from os.path import abspath, basename, dirname, join, normpath, splitext
 
-from nbconvert.exporters import HTMLExporter
+import nbformat
+from nbconvert.exporters import HTMLExporter, NotebookExporter
 from nbconvert.exporters.templateexporter import default_filters
+from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
 from .reader import DataReader
 
 if HAS_RSMEXTRA:
+    from rsmextra.settings import special_section_list_rsmtool  # noqa
     from rsmextra.settings import (
         ordered_section_list_with_special_sections_rsmcompare,
         ordered_section_list_with_special_sections_rsmeval,
@@ -33,7 +37,6 @@ if HAS_RSMEXTRA:
         special_section_list_rsmcompare,
         special_section_list_rsmeval,
         special_section_list_rsmsummarize,
-        special_section_list_rsmtool,
     )
 
     ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
@@ -96,10 +99,13 @@ else:
         "sysinfo",
     ]
 
+    ordered_section_list_rsmexplain = ["data_description", "shap_values", "shap_plots"]
+
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
     special_section_list_rsmeval = []
     special_section_list_rsmsummarize = []
+    special_section_list_rsmexplain = []
     special_notebook_path = ""
 
 package_path = dirname(__file__)
@@ -109,7 +115,7 @@ template_path = join(notebook_path, "templates")
 javascript_path = join(notebook_path, "javascript")
 comparison_notebook_path = join(notebook_path, "comparison")
 summary_notebook_path = join(notebook_path, "summary")
-
+explanations_notebook_path = join(notebook_path, "explanations")
 
 # Define the general section list
 
@@ -137,6 +143,11 @@ general_section_list_rsmsummarize = [
     if section not in special_section_list_rsmsummarize
 ]
 
+general_section_list_rsmexplain = [
+    section
+    for section in ordered_section_list_rsmexplain
+    if section not in special_section_list_rsmexplain
+]
 
 # define a mapping from the tool name to the master
 # list for both general and special sections
@@ -146,12 +157,14 @@ master_section_dict = {
         "rsmeval": general_section_list_rsmeval,
         "rsmcompare": general_section_list_rsmcompare,
         "rsmsummarize": general_section_list_rsmsummarize,
+        "rsmexplain": general_section_list_rsmexplain,
     },
     "special": {
         "rsmtool": special_section_list_rsmtool,
         "rsmeval": special_section_list_rsmeval,
         "rsmcompare": special_section_list_rsmcompare,
         "rsmsummarize": special_section_list_rsmsummarize,
+        "rsmexplain": special_section_list_rsmexplain,
     },
 }
 
@@ -162,6 +175,7 @@ notebook_path_dict = {
         "rsmeval": notebook_path,
         "rsmcompare": comparison_notebook_path,
         "rsmsummarize": summary_notebook_path,
+        "rsmexplain": explanations_notebook_path,
     },
     "special": {
         "rsmtool": special_notebook_path,
@@ -226,23 +240,31 @@ class Reporter:
             List of paths to the input Jupyter notebook files.
         output_file : str
             Path to output Jupyter notebook file
-
-        Note
-        ----
-        Adapted from: https://stackoverflow.com/q/20454668.
         """
-        # Merging ipython notebooks basically means that we keep the
-        # metadata from the "first" notebook and then add in the cells
-        # from all the other notebooks.
-        first_notebook = notebook_files[0]
-        merged_notebook = json.loads(open(first_notebook, "r", encoding="utf-8").read())
-        for notebook in notebook_files[1:]:
-            section_cells = json.loads(open(notebook, "r", encoding="utf-8").read())["cells"]
-            merged_notebook["cells"].extend(section_cells)
+        # create a new blank notebook
+        merged_notebook = nbformat.v4.new_notebook()
 
-        # output the merged cells into a report
-        with open(output_file, "w") as outf:
-            json.dump(merged_notebook, outf, indent=1)
+        # append the cells from all of the notebooks to this notebook
+        for nbfile in notebook_files:
+            with open(nbfile, "r") as nbfh:
+                nb = nbformat.read(nbfh, as_version=4)
+
+            for cell in nb.cells:
+                merged_notebook.cells.append(cell)
+
+        # normalize the merged notebook to fix any issues with metadata
+        # especially missing or duplicate IDs in code cells which seems to
+        # happen a lot for our sections
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=MissingIDFieldWarning)
+            warnings.filterwarnings("ignore", category=DuplicateCellId)
+            _, merged_notebook = nbformat.validator.normalize(merged_notebook.dict())
+
+        # write out the merged notebook to disk
+        exporter = NotebookExporter()
+        output, _ = exporter.from_notebook_node(merged_notebook)
+        with open(output_file, "w") as outfh:
+            outfh.write(output)
 
     @staticmethod
     def check_section_names(specified_sections, section_type, context="rsmtool"):
@@ -298,7 +320,6 @@ class Reporter:
             from the list of chosen sections or vice versa.
         """
         if sorted(chosen_sections) != sorted(section_order):
-
             # check for discrepancies and create a helpful error message
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
@@ -603,6 +624,8 @@ class Reporter:
             ordered_section_list = ordered_section_list_rsmcompare
         elif context == "rsmsummarize":
             ordered_section_list = ordered_section_list_rsmsummarize
+        elif context == "rsmexplain":
+            ordered_section_list = ordered_section_list_rsmexplain
 
         # add all custom sections to the end of the default ordered list
         ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
@@ -843,9 +866,59 @@ class Reporter:
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
 
+    def create_explanation_report(self, config, csv_dir, output_dir):
+        """
+        Generate a html report for rsmexplain.
+
+        Parameters
+        ----------
+        config : configuration_parser.Configuration
+            A configuration object
+        csv_dir : str
+            The experiment output directory containing the .csv files of shap values
+        output_dir : str
+            The directory for the html report
+
+        """
+        # we define a directory for the saved figures
+        fig_dir = normpath(join(output_dir, "..", "figure"))
+
+        environ_config = {
+            "EXPERIMENT_ID": config["experiment_id"],
+            "JAVASCRIPT_PATH": javascript_path,
+            "DESCRIPTION": config["description"],
+            "EXPLANATION": config["explanation"],  # the path to the explanation object
+            "BACKGROUND_KMEANS_SIZE": config["background_kmeans_size"],
+            "IDs": config["ids"],
+            "CSV_DIR": csv_dir,  # the report loads some csv files, so we need this parameter
+            "NUM_FEATURES_TO_DISPLAY": config["num_features_to_display"],
+            "FIG_DIR": fig_dir,
+        }
+        report_name = f"{config['experiment_id']}_explain_report"
+        reportdir = abspath(join(output_dir, "..", "report"))
+
+        merged_notebook_file = join(reportdir, f"{report_name}.ipynb")
+        environ_config_file = join(reportdir, ".environ.json")
+
+        # set the report directory as an environment variable
+        os.environ["RSM_REPORT_DIR"] = reportdir
+
+        # write out hidden environment JSON file
+        with open(environ_config_file, "w") as out_environ_config:
+            json.dump(environ_config, out_environ_config)
+
+        # merge all the given sections
+        self.logger.info("Merging sections")
+        self.merge_notebooks(config["chosen_notebook_files"], merged_notebook_file)
+
+        # run the merged notebook and save the output as
+        # an HTML file in the report directory
+        self.logger.info("Exporting HTML")
+        self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
+        self.logger.info("Success")
+
 
 def main():  # noqa: D103
-
     # set up an argument parser
     parser = argparse.ArgumentParser(prog="render_notebook")
     parser.add_argument("ipynb_file", help="IPython notebook file")
