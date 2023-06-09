@@ -41,7 +41,7 @@ from .utils.conversion import parse_range
 from .utils.logging import LogFormatter
 
 
-def select_features(featureset, range_size=None):
+def select_examples(featureset, range_size=None):
     """
     Sample examples from the given featureset and return indices.
 
@@ -49,7 +49,7 @@ def select_features(featureset, range_size=None):
     ----------
     featureset: skll.data.FeatureSet
         The SKLL FeatureSet object from which we are sampling.
-    range_size: Optional[int, Tuple[int, int]]
+    range_size: Optional[Union[int, Tuple[int, int]]]
         A user defined sample size or range. If ``None``, all examples in the
         featureset are selected. If it's a size (int), that many examples are
         randomly selected. If it's a tuple, the two integers in the tuple
@@ -113,8 +113,8 @@ def mask(learner, featureset, feature_range=None):
         )
     )
 
-    # sample exampeles from the featureset
-    selected_feature_map = select_features(featureset, range_size=feature_range)
+    # sample examples from the featureset
+    selected_feature_map = select_examples(featureset, range_size=feature_range)
 
     # if the user specified a sample size or a range, use it; otherwise all
     # features will be selected
@@ -140,7 +140,7 @@ def generate_explanation(
     Parameters
     ----------
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
-        Path to the experiment configuration file either a a string
+        Path to the experiment configuration file either as a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
         with keys corresponding to fields in the configuration file. Given a
@@ -157,13 +157,11 @@ def generate_explanation(
 
     Raises
     ------
-    AssertionError
-        If the size of the background sample is < 300, to avoid inaccurate explanations.
     FileNotFoundError
         If any file contained in ``config_file_or_obj_or_dict`` cannot be located.
     ValueError
-        If range is not an integer of list of integer.
-
+        If both ``sample_range`` and ``sample_size`` are defined in the configuration
+        file.
     """
     logger = logger if logger else logging.getLogger(__name__)
 
@@ -240,7 +238,7 @@ def generate_explanation(
             f"experiments are contained in this directory: {experiment_ids}"
         )
 
-    # check that the directory contains outher required files
+    # check that the directory contains other required files
     expected_feature_file_name = f"{experiment_id}_feature.csv"
     if not exists(join(experiment_output_dir, expected_feature_file_name)):
         raise FileNotFoundError(
@@ -260,8 +258,8 @@ def generate_explanation(
         raise FileNotFoundError(f"Input file {configuration['explainable_data']} does not exist")
 
     # read the background data, explainable data, and feature info files
-    feature_info = join(experiment_output_dir, f"{experiment_id}_feature.csv")
-    file_paths = [background_data_path, explainable_data_path, feature_info]
+    feature_info_path = join(experiment_output_dir, f"{experiment_id}_feature.csv")
+    file_paths = [background_data_path, explainable_data_path, feature_info_path]
     file_names = [
         "background_features",
         "explainable_features",
@@ -272,9 +270,7 @@ def generate_explanation(
 
     # ensure that the background data is large enough for meaningful explanations
     background_data_size = len(container.background_features)
-    try:
-        assert background_data_size > 300
-    except AssertionError:
+    if background_data_size < 300:
         logger.error(
             f"The background data {background_data_path} contains only "
             f"{background_data_size} examples. It must contain at least 300 examples "
@@ -380,7 +376,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     output_dir : str
         Path to the experiment output directory.
     ids: dict
-        Dictionary mapping new row indices to original FeatureSet indices.
+        Dictionary mapping new row indices to original FeatureSet ids.
     configuration: rsmtool.configuration_parser.Configuration
         The Configuration object for rsmexplain.
     logger : logging object, optional
@@ -397,7 +393,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     # get the experiment ID
     experiment_id = configuration["experiment_id"]
 
-    # first write the explanation object to disk, in case need it later
+    # first write the explanation object to disk, in case we need it later
     explanation_path = join(csvdir, f"{experiment_id}_explanation.pkl")
     with open(explanation_path, "wb") as pickle_out:
         pickle.dump(explanation, pickle_out)

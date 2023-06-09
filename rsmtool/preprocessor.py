@@ -2669,7 +2669,7 @@ class FeaturePreprocessor:
             None,
         )
 
-        # check that the id_column in both frames contains unique values
+        # check that the default ID column in both frames contains unique values
         if (
             df_background_preprocessed["spkitemid"].size
             != df_background_preprocessed["spkitemid"].unique().size

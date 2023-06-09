@@ -8,7 +8,7 @@ from sklearn.datasets import make_classification
 from skll.data import FeatureSet, Reader
 from skll.learner import Learner
 
-from rsmtool.rsmexplain import mask, select_features
+from rsmtool.rsmexplain import mask, select_examples
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -77,22 +77,22 @@ class TestExplainUtils:
             13: 14,
             14: 15,
         }
-        assert_equal(select_features(self.test_fs), expected_output)
+        assert_equal(select_examples(self.test_fs), expected_output)
 
     def test_select_features_integer_range_size(self):
         """Test select_features with an integer range size."""
         expected_output = {5: 6, 12: 13}
-        assert_equal(select_features(self.test_fs, range_size=2), expected_output)
+        assert_equal(select_examples(self.test_fs, range_size=2), expected_output)
 
     def test_select_features_full_range_size(self):
         """Test select_features with an ierable range size."""
         expected_output = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
-        assert_equal(select_features(self.test_fs, range_size=[5, 10]), expected_output)
+        assert_equal(select_examples(self.test_fs, range_size=[5, 10]), expected_output)
 
     def test_select_features_exceed_range_size(self):
         """Test select_features with an exceed range size."""
         expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
-        assert_equal(select_features(self.test_fs, range_size=[10, 20]), expected_output)
+        assert_equal(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
 
     def test_mask_from_learner_in_memory(self):
         """Test mask with a SKLL Learner created in memory."""
