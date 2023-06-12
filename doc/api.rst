@@ -98,7 +98,7 @@ The primary method of using RSMTool is via the command-line scripts :ref:`rsmtoo
 .. autofunction:: rsmtool.run_summary
 .. autofunction:: rsmtool.compute_and_save_predictions
 .. autofunction:: rsmtool.fast_predict
-.. autofunction:: rsmtool.run_explain
+.. autofunction:: rsmtool.generate_explanation
 
 From :py:mod:`~rsmtool.analyzer` Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

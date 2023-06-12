@@ -1,5 +1,5 @@
 {
-    "description": "Explaining an linear regression model trained on all features.",
+    "description": "Explaining a linear regression model trained on all features.",
     "experiment_dir": "../rsmtool",
     "experiment_id": "ASAP2",
     "background_data": "../rsmtool/train.csv",

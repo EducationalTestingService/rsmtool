@@ -14,7 +14,7 @@ background_data
 The path to the background data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain the numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. This path can be absolute or relative to the location of the config file. It must contain at least 300 responses to ensure meaningful explanations.
 
 explain_data
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 The path to the file containing the data that we want to explain. The file should be in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. The path can be absolute or relative to the location of config file.
 
 experiment_id
@@ -27,7 +27,11 @@ The directory containing the rsmtool models we want to explain. This directory s
 
 background_kmeans_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The size of the k-means sample for background. Defaults to ``500``. A dataset is summarized with k mean samples weighted by the number of data points they each represent.
+The size of the k-means sample for background. Defaults to ``500``. A dataset is summarized with k mean samples weighted by the number of data points they each represent. We use kmeans sampling on the background data in order to speed up the explanation process. This may come at some cost in terms of accuracy. A kmeans size of 500 has proven to provide a good balance between speed and accuracy in the past. You can try to set this number higher if you have a very large or very diverse background dataset. The maximum kmeans number is equivalent to the amount of feature rows in your background data.
+
+.. warning::
+
+     The `background_kmeans_size` should be smaller than the size of the background data otherwise you may see an error like this: `ValueError: n_samples=500 should be >= n_clusters=750.`
 
 custom_sections *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +63,7 @@ If we want to explain a random sample of the responses in explain_data, we can s
 
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful to detect interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``.
+If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful to detect interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. The reason that we have this to be optional initially was because this feature can be unstable or provide misleading information if the users do not pass a large dataset for explanation. It was also sometimes a pretty wonky if it could not establish clear cohorts, because the way this works is that it tries to automatically detect possible cohorts and if there are no strong interactions the graphs just look weird.
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

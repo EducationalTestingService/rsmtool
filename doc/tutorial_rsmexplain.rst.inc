@@ -20,7 +20,7 @@ ASAP Example
 We are going to use the same example from 2012 Kaggle competition on automated essay scoring that we used for the :ref:`rsmtool tutorial <tutorial>`.
 
 Run ``rsmtool`` experiments with chosen model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``rsmexplain`` requires an existing ``rsmtool`` experiment with a trained model. For this tutorial, we will explain the model trained as part of the :ref:`rsmtool tutorial <tutorial>`.
 
 .. note::
@@ -42,12 +42,12 @@ Let's take a look at the options in our configuration file.
 - **Line 2**: We give a short description of this experiment. This will be shown in the report.
 - **Line 3**: We give the path to the directory containing the output of the original `rsmtool`` experiment. Note that this is the top-level directory that contains the ``output`` directory produced by ``rsmtool``.
 - **Line 4**: We provide the experiment_id of the rsmtool experiment used to train the model. This can usually be read off the output/<experiment_id>.model file in the rsmtool experiment output directory.
-- **Line 5**: We list the path to the data file for use as the background distribution.
-- **Line 6**: We list the path to the data file to explain.
+- **Line 5**: We provide the path to the data file that will be used as the background distribution.
+- **Line 6**: We provide the path to the data file that will be used to generate the explanations.
 - **Line 7**: This field indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
-- **Line 8**: This field indicates that we wish to explain a random sample of responses from the second data file of the given size.
+- **Line 8**: This field indicates that we wish to explain a random sample of 10 responses from the second data file..
 - **Line 9**: This field indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
-- **Line 10**: This feild indicates whether to show the [automatically generated Cohort bar plots](https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot) in the report.
+- **Line 10**: This field indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmexplain>`.
 
