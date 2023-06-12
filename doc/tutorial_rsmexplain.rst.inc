@@ -41,7 +41,7 @@ Let's take a look at the options in our configuration file.
 
 - **Line 2**: We give a short description of this experiment. This will be shown in the report.
 - **Line 3**: We give the path to the directory containing the output of the original `rsmtool`` experiment. Note that this is the top-level directory that contains the ``output`` directory produced by ``rsmtool``.
-- **Line 4**: We provide the experiment_id of the rsmtool experiment used to train the model. This can usually be read off the output/<experiment_id>.model file in the rsmtool experiment output directory.
+- **Line 4**: We provide the ``experiment_id`` of the rsmtool experiment used to train the model. This can usually be read off the ``output/<experiment_id>.model`` file in the rsmtool experiment output directory.
 - **Line 5**: We provide the path to the data file that will be used as the background distribution.
 - **Line 6**: We provide the path to the data file that will be used to generate the explanations.
 - **Line 7**: This field indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
