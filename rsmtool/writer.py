@@ -7,7 +7,7 @@ Class for writing DataContainer frames to disk.
 
 :organization: ETS
 """
-
+import wandb
 from os import makedirs
 from os.path import join
 
@@ -80,6 +80,7 @@ class DataWriter:
         reset_index=False,
         file_format="csv",
         index=False,
+        wandb_run=None,
         **kwargs,
     ):
         """
@@ -91,7 +92,7 @@ class DataWriter:
         are prefixed with the given experiment ID and suffixed with either the
         name of the data frame in the DataContainer (or dict) object, or a new
         name if ``new_names_dict`` is specified. Additionally, the indexes in
-        the  data frames are reset if so specified.
+        the data frames are reset if so specified.
 
         Parameters
         ----------
@@ -121,6 +122,11 @@ class DataWriter:
         index : bool, optional
             Whether to include the index in the output file.
             Defaults to ``False``.
+        wandb_run : wandb.Run
+            The wandb run object if wandb is enabled, None otherwise.
+            If enabled, all the output data frames will be logged to
+            this run as tables.
+            Defaults to ``None``.
 
         Raises
         ------
@@ -173,6 +179,9 @@ class DataWriter:
 
             # write out the frame to disk in the given file
             self.write_frame_to_file(df, outfile, file_format=file_format, index=index, **kwargs)
+            if wandb_run:
+                table = wandb.Table(dataframe=df)
+                wandb_run.log({dataframe_name: table})
 
     def write_feature_csv(
         self,
