@@ -11,7 +11,7 @@ Next, we describe all of the ``rsmexplain`` configuration fields in detail. Ther
 
 background_data
 ~~~~~~~~~~~~~~~
-The path to the background data feature file one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain the numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. This path can be absolute or relative to the location of config file. It must contain at least 300 responses to ensure meaningful explanations.
+The path to the background data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain the numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. This path can be absolute or relative to the location of the config file. It must contain at least 300 responses to ensure meaningful explanations.
 
 explainable_data
 ~~~~~~~~~~~~~~~~
@@ -43,7 +43,7 @@ Number of top features that should be displayed in ``rsmexplain`` plots. Default
 
 id_column *(Optional)*
 ~~~~~~~~~
-The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both background_data and explainable_data files. Note: id_column must be same in these two files.
+The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both background_data and explainable_data files. Note: id_column must be the same in these two files.
 
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~
