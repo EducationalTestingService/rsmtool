@@ -1574,7 +1574,7 @@ class TestBatchGenerateConfiguration:
             configdict = {
                 "experiment_id": "ENTER_VALUE_HERE",
                 "background_data": "ENTER_VALUE_HERE",
-                "explainable_data": "ENTER_VALUE_HERE",
+                "explain_data": "ENTER_VALUE_HERE",
                 "experiment_dir": "ENTER_VALUE_HERE",
             }
 

@@ -3,7 +3,7 @@
     "experiment_dir": "../rsmtool",
     "experiment_id": "ASAP2",
     "background_data": "../rsmtool/train.csv",
-    "explainable_data": "../rsmtool/test.csv",
+    "explain_data": "../rsmtool/test.csv",
     "id_column": "ID",
     "sample_size": 10,
     "num_features_to_display": 15,

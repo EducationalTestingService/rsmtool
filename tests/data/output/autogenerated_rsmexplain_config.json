@@ -3,7 +3,7 @@ WARNING: Automatically generated configuration files MUST be edited to add value
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmexplain
     // REQUIRED: replace "ENTER_VALUE_HERE" with the appropriate value!
     "background_data": "ENTER_VALUE_HERE",
-    "explainable_data": "ENTER_VALUE_HERE",
+    "explain_data": "ENTER_VALUE_HERE",
     "experiment_id": "ENTER_VALUE_HERE",
     "experiment_dir": "ENTER_VALUE_HERE",
     // OPTIONAL: replace default values below based on your data.

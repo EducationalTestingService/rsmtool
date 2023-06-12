@@ -13,7 +13,7 @@ background_data
 ~~~~~~~~~~~~~~~
 The path to the background data feature file in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain the numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. This path can be absolute or relative to the location of the config file. It must contain at least 300 responses to ensure meaningful explanations.
 
-explainable_data
+explain_data
 ~~~~~~~~~~~~~~~~
 The path to the file containing the data that we want to explain. The file should be in one of the :ref:`supported formats <input_file_format>`. Each row should correspond to a single response and contain numeric feature values extracted for this response. In addition, there should be a column containing a unique identifier (ID) for each response. The path can be absolute or relative to the location of config file.
 
@@ -42,20 +42,20 @@ num_features_to_display *(Optional)*
 Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to ``15``.
 
 id_column *(Optional)*
-~~~~~~~~~
-The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both background_data and explainable_data files. Note: id_column must be the same in these two files.
+~~~~~~~~~~~~~~~~~~~~~~
+The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both background_data and explain_data files. Note: id_column must be the same in these two files.
 
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a specific range of responses from the ``explainable_data``, we can specify that range here. Note that the range is specified in terms of the *location* of the responses in the ``explainable_data`` file and that the locations are zero-indexed. So, for example, to explain only the first 50 responses in the file, we should set a value of ``"0-49"`` for this option. Defaults to ``None``.
+If we want to explain a specific range of responses from the ``explain_data``, we can specify that range here. Note that the range is specified in terms of the *location* of the responses in the ``explain_data`` file and that the locations are zero-indexed. So, for example, to explain only the first 50 responses in the file, we should set a value of ``"0-49"`` for this option. Defaults to ``None``.
 
 sample_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a random sample of the responses in explainable_data, we can specify the size of that random sample here. For example, to explain a random sample of 10 responses, we would set this to 10. Defaults to None.
+If we want to explain a random sample of the responses in explain_data, we can specify the size of that random sample here. For example, to explain a random sample of 10 responses, we would set this to 10. Defaults to None.
 
 .. note ::
 
-    Only one of ``sample_range`` or ``sample_size`` must be specified. If neither is specified, explanations will be generated for the entire set of responses in ``explainable_data`` which could be very slow, depending on its size.
+    Only one of ``sample_range`` or ``sample_size`` must be specified. If neither is specified, explanations will be generated for the entire set of responses in ``explain_data`` which could be very slow, depending on its size.
 
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,4 +63,4 @@ If this option is set to ``true``, auto cohort bar plots will be displayed. Thes
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``false``, the feature values for the responses in ``background_data`` and ``explainable_data`` will *not* be standardized using the mean and standard deviation parameters from the rsmtool experiment from ``<experiment_dir>/output/<experiment_id>_feature.csv``. This should only be set to ``false`` if the same option was also set to ``false`` when running the original rsmtool experiment. Defaults to ``true``.
+If this option is set to ``false``, the feature values for the responses in ``background_data`` and ``explain_data`` will *not* be standardized using the mean and standard deviation parameters from the rsmtool experiment from ``<experiment_dir>/output/<experiment_id>_feature.csv``. This should only be set to ``false`` if the same option was also set to ``false`` when running the original rsmtool experiment. Defaults to ``true``.

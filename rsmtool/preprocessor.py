@@ -2637,7 +2637,7 @@ class FeaturePreprocessor:
             If data contains duplicate response IDs.
         """
         df_background_features = data_container_obj.background_features
-        df_explainable_features = data_container_obj.explainable_features
+        df_explain_features = data_container_obj.explain_features
         df_feature_info = data_container_obj.feature_info
 
         # get the column name that holds the IDs
@@ -2658,8 +2658,8 @@ class FeaturePreprocessor:
             None,
         )
 
-        df_explainable_preprocessed = self.rename_default_columns(
-            df_explainable_features,
+        df_explain_preprocessed = self.rename_default_columns(
+            df_explain_features,
             [],
             id_column,
             None,
@@ -2679,11 +2679,11 @@ class FeaturePreprocessor:
                 f"Please make sure all response IDs are unique and re-run the tool."
             )
         if (
-            df_explainable_preprocessed["spkitemid"].size
-            != df_explainable_preprocessed["spkitemid"].unique().size
+            df_explain_preprocessed["spkitemid"].size
+            != df_explain_preprocessed["spkitemid"].unique().size
         ):
             raise ValueError(
-                f"The explainable data contains repeated response IDs in {id_column}. "
+                f"The explain data contains repeated response IDs in {id_column}. "
                 f"Please make sure all response IDs are unique and re-run the tool."
             )
 
@@ -2691,19 +2691,19 @@ class FeaturePreprocessor:
         (df_background_preprocessed, _) = self.preprocess_new_data(
             df_background_preprocessed, df_feature_info, standardize_features
         )
-        (df_explainable_preprocessed, _) = self.preprocess_new_data(
-            df_explainable_preprocessed, df_feature_info, standardize_features
+        (df_explain_preprocessed, _) = self.preprocess_new_data(
+            df_explain_preprocessed, df_feature_info, standardize_features
         )
 
-        # set ID column as index for the background and explainable feature frames
+        # set ID column as index for the background and explain feature frames
         # since we are going to convert these to featuresets in rsmexplain
         df_background_preprocessed.set_index("spkitemid", inplace=True)
-        df_explainable_preprocessed.set_index("spkitemid", inplace=True)
+        df_explain_preprocessed.set_index("spkitemid", inplace=True)
 
         # return the container with the pre-processed features
         datasets = [
             {"name": "background_features_preprocessed", "frame": df_background_preprocessed},
-            {"name": "explainable_features_preprocessed", "frame": df_explainable_preprocessed},
+            {"name": "explain_features_preprocessed", "frame": df_explain_preprocessed},
         ]
 
         return config_obj, DataContainer(datasets)

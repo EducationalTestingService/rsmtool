@@ -249,22 +249,22 @@ def generate_explanation(
             f"generated during model training."
         )
 
-    # load the background and explainable data sets
-    (background_data_path, explainable_data_path) = DataReader.locate_files(
-        [configuration["background_data"], configuration["explainable_data"]],
+    # load the background and explain data sets
+    (background_data_path, explain_data_path) = DataReader.locate_files(
+        [configuration["background_data"], configuration["explain_data"]],
         configuration.configdir,
     )
     if not background_data_path:
         raise FileNotFoundError(f"Input file {configuration['background_data']} does not exist")
-    if not explainable_data_path:
-        raise FileNotFoundError(f"Input file {configuration['explainable_data']} does not exist")
+    if not explain_data_path:
+        raise FileNotFoundError(f"Input file {configuration['explain_data']} does not exist")
 
-    # read the background data, explainable data, and feature info files
+    # read the background data, explain data, and feature info files
     feature_info_path = join(experiment_output_dir, f"{experiment_id}_feature.csv")
-    file_paths = [background_data_path, explainable_data_path, feature_info_path]
+    file_paths = [background_data_path, explain_data_path, feature_info_path]
     file_names = [
         "background_features",
-        "explainable_features",
+        "explain_features",
         "feature_info",
     ]
     reader = DataReader(file_paths, file_names)
@@ -280,7 +280,7 @@ def generate_explanation(
         )
         sys.exit(1)
 
-    # now pre-process the background and explainable data features to match
+    # now pre-process the background and explain data features to match
     # what the model expects
     processor = FeaturePreprocessor(logger=logger)
 
@@ -288,12 +288,12 @@ def generate_explanation(
         configuration, container, context="rsmexplain"
     )
 
-    # create featuresets from pre-processed background and explainable features
+    # create featuresets from pre-processed background and explain features
     background_fs = FeatureSet.from_data_frame(
         processed_container.background_features_preprocessed, "background"
     )
-    explainable_fs = FeatureSet.from_data_frame(
-        processed_container.explainable_features_preprocessed, "explainable"
+    explain_fs = FeatureSet.from_data_frame(
+        processed_container.explain_features_preprocessed, "explain"
     )
 
     # get the SKLL learner object for the rsmtool experiment and its feature names
@@ -321,7 +321,7 @@ def generate_explanation(
         )
 
     # get the features we want to explain
-    ids, data_features = mask(learner, explainable_fs, feature_range=range_size)
+    ids, data_features = mask(learner, explain_fs, feature_range=range_size)
 
     # define a shap explainer
     explainer = shap.explainers.Sampling(
@@ -333,7 +333,7 @@ def generate_explanation(
 
     logger.info(
         f"Generating shap explanations for {len(ids)} "
-        f"examples from {configuration['explainable_data']}"
+        f"examples from {configuration['explain_data']}"
     )
     explanation = explainer(data_features)
 
