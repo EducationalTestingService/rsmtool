@@ -41,7 +41,7 @@ A brief description of the ``rsmexplain`` experiment that will be shown at the t
 
 num_features_to_display *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to ``15``.
+Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to 15.
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
