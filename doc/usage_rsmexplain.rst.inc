@@ -3,7 +3,7 @@
 ``rsmexplain`` - Explain non-linear models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-RSMTool provides the ``rsmexplain`` command-line utility to generate a report explaining the predictions made by a model trained using the ``rsmtool`` utility. These explanations contain useful information about the contribution of each feature to the final score, even if the model is non-linear or black-box in nature. The `rsmxxplain` module utilizes the `SHAP <https://shap.readthedocs.io/en/latest/index.html>_` library for the explanability.
+RSMTool provides the ``rsmexplain`` command-line utility to generate a report explaining the predictions made by a model trained using the ``rsmtool`` utility. These explanations contain useful information about the contribution of each feature to the final score, even if the model is non-linear or black-box in nature. The `rsmexplain` command-line utility uses the `SHAP library <https://shap.readthedocs.io/en/latest/index.html>`_ to compute the explanations.
 
 .. note::
 

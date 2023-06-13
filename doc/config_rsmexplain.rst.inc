@@ -27,7 +27,7 @@ The directory containing the rsmtool models we want to explain. This directory s
 
 background_kmeans_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The size of the k-means sample for background sampling. Defaults to 500. We summarize the dataset specified in `background_data` with this many k-means clusters (each sluter is weighted by the number of data points it represents) and then use the summarized data set for sampling *instead* of the original. The k-means clustering allows us to speed up the explanation process but may sacrifice some accuracy. The default value of 500 has been shown to provide a good balance between speed and accuracy in our experiments. You may use a higher value if you have a very large or very diverse background dataset and you want to ensure that it's accurately summarized.
+The size of the k-means sample for background sampling. Defaults to 500. We summarize the dataset specified in `background_data` with this many k-means clusters (each cluster is weighted by the number of data points it represents) and then use the summarized data set for sampling *instead* of the original. The k-means clustering allows us to speed up the explanation process but may sacrifice some accuracy. The default value of 500 has been shown to provide a good balance between speed and accuracy in our experiments. You may use a higher value if you have a very large or very diverse background dataset and you want to ensure that it's accurately summarized.
 
 .. warning:: ``background_kmeans_size`` *must* be smaller than the size of the original background data. If not, you may see errors like this: ``ValueError: n_samples=500 should be >= n_clusters=750.``
 

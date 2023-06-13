@@ -31,8 +31,8 @@ def float_format_func(num, prec=3, scientific=False):
         The number of decimal places to use when displaying the number.
         Defaults to 3.
     scientific: bool, optional
-        Whether to display the number in in scientific notiation if
-        the rounded version becomes "0.000".
+        Whether to display the number in scientific notiation if
+        the rounded version is "0.000".
         Defaults to ``False``.
 
     Returns:
