@@ -244,7 +244,7 @@ CHECK_FIELDS = {
     "rsmexplain": {
         "required": [
             "background_data",
-            "explainable_data",
+            "explain_data",
             "experiment_id",
             "experiment_dir",
         ],
@@ -390,7 +390,7 @@ INTERACTIVE_MODE_METADATA = {
         "label": "size of k-means sample for background (<u>500</u>)",
         "type": "integer",
     },
-    "explainable_data": {"label": "Path to file to be explained ", "type": "file"},
+    "explain_data": {"label": "Path to file to be explained ", "type": "file"},
     "sample_range": {"label": "Range of specific row IDs to explain "},
     "sample_size": {"label": "Size of random sample to be explained ", "type": "integer"},
     "num_features_to_display": {

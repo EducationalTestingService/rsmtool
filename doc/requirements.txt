@@ -1,4 +1,5 @@
-skll
 ipython
 nbconvert
+shap
+skll
 statsmodels

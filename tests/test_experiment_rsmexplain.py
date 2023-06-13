@@ -43,7 +43,7 @@ def test_run_experiment_svc_explain_with_object():
         "experiment_id": "svr_explain_object",
         "background_data": "../../files/train.csv",
         "background_kmeans_size": 50,
-        "explainable_data": "../../files/test.csv",
+        "explain_data": "../../files/test.csv",
         "id_column": "ID",
         "sample_size": 10,
         "num_features_to_display": 15,
@@ -67,7 +67,7 @@ def test_run_experiment_svc_explain_with_dictionary():
     old_file_dict = {
         "experiment_dir": "data/experiments/svr-explain-dict/existing_experiment",
         "background_data": "data/files/train.csv",
-        "explainable_data": "data/files/test.csv",
+        "explain_data": "data/files/test.csv",
     }
 
     new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
@@ -78,7 +78,7 @@ def test_run_experiment_svc_explain_with_dictionary():
         "experiment_id": "svr_explain_dict",
         "background_data": new_file_dict["background_data"],
         "background_kmeans_size": 50,
-        "explainable_data": new_file_dict["explainable_data"],
+        "explain_data": new_file_dict["explain_data"],
         "id_column": "ID",
         "sample_size": 10,
         "num_features_to_display": 15,

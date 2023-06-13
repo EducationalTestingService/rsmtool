@@ -875,7 +875,7 @@ class Reporter:
         config : configuration_parser.Configuration
             A configuration object
         csv_dir : str
-            The experiment output directory containing the .csv files of shap values
+            The experiment output directory containing CSV files with SHAP values
         output_dir : str
             The directory for the html report
 

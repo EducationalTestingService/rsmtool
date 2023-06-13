@@ -19,7 +19,7 @@ from IPython.display import HTML, display
 HTML_STRING = """<li><b>{}</b>: <a href="{}" download>{}</a></li>"""
 
 
-def float_format_func(num, prec=3):
+def float_format_func(num, prec=3, scientific=False):
     """
     Format given float to the specified precision as a string.
 
@@ -30,14 +30,21 @@ def float_format_func(num, prec=3):
     prec: int, optional
         The number of decimal places to use when displaying the number.
         Defaults to 3.
+    scientific: bool, optional
+        Whether to display the number in scientific notiation if
+        the rounded version is "0.000".
+        Defaults to ``False``.
 
     Returns:
     -------
     ans : str
         The formatted string representing the given number.
     """
-    formatter_string = Template("{:.${prec}f}").substitute(prec=prec)
-    ans = formatter_string.format(num)
+    rounded_formatter_string = Template("{:.${prec}f}").substitute(prec=prec)
+    scientific_formatter_string = Template("{:.${prec}e}").substitute(prec=prec)
+    ans = rounded_formatter_string.format(num)
+    if ans == "0.000" and scientific:
+        ans = scientific_formatter_string.format(num)
     return ans
 
 

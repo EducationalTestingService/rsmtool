@@ -1,7 +1,7 @@
 {
     // Reference: https://rsmtool.readthedocs.io/en/stable/advanced_usage.html#config-file-rsmexplain
     "background_data": "train.csv",
-    "explainable_data": "test.csv",
+    "explain_data": "test.csv",
     "experiment_id": "testexplain",
     "experiment_dir": "/a/b",
     // OPTIONAL: replace default values below based on your data.

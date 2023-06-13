@@ -219,6 +219,18 @@ def test_float_format_func_add_extra_zeros():
     assert_equal(float_format_func(x), ans)
 
 
+def test_float_format_func_add_scientific_not_apply():
+    x = 0.5
+    ans = "0.500"
+    assert_equal(float_format_func(x, scientific=True), ans)
+
+
+def test_float_format_func_add_scientific_apply():
+    x = 0.0003
+    ans = "3.000e-04"
+    assert_equal(float_format_func(x, scientific=True), ans)
+
+
 def test_int_or_float_format_func_with_integer_as_float():
     x = 3.0
     ans = "3"
@@ -1574,7 +1586,7 @@ class TestBatchGenerateConfiguration:
             configdict = {
                 "experiment_id": "ENTER_VALUE_HERE",
                 "background_data": "ENTER_VALUE_HERE",
-                "explainable_data": "ENTER_VALUE_HERE",
+                "explain_data": "ENTER_VALUE_HERE",
                 "experiment_dir": "ENTER_VALUE_HERE",
             }
 
