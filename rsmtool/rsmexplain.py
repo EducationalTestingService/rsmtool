@@ -208,7 +208,7 @@ def generate_explanation(
     if has_sample_size and has_sample_range:
         raise ValueError(
             "You must specify either 'sample_range' or 'sample_size'. "
-            "Please refer to the RSMExplain documentation for more details. "
+            "Please refer to the `rsmexplain` documentation for more details. "
         )
 
     # find the rsmtool experiment directory
@@ -373,7 +373,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     Parameters
     ----------
     explanation: shap.Explanation
-        SHAP explanation object containing shap values, data points, feature
+        SHAP explanation object containing SHAP values, data points, feature
         names and base values.
     output_dir : str
         Path to the experiment output directory.
@@ -406,7 +406,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
         pickle.dump(ids, pickle_out)
     configuration["ids"] = id_path
 
-    # create various versions of the shap values to write to disk
+    # create various versions of the SHAP values to write to disk
     csv_path = join(csvdir, f"{experiment_id}_shap_values.csv")
     shap_frame = pd.DataFrame(
         explanation.values, columns=explanation.feature_names, index=ids.values()
