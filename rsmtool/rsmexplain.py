@@ -10,6 +10,7 @@ Explain a SKLL model using SHAP explainers.
 """
 
 import glob
+import json
 import logging
 import os
 import pickle
@@ -30,7 +31,7 @@ with warnings.catch_warnings(record=False) as w:
 
 from skll.data import FeatureSet
 
-from .configuration_parser import configure
+from .configuration_parser import Configuration, configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
@@ -224,6 +225,46 @@ def generate_explanation(
                 f"The directory {experiment_dir} does not contain "
                 f"the output of an rsmtool experiment."
             )
+
+    def get_single_file_name(dir):
+        json_files = glob.glob(join(dir, "*.json"))
+        if len(json_files) == 1:
+            return json_files[0]
+
+        else:
+            raise FileNotFoundError(f"The directory {dir} should only contain one json file ")
+
+    rsmtool_config = json.load(open(join(experiment_dir, get_single_file_name(experiment_dir))))
+    rsmtool_standardize = rsmtool_config.get("standardize_features", True)
+
+    if isinstance(config_file_or_obj_or_dict, (str, Path)):
+        rsmexplain_config = json.load(
+            open(join(configuration.configdir, get_single_file_name(configuration.configdir)))
+        )
+        rsmexplain_standardize = rsmexplain_config.get("standardize_features", None)
+
+    elif isinstance(config_file_or_obj_or_dict, dict):
+        rsmexplain_standardize = config_file_or_obj_or_dict.get("standardize_features", None)
+
+    elif isinstance(config_file_or_obj_or_dict, Configuration):
+        rsmexplain_standardize = config_file_or_obj_or_dict.get("standardize_features", None)
+
+    else:
+        raise ValueError(
+            f"The input to run_experiment must be a path to the file (str), "
+            f"a dictionary, or a configuration object. You passed "
+            f"{type(config_file_or_obj_or_dict)}."
+        )
+
+    if rsmexplain_standardize is not None and rsmexplain_standardize != rsmtool_standardize:
+        raise ValueError(
+            "'standardize_features' in the rsmexplain config has to match"
+            "with the one in the rsmtool config file."
+        )
+    else:
+        standardize_features = rsmtool_standardize
+
+    configuration["standardize_features"] = standardize_features
 
     # find all the .model files in the experiment output directory
     model_files = glob.glob(join(experiment_output_dir, "*.model"))

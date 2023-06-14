@@ -1,0 +1,15 @@
+{
+    "experiment_id": "ASAP2",
+    "train_file": "../files/train.csv",
+    "test_file": "../files/test.csv",
+    "model": "SVR",
+    "description": "A model which uses all features and a SVR.",
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "use_scaled_predictions": true,
+    "trim_min": 1,
+    "trim_max": 6,
+    "id_column": "ID",
+    "second_human_score_column": "score2",
+    "length_column": "LENGTH"
+}
