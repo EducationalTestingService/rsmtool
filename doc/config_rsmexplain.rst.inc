@@ -65,4 +65,8 @@ If this option is set to ``true``, auto cohort bar plots will be displayed. Thes
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``false``, the feature values for the responses in ``background_data`` and ``explain_data`` will *not* be standardized using the mean and standard deviation parameters from the rsmtool experiment from ``<experiment_dir>/output/<experiment_id>_feature.csv``. This should only be set to ``false`` if the same option was also set to ``false`` when running the original rsmtool experiment. Defaults to ``true``.
+If this option is set to ``false``, the feature values for the responses in ``background_data`` and ``explain_data`` will *not* be standardized using the mean and standard deviation parameters for the rsmtool experiment and contained in ``<experiment_dir>/output/<experiment_id>_feature.csv``. Defaults to ``true``.
+
+.. important::
+
+    If ``experiment_dir`` contains the rsmtool configuration file, that file's value for ``standardize_features`` will override the value specified by the user. The reason is that if ``rsmtool`` trained the model with (or without) standardized features, then ``rsmexplain`` must do the same for the explanations to be meaningful.
