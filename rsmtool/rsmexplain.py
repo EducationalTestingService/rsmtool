@@ -31,7 +31,7 @@ with warnings.catch_warnings(record=False) as w:
 
 from skll.data import FeatureSet
 
-from .configuration_parser import Configuration, configure
+from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
@@ -226,46 +226,6 @@ def generate_explanation(
                 f"the output of an rsmtool experiment."
             )
 
-    def get_single_file_name(dir):
-        json_files = glob.glob(join(dir, "*.json"))
-        if len(json_files) == 1:
-            return json_files[0]
-
-        else:
-            raise FileNotFoundError(f"The directory {dir} should only contain one json file ")
-
-    rsmtool_config = json.load(open(join(experiment_dir, get_single_file_name(experiment_dir))))
-    rsmtool_standardize = rsmtool_config.get("standardize_features", True)
-
-    if isinstance(config_file_or_obj_or_dict, (str, Path)):
-        rsmexplain_config = json.load(
-            open(join(configuration.configdir, get_single_file_name(configuration.configdir)))
-        )
-        rsmexplain_standardize = rsmexplain_config.get("standardize_features", None)
-
-    elif isinstance(config_file_or_obj_or_dict, dict):
-        rsmexplain_standardize = config_file_or_obj_or_dict.get("standardize_features", None)
-
-    elif isinstance(config_file_or_obj_or_dict, Configuration):
-        rsmexplain_standardize = config_file_or_obj_or_dict.get("standardize_features", None)
-
-    else:
-        raise ValueError(
-            f"The input to run_experiment must be a path to the file (str), "
-            f"a dictionary, or a configuration object. You passed "
-            f"{type(config_file_or_obj_or_dict)}."
-        )
-
-    if rsmexplain_standardize is not None and rsmexplain_standardize != rsmtool_standardize:
-        raise ValueError(
-            "'standardize_features' in the rsmexplain config has to match"
-            "with the one in the rsmtool config file."
-        )
-    else:
-        standardize_features = rsmtool_standardize
-
-    configuration["standardize_features"] = standardize_features
-
     # find all the .model files in the experiment output directory
     model_files = glob.glob(join(experiment_output_dir, "*.model"))
     if not model_files:
@@ -281,7 +241,7 @@ def generate_explanation(
             f"experiments are contained in this directory: {experiment_ids}"
         )
 
-    # check that the directory contains other required files
+    # check that the directory contains the file with feature names and info
     expected_feature_file_name = f"{experiment_id}_feature.csv"
     if not exists(join(experiment_output_dir, expected_feature_file_name)):
         raise FileNotFoundError(
@@ -290,11 +250,43 @@ def generate_explanation(
             f"generated during model training."
         )
 
+    # read the original rsmtool configuration file, if it exists, and figure
+    # out the value of `standardize_features` that was specified when running
+    # the original rsmtool experiment
+    rsmexplain_standardize_features = configuration["standardize_features"]
+    expected_config_file_path = join(experiment_output_dir, f"{experiment_id}_rsmtool.json")
+    if exists(expected_config_file_path):
+        with open(expected_config_file_path, "r") as rsmtool_configfh:
+            rsmtool_config = json.load(rsmtool_configfh)
+            rsmtool_standardize_features = rsmtool_config["standardize_features"]
+
+        # use the original rsmtool experiment's value for `standardize_features`
+        # for rsmexplain as well; raise a warning if the values were different
+        # to begin with
+        if rsmexplain_standardize_features != rsmtool_standardize_features:
+            logger.warning(
+                f"overwriting current `standardize_features` value "
+                f"({rsmexplain_standardize_features}) to match "
+                f"value specified in original rsmtool experiment "
+                f"({rsmtool_standardize_features})."
+            )
+        configuration["standardize_features"] = rsmtool_standardize_features
+
+    # if the original experiment rsmtool does not exist, let the user know
+    else:
+        logger.warning(
+            f"cannot locate original rsmtool configuration; "
+            f"ensure that current value of "
+            f"`standardize_features` ({rsmexplain_standardize_features}) "
+            f"was the same when running rsmtool."
+        )
+
     # load the background and explain data sets
     (background_data_path, explain_data_path) = DataReader.locate_files(
         [configuration["background_data"], configuration["explain_data"]],
         configuration.configdir,
     )
+
     if not background_data_path:
         raise FileNotFoundError(f"Input file {configuration['background_data']} does not exist")
     if not explain_data_path:
