@@ -17,6 +17,7 @@ WARNING: Automatically generated configuration files MUST be edited to add value
     ],
     "id_column": "spkitemid",
     "num_features_to_display": 15,
+    "sample_ids": null,
     "sample_range": null,
     "sample_size": null,
     "show_auto_cohorts": false,

@@ -483,7 +483,8 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     notebooks_path = Path(__file__).parent / "notebooks"
     notebooks_path = notebooks_path.resolve()
     explanation_notebooks_path = notebooks_path / "explanations"
-    if configuration["show_auto_cohorts"]:
+    # auto cohort plots will be displayed with more than one example selected
+    if configuration["show_auto_cohorts"] and len(explanation.values) > 1:
         custom_report_sections.append(f"{explanation_notebooks_path}/auto_cohorts.ipynb")
 
     # define all of the chosen notebook sections
