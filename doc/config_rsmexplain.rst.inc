@@ -47,6 +47,10 @@ id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both background_data and explain_data files. Note: id_column must be the same in these two files.
 
+sample_ids *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~
+If we want to explain a specific range of responses from the ``explain_data``, we can specify the range ids here. Note that the range is specified in terms of the location of the responses in the explain_data file and that the locations are zero-indexed. So, for example, to explain only the first, third and tenth responses in the file, we should set a value of "0,2,9" for this option. Defaults to None.
+
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 If we want to explain a specific range of responses from the ``explain_data``, we can specify that range here. Note that the range is specified in terms of the *location* of the responses in the ``explain_data`` file and that the locations are zero-indexed. So, for example, to explain only the first 50 responses in the file, we should set a value of ``"0-49"`` for this option. Defaults to ``None``.
@@ -57,7 +61,7 @@ If we want to explain a random sample of the responses in explain_data, we can s
 
 .. note ::
 
-    Only one of ``sample_range`` or ``sample_size`` must be specified. If neither is specified, explanations will be generated for the entire set of responses in ``explain_data`` which could be very slow, depending on its size.
+    Only one of ``sample_ids``, ``sample_range`` or ``sample_size`` must be specified. If neither is specified, explanations will be generated for the entire set of responses in ``explain_data`` which could be very slow, depending on its size.
 
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
