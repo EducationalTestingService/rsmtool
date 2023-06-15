@@ -2,11 +2,13 @@ import os
 import tempfile
 from os import getcwd
 from os.path import join
+from unittest.mock import patch
 
+from nose.tools import eq_
 from parameterized import param, parameterized
 
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import check_run_explain, copy_data_files
+from rsmtool.test_utils import check_run_explain, copy_data_files, do_run_explain
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -86,3 +88,39 @@ def test_run_experiment_svc_explain_with_dictionary():
     }
 
     check_run_explain(source, experiment_id, config_obj_or_dict=config_dict)
+
+
+def test_run_rsmexplain_different_standardize_features_value():
+    """Check that rsmtool standardize features value overrides rsmexplain value."""
+    # set up a temporary directory since we will be using getcwd
+    temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+    old_file_dict = {
+        "experiment_dir": "data/experiments/knn-explain-std/existing_experiment",
+        "background_data": "data/files/train.csv",
+        "explain_data": "data/files/test.csv",
+    }
+
+    new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
+
+    source = "knn-explain-different-std"
+    config_dict = {
+        "description": "Explaning an KNeighborsRegressor model trained on all features.",
+        "experiment_dir": new_file_dict["experiment_dir"],
+        "experiment_id": "knn_std",
+        "background_data": new_file_dict["background_data"],
+        "background_kmeans_size": 50,
+        "explain_data": new_file_dict["explain_data"],
+        "standardize_features": False,
+        "id_column": "ID",
+        "sample_size": 10,
+        "num_features_to_display": 15,
+        "show_auto_cohorts": True,
+    }
+
+    # check `standardize_features` in the config has been overridden to `True`
+    # since that was the value in rsmtool configuration
+    with patch("rsmtool.rsmexplain.generate_report") as mock_generate_report:
+        do_run_explain(source, config_dict)
+        called_config = mock_generate_report.call_args[0][3]
+        eq_(called_config["standardize_features"], True)

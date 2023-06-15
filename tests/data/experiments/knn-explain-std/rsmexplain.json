@@ -1,10 +1,11 @@
 {
     "description": "Explaning an KNeighborsRegressor model trained on all features.",
     "experiment_dir": "existing_experiment",
-    "experiment_id": "knn",
+    "experiment_id": "knn_std",
     "background_data": "../../files/train.csv",
     "background_kmeans_size": 50,
     "explain_data": "../../files/test.csv",
+    "standardize_features": false,
     "id_column": "ID",
     "sample_size": 10,
     "num_features_to_display": 15,
