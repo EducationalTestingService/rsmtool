@@ -365,7 +365,7 @@ def generate_explanation(
     )
 
     logger.info(
-        f"Generating shap explanations for {len(ids)} "
+        f"Generating SHAP explanations for {len(ids)} "
         f"examples from {configuration['explain_data']}"
     )
     explanation = explainer(data_features)
