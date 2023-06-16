@@ -10,6 +10,7 @@ Explain a SKLL model using SHAP explainers.
 """
 
 import glob
+import json
 import logging
 import os
 import pickle
@@ -240,7 +241,7 @@ def generate_explanation(
             f"experiments are contained in this directory: {experiment_ids}"
         )
 
-    # check that the directory contains other required files
+    # check that the directory contains the file with feature names and info
     expected_feature_file_name = f"{experiment_id}_feature.csv"
     if not exists(join(experiment_output_dir, expected_feature_file_name)):
         raise FileNotFoundError(
@@ -249,11 +250,43 @@ def generate_explanation(
             f"generated during model training."
         )
 
+    # read the original rsmtool configuration file, if it exists, and figure
+    # out the value of `standardize_features` that was specified when running
+    # the original rsmtool experiment
+    rsmexplain_standardize_features = configuration["standardize_features"]
+    expected_config_file_path = join(experiment_output_dir, f"{experiment_id}_rsmtool.json")
+    if exists(expected_config_file_path):
+        with open(expected_config_file_path, "r") as rsmtool_configfh:
+            rsmtool_config = json.load(rsmtool_configfh)
+            rsmtool_standardize_features = rsmtool_config["standardize_features"]
+
+        # use the original rsmtool experiment's value for `standardize_features`
+        # for rsmexplain as well; raise a warning if the values were different
+        # to begin with
+        if rsmexplain_standardize_features != rsmtool_standardize_features:
+            logger.warning(
+                f"overwriting current `standardize_features` value "
+                f"({rsmexplain_standardize_features}) to match "
+                f"value specified in original rsmtool experiment "
+                f"({rsmtool_standardize_features})."
+            )
+        configuration["standardize_features"] = rsmtool_standardize_features
+
+    # if the original experiment rsmtool does not exist, let the user know
+    else:
+        logger.warning(
+            f"cannot locate original rsmtool configuration; "
+            f"ensure that current value of "
+            f"`standardize_features` ({rsmexplain_standardize_features}) "
+            f"was the same when running rsmtool."
+        )
+
     # load the background and explain data sets
     (background_data_path, explain_data_path) = DataReader.locate_files(
         [configuration["background_data"], configuration["explain_data"]],
         configuration.configdir,
     )
+
     if not background_data_path:
         raise FileNotFoundError(f"Input file {configuration['background_data']} does not exist")
     if not explain_data_path:
@@ -332,7 +365,7 @@ def generate_explanation(
     )
 
     logger.info(
-        f"Generating shap explanations for {len(ids)} "
+        f"Generating SHAP explanations for {len(ids)} "
         f"examples from {configuration['explain_data']}"
     )
     explanation = explainer(data_features)

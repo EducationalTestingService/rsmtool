@@ -65,7 +65,13 @@ Now that we have the ``rsmtool`` experiment, the data files, and our configurati
 This should produce output like::
 
     Output directory: /Users/nmadnani/work/rsmtool/examples/rsmexplain
-    Generating shap explanations for 355 examples from explain_features.csv
+    Saving configuration file.
+    WARNING: The following extraneous features will be ignored: {'QUESTION', 'LENGTH', 'score', 'score2', 'L1'}
+    Pre-processing input features
+    WARNING: The following extraneous features will be ignored: {'QUESTION', 'LENGTH', 'score', 'score2', 'L1'}
+    Pre-processing input features
+    Generating SHAP explanations for 10 examples from ../../files/test.csv
+    100%|███████████████████████████████████████████████████████████████████████| 10/10 [00:00<00:00, 21.99it/s]
     Merging sections
     Exporting HTML
     Success
