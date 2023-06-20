@@ -110,7 +110,7 @@ Note that in this case the variances and covariance are computed by dividing by 
 
 QWK is computed using :ref:`rsmtool.utils.quadratic_weighted_kappa<qwk_api>` with ``ddof`` set to ``0``.
 
-See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_ for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one.
+See `Haberman (2019) <https://www.sciencedirect.com/science/article/pii/S0093691X10000233>`_ for the full derivation of this formula. The discrete case is simply treated as a special case of the continuous one.
 
 .. note::
 
@@ -149,7 +149,7 @@ SMD between system and human scores is computed using :ref:`rsmtool.utils.standa
 
 .. note::
 
-	In RSMTool v6.x and earlier SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  The values computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://eric.ed.gov/?id=EJ959585>`_.  The values computed by RSMTool starting with v7.0 will be *different* from those computed by earlier versions.
 
 
 .. _mse:
@@ -179,7 +179,7 @@ Accuracy Metrics (True score)
 
 According to test theory, an observed score is a combination of the true score :math:`T` and a measurement error. The true score cannot be observed, but its distribution parameters can be estimated from observed scores. Such an estimation requires that two human scores be available for *at least a* subset of responses in the evaluation set since these are necessary to estimate the measurement error component.
 
-Evaluating system against true score produces performance estimates that are robust to errors in human scores and remain stable even when human-human agreeement varies (see `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2/>`_.
+Evaluating system against true score produces performance estimates that are robust to errors in human scores and remain stable even when human-human agreeement varies (see `Loukina et al. (2020) <https://aclanthology.org/2020.bea-1.2/>`_.
 
 The true score evaluations computed by RSMTool are available in the :ref:`intermediate file<rsmtool_true_score_eval>` ``true_score_eval``.
 
@@ -208,7 +208,7 @@ and :math:`\sigma_T^2` is estimated as:
 
    :math:`\sigma_T^2 = \sigma_{\hat{H}}^2 - \displaystyle\frac{1}{2}\sigma_{e}^2`
 
-The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of the PRMSE formula available via the :ref:`API<prmse_api>` supports cases where some of the responses have **more than two** ratings available. The formula was derived by Matt S. Johnson and is explained in more detail in `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2/>`_.
+The PRMSE formula implemented in RSMTool is more general and can also handle the case where the number of available ratings varies across the responses (e.g.  **only a subset of responses is double-scored**). While ``rsmtool`` and ``rsmeval`` only support evaluations with two raters, the implementation of the PRMSE formula available via the :ref:`API<prmse_api>` supports cases where some of the responses have **more than two** ratings available. The formula was derived by Matt S. Johnson and is explained in more detail in `Loukina et al. (2020) <https://aclanthology.org/2020.bea-1.2/>`_.
 
 In this case, the variance of rater errors is computed as a pooled variance estimator.
 
@@ -262,7 +262,7 @@ In some cases, it may be appropriate to compute variance of human errors using a
 Fairness
 ~~~~~~~~
 
-Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://www.aclweb.org/anthology/W17-1605/>`_).
+Fairness of automated scores is an important component of RSMTool evaluations (see `Madnani et al, 2017 <https://aclanthology.org/W17-1605/>`_).
 
 When defining an experiment, the RSMTool user has the option of specifying which subgroups should be considered for such evaluations using :ref:`subgroups<subgroups_rsmtool>` field. These subgroups are then used in all fairness evaluations.
 
@@ -308,7 +308,7 @@ DSM is computed using :ref:`rsmtool.utils.difference_of_standardized_means<dsm_a
 Additional fairness evaluations
 +++++++++++++++++++++++++++++++
 
-Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
+Starting with v7.0, RSMTool includes additional fairness analyses suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclanthology.org/W19-4401/>`_. The computed metrics from these analyses are available in :ref:`intermediate files<rsmtool_fairness_eval>` ``fairness_metrics_by_<SUBGROUP>``.
 
 These include:
 
@@ -372,4 +372,4 @@ Therefore, SMD between two human scores is computed using :ref:`rsmtool.utils.st
 
 .. note::
 
-	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://onlinelibrary.wiley.com/doi/full/10.1111/j.1745-3992.2011.00223.x>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.
+	In RSMTool v6.x and earlier, SMD was computed with the ``method`` argument set to ``"williamson"`` as described in `Williamson et al. (2012) <https://eric.ed.gov/?id=EJ959585>`_.  Starting with v7.0, the values computed by RSMTool will be *different* from those computed by earlier versions.

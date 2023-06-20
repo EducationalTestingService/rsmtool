@@ -398,7 +398,6 @@ def difference_of_standardized_means(
     # We only check for mean since the function requires
     # both of these to be set or both to be None
     if population_y_true_observed_mn is None:
-
         warnings.warn(warning_msg.format("y_true_observed"))
         (population_y_true_observed_sd, population_y_true_observed_mn) = (
             np.std(y_true_observed, ddof=ddof),
@@ -406,7 +405,6 @@ def difference_of_standardized_means(
         )
 
     if population_y_pred_mn is None:
-
         warnings.warn(warning_msg.format("y_pred"))
         (population_y_pred_sd, population_y_pred_mn) = (
             np.std(y_pred, ddof=ddof),
@@ -446,7 +444,8 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
 
     The formula to compute quadratic-weighted kappa for continuous values
     was developed at ETS by Shelby Haberman.
-    See `Haberman (2019) <https://onlinelibrary.wiley.com/doi/abs/10.1002/ets2.12258>`_
+    See `Haberman (2019) <https://eric.ed.gov/?q=Measures+of+Agreement+Versus
+    +Measures+of+Prediction+Accuracy&id=EJ1238497>`_
     for the full derivation. The discrete case is simply treated as a
     special case of the continuous one.
 

@@ -167,7 +167,7 @@ def get_fairness_analyses(
     df, group, system_score_column, human_score_column="sc1", base_group=None
 ):
     """
-    Compute analyses from `Loukina et al. 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
+    Compute analyses from `Loukina et al. 2019 <https://aclanthology.org/W19-4401/>`_.
 
     The function computes how much variance group membership explains in
     overall score accuracy (osa), overall score difference (osd),

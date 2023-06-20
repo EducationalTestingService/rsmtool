@@ -260,7 +260,7 @@ Evaluations based on test theory
 Additional fairness analyses
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These files contain the results of additional fairness analyses suggested in suggested in `Loukina, Madnani, & Zechner, 2019 <https://www.aclweb.org/anthology/W19-4401/>`_.
+These files contain the results of additional fairness analyses suggested in suggested in `Loukina, Madnani, & Zechner, 2019 <https://aclanthology.org/W19-4401/>`_.
 
 - ``<METRICS>_by_<SUBGROUP>.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model for estimating the variance attributed to a given subgroup membership for a given metric. The subgroups are defined by the :ref:`configuration file<subgroups_rsmtool>`. The metrics are ``osa`` (overall score accuracy), ``osd`` (overall score difference), and ``csd`` (conditional score difference).
 

@@ -192,7 +192,6 @@ def mse_true(system, human_scores, variance_errors_human=None):
         return None
 
     else:
-
         # get total number of scores for each response
         n_scores = get_n_human_scores(human_scores)
         mean_scores = np.nanmean(human_scores, axis=1)
@@ -213,7 +212,7 @@ def prmse_true(system, human_scores, variance_errors_human=None):
     PRMSE = Proportional Reduction in Mean Squared Error.
     The formula to compute PRMSE implemented in RSMTool
     was derived at ETS by Matthew S. Johnson. See
-    `Loukina et al. (2020) <https://www.aclweb.org/anthology/2020.bea-1.2.pdf>`_
+    `Loukina et al. (2020) <https://aclanthology.org/2020.bea-1.2.pdf>`_
     for further information about PRMSE.
 
     Parameters
@@ -253,7 +252,6 @@ def prmse_true(system, human_scores, variance_errors_human=None):
         return None
 
     else:
-
         variance_true = true_score_variance(human_scores, variance_errors_human)
 
         mse = mse_true(system, human_scores, variance_errors_human)
