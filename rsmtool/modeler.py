@@ -357,7 +357,8 @@ class Modeler:
         Train a "RebalancedLR" model.
 
         This model balances empirical weights by changing betas (adapted
-        from `here <https://stats.stackexchange.com/q/30876>`_).
+        from `here <https://stats.stackexchange.com/questions/30876/
+        how-to-convert-standardized-coefficients-to-unstandardized-coefficients>`_).
 
         Parameters
         ----------

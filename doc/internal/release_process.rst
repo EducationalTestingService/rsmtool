@@ -34,7 +34,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Build the PyPI source and wheel distributions using ``python setup.py sdist build`` and ``python setup.py bdist_wheel build`` respectively. Note that you should delete the ``build`` directory after running the ``sdist`` command and before running the ``bdist_wheel`` command.
 
-#. Upload the source and wheel distributions to TestPyPI using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization on TestPyPI.
+#. Upload the source and wheel distributions to TestPyPI using ``twine upload --repository testpypi dist/*``. You will need to have the ``twine`` package installed and set up your ``$HOME/.pypirc`` correctly. See details `here <https://packaging.python.org/en/latest/guides/using-testpypi/>`__. You will need to have the appropriate permissions for the ``ets`` organization on TestPyPI.
 
 #. Install the TestPyPI package as follows::
 
