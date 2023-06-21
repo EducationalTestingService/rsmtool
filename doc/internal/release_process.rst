@@ -38,7 +38,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Install the TestPyPI package as follows::
 
-    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rsmtool "pandas>=1.5" "numpy>=1.24" "matplotlib>=3.6" "jupyter_server>=2.0" "notebook-shim>=0.2.0"
+    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rsmtool
 
 #. Then run some tests from a RSMTool working copy. If the TestPyPI package works, then move on to the next step. If it doesn't, figure out why and rebuild and re-upload the package.
 
