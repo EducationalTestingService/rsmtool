@@ -60,7 +60,7 @@ Requirements
 ------------
 
 - Python >=3.8, <3.11
-- ``numpy``
+- ``numpy`` <= 1.23.5
 - ``scipy``
 - ``scikit-learn``
 - ``statsmodels``
@@ -70,6 +70,7 @@ Requirements
 - ``jupyter``
 - ``notebook``
 - ``seaborn``
+- ``shap```
 
 Contributing
 ------------
