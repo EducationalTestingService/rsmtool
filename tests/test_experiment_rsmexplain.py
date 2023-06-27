@@ -82,7 +82,7 @@ def test_run_experiment_svc_explain_with_dictionary():
         "background_kmeans_size": 50,
         "explain_data": new_file_dict["explain_data"],
         "id_column": "ID",
-        "sample_size": 10,
+        "sample_ids": "5, 10, 20",
         "num_features_to_display": 15,
         "show_auto_cohorts": True,
     }
