@@ -485,7 +485,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     explanation_notebooks_path = notebooks_path / "explanations"
 
     # check to see whether a single or multiple examples have been chosen
-    has_single_example = False if len(explanation.values) > 1 else True
+    has_single_example = len(explanation.values) <= 1
     configuration["has_single_example"] = has_single_example
 
     # auto cohort plots will be displayed with more than one example selected
