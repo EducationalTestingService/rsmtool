@@ -460,7 +460,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
         [shap_frame.abs().mean(), shap_frame.abs().max(), shap_frame.abs().min()],
         index=["abs. mean shap", "abs. max shap", "abs. min shap"],
     ).transpose()
-    df_abs.to_csv(csv_path_abs, index_label="Feature")
+    df_abs.to_csv(csv_path_abs, index_label="")
 
     # Initialize a reporter instance and add the sections:
     reporter = Reporter(logger=logger)
