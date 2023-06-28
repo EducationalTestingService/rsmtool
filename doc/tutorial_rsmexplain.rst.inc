@@ -45,7 +45,7 @@ Let's take a look at the options in our configuration file.
 - **Line 5**: We provide the path to the data file that will be used as the background distribution.
 - **Line 6**: We provide the path to the data file that will be used to generate the explanations.
 - **Line 7**: This field indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
-- **Line 8**: This field indicates that we wish to explain a random sample of 10 responses from the second data file..
+- **Line 8**: This field indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from hat file, we would use the :ref:`sample_ids <rsmexplain_sample_ids>` option instead.
 - **Line 9**: This field indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
 - **Line 10**: This field indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
 
@@ -83,4 +83,8 @@ Examine the report
 Our experiment report contains all the information we would need to explain the trained model. It includes:
 
 1. The various absolute value variants of the SHAP values.
-2. Several SHAP plots indicating how different features contribute to the predicted score. When a single response is selected, the following plots will be displayed in the report: bar plots, beeswarm plots, decision plot and water plot. If multiple responses are chosen, bar plots, beeswarm plots and heatmap plots will be displayed. Cohort plots can only be displayed when multiple responses have been chosen and ``show_auto_cohorts`` is set to ``true``.
+2. Several SHAP plots indicating how different features contribute to the predicted score. Since we chose to explain a single example in this tutorial, the following plots will be displayed in the report: `global bar plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Global-bar-plot>`__, `beeswarm plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html>`__, `decision plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/decision_plot.html>`__, and `waterfall plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/waterfall.html>`__.
+
+  .. note ::
+
+     We encourage you to re-run the tutorial by modifying the configuration file to explain multiple examples instead of a single one. You can do so either by setting :ref:`sample_size <rsmexplain_sample_size>` to a value larger than 1, by explicitly specifying multiple example indices via :ref:`sample_ids <rsmexplain_sample_ids>`, or by setting :ref:`sample_range <rsmexplain_sample_range>` to an appropriate range of example indices. For a multiple-example explanation run, the following plots will be displayed in the report: `global bar plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Global-bar-plot>`__, `beeswarm plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html>`__, and `heatmap plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/heatmap.html>`__.
