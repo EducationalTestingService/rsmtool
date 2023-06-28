@@ -484,7 +484,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     notebooks_path = notebooks_path.resolve()
     explanation_notebooks_path = notebooks_path / "explanations"
 
-    # check to see single or mulitple examples have been chosen
+    # check to see whether a single or multiple examples have been chosen
     has_single_example = False if len(explanation.values) > 1 else True
     configuration["has_single_example"] = has_single_example
 
