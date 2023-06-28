@@ -85,7 +85,7 @@ class TestExplainUtils:
         assert_equal(select_examples(self.test_fs, range_size=2), expected_output)
 
     def test_select_features_integer_exceed_range_size(self):
-        """Test select_features with an exceed integer range size."""
+        """Test select_features with range size larger than data size."""
         expected_output = {
             0: 1,
             1: 2,
@@ -111,17 +111,17 @@ class TestExplainUtils:
         assert_equal(select_examples(self.test_fs, range_size=[5, 10]), expected_output)
 
     def test_select_features_exceed_range_size(self):
-        """Test select_features with an exceed range size."""
+        """Test select_features with range size larger than data size."""
         expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
         assert_equal(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
 
     def test_select_features_range_ids_size(self):
-        """Test select_features with specified range ids."""
+        """Test select_features with specific example IDs."""
         expected_output = {5: 6, 10: 11, 12: 13}
         assert_equal(select_examples(self.test_fs, range_size=(5, 10, 12)), expected_output)
 
     def test_select_features_inordered_range_ids_size(self):
-        """Test select_features with inordered range ids."""
+        """Test select_features with unordered range ids."""
         expected_output = {
             10: 11,
             1: 2,

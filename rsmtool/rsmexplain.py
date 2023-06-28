@@ -212,7 +212,7 @@ def generate_explanation(
     has_sample_ids = configuration.get("sample_ids") is not None
     if sum([has_sample_range, has_sample_size, has_sample_ids]) > 1:
         raise ValueError(
-            "You must specify either 'sample_range', 'sample_size' or 'sample_ids'. "
+            "You must specify one of 'sample_range', 'sample_size' or 'sample_ids'. "
             "Please refer to the `rsmexplain` documentation for more details. "
         )
 
@@ -351,7 +351,7 @@ def generate_explanation(
         range_size = parse_range(configuration.get("sample_range"))
     elif has_sample_ids:
         range_size = configuration.get("sample_ids").split(",")
-        range_size = tuple([int(id) for id in range_size])
+        range_size = tuple([int(id_) for id_ in range_size])
     else:
         range_size = None
         logger.warning(
@@ -483,8 +483,13 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     notebooks_path = Path(__file__).parent / "notebooks"
     notebooks_path = notebooks_path.resolve()
     explanation_notebooks_path = notebooks_path / "explanations"
+
+    # check to see single or mulitple examples have been chosen
+    has_single_example = False if len(explanation.values) > 1 else True
+    configuration["has_single_example"] = has_single_example
+
     # auto cohort plots will be displayed with more than one example selected
-    if configuration["show_auto_cohorts"] and len(explanation.values) > 1:
+    if configuration["show_auto_cohorts"] and not has_single_example:
         custom_report_sections.append(f"{explanation_notebooks_path}/auto_cohorts.ipynb")
 
     # define all of the chosen notebook sections

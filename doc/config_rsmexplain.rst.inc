@@ -49,7 +49,7 @@ The name of the column containing the response IDs. Defaults to ``spkitemid``, i
 
 sample_ids *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a specific range of responses from the ``explain_data``, we can specify the range ids here. Note that the range is specified in terms of the location of the responses in the explain_data file and that the locations are zero-indexed. So, for example, to explain only the first, third and tenth responses in the file, we should set a value of "0,2,9" for this option. Defaults to None.
+If we want to explain a specific set of responses from the ``explain_data``, we can specify them here. Note that the ids are specified in terms of the location of the responses in the explain_data file and that the locations are zero-indexed. So, for example, to explain only the first, third and tenth responses in the file, we should set a value of "0,2,9" for this option. Defaults to ``None``.
 
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~

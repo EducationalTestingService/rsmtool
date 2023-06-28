@@ -83,4 +83,4 @@ Examine the report
 Our experiment report contains all the information we would need to explain the trained model. It includes:
 
 1. The various absolute value variants of the SHAP values.
-2. Several SHAP plots indicating how different features contribute to the predicted score.
+2. Several SHAP plots indicating how different features contribute to the predicted score. When a single response is selected, the following plots will be displayed in the report: bar plots, beeswarm plots, decision plot and water plot. If multiple responses are chosen, bar plots, beeswarm plots and heatmap plots will be displayed. Cohort plots can only be displayed when multiple responses have been chosen and ``show_auto_cohorts`` is set to ``true``.

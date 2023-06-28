@@ -5,7 +5,7 @@
     "background_data": "../rsmtool/train.csv",
     "explain_data": "../rsmtool/test.csv",
     "id_column": "ID",
-    "sample_size": 10,
+    "sample_size": 1,
     "num_features_to_display": 15,
     "show_auto_cohorts": true
 }
