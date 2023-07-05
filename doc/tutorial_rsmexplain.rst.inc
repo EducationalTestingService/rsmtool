@@ -45,7 +45,7 @@ Let's take a look at the options in our configuration file.
 - **Line 5**: We provide the path to the data file that will be used as the background distribution.
 - **Line 6**: We provide the path to the data file that will be used to generate the explanations.
 - **Line 7**: This field indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
-- **Line 8**: This field indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from hat file, we would use the :ref:`sample_ids <rsmexplain_sample_ids>` option instead.
+- **Line 8**: This field indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from that file, we would use the :ref:`sample_ids <rsmexplain_sample_ids>` option instead.
 - **Line 9**: This field indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
 - **Line 10**: This field indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
 
