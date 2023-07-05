@@ -15,6 +15,7 @@
     ],
     "id_column": "ID",
     "num_features_to_display": 15,
+    "sample_ids": null,
     "sample_range": null,
     "sample_size": null,
     "show_auto_cohorts": false,

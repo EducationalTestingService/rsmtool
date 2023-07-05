@@ -893,6 +893,7 @@ class Reporter:
             "CSV_DIR": csv_dir,  # the report loads some csv files, so we need this parameter
             "NUM_FEATURES_TO_DISPLAY": config["num_features_to_display"],
             "FIG_DIR": fig_dir,
+            "HAS_SINGLE_EXAMPLE": config["has_single_example"],
         }
         report_name = f"{config['experiment_id']}_explain_report"
         reportdir = abspath(join(output_dir, "..", "report"))

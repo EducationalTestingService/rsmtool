@@ -7,4 +7,3 @@ This section of the documentation is meant only for the project administrators, 
    :maxdepth: 4
 
    internal/release_process
-   internal/dash_instructions

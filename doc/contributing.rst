@@ -33,8 +33,6 @@ Documentation
 
 Note that the file ``doc/requirements.txt`` is meant specifically for the ReadTheDocs documentation build process and should not be used locally. To build the documentation locally, you *must* use the same conda environment created above.
 
-If you are on macOS and use the `Dash <https://kapeli.com/dash>`_ app, follow steps 1 and 2 :ref:`here <dash_docset>` to build the RSMTool Dash docset locally.
-
 Code style
 ----------
 The RSMTool codebase enforces a certain code style via pre-commit checks and this style is automatically applied to any new contributions. This code style consists of:

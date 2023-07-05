@@ -2,7 +2,7 @@ from os import environ
 from os.path import join
 
 import numpy as np
-from nose.tools import assert_equal
+from nose.tools import assert_equal, raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.datasets import make_classification
 from skll.data import FeatureSet, Reader
@@ -84,15 +84,55 @@ class TestExplainUtils:
         expected_output = {5: 6, 12: 13}
         assert_equal(select_examples(self.test_fs, range_size=2), expected_output)
 
+    def test_select_features_integer_exceed_range_size(self):
+        """Test select_features with range size larger than data size."""
+        expected_output = {
+            0: 1,
+            1: 2,
+            2: 3,
+            3: 4,
+            4: 5,
+            5: 6,
+            6: 7,
+            7: 8,
+            8: 9,
+            9: 10,
+            10: 11,
+            11: 12,
+            12: 13,
+            13: 14,
+            14: 15,
+        }
+        assert_equal(select_examples(self.test_fs, range_size=20), expected_output)
+
     def test_select_features_full_range_size(self):
-        """Test select_features with an ierable range size."""
+        """Test select_features with an iterable range size."""
         expected_output = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
         assert_equal(select_examples(self.test_fs, range_size=[5, 10]), expected_output)
 
     def test_select_features_exceed_range_size(self):
-        """Test select_features with an exceed range size."""
+        """Test select_features with range size larger than data size."""
         expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
         assert_equal(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
+
+    def test_select_features_range_ids_size(self):
+        """Test select_features with specific example IDs."""
+        expected_output = {5: 6, 10: 11, 12: 13}
+        assert_equal(select_examples(self.test_fs, range_size=(5, 10, 12)), expected_output)
+
+    def test_select_features_inordered_range_ids_size(self):
+        """Test select_features with unordered range ids."""
+        expected_output = {
+            10: 11,
+            1: 2,
+            5: 6,
+        }
+        assert_equal(select_examples(self.test_fs, range_size=(1, 5, 10)), expected_output)
+
+    @raises(IndexError)
+    def test_select_features_exceed_range_ids_size(self):
+        """Test select_features with out of boundary range ids."""
+        select_examples(self.test_fs, range_size=(1, 5, 20))
 
     def test_mask_from_learner_in_memory(self):
         """Test mask with a SKLL Learner created in memory."""
