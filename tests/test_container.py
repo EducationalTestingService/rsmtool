@@ -1,16 +1,17 @@
+import unittest
 import warnings
 
 import numpy as np
 import pandas as pd
-from nose.tools import assert_equal, assert_false, assert_not_equal, eq_, raises
 from pandas.testing import assert_frame_equal
 
 from rsmtool.container import DataContainer
 
 
-class TestBuilderDataContainer:
-    def test_copy(self):
+class TestBuilderDataContainer(unittest.TestCase):
+    """Test class for BuilderDataContainer."""
 
+    def test_copy(self):
         expected = pd.DataFrame(
             [
                 ["John", 1, 5.0],
@@ -25,21 +26,19 @@ class TestBuilderDataContainer:
         container = DataContainer([{"frame": expected, "name": "test", "path": "foo"}])
         new_container = container.copy()
 
-        assert_not_equal(id(new_container), id(container))
+        self.assertNotEqual(id(new_container), id(container))
         for name in new_container.keys():
-
             frame = new_container.get_frame(name)
             path = new_container.get_path(name)
 
             old_frame = container.get_frame(name)
             old_path = container.get_path(name)
 
-            eq_(path, old_path)
+            self.assertEqual(path, old_path)
             assert_frame_equal(frame, old_frame)
-            assert_not_equal(id(frame), id(old_frame))
+            self.assertNotEqual(id(frame), id(old_frame))
 
     def test_copy_not_deep(self):
-
         expected = pd.DataFrame(
             [
                 ["John", 1, 5.0],
@@ -54,21 +53,19 @@ class TestBuilderDataContainer:
         container = DataContainer([{"frame": expected, "name": "test", "path": "foo"}])
         new_container = container.copy(deep=False)
 
-        assert_not_equal(id(new_container), id(container))
+        self.assertNotEqual(id(new_container), id(container))
         for name in new_container.keys():
-
             frame = new_container.get_frame(name)
             path = new_container.get_path(name)
 
             old_frame = container.get_frame(name)
             old_path = container.get_path(name)
 
-            eq_(path, old_path)
+            self.assertEqual(path, old_path)
             assert_frame_equal(frame, old_frame)
-            assert_equal(id(frame), id(old_frame))
+            self.assertEqual(id(frame), id(old_frame))
 
     def test_rename(self):
-
         expected = pd.DataFrame(
             [
                 ["John", 1, 5.0],
@@ -85,7 +82,6 @@ class TestBuilderDataContainer:
         assert_frame_equal(container.flerf, expected)
 
     def test_rename_with_path(self):
-
         expected = pd.DataFrame(
             [
                 ["John", 1, 5.0],
@@ -99,25 +95,22 @@ class TestBuilderDataContainer:
 
         container = DataContainer([{"frame": expected, "name": "test", "path": "foo"}])
         container.rename("test", "flerf")
-        eq_(container.get_path("flerf"), "foo")
+        self.assertEqual(container.get_path("flerf"), "foo")
 
     def test_drop(self):
-
         container = DataContainer([{"frame": pd.DataFrame(), "name": "test"}])
         container.drop("test")
-        assert_false("test" in container)
+        self.assertFalse("test" in container)
 
-    @raises(Warning)
     def test_drop_warning(self):
-
         container = DataContainer([{"frame": pd.DataFrame(), "name": "test"}])
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("error")
-            container.drop("flab")
+        with self.assertRaises(Warning):
+            with warnings.catch_warnings():
+                warnings.filterwarnings("error")
+                container.drop("flab")
 
     def test_get_frames_by_prefix(self):
-
         container = DataContainer(
             [
                 {"frame": pd.DataFrame(), "name": "test_two"},
@@ -127,10 +120,9 @@ class TestBuilderDataContainer:
         )
 
         frames = container.get_frames(prefix="test")
-        eq_(sorted(list(frames.keys())), sorted(["test_two", "test_three"]))
+        self.assertEqual(sorted(list(frames.keys())), sorted(["test_two", "test_three"]))
 
     def test_get_frames_by_suffix(self):
-
         container = DataContainer(
             [
                 {"frame": pd.DataFrame(), "name": "include_this_one"},
@@ -140,13 +132,12 @@ class TestBuilderDataContainer:
         )
 
         frames = container.get_frames(suffix="one")
-        eq_(
+        self.assertEqual(
             sorted(list(frames.keys())),
             sorted(["include_this_one", "we_want_this_one"]),
         )
 
     def test_get_frames_both_suffix_and_prefix(self):
-
         container = DataContainer(
             [
                 {"frame": pd.DataFrame(), "name": "include_this_frame"},
@@ -157,13 +148,12 @@ class TestBuilderDataContainer:
         )
 
         frames = container.get_frames(prefix="include", suffix="frame")
-        eq_(
+        self.assertEqual(
             sorted(list(frames.keys())),
             sorted(["include_this_frame", "include_this_other_frame"]),
         )
 
     def test_get_frames_no_match(self):
-
         container = DataContainer(
             [
                 {"frame": pd.DataFrame(), "name": "include_this_one"},
@@ -173,4 +163,4 @@ class TestBuilderDataContainer:
         )
 
         frames = container.get_frames(suffix="foo")
-        eq_(frames, {})
+        self.assertEqual(frames, {})

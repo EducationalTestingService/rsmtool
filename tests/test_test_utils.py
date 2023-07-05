@@ -1,9 +1,8 @@
 import os
 import shutil
+import unittest
 from os.path import join
 from pathlib import Path
-
-from nose.tools import eq_, ok_
 
 from rsmtool.test_utils import copy_data_files
 
@@ -16,12 +15,14 @@ else:
     from rsmtool.test_utils import rsmtool_test_dir
 
 
-class TestCopyData:
-    def setUp(self):
-        self.dirs_to_remove = []
+class TestCopyData(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.dirs_to_remove = []
 
-    def tearDown(self):
-        for temp_dir in self.dirs_to_remove:
+    @classmethod
+    def tearDownClass(cls):
+        for temp_dir in cls.dirs_to_remove:
             shutil.rmtree(temp_dir)
 
     def test_copy_data_files(self):
@@ -36,9 +37,9 @@ class TestCopyData:
         self.dirs_to_remove.append("temp_test_copy_data_file")
         output_dict = copy_data_files("temp_test_copy_data_file", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
-            eq_(output_dict[file_type], expected_dict[file_type])
-            ok_(Path(output_dict[file_type]).exists())
-            ok_(Path(output_dict[file_type]).is_file())
+            self.assertEqual(output_dict[file_type], expected_dict[file_type])
+            self.assertTrue(Path(output_dict[file_type]).exists())
+            self.assertTrue(Path(output_dict[file_type]).is_file())
 
     def test_copy_data_files_directory(self):
         file_dict = {"exp_dir": "data/experiments/lr-self-compare/lr-subgroups"}
@@ -46,9 +47,9 @@ class TestCopyData:
         self.dirs_to_remove.append("temp_test_copy_dirs")
         output_dict = copy_data_files("temp_test_copy_dirs", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
-            eq_(output_dict[file_type], expected_dict[file_type])
-            ok_(Path(output_dict[file_type]).exists())
-            ok_(Path(output_dict[file_type]).is_dir())
+            self.assertEqual(output_dict[file_type], expected_dict[file_type])
+            self.assertTrue(Path(output_dict[file_type]).exists())
+            self.assertTrue(Path(output_dict[file_type]).is_dir())
 
     def test_copy_data_files_files_and_directories(self):
         file_dict = {
@@ -62,7 +63,7 @@ class TestCopyData:
         self.dirs_to_remove.append("temp_test_copy_mixed")
         output_dict = copy_data_files("temp_test_copy_mixed", file_dict, rsmtool_test_dir)
         for file_type in expected_dict:
-            eq_(output_dict[file_type], expected_dict[file_type])
-            ok_(Path(output_dict[file_type]).exists())
-        ok_(Path(output_dict["exp_dir"]).is_dir())
-        ok_(Path(output_dict["test"]).is_file())
+            self.assertEqual(output_dict[file_type], expected_dict[file_type])
+            self.assertTrue(Path(output_dict[file_type]).exists())
+        self.assertTrue(Path(output_dict["exp_dir"]).is_dir())
+        self.assertTrue(Path(output_dict["test"]).is_file())

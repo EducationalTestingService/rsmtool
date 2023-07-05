@@ -1,9 +1,9 @@
+import unittest
 import warnings
 from os.path import dirname, join
 
 import numpy as np
 import pandas as pd
-from nose.tools import assert_almost_equal, assert_equal, raises
 from pandas.testing import assert_frame_equal
 from scipy.stats import pearsonr
 
@@ -11,7 +11,9 @@ from rsmtool.comparer import Comparer
 from rsmtool.test_utils import do_run_experiment
 
 
-class TestComparer:
+class TestComparer(unittest.TestCase):
+    """Test class for Comparer tests"""
+
     def test_make_summary_stat_df(self):
         array = np.random.multivariate_normal([100, 25], [[25, 0.5], [0.5, 1]], 5000)
 
@@ -25,7 +27,6 @@ class TestComparer:
         assert np.isclose(summary.loc["B", "MEAN"], 25, rtol=0.1)
 
     def test_make_summary_stat_df_no_warning(self):
-
         df = pd.DataFrame({"A": [1, 2, np.nan], "B": [np.nan, 2, 3]})
 
         with warnings.catch_warnings():
@@ -72,17 +73,17 @@ class TestComparer:
             }
         )
         df_cors = Comparer.compute_correlations_between_versions(df_old, df_new)
-        assert_almost_equal(df_cors.at["feature1", "old_new"], -1.0)
-        assert_almost_equal(df_cors.at["feature2", "old_new"], 1.0)
-        assert_equal(
+        self.assertAlmostEqual(df_cors.at["feature1", "old_new"], -1.0)
+        self.assertAlmostEqual(df_cors.at["feature2", "old_new"], 1.0)
+        self.assertEqual(
             df_cors.at["feature1", "human_old"],
             pearsonr(df_old["feature1"], df_old["sc1"])[0],
         )
-        assert_equal(
+        self.assertEqual(
             df_cors.at["feature1", "human_new"],
             pearsonr(df_new["feature1"], df_new["sc1"])[0],
         )
-        assert_equal(df_cors.at["feature1", "N"], 3)
+        self.assertEqual(df_cors.at["feature1", "N"], 3)
 
     def test_compute_correlations_between_versions_custom_columns(self):
         df_old = pd.DataFrame(
@@ -106,19 +107,18 @@ class TestComparer:
             df_old, df_new, human_score="r1", id_column="id"
         )
 
-        assert_almost_equal(df_cors.at["feature1", "old_new"], -1.0)
-        assert_almost_equal(df_cors.at["feature2", "old_new"], 1.0)
-        assert_equal(
+        self.assertAlmostEqual(df_cors.at["feature1", "old_new"], -1.0)
+        self.assertAlmostEqual(df_cors.at["feature2", "old_new"], 1.0)
+        self.assertEqual(
             df_cors.at["feature1", "human_old"],
             pearsonr(df_old["feature1"], df_old["r1"])[0],
         )
-        assert_equal(
+        self.assertEqual(
             df_cors.at["feature1", "human_new"],
             pearsonr(df_new["feature1"], df_new["r1"])[0],
         )
-        assert_equal(df_cors.at["feature1", "N"], 3)
+        self.assertEqual(df_cors.at["feature1", "N"], 3)
 
-    @raises(ValueError)
     def test_compute_correlations_between_versions_no_matching_feature(self):
         df_old = pd.DataFrame(
             {
@@ -136,9 +136,11 @@ class TestComparer:
                 "r1": [2, 3, 4],
             }
         )
-        Comparer.compute_correlations_between_versions(
-            df_old, df_new, human_score="r1", id_column="id"
-        )
+
+        with self.assertRaises(ValueError):
+            Comparer.compute_correlations_between_versions(
+                df_old, df_new, human_score="r1", id_column="id"
+            )
 
     def test_compute_correlations_between_versions_extra_data(self):
         df_old = pd.DataFrame(
@@ -162,12 +164,11 @@ class TestComparer:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore")
             df_cors = Comparer.compute_correlations_between_versions(df_old, df_new)
-        assert_almost_equal(df_cors.at["feature1", "old_new"], -1.0)
-        assert_almost_equal(df_cors.at["feature2", "old_new"], 1.0)
-        assert_equal(df_cors.at["feature1", "N"], 3)
-        assert_equal(len(df_cors), 2)
+        self.assertAlmostEqual(df_cors.at["feature1", "old_new"], -1.0)
+        self.assertAlmostEqual(df_cors.at["feature2", "old_new"], 1.0)
+        self.assertEqual(df_cors.at["feature1", "N"], 3)
+        self.assertEqual(len(df_cors), 2)
 
-    @raises(ValueError)
     def test_compute_correlations_between_versions_no_matching_ids(self):
         df_old = pd.DataFrame(
             {
@@ -186,9 +187,10 @@ class TestComparer:
             }
         )
 
-        Comparer.compute_correlations_between_versions(
-            df_old, df_new, human_score="r1", id_column="id"
-        )
+        with self.assertRaises(ValueError):
+            Comparer.compute_correlations_between_versions(
+                df_old, df_new, human_score="r1", id_column="id"
+            )
 
     def test_load_rsmtool_output(self):
         source = "lr-subgroups-with-h2"
@@ -257,6 +259,6 @@ class TestComparer:
             "pca_scree_plot",
         ]
 
-        assert_equal(file_format, "csv")
-        assert_equal(expected_csv_keys, sorted(csvs.keys()))
-        assert_equal(expected_fig_keys, sorted(figs.keys()))
+        self.assertEqual(file_format, "csv")
+        self.assertEqual(expected_csv_keys, sorted(csvs.keys()))
+        self.assertEqual(expected_fig_keys, sorted(figs.keys()))

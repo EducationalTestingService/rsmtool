@@ -1,9 +1,9 @@
+import unittest
 import warnings
 from os.path import dirname, join
 
 import numpy as np
 import pandas as pd
-from nose.tools import assert_almost_equal, assert_equal
 from numpy.random import RandomState
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_series_equal
@@ -11,64 +11,65 @@ from pandas.testing import assert_series_equal
 from rsmtool.analyzer import Analyzer
 
 
-class TestAnalyzer:
-    def setUp(self):
+class TestAnalyzer(unittest.TestCase):
+    """Test class for Analyzer tests."""
 
-        self.prng = RandomState(133)
+    @classmethod
+    def setUpClass(cls):
+        cls.prng = RandomState(133)
 
-        self.df_features = pd.DataFrame(
+        cls.df_features = pd.DataFrame(
             {
                 "sc1": [1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
-                "f1": self.prng.normal(0, 1, 10),
-                "f2": self.prng.normal(1, 0.1, 10),
-                "f3": self.prng.normal(2, 0.1, 10),
+                "f1": cls.prng.normal(0, 1, 10),
+                "f2": cls.prng.normal(1, 0.1, 10),
+                "f3": cls.prng.normal(2, 0.1, 10),
                 "group": ["group1"] * 10,
             },
             index=range(0, 10),
         )
 
-        self.df_features_same_score = self.df_features.copy()
-        self.df_features_same_score["sc1"] = [3] * 10
+        cls.df_features_same_score = cls.df_features.copy()
+        cls.df_features_same_score["sc1"] = [3] * 10
 
-        self.df_features_with_groups = self.df_features.copy()
-        self.df_features_with_groups["group"] = ["group1"] * 5 + ["group2"] * 5
+        cls.df_features_with_groups = cls.df_features.copy()
+        cls.df_features_with_groups["group"] = ["group1"] * 5 + ["group2"] * 5
 
-        self.df_features_with_groups_and_length = self.df_features_with_groups.copy()
-        self.df_features_with_groups_and_length["length"] = self.prng.normal(50, 250, 10)
+        cls.df_features_with_groups_and_length = cls.df_features_with_groups.copy()
+        cls.df_features_with_groups_and_length["length"] = cls.prng.normal(50, 250, 10)
 
-        self.human_scores = pd.Series(self.prng.randint(1, 5, size=10))
-        self.system_scores = pd.Series(self.prng.random_sample(10) * 5)
-        self.same_human_scores = pd.Series([3] * 10)
+        cls.human_scores = pd.Series(cls.prng.randint(1, 5, size=10))
+        cls.system_scores = pd.Series(cls.prng.random_sample(10) * 5)
+        cls.same_human_scores = pd.Series([3] * 10)
 
         # get the directory containing the tests
-        self.test_dir = dirname(__file__)
+        cls.test_dir = dirname(__file__)
 
     def test_correlation_helper(self):
-
         # test that there are no nans for data frame with 10 values
         retval = Analyzer.correlation_helper(self.df_features, "sc1", "group")
-        assert_equal(retval[0].isnull().values.sum(), 0)
-        assert_equal(retval[1].isnull().values.sum(), 0)
+        self.assertEqual(retval[0].isnull().values.sum(), 0)
+        self.assertEqual(retval[1].isnull().values.sum(), 0)
 
     def test_correlation_helper_for_data_with_one_row(self):
         # this should return two data frames with nans
         retval = Analyzer.correlation_helper(self.df_features[:1], "sc1", "group")
-        assert_equal(retval[0].isnull().values.sum(), 3)
-        assert_equal(retval[1].isnull().values.sum(), 3)
+        self.assertEqual(retval[0].isnull().values.sum(), 3)
+        self.assertEqual(retval[1].isnull().values.sum(), 3)
 
     def test_correlation_helper_for_data_with_two_rows(self):
         # this should return 1/-1 for marginal correlations and nans for
         # partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:2], "sc1", "group")
-        assert_equal(abs(retval[0].values).sum(), 3)
-        assert_equal(retval[1].isnull().values.sum(), 3)
+        self.assertEqual(abs(retval[0].values).sum(), 3)
+        self.assertEqual(retval[1].isnull().values.sum(), 3)
 
     def test_correlation_helper_for_data_with_three_rows(self):
         # this should compute marginal correlations but return Nans for
         # partial correlations
         retval = Analyzer.correlation_helper(self.df_features[:3], "sc1", "group")
-        assert_equal(retval[0].isnull().values.sum(), 0)
-        assert_equal(retval[1].isnull().values.sum(), 3)
+        self.assertEqual(retval[0].isnull().values.sum(), 0)
+        self.assertEqual(retval[1].isnull().values.sum(), 3)
 
     def test_correlation_helper_for_data_with_four_rows(self):
         # this should compute marginal correlations and return a unity
@@ -76,29 +77,29 @@ class TestAnalyzer:
         # it should also raise a UserWarning
         with warnings.catch_warnings(record=True) as warning_list:
             retval = Analyzer.correlation_helper(self.df_features[:4], "sc1", "group")
-        assert_equal(retval[0].isnull().values.sum(), 0)
-        assert_almost_equal(np.abs(retval[1].values).sum(), 0.9244288637889855)
+        self.assertEqual(retval[0].isnull().values.sum(), 0)
+        self.assertAlmostEqual(np.abs(retval[1].values).sum(), 0.9244288637889855)
         assert issubclass(warning_list[-1].category, UserWarning)
 
     def test_correlation_helper_for_data_with_groups(self):
         retval = Analyzer.correlation_helper(self.df_features_with_groups, "sc1", "group")
-        assert_equal(len(retval[0]), 2)
-        assert_equal(len(retval[1]), 2)
+        self.assertEqual(len(retval[0]), 2)
+        self.assertEqual(len(retval[1]), 2)
 
     def test_correlation_helper_for_one_group_with_one_row(self):
         # this should return a data frames with nans for group with 1 row
         retval = Analyzer.correlation_helper(self.df_features_with_groups[:6], "sc1", "group")
-        assert_equal(len(retval[0]), 2)
-        assert_equal(len(retval[1]), 2)
-        assert_equal(retval[0].isnull().values.sum(), 3)
+        self.assertEqual(len(retval[0]), 2)
+        self.assertEqual(len(retval[1]), 2)
+        self.assertEqual(retval[0].isnull().values.sum(), 3)
 
     def test_correlation_helper_for_groups_and_length(self):
         retval = Analyzer.correlation_helper(
             self.df_features_with_groups_and_length, "sc1", "group", include_length=True
         )
         for df in retval:
-            assert_equal(len(df), 2)
-            assert_equal(len(df.columns), 3)
+            self.assertEqual(len(df), 2)
+            self.assertEqual(len(df.columns), 3)
 
     def test_correlation_helper_for_group_with_one_row_and_length(self):
         # this should return a data frames with nans for group with 1 row
@@ -109,8 +110,8 @@ class TestAnalyzer:
             include_length=True,
         )
         for df in retval:
-            assert_equal(len(df), 2)
-            assert_equal(len(df.columns), 3)
+            self.assertEqual(len(df), 2)
+            self.assertEqual(len(df.columns), 3)
 
     def test_that_correlation_helper_works_for_data_with_the_same_human_score(self):
         # this test should raise UserWarning because the determinant is very close to
@@ -119,8 +120,8 @@ class TestAnalyzer:
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             retval = Analyzer.correlation_helper(self.df_features_same_score, "sc1", "group")
-            assert_equal(retval[0].isnull().values.sum(), 3)
-            assert_equal(retval[1].isnull().values.sum(), 3)
+            self.assertEqual(retval[0].isnull().values.sum(), 3)
+            self.assertEqual(retval[1].isnull().values.sum(), 3)
             assert issubclass(warning_list[-1].category, UserWarning)
 
     def test_that_metrics_helper_works_for_data_with_one_row(self):
@@ -130,7 +131,7 @@ class TestAnalyzer:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.human_scores[0:1], self.system_scores[0:1])
-            assert_equal(evals.isnull().values.sum(), 5)
+            self.assertEqual(evals.isnull().values.sum(), 5)
 
     def test_that_metrics_helper_works_for_data_with_the_same_label(self):
         # There should be NaNs for correlation and SMD.
@@ -139,7 +140,7 @@ class TestAnalyzer:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             evals = Analyzer.metrics_helper(self.same_human_scores, self.system_scores)
-            assert_equal(evals.isnull().values.sum(), 2)
+            self.assertEqual(evals.isnull().values.sum(), 2)
 
     def test_metrics_helper_population_sds(self):
         df_new_features = pd.read_csv(join(self.test_dir, "data", "files", "train.csv"))
@@ -241,40 +242,40 @@ class TestAnalyzer:
             dfs.append(pd.DataFrame({i: pd.Series(range(50)) * i}))
         df = pd.concat(dfs, axis=1)
         (components, variance) = Analyzer.compute_pca(df, df.columns)
-        assert_equal(len(components.columns), 50)
-        assert_equal(len(variance.columns), 50)
+        self.assertEqual(len(components.columns), 50)
+        self.assertEqual(len(variance.columns), 50)
 
     def test_compute_disattenuated_correlations_single_human(self):
         hm_corr = pd.Series([0.9, 0.8, 0.6], index=["raw", "raw_trim", "raw_trim_round"])
         hh_corr = pd.Series([0.81], index=[""])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
-        assert_equal(len(df_dis_corr), 3)
-        assert_equal(df_dis_corr.loc["raw", "corr_disattenuated"], 1.0)
+        self.assertEqual(len(df_dis_corr), 3)
+        self.assertEqual(df_dis_corr.loc["raw", "corr_disattenuated"], 1.0)
 
     def test_compute_disattenuated_correlations_matching_human(self):
         hm_corr = pd.Series([0.9, 0.4, 0.6], index=["All data", "GROUP1", "GROUP2"])
         hh_corr = pd.Series([0.81, 0.64, 0.36], index=["All data", "GROUP1", "GROUP2"])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
-        assert_equal(len(df_dis_corr), 3)
+        self.assertEqual(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr["corr_disattenuated"], [1.0, 0.5, 1.0])
 
     def test_compute_disattenuated_correlations_single_matching_human(self):
         hm_corr = pd.Series([0.9, 0.4, 0.6], index=["All data", "GROUP1", "GROUP2"])
         hh_corr = pd.Series([0.81], index=["All data"])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
-        assert_equal(len(df_dis_corr), 3)
+        self.assertEqual(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr["corr_disattenuated"], [1.0, np.nan, np.nan])
 
     def test_compute_disattenuated_correlations_mismatched_indices(self):
         hm_corr = pd.Series([0.9, 0.6], index=["All data", "GROUP2"])
         hh_corr = pd.Series([0.81, 0.64], index=["All data", "GROUP1"])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
-        assert_equal(len(df_dis_corr), 3)
+        self.assertEqual(len(df_dis_corr), 3)
         assert_array_equal(df_dis_corr["corr_disattenuated"], [1.0, np.nan, np.nan])
 
     def test_compute_disattenuated_correlations_negative_human(self):
         hm_corr = pd.Series([0.9, 0.8], index=["All data", "GROUP1"])
         hh_corr = pd.Series([-0.03, 0.64], index=["All data", "GROUP1"])
         df_dis_corr = Analyzer.compute_disattenuated_correlations(hm_corr, hh_corr)
-        assert_equal(len(df_dis_corr), 2)
+        self.assertEqual(len(df_dis_corr), 2)
         assert_array_equal(df_dis_corr["corr_disattenuated"], [np.nan, 1.0])
