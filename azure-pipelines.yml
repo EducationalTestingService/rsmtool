@@ -42,12 +42,12 @@ jobs:
   - script: |
       CALL activate rsmdev
       echo $(pytestfiles)
-      nosetests --nologcapture --with-xunit $(pytestfiles)
+      nose2 -s tests $(pytestfiles)
     displayName: 'Run tests'
 
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
     inputs:
-      testResultsFiles: 'nosetests.xml'
+      testResultsFiles: 'junit.xml'
       testRunTitle: 'RSMTool tests'
     condition: succeededOrFailed()
