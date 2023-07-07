@@ -28,40 +28,36 @@ class TestReader(unittest.TestCase):
 
 
 class TestDataReader(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.filepaths = []
+    filepaths = []
+    df_train = pd.DataFrame(
+        {
+            "id": ["001", "002", "003"],
+            "feature1": [1, 2, 3],
+            "feature2": [4, 5, 6],
+            "gender": ["M", "F", "F"],
+            "candidate": ["123", "456", "78901"],
+        }
+    )
 
-        # Create files
-        cls.df_train = pd.DataFrame(
-            {
-                "id": ["001", "002", "003"],
-                "feature1": [1, 2, 3],
-                "feature2": [4, 5, 6],
-                "gender": ["M", "F", "F"],
-                "candidate": ["123", "456", "78901"],
-            }
-        )
+    df_test = pd.DataFrame(
+        {
+            "id": ["102", "102", "103"],
+            "feature1": [5, 3, 2],
+            "feature2": [3, 4, 3],
+            "gender": ["F", "M", "F"],
+            "candidate": ["135", "546", "781"],
+        }
+    )
 
-        cls.df_test = pd.DataFrame(
-            {
-                "id": ["102", "102", "103"],
-                "feature1": [5, 3, 2],
-                "feature2": [3, 4, 3],
-                "gender": ["F", "M", "F"],
-                "candidate": ["135", "546", "781"],
-            }
-        )
+    df_specs = pd.DataFrame(
+        {
+            "feature": ["f1", "f2", "f3"],
+            "transform": ["raw", "inv", "sqrt"],
+            "sign": ["+", "+", "-"],
+        }
+    )
 
-        cls.df_specs = pd.DataFrame(
-            {
-                "feature": ["f1", "f2", "f3"],
-                "transform": ["raw", "inv", "sqrt"],
-                "sign": ["+", "+", "-"],
-            }
-        )
-
-        cls.df_other = pd.DataFrame({"random": ["a", "b", "c"], "things": [1241, 45332, 3252]})
+    df_other = pd.DataFrame({"random": ["a", "b", "c"], "things": [1241, 45332, 3252]})
 
     @classmethod
     def tearDownClass(cls):

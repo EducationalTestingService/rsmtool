@@ -24,10 +24,6 @@ _MY_DIR = dirname(__file__)
 class TestConfigurationParser(unittest.TestCase):
     """Test class for ConfigurationParser tests."""
 
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def test_init_nonexistent_file(self):
         non_existent_file = "/x/y.json"
         with self.assertRaises(FileNotFoundError):

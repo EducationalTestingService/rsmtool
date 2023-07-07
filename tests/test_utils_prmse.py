@@ -98,6 +98,9 @@ class TestPrmseJohnsonData(unittest.TestCase):
     implementation results in the same values
     """
 
+    human_score_columns = ["h1", "h2", "h3", "h4"]
+    system_score_columns = ["system"]
+
     @classmethod
     def setUpClass(cls):
         full_matrix_file = Path(rsmtool_test_dir) / "data" / "files" / "prmse_data.csv"
@@ -106,8 +109,6 @@ class TestPrmseJohnsonData(unittest.TestCase):
         )
         cls.data_full = pd.read_csv(full_matrix_file)
         cls.data_sparse = pd.read_csv(sparse_matrix_file)
-        cls.human_score_columns = ["h1", "h2", "h3", "h4"]
-        cls.system_score_columns = ["system"]
 
     def test_variance_of_errors_full_matrix(self):
         human_scores = self.human_score_columns

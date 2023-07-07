@@ -169,7 +169,7 @@ To do this, you should now run the following:
 
     python tests/update_files.py --tests tests --outputs test_outputs
 
-This will copy over the generated outputs for the newly added tests and show you a report of the files that it added. It will also update the input files form tests for ``rsmcompare`` and ``rsmsummarize``. If run correctly, the report should *only* refer the files affected by the functionality you implemented. If you run ``nose2`` again, your newly added tests should now pass.
+This will copy over the generated outputs for the newly added tests and show you a report of the files that it added. It will also update the input files form tests for ``rsmcompare`` and ``rsmsummarize``. If run correctly, the report should *only* refer to the files affected by the functionality you implemented. If you run ``nose2`` again, your newly added tests should now pass.
 
 At this point, you should inspect all of the new test files added by the above command to make sure that the outputs are as expected. You can find these files under ``tests/data/experiments/<test>/output`` where ``<test>`` refers to the test(s) that you added.
 
@@ -181,7 +181,7 @@ The two examples below might help make this process easier to understand:
 
 .. topic:: Example 1: You made a code change to better handle an edge case that only affects one test.
 
-    #. Run ``nose2 --quiet tests *``. The affected test failed.
+    #. Run ``nose2 --quiet -s tests``. The affected test failed.
 
     #. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. You will see the total number of deleted, updated and missing files. There should be no deleted files and no missing files. Only the files for your new test should be updated. There are no warnings in the output.
 
@@ -189,7 +189,7 @@ The two examples below might help make this process easier to understand:
 
 .. topic:: Example 2: You made a code change that changes the output of many tests. For example, you renamed one of the evaluation metrics.
 
-     #. Run ``nose2 --quiet tests *``. Many tests will now fail since the output produced by the tool(s) has changed.
+     #. Run ``nose2 --quiet -s tests``. Many tests will now fail since the output produced by the tool(s) has changed.
 
      #. Run ``python tests/update_files.py --tests tests --outputs test_outputs`` to update test outputs. The files affected by your change are shown as added/deleted. You also see the following warning:
 
@@ -199,7 +199,7 @@ The two examples below might help make this process easier to understand:
 
      #. This means that the changes you made to the code changed the outputs for one or more ``rsmtool``/``rsmeval`` tests that served as inputs to one or more ``rsmcompare``/``rsmsummarize`` tests. Therefore, it is likely that the current test outputs no longer match the expected output and the tests for those two tools must be be re-run.
 
-     #. Run ``nose2 --quiet tests *rsmsummarize*.`` and ``nose2 --quiet tests *rsmcompare*.``. If you see any failures, make sure they are related to the changes you made since those are expected.
+     #. Run ``nose2 --quiet -s tests $(find tests -name 'test_*rsmsummarize*.py' | cut -d'/' -f2 | sed 's/.py//')`` and ``nose2 --quiet -s tests $(find tests -name 'test_*rsmcompare*.py' | cut -d'/' -f2 | sed 's/.py//')``. If you see any failures, make sure they are related to the changes you made since those are expected.
 
      #. Next, re-run ``python tests/update_files.py --tests tests --outputs test_outputs`` which should only update the outputs for the ``rsmcompare``/``rsmsummarize`` tests.
 
@@ -211,12 +211,12 @@ Advanced tips and tricks
 
 Here are some advanced tips and tricks when working with RSMTool tests.
 
-#. To run a specific test function in a specific test file, simply use ``nose2 --quiet tests test_X.Y.Z`` where ``test_X`` is the name of the test file, and ``Y`` is the ``unittest.TestCase`` subclass. ``Z`` is the test function. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other parameters in the ``params``` and run the ``test_run_experiment_parameterized()`` function as above.
+#. To run a specific test function in a specific test file, simply use ``nose2 --quiet tests test_X.Y.Z`` where ``test_X`` is the name of the test file, ``Y`` is the enclosing ``unittest.TestCase`` subclass, and ``Z`` is the desired test function. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other parameters in the ``params``` and run the ``test_run_experiment_parameterized()`` function as above.
 
 #. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and then update the *expected* test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
 
 #. In the rare case that you *do* need to create an entirely new ``tests/test_experiment_X.py`` file instead of using one of the existing ones, you can choose whether to exclude the tests contained in this file from updating their expected outputs when ``update_files.py`` is run by setting ``_AUTO_UPDATE=False`` at the top of the file. This should *only* be necessary if you are absolutely sure that your tests will never need updating.
 
-#. The ``--pdb-errors`` and ``--pdb-failures`` options for ``nose2`` are your friends. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nose2`` command with the appropriate option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``--pdb-errors`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
+#. The ``--debugger/-D`` option for ``nose2`` is your friend. If you encounter test errors or test failures where the cause may not be immediately clear, re-run the ``nose2`` command with this option. Doing so will drop you into an interactive PDB session as soon as a error (or failure) is encountered and then you inspect the variables at that point (or use "u" and "d" to go up and down the call stack). This may be particularly useful for tests in ``tests/test_cli.py`` that use ``subprocess.run()``. If these tests are erroring out, use ``-D`` and inspect the "stderr" variable in the resulting PDB session to see what the error is.
 
-#. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nose2 --quiet tests``).
+#. In RSMTool 8.0.1 and later, the tests will pass even if any of the reports contain warnings. To catch any warnings that may appear in the reports, run the tests in strict mode (``STRICT=1 nose2 --quiet -s tests``).

@@ -586,11 +586,8 @@ class TestUtils(unittest.TestCase):
 
 
 class TestLogging(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # create a log file with a random name
-        logname = str(uuid4())
-        cls.logpath = Path(rsmtool_test_dir) / f"{logname}.log"
+    logname = str(uuid4())
+    logpath = Path(rsmtool_test_dir) / f"{logname}.log"
 
     @classmethod
     def tearDownClass(cls):
@@ -1379,9 +1376,7 @@ class TestSetupRsmCmdParser(unittest.TestCase):
 
 
 class TestBatchGenerateConfiguration(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.expected_json_dir = join(rsmtool_test_dir, "data", "output")
+    expected_json_dir = join(rsmtool_test_dir, "data", "output")
 
     # a helper method to check that the automatically generated configuration
     # matches what we expect for each tool
@@ -2071,134 +2066,132 @@ class TestInteractiveGenerate(unittest.TestCase):
     # subprocess calls which is what `test_cli.py` uses for the `run`
     # subcommand and the non-interactive `generate` subcommand.
 
-    @classmethod
-    def setUpClass(cls):
-        # define lists of mocked up values for each tool in the same order
-        # that the interactive fields would have been displayed
-        cls.mocked_rsmtool_interactive_values = [
-            "testtool",  # experiment_id
-            "Lasso",  # model
-            "train.csv",  # train_file
-            "test.csv",  # test_file
-            "an rsmtool test",  # description
-            False,  # exclude_zero_scores
-            "csv",  # file_format
-            "ID",  # id_column
-            None,  # length_column
-            "score2",  # second_human_score_column
-            False,  # standardize_features
-            ["L1", "QUESTION"],  # subgroups
-            "score",  # test_label_column
-            "score",  # train_label_column
-            1,  # trim_min
-            5,  # trim_max,
-            True,  # use_scaled_predictions
-            False,  # use_thumbnails
-        ]
+    # define lists of mocked up values for each tool in the same order
+    # that the interactive fields would have been displayed
+    mocked_rsmtool_interactive_values = [
+        "testtool",  # experiment_id
+        "Lasso",  # model
+        "train.csv",  # train_file
+        "test.csv",  # test_file
+        "an rsmtool test",  # description
+        False,  # exclude_zero_scores
+        "csv",  # file_format
+        "ID",  # id_column
+        None,  # length_column
+        "score2",  # second_human_score_column
+        False,  # standardize_features
+        ["L1", "QUESTION"],  # subgroups
+        "score",  # test_label_column
+        "score",  # train_label_column
+        1,  # trim_min
+        5,  # trim_max,
+        True,  # use_scaled_predictions
+        False,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmeval_interactive_values = [
-            "testeval",  # experiment_id
-            "preds.csv",  # predictions_file
-            "pred",  # system_score_column
-            1,  # trim_min
-            6,  # trim_max
-            "an rsmeval test",  # description
-            True,  # exclude_zeros
-            "xlsx",  # file_format
-            "score",  # human_score_column
-            "ID",  # id_column
-            "score2",  # second_human_score_column
-            ["L1"],  # subgroups
-            True,  # use_thumbnails
-        ]
+    mocked_rsmeval_interactive_values = [
+        "testeval",  # experiment_id
+        "preds.csv",  # predictions_file
+        "pred",  # system_score_column
+        1,  # trim_min
+        6,  # trim_max
+        "an rsmeval test",  # description
+        True,  # exclude_zeros
+        "xlsx",  # file_format
+        "score",  # human_score_column
+        "ID",  # id_column
+        "score2",  # second_human_score_column
+        ["L1"],  # subgroups
+        True,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmcompare_interactive_values = [
-            "testcompare",  # comparison_id
-            "rsmtool1",  # experiment_id_old
-            "/a/b/c",  # experiment_dir_old
-            "rsmtool2",  # experiment_id_new
-            "/d/e",  # experiment_dir_new
-            "rsmtool expt 1",  # description_old
-            "rsmtool expt 2",  # description_new
-            [],  # subgroups
-            True,  # use_thumbnails
-        ]
+    mocked_rsmcompare_interactive_values = [
+        "testcompare",  # comparison_id
+        "rsmtool1",  # experiment_id_old
+        "/a/b/c",  # experiment_dir_old
+        "rsmtool2",  # experiment_id_new
+        "/d/e",  # experiment_dir_new
+        "rsmtool expt 1",  # description_old
+        "rsmtool expt 2",  # description_new
+        [],  # subgroups
+        True,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmpredict_interactive_values = [
-            "testpred",  # experiment_id
-            "/a/b",  # experiment_dir_new
-            "features.csv",  # input_features_file
-            "csv",  # file_format
-            "score",  # human_score_column
-            "spkitemid",  # id_column
-            None,  # second_human_score_column
-            True,  # standardize_features
-        ]
+    mocked_rsmpredict_interactive_values = [
+        "testpred",  # experiment_id
+        "/a/b",  # experiment_dir_new
+        "features.csv",  # input_features_file
+        "csv",  # file_format
+        "score",  # human_score_column
+        "spkitemid",  # id_column
+        None,  # second_human_score_column
+        True,  # standardize_features
+    ]
 
-        cls.mocked_rsmsummarize_interactive_values = [
-            "testsumm",  # summary_id
-            ["/a/b", "/d", "/e/f/g"],  # experiment_dirs
-            "summary test",  # description
-            "tsv",  # file_format
-            True,  # use_thumbnails
-        ]
+    mocked_rsmsummarize_interactive_values = [
+        "testsumm",  # summary_id
+        ["/a/b", "/d", "/e/f/g"],  # experiment_dirs
+        "summary test",  # description
+        "tsv",  # file_format
+        True,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmxval_interactive_values = [
-            "testxval",  # experiment_id
-            "LinearSVC",  # model
-            "train.csv",  # train_file
-            "xval test",  # description
-            True,  # exclude_zero_scores
-            "xlsx",  # file_format
-            3,  # folds
-            None,  # folds file
-            "ID",  # id_column
-            "length",  # length_column
-            "score2",  # second_human_score_column
-            True,  # standardize_features
-            ["L1", "QUESTION"],  # subgroups
-            "score",  # train_label_column
-            1,  # trim_min
-            5,  # trim_max,
-            True,  # use_scaled_predictions
-            False,  # use_thumbnails
-        ]
+    mocked_rsmxval_interactive_values = [
+        "testxval",  # experiment_id
+        "LinearSVC",  # model
+        "train.csv",  # train_file
+        "xval test",  # description
+        True,  # exclude_zero_scores
+        "xlsx",  # file_format
+        3,  # folds
+        None,  # folds file
+        "ID",  # id_column
+        "length",  # length_column
+        "score2",  # second_human_score_column
+        True,  # standardize_features
+        ["L1", "QUESTION"],  # subgroups
+        "score",  # train_label_column
+        1,  # trim_min
+        5,  # trim_max,
+        True,  # use_scaled_predictions
+        False,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmxval_interactive_values_folds_file = [
-            "testxval",  # experiment_id
-            "LinearSVC",  # model
-            "train.csv",  # train_file
-            "xval test",  # description
-            True,  # exclude_zero_scores
-            "xlsx",  # file_format
-            5,  # default folds
-            "folds.csv",  # folds file
-            "ID",  # id_column
-            "length",  # length_column
-            "score2",  # second_human_score_column
-            True,  # standardize_features
-            ["L1"],  # subgroups
-            "score",  # train_label_column
-            1,  # trim_min
-            5,  # trim_max,
-            True,  # use_scaled_predictions
-            False,  # use_thumbnails
-        ]
+    mocked_rsmxval_interactive_values_folds_file = [
+        "testxval",  # experiment_id
+        "LinearSVC",  # model
+        "train.csv",  # train_file
+        "xval test",  # description
+        True,  # exclude_zero_scores
+        "xlsx",  # file_format
+        5,  # default folds
+        "folds.csv",  # folds file
+        "ID",  # id_column
+        "length",  # length_column
+        "score2",  # second_human_score_column
+        True,  # standardize_features
+        ["L1"],  # subgroups
+        "score",  # train_label_column
+        1,  # trim_min
+        5,  # trim_max,
+        True,  # use_scaled_predictions
+        False,  # use_thumbnails
+    ]
 
-        cls.mocked_rsmexplain_interactive_values = [
-            "train.csv",  # background_file
-            "test.csv",  # explanable_file
-            "testexplain",  # experiment_id
-            "/a/b",  # RSMTool experiment_dir
-            500,  # size of k-means sample for background
-            "explain test",  # description
-            "ID",  # id_column
-            15,  # Number of features to be displayed
-            None,  # Range of specific row IDs
-            None,  # Size of random sample
-            False,  # Show auto cohorts plot
-            True,  # Standardize all features
-        ]
+    mocked_rsmexplain_interactive_values = [
+        "train.csv",  # background_file
+        "test.csv",  # explanable_file
+        "testexplain",  # experiment_id
+        "/a/b",  # RSMTool experiment_dir
+        500,  # size of k-means sample for background
+        "explain test",  # description
+        "ID",  # id_column
+        15,  # Number of features to be displayed
+        None,  # Range of specific row IDs
+        None,  # Size of random sample
+        False,  # Show auto cohorts plot
+        True,  # Standardize all features
+    ]
 
     def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """

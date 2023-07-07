@@ -16,9 +16,7 @@ else:
 
 
 class TestCopyData(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.dirs_to_remove = []
+    dirs_to_remove = []
 
     @classmethod
     def tearDownClass(cls):
