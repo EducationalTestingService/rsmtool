@@ -5,13 +5,13 @@ ipython
 jupyter
 nose2
 notebook
-numpy<1.24
+numpy
 openpyxl
 pandas
 parameterized
 pre-commit
 seaborn
-shap==0.41.0
+shap==0.42.0
 skll==3.2.0
 sphinx<6.0
 sphinx_rtd_theme
