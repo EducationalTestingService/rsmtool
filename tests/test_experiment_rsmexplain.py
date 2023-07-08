@@ -30,7 +30,7 @@ class TestExperimentRsmexplain(unittest.TestCase):
             kwargs["given_test_dir"] = TEST_DIR
         check_run_explain(**kwargs)
 
-    def test_run_experiment_svc_explain_with_object(self):
+    def test_run_experiment_svr_explain_with_object(self):
         """Test rsmexplain using a Configuration object, rather than a file."""
         source = "svr-explain-object"
         experiment_id = "svr_explain_object"
@@ -54,7 +54,7 @@ class TestExperimentRsmexplain(unittest.TestCase):
 
         check_run_explain(source, experiment_id, config_obj_or_dict=config_obj)
 
-    def test_run_experiment_svc_explain_with_dictionary(self):
+    def test_run_experiment_svr_explain_with_dictionary(self):
         """Test rsmexplain using the dictionary object, rather than a file."""
         source = "svr-explain-dict"
         experiment_id = "svr_explain_dict"
