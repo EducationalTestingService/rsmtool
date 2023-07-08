@@ -33,7 +33,7 @@ requirements:
     - ipython
     - nose
     - notebook
-    - numpy<1.24
+    - numpy
     - openpyxl
     - pandas
     - seaborn
@@ -42,7 +42,7 @@ requirements:
     - tqdm
     - xlrd
     - xlwt
-    - shap==0.41.0
+    - shap==0.42.0
 
 test:
   # Python imports
