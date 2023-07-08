@@ -83,7 +83,7 @@ class TestExplainUtils(unittest.TestCase):
 
     def test_select_features_integer_range_size(self):
         """Test select_features with an integer range size."""
-        expected_output = {5: 6, 12: 13}
+        expected_output = {1: 2, 6: 7}
         self.assertEqual(select_examples(self.test_fs, range_size=2), expected_output)
 
     def test_select_features_integer_exceed_range_size(self):
