@@ -1,8 +1,8 @@
+import unittest
 from os import environ
 from os.path import join
 
 import numpy as np
-from nose.tools import assert_equal, raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.datasets import make_classification
 from skll.data import FeatureSet, Reader
@@ -19,7 +19,9 @@ else:
     from rsmtool.test_utils import rsmtool_test_dir
 
 
-class TestExplainUtils:
+class TestExplainUtils(unittest.TestCase):
+    """Test class for Explain Utilis tests."""
+
     @classmethod
     def setUpClass(cls):
         # create a dummy train and test feature set
@@ -77,12 +79,12 @@ class TestExplainUtils:
             13: 14,
             14: 15,
         }
-        assert_equal(select_examples(self.test_fs), expected_output)
+        self.assertEqual(select_examples(self.test_fs), expected_output)
 
     def test_select_features_integer_range_size(self):
         """Test select_features with an integer range size."""
         expected_output = {5: 6, 12: 13}
-        assert_equal(select_examples(self.test_fs, range_size=2), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=2), expected_output)
 
     def test_select_features_integer_exceed_range_size(self):
         """Test select_features with range size larger than data size."""
@@ -103,22 +105,22 @@ class TestExplainUtils:
             13: 14,
             14: 15,
         }
-        assert_equal(select_examples(self.test_fs, range_size=20), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=20), expected_output)
 
     def test_select_features_full_range_size(self):
         """Test select_features with an iterable range size."""
         expected_output = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
-        assert_equal(select_examples(self.test_fs, range_size=[5, 10]), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=[5, 10]), expected_output)
 
     def test_select_features_exceed_range_size(self):
         """Test select_features with range size larger than data size."""
         expected_output = {10: 11, 11: 12, 12: 13, 13: 14, 14: 15}
-        assert_equal(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=[10, 20]), expected_output)
 
     def test_select_features_range_ids_size(self):
         """Test select_features with specific example IDs."""
         expected_output = {5: 6, 10: 11, 12: 13}
-        assert_equal(select_examples(self.test_fs, range_size=(5, 10, 12)), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=(5, 10, 12)), expected_output)
 
     def test_select_features_inordered_range_ids_size(self):
         """Test select_features with unordered range ids."""
@@ -127,12 +129,12 @@ class TestExplainUtils:
             1: 2,
             5: 6,
         }
-        assert_equal(select_examples(self.test_fs, range_size=(1, 5, 10)), expected_output)
+        self.assertEqual(select_examples(self.test_fs, range_size=(1, 5, 10)), expected_output)
 
-    @raises(IndexError)
     def test_select_features_exceed_range_ids_size(self):
         """Test select_features with out of boundary range ids."""
-        select_examples(self.test_fs, range_size=(1, 5, 20))
+        with self.assertRaises(IndexError):
+            select_examples(self.test_fs, range_size=(1, 5, 20))
 
     def test_mask_from_learner_in_memory(self):
         """Test mask with a SKLL Learner created in memory."""
@@ -140,7 +142,7 @@ class TestExplainUtils:
         expected_features = np.loadtxt(output_path)
         expected_ids = {5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11}
         computed_ids, computed_features = mask(self.svc, self.test_fs, feature_range=[5, 10])
-        assert_equal(computed_ids, expected_ids)
+        self.assertEqual(computed_ids, expected_ids)
         assert_array_almost_equal(computed_features, expected_features)
 
     def test_mask_from_learner_on_disk(self):
@@ -163,5 +165,5 @@ class TestExplainUtils:
             10: "RESPONSE_11",
         }
         computed_ids, computed_features = mask(model, background, feature_range=[5, 10])
-        assert_equal(computed_ids, expected_ids)
+        self.assertEqual(computed_ids, expected_ids)
         assert_array_equal(computed_features, expected_features)

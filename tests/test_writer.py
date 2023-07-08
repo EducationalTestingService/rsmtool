@@ -1,4 +1,5 @@
 import os
+import unittest
 from itertools import product
 from pathlib import Path
 from shutil import rmtree
@@ -13,9 +14,8 @@ from rsmtool.container import DataContainer
 from rsmtool.writer import DataWriter
 
 
-class TestDataWriter:
+class TestDataWriter(unittest.TestCase):
     def check_write_frame_to_file(self, file_format, include_index):
-
         # create a dummy data frame for testing
         df_to_write = pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"])
 
@@ -56,15 +56,12 @@ class TestDataWriter:
         tempdir.cleanup()
 
     def test_write_frame_to_file(self):
-
-        for (file_format, include_index) in product(
+        for file_format, include_index in product(
             ["csv", "tsv", "xlsx", "jsonlines"], [False, True]
         ):
-
             yield self.check_write_frame_to_file, file_format, include_index
 
     def test_data_container_save_files(self):
-
         data_sets = [
             {
                 "name": "dataset1",
@@ -83,9 +80,7 @@ class TestDataWriter:
 
         writer = DataWriter()
         for file_type in ["jsonlines", "csv", "xlsx"]:
-
             if file_type != "jsonlines":
-
                 writer.write_experiment_output(
                     directory,
                     container,
@@ -116,7 +111,6 @@ class TestDataWriter:
         assert_frame_equal(container.dataset1, ds_1_xls)
 
     def test_dictionary_save_files(self):
-
         data_sets = {
             "dataset1": pd.DataFrame(np.random.normal(size=(100, 2)), columns=["A", "B"]),
             "dataset2": pd.DataFrame(np.random.normal(size=(120, 3)), columns=["A", "B", "C"]),
@@ -127,9 +121,7 @@ class TestDataWriter:
 
         writer = DataWriter()
         for file_type in ["jsonlines", "csv", "xlsx"]:
-
             if file_type != "jsonlines":
-
                 writer.write_experiment_output(
                     directory,
                     data_sets,
@@ -161,7 +153,6 @@ class TestDataWriter:
 
     @raises(KeyError)
     def test_data_container_save_wrong_format(self):
-
         data_sets = [
             {
                 "name": "dataset1",
@@ -183,7 +174,6 @@ class TestDataWriter:
         )
 
     def test_data_container_save_files_with_id(self):
-
         data_sets = [
             {
                 "name": "dataset1",
@@ -202,9 +192,7 @@ class TestDataWriter:
 
         writer = DataWriter("test")
         for file_type in ["jsonlines", "csv", "xlsx"]:
-
             if file_type != "jsonlines":
-
                 writer.write_experiment_output(
                     directory,
                     container,

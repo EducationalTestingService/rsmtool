@@ -1,76 +1,70 @@
 import json
 import os
 import tempfile
+import unittest
 import warnings
 from shutil import rmtree
 
 import numpy as np
 import pandas as pd
-from nose.tools import eq_, raises
 from pandas.testing import assert_frame_equal
 
 from rsmtool.reader import DataReader, read_jsonlines, try_to_load_file
 
 
-def test_try_to_load_file_none():
+class TestReader(unittest.TestCase):
+    def test_try_to_load_file_none(self):
+        assert try_to_load_file("bdadui88asldfkas;j.sarasd") is None
 
-    assert try_to_load_file("bdadui88asldfkas;j.sarasd") is None
+    def test_try_to_load_file_fail(self):
+        with self.assertRaises(FileNotFoundError):
+            try_to_load_file("bdadui88asldfkas;j.sarasd", raise_error=True)
 
-
-@raises(FileNotFoundError)
-def test_try_to_load_file_fail():
-
-    try_to_load_file("bdadui88asldfkas;j.sarasd", raise_error=True)
-
-
-@raises(Warning)
-def test_try_to_load_file_warn():
-
-    with warnings.catch_warnings():
-        warnings.filterwarnings("error")
-        try_to_load_file("bdadui88asldfkas;j.sarasd", raise_warning=True)
+    def test_try_to_load_file_warn(self):
+        with self.assertRaises(Warning):
+            with warnings.catch_warnings():
+                warnings.filterwarnings("error")
+                try_to_load_file("bdadui88asldfkas;j.sarasd", raise_warning=True)
 
 
-class TestDataReader:
-    def setUp(self):
-        self.filepaths = []
+class TestDataReader(unittest.TestCase):
+    filepaths = []
+    df_train = pd.DataFrame(
+        {
+            "id": ["001", "002", "003"],
+            "feature1": [1, 2, 3],
+            "feature2": [4, 5, 6],
+            "gender": ["M", "F", "F"],
+            "candidate": ["123", "456", "78901"],
+        }
+    )
 
-        # Create files
-        self.df_train = pd.DataFrame(
-            {
-                "id": ["001", "002", "003"],
-                "feature1": [1, 2, 3],
-                "feature2": [4, 5, 6],
-                "gender": ["M", "F", "F"],
-                "candidate": ["123", "456", "78901"],
-            }
-        )
+    df_test = pd.DataFrame(
+        {
+            "id": ["102", "102", "103"],
+            "feature1": [5, 3, 2],
+            "feature2": [3, 4, 3],
+            "gender": ["F", "M", "F"],
+            "candidate": ["135", "546", "781"],
+        }
+    )
 
-        self.df_test = pd.DataFrame(
-            {
-                "id": ["102", "102", "103"],
-                "feature1": [5, 3, 2],
-                "feature2": [3, 4, 3],
-                "gender": ["F", "M", "F"],
-                "candidate": ["135", "546", "781"],
-            }
-        )
+    df_specs = pd.DataFrame(
+        {
+            "feature": ["f1", "f2", "f3"],
+            "transform": ["raw", "inv", "sqrt"],
+            "sign": ["+", "+", "-"],
+        }
+    )
 
-        self.df_specs = pd.DataFrame(
-            {
-                "feature": ["f1", "f2", "f3"],
-                "transform": ["raw", "inv", "sqrt"],
-                "sign": ["+", "+", "-"],
-            }
-        )
+    df_other = pd.DataFrame({"random": ["a", "b", "c"], "things": [1241, 45332, 3252]})
 
-        self.df_other = pd.DataFrame({"random": ["a", "b", "c"], "things": [1241, 45332, 3252]})
-
-    def tearDown(self):
-        for path in self.filepaths:
+    @classmethod
+    def tearDownClass(cls):
+        for path in cls.filepaths:
             if os.path.exists(path):
                 os.unlink(path)
-        self.filepaths = []
+        cls.filepaths = []
 
     @staticmethod
     def make_file_from_ext(df, ext):
@@ -140,9 +134,9 @@ class TestDataReader:
         for extension in ["csv", "tsv", "xlsx", "CSV", "TSV"]:
             yield self.check_read_from_file, extension
 
-    @raises(ValueError)
     def test_read_data_file_wrong_extension(self):
-        self.check_read_from_file("txt")
+        with self.assertRaises(ValueError):
+            self.check_read_from_file("txt")
 
     def test_container_train_property(self):
         test_lists = [
@@ -177,13 +171,12 @@ class TestDataReader:
         for test_list in test_lists:
             yield self.check_feature_specs, test_list
 
-    @raises(AttributeError)
     def test_no_container_feature_specs_property(self):
         test_lists = [("train", "csv"), ("test", "tsv"), ("train_metadata", "xlsx")]
         container = self.get_container(test_lists)
-        container.feature_specs
+        with self.assertRaises(AttributeError):
+            container.feature_specs
 
-    @raises(AttributeError)
     def test_no_container_test_property(self):
         test_lists = [
             ("feature_specs", "csv"),
@@ -191,7 +184,8 @@ class TestDataReader:
             ("train_metadata", "xlsx"),
         ]
         container = self.get_container(test_lists)
-        container.test
+        with self.assertRaises(AttributeError):
+            container.test
 
     def test_container_test_property_frame_equal(self):
         test_lists = [
@@ -219,12 +213,12 @@ class TestDataReader:
     def test_length(self):
         test_lists = [("feature_specs", "csv")]
         container = self.get_container(test_lists)
-        eq_(len(container), 1)
+        self.assertEqual(len(container), 1)
 
     def test_get_path_default(self):
         test_lists = [("feature_specs", "csv")]
         container = self.get_container(test_lists)
-        eq_(container.get_path("aaa"), None)
+        self.assertEqual(container.get_path("aaa"), None)
 
     def test_getitem_test_from_key(self):
         test_lists = [("feature_specs", "csv"), ("test", "tsv"), ("train", "xlsx")]
@@ -248,34 +242,31 @@ class TestDataReader:
 
         container3 = container1 + container2
         names = sorted(container3.keys())
-        eq_(names, ["feature_specs", "test", "train", "train_metadata"])
+        self.assertEqual(names, ["feature_specs", "test", "train", "train_metadata"])
 
-    @raises(KeyError)
     def test_add_containers_duplicate_keys(self):
         test_list1 = [("feature_specs", "csv"), ("train", "xlsx")]
         container1 = self.get_container(test_list1)
 
         test_list2 = [("test", "csv"), ("train", "tsv")]
         container2 = self.get_container(test_list2)
-        container1 + container2
+        with self.assertRaises(KeyError):
+            container1 + container2
 
     def test_locate_files_list(self):
-
         paths = ["file1.csv", "file2.xlsx"]
         config_dir = "output"
         result = DataReader.locate_files(paths, config_dir)
         assert isinstance(result, list)
-        eq_(result, [None, None])
+        self.assertEqual(result, [None, None])
 
     def test_locate_files_str(self):
-
         paths = "file1.csv"
         config_dir = "output"
         result = DataReader.locate_files(paths, config_dir)
-        eq_(result, None)
+        self.assertEqual(result, None)
 
     def test_locate_files_works(self):
-
         config_dir = "temp_output"
         os.makedirs(config_dir, exist_ok=True)
 
@@ -285,23 +276,22 @@ class TestDataReader:
 
         result = DataReader.locate_files(paths, config_dir)
         rmtree(config_dir)
-        eq_(result, full_path)
+        self.assertEqual(result, full_path)
 
-    @raises(ValueError)
     def test_locate_files_wrong_type(self):
-
         paths = {"file1.csv", "file2.xlsx"}
         config_dir = "output"
-        DataReader.locate_files(paths, config_dir)
+        with self.assertRaises(ValueError):
+            DataReader.locate_files(paths, config_dir)
 
-    @raises(ValueError)
     def test_setup_none_in_path(self):
         paths = ["path1.csv", None, "path2.csv"]
         framenames = ["train", "test", "features"]
-        DataReader(paths, framenames)
+        with self.assertRaises(ValueError):
+            DataReader(paths, framenames)
 
 
-class TestJsonLines:
+class TestJsonLines(unittest.TestCase):
     def setUp(self):
         self.filepaths = []
 
@@ -415,11 +405,11 @@ class TestJsonLines:
         self.expected.loc[2, "feature2"] = np.nan
         self.check_jsonlines_output(all_nested_jsonlines)
 
-    @raises(ValueError)
     def test_read_plain_json(self):
         plain_json = {
             "id": ["001", "002", "003"],
             "feature1": [1, 2, 3],
             "feature2": [1.5, 2.5, 3.5],
         }
-        self.check_jsonlines_output(plain_json)
+        with self.assertRaises(ValueError):
+            self.check_jsonlines_output(plain_json)

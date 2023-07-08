@@ -1,14 +1,17 @@
+import unittest
+
 import numpy as np
 import pandas as pd
-from nose.tools import eq_
 from numpy.testing import assert_array_equal, assert_raises_regex
 
 from rsmtool.modeler import Modeler
 
 
-class TestModeler:
-    def setUp(self):
+class TestModeler(unittest.TestCase):
+    """Tests for Modeler"""
 
+    @classmethod
+    def setUpClass(self):
         series = pd.Series([34, 0.34, 1.2], index=["const", "A", "B"])
         coef = Modeler().ols_coefficients_to_dataframe(series)
         learner = Modeler().create_fake_skll_learner(coef)
@@ -20,23 +23,23 @@ class TestModeler:
 
     def test_get_coefficients_is_none(self):
         modeler = Modeler()
-        eq_(modeler.get_coefficients(), None)
+        self.assertEqual(modeler.get_coefficients(), None)
 
     def test_get_intercept(self):
         intercept = self.modeler.get_intercept()
-        eq_(intercept, 34)
+        self.assertEqual(intercept, 34)
 
     def test_get_intercept_is_none(self):
         modeler = Modeler()
-        eq_(modeler.get_intercept(), None)
+        self.assertEqual(modeler.get_intercept(), None)
 
     def test_get_feature_names(self):
         intercept = self.modeler.get_feature_names()
-        eq_(intercept, ["A", "B"])
+        self.assertEqual(intercept, ["A", "B"])
 
     def test_get_feature_names_is_none(self):
         modeler = Modeler()
-        eq_(modeler.get_feature_names(), None)
+        self.assertEqual(modeler.get_feature_names(), None)
 
     def test_expected_scores_no_min_max(self):
         df = pd.DataFrame([{"spkitemid": "DUMMY", "A": 1, "B": 2}])

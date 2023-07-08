@@ -1,6 +1,7 @@
+import unittest
+
 import numpy as np
 import pandas as pd
-from nose.tools import assert_almost_equal, assert_equal, eq_, ok_, raises
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
@@ -11,9 +12,12 @@ from rsmtool.preprocessor import (
 )
 
 
-class TestFeaturePreprocessor:
-    def setUp(self):
-        self.fpp = FeaturePreprocessor()
+class TestFeaturePreprocessor(unittest.TestCase):
+    """Tests class for FeaturePreprocessor tests."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.fpp = FeaturePreprocessor()
 
     def test_select_candidates_with_N_or_more_items(self):
         data = pd.DataFrame({"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
@@ -33,14 +37,14 @@ class TestFeaturePreprocessor:
 
         (df_included, df_excluded) = self.fpp.select_candidates(data, 2)
         assert_frame_equal(df_included, data)
-        assert_equal(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_select_candidates_with_N_or_more_items_all_excluded(self):
         data = pd.DataFrame({"candidate": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
 
         (df_included, df_excluded) = self.fpp.select_candidates(data, 4)
         assert_frame_equal(df_excluded, data)
-        assert_equal(len(df_included), 0)
+        self.assertEqual(len(df_included), 0)
 
     def test_select_candidates_with_N_or_more_items_custom_name(self):
         data = pd.DataFrame({"ID": ["a"] * 3 + ["b"] * 2 + ["c"], "sc1": [2, 3, 1, 5, 6, 1]})
@@ -169,12 +173,13 @@ class TestFeaturePreprocessor:
             ["spkitemid", "sc1", "candidate", "question", "l1", "raw"],
         )
 
-    @raises(KeyError)
     def test_check_subgroups_missing_columns(self):
         df = pd.DataFrame(columns=["a", "b", "c"])
 
         subgroups = ["a", "d"]
-        self.fpp.check_subgroups(df, subgroups)
+
+        with self.assertRaises(KeyError):
+            self.fpp.check_subgroups(df, subgroups)
 
     def test_check_subgroups_nothing_to_replace(self):
         df = pd.DataFrame({"a": ["1", "2"], "b": ["32", "34"], "d": ["abc", "def"]})
@@ -194,7 +199,6 @@ class TestFeaturePreprocessor:
         assert_frame_equal(df_out, df_expected)
 
     def test_filter_on_column(self):
-
         bad_df = pd.DataFrame(
             {
                 "spkitemlab": np.arange(1, 9, dtype="int64"),
@@ -218,7 +222,6 @@ class TestFeaturePreprocessor:
         assert_frame_equal(output_df, df_filtered)
 
     def test_filter_on_column_all_non_numeric(self):
-
         bad_df = pd.DataFrame({"sc1": ["A", "I", "TD", "TD"] * 2, "spkitemlab": range(1, 9)})
 
         expected_df_excluded = bad_df.copy()
@@ -228,8 +231,8 @@ class TestFeaturePreprocessor:
             bad_df, "sc1", "spkitemlab", exclude_zeros=True
         )
 
-        ok_(df_filtered.empty)
-        ok_("sc1" not in df_filtered.columns)
+        self.assertTrue(df_filtered.empty)
+        self.assertTrue("sc1" not in df_filtered.columns)
         assert_frame_equal(df_excluded, expected_df_excluded, check_dtype=False)
 
     def test_filter_on_column_std_epsilon_zero(self):
@@ -248,7 +251,7 @@ class TestFeaturePreprocessor:
 
         good_df = bad_df[["id", "feature_ok"]].copy()
         assert_frame_equal(output_df, good_df)
-        ok_(output_excluded_df.empty)
+        self.assertTrue(output_excluded_df.empty)
 
     def test_filter_on_column_with_inf(self):
         # Test that the function exclude columns where feature value is 'inf'
@@ -283,7 +286,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_int_column_and_dict(self):
         df = pd.DataFrame(
@@ -298,7 +301,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_float_column_and_dict(self):
         df = pd.DataFrame(
@@ -313,7 +316,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_str_column_and_dict(self):
         df = pd.DataFrame(
@@ -328,7 +331,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_float_column_int_dict(self):
         df = pd.DataFrame(
@@ -343,7 +346,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_int_column_float_dict(self):
         df = pd.DataFrame(
@@ -358,7 +361,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_str_column_float_dict(self):
         df = pd.DataFrame(
@@ -373,7 +376,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_float_column_str_dict(self):
         df = pd.DataFrame(
@@ -388,7 +391,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_str_column_int_dict(self):
         df = pd.DataFrame(
@@ -403,7 +406,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_int_column_str_dict(self):
         df = pd.DataFrame(
@@ -418,7 +421,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_str_dict(self):
         df = pd.DataFrame(
@@ -433,7 +436,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_int_dict(self):
         df = pd.DataFrame(
@@ -448,7 +451,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_float_dict(
         self,
@@ -465,7 +468,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_int_column_mixed_type_dict(self):
         df = pd.DataFrame(
@@ -480,7 +483,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_float_column_mixed_type_dict(
         self,
@@ -497,7 +500,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_str_column_mixed_type_dict(self):
         df = pd.DataFrame(
@@ -512,7 +515,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_nothing_to_exclude_mixed_type_column_mixed_type_dict(
         self,
@@ -529,7 +532,7 @@ class TestFeaturePreprocessor:
 
         df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
         assert_frame_equal(df_new, df)
-        eq_(len(df_excluded), 0)
+        self.assertEqual(len(df_excluded), 0)
 
     def test_filter_on_flag_column_mixed_type_column_mixed_type_dict_filter_preserve_type(
         self,
@@ -857,7 +860,6 @@ class TestFeaturePreprocessor:
         assert_frame_equal(df_new, df_new_expected)
         assert_frame_equal(df_excluded, df_excluded_expected)
 
-    @raises(KeyError)
     def test_filter_on_flag_column_missing_columns(self):
         df = pd.DataFrame(
             {
@@ -870,9 +872,9 @@ class TestFeaturePreprocessor:
         )
         flag_dict = {"flag3": ["0"], "flag2": ["1", "2"]}
 
-        df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
+        with self.assertRaises(KeyError):
+            df_new, df_excluded = self.fpp.filter_on_flag_columns(df, flag_dict)
 
-    @raises(ValueError)
     def test_filter_on_flag_column_nothing_left(self):
         bad_df = pd.DataFrame(
             {
@@ -886,7 +888,8 @@ class TestFeaturePreprocessor:
 
         flag_dict = {"flag1": [1, 0, 14], "flag2": ["TD"]}
 
-        df_new, df_excluded = self.fpp.filter_on_flag_columns(bad_df, flag_dict)
+        with self.assertRaises(ValueError):
+            df_new, df_excluded = self.fpp.filter_on_flag_columns(bad_df, flag_dict)
 
     def test_remove_outliers(self):
         # we want to test that even if we pass in a list of
@@ -895,10 +898,9 @@ class TestFeaturePreprocessor:
         ceiling = np.mean(data) + 4 * np.std(data)
 
         clamped_data = self.fpp.remove_outliers(data)
-        assert_almost_equal(clamped_data[-1], ceiling)
+        self.assertAlmostEqual(clamped_data[-1], ceiling)
 
     def test_generate_feature_names_subset(self):
-
         reserved_column_names = ["reserved_col1", "reserved_col2"]
         expected = ["col_1"]
 
@@ -919,10 +921,9 @@ class TestFeaturePreprocessor:
         feat_names = self.fpp.generate_feature_names(
             df, reserved_column_names, feature_subset, subset
         )
-        eq_(feat_names, expected)
+        self.assertEqual(feat_names, expected)
 
     def test_generate_feature_names_none(self):
-
         reserved_column_names = ["reserved_col1", "reserved_col2"]
         expected = ["col_1", "col_2"]
 
@@ -938,46 +939,42 @@ class TestFeaturePreprocessor:
         feat_names = self.fpp.generate_feature_names(
             df, reserved_column_names, feature_subset_specs=None, feature_subset=None
         )
-        eq_(feat_names, expected)
+        self.assertEqual(feat_names, expected)
 
     def test_model_name_builtin_model(self):
         model_name = "LinearRegression"
         model_type = self.fpp.check_model_name(model_name)
-        eq_(model_type, "BUILTIN")
+        self.assertEqual(model_type, "BUILTIN")
 
     def test_model_name_skll_model(self):
         model_name = "AdaBoostRegressor"
         model_type = self.fpp.check_model_name(model_name)
-        eq_(model_type, "SKLL")
+        self.assertEqual(model_type, "SKLL")
 
-    @raises(ValueError)
     def test_model_name_wrong_name(self):
         model_name = "random_model"
-        self.fpp.check_model_name(model_name)
+        with self.assertRaises(ValueError):
+            self.fpp.check_model_name(model_name)
 
     def test_trim(self):
-
         values = np.array([1.4, 8.5, 7.4])
         expected = np.array([1.4, 8.4998, 7.4])
         actual = self.fpp.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
     def test_trim_with_list(self):
-
         values = [1.4, 8.5, 7.4]
         expected = np.array([1.4, 8.4998, 7.4])
         actual = self.fpp.trim(values, 1, 8)
         assert_array_equal(actual, expected)
 
     def test_trim_with_custom_tolerance(self):
-
         values = [0.6, 8.4, 7.4]
         expected = np.array([0.75, 8.25, 7.4])
         actual = self.fpp.trim(values, 1, 8, 0.25)
         assert_array_equal(actual, expected)
 
     def test_preprocess_feature_fail(self):
-
         np.random.seed(10)
         values = np.random.random(size=1000)
         values = np.append(values, np.array([10000000]))
@@ -993,7 +990,6 @@ class TestFeaturePreprocessor:
         assert_array_equal(actual, expected)
 
     def test_preprocess_feature_with_outlier(self):
-
         np.random.seed(10)
         values = np.random.random(size=1000)
         values = np.append(values, np.array([10000000]))
@@ -1009,7 +1005,6 @@ class TestFeaturePreprocessor:
         assert_array_equal(actual, expected)
 
     def test_preprocess_features(self):
-
         train = pd.DataFrame({"A": [1, 2, 4, 3]})
         test = pd.DataFrame({"A": [4, 3, 2, 1]})
 
@@ -1044,7 +1039,6 @@ class TestFeaturePreprocessor:
         assert_frame_equal(info_processed.sort_index(axis=1), info_expected.sort_index(axis=1))
 
     def test_filter_data_features(self):
-
         data = {
             "ID": [1, 2, 3, 4],
             "LENGTH": [10, 12, 11, 12],
@@ -1087,7 +1081,6 @@ class TestFeaturePreprocessor:
         assert_frame_equal(df_filtered_features, df_filtered_features_expected)
 
     def test_filter_data_correct_features_and_length_in_other_columns(self):
-
         data = {
             "ID": [1, 2, 3, 4],
             "LENGTH": [10, 10, 10, 10],
@@ -1100,7 +1093,18 @@ class TestFeaturePreprocessor:
 
         data = pd.DataFrame(data)
 
-        (_, _, df_filtered_other_columns, _, _, _, _, _, _, feature_names,) = self.fpp.filter_data(
+        (
+            _,
+            _,
+            df_filtered_other_columns,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            feature_names,
+        ) = self.fpp.filter_data(
             data,
             "h1",
             "ID",
@@ -1115,11 +1119,10 @@ class TestFeaturePreprocessor:
             [],
         )
 
-        eq_(feature_names, ["feature1", "feature2"])
+        self.assertEqual(feature_names, ["feature1", "feature2"])
         assert "##LENGTH##" in df_filtered_other_columns.columns
 
     def test_filter_data_length_in_other_columns(self):
-
         data = {
             "ID": [1, 2, 3, 4],
             "LENGTH": [10, 10, 10, 10],
@@ -1132,7 +1135,18 @@ class TestFeaturePreprocessor:
 
         data = pd.DataFrame(data)
 
-        (_, _, df_filtered_other_columns, _, _, _, _, _, _, feature_names,) = self.fpp.filter_data(
+        (
+            _,
+            _,
+            df_filtered_other_columns,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            feature_names,
+        ) = self.fpp.filter_data(
             data,
             "h1",
             "ID",
@@ -1147,12 +1161,10 @@ class TestFeaturePreprocessor:
             [],
         )
 
-        eq_(feature_names, ["feature1", "feature2"])
+        self.assertEqual(feature_names, ["feature1", "feature2"])
         assert "##LENGTH##" in df_filtered_other_columns.columns
 
-    @raises(ValueError)
     def test_filter_data_min_candidates_raises_value_error(self):
-
         data = {
             "ID": [1, 2, 3, 4],
             "LENGTH": [10, 10, 10, 10],
@@ -1165,24 +1177,24 @@ class TestFeaturePreprocessor:
 
         data = pd.DataFrame(data)
 
-        self.fpp.filter_data(
-            data,
-            "h1",
-            "ID",
-            "LENGTH",
-            "h2",
-            "candidate",
-            ["feature1", "feature2"],
-            ["LENGTH", "ID", "candidate", "h1"],
-            0,
-            6,
-            {},
-            [],
-            min_candidate_items=5,
-        )
+        with self.assertRaises(ValueError):
+            self.fpp.filter_data(
+                data,
+                "h1",
+                "ID",
+                "LENGTH",
+                "h2",
+                "candidate",
+                ["feature1", "feature2"],
+                ["LENGTH", "ID", "candidate", "h1"],
+                0,
+                6,
+                {},
+                [],
+                min_candidate_items=5,
+            )
 
     def test_filter_data_with_min_candidates(self):
-
         data = {
             "ID": [1, 2, 3, 4],
             "LENGTH": [10, 10, 10, 10],
@@ -1222,11 +1234,10 @@ class TestFeaturePreprocessor:
             min_candidate_items=2,
         )
 
-        eq_(df_filtered_features.shape[0], 2)
+        self.assertEqual(df_filtered_features.shape[0], 2)
         assert all(col in df_filtered_human_scores.columns for col in ["sc1", "sc2"])
 
     def test_filter_data_id_candidate_equal(self):
-
         data = {
             "LENGTH": [10, 12, 18, 21],
             "h1": [1, 2, 3, 1],
@@ -1260,17 +1271,18 @@ class TestFeaturePreprocessor:
         assert_frame_equal(df_filtered_metadata, expected)
 
 
-class TestFeatureSpecsProcessor:
-    def setUp(self):
-        self.fsp = FeatureSpecsProcessor()
+class TestFeatureSpecsProcessor(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fsp = FeatureSpecsProcessor()
 
     def test_generate_default_specs(self):
         fnames = ["Grammar", "Vocabulary", "Pronunciation"]
         df_specs = self.fsp.generate_default_specs(fnames)
-        assert_equal(len(df_specs), 3)
-        assert_equal(df_specs["feature"][0], "Grammar")
-        assert_equal(df_specs["transform"][1], "raw")
-        assert_equal(df_specs["sign"][2], 1.0)
+        self.assertEqual(len(df_specs), 3)
+        self.assertEqual(df_specs["feature"][0], "Grammar")
+        self.assertEqual(df_specs["transform"][1], "raw")
+        self.assertEqual(df_specs["sign"][2], 1.0)
 
     def test_generate_specs_from_data_with_negative_sign(self):
         feature_subset_specs = pd.DataFrame(
@@ -1300,7 +1312,7 @@ class TestFeatureSpecsProcessor:
             df, ["Grammar", "Fluency", "Discourse"], "r1", feature_subset_specs, "SYS1"
         )
 
-        assert_equal(len(df_specs), 3)
+        self.assertEqual(len(df_specs), 3)
         assert_array_equal(df_specs["feature"], ["Grammar", "Fluency", "Discourse"])
         assert_array_equal(df_specs["sign"], [-1.0, 1.0, -1.0])
 
@@ -1334,7 +1346,7 @@ class TestFeatureSpecsProcessor:
             feature_subset_specs,
             feature_sign=None,
         )
-        assert_equal(len(df_specs), 3)
+        self.assertEqual(len(df_specs), 3)
         assert_array_equal(df_specs["feature"], ["Grammar", "Fluency", "Discourse"])
         assert_array_equal(df_specs["sign"], [1.0, 1.0, 1.0])
 
@@ -1369,7 +1381,7 @@ class TestFeatureSpecsProcessor:
             "SYS1",
         )
         assert_array_equal(df_specs["feature"], ["Grammar", "Vocabulary", "Discourse"])
-        assert_equal(df_specs["transform"][1], "sqrt")
+        self.assertEqual(df_specs["transform"][1], "sqrt")
 
     def test_generate_specs_from_data_when_transformation_changes_sign(self):
         feature_subset_specs = pd.DataFrame(
@@ -1401,9 +1413,9 @@ class TestFeatureSpecsProcessor:
             feature_subset_specs,
             "SYS1",
         )
-        assert_equal(df_specs["feature"][1], "Vocabulary")
-        assert_equal(df_specs["transform"][1], "addOneInv")
-        assert_equal(df_specs["sign"][1], -1)
+        self.assertEqual(df_specs["feature"][1], "Vocabulary")
+        self.assertEqual(df_specs["transform"][1], "addOneInv")
+        self.assertEqual(df_specs["sign"][1], -1)
 
     def test_generate_specs_from_data_no_subset_specs(self):
         np.random.seed(10)
@@ -1416,7 +1428,7 @@ class TestFeatureSpecsProcessor:
         }
         df = pd.DataFrame(data)
         df_specs = self.fsp.generate_specs(df, ["Grammar", "Fluency", "Discourse"], "r1")
-        assert_equal(len(df_specs), 3)
+        self.assertEqual(len(df_specs), 3)
         assert_array_equal(df_specs["feature"], ["Grammar", "Fluency", "Discourse"])
         assert_array_equal(df_specs["sign"], [1.0, 1.0, 1.0])
 
@@ -1484,7 +1496,6 @@ class TestFeatureSpecsProcessor:
         df_new_feature_specs = self.fsp.validate_feature_specs(df_feature_specs)
         assert_frame_equal(df_new_feature_specs, df_expected_feature_specs)
 
-    @raises(ValueError)
     def test_validate_feature_specs_wrong_sign_format(self):
         df_feature_specs = pd.DataFrame(
             {
@@ -1494,9 +1505,9 @@ class TestFeatureSpecsProcessor:
             }
         )
 
-        self.fsp.validate_feature_specs(df_feature_specs)
+        with self.assertRaises(ValueError):
+            self.fsp.validate_feature_specs(df_feature_specs)
 
-    @raises(ValueError)
     def test_validate_feature_duplicate_feature(self):
         df_feature_specs = pd.DataFrame(
             {
@@ -1505,9 +1516,10 @@ class TestFeatureSpecsProcessor:
                 "transform": ["raw", "inv", "sqrt"],
             }
         )
-        self.fsp.validate_feature_specs(df_feature_specs)
 
-    @raises(KeyError)
+        with self.assertRaises(ValueError):
+            self.fsp.validate_feature_specs(df_feature_specs)
+
     def test_validate_feature_missing_feature_column(self):
         df_feature_specs = pd.DataFrame(
             {
@@ -1516,12 +1528,15 @@ class TestFeatureSpecsProcessor:
                 "transform": ["raw", "inv", "sqrt"],
             }
         )
-        self.fsp.validate_feature_specs(df_feature_specs)
+
+        with self.assertRaises(KeyError):
+            self.fsp.validate_feature_specs(df_feature_specs)
 
 
-class TestFeatureSubsetProcessor:
-    def setUp(self):
-        self.fsp = FeatureSubsetProcessor()
+class TestFeatureSubsetProcessor(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fsp = FeatureSubsetProcessor()
 
     def test_select_by_subset(self):
         feature_subset_specs = pd.DataFrame(
@@ -1599,12 +1614,11 @@ class TestFeatureSubsetProcessor:
         feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "Sign_SYS": ["+", "-", "+"]})
         self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_sign_named_something_else(self):
         feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "SYS_sign": ["+", "-", "+"]})
-        self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_multiple_sign_columns(self):
         feature_specs = pd.DataFrame(
             {
@@ -1613,33 +1627,34 @@ class TestFeatureSubsetProcessor:
                 "Sign_SYS": ["-", "+", "-"],
             }
         )
-        self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, sign="SYS")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_no_feature_column(self):
         feature_specs = pd.DataFrame({"feat": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
-        self.fsp.check_feature_subset_file(feature_specs, "subset1")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, "subset1")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_no_subset_column(self):
         feature_specs = pd.DataFrame({"Feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
-        self.fsp.check_feature_subset_file(feature_specs, "subset2")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, "subset2")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_wrong_values_in_subset(self):
         feature_specs = pd.DataFrame(
             {"Feature": ["f1", "f2", "f3"], "subset1": ["yes", "no", "yes"]}
         )
-        self.fsp.check_feature_subset_file(feature_specs, "subset1")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, "subset1")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_no_sign_column(self):
         feature_specs = pd.DataFrame({"feature": ["f1", "f2", "f3"], "subset1": [0, 1, 0]})
-        self.fsp.check_feature_subset_file(feature_specs, sign="subset1")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, sign="subset1")
 
-    @raises(ValueError)
     def test_check_feature_subset_file_wrong_values_in_sign(self):
         feature_specs = pd.DataFrame(
             {"Feature": ["f1", "f2", "f3"], "sign_SYS1": ["+1", "-1", "+1"]}
         )
-        self.fsp.check_feature_subset_file(feature_specs, sign="SYS1")
+        with self.assertRaises(ValueError):
+            self.fsp.check_feature_subset_file(feature_specs, sign="SYS1")

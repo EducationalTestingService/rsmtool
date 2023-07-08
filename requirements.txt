@@ -3,7 +3,7 @@ codecov
 doc2dash
 ipython
 jupyter
-nose
+nose2
 notebook
 numpy<1.24
 openpyxl

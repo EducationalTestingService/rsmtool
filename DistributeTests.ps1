@@ -29,42 +29,42 @@ Write-Host "Total tests: $testCount"
 $testsToRun= @()
 
 if ($agentNumber -eq 1) {
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_1.py"
+    $testsToRun = $testsToRun + "test_experiment_rsmtool_1"
 }
 elseif ($agentNumber -eq 2) {
-    $testsToRun = $testsToRun + "tests/test_comparer.py"
-    $testsToRun = $testsToRun + "tests/test_configuration_parser.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_2.py"
-    $testsToRun = $testsToRun + "tests/test_container.py"
+    $testsToRun = $testsToRun + "test_comparer"
+    $testsToRun = $testsToRun + "test_configuration_parser"
+    $testsToRun = $testsToRun + "test_experiment_rsmtool_2"
+    $testsToRun = $testsToRun + "test_container"
 }
 elseif ($agentNumber -eq 3) {
-    $testsToRun = $testsToRun + "tests/test_analyzer.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmeval.py"
-    $testsToRun = $testsToRun + "tests/test_fairness_utils.py"
-    $testsToRun = $testsToRun + "tests/test_utils_prmse.py"
-    $testsToRun = $testsToRun + "tests/test_test_utils.py"
-    $testsToRun = $testsToRun + "tests/test_cli.py"
+    $testsToRun = $testsToRun + "test_analyzer"
+    $testsToRun = $testsToRun + "test_experiment_rsmeval"
+    $testsToRun = $testsToRun + "test_fairness_utils"
+    $testsToRun = $testsToRun + "test_utils_prmse"
+    $testsToRun = $testsToRun + "test_test_utils"
+    $testsToRun = $testsToRun + "test_cli"
 }
 elseif ($agentNumber -eq 4) {
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmcompare.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmsummarize.py"
-    $testsToRun = $testsToRun + "tests/test_modeler.py"
-    $testsToRun = $testsToRun + "tests/test_preprocessor.py"
-    $testsToRun = $testsToRun + "tests/test_writer.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_3.py"
+    $testsToRun = $testsToRun + "test_experiment_rsmcompare"
+    $testsToRun = $testsToRun + "test_experiment_rsmsummarize"
+    $testsToRun = $testsToRun + "test_modeler"
+    $testsToRun = $testsToRun + "test_preprocessor"
+    $testsToRun = $testsToRun + "test_writer"
+    $testsToRun = $testsToRun + "test_experiment_rsmtool_3"
 }
 elseif ($agentNumber -eq 5) {
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmpredict.py"
-    $testsToRun = $testsToRun + "tests/test_reader.py"
-    $testsToRun = $testsToRun + "tests/test_reporter.py"
-    $testsToRun = $testsToRun + "tests/test_transformer.py"
-    $testsToRun = $testsToRun + "tests/test_utils.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmtool_4.py"
+    $testsToRun = $testsToRun + "test_experiment_rsmpredict"
+    $testsToRun = $testsToRun + "test_reader"
+    $testsToRun = $testsToRun + "test_reporter"
+    $testsToRun = $testsToRun + "test_transformer"
+    $testsToRun = $testsToRun + "test_utils"
+    $testsToRun = $testsToRun + "test_experiment_rsmtool_4"
 }
 elseif ($agentNumber -eq 6) {
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmxval.py"
-    $testsToRun = $testsToRun + "tests/test_experiment_rsmexplain.py"
-    $testsToRun = $testsToRun + "tests/test_explanation_utils.py"
+    $testsToRun = $testsToRun + "test_experiment_rsmxval"
+    $testsToRun = $testsToRun + "test_experiment_rsmexplain"
+    $testsToRun = $testsToRun + "test_explanation_utils"
 }
 
 # join all test files seperated by space. pytest runs multiple test files in following format pytest test1.py test2.py test3.py

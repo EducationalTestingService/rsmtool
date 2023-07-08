@@ -1,19 +1,20 @@
+import unittest
 import warnings
 
 import numpy as np
-from nose.tools import assert_raises
 from numpy.testing import assert_array_equal
 
 from rsmtool.transformer import FeatureTransformer
 
 
-class TestFeatureTransformer:
-    def setUp(self):
-        self.ft = FeatureTransformer()
+class TestFeatureTransformer(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ft = FeatureTransformer()
 
     def test_apply_inverse_transform(self):
-        assert_raises(ValueError, self.ft.apply_inverse_transform, "name", np.array([0, 1, 2]))
-        assert_raises(
+        self.assertRaises(ValueError, self.ft.apply_inverse_transform, "name", np.array([0, 1, 2]))
+        self.assertRaises(
             ValueError,
             self.ft.apply_inverse_transform,
             "name",
@@ -39,7 +40,9 @@ class TestFeatureTransformer:
         )
 
     def test_apply_sqrt_transform(self):
-        assert_raises(ValueError, self.ft.apply_sqrt_transform, "name", np.array([-2, -3, 1, 2]))
+        self.assertRaises(
+            ValueError, self.ft.apply_sqrt_transform, "name", np.array([-2, -3, 1, 2])
+        )
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             assert_array_equal(
@@ -57,8 +60,8 @@ class TestFeatureTransformer:
         assert_array_equal(self.ft.apply_sqrt_transform("name", np.array([0, 4])), np.array([0, 2]))
 
     def test_apply_log_transform(self):
-        assert_raises(ValueError, self.ft.apply_log_transform, "name", np.array([-1, 2, 3]))
-        assert_raises(ValueError, self.ft.apply_log_transform, "name", np.array([0, 2, 3]))
+        self.assertRaises(ValueError, self.ft.apply_log_transform, "name", np.array([-1, 2, 3]))
+        self.assertRaises(ValueError, self.ft.apply_log_transform, "name", np.array([0, 2, 3]))
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
             assert_array_equal(
@@ -75,7 +78,7 @@ class TestFeatureTransformer:
         )
 
     def test_apply_add_one_inverse_transform(self):
-        assert_raises(
+        self.assertRaises(
             ValueError,
             self.ft.apply_add_one_inverse_transform,
             "name",
@@ -97,7 +100,7 @@ class TestFeatureTransformer:
         )
 
     def test_apply_add_one_log_transform(self):
-        assert_raises(
+        self.assertRaises(
             ValueError,
             self.ft.apply_add_one_log_transform,
             "name",
@@ -127,7 +130,7 @@ class TestFeatureTransformer:
         # run the test but suppress the expected runtime warnings
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "add_one_inverse")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "add_one_inverse")
             assert_array_equal(self.ft.transform_feature(data, name, "inv"), 1 / data)
             assert_array_equal(self.ft.transform_feature(data, name, "raw"), data)
             assert_array_equal(self.ft.transform_feature(data, name, "org"), data)
@@ -170,8 +173,8 @@ class TestFeatureTransformer:
         # run the test but suppress the expected runtime warnings
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RuntimeWarning)
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "sqrt")
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "inv")
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "addOneInv")
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "log")
-            assert_raises(ValueError, self.ft.transform_feature, data, name, "addOneLn")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "sqrt")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "inv")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "addOneInv")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "log")
+            self.assertRaises(ValueError, self.ft.transform_feature, data, name, "addOneLn")
