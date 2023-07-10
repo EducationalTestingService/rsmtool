@@ -60,15 +60,19 @@ def select_examples(featureset, range_size=None):
     elif isinstance(range_size, int):
         selected_ids = shap.sample(fs_ids, range_size)
     elif isinstance(range_size, tuple):
-        array_index = np.array(range_size)
-        selected_ids = fs_ids[array_index]
+        selected_ids = range_size
     else:
         start, end = range_size
         # NOTE: include the end index in the selected examples since it's more intuitive
         selected_ids = fs_ids[start : end + 1]  # noqa: E203
 
     # find the positions of the selected ids in the original featureset
-    selected_positions = [np.where(fs_ids == id_)[0][0] for id_ in selected_ids]
+    try:
+        selected_positions = [np.where(fs_ids == id_)[0][0] for id_ in selected_ids]
+    except IndexError:
+        raise ValueError(
+            "Samples could not be selected; please check your configuration file."
+        ) from None
 
     # create and return a dictionary mapping the position to the IDs
     return dict(zip(selected_positions, selected_ids))
@@ -343,8 +347,7 @@ def generate_explanation(
     elif has_sample_range:
         range_size = parse_range(configuration.get("sample_range"))
     elif has_sample_ids:
-        range_size = configuration.get("sample_ids").split(",")
-        range_size = tuple([int(id_) for id_ in range_size])
+        range_size = tuple(configuration.get("sample_ids").split(","))
     else:
         range_size = None
         logger.warning(
