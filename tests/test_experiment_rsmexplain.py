@@ -79,7 +79,7 @@ class TestExperimentRsmexplain(unittest.TestCase):
             "background_kmeans_size": 50,
             "explain_data": new_file_dict["explain_data"],
             "id_column": "ID",
-            "sample_ids": "5, 10, 20",
+            "sample_ids": "RESPONSE_6, RESPONSE_11, RESPONSE_21",
             "num_features_to_display": 15,
             "show_auto_cohorts": True,
         }
