@@ -347,7 +347,8 @@ def generate_explanation(
     elif has_sample_range:
         range_size = parse_range(configuration.get("sample_range"))
     elif has_sample_ids:
-        range_size = tuple(configuration.get("sample_ids").split(","))
+        range_size = configuration.get("sample_ids").split(",")
+        range_size = tuple([id_.strip() for id_ in range_size])
     else:
         range_size = None
         logger.warning(

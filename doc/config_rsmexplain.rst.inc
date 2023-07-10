@@ -65,7 +65,7 @@ If we want to explain a random sample of the responses in explain_data, we can s
 
 sample_ids *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string (no whitespace). Note that the IDs must be values from the :ref:`id_column <rsmexplain_id_column>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"`` etc. and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5,EXAMPLE_10,EXAMPLE_12"``. Defaults to ``None``.
+If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string. Note that the IDs must be values from the :ref:`id_column <rsmexplain_id_column>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"`` etc. and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5, EXAMPLE_10, EXAMPLE_12"``. Defaults to ``None``.
 
 .. note ::
 
