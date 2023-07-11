@@ -60,11 +60,14 @@ def select_examples(featureset, range_size=None):
     elif isinstance(range_size, int):
         selected_ids = shap.sample(fs_ids, range_size)
     elif isinstance(range_size, tuple):
-        selected_ids = range_size
+        selected_ids = np.array(range_size)
     else:
         start, end = range_size
         # NOTE: include the end index in the selected examples since it's more intuitive
         selected_ids = fs_ids[start : end + 1]  # noqa: E203
+
+    # make sure that ``selected_ids`` is the same data type as ``fs_ids``
+    selected_ids = selected_ids.astype(fs_ids.dtype)
 
     # find the positions of the selected ids in the original featureset
     try:
