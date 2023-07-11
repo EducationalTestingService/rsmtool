@@ -45,7 +45,8 @@ class TestExplainUtils(unittest.TestCase):
         ]
         train_labels = list(y_train)
 
-        test_ids = [f"TEST_{idx}" for idx in range(1, test_size + 1)]
+        test_ids_strings = [f"TEST_{idx}" for idx in range(1, test_size + 1)]
+        test_ids_ints = list(range(1, test_size + 1))
         test_features = [
             dict(zip([f"FEATURE_{i + 1}" for i in range(num_features)], x)) for x in X_test
         ]
@@ -53,7 +54,8 @@ class TestExplainUtils(unittest.TestCase):
         cls.train_fs = FeatureSet(
             "train", ids=train_ids, features=train_features, labels=train_labels
         )
-        cls.test_fs = FeatureSet("test", ids=test_ids, features=test_features)
+        cls.test_fs = FeatureSet("test", ids=test_ids_strings, features=test_features)
+        cls.test_fs_int_ids = FeatureSet("test", ids=test_ids_ints, features=test_features)
 
         # create a dummy learner
         svc = Learner("SVC")
@@ -143,6 +145,14 @@ class TestExplainUtils(unittest.TestCase):
         expected_output = {11: "TEST_12", 4: "TEST_5", 9: "TEST_10"}
         self.assertEqual(
             select_examples(self.test_fs, range_size=("TEST_12", "TEST_5", "TEST_10")),
+            expected_output,
+        )
+
+    def test_select_features_mismatched_range_ids_size(self):
+        """Test select_features with range IDs as strings but featureset IDs as ints."""
+        expected_output = {4: 5, 9: 10, 11: 12}
+        self.assertEqual(
+            select_examples(self.test_fs_int_ids, range_size=("5", "10", "12")),
             expected_output,
         )
 
