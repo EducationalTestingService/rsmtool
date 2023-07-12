@@ -112,18 +112,18 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     scale_with = configuration.get("scale_with")
 
     # scale_with can be one of the following:
-    # (a) None       : the predictions are assumed to be 'raw' and should be used as is
-    #                  when computing the metrics; the names for the final columns are
-    #                  'raw', 'raw_trim' and 'raw_trim_round'.
-    # (b) 'asis'     : the predictions are assumed to be pre-scaled and should be used as is
-    #                  when computing the metrics; the names for the final columns are
-    #                  'scale', 'scale_trim' and 'scale_trim_round'.
-    # (c) a CSV file : the predictions are assumed to be 'raw' and should be scaled
-    #                  before computing the metrics; the names for the final columns are
-    #                  'scale', 'scale_trim' and 'scale_trim_round'.
+    # (a) 'raw' or None : the predictions are assumed to be 'raw' and should be used as is
+    #                     when computing the metrics; the names for the final columns are
+    #                     'raw', 'raw_trim' and 'raw_trim_round'.
+    # (b) 'asis'        : the predictions are assumed to be pre-scaled and should be used as is
+    #                     when computing the metrics; the names for the final columns are
+    #                     'scale', 'scale_trim' and 'scale_trim_round'.
+    # (c) a CSV file    : the predictions are assumed to be 'raw' and should be scaled
+    #                     before computing the metrics; the names for the final columns are
+    #                     'scale', 'scale_trim' and 'scale_trim_round'.
 
     # Check whether we want to do scaling
-    do_scaling = scale_with is not None and scale_with != "asis"
+    do_scaling = scale_with is not None and scale_with not in ["asis", "raw"]
 
     # The paths to files and names for data container properties
     paths = ["predictions_file"]
@@ -131,7 +131,6 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
 
     # If we want to do scaling, get the scale file
     if do_scaling:
-
         # Make sure scale file can be located
         scale_file_location = DataReader.locate_files(scale_with, configuration.configdir)
         if not scale_file_location:
@@ -206,7 +205,6 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
 
 
 def main():  # noqa: D103
-
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -253,7 +251,6 @@ def main():  # noqa: D103
 
     # call the appropriate function based on which sub-command was run
     if args.subcommand == "run":
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -266,7 +263,6 @@ def main():  # noqa: D103
         )
 
     else:
-
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
