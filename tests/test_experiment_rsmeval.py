@@ -248,28 +248,8 @@ class TestExperimentRsmeval(unittest.TestCase):
 
     def test_run_experiment_lr_eval_scale_with_raw(self):
         """Test rsmeval with 'scale_with' set to 'raw'"""
-        source = "lr-eval-dict"
-        experiment_id = "lr_eval_raw"
-
-        # set up a temporary directory since
-        # we will be using getcwd
-        temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
-
-        old_file_dict = {"pred": "data/files/predictions_scaled_with_subgroups.csv"}
-
-        new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
-
-        config_dict = {
-            "predictions_file": new_file_dict["pred"],
-            "system_score_column": "score",
-            "description": "An evaluation of LinearRegression predictions.",
-            "human_score_column": "h1",
-            "id_column": "id",
-            "experiment_id": "lr_eval_dict",
-            "subgroups": "QUESTION",
-            "scale_with": "raw",
-            "trim_min": 1,
-            "trim_max": 6,
-        }
-
-        check_run_evaluation(source, experiment_id, config_obj_or_dict=config_dict)
+        source = "lr-eval-scale-raw"
+        experiment_id = "lr_eval_scale_raw"
+        config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
+        with self.assertRaises(FileNotFoundError):
+            do_run_evaluation(source, experiment_id, config_file)
