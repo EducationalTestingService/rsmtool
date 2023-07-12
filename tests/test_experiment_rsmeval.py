@@ -112,6 +112,10 @@ class TestExperimentRsmeval(unittest.TestCase):
             "consistency": "True",
             "suppress_warnings_for": [UserWarning],
         },
+        {
+            "source": "lr-eval-scale-raw",
+            "experiment_id": "lr_eval_scale_raw",
+        },
     )
     def test_run_experiment_parameterized(self, kwargs):
         if TEST_DIR:
@@ -242,14 +246,6 @@ class TestExperimentRsmeval(unittest.TestCase):
 
         source = "lr-eval-with-wrong-path"
         experiment_id = "lr_eval_with_h2"
-        config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        with self.assertRaises(FileNotFoundError):
-            do_run_evaluation(source, experiment_id, config_file)
-
-    def test_run_experiment_lr_eval_scale_with_raw(self):
-        """Test rsmeval with 'scale_with' set to 'raw'"""
-        source = "lr-eval-scale-raw"
-        experiment_id = "lr_eval_scale_raw"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(FileNotFoundError):
             do_run_evaluation(source, experiment_id, config_file)
