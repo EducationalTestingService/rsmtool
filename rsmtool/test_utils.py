@@ -6,7 +6,7 @@ from ast import literal_eval as eval
 from filecmp import clear_cache, dircmp
 from glob import glob
 from importlib.machinery import SourceFileLoader
-from inspect import getmembers, getsourcelines, isfunction
+from inspect import getmembers, getsource, getsourcelines, isclass, isfunction
 from os import remove
 from os.path import basename, exists, join
 from pathlib import Path
@@ -1603,42 +1603,50 @@ class FileUpdater(object):
                 if not test_module._AUTO_UPDATE:
                     continue
 
-            # iterate over all the members and focus on only the experiment functions.
-            # For rsmtool/rsmeval we skip over the functions that are decorated with
-            # '@raises' since those functions do not need any test data to be updated.
-            # For rsmsummarize and rsmcompare we only update the input files for these functions.
-            # For the rest, try to get the source since that's what we need to update
-            # the test files.
+            # iterate over all the members and focus on only the experiment classes
+            # and methods. For rsmtool/rsmeval we skip over the functions that are
+            # decorated with '@raises' since those functions do not need any test
+            # data to be updated. For rsmsummarize and rsmcompare we only update
+            # the input files for these functions. For the rest, try to get
+            # the source since that's what we need to update the test files.
             for member_name, member_object in getmembers(test_module):
-                if isfunction(member_object) and member_name.startswith("test_run_experiment"):
-                    function = member_object
+                if isclass(member_object) and member_name.startswith("Test"):
+                    test_class = member_object
 
-                    # get the qualified name of the member function
-                    member_qualified_name = member_object.__qualname__
+                    # now iterate over all the test methods in the test class
+                    for class_member_name, class_member_object in getmembers(test_class):
+                        if isfunction(class_member_object) and class_member_name.startswith(
+                            "test_run_experiment"
+                        ):
+                            function = class_member_object
 
-                    # check if it has 'raises' in the qualified name
-                    # and skip it
-                    if "raises" in member_qualified_name:
-                        continue
+                            # get the qualified name of the member function
 
-                    # otherwise first we check if it's the parameterized function and if so
-                    # we can easily get the source from the parameter list
-                    if member_name.endswith("parameterized"):
-                        for param in function.parameterized_input:
-                            source_name = param.args[0]
-                            skll = param.kwargs.get("skll", False)
-                            self.update_test_data(source_name, test_tool, skll=skll)
+                            # check if the member function uses `assertRaises`
+                            source = getsource(function)
+                            if "with self.assertRaises" in source:
+                                continue
 
-                    # if it's another function, then we actually inspect the code
-                    # to get the source. Note that this should never be a SKLL experiment
-                    # since those should always be run parameterized
-                    else:
-                        function_code_lines = getsourcelines(function)
-                        source_line = [
-                            line for line in function_code_lines[0] if re.search(r"source = ", line)
-                        ]
-                        source_name = eval(source_line[0].strip().split(" = ")[1])
-                        self.update_test_data(source_name, test_tool)
+                            # otherwise first we check if it's the parameterized function and if so
+                            # we can easily get the source from the parameter list
+                            if class_member_name.endswith("parameterized"):
+                                for param in function.paramList:
+                                    source_name = param["source"]
+                                    skll = param.get("skll", False)
+                                    self.update_test_data(source_name, test_tool, skll=skll)
+
+                            # if it's another function, then we actually inspect the code
+                            # to get the source. Note that this should never be a SKLL experiment
+                            # since those should always be run parameterized
+                            else:
+                                function_code_lines = getsourcelines(function)
+                                source_line = [
+                                    line
+                                    for line in function_code_lines[0]
+                                    if re.search(r"source = ", line)
+                                ]
+                                source_name = eval(source_line[0].strip().split(" = ")[1])
+                                self.update_test_data(source_name, test_tool)
 
     def print_report(self):
         """Print a report of all changes made when the updater was run."""
