@@ -2,7 +2,7 @@
 """
 Update the expected test outputs and inputs for rsmsummarize and rsmcompare tests.
 
-This script assumes that you have already run nosetests and ran the entire
+This script assumes that you have already run `nose2 -s tests` and ran the entire
 test suite. By doing so, the output has been generated under the given outputs
 directory. And that is what will be used to generate the new expected output
 under `tests/data/experiments`.
@@ -71,8 +71,7 @@ def main():  # noqa: D103
     run_test_suite = input("Have you already run the whole test suite? (y/n): ")
     if run_test_suite == "n":
         print(
-            "Please run the whole test suite using "
-            "`nosetests --nologcapture` before running this script."
+            "Please run the whole test suite using " "`nose2 -s tests` before running this script."
         )
         sys.exit(0)
     elif run_test_suite != "y":
