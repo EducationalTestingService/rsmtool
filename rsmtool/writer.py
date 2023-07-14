@@ -7,9 +7,12 @@ Class for writing DataContainer frames to disk.
 
 :organization: ETS
 """
-import wandb
 from os import makedirs
 from os.path import join
+
+import wandb
+
+from .utils.constants import EXCLUDE_WANDB_LOG
 
 
 class DataWriter:
@@ -150,7 +153,6 @@ class DataWriter:
         # Loop through DataFrames, and save
         # output in specified format
         for dataframe_name in dataframe_names:
-
             df = container_or_dict[dataframe_name]
             if df is None:
                 raise KeyError(f"The DataFrame `{dataframe_name}` does not exist.")
@@ -179,8 +181,8 @@ class DataWriter:
 
             # write out the frame to disk in the given file
             self.write_frame_to_file(df, outfile, file_format=file_format, index=index, **kwargs)
-            if wandb_run:
-                table = wandb.Table(dataframe=df)
+            if wandb_run and dataframe_name not in EXCLUDE_WANDB_LOG:
+                table = wandb.Table(dataframe=df, allow_mixed_types=True)
                 wandb_run.log({dataframe_name: table})
 
     def write_feature_csv(
