@@ -369,3 +369,23 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 .. note::
 
     If ``use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
+
+.. _use_wandb:
+
+use_wandb *(Optional)*
+""""""""""""""""""""""
+If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
+The Weights & Biases entity and project name should be specified in the appropriate configuration fields. Defaults to ``false``.
+
+.. _wandb_project:
+
+wandb_project *(Optional)*
+""""""""""""""""""""""""""
+The Weights & Biases project name if logging to Weights and Biases is enabled.
+
+.. _wandb_entity:
+
+wandb_entity *(Optional)*
+""""""""""""""""""""""""""
+The Weights & Biases entity name if logging to Weights and Biases is enabled.
+Entity can be a user name or the name of a team or organization.

@@ -192,6 +192,7 @@ class DataWriter:
         selected_features,
         include_experiment_id=True,
         file_format="csv",
+        wandb_run=None,
     ):
         """
         Write out the selected features to disk.
@@ -212,6 +213,11 @@ class DataWriter:
             The file format in which to output the data.
             One of {"csv", "tsv", "xlsx"}.
             Defaults to "csv".
+        wandb_run : wandb.Run
+            The wandb run object if wandb is enabled, None otherwise.
+            If enabled, all the output data frames will be logged to
+            this run as tables.
+            Defaults to ``None``.
         """
         df_feature_specs = data_container["feature_specs"]
 
@@ -229,4 +235,5 @@ class DataWriter:
             {"feature_specs": "selected"},
             include_experiment_id=include_experiment_id,
             file_format=file_format,
+            wandb_run=wandb_run,
         )

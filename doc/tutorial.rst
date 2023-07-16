@@ -80,6 +80,10 @@ Documentation for all of the available configuration options is available :ref:`
 
     2. You can also use our nifty capability to :ref:`automatically generate <autogen_configuration>` ``rsmtool`` configuration files rather than creating them manually.
 
+    3. To view the tutorial output on a `Weights & Biases <https://wandb.ai/>`__ project, use the file
+       `config_rsmtool_with_wandb.json` in the same tutorial folder. Make sure to edit the
+       :ref:`W&B entity <wandb_entity>` field to work with your Weights & Biases credentials.
+
 Run the experiment
 ^^^^^^^^^^^^^^^^^^
 Now that we have our features in right format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
