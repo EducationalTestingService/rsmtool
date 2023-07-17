@@ -1054,11 +1054,11 @@ class ConfigurationParser:
         # specified wandb project and entity.
         if new_config["use_wandb"]:
             # make sure we have project name and entity
-            if "wandb_project" not in new_config or "wandb_entity" not in new_config:
+            if not new_config["wandb_project"] or not new_config["wandb_entity"]:
                 raise ValueError(
                     "You must specify both `wandb_project` "
                     "and `wandb_entity` if you want to enable "
-                    "logging to W&B"
+                    "logging to W&B."
                 )
 
         # 16. Clean up config dict to keep only context-specific fields

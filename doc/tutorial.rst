@@ -86,7 +86,7 @@ Documentation for all of the available configuration options is available :ref:`
 
 Run the experiment
 ^^^^^^^^^^^^^^^^^^
-Now that we have our features in right format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
+Now that we have our features in the right format and our configuration file in ``.json`` format, we can use the :ref:`rsmtool <usage_rsmtool>` command-line script to run our modeling experiment.
 
 .. code-block:: bash
 

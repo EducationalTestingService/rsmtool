@@ -375,17 +375,17 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 use_wandb *(Optional)*
 """"""""""""""""""""""
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases entity and project name should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity<_wandb_entity>` and :ref:`project name<_wandb_project_name>` should be specified in the appropriate configuration fields. Defaults to ``false``.
 
 .. _wandb_project:
 
 wandb_project *(Optional)*
 """"""""""""""""""""""""""
-The Weights & Biases project name if logging to Weights and Biases is enabled.
+The Weights & Biases project name if logging to Weights & Biases is enabled.
 
 .. _wandb_entity:
 
 wandb_entity *(Optional)*
 """"""""""""""""""""""""""
-The Weights & Biases entity name if logging to Weights and Biases is enabled.
+The Weights & Biases entity name if logging to Weights & Biases is enabled.
 Entity can be a user name or the name of a team or organization.

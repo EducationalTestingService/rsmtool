@@ -64,8 +64,8 @@ DEFAULTS = {
     "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
     "use_wandb": False,  # enables logging to Weights & Biases
-    "wandb_project": "",
-    "wandb_entity": "",
+    "wandb_project": None,
+    "wandb_entity": None,
 }
 
 LIST_FIELDS = [

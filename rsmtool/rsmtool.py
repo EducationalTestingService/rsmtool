@@ -115,8 +115,8 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     use_wandb = configuration.get("use_wandb", False)
     wandb_run = None
     if use_wandb:
-        wandb_project = configuration.get("wandb_project")
-        wandb_entity = configuration.get("wandb_entity")
+        wandb_project = configuration["wandb_project"]
+        wandb_entity = configuration.get["wandb_entity"]
         wandb_run = wandb.init(project=wandb_project, entity=wandb_entity)
         wandb_run.config.update(configuration)
 
