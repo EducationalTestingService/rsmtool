@@ -1284,6 +1284,18 @@ class TestConfiguration(unittest.TestCase):
         )
         self.assertEqual(values_for_reader, expected)
 
+    def test_validate_config_missing_wandb_fields(self):
+        data = {
+            "experiment_id": "experiment_1",
+            "train_file": "path/to/train.tsv",
+            "test_file": "path/to/test.tsv",
+            "model": "LinearRegression",
+            "use_wandb": True,
+        }
+
+        with self.assertRaises(ValueError):
+            _ = ConfigurationParser.validate_config(data)
+
 
 class TestJSONFeatureConversion(unittest.TestCase):
     def check_json_feature_conversion(self, input_file_format):
