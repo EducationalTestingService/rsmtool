@@ -165,15 +165,12 @@ class TestExperimentRsmtool4(unittest.TestCase):
             run_experiment(config, output_dir, overwrite_output=True)
 
     def test_run_experiment_with_wandb(self):
-        experiment_path = join(rsmtool_test_dir, "data", "experiments", "wandb")
-        configpath = join(experiment_path, "wandb.json")
-        configdict = json.load(open(configpath, "r"))
-
-        output_dir = "test_outputs/wandb"
-        config = Configuration(configdict, configdir=experiment_path)
+        source = "wandb"
+        experiment_id = "wandb"
+        config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         mock_wandb_run = Mock()
         with patch("wandb.init") as mock_wandb_init:
             mock_wandb_init.return_value = mock_wandb_run
-            run_experiment(config, output_dir, overwrite_output=True)
+            do_run_experiment(source, experiment_id, config_file)
         mock_wandb_init.assert_called_with(project="wandb_project", entity="wandb_entity")
         mock_wandb_run.assert_called()

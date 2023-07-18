@@ -132,7 +132,6 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
         ["train_file", "test_file", "features", "feature_subset_file"],
         ["train", "test", "feature_specs", "feature_subset_specs"],
     )
-
     file_paths = DataReader.locate_files(file_paths_org, configuration.configdir)
 
     # if there are any missing files after trying to locate
