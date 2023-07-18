@@ -173,4 +173,4 @@ class TestExperimentRsmtool4(unittest.TestCase):
             mock_wandb_init.return_value = mock_wandb_run
             do_run_experiment(source, experiment_id, config_file)
         mock_wandb_init.assert_called_with(project="wandb_project", entity="wandb_entity")
-        mock_wandb_run.assert_called()
+        mock_wandb_run.log_artifact.assert_called()
