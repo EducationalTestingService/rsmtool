@@ -375,13 +375,19 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 use_wandb *(Optional)*
 """"""""""""""""""""""
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity<_wandb_entity>` and :ref:`project name<_wandb_project_name>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
 
 .. _wandb_project:
 
 wandb_project *(Optional)*
 """"""""""""""""""""""""""
-The Weights & Biases project name if logging to Weights & Biases is enabled.
+The Weights & Biases project name if logging to Weights & Biases is enabled. If a project by this name does not already exist, it will be created.
+
+.. important::
+    1. Before using Weights & Biases for the first time, users should log in and provide their API key as described in
+       `W&B Quickstart guidelines <https://docs.wandb.ai/quickstart#2-log-in-to-wb>`__.
+    2. Note that when using W&B logging, the rsmtool run may take significantly longer due to the network traffic being
+       sent to W&B.
 
 .. _wandb_entity:
 

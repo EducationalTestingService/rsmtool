@@ -43,7 +43,7 @@ Output
 ------
 
 ``rsmtool`` produces a set of folders in the experiment output directory. This is either the current directory in which ``rsmtool`` is run or the directory specified as the second optional command-line argument.
-If logging to `Weights & Biases <https://wandb.ai/>`__ is :ref:`enabled <_use_wandb>`, the reports and all intermediate files are also logged to
+If logging to `Weights & Biases <https://wandb.ai/>`__ is :ref:`enabled <use_wandb>`, the reports and all intermediate files are also logged to
 the specified Weights & Biases project.
 
 report
