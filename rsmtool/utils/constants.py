@@ -197,6 +197,9 @@ CHECK_FIELDS = {
             "section_order",
             "candidate_column",
             "min_items_per_candidate",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmpredict": {
@@ -410,5 +413,3 @@ INTERACTIVE_MODE_METADATA = {
 
 # regular expression used to parse rsmexplain range values
 RSMEXPLAIN_RANGE_REGEXP = re.compile(r"^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$")
-
-EXCLUDE_WANDB_LOG = ["confMatrix"]

@@ -10,16 +10,28 @@ Class for writing DataContainer frames to disk.
 from os import makedirs
 from os.path import join
 
-import wandb
-
-from .utils.constants import EXCLUDE_WANDB_LOG
+from .utils.wandb_logging import log_dataframe_to_wandb
 
 
 class DataWriter:
     """Class to write out DataContainer objects."""
 
-    def __init__(self, experiment_id=None):  # noqa: D107
+    def __init__(self, experiment_id=None, wandb_run=None):
+        """
+        Initialize the DataWriter object.
+
+        Parameters
+        ----------
+        experiment_id : str
+            The experiment name to be used in the output file names
+        wandb_run : wandb.Run
+            The wandb run object if wandb is enabled, None otherwise.
+            If enabled, all the output data frames will be logged to
+            this run as tables.
+            Defaults to ``None``.
+        """
         self._id = experiment_id
+        self.wandb_run = wandb_run
 
     @staticmethod
     def write_frame_to_file(df, name_prefix, file_format="csv", index=False, **kwargs):
@@ -83,7 +95,6 @@ class DataWriter:
         reset_index=False,
         file_format="csv",
         index=False,
-        wandb_run=None,
         **kwargs,
     ):
         """
@@ -125,11 +136,7 @@ class DataWriter:
         index : bool, optional
             Whether to include the index in the output file.
             Defaults to ``False``.
-        wandb_run : wandb.Run
-            The wandb run object if wandb is enabled, None otherwise.
-            If enabled, all the output data frames will be logged to
-            this run as tables.
-            Defaults to ``None``.
+
 
         Raises
         ------
@@ -181,9 +188,7 @@ class DataWriter:
 
             # write out the frame to disk in the given file
             self.write_frame_to_file(df, outfile, file_format=file_format, index=index, **kwargs)
-            if wandb_run and dataframe_name not in EXCLUDE_WANDB_LOG:
-                table = wandb.Table(dataframe=df, allow_mixed_types=True)
-                wandb_run.log({dataframe_name: table})
+            log_dataframe_to_wandb(self.wandb_run, df, dataframe_name)
 
     def write_feature_csv(
         self,
@@ -192,7 +197,6 @@ class DataWriter:
         selected_features,
         include_experiment_id=True,
         file_format="csv",
-        wandb_run=None,
     ):
         """
         Write out the selected features to disk.
@@ -213,11 +217,6 @@ class DataWriter:
             The file format in which to output the data.
             One of {"csv", "tsv", "xlsx"}.
             Defaults to "csv".
-        wandb_run : wandb.Run
-            The wandb run object if wandb is enabled, None otherwise.
-            If enabled, all the output data frames will be logged to
-            this run as tables.
-            Defaults to ``None``.
         """
         df_feature_specs = data_container["feature_specs"]
 
@@ -235,5 +234,4 @@ class DataWriter:
             {"feature_specs": "selected"},
             include_experiment_id=include_experiment_id,
             file_format=file_format,
-            wandb_run=wandb_run,
         )

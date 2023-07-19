@@ -23,6 +23,7 @@ from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
+from .utils.wandb_logging import init_wandb_run
 from .writer import DataWriter
 
 
@@ -36,7 +37,7 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     Parameters
     ----------
     config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
-        Path to the experiment configuration file either a a string
+        Path to the experiment configuration file either a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
         with keys corresponding to fields in the configuration file. Given a
@@ -97,11 +98,14 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
+    # If wandb logging is enabled, start a wandb run and log configuration
+    wandb_run = init_wandb_run(configuration)
+
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
     # Get DataWriter object
-    writer = DataWriter(configuration["experiment_id"])
+    writer = DataWriter(configuration["experiment_id"], wandb_run)
 
     # Make sure prediction file can be located
     if not DataReader.locate_files(configuration["predictions_file"], configuration.configdir):
@@ -197,7 +201,7 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     )
 
     # Initialize reporter
-    reporter = Reporter(logger=logger)
+    reporter = Reporter(logger=logger, wandb_run=wandb_run)
 
     # generate the report
     logger.info("Starting report generation.")
