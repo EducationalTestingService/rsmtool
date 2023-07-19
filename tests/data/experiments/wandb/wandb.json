@@ -1,0 +1,14 @@
+{
+    "train_file": "../../files/train.csv",
+    "test_file": "../../files/test.csv",
+    "id_column": "ID",
+    "test_label_column": "score",
+    "train_label_column": "score",
+    "features": "features.csv",
+    "model": "LinearRegression",
+    "description": "LinearRegression experiment with logging to wandb enabled.",
+    "experiment_id": "wandb",
+    "use_wandb": true,
+    "wandb_entity": "wandb_entity",
+    "wandb_project": "wandb_project"
+}

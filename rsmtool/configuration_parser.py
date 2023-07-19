@@ -79,18 +79,15 @@ def configure(context, config_file_or_obj_or_dict):
     # check what sort of input we got
     # if we got a string we consider this to be path to config file
     if isinstance(config_file_or_obj_or_dict, (str, Path)):
-
         # Instantiate configuration parser object
         parser = ConfigurationParser(config_file_or_obj_or_dict)
         configuration = parser.parse(context=context)
 
     elif isinstance(config_file_or_obj_or_dict, dict):
-
         # directly instantiate the Configuration from the dictionary
         configuration = Configuration(config_file_or_obj_or_dict, context=context)
 
     elif isinstance(config_file_or_obj_or_dict, Configuration):
-
         # raise an error if we are passed a Configuration object
         # without a configdir attribute. This can only
         # happen if the object was constructed using an earlier version
@@ -513,7 +510,6 @@ class Configuration:
                 )
 
         if config.get(flag_column):
-
             original_filter_dict = config[flag_column]
 
             # first check that the value is a dictionary
@@ -525,7 +521,6 @@ class Configuration:
                 )
 
             for column in original_filter_dict:
-
                 # if we were given a single value, convert it to list
                 if not isinstance(original_filter_dict[column], list):
                     new_filter_dict[column] = [original_filter_dict[column]]
@@ -660,7 +655,6 @@ class Configuration:
         existing_names = []
         existing_paths = []
         for idx, key in enumerate(keys):
-
             path = self._config.get(key)
 
             # if the `features` field is a list,
@@ -906,7 +900,6 @@ class ConfigurationParser:
         # 6. Check for fields that require feature_subset_file and try
         # to use the default feature file
         if new_config["feature_subset"] and not new_config["feature_subset_file"]:
-
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
@@ -922,7 +915,6 @@ class ConfigurationParser:
                 )
 
         if new_config["sign"] and not new_config["feature_subset_file"]:
-
             # Check if we have the default subset file from rsmextra
             if HAS_RSMEXTRA:
                 default_basename = Path(default_feature_subset_file).name
@@ -1058,7 +1050,18 @@ class ConfigurationParser:
                     group: new_config["min_n_per_group"] for group in new_config["subgroups"]
                 }
 
-        # 15. Clean up config dict to keep only context-specific fields
+        # 15. Check that if the user enables logging to W&B, they also
+        # specified wandb project and entity.
+        if new_config["use_wandb"]:
+            # make sure we have project name and entity
+            if not new_config["wandb_project"] or not new_config["wandb_entity"]:
+                raise ValueError(
+                    "You must specify both `wandb_project` "
+                    "and `wandb_entity` if you want to enable "
+                    "logging to W&B."
+                )
+
+        # 16. Clean up config dict to keep only context-specific fields
         context_relevant_fields = (
             CHECK_FIELDS[context]["optional"] + CHECK_FIELDS[context]["required"]
         )

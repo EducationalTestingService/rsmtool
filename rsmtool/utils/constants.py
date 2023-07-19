@@ -63,6 +63,9 @@ DEFAULTS = {
     "background_kmeans_size": 500,  # size of k-means sample for background
     "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
+    "use_wandb": False,  # enables logging to Weights & Biases
+    "wandb_project": None,
+    "wandb_entity": None,
 }
 
 LIST_FIELDS = [
@@ -125,6 +128,9 @@ CHECK_FIELDS = {
             "candidate_column",
             "standardize_features",
             "min_items_per_candidate",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmxval": {
@@ -404,3 +410,5 @@ INTERACTIVE_MODE_METADATA = {
 
 # regular expression used to parse rsmexplain range values
 RSMEXPLAIN_RANGE_REGEXP = re.compile(r"^(?P<start>[0-9]+)\-(?P<end>[0-9]+)$")
+
+EXCLUDE_WANDB_LOG = ["confMatrix"]

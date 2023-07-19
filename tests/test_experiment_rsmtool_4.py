@@ -2,6 +2,7 @@ import json
 import os
 import unittest
 from os.path import join
+from unittest.mock import Mock, patch
 
 from nose2.tools import params
 from sklearn.exceptions import ConvergenceWarning
@@ -162,3 +163,14 @@ class TestExperimentRsmtool4(unittest.TestCase):
         config["model"] = "SVC"
         with self.assertRaises(ValueError):
             run_experiment(config, output_dir, overwrite_output=True)
+
+    def test_run_experiment_with_wandb(self):
+        source = "wandb"
+        experiment_id = "wandb"
+        config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
+        mock_wandb_run = Mock()
+        with patch("wandb.init") as mock_wandb_init:
+            mock_wandb_init.return_value = mock_wandb_run
+            do_run_experiment(source, experiment_id, config_file)
+        mock_wandb_init.assert_called_with(project="wandb_project", entity="wandb_entity")
+        mock_wandb_run.log_artifact.assert_called()
