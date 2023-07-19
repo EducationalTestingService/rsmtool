@@ -3,3 +3,4 @@ nbconvert
 shap
 skll==3.2.0
 statsmodels
+wandb
