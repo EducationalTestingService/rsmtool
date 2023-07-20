@@ -1,4 +1,4 @@
 	N features	N negative	learner	train_label
-lr_subgroups	-	-	LinearRegression	score
-lr_subgroups	-	-	LinearRegression	score
-lr_subgroups	-	-	LinearRegression	score
+lr_subgroups	8	2	LinearRegression	score
+lr_subgroups	8	2	LinearRegression	score
+lr_subgroups	8	2	LinearRegression	score
