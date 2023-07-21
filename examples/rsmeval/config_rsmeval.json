@@ -9,7 +9,4 @@
     "trim_max": 6,
     "second_human_score_column": "human2",
     "scale_with": "asis",
-    "use_wandb": true,
-    "wandb_project": "rsmeval_turorial",
-    "wandb_entity": "etslabs"
 }
