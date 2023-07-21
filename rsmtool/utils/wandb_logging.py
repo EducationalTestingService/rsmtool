@@ -23,7 +23,7 @@ def init_wandb_run(config_obj):
     -------
     wandb.Run : a wandb run object, or None if logging to wandb is disabled.
     """
-    use_wandb = config_obj["use_wandb", False]
+    use_wandb = config_obj["use_wandb"]
     wandb_run = None
     if use_wandb:
         wandb_run = wandb.init(
