@@ -47,7 +47,8 @@ Here are all the arguments to the ``rsmeval`` command-line script.
 Output
 """"""
 
-``rsmeval`` produces a set of folders in the output directory.
+``rsmeval`` produces a set of folders in the output directory. If logging to `Weights & Biases <https://wandb.ai/>`__ is :ref:`enabled <use_wandb_rsmeval>`,
+the reports and all intermediate files are also logged to the specified Weights & Biases project.
 
 report
 ~~~~~~
