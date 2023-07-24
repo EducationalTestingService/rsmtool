@@ -23,7 +23,7 @@ from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
-from .utils.wandb_logging import init_wandb_run
+from .utils.wandb import init_wandb_run
 from .writer import DataWriter
 
 

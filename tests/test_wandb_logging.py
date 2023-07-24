@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 import pandas as pd
 
 from rsmtool.test_utils import rsmtool_test_dir
-from rsmtool.utils.wandb_logging import (
+from rsmtool.utils.wandb import (
     init_wandb_run,
     log_dataframe_to_wandb,
     log_report_to_wandb,

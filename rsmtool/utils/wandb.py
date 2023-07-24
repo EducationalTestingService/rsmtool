@@ -14,6 +14,7 @@ def init_wandb_run(config_obj):
 
     The run object is created using the wandb project name and entity specified in
     the configuration, and full configuration is logged to this run.
+
     Parameters
     ----------
     config_obj : configuration_parser.Configuration

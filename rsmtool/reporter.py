@@ -25,7 +25,7 @@ from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
 from .reader import DataReader
-from .utils.wandb_logging import log_report_to_wandb
+from .utils.wandb import log_report_to_wandb
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import special_section_list_rsmtool  # noqa

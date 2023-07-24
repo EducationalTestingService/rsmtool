@@ -10,7 +10,7 @@ Class for writing DataContainer frames to disk.
 from os import makedirs
 from os.path import join
 
-from .utils.wandb_logging import log_dataframe_to_wandb
+from .utils.wandb import log_dataframe_to_wandb
 
 
 class DataWriter:
