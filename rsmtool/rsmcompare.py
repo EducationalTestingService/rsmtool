@@ -14,6 +14,8 @@ import logging
 import sys
 from os.path import abspath, exists, join, normpath
 
+from rsmtool.utils.wandb import init_wandb_run
+
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
@@ -86,6 +88,9 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
+    # If wandb logging is enabled, start a wandb run and log configuration
+    wandb_run = init_wandb_run(configuration)
+
     # get the information about the "old" experiment
     experiment_id_old = configuration["experiment_id_old"]
     experiment_dir_old = DataReader.locate_files(
@@ -150,7 +155,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     subgroups = configuration.get("subgroups")
 
     # Initialize reporter
-    reporter = Reporter(logger=logger)
+    reporter = Reporter(logger=logger, wandb_run=wandb_run)
 
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
@@ -173,7 +178,6 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
 
 def main():  # noqa: D103
-
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -215,7 +219,6 @@ def main():  # noqa: D103
 
     # call the appropriate function based on which sub-command was run
     if args.subcommand == "run":
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -224,7 +227,6 @@ def main():  # noqa: D103
         run_comparison(abspath(args.config_file), abspath(args.output_dir))
 
     else:
-
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
@@ -240,5 +242,4 @@ def main():  # noqa: D103
 
 
 if __name__ == "__main__":
-
     main()

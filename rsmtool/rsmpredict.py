@@ -18,6 +18,8 @@ from os.path import abspath, basename, dirname, exists, join, normpath, split, s
 import numpy as np
 import pandas as pd
 
+from rsmtool.utils.wandb import init_wandb_run
+
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
@@ -241,8 +243,11 @@ def compute_and_save_predictions(
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
+    # If wandb logging is enabled, start a wandb run and log configuration
+    wandb_run = init_wandb_run(configuration)
+
     # Get DataWriter object
-    writer = DataWriter(experiment_id)
+    writer = DataWriter(experiment_id, wandb_run)
 
     # get the input file containing the feature values
     # for which we want to generate the predictions
