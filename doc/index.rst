@@ -46,6 +46,7 @@ Documentation
    automated_configuration
    api
    utilities
+   faq
    contributing
    internal
 
