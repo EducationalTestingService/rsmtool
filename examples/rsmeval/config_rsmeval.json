@@ -8,5 +8,5 @@
     "trim_min": 1,
     "trim_max": 6,
     "second_human_score_column": "human2",
-    "scale_with": "asis",
+    "scale_with": "asis"
 }
