@@ -43,6 +43,6 @@
     "flag_column_test": null,
     "min_items_per_candidate": null,
     "use_wandb": false,
-    "wandb_project": null,
-    "wandb_entity": null
+    "wandb_project": "",
+    "wandb_entity": ""
 }
