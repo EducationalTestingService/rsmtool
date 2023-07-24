@@ -15,8 +15,6 @@ import sys
 from os import listdir, makedirs
 from os.path import abspath, exists, join
 
-import wandb
-
 from .analyzer import Analyzer
 from .configuration_parser import configure
 from .modeler import Modeler
@@ -26,6 +24,7 @@ from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
+from .utils.wandb import init_wandb_run
 from .writer import DataWriter
 
 
@@ -112,19 +111,13 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     configuration.save(output_dir)
 
     # If wandb logging is enabled, start a wandb run and log configuration
-    use_wandb = configuration.get("use_wandb", False)
-    wandb_run = None
-    if use_wandb:
-        wandb_project = configuration["wandb_project"]
-        wandb_entity = configuration["wandb_entity"]
-        wandb_run = wandb.init(project=wandb_project, entity=wandb_entity)
-        wandb_run.config.update(configuration)
+    wandb_run = init_wandb_run(configuration)
 
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
     # Get DataWriter object
-    writer = DataWriter(configuration["experiment_id"])
+    writer = DataWriter(configuration["experiment_id"], wandb_run)
 
     # Get the paths and names for the DataReader
 
@@ -195,7 +188,6 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
         ],
         rename_dict,
         file_format=file_format,
-        wandb_run=wandb_run,
     )
 
     # Initialize the analyzer
@@ -206,9 +198,7 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     )
 
     # Write out files
-    writer.write_experiment_output(
-        csvdir, analyzed_container, file_format=file_format, wandb_run=wandb_run
-    )
+    writer.write_experiment_output(csvdir, analyzed_container, file_format=file_format)
 
     logger.info(f"Training {processed_config['model_name']} model.")
 
@@ -246,7 +236,6 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
         dataframe_names=["selected_feature_info"],
         new_names_dict={"selected_feature_info": "feature"},
         file_format=file_format,
-        wandb_run=wandb_run,
     )
 
     logger.info("Running analyses on training set.")
@@ -257,11 +246,7 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
 
     # Write out files
     writer.write_experiment_output(
-        csvdir,
-        train_analyzed_container,
-        reset_index=True,
-        file_format=file_format,
-        wandb_run=wandb_run,
+        csvdir, train_analyzed_container, reset_index=True, file_format=file_format
     )
 
     # Use only selected features for predictions
@@ -282,7 +267,6 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
         pred_data_container,
         new_names_dict={"pred_test": "pred_processed"},
         file_format=file_format,
-        wandb_run=wandb_run,
     )
 
     original_coef_file = join(csvdir, f"{pred_config['experiment_id']}_coefficients.{file_format}")
@@ -312,9 +296,7 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
             )
         else:
             # Write out scaled coefficients to disk
-            writer.write_experiment_output(
-                csvdir, scaled_data_container, file_format=file_format, wandb_run=wandb_run
-            )
+            writer.write_experiment_output(csvdir, scaled_data_container, file_format=file_format)
 
     # Add processed data_container frames to pred_data_container
     new_pred_data_container = pred_data_container + processed_container
@@ -327,25 +309,14 @@ def run_experiment(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
 
     # Write out files
     writer.write_experiment_output(
-        csvdir,
-        pred_analysis_data_container,
-        reset_index=True,
-        file_format=file_format,
-        wandb_run=wandb_run,
+        csvdir, pred_analysis_data_container, reset_index=True, file_format=file_format
     )
     # Initialize reporter
-    reporter = Reporter(logger=logger)
+    reporter = Reporter(logger=logger, wandb_run=wandb_run)
 
     # generate the report
     logger.info("Starting report generation.")
     reporter.create_report(pred_analysis_config, csvdir, figdir)
-    if use_wandb:
-        report_path = join(reportdir, f"{pred_config['experiment_id']}_report.html")
-        with open(report_path, "r") as rf:
-            wandb_run.log({"rsmtool_report": wandb.Html(rf.read())})
-        report_artifact = wandb.Artifact("rsmtool_report", type="html_report")
-        report_artifact.add_file(local_path=report_path)
-        wandb_run.log_artifact(report_artifact)
 
 
 def main():  # noqa: D103

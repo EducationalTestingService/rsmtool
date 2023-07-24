@@ -25,6 +25,7 @@ from traitlets.config import Config
 
 from . import HAS_RSMEXTRA
 from .reader import DataReader
+from .utils.wandb import log_report_to_wandb
 
 if HAS_RSMEXTRA:
     from rsmextra.settings import special_section_list_rsmtool  # noqa
@@ -189,9 +190,10 @@ notebook_path_dict = {
 class Reporter:
     """Class to generate Jupyter notebook reports and convert them to HTML."""
 
-    def __init__(self, logger=None):
+    def __init__(self, logger=None, wandb_run=None):
         """Initialize the Reporter object."""
         self.logger = logger if logger else logging.getLogger(__name__)
+        self.wandb_run = wandb_run
 
     @staticmethod
     def locate_custom_sections(custom_report_section_paths, configdir):
@@ -755,6 +757,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
+        log_report_to_wandb(self.wandb_run, join(reportdir, f"{report_name}.html"))
 
     def create_comparison_report(
         self, config, csvdir_old, figdir_old, csvdir_new, figdir_new, output_dir
