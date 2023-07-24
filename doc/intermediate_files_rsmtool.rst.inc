@@ -40,6 +40,9 @@ These files contain all of the rows in the training and evaluation sets that wer
 
     If the training/evaluation files contained columns with internal names such as ``sc1`` or ``length`` but these columns were not actually used by ``rsmtool``, these columns will also be included into these files but their names will be changed to ``##name##`` (e.g. ``##sc1##``).
 
+
+.. _rsmtool_excluded_responses:
+
 Excluded responses
 ^^^^^^^^^^^^^^^^^^
 filenames: ``train_excluded_responses``, ``test_excluded_responses``
