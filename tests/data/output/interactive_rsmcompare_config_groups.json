@@ -28,5 +28,8 @@
     "subgroups": [],
     "use_scaled_predictions_new": false,
     "use_scaled_predictions_old": false,
-    "use_thumbnails": true
+    "use_thumbnails": true,
+    "use_wandb": false,
+    "wandb_entity": null,
+    "wandb_project": null
 }

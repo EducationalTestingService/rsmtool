@@ -214,6 +214,9 @@ CHECK_FIELDS = {
             "standardize_features",
             "subgroups",
             "flag_column",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmcompare": {
@@ -235,6 +238,9 @@ CHECK_FIELDS = {
             "custom_sections",
             "special_sections",
             "section_order",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmsummarize": {
@@ -249,6 +255,9 @@ CHECK_FIELDS = {
             "special_sections",
             "subgroups",
             "section_order",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmexplain": {

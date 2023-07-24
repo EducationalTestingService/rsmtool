@@ -822,6 +822,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(output_dir, f"{report_name}.html"))
+        log_report_to_wandb(self.wandb_run, join(output_dir, f"{report_name}.html"))
 
     def create_summary_report(self, config, all_experiments, csvdir):
         """
@@ -868,6 +869,7 @@ class Reporter:
         # an HTML file in the report directory
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
+        log_report_to_wandb(self.wandb_run, join(reportdir, f"{report_name}.html"))
 
     def create_explanation_report(self, config, csv_dir, output_dir):
         """

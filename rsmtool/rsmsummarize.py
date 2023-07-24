@@ -16,6 +16,8 @@ import sys
 from os import listdir
 from os.path import abspath, exists, join, normpath
 
+from rsmtool.utils.wandb import init_wandb_run
+
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
@@ -161,6 +163,9 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
+    # If wandb logging is enabled, start a wandb run and log configuration
+    wandb_run = init_wandb_run(configuration)
+
     # get the list of the experiment dirs
     experiment_dirs = configuration["experiment_dirs"]
 
@@ -171,7 +176,7 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
 
     # check the experiment dirs and assemble the list of csvdir and jsons
     all_experiments = []
-    for (experiment_dir, experiment_name) in dirs_with_names:
+    for experiment_dir, experiment_name in dirs_with_names:
         experiments = check_experiment_dir(experiment_dir, experiment_name, configuration.configdir)
         all_experiments.extend(experiments)
 
@@ -200,7 +205,7 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
     section_order = configuration["section_order"]
 
     # Initialize reporter
-    reporter = Reporter(logger=logger)
+    reporter = Reporter(logger=logger, wandb_run=wandb_run)
 
     # check all sections values and order and get the
     # ordered list of notebook files
@@ -223,7 +228,6 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
 
 
 def main():  # noqa: D103
-
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -267,7 +271,6 @@ def main():  # noqa: D103
 
     # call the appropriate function based on which sub-command was run
     if args.subcommand == "run":
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -280,7 +283,6 @@ def main():  # noqa: D103
         )
 
     else:
-
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 
