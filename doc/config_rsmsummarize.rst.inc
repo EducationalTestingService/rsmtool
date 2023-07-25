@@ -84,3 +84,30 @@ A list specifying special ETS-only comparison sections to be included into the f
 use_thumbnails *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If set to ``true``, the images in the HTML will be set to clickable thumbnails rather than full-sized images. Upon clicking the thumbnail, the full-sized images will be displayed in a separate tab in the browser. If set to ``false``, full-sized images will be displayed as usual. Defaults to ``false``.
+
+.. _use_wandb_rsmsummarize:
+
+use_wandb *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~
+
+If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+
+.. _wandb_project_rsmsummarize:
+
+wandb_project *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Weights & Biases project name if logging to Weights & Biases is enabled. If a project by this name does not already exist, it will be created.
+
+.. important::
+    1. Before using Weights & Biases for the first time, users should log in and provide their API key as described in
+       `W&B Quickstart guidelines <https://docs.wandb.ai/quickstart#2-log-in-to-wb>`__.
+    2. Note that when using W&B logging, the rsmtool run may take significantly longer due to the network traffic being
+       sent to W&B.
+
+.. _wandb_entity_rsmsummarize:
+
+wandb_entity *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The Weights & Biases entity name if logging to Weights & Biases is enabled.
+Entity can be a user name or the name of a team or organization.
