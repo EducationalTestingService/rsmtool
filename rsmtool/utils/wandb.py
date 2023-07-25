@@ -52,7 +52,7 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
         wandb_run.log({df_name: table})
 
 
-def log_report_to_wandb(wandb_run, report_path):
+def log_report_to_wandb(wandb_run, report_name, report_path):
     """
     Log a report to W&B if logging to W&B is enabled.
 
@@ -60,14 +60,16 @@ def log_report_to_wandb(wandb_run, report_path):
 
     Parameters
     ----------
-     wandb_run : wandb.Run
+    wandb_run : wandb.Run
         The wandb run object, or None, if logging to W&B is disabled
+    report_name: str
+        The report's name
     report_path : str
         The path to the report html file.
     """
     if wandb_run:
         with open(report_path, "r") as rf:
-            wandb_run.log({"rsmtool_report": wandb.Html(rf.read())})
-        report_artifact = wandb.Artifact("rsmtool_report", type="html_report")
+            wandb_run.log({report_name: wandb.Html(rf.read())})
+        report_artifact = wandb.Artifact(report_name, type="html_report")
         report_artifact.add_file(local_path=report_path)
         wandb_run.log_artifact(report_artifact)
