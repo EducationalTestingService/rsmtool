@@ -12,7 +12,7 @@ from rsmtool.utils.wandb import (
 )
 
 
-class TestWandbLogging(unittest.TestCase):
+class TestWandb(unittest.TestCase):
     def test_init_wandb_run_wandb_enabled(self):
         config = {"use_wandb": True, "wandb_entity": "test_entity", "wandb_project": "test_project"}
 
@@ -78,7 +78,7 @@ class TestWandbLogging(unittest.TestCase):
             mock_report_artifact = Mock()
             mock_wandb_artifact.return_value = mock_report_artifact
 
-            log_report_to_wandb(mock_wandb_run, report_path)
+            log_report_to_wandb(mock_wandb_run, "report_name", report_path)
             # assert that all calls have been made
             mock_wandb_artifact.assert_called_once()
             mock_report_artifact.add_file.assert_called_with(local_path=report_path)
@@ -93,7 +93,7 @@ class TestWandbLogging(unittest.TestCase):
             mock_report_artifact = Mock()
             mock_wandb_artifact.return_value = mock_report_artifact
 
-            log_report_to_wandb(wandb_run, report_path)
+            log_report_to_wandb(wandb_run, "report_name", report_path)
             # assert that no calls to wandb objects have been made
             mock_wandb_artifact.assert_not_called()
             mock_report_artifact.add_file.assert_not_called()
