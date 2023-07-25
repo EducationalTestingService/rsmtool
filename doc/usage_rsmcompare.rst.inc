@@ -52,3 +52,5 @@ Here are all the arguments to the ``rsmcompare`` command-line script.
 Output
 """"""
 ``rsmcompare`` produces the comparison report in HTML format as well as in the form of a Jupyter notebook (a ``.ipynb`` file) in the output directory.
+If logging to `Weights & Biases <https://wandb.ai/>`__ is :ref:`enabled <use_wandb_rsmcompare>`,
+the report will be also logged to the specified Weights & Biases project.
