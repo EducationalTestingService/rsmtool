@@ -18,4 +18,11 @@ RSMTool is designed to be customizable:
 
 2. RSMTool provides explicit support for adding :ref:`custom analyses <custom_notebooks>` to the report if the user has some analysis in mind that is not already provided by RSMTool. These analyses can then be automatically included in all subsequent experiments.
 
-While training and evaluating a scoring model represents the most common use case for RSMTool, it can do a lot more for advanced users such as :ref:`evaluating predictions obtained using an external scoring engine <usage_rsmeval>`, :ref:`generating predictions for new data <usage_rsmpredict>`, :ref:`generating a detailed comparison between two different scoring models <usage_rsmcompare>`, :ref:`generating a summary report for multiple scoring models <usage_rsmsummarize>`, and :ref:`using cross-validation to better estimate the performance of scoring models <usage_rsmxval>`.
+While training and evaluating a scoring model represents the most common use case for RSMTool, it can do a lot more for advanced users such as:
+
+- evaluating predictions obtained from *any* ML model using :ref:`rsmeval <usage_rsmeval>`,
+- generating predictions for new data from an ``rsmtool`` model using :ref:`rsmpredict <usage_rsmpredict>`,
+- generating a detailed comparison between two different ``rsmtool`` models using :ref:`rsmcompare <usage_rsmcompare>`,
+- generating a summary report for multiple ``rsmtool`` models using :ref:`rsmsummarize <usage_rsmsummarize>`,
+- running cross-validation to estimate the performance of ``rsmtool`` models using :ref:`rsmxval <usage_rsmxval>`, and
+- explaining the predictions of non-linear ``rsmtool`` models using :ref:`rsmexplain <usage_rsmexplain>`.
