@@ -153,3 +153,14 @@ Yes! W&B logging is natively supported the following command-line tools:
 ``rsmsummarize``. To enable it, set the :ref:`use_wandb <use_wandb>`
 configuration option to ``true`` and set the :ref:`wandb_entity <wandb_entity>`
 and :ref:`wandb_project <wandb_project>` options appropriately.
+
+|hr|
+
+.. _q_autogenerate_config:
+
+:fa:`quora`. **It's so difficult to remember all the configuration options.**
+[:ref:`# <q_autogenerate_config>`]
+
+We agree that it can be quite overwhelming to remember all the configuration
+options. This is why all command-line tools support :ref:`automatic generation
+of configuration files <autogen_configuration>`!
