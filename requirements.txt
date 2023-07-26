@@ -12,7 +12,7 @@ parameterized
 pre-commit
 seaborn
 shap==0.42.0
-skll==3.2.0
+skll==4.0.0
 sphinx<6.0
 sphinx-design
 sphinx_rtd_theme
