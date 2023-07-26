@@ -322,7 +322,6 @@ class TestToolCLI(unittest.TestCase):
 
     def test_default_subcommand_is_run(self):
         # test that the default subcommand for all contexts is "run"
-        # __import__('ipdb').sset_trace()
 
         # this applies to all tools
         for context in [
