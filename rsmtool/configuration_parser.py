@@ -21,8 +21,9 @@ from os import getcwd
 from os.path import abspath
 from pathlib import Path
 
+from sklearn.metrics import get_scorer_names
 from skll.learner import Learner
-from skll.metrics import _SCORERS
+from skll.metrics import _PREDEFINED_CUSTOM_METRICS
 
 from . import HAS_RSMEXTRA
 from .utils.constants import (
@@ -959,7 +960,10 @@ class ConfigurationParser:
                     "non-SKLL model. The objective will be ignored."
                 )
             else:
-                if new_config["skll_objective"] not in _SCORERS:
+                if (
+                    new_config["skll_objective"] not in get_scorer_names()
+                    and new_config["skll_objective"] not in _PREDEFINED_CUSTOM_METRICS
+                ):
                     raise ValueError(
                         "Invalid SKLL objective. Please refer to the SKLL "
                         "documentation and choose a valid tuning objective."
