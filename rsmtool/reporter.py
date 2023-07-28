@@ -934,6 +934,9 @@ class Reporter:
         self.logger.info("Exporting HTML")
         self.convert_ipynb_to_html(merged_notebook_file, join(reportdir, f"{report_name}.html"))
         self.logger.info("Success")
+        log_report_to_wandb(
+            self.wandb_run, "explain_report", join(reportdir, f"{report_name}.html")
+        )
 
 
 def main():  # noqa: D103

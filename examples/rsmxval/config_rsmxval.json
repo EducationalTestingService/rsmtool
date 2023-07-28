@@ -9,5 +9,8 @@
     "trim_min": 1,
     "trim_max": 6,
     "second_human_score_column": "score2",
-    "use_scaled_predictions": true
+    "use_scaled_predictions": true,
+    "use_wandb": true,
+    "wandb_project": "xval-tutorial-2",
+    "wandb_entity": "etslabs"
 }

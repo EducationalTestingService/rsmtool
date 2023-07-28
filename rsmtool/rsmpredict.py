@@ -18,7 +18,7 @@ from os.path import abspath, basename, dirname, exists, join, normpath, split, s
 import numpy as np
 import pandas as pd
 
-from rsmtool.utils.wandb import init_wandb_run
+from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 from .configuration_parser import configure
 from .modeler import Modeler
@@ -189,7 +189,7 @@ def fast_predict(
 
 
 def compute_and_save_predictions(
-    config_file_or_obj_or_dict, output_file, feats_file=None, logger=None
+    config_file_or_obj_or_dict, output_file, feats_file=None, logger=None, wandb_run=None
 ):
     """
     Run rsmpredict using the given configuration.
@@ -218,6 +218,10 @@ def compute_and_save_predictions(
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
 
     Raises
     ------
@@ -243,8 +247,11 @@ def compute_and_save_predictions(
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
-    # If wandb logging is enabled, start a wandb run and log configuration
-    wandb_run = init_wandb_run(configuration)
+    # If wandb logging is enabled, and wandb_run is not provided,
+    # start a wandb run and log configuration
+    if wandb_run is None:
+        wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmpredict")
 
     # Get DataWriter object
     writer = DataWriter(experiment_id, wandb_run)

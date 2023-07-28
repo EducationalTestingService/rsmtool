@@ -23,11 +23,13 @@ from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
-from .utils.wandb import init_wandb_run
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 from .writer import DataWriter
 
 
-def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None):
+def run_evaluation(
+    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
+):
     """
     Run an rsmeval experiment using the given configuration.
 
@@ -54,6 +56,10 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
 
     Raises
     ------
@@ -98,8 +104,11 @@ def run_evaluation(config_file_or_obj_or_dict, output_dir, overwrite_output=Fals
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
-    # If wandb logging is enabled, start a wandb run and log configuration
-    wandb_run = init_wandb_run(configuration)
+    # If wandb logging is enabled, and wandb_run is not provided,
+    # start a wandb run and log configuration
+    if wandb_run is None:
+        wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmeval")
 
     # Get output format
     file_format = configuration.get("file_format", "csv")

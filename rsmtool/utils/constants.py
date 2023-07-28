@@ -167,6 +167,9 @@ CHECK_FIELDS = {
             "candidate_column",
             "standardize_features",
             "min_items_per_candidate",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
     "rsmeval": {
@@ -280,6 +283,9 @@ CHECK_FIELDS = {
             "general_sections",
             "custom_sections",
             "special_sections",
+            "use_wandb",
+            "wandb_project",
+            "wandb_entity",
         ],
     },
 }

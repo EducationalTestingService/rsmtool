@@ -36,6 +36,8 @@ from pathlib import Path
 from joblib.parallel import Parallel, delayed
 from tqdm import tqdm
 
+from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
+
 from .configuration_parser import Configuration, configure
 from .rsmeval import run_evaluation
 from .rsmsummarize import run_summary
@@ -63,7 +65,9 @@ FINAL_MODEL_SECTION_LIST = [
 ]
 
 
-def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=False):
+def run_cross_validation(
+    config_file_or_obj_or_dict, output_dir, silence_tqdm=False, wandb_run=None
+):
     """
     Run cross-validation experiment.
 
@@ -86,6 +90,10 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         rsmtool for each fold. This option should only be used when
         running the unit tests.
         Defaults to ``False``.
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
 
     Raises
     ------
@@ -117,6 +125,13 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
         raise IOError(f"'{output_dir}' already contains a non-empty 'folds' directory.")
 
     configuration = configure("rsmxval", config_file_or_obj_or_dict)
+
+    # If wandb logging is enabled, start a wandb run and log configuration
+    if wandb_run is None:
+        wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmxval")
+
+    configuration["use_wandb"] = False
 
     logger.info("Saving configuration file.")
     with open(Path(output_dir) / "rsmxval.json", "w") as outfh:
@@ -150,7 +165,9 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
 
     # run rsmsummarize on all of the fold directories
     summary_logger = get_file_logger("fold-summary", Path(summarydir) / "rsmsummarize.log")
-    run_summary(fold_summary_configuration, summarydir, False, logger=summary_logger)
+    run_summary(
+        fold_summary_configuration, summarydir, False, logger=summary_logger, wandb_run=wandb_run
+    )
 
     # combine all of the fold prediction files for evaluation
     df_predictions = combine_fold_prediction_files(foldsdir, given_file_format)
@@ -216,7 +233,9 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     # run rsmeval on the combined predictions file
     logger.info("Evaluating combined fold predictions")
     eval_logger = get_file_logger("evaluation", Path(evaldir) / "rsmeval.log")
-    run_evaluation(evaluation_configuration, evaldir, False, logger=eval_logger)
+    run_evaluation(
+        evaluation_configuration, evaldir, False, logger=eval_logger, wandb_run=wandb_run
+    )
 
     # run rsmtool on the full dataset and generate only model/feature
     # descriptives report; we will use the dummy test set that we
@@ -238,11 +257,12 @@ def run_cross_validation(config_file_or_obj_or_dict, output_dir, silence_tqdm=Fa
     final_rsmtool_configuration = Configuration(
         final_rsmtool_configdict, configdir=configuration.configdir, context="rsmtool"
     )
-    run_experiment(final_rsmtool_configuration, modeldir, False, logger=model_logger)
+    run_experiment(
+        final_rsmtool_configuration, modeldir, False, logger=model_logger, wandb_run=wandb_run
+    )
 
 
 def main():  # noqa: D103
-
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -289,7 +309,6 @@ def main():  # noqa: D103
 
     # call the appropriate function based on which sub-command was run
     if args.subcommand == "run":
-
         # when running, log to stdout
         logging.root.addHandler(stdout_handler)
 
@@ -298,7 +317,6 @@ def main():  # noqa: D103
         run_cross_validation(abspath(args.config_file), abspath(args.output_dir))
 
     else:
-
         # when generating, log to stderr
         logging.root.addHandler(stderr_handler)
 

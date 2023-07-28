@@ -16,7 +16,7 @@ import sys
 from os import listdir
 from os.path import abspath, exists, join, normpath
 
-from rsmtool.utils.wandb import init_wandb_run
+from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 from .configuration_parser import configure
 from .reader import DataReader
@@ -92,7 +92,9 @@ def check_experiment_dir(experiment_dir, experiment_name, configpath):
         return list(zip(jsons, [experiment_name] * len(jsons)))
 
 
-def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None):
+def run_summary(
+    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
+):
     """
     Run rsmsummarize experiment using the given configuration.
 
@@ -121,6 +123,10 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
 
     Raises
     ------
@@ -163,8 +169,11 @@ def run_summary(config_file_or_obj_or_dict, output_dir, overwrite_output=False, 
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
-    # If wandb logging is enabled, start a wandb run and log configuration
-    wandb_run = init_wandb_run(configuration)
+    # If wandb logging is enabled, and wandb_run is not provided,
+    # start a wandb run and log configuration
+    if wandb_run is None:
+        wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmsummarize")
 
     # get the list of the experiment dirs
     experiment_dirs = configuration["experiment_dirs"]
