@@ -373,6 +373,12 @@ class Reporter:
         if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith("win"):
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+        # set this environment variable for Python 3.11 since otherwise
+        # invoking anything ipython-related yields warnings about debugging
+        # frozen modules
+        if sys.version_info[0] == 3 and sys.version_info[1] >= 11:
+            os.environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
+
         # set a high timeout for datasets with a large number of features
         report_config = Config(
             {
