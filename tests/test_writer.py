@@ -7,7 +7,6 @@ from tempfile import TemporaryDirectory
 
 import numpy as np
 import pandas as pd
-from nose.tools import ok_, raises
 from pandas.testing import assert_frame_equal
 
 from rsmtool.container import DataContainer
@@ -32,7 +31,7 @@ class TestDataWriter(unittest.TestCase):
 
         # check that the file was written to disk
         dir_listing = os.listdir(tempdir.name)
-        assert f"test_frame.{file_format}" in dir_listing
+        self.assertTrue(f"test_frame.{file_format}" in dir_listing)
 
         # read the file and check that the frame was written as expected
         if file_format == "csv":
@@ -46,7 +45,7 @@ class TestDataWriter(unittest.TestCase):
 
         # check that the index is there if it's supposed to be
         if include_index and file_format in ["csv", "tsv", "xlsx"]:
-            ok_("Unnamed: 0" in df_written.columns)
+            self.assertTrue("Unnamed: 0" in df_written.columns)
 
         # check that the data is the same
         df_written = df_written[["A", "B", "C"]]
@@ -104,7 +103,9 @@ class TestDataWriter(unittest.TestCase):
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
+        self.assertEqual(
+            sorted(output_dir), sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
+        )
 
         assert_frame_equal(container.dataset1, aaa_json)
         assert_frame_equal(container.dataset1, ds_1_csv)
@@ -145,13 +146,14 @@ class TestDataWriter(unittest.TestCase):
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
+        self.assertEqual(
+            sorted(output_dir), sorted(["aaa.jsonlines", "dataset1.csv", "dataset1.xlsx"])
+        )
 
         assert_frame_equal(data_sets["dataset1"], aaa_json)
         assert_frame_equal(data_sets["dataset1"], ds_1_csv)
         assert_frame_equal(data_sets["dataset1"], ds_1_xls)
 
-    @raises(KeyError)
     def test_data_container_save_wrong_format(self):
         data_sets = [
             {
@@ -169,9 +171,10 @@ class TestDataWriter(unittest.TestCase):
         directory = "temp_directory_container_save_wrong_format_xyz"
 
         writer = DataWriter()
-        writer.write_experiment_output(
-            directory, container, dataframe_names=["dataset1"], file_format="html"
-        )
+        with self.assertRaises(KeyError):
+            writer.write_experiment_output(
+                directory, container, dataframe_names=["dataset1"], file_format="html"
+            )
 
     def test_data_container_save_files_with_id(self):
         data_sets = [
@@ -216,8 +219,9 @@ class TestDataWriter(unittest.TestCase):
 
         output_dir = os.listdir(directory)
         rmtree(directory)
-        assert sorted(output_dir) == sorted(
-            ["test_aaa.jsonlines", "test_dataset1.csv", "test_dataset1.xlsx"]
+        self.assertEqual(
+            sorted(output_dir),
+            sorted(["test_aaa.jsonlines", "test_dataset1.csv", "test_dataset1.xlsx"]),
         )
 
         assert_frame_equal(container.dataset1, aaa_json)
