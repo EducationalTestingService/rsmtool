@@ -49,17 +49,32 @@ def update_model(model_file):
 
 
 def main():  # noqa: D103
-    model_files = glob.glob(
-        join(
-            TEST_DIR,
-            "data",
-            "experiments",
-            "*predict*",
-            "existing_experiment",
-            "output",
-            "*.model",
+    model_files = (
+        glob.glob(
+            join(
+                TEST_DIR,
+                "data",
+                "experiments",
+                "*predict*",
+                "existing_experiment",
+                "output",
+                "*.model",
+            )
         )
+        + glob.glob(
+            join(
+                TEST_DIR,
+                "data",
+                "experiments",
+                "*explain*",
+                "existing_experiment",
+                "output",
+                "*.model",
+            )
+        )
+        + [join(TEST_DIR, "data", "files", "explain_svr.model")]
     )
+
     for model_file in model_files:
         print(f"Processing {model_file}")
         update_model(model_file)
