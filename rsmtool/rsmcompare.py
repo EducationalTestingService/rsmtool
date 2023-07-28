@@ -14,7 +14,7 @@ import logging
 import sys
 from os.path import abspath, exists, join, normpath
 
-from rsmtool.utils.wandb import init_wandb_run
+from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 from .configuration_parser import configure
 from .reader import DataReader
@@ -88,8 +88,10 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
 
-    # If wandb logging is enabled, start a wandb run and log configuration
+    # If wandb logging is enabled, and wandb_run is not provided,
+    # start a wandb run and log configuration
     wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmcompare")
 
     # get the information about the "old" experiment
     experiment_id_old = configuration["experiment_id_old"]

@@ -24,6 +24,8 @@ import pandas as pd
 import shap
 from skll.data import FeatureSet
 
+from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
+
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
@@ -132,7 +134,7 @@ def mask(learner, featureset, feature_range=None):
 
 
 def generate_explanation(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None
+    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
 ):
     """
     Generate a shap.Explanation object.
@@ -158,6 +160,10 @@ def generate_explanation(
     logger : Optional[logging object]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
 
     Raises
     ------
@@ -202,6 +208,12 @@ def generate_explanation(
 
     logger.info("Saving configuration file.")
     configuration.save(output_dir)
+
+    # If wandb logging is enabled, and wandb_run is not provided,
+    # start a wandb run and log configuration
+    if wandb_run is None:
+        wandb_run = init_wandb_run(configuration)
+    log_configuration_to_wandb(wandb_run, configuration, "rsmexplain")
 
     # get the experiment ID
     experiment_id = configuration["experiment_id"]
@@ -402,7 +414,7 @@ def generate_explanation(
     generate_report(explanation, output_dir, ids, configuration, logger)
 
 
-def generate_report(explanation, output_dir, ids, configuration, logger=None):
+def generate_report(explanation, output_dir, ids, configuration, logger=None, wandb_run=None):
     """
     Generate an rsmexplain report.
 
@@ -463,7 +475,7 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None):
     df_abs.to_csv(csv_path_abs, index_label="")
 
     # Initialize a reporter instance and add the sections:
-    reporter = Reporter(logger=logger)
+    reporter = Reporter(logger=logger, wandb_run=wandb_run)
     general_report_sections = configuration["general_sections"]
     special_report_sections = configuration["special_sections"]
 

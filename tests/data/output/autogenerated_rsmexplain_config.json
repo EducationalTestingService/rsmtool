@@ -22,5 +22,8 @@ WARNING: Automatically generated configuration files MUST be edited to add value
     "sample_size": null,
     "show_auto_cohorts": false,
     "special_sections": null,
-    "standardize_features": true
+    "standardize_features": true,
+    "use_wandb": false,
+    "wandb_entity": null,
+    "wandb_project": null
 }

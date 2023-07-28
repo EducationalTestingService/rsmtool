@@ -34,5 +34,8 @@
     "trim_tolerance": 0.4998,
     "use_scaled_predictions": true,
     "use_thumbnails": false,
-    "use_truncation_thresholds": false
+    "use_truncation_thresholds": false,
+    "use_wandb": false,
+    "wandb_entity": null,
+    "wandb_project": null
 }

@@ -28,10 +28,26 @@ def init_wandb_run(config_obj):
     wandb_run = None
     if use_wandb:
         wandb_run = wandb.init(
-            project=config_obj["wandb_project"], entity=config_obj["wandb_entity"]
+            project=config_obj["wandb_project"], entity=config_obj["wandb_entity"], reinit=True
         )
-        wandb_run.config.update(config_obj)
     return wandb_run
+
+
+def log_configuration_to_wandb(wandb_run, configuration, name):
+    """
+    Log a configuration object to W&B if logging to W&B is enabled.
+
+    Parameters
+    ----------
+    wandb_run : wandb.Run
+        The wandb run object, or None, if logging to W&B is disabled
+    configuration : rsmtool.configuration_parser.Configuration
+        A Configuration object
+    name : str
+        Configuration name
+    """
+    if wandb_run:
+        wandb_run.config.update({name: configuration.to_dict()})
 
 
 def log_dataframe_to_wandb(wandb_run, df, df_name):
