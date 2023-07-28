@@ -28,7 +28,7 @@ def init_wandb_run(config_obj):
     wandb_run = None
     if use_wandb:
         wandb_run = wandb.init(
-            project=config_obj["wandb_project"], entity=config_obj["wandb_entity"], reinit=True
+            project=config_obj["wandb_project"], entity=config_obj["wandb_entity"]
         )
     return wandb_run
 

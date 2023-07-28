@@ -51,7 +51,8 @@ Here are all the arguments to the ``rsmxval`` command-line script.
 Output
 """"""
 
-``rsmxval`` produces a set of folders in the output directory.
+``rsmxval`` produces a set of folders in the output directory. If logging to `Weights & Biases <https://wandb.ai/>`__ is :ref:`enabled <use_wandb_rsmeval>`,
+the reports generated in this run are also logged to the specified Weights & Biases project.
 
 folds
 ~~~~~
