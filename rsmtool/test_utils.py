@@ -14,7 +14,6 @@ from shutil import copyfile, copytree, rmtree
 
 import numpy as np
 from bs4 import BeautifulSoup
-from nose.tools import assert_equal, ok_
 from pandas.testing import assert_frame_equal
 
 from .modeler import Modeler
@@ -142,7 +141,7 @@ def check_run_experiment(
     # but ignore warnings if appropriate
     if not IGNORE_WARNINGS:
         warning_msgs = collect_warning_messages_from_report(html_report)
-        assert_equal(len(warning_msgs), 0)
+        assert len(warning_msgs) == 0
 
 
 def check_run_evaluation(
@@ -228,7 +227,7 @@ def check_run_evaluation(
     # but ignore warnings if appropriate
     if not IGNORE_WARNINGS:
         warning_msgs = collect_warning_messages_from_report(html_report)
-        assert_equal(len(warning_msgs), 0)
+        assert len(warning_msgs) == 0
 
 
 def check_run_explain(
@@ -295,7 +294,7 @@ def check_run_explain(
     # but ignore warnings if appropriate
     if not IGNORE_WARNINGS:
         warning_msgs = collect_warning_messages_from_report(html_report)
-        assert_equal(len(warning_msgs), 0)
+        assert len(warning_msgs) == 0
 
 
 def check_run_comparison(
@@ -350,7 +349,7 @@ def check_run_comparison(
     # but ignore warnings if appropriate
     if not IGNORE_WARNINGS:
         warning_msgs = collect_warning_messages_from_report(html_report)
-        assert_equal(len(warning_msgs), 0)
+        assert len(warning_msgs) == 0
 
 
 def check_run_prediction(
@@ -480,7 +479,7 @@ def check_run_summary(
     # but ignore warnings if appropriate
     if not IGNORE_WARNINGS:
         warning_msgs = collect_warning_messages_from_report(html_report)
-        assert_equal(len(warning_msgs), 0)
+        assert len(warning_msgs) == 0
 
 
 def check_run_cross_validation(
@@ -675,7 +674,7 @@ def check_run_cross_validation(
         # but ignore warnings if appropriate
         if not IGNORE_WARNINGS:
             warning_msgs = collect_warning_messages_from_report(html_report)
-            assert_equal(len(warning_msgs), 0)
+            assert len(warning_msgs) == 0
 
 
 def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for=[]):
@@ -1126,10 +1125,10 @@ def check_report(html_file, raise_errors=True, raise_warnings=True):
                     report_warnings += 1
 
     if raise_errors:
-        assert_equal(report_errors, 0)
+        assert report_errors == 0
 
     if raise_warnings:
-        assert_equal(report_warnings, 0)
+        assert report_warnings == 0
 
 
 def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
@@ -1223,7 +1222,7 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
     missing_file = set(file_must_with_id).difference(set(file_exist))
-    assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
+    assert len(missing_file) == 0, f"Missing files: {','.join(missing_file)}"
 
 
 def check_consistency_files_exist(generated_files, experiment_id, file_format="csv"):
@@ -1250,7 +1249,7 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format="c
     file_must_with_id = [experiment_id + file_name for file_name in file_must_have]
     file_exist = [basename(file_name) for file_name in generated_files]
     missing_file = set(file_must_with_id).difference(set(file_exist))
-    assert_equal(len(missing_file), 0, f"Missing files: {','.join(missing_file)}")
+    assert len(missing_file) == 0, f"Missing files: {','.join(missing_file)}"
 
 
 def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="csv"):
@@ -1276,8 +1275,8 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
     test_preprocessed_file = join(output_dir, f"{experiment_id}_test_metadata.{file_format}")
     test_preprocessed = DataReader.read_from_file(test_preprocessed_file, index_col=0)
     for group in subgroups:
-        ok_(group in train_preprocessed.columns)
-        ok_(group in test_preprocessed.columns)
+        assert group in train_preprocessed.columns
+        assert group in test_preprocessed.columns
 
     # check that the total sum of N per category matches the total N
     # in data composition and the total N categories matches what is
@@ -1295,10 +1294,10 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
             ]
 
             summation = sum(composition_by_group[f"{partition} set"])
-            ok_(summation == partition_info.iloc[0]["responses"])
+            assert summation == partition_info.iloc[0]["responses"]
 
             length = len(composition_by_group.loc[composition_by_group[f"{partition} set"] != 0])
-            ok_(length == partition_info.iloc[0][group])
+            assert length == partition_info.iloc[0][group]
 
 
 def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
