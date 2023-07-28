@@ -11,7 +11,7 @@ pandas
 parameterized
 pre-commit
 seaborn
-shap==0.42.0
+shap==0.42.1
 skll==4.0.0
 sphinx<6.0
 sphinx-design
