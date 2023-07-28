@@ -66,5 +66,8 @@ In addition to the fields described so far, an ``rsmxval`` configuration file al
 - ``use_scaled_predictions``
 - ``use_thumbnails``
 - ``use_truncation_thresholds``
+- ``use_wandb``
+- ``wandb_entity``
+- ``wandb_project``
 
 Please refer to these fields' descriptions on the page describing the :ref:`rsmtool configuration file <config_file_rsmtool>`.

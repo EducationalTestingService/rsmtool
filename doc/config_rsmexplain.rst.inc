@@ -82,3 +82,30 @@ If this option is set to ``false``, the feature values for the responses in ``ba
 .. important::
 
     If ``experiment_dir`` contains the rsmtool configuration file, that file's value for ``standardize_features`` will override the value specified by the user. The reason is that if ``rsmtool`` trained the model with (or without) standardized features, then ``rsmexplain`` must do the same for the explanations to be meaningful.
+
+.. _use_wandb_rsmexplain:
+
+use_wandb *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~
+
+If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+
+.. _wandb_project_rsmexplain:
+
+wandb_project *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The Weights & Biases project name if logging to Weights & Biases is enabled. If a project by this name does not already exist, it will be created.
+
+.. important::
+    1. Before using Weights & Biases for the first time, users should log in and provide their API key as described in
+       `W&B Quickstart guidelines <https://docs.wandb.ai/quickstart#2-log-in-to-wb>`__.
+    2. Note that when using W&B logging, the rsmtool run may take significantly longer due to the network traffic being
+       sent to W&B.
+
+.. _wandb_entity_rsmexplain:
+
+wandb_entity *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The Weights & Biases entity name if logging to Weights & Biases is enabled.
+Entity can be a user name or the name of a team or organization.
