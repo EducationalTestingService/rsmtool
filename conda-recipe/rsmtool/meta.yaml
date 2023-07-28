@@ -37,12 +37,12 @@ requirements:
     - openpyxl
     - pandas
     - seaborn
-    - skll==3.2.0
+    - skll==4.0.0
     - statsmodels
     - tqdm
     - xlrd
     - xlwt
-    - shap==0.42.0
+    - shap==0.42.1
 
 test:
   # Python imports
