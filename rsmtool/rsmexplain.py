@@ -411,7 +411,7 @@ def generate_explanation(
     )
 
     # generate the HTML report
-    generate_report(explanation, output_dir, ids, configuration, logger)
+    generate_report(explanation, output_dir, ids, configuration, logger, wandb_run=wandb_run)
 
 
 def generate_report(explanation, output_dir, ids, configuration, logger=None, wandb_run=None):
