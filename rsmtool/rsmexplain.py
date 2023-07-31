@@ -436,7 +436,10 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-
+    wandb_run : wandb.Run
+        A wandb run object that will be used to log artifacts and tables.
+        If ``None`` is passed, a new wandb run will be initialized if
+        wandb is enabled in the configuration. Defaults to ``None``.
     """
     logger = logger if logger else logging.getLogger(__name__)
 
