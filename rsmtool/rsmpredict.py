@@ -18,8 +18,6 @@ from os.path import abspath, basename, dirname, exists, join, normpath, split, s
 import numpy as np
 import pandas as pd
 
-from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
-
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
@@ -27,6 +25,7 @@ from .reader import DataReader
 from .utils.commandline import CmdOption, ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 from .writer import DataWriter
 
 

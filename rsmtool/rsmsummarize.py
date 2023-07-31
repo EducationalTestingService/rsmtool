@@ -16,14 +16,13 @@ import sys
 from os import listdir
 from os.path import abspath, exists, join, normpath
 
-from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
-
 from .configuration_parser import configure
 from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.logging import LogFormatter
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 
 def check_experiment_dir(experiment_dir, experiment_name, configpath):
