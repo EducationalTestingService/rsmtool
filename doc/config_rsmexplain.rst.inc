@@ -39,15 +39,33 @@ description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the ``rsmexplain`` experiment that will be shown at the top of the report. The description can contain spaces and punctuation.
 
-num_features_to_display *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to 15.
+general_sections *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RSMTool provides pre-defined sections for ``rsmexplain`` (listed below) and, by default, all of them are included in the report. However, you can choose a subset of these pre-defined sections by specifying a list as the value for this field.
+
+    - ``data_description``: Shows the number/identity of responses that are being explained.
+
+    - ``shap_values``: Shows different types of SHAP values for the features.
+
+    - ``shap_plots``: Shows various SHAP explanation plots for the features.
+
+    - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
 .. _rsmexplain_id_column:
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both ``background_data`` and ``explain_data`` files. Note that the name of the ``id_column`` must be the same in these two files.
+
+num_features_to_display *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to 15.
+
+.. _rsmexplain_sample_ids:
+
+sample_ids *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~
+If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string. Note that the IDs must be values from the :ref:`id_column <rsmexplain_id_column>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"`` etc. and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5, EXAMPLE_10, EXAMPLE_12"``. Defaults to ``None``.
 
 .. _rsmexplain_sample_range:
 
@@ -60,12 +78,6 @@ If we want to explain a specific range of responses from the ``explain_data``, w
 sample_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 If we want to explain a random sample of the responses in explain_data, we can specify the size of that random sample here. For example, to explain a random sample of 10 responses, we would set this to 10. Defaults to ``None``.
-
-.. _rsmexplain_sample_ids:
-
-sample_ids *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string. Note that the IDs must be values from the :ref:`id_column <rsmexplain_id_column>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"`` etc. and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5, EXAMPLE_10, EXAMPLE_12"``. Defaults to ``None``.
 
 .. note ::
 
