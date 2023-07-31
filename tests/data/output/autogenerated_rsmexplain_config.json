@@ -13,7 +13,8 @@ WARNING: Automatically generated configuration files MUST be edited to add value
     "general_sections": [
         "data_description",
         "shap_values",
-        "shap_plots"
+        "shap_plots",
+        "sysinfo"
     ],
     "id_column": "spkitemid",
     "num_features_to_display": 15,
