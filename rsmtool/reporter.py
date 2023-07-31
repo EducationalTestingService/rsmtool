@@ -400,8 +400,16 @@ class Reporter:
 
         default_filters["clean_html"] = custom_clean_html
 
+        # we want to suppress the logged warning from nbconvert about missing
+        # alt text since there is currently no easy way to add alt text to
+        # inlined-SVG images that are generated programmatically. To do this,
+        # we will temporarily change the log level for the log object that
+        # produces this warning and then restore it after we are done
         exportHtml = HTMLExporter(config=report_config)
+        old_level = exportHtml.log.level
+        exportHtml.log.setLevel(logging.ERROR)
         output, _ = exportHtml.from_filename(notebook_file)
+        exportHtml.log.setLevel(old_level)
         open(html_file, mode="w", encoding="utf-8").write(output)
 
     def determine_chosen_sections(
