@@ -13,6 +13,7 @@ import pickle
 from math import log10, sqrt
 from os.path import join
 
+import joblib
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -37,6 +38,17 @@ class Modeler:
         """Instantiate empty instance with no learner and given logger, if any."""
         self.learner = None
         self.logger = logger if logger else logging.getLogger(__name__)
+
+    def save(self, model_path):
+        """
+        Save an instance of this class to disk.
+
+        Parameters
+        ----------
+        model_path : str
+            Destination path for model file
+        """
+        joblib.dump(self, model_path)
 
     @classmethod
     def load_from_file(cls, model_path):
@@ -64,7 +76,14 @@ class Modeler:
                 f"extension. Please make sure that it is a `.model` file."
             )
 
-        # Create SKLL learner from file
+        with open(model_path, "rb") as model_file:
+            modeler_or_learner = joblib.load(model_file)
+
+        if isinstance(modeler_or_learner, Modeler):
+            return modeler_or_learner
+
+        # If not a Modeler object, try to load as if it were a SKLL
+        # Learner object (for backward compatibility)
         learner = Learner.from_file(model_path)
         return cls.load_from_learner(learner)
 
@@ -1045,10 +1064,6 @@ class Modeler:
             # add model_fit to frame list
             frames.append({"name": "model_fit", "frame": df_model_fit})
 
-        # save the SKLL model to a file
-        model_file = join(filedir, f"{experiment_id}.model")
-        learner.save(model_file)
-
         container = DataContainer(frames)
         writer.write_experiment_output(filedir, container, file_format=file_format)
 
@@ -1137,10 +1152,6 @@ class Modeler:
 
         # TODO: compute betas for linear SKLL models?
 
-        # save the SKLL model to disk with the given model name prefix
-        model_file = join(filedir, f"{experiment_id}.model")
-        learner.save(model_file)
-
         self.learner = learner
 
         # return the SKLL learner object and the chosen objective
@@ -1199,6 +1210,14 @@ class Modeler:
             configuration["skll_objective"] = chosen_objective
         else:
             model = self.train_builtin_model(*args, **kwargs)
+
+        self.feature_info = data_container.feature_info.copy()
+        self.feature_info.set_index("feature", inplace=True)
+        (
+            self.trim_min,
+            self.trim_max,
+            self.trim_tolerance,
+        ) = configuration.get_trim_min_max_tolerance()
 
         return model
 
