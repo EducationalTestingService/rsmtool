@@ -32,7 +32,7 @@ from .writer import DataWriter
 def fast_predict(
     input_features,
     modeler,
-    df_feature_info,
+    df_feature_info=None,
     trim_min=None,
     trim_max=None,
     trim_tolerance=0.4998,
@@ -72,7 +72,10 @@ def fast_predict(
         are to be generated. This object should be created from the already
         existing model file in the "output" directory of the previously run
         RSMTool experiment.
-    df_feature_info : pandas DataFrame
+    df_feature_info : pandas DataFrame, optional
+        If ``None``, this function will try to extract this information
+        from the ``Modeler`` object.
+
         A DataFrame containing the information regarding the model features.
         The index of the dataframe should be the names of the features and
         the columns should be:
@@ -88,41 +91,57 @@ def fast_predict(
 
         This dataframe should be read from the "feature.csv" file under the
         "output" directory of the previously run RSMTool experiment.
+
+        Defaults to ``None``.
     trim_min : int, optional
         The lowest possible integer score that the machine should predict.
-        If ``None``, raw predictions will not be trimmed.
+        If ``None``, this function will try to extract this value from the
+        ``Modeler`` object. If ``None`` and no such attribute exists, raw
+        predictions will not be trimmed.
         Defaults to ``None``.
     trim_max : int, optional
         The highest possible integer score that the machine should predict.
-        If ``None``, raw predictions will not be trimmed.
+        If ``None``, this function will try to extract this value from the
+        ``Modeler`` object. If ``None`` and no such attribute exists, raw
+        predictions will not be trimmed.
         Defaults to ``None``.
     trim_tolerance : float, optional
        The single numeric value that will be used to pad the trimming range
-       specified in ``trim_min`` and ``trim_max``.
-       Defaults to 0.4998.
+       specified in ``trim_min`` and ``trim_max``. If ``None``, this function
+       will try to extract this value from the ``Modeler`` object. If no
+       such attribute can be found, the value will default to ``0.4998``.
+       Defaults to ``None``.
     train_predictions_mean : float, optional
        The mean of the predictions on the training set used to re-scale the
        predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
-       the model. If ``None``, predictions will not be scaled.
+       the model. If ``None``, this function will try to extract this value from
+       the ``Modeler`` object. If ``None`` and no such attribute exists,
+       predictions will not be scaled.
        Defaults to ``None``.
     train_predictions_sd : float, optional
        The standard deviation of the predictions on the training set used to
        re-scale the predictions. May be read from the "postprocessing_params.csv"
        file under the "output" directory of the RSMTool experiment used to train
-       the model.If ``None``, predictions will not be scaled.
+       the model. If ``None``, this function will try to extract this value from
+       the ``Modeler`` object. If ``None`` and no such attribute exists,
+       predictions will not be scaled.
        Defaults to ``None``.
     h1_mean : float, optional
        The mean of the human scores in the training set also used to re-scale
        the predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
-       the model. If ``None``, predictions will not be scaled.
+       the model. If ``None``, this function will try to extract this value from
+       the ``Modeler`` object. If ``None`` and no such attribute exists,
+       predictions will not be scaled.
        Defaults to ``None``.
     h1_sd : float, optional
        The standard deviation of the human scores in the training set used to
        re-scale the predictions. May be read from the "postprocessing_params.csv"
        file under the "output" directory of the RSMTool experiment used to train
-       the model. If ``None``, predictions will not be scaled.
+       the model. If ``None``, this function will try to extract this value from
+       the ``Modeler`` object. If ``None`` and no such attribute exists,
+       predictions will not be scaled.
        Defaults to ``None``.
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
@@ -153,6 +172,15 @@ def fast_predict(
     df_input_features = pd.DataFrame([input_features])
     df_input_features["spkitemid"] = "RESPONSE"
 
+    if df_feature_info is None:
+        try:
+            df_feature_info = modeler.feature_info
+        except AttributeError:
+            raise ValueError(
+                "df_feature_info must be specified if it cannot be found as an "
+                "attribute in the modeler object"
+            )
+
     # preprocess the input features so that they match what the model expects
     try:
         df_processed_features, _ = preprocessor.preprocess_new_data(
@@ -165,6 +193,14 @@ def fast_predict(
     df_predictions = modeler.predict(df_processed_features)
 
     # compute scaled prediction if the scaling parameters are available
+    if all(x is None for x in [train_predictions_mean, train_predictions_sd, h1_mean, h1_sd]):
+        try:
+            train_predictions_mean = modeler.train_predictions_mean
+            train_predictions_sd = modeler.train_predictions_sd
+            h1_mean = modeler.h1_mean
+            h1_sd = modeler.h1_sd
+        except AttributeError:
+            pass
     if train_predictions_mean and train_predictions_sd and h1_mean and h1_sd:
         df_predictions["scale"] = (
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
@@ -173,8 +209,20 @@ def fast_predict(
     # drop the spkitemid column since it's not needed from this point onwards
     df_predictions.drop("spkitemid", axis="columns", inplace=True)
 
-    # trim both raw and scale predictions if ``trim_min`` and ``trim_max`` were specified
-    if trim_min and trim_max:
+    # trim both raw and scale predictions if ``trim_min`` and ``trim_max``
+    # were specified
+    if trim_tolerance is None:
+        try:
+            trim_tolerance = modeler.trim_tolerance
+        except AttributeError:
+            trim_tolerance = 0.4998
+    if trim_min is None and trim_max is None:
+        try:
+            trim_min = modeler.trim_min
+            trim_max = modeler.trim_max
+        except AttributeError:
+            pass
+    if trim_min is not None and trim_max is not None:
         for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance

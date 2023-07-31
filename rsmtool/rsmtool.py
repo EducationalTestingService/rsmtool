@@ -270,6 +270,18 @@ def run_experiment(
         train_for_prediction, test_for_prediction, processed_config
     )
 
+    # Save modeler instance
+    pred_config_dict = pred_config.to_dict()
+    for key, attr_name in [
+        ("train_predictions_mean", "train_predictions_mean"),
+        ("train_predictions_sd", "train_predictions_sd"),
+        ("human_labels_mean", "h1_mean"),
+        ("human_labels_sd", "h1_sd"),
+    ]:
+        setattr(modeler, attr_name, pred_config_dict[key])
+    logger.info("Saving model.")
+    modeler.save(join(csvdir, f"{configuration['experiment_id']}.model"))
+
     # Write out files
     writer.write_experiment_output(
         csvdir,
