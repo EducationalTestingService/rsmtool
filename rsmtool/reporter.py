@@ -100,7 +100,7 @@ else:
         "sysinfo",
     ]
 
-    ordered_section_list_rsmexplain = ["data_description", "shap_values", "shap_plots"]
+    ordered_section_list_rsmexplain = ["data_description", "shap_values", "shap_plots", "sysinfo"]
 
     special_section_list_rsmtool = []
     special_section_list_rsmcompare = []
