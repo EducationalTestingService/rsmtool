@@ -24,8 +24,6 @@ import pandas as pd
 import shap
 from skll.data import FeatureSet
 
-from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
-
 from .configuration_parser import configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
@@ -35,6 +33,7 @@ from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
 from .utils.constants import VALID_PARSER_SUBCOMMANDS
 from .utils.conversion import parse_range
 from .utils.logging import LogFormatter
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 
 def select_examples(featureset, range_size=None):

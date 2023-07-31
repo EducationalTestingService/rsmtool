@@ -36,8 +36,6 @@ from pathlib import Path
 from joblib.parallel import Parallel, delayed
 from tqdm import tqdm
 
-from rsmtool.utils.wandb import init_wandb_run, log_configuration_to_wandb
-
 from .configuration_parser import Configuration, configure
 from .rsmeval import run_evaluation
 from .rsmsummarize import run_summary
@@ -50,6 +48,7 @@ from .utils.cross_validation import (
     process_fold,
 )
 from .utils.logging import LogFormatter, get_file_logger, tqdm_joblib
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 from .writer import DataWriter
 
 # a constant defining all of the sections we can use when
