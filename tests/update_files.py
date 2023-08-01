@@ -11,7 +11,7 @@ under `tests/data/experiments`.
 # IMPORTANT: DO NOT RUN THIS SCRIPT BEFORE RUNNING THE TEST SUITE OR IT WILL BE DISASTROUS. #
 #############################################################################################
 
-The scripts works as as follows. For each experiment test:
+The script works as follows. For each experiment test:
 - The script locates the output under the updated outputs directory.
 - New and changed files in this directory are copied over to the expected test
   output location.
