@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 """
-Update SKLL models in tests.
+Update RSMTool models in tests.
 
-This script updates the SKLL model files to ensure they are compatible with the
-current version. It simply iterates through all rsmpredict tests under the
+This script updates the RSMTool model files to ensure they are compatible with
+the current version. It simply iterates through all rsmpredict tests under the
 `data/experiments` directory, finds the model files, loads them, and saves
 them again.
 
@@ -20,31 +20,17 @@ IMPORTANT:
 """
 
 import glob
-from os import getcwd, remove
-from os.path import dirname, join
+from os import getcwd
+from os.path import join
 
-from skll.learner import Learner
+from rsmtool.modeler import Modeler
 
 TEST_DIR = getcwd()
 
 
 def update_model(model_file):
     """Read in the model file and save it again."""
-    model_dir = dirname(model_file)
-
-    # get the list of current files so that we can
-    # remove them later to ensure there are no stranded
-    # .npy files
-    npy_files = glob.glob(join(model_dir, "*.npy"))
-
-    # now load the SKLL model
-    model = Learner.from_file(model_file)
-
-    # delete the existing npy files. The model file will get overwritten,
-    # but we do not know the exact number of current .npy files.
-    for npy_file in npy_files:
-        remove(npy_file)
-
+    model = Modeler.load_from_file(model_file)
     model.save(model_file)
 
 
