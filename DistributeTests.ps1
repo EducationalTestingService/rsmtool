@@ -36,6 +36,7 @@ elseif ($agentNumber -eq 2) {
     $testsToRun = $testsToRun + "test_configuration_parser"
     $testsToRun = $testsToRun + "test_experiment_rsmtool_2"
     $testsToRun = $testsToRun + "test_container"
+    $testsToRun = $testsToRun + "test_wandb"
 }
 elseif ($agentNumber -eq 3) {
     $testsToRun = $testsToRun + "test_analyzer"
