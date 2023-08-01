@@ -70,9 +70,7 @@ def main():  # noqa: D103
     # print out a reminder that the user should have run the test suite
     run_test_suite = input("Have you already run the whole test suite? (y/n): ")
     if run_test_suite == "n":
-        print(
-            "Please run the whole test suite using " "`nose2 -s tests` before running this script."
-        )
+        print("Please run the whole test suite using `nose2 -s tests` before running this script.")
         sys.exit(0)
     elif run_test_suite != "y":
         print("Invalid answer. Exiting.")
