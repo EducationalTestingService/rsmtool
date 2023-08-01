@@ -4,9 +4,11 @@ from unittest.mock import Mock, patch
 
 import pandas as pd
 
+from rsmtool.configuration_parser import Configuration
 from rsmtool.test_utils import rsmtool_test_dir
 from rsmtool.utils.wandb import (
     init_wandb_run,
+    log_configuration_to_wandb,
     log_dataframe_to_wandb,
     log_report_to_wandb,
 )
@@ -14,14 +16,25 @@ from rsmtool.utils.wandb import (
 
 class TestWandb(unittest.TestCase):
     def test_init_wandb_run_wandb_enabled(self):
-        config = {"use_wandb": True, "wandb_entity": "test_entity", "wandb_project": "test_project"}
+        config = {
+            "use_wandb": True,
+            "wandb_entity": "test_entity",
+            "wandb_project": "test_project",
+            "experiment_id": "test",
+            "model": "LinearRegression",
+            "train_file": "train.csv",
+            "test_file": "test.csv",
+        }
+        config_object = Configuration(config)
 
         mock_wandb_run = Mock()
-        with patch("wandb.init") as mock_wandb_init:
-            mock_wandb_init.return_value = mock_wandb_run
+        with patch(
+            "rsmtool.utils.wandb.wandb.init", return_value=mock_wandb_run
+        ) as mock_wandb_init:
             init_wandb_run(config)
+            log_configuration_to_wandb(mock_wandb_run, config_object, "test")
         mock_wandb_init.assert_called_with(project="test_project", entity="test_entity")
-        mock_wandb_run.config.update.assert_called_with(config)
+        mock_wandb_run.config.update.assert_called_with({"test": config_object.to_dict()})
 
     def test_init_wandb_run_wandb_disabled(self):
         config = {
