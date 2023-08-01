@@ -1,0 +1,10 @@
+select = ["D", "E", "F", "I"]
+ignore = ["D212"]
+line-length = 100
+target-version = "py38"
+
+[pydocstyle]
+convention = "numpy"
+
+[per-file-ignores]
+"tests/test*.py" = ["D100", "D101", "D102", "D103"]
