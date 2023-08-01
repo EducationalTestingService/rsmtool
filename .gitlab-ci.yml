@@ -36,7 +36,7 @@ testset1:
 testset2:
   extends: ".runtests"
   variables:
-    TESTFILES: "test_comparer test_configuration_parser test_experiment_rsmtool_2"
+    TESTFILES: "test_comparer test_configuration_parser test_experiment_rsmtool_2 test_wandb"
   stage: "test"
 
 # third set of test files
