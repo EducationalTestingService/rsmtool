@@ -1154,7 +1154,7 @@ class Modeler:
         data and save the results in the given directories using the
         given experiment ID as the prefix.
 
-        parameters
+        Parameters
         ----------
         configuration : configuration_parser.Configuration
             A configuration object containing "experiment_id" and "model_name"
