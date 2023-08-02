@@ -51,6 +51,7 @@ class TestModeler(unittest.TestCase):
             self.modeler.predict(df, predict_expected=True)
 
     def test_save_and_load(self):
+        """Test that a modeler can be saved and subsequently loaded."""
         model_file = tempfile.NamedTemporaryFile(suffix=".model", delete=False)
         model_file.close()
         self.modeler.save(model_file.name)
@@ -59,6 +60,8 @@ class TestModeler(unittest.TestCase):
 
     def test_load_from_skll_model_file(self):
         """
+        Test that SKLL learners can be loaded as modelers.
+
         Meant to test for backward compatibility. Saved models were
         formerly bare SKLL learner objects. This can be emulated by
         saving just the learner attribute within the modeler object

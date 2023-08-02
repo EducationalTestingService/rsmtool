@@ -35,7 +35,8 @@ class Modeler:
     """Class to train model and generate predictions with built-in or SKLL models."""
 
     def __init__(self, logger=None):
-        """Initialize empty modeler object.
+        """
+        Initialize empty ``Modeler`` object.
 
         The learner and the scaling-/trimming-related attributes are
         set to ``None``.
@@ -64,7 +65,7 @@ class Modeler:
     @classmethod
     def load_from_file(cls, model_path):
         """
-        Load a modeler object from a file on disk.
+        Load a ``Modeler`` object from a file on disk.
 
         Parameters
         ----------
