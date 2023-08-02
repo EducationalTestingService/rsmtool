@@ -1,10 +1,8 @@
 [run]
 source=rsmtool
+omit=rsmtool/notebooks/templates/report.tpl
+     rsmtool/test_utils.py
+     setup.py
+     examples/*
+     tests/*
 parallel=true
-omit =
-    *rsmtool/notebooks/templates/report.tpl
-    rsmtool/test_utils.py
-    setup.py
-    sitecustomize.py
-    examples/*
-    tests/*
