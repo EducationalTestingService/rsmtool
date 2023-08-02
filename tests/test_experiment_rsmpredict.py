@@ -1,4 +1,5 @@
 import csv
+import itertools
 import os
 import tempfile
 import unittest
@@ -248,7 +249,9 @@ class TestExperimentRsmpredict(unittest.TestCase):
         with self.assertRaises(ValueError):
             do_run_prediction(source, config_file)
 
-    def check_fast_predict(self, source, do_trim=False, do_scale=False):
+    def check_fast_predict(
+        self, source, do_trim=False, do_scale=False, explicit_trim_scale_args=False
+    ):
         """Ensure that predictions from `fast_predict()` match expected predictions."""
         # define the paths to the various files we need
         test_file = join(rsmtool_test_dir, "data", "files", "test.csv")
@@ -269,26 +272,32 @@ class TestExperimentRsmpredict(unittest.TestCase):
         # initialize the modeler instance
         modeler = Modeler.load_from_file(model_file)
 
-        # initialize the keyword arguments we want to passs
+        # initialize the keyword arguments we want to pass
         kwargs = {}
+        if explicit_trim_scale_args:
+            kwargs["df_feature_info"] = df_feature_info
         if do_trim:
-            kwargs["trim_min"] = int(params["trim_min"])
-            kwargs["trim_max"] = int(params["trim_max"])
-            if "trim_tolerance" in params:
-                kwargs["trim_tolerance"] = float(params["trim_tolerance"])
+            if explicit_trim_scale_args:
+                kwargs["trim_min"] = int(params["trim_min"])
+                kwargs["trim_max"] = int(params["trim_max"])
+                if "trim_tolerance" in params:
+                    kwargs["trim_tolerance"] = float(params["trim_tolerance"])
+        else:
+            kwargs["trim"] = False
 
         if do_scale:
-            kwargs["train_predictions_mean"] = float(params["train_predictions_mean"])
-            kwargs["train_predictions_sd"] = float(params["train_predictions_sd"])
-            kwargs["h1_mean"] = float(params["h1_mean"])
-            kwargs["h1_sd"] = float(params["h1_sd"])
+            if explicit_trim_scale_args:
+                kwargs["train_predictions_mean"] = float(params["train_predictions_mean"])
+                kwargs["train_predictions_sd"] = float(params["train_predictions_sd"])
+                kwargs["h1_mean"] = float(params["h1_mean"])
+                kwargs["h1_sd"] = float(params["h1_sd"])
+        else:
+            kwargs["scale"] = False
 
         # initialize a variable to hold all the predictions
         prediction_dicts = []
         for input_features in df_test.to_dict(orient="records"):
-            tolerance = params.get("trim_tolerance")
-            tolerance = float(tolerance) if tolerance else tolerance
-            predictions = fast_predict(input_features, modeler, df_feature_info, **kwargs)
+            predictions = fast_predict(input_features, modeler, **kwargs)
             prediction_dicts.append(predictions)
 
         # combine all the computed predictions into a data frame
@@ -320,11 +329,11 @@ class TestExperimentRsmpredict(unittest.TestCase):
         )
 
     def test_fast_predict(self):  # noqa: D103
-        yield self.check_fast_predict, "lr-predict",
-        yield self.check_fast_predict, "lr-predict", True, False
-        yield self.check_fast_predict, "lr-predict", False, True
-        yield self.check_fast_predict, "lr-predict", True, True
-        yield self.check_fast_predict, "lr-predict-no-tolerance", True, True
+        for do_trim, do_scale, explicit_trim_scale_args in itertools.product(
+            [True, False], repeat=3
+        ):
+            for source in ["lr-predict", "lr-predict-no-tolerance"]:
+                yield self.check_fast_predict, source, do_trim, do_scale, explicit_trim_scale_args
 
     def test_fast_predict_non_numeric(self):
         """Check that ``fast_predict()`` raises an error with non-numeric values."""
@@ -358,3 +367,113 @@ class TestExperimentRsmpredict(unittest.TestCase):
         }
         with self.assertRaises(ValueError):
             _ = fast_predict(input_features, modeler, df_feature_info)
+
+    def test_fast_predict_no_feature_info(self):
+        """
+        Check that ``fast_predict()`` raises an error when
+        ``df_feature_info=None`` and the ``feature_info`` attribute
+        cannot be found.
+        """
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+
+        # initialize the modeler instance and remove the
+        # ``feature_info`` attribute
+        modeler = Modeler.load_from_file(model_file)
+        delattr(modeler, "feature_info")
+
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+        with self.assertRaises(ValueError):
+            _ = fast_predict(input_features, modeler)
+
+    def test_fast_predict_scaling_params_but_scale_false(self):
+        """
+        Check that ``fast_predict()`` raises an error when
+        scaling-related parameters are set but ``scale=False``.
+        """
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+        modeler = Modeler.load_from_file(model_file)
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+
+        # For each scaling-related parameter, simply get the parameter
+        # from the modeler and try to pass it in with scale=False
+        for param in ["train_predictions_mean", "train_predictions_sd", "h1_mean", "h1_sd"]:
+            scale_params = {param: getattr(modeler, param)}
+            with self.assertRaises(ValueError):
+                _ = fast_predict(
+                    input_features,
+                    modeler,
+                    scale=False,
+                    **scale_params,
+                )
+
+    def test_fast_predict_trimming_params_but_trim_false(self):
+        """
+        Check that ``fast_predict()`` raises an error when
+        trimming-related parameters are set but ``trim=False``.
+        """
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+        modeler = Modeler.load_from_file(model_file)
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+
+        # For each trimming-related parameter, simply get the parameter
+        # from the modeler and try to pass it in with trim=False
+        for param in ["trim_min", "trim_max", "trim_tolerance"]:
+            trim_params = {param: getattr(modeler, param)}
+            with self.assertRaises(ValueError):
+                _ = fast_predict(
+                    input_features,
+                    modeler,
+                    trim=False,
+                    **trim_params,
+                )
