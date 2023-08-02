@@ -250,7 +250,12 @@ class TestExperimentRsmpredict(unittest.TestCase):
             do_run_prediction(source, config_file)
 
     def check_fast_predict(
-        self, source, do_trim=False, do_scale=False, explicit_trim_scale_args=False
+        self,
+        source,
+        do_trim=False,
+        do_scale=False,
+        explicit_trim_scale_args=False,
+        use_default_trim_tolerance=False,
     ):
         """Ensure that predictions from `fast_predict()` match expected predictions."""
         # define the paths to the various files we need
@@ -281,7 +286,10 @@ class TestExperimentRsmpredict(unittest.TestCase):
             if explicit_trim_scale_args:
                 kwargs["trim_min"] = int(params["trim_min"])
                 kwargs["trim_max"] = int(params["trim_max"])
-                if "trim_tolerance" in params:
+                if use_default_trim_tolerance:
+                    if getattr(modeler, "trim_tolerance"):
+                        delattr(modeler, "trim_tolerance")
+                elif "trim_tolerance" in params:
                     kwargs["trim_tolerance"] = float(params["trim_tolerance"])
 
         if do_scale:
@@ -332,6 +340,10 @@ class TestExperimentRsmpredict(unittest.TestCase):
         ):
             for source in ["lr-predict", "lr-predict-no-tolerance"]:
                 yield self.check_fast_predict, source, do_trim, do_scale, explicit_trim_scale_args
+
+        # Use the default trim tolerance value
+        for explicit_trim_scale_args in [True, False]:
+            yield self.check_fast_predict, "lr-predict", True, False, explicit_trim_scale_args, True
 
     def test_fast_predict_non_numeric(self):
         """Check that ``fast_predict()`` raises an error with non-numeric values."""
