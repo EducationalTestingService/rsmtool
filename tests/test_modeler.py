@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 
 import numpy as np
@@ -47,3 +49,24 @@ class TestModeler(unittest.TestCase):
             ValueError, r"Must specify 'min_score' and 'max_score' for expected scores."
         ):
             self.modeler.predict(df, predict_expected=True)
+
+    def test_save_and_load(self):
+        model_file = tempfile.NamedTemporaryFile(suffix=".model", delete=False)
+        model_file.close()
+        self.modeler.save(model_file.name)
+        Modeler.load_from_file(model_file.name)
+        os.unlink(model_file.name)
+
+    def test_load_from_skll_model_file(self):
+        """
+        Meant to test for backward compatibility. Saved models were
+        formerly bare SKLL learner objects. This can be emulated by
+        saving just the learner attribute within the modeler object
+        and then trying to load that in the same way modeler objects
+        would be loaded.
+        """
+        model_file = tempfile.NamedTemporaryFile(suffix=".model", delete=False)
+        model_file.close()
+        self.modeler.learner.save(model_file.name)
+        Modeler.load_from_file(model_file.name)
+        os.unlink(model_file.name)
