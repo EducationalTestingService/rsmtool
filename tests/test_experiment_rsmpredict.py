@@ -380,9 +380,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
 
     def test_fast_predict_no_feature_info(self):
         """
-        Check that ``fast_predict()`` raises an error when
-        ``df_feature_info=None`` and the ``feature_info`` attribute
-        cannot be found.
+        Check case where there is no feature information.
         """
         existing_experiment_dir = join(
             rsmtool_test_dir,
@@ -414,8 +412,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
 
     def test_fast_predict_scaling_params_but_scale_false(self):
         """
-        Check that ``fast_predict()`` raises an error when
-        scaling-related parameters are set but ``scale=False``.
+        Check case when scaling is turned off yet scaling-related parameters are used.
         """
         existing_experiment_dir = join(
             rsmtool_test_dir,
@@ -452,8 +449,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
 
     def test_fast_predict_trimming_params_but_trim_false(self):
         """
-        Check that ``fast_predict()`` raises an error when
-        trimming-related parameters are set but ``trim=False``.
+        Check case when trimming is turned off yet trimming-related parameters are used.
         """
         existing_experiment_dir = join(
             rsmtool_test_dir,
