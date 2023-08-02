@@ -277,22 +277,20 @@ class TestExperimentRsmpredict(unittest.TestCase):
         if explicit_trim_scale_args:
             kwargs["df_feature_info"] = df_feature_info
         if do_trim:
+            kwargs["trim"] = True
             if explicit_trim_scale_args:
                 kwargs["trim_min"] = int(params["trim_min"])
                 kwargs["trim_max"] = int(params["trim_max"])
                 if "trim_tolerance" in params:
                     kwargs["trim_tolerance"] = float(params["trim_tolerance"])
-        else:
-            kwargs["trim"] = False
 
         if do_scale:
+            kwargs["scale"] = True
             if explicit_trim_scale_args:
                 kwargs["train_predictions_mean"] = float(params["train_predictions_mean"])
                 kwargs["train_predictions_sd"] = float(params["train_predictions_sd"])
                 kwargs["h1_mean"] = float(params["h1_mean"])
                 kwargs["h1_sd"] = float(params["h1_sd"])
-        else:
-            kwargs["scale"] = False
 
         # initialize a variable to hold all the predictions
         prediction_dicts = []
