@@ -33,11 +33,11 @@ def fast_predict(
     input_features,
     modeler,
     df_feature_info=None,
-    trim=True,
+    trim=False,
     trim_min=None,
     trim_max=None,
     trim_tolerance=None,
-    scale=True,
+    scale=False,
     train_predictions_mean=None,
     train_predictions_sd=None,
     h1_mean=None,
@@ -99,7 +99,7 @@ def fast_predict(
         Whether to trim the predictions. If ``True``, ``trim_min`` and
         ``trim_max`` must be specified or be available as attributes of
         the modeler object.
-        Defaults to ``True``.
+        Defaults to ``False``.
     trim_min : int, optional
         The lowest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from the
@@ -123,7 +123,7 @@ def fast_predict(
         ``train_predictions_mean``, ``train_predictions_sd``,
         ``h1_mean``, and ``h1_sd`` must be specified or be available as
         attributes of the modeler object.
-        Defaults to ``True``.
+        Defaults to ``False``.
     train_predictions_mean : float, optional
        The mean of the predictions on the training set used to re-scale the
        predictions. May be read from the "postprocessing_params.csv" file
