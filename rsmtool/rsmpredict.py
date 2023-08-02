@@ -33,9 +33,11 @@ def fast_predict(
     input_features,
     modeler,
     df_feature_info=None,
+    trim=True,
     trim_min=None,
     trim_max=None,
-    trim_tolerance=0.4998,
+    trim_tolerance=None,
+    scale=True,
     train_predictions_mean=None,
     train_predictions_sd=None,
     h1_mean=None,
@@ -93,6 +95,11 @@ def fast_predict(
         "output" directory of the previously run RSMTool experiment.
 
         Defaults to ``None``.
+    trim : bool
+        Whether to trim the predictions. If ``True``, ``trim_min`` and
+        ``trim_max`` must be specified or be available as attributes of
+        the modeler object.
+        Defaults to ``True``.
     trim_min : int, optional
         The lowest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from the
@@ -111,6 +118,12 @@ def fast_predict(
        will try to extract this value from the ``Modeler`` object. If no
        such attribute can be found, the value will default to ``0.4998``.
        Defaults to ``None``.
+    scale : bool
+        Whether to scale predictions. If ``True``, all of
+        ``train_predictions_mean``, ``train_predictions_sd``,
+        ``h1_mean``, and ``h1_sd`` must be specified or be available as
+        attributes of the modeler object.
+        Defaults to ``True``.
     train_predictions_mean : float, optional
        The mean of the predictions on the training set used to re-scale the
        predictions. May be read from the "postprocessing_params.csv" file
@@ -192,37 +205,40 @@ def fast_predict(
     # now compute the raw prediction for the given features
     df_predictions = modeler.predict(df_processed_features)
 
-    # compute scaled prediction if the scaling parameters are available
-    if all(x is None for x in [train_predictions_mean, train_predictions_sd, h1_mean, h1_sd]):
-        try:
+    # compute scaled predictions if requested
+    if scale:
+        if train_predictions_mean is None:
             train_predictions_mean = modeler.train_predictions_mean
+        if train_predictions_sd is None:
             train_predictions_sd = modeler.train_predictions_sd
+        if h1_mean is None:
             h1_mean = modeler.h1_mean
+        if h1_sd is None:
             h1_sd = modeler.h1_sd
-        except AttributeError:
-            pass
-    if train_predictions_mean and train_predictions_sd and h1_mean and h1_sd:
         df_predictions["scale"] = (
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
         ) * h1_sd + h1_mean
+    elif any(x is not None for x in [train_predictions_mean, train_predictions_sd, h1_mean, h1_sd]):
+        raise ValueError(
+            "train_predictions_mean/train_predictions_sd/h1_mean/h1_sd cannot be "
+            "specified when trim=False"
+        )
 
     # drop the spkitemid column since it's not needed from this point onwards
     df_predictions.drop("spkitemid", axis="columns", inplace=True)
 
-    # trim both raw and scale predictions if ``trim_min`` and ``trim_max``
-    # were specified
-    if trim_tolerance is None:
-        try:
-            trim_tolerance = modeler.trim_tolerance
-        except AttributeError:
-            trim_tolerance = 0.4998
-    if trim_min is None and trim_max is None:
-        try:
+    # trim both raw and scaled predictions if requested
+    if trim:
+        default_trim_tolerance = 0.4998
+        if trim_tolerance is None:
+            try:
+                trim_tolerance = modeler.trim_tolerance
+            except AttributeError:
+                trim_tolerance = default_trim_tolerance
+        if trim_min is None:
             trim_min = modeler.trim_min
+        if trim_max is None:
             trim_max = modeler.trim_max
-        except AttributeError:
-            pass
-    if trim_min is not None and trim_max is not None:
         for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance
@@ -230,6 +246,8 @@ def fast_predict(
             df_predictions[f"{column}_trim_round"] = np.rint(
                 df_predictions[f"{column}_trim"]
             ).astype("int64")
+    elif any(x is not None for x in [trim_tolerance, trim_min, trim_max]):
+        raise ValueError("trim_tolerance/trim_min/trim_max cannot be specified when trim=False")
 
     # return the predictions as a dictionary
     return df_predictions.to_dict(orient="records")[0]

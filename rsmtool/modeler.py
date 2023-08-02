@@ -35,8 +35,19 @@ class Modeler:
     """Class to train model and generate predictions with built-in or SKLL models."""
 
     def __init__(self, logger=None):
-        """Instantiate empty instance with no learner and given logger, if any."""
+        """Initialize empty modeler object.
+
+        The learner and the scaling-/trimming-related attributes are
+        set to ``None``.
+        """
         self.learner = None
+        self.trim_min = None
+        self.trim_max = None
+        self.trim_tolerance = None
+        self.train_predictions_mean = None
+        self.train_predictions_sd = None
+        self.h1_mean = None
+        self.h1_sd = None
         self.logger = logger if logger else logging.getLogger(__name__)
 
     def save(self, model_path):
@@ -1210,14 +1221,6 @@ class Modeler:
             configuration["skll_objective"] = chosen_objective
         else:
             model = self.train_builtin_model(*args, **kwargs)
-
-        self.feature_info = data_container.feature_info.copy()
-        self.feature_info.set_index("feature", inplace=True)
-        (
-            self.trim_min,
-            self.trim_max,
-            self.trim_tolerance,
-        ) = configuration.get_trim_min_max_tolerance()
 
         return model
 
