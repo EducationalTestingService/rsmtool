@@ -8,6 +8,7 @@ from sklearn.datasets import make_classification
 from skll.data import FeatureSet, Reader
 from skll.learner import Learner
 
+from rsmtool.modeler import Modeler
 from rsmtool.rsmexplain import mask, select_examples
 
 # allow test directory to be set via an environment variable
@@ -20,7 +21,7 @@ else:
 
 
 class TestExplainUtils(unittest.TestCase):
-    """Test class for Explain Utilis tests."""
+    """Test class for Explain Utils tests."""
 
     @classmethod
     def setUpClass(cls):
@@ -189,7 +190,7 @@ class TestExplainUtils(unittest.TestCase):
         output_path = join(rsmtool_test_dir, "data", "output", "explain_mask_from_pickle.out")
         expected_features = np.loadtxt(output_path)
 
-        model = Learner.from_file(model_path)
+        model = Modeler.load_from_file(model_path).learner
         reader = Reader.for_path(data_path, id_col="ID")
         background = reader.read()
 
