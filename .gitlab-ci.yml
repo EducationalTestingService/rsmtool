@@ -11,8 +11,10 @@ variables:
 # set up basic job
 .runtests:
   before_script:
-    - "conda create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} --yes --quiet"
+    - "conda create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} curl --yes --quiet"
     - /root/rsmenv/bin/pip install -e .
+    - /root/rsmenv/bin/curl -o /root/rsmenv/bin/codecov https://uploader.codecov.io/latest/linux/codecov
+    - chmod +x /root/rsmenv/bin/codecov
     - echo "import os" > sitecustomize.py
     - echo "try:" >> sitecustomize.py
     - echo "    import coverage" >> sitecustomize.py
@@ -22,6 +24,7 @@ variables:
     - echo "    pass" >> sitecustomize.py
   script:
     - "/root/rsmenv/bin/nose2 -s tests ${TESTFILES}"
+    - "/root/rsmenv/bin/coverage xml"
   after_script:
     - /root/rsmenv/bin/codecov
 
