@@ -1,5 +1,6 @@
 import argparse
 import filecmp
+import logging
 import unittest
 import warnings
 from io import StringIO
@@ -44,7 +45,7 @@ from rsmtool.utils.files import (
     has_files_with_extension,
     parse_json_with_comments,
 )
-from rsmtool.utils.logging import get_file_logger
+from rsmtool.utils.logging import LogFormatter, get_file_logger
 from rsmtool.utils.metrics import (
     compute_expected_scores_from_model,
     difference_of_standardized_means,
@@ -2015,9 +2016,7 @@ class TestInteractiveField(unittest.TestCase):
             )
 
     def check_optional_interactive_fields_blanks(self, field_name, field_count):
-        """
-        Check that blank user input for an optional field is handled correctly
-        """
+        """Check that blank user input for an optional field is handled correctly."""
         default_value = DEFAULTS.get(field_name)
         blank_return_value = "" if field_count == "single" else []
         with patch("rsmtool.utils.commandline.prompt", return_value=blank_return_value):
@@ -2195,8 +2194,7 @@ class TestInteractiveGenerate(unittest.TestCase):
 
     def check_tool_interact(self, context, subgroups=False, with_folds_file=False):
         """
-        A helper method that runs `ConfigurationGenerator.interact()`
-        and compares its output to expected output.
+        Run ``ConfigurationGenerator.interact()`` and validate output.
 
         Parameters
         ----------
@@ -2275,3 +2273,35 @@ class TestInteractiveGenerate(unittest.TestCase):
         yield self.check_tool_interact, "rsmxval", False, True
         yield self.check_tool_interact, "rsmxval", True, False
         yield self.check_tool_interact, "rsmxval", True, True
+
+
+class TestLogFormatter(unittest.TestCase):
+    def test_format_debug(self):
+        formatter = LogFormatter()
+        record = logging.LogRecord(
+            "name", logging.DEBUG, "pathname", 10, "debug message", None, None
+        )
+        formatted = formatter.format(record)
+        self.assertEqual(formatted, "DEBUG: pathname: 10: debug message")
+
+    def test_format_warning(self):
+        formatter = LogFormatter()
+        record = logging.LogRecord(
+            "name", logging.WARNING, "pathname", 10, "warning message", None, None
+        )
+        formatted = formatter.format(record)
+        self.assertEqual(formatted, "WARNING: warning message")
+
+    def test_format_info(self):
+        formatter = LogFormatter()
+        record = logging.LogRecord("name", logging.INFO, "pathname", 10, "info message", None, None)
+        formatted = formatter.format(record)
+        self.assertEqual(formatted, "info message")
+
+    def test_format_error(self):
+        formatter = LogFormatter()
+        record = logging.LogRecord(
+            "name", logging.ERROR, "pathname", 10, "error message", None, None
+        )
+        formatted = formatter.format(record)
+        self.assertEqual(formatted, "ERROR: error message")
