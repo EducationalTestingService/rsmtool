@@ -63,32 +63,36 @@ class Modeler:
         joblib.dump(self, model_path)
 
     @classmethod
-    def load_from_file(cls, model_path):
+    def load_from_file(cls, path):
         """
-        Load a ``Modeler`` object from a file on disk.
+        Load a modeler object from a file on disk.
+
+        The file must contain either ``Modeler`` or a SKLL ``Learner``,
+        in which case a ``Modeler`` object will be created from the
+        ``Learner``.
 
         Parameters
         ----------
-        model_path : str
-            The path to the modeler file.
+        path : str
+            File path.
 
         Returns
         -------
         model : Modeler
-            A Modeler instance.
+            A ``Modeler`` instance.
 
         Raises
         ------
         ValueError
-            If ``model_path`` does not end with ".model".
+            If ``path`` does not end with ".model".
         """
-        if not model_path.lower().endswith(".model"):
+        if not path.lower().endswith(".model"):
             raise ValueError(
-                f"The file `{model_path}` does not end with the proper "
-                f"extension. Please make sure that it is a `.model` file."
+                f"The file `{path}` does not end with the proper extension. Please "
+                "make sure that it is a `.model` file."
             )
 
-        with open(model_path, "rb") as model_file:
+        with open(path, "rb") as model_file:
             modeler_or_learner = joblib.load(model_file)
 
         if isinstance(modeler_or_learner, Modeler):
@@ -96,13 +100,13 @@ class Modeler:
 
         # If not a Modeler object, try to load as if it were a SKLL
         # Learner object (for backward compatibility)
-        learner = Learner.from_file(model_path)
+        learner = Learner.from_file(path)
         return cls.load_from_learner(learner)
 
     @classmethod
     def load_from_learner(cls, learner):
         """
-        Create a new Modeler instance with a pre-populated learner.
+        Create a new ``Modeler`` instance with a pre-populated learner.
 
         Parameters
         ----------
@@ -112,7 +116,7 @@ class Modeler:
         Returns
         -------
         modeler : Modeler
-            A Modeler object.
+            A ``Modeler`` object.
 
         Raises
         ------
@@ -121,7 +125,7 @@ class Modeler:
         """
         if not isinstance(learner, Learner):
             raise TypeError(
-                f"The `learner` argument must be a ` SKLL Learner` instance, "
+                "The `learner` argument must be a `SKLL Learner` instance, "
                 f"not `{type(learner)}`."
             )
 

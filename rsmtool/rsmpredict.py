@@ -70,10 +70,10 @@ def fast_predict(
         features on which the model was trained and the values should
         be the *raw* feature values.
     modeler : rsmtool.modeler.Modeler object
-        The RSMTool modeler object using which the predictions are to be
+        The RSMTool ``Modeler`` object from which the predictions are to be
         generated. This object should be created from the already existing
-        model file in the "output" directory of the previously run RSMTool
-        experiment.
+        ``.model`` file in the "output" directory of the previously run
+        RSMTool experiment.
     df_feature_info : pandas DataFrame, optional
         If ``None``, this function will try to extract this information
         from ``modeler``.
@@ -120,9 +120,9 @@ def fast_predict(
        Defaults to ``None``.
     scale : bool
         Whether to scale predictions. If ``True``, all of
-        ``train_predictions_mean``, ``train_predictions_sd``,
-        ``h1_mean``, and ``h1_sd`` must be specified or be available as
-        attributes of ``modeler``.
+        ``train_predictions_mean``, ``train_predictions_sd``, ``h1_mean``,
+        and ``h1_sd`` must be specified or be available as attributes of
+        ``modeler``.
         Defaults to ``False``.
     train_predictions_mean : float, optional
        The mean of the predictions on the training set used to re-scale the
