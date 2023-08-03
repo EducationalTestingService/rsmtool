@@ -178,7 +178,7 @@ Model information
 
 - ``model_fit``: R squared and adjusted R squared computed on the training set. Note that these values are always computed on raw predictions without any trimming or rounding.
 
-- ``.model``: the serialized RSMTool ``Modeler`` object containing the SKLL ``Learner`` object with the fitted model (before scaling the coeffcients).
+- ``.model``: the serialized RSMTool ``Modeler`` object containing the fitted SKLL ``Learner`` object  (before scaling the coeffcients).
 
 - ``.ols``: a serialized object of type ``pandas.stats.ols.OLS`` containing the fitted model (for built-in models excluding ``LassoFixedLambda`` and ``PositiveLassoCV``).
 
