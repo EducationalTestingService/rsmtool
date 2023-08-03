@@ -379,9 +379,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
             _ = fast_predict(input_features, modeler, df_feature_info)
 
     def test_fast_predict_no_feature_info(self):
-        """
-        Check case where there is no feature information.
-        """
+        """Check case where there is no feature information."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
@@ -411,9 +409,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
             _ = fast_predict(input_features, modeler)
 
     def test_fast_predict_scaling_params_but_scale_false(self):
-        """
-        Check case when scaling is turned off yet scaling-related parameters are used.
-        """
+        """Check case when scaling is turned off yet scaling-related parameters are used."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
@@ -447,10 +443,43 @@ class TestExperimentRsmpredict(unittest.TestCase):
                     **scale_params,
                 )
 
+    def test_fast_predict_scale_true_missing_scale_params(self):
+        """Check case when scaling is turned on yet scaling-related parameters are missing."""
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+
+        # For each scaling-related parameter, simply delete the
+        # parameter-related attribute from the modeler and then call
+        # ``fast_predict`` with scale=True
+        for param in ["train_predictions_mean", "train_predictions_sd", "h1_mean", "h1_sd"]:
+            modeler = Modeler.load_from_file(model_file)
+            delattr(modeler, param)
+            with self.assertRaises(ValueError):
+                _ = fast_predict(
+                    input_features,
+                    modeler,
+                    scale=True,
+                )
+
     def test_fast_predict_trimming_params_but_trim_false(self):
-        """
-        Check case when trimming is turned off yet trimming-related parameters are used.
-        """
+        """Check case when trimming is turned off yet trimming-related parameters are used."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
@@ -482,4 +511,39 @@ class TestExperimentRsmpredict(unittest.TestCase):
                     modeler,
                     trim=False,
                     **trim_params,
+                )
+
+    def test_fast_predict_trim_true_missing_trim_params(self):
+        """Check case when trimming is turned on yet trimming-related parameters are missing."""
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+
+        # For each trimming-related parameter, simply delete the
+        # parameter-related attribute from the modeler and then call
+        # ``fast_predict`` with trim=True
+        for param in ["trim_min", "trim_max"]:
+            modeler = Modeler.load_from_file(model_file)
+            delattr(modeler, param)
+            with self.assertRaises(ValueError):
+                _ = fast_predict(
+                    input_features,
+                    modeler,
+                    trim=True,
                 )
