@@ -95,7 +95,7 @@ def fast_predict(
         "output" directory of the previously run RSMTool experiment.
 
         Defaults to ``None``.
-    trim : bool
+    trim : bool, optional
         Whether to trim the predictions. If ``True``, ``trim_min`` and
         ``trim_max`` must be specified or be available as attributes of
         the ``modeler``.
@@ -103,14 +103,14 @@ def fast_predict(
     trim_min : int, optional
         The lowest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from
-        ``modeler``. If ``None`` and no such attribute exists, raw
-        predictions will not be trimmed.
+        ``modeler``. If ``None``, no such attribute exists, and
+        ``trim=True``, a ``ValueError`` will be raised.
         Defaults to ``None``.
     trim_max : int, optional
         The highest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from
-        ``modeler``. If ``None`` and no such attribute exists, raw
-        predictions will not be trimmed.
+        ``modeler``. If ``None``, no such attribute exists, and
+        ``trim=True``, a ``ValueError`` will be raised.
         Defaults to ``None``.
     trim_tolerance : float, optional
        The single numeric value that will be used to pad the trimming range
@@ -118,7 +118,7 @@ def fast_predict(
        will try to extract this value from ``modeler``. If no such attribute
        can be found, the value will default to ``0.4998``.
        Defaults to ``None``.
-    scale : bool
+    scale : bool, optional
         Whether to scale predictions. If ``True``, all of
         ``train_predictions_mean``, ``train_predictions_sd``, ``h1_mean``,
         and ``h1_sd`` must be specified or be available as attributes of
@@ -129,8 +129,8 @@ def fast_predict(
        predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
        the model. If ``None``, this function will try to extract this value
-       from ``modeler``. If ``None`` and no such attribute exists,
-       predictions will not be scaled.
+       from ``modeler``. If ``None``, no such attribute exists, and
+       ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
     train_predictions_sd : float, optional
        The standard deviation of the predictions on the training set used to
@@ -145,16 +145,16 @@ def fast_predict(
        the predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
        the model. If ``None``, this function will try to extract this value from
-       ``modeler``. If ``None`` and no such attribute exists, predictions
-       will not be scaled.
+       ``modeler``. If ``None``, no such attribute exists, and
+       ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
     h1_sd : float, optional
        The standard deviation of the human scores in the training set used to
        re-scale the predictions. May be read from the "postprocessing_params.csv"
        file under the "output" directory of the RSMTool experiment used to train
        the model. If ``None``, this function will try to extract this value from
-       ``modeler``. If ``None`` and no such attribute exists, predictions will
-       not be scaled.
+       ``modeler``. If ``None``, no such attribute exists, and
+       ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
     logger : logging object, optional
         A logging object. If ``None`` is passed, get logger from ``__name__``.
@@ -173,7 +173,12 @@ def fast_predict(
     Raises
     ------
     ValueError
-        If ``input_features`` contains any non-numeric features.
+        If ``input_features`` contains any non-numeric features; if
+        trimming/scaling is turned on but related parameters are either
+        not specified or cannot be found as attributes in ``modeler``;
+        if trimming/scaling-related parameters are specified but
+        trimming/scaling is turned off; if feature information is either
+        not specified or cannot be found as an attribute in ``modeler``.
     """
     # initialize a logger if none provided
     logger = logger if logger else logging.getLogger(__name__)
@@ -207,14 +212,21 @@ def fast_predict(
 
     # compute scaled predictions if requested
     if scale:
-        if train_predictions_mean is None:
-            train_predictions_mean = modeler.train_predictions_mean
-        if train_predictions_sd is None:
-            train_predictions_sd = modeler.train_predictions_sd
-        if h1_mean is None:
-            h1_mean = modeler.h1_mean
-        if h1_sd is None:
-            h1_sd = modeler.h1_sd
+        try:
+            if train_predictions_mean is None:
+                train_predictions_mean = modeler.train_predictions_mean
+            if train_predictions_sd is None:
+                train_predictions_sd = modeler.train_predictions_sd
+            if h1_mean is None:
+                h1_mean = modeler.h1_mean
+            if h1_sd is None:
+                h1_sd = modeler.h1_sd
+        except AttributeError:
+            raise ValueError(
+                "The train_predictions_mean/train_predictions_sd/h1_mean/h1_sd modeler"
+                " attributes must exist when scale=True and these values are not "
+                "explicitly specified"
+            ) from None
         df_predictions["scale"] = (
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
         ) * h1_sd + h1_mean
@@ -237,10 +249,16 @@ def fast_predict(
                 trim_tolerance = modeler.trim_tolerance
             except AttributeError:
                 trim_tolerance = default_trim_tolerance
-        if trim_min is None:
-            trim_min = modeler.trim_min
-        if trim_max is None:
-            trim_max = modeler.trim_max
+        try:
+            if trim_min is None:
+                trim_min = modeler.trim_min
+            if trim_max is None:
+                trim_max = modeler.trim_max
+        except AttributeError:
+            raise ValueError(
+                "The trim_min/trim_max modeler attributes must exist when trim=True "
+                "and these values are not explicitly specified"
+            ) from None
         for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance
