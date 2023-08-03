@@ -3,6 +3,7 @@ source=rsmtool
 parallel=true
 omit =
     *rsmtool/notebooks/templates/report.tpl
+    rsmtool/test_utils.py
     setup.py
     sitecustomize.py
     examples/*
