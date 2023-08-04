@@ -470,7 +470,7 @@ def compute_and_save_predictions(
         # save the predictions to disk
         logger.info(
             f"Saving excluded responses to "
-            f"{join(output_dir, '{}_excluded_responses.csv'.format(filename))}"
+            f"{join(output_dir, f'{filename}_excluded_responses.csv')}"
         )
 
         # Write out files
@@ -560,8 +560,12 @@ def main():  # noqa: D103
         generator = ConfigurationGenerator(
             "rsmpredict", as_string=True, suppress_warnings=args.quiet
         )
-        configuration = generator.interact() if args.interactive else generator.generate()
-        print(configuration)
+        configuration = (
+            generator.interact(output_file_name=args.output_file.name)
+            if args.interactive
+            else generator.generate()
+        )
+        print(configuration, file=args.output_file)
 
 
 if __name__ == "__main__":

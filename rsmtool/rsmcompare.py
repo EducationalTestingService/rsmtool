@@ -238,8 +238,12 @@ def main():  # noqa: D103
             suppress_warnings=args.quiet,
             use_subgroups=args.subgroups,
         )
-        configuration = generator.interact() if args.interactive else generator.generate()
-        print(configuration)
+        configuration = (
+            generator.interact(output_file_name=args.output_file.name)
+            if args.interactive
+            else generator.generate()
+        )
+        print(configuration, file=args.output_file)
 
 
 if __name__ == "__main__":
