@@ -298,8 +298,12 @@ def main():  # noqa: D103
         generator = ConfigurationGenerator(
             "rsmsummarize", as_string=True, suppress_warnings=args.quiet
         )
-        configuration = generator.interact() if args.interactive else generator.generate()
-        print(configuration)
+        configuration = (
+            generator.interact(output_file_name=args.output_file.name)
+            if args.interactive
+            else generator.generate()
+        )
+        print(configuration, file=args.output_file)
 
 
 if __name__ == "__main__":
