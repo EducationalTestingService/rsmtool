@@ -11,14 +11,12 @@ For example, to generate an ``rsmtool`` configuration file interactively, run th
 
 .. code-block:: bash
 
-    rsmtool generate --interactive > example_rsmtool.json
+    rsmtool generate --interactive --output example_rsmtool.json
 
 The following screencast shows an example interactive session after the above command is run (click to play):
 
-.. raw:: html
 
-   <script id="asciicast-313107" src="https://asciinema.org/a/313107.js" data-autoplay="false" async></script>
-
+.. image:: assets/demo.gif
 
 The configuration file ``example_rsmtool.json`` generated via the session is shown below:
 
@@ -31,13 +29,11 @@ There are some configuration options that can accept multiple inputs. For exampl
 
 .. code-block:: bash
 
-    rsmsummarize generate --interactive > example_rsmsummarize.json
+    rsmsummarize generate --interactive --output example_rsmsummarize.json
 
 The following screencast shows the interactive session (click to play):
 
-.. raw:: html
-
-   <script id="asciicast-313149" src="https://asciinema.org/a/313149.js" data-autoplay="false" async></script>
+.. image:: assets/summary.gif
 
 And here is the generated configuration file for ``rsmsummarize``:
 
@@ -52,7 +48,7 @@ We end with a list of important things to note about interactive generation:
 
 - Carefully read the instructions and notes displayed at the top when you first enter interactive mode.
 
-- If you do not redirect the output of the command to a file, the generated configuration file will simply be printed out.
+- If you do not specify an output file using ``--output``, the generated configuration file will simply be printed out.
 
 - You may see messages like "invalid option" and "invalid file" on the bottom left while you are entering the value for a field. This is an artifact of real-time validation. For example, when choosing a training file for ``rsmtool``, the message "invalid file" may be displayed while you navigate to the actual file. Once you get to a valid file, this message should disappear.
 
@@ -71,7 +67,7 @@ that they feel comfortable editing manually, RSMTool also provides the capabilit
 
 .. code-block:: bash
 
-    rsmtool generate > dummy_rsmtool.json
+    rsmtool generate --output dummy_rsmtool.json
 
 When running this command, the following warning would be printed out to stderr:
 
