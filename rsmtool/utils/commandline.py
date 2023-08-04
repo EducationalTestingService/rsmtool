@@ -122,6 +122,7 @@ def setup_rsmcmd_parser(
     ----
     This function is only meant to be used by RSMTool developers.
     """
+
     # a special callable to test whether configuration files exist
     # or not; this is nested because it is only used within this function
     # and should never be used externally
@@ -186,6 +187,17 @@ def setup_rsmcmd_parser(
             )
 
     parser_generate.add_argument(
+        "-o",
+        "--output",
+        dest="output_file",
+        type=argparse.FileType("w", encoding="utf-8"),
+        required=False,
+        default=None,
+        help=f"if specified, the generated {name} configuration will be "
+        f"written out to this file.",
+    )
+
+    parser_generate.add_argument(
         "-q",
         "--quiet",
         dest="quiet",
@@ -202,7 +214,7 @@ def setup_rsmcmd_parser(
         dest="interactive",
         action="store_true",
         default=False,
-        help=f"if specified, generate the {name} " f"configuration file interactively",
+        help=f"if specified, generate the {name} configuration file interactively",
     )
 
     ##############################################
@@ -242,7 +254,6 @@ def setup_rsmcmd_parser(
 
     # add any extra options passed in for the rub subcommand;
     for parser_option in extra_run_options:
-
         # construct the arguments and keyword arguments needed for the
         # `add_argument()` call to the parser
         argparse_option_args = []
@@ -648,7 +659,6 @@ class InteractiveField:
         """
         # if we are dealing with a field that accepts multiple inputs
         if self.count == "multiple":
-
             # instantiate a blank list to hold the multiple values
             values = []
 
@@ -830,7 +840,6 @@ class ConfigurationGenerator:
         return configuration
 
     def _get_all_general_section_names(self):
-
         default_general_sections_value = DEFAULTS.get("general_sections", "")
         default_special_sections_value = DEFAULTS.get("special_sections", "")
         default_custom_sections_value = DEFAULTS.get("custom_sections", "")
@@ -847,13 +856,20 @@ class ConfigurationGenerator:
             context=self.context,
         )
 
-    def interact(self):
+    def interact(self, output_file_name=None):
         """
         Automatically generate an example configuration in interactive mode.
 
+        Parameters
+        ----------
+        output_file_name : str, optional
+            The file path where the configuration will eventually be saved.
+            Note that this function just uses this name to inform the user.
+            The actual saving happens elsewhere.
+
         Returns
         -------
-        configuration : str
+        str
             The generated configuration as a formatted string.
 
         Note
@@ -882,6 +898,9 @@ class ConfigurationGenerator:
             )
             sys.stderr.write("\n")
 
+        if output_file_name:
+            sys.stderr.write(f"Your configuration is being written to '{output_file_name}'.\n\n")
+
         # instantiate a blank dictionary
         configdict = OrderedDict()
 
@@ -891,7 +910,6 @@ class ConfigurationGenerator:
             product(["required"], self._required_fields),
             product(["optional"], self._optional_fields),
         ):
-
             # skip the subgroups field unless we were told to use subgroups
             if field_name == "subgroups" and not self.use_subgroups:
                 configdict["subgroups"] = DEFAULTS.get("subgroups")
@@ -947,7 +965,6 @@ class ConfigurationGenerator:
 
         # insert the optional fields in alphabetical order
         for optional_field in self._optional_fields:
-
             # to make it easy for users to add/remove sections, we should
             # populate the `general_sections` field with an explicit list
             # instead of the default value which is simply ``['all']``. To
