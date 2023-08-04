@@ -4,7 +4,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from rsmtool.test_utils import (
     check_file_output,
@@ -32,6 +32,7 @@ class TestToolCLI(unittest.TestCase):
     """Test class for ToolCLI tests."""
 
     temporary_directories = []
+    temporary_files = []
     expected_json_dir = Path(rsmtool_test_dir) / "data" / "output"
 
     common_dir = Path(rsmtool_test_dir) / "data" / "experiments"
@@ -54,6 +55,8 @@ class TestToolCLI(unittest.TestCase):
     def tearDownClass(cls):
         for tempdir in cls.temporary_directories:
             tempdir.cleanup()
+        for tempfile in cls.temporary_files:
+            os.unlink(tempfile)
 
     def check_no_args(self, context):
         """Check running the tool with no arguments."""
@@ -262,7 +265,9 @@ class TestToolCLI(unittest.TestCase):
             expected_output = expectedfh.read().strip()
             self.assertEqual(output, expected_output)
 
-    def check_tool_cmd(self, context, subcmd, output_dir=None, working_dir=None):
+    def check_tool_cmd(
+        self, context, subcmd, output_dir=None, working_dir=None, generate_output_file=None
+    ):
         """
         Test that the ``subcmd`` invocation for ``context`` works as expected.
 
@@ -280,6 +285,10 @@ class TestToolCLI(unittest.TestCase):
             If we want the "run" subcommand to be run in a specific
             working directory.
             Defaults to ``None``.
+        generate_output_file: str, optional
+           If we want the output of the "generate" subcommand to be
+           written to a specific output file.
+           Defaults to ``None``.
         """
         # if the BINPATH environment variable is defined
         # use that to construct the command instead of just
@@ -318,7 +327,16 @@ class TestToolCLI(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertTrue(proc.returncode == 0)
-            self.validate_generate_output(context, proc.stdout.strip(), subgroups=subgroups)
+            # if an output file was specified, we get the output to validate
+            # by reading that in instead of from STDOUT; in that case STDOUT
+            # only contains a message which we can also validate
+            if generate_output_file:
+                with open(generate_output_file, "r") as outfh:
+                    output_to_check = outfh.read().strip()
+            else:
+                output_to_check = proc.stdout.strip()
+
+            self.validate_generate_output(context, output_to_check, subgroups=subgroups)
 
     def test_default_subcommand_is_run(self):
         # test that the default subcommand for all contexts is "run"
@@ -340,7 +358,7 @@ class TestToolCLI(unittest.TestCase):
             # and test the default subcommand
             config_file = getattr(self, f"{context}_config_file")
             subcmd = f"{config_file} {tempdir.name}"
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, None
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, None, None
 
     def test_run_without_output_directory(self):
         # test that "run" subcommand works without an output directory
@@ -364,7 +382,7 @@ class TestToolCLI(unittest.TestCase):
             # we call check_tool_cmd with a working directory here to simulate
             # the usage of the current working directory when the output directory
             # is not specified
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, tempdir.name
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, tempdir.name, None
 
     def check_run_bad_overwrite(self, cmd):
         """Check that the overwriting error is raised properly."""
@@ -418,7 +436,7 @@ class TestToolCLI(unittest.TestCase):
 
             config_file = getattr(self, f"{context}_config_file")
             subcmd = f"{config_file} {tempdir.name} -f"
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, None
+            yield self.check_tool_cmd, context, subcmd, tempdir.name, None, None
 
     def test_rsmpredict_run_features_file(self):
         tempdir = TemporaryDirectory()
@@ -429,7 +447,7 @@ class TestToolCLI(unittest.TestCase):
             f"--features {tempdir.name}/preprocessed_features.csv"
         )
 
-        self.check_tool_cmd("rsmpredict", subcmd, tempdir.name)
+        self.check_tool_cmd("rsmpredict", subcmd, tempdir.name, None)
 
         # check the features file separately
         file1 = Path(tempdir.name) / "preprocessed_features.csv"
@@ -449,7 +467,7 @@ class TestToolCLI(unittest.TestCase):
             "rsmxval",
             "rsmexplain",
         ]:
-            yield self.check_tool_cmd, context, "generate", None, None
+            yield self.check_tool_cmd, context, "generate", None, None, None
 
     def test_generate_with_groups(self):
         # test that the "generate --subgroups" subcommand for all tools works
@@ -459,4 +477,48 @@ class TestToolCLI(unittest.TestCase):
         # rsmxval and rsmexplain; rsmxval does support subgroups but since it has no sections
         # fields, it's not relevant for this test
         for context in ["rsmtool", "rsmeval", "rsmcompare"]:
-            yield self.check_tool_cmd, context, "generate --subgroups", None, None
+            yield self.check_tool_cmd, context, "generate --subgroups", None, None, None
+
+    def test_generate_with_output_file(self):
+        # test that the "generate --output <file>" subcommand for all tools works
+        # as expected in batch mode
+        for context in [
+            "rsmtool",
+            "rsmeval",
+            "rsmcompare",
+            "rsmpredict",
+            "rsmsummarize",
+            "rsmxval",
+            "rsmexplain",
+        ]:
+            tempf = NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+            tempf.close()
+            self.temporary_files.append(tempf.name)
+            yield (
+                self.check_tool_cmd,
+                context,
+                f"generate --output {tempf.name}",
+                None,
+                None,
+                tempf.name,
+            )
+
+    def test_generate_with_output_file_and_groups(self):
+        # test that the "generate --subgroups" subcommand for all tools works
+        # as expected when written to output files
+
+        # this applies to all tools except rsmpredict, rsmsummarize,
+        # rsmxval and rsmexplain; rsmxval does support subgroups but since it has no sections
+        # fields, it's not relevant for this test
+        for context in ["rsmtool", "rsmeval", "rsmcompare"]:
+            tempf = NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+            tempf.close()
+            self.temporary_files.append(tempf.name)
+            yield (
+                self.check_tool_cmd,
+                context,
+                f"generate --subgroups --output {tempf.name}",
+                None,
+                None,
+                tempf.name,
+            )
