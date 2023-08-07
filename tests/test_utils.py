@@ -1,6 +1,7 @@
 import argparse
 import filecmp
 import logging
+import os
 import unittest
 import warnings
 from io import StringIO
@@ -1101,10 +1102,14 @@ class TestCmdOption(unittest.TestCase):
 
 
 class TestSetupRsmCmdParser(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        os.unlink("dummy.json")
+
     def test_run_subparser_no_args(self):
         """Test run subparser with no arguments."""
         parser = setup_rsmcmd_parser("test")
-        # we need to patch sys.exit since --help just exists otherwise
+        # we need to patch sys.exit since --help just exits otherwise
         with patch("sys.exit") as exit_mock:
             parsed_namespace = parser.parse_args("run --help".split())
         expected_namespace = argparse.Namespace(
@@ -1269,111 +1274,106 @@ class TestSetupRsmCmdParser(unittest.TestCase):
         with patch("sys.exit") as exit_mock:
             parsed_namespace = parser.parse_args("generate --help".split())
         expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=False
+            subcommand="generate", interactive=False, quiet=False, output_file=None
         )
         self.assertEqual(parsed_namespace, expected_namespace)
         assert exit_mock.called
 
+    def check_generate_subparser(self, parser, cmd, expected_namespace):
+        parsed_namespace = parser.parse_args(cmd)
+        # for output file attributes, check them separately since two file
+        # handles will never be considered equal
+        if parsed_namespace.output_file is not None:
+            self.assertEqual(parsed_namespace.output_file.name, expected_namespace.output_file.name)
+            self.assertEqual(parsed_namespace.output_file.mode, expected_namespace.output_file.mode)
+            self.assertEqual(
+                parsed_namespace.output_file.encoding, expected_namespace.output_file.encoding
+            )
+            delattr(parsed_namespace, "output_file")
+            delattr(expected_namespace, "output_file")
+        self.assertEqual(parsed_namespace, expected_namespace)
+
+    def check_generate_subparser_exit(self, parser, cmd):
+        with patch("sys.exit") as exit_mock:
+            _ = parser.parse_args(cmd)
+        assert exit_mock.called
+
     def test_generate_subparser(self):
-        """Test generate subparser with no arguments."""
-        parser = setup_rsmcmd_parser("test")
-        parsed_namespace = parser.parse_args("generate".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=False
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+        # instantiate two parsers - one that supports subgroups and one that doesn't
+        parser_without_subgroups = setup_rsmcmd_parser("without_sub")
+        parser_with_subgroups = setup_rsmcmd_parser("with_sub", uses_subgroups=True)
 
-    def test_generate_subparser_with_subgroups_and_flag(self):
-        """Test generate subparser with subgroups option and flag."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate --subgroups".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=False, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+        # iterate over all possible combinations of the two parsers and all
+        # the generate flags we can specify
+        for parser, (
+            subgroups,
+            quiet,
+            output_file,
+            interactive,
+            short_subgroups,
+            short_quiet,
+            short_interactive,
+            short_output_file,
+        ) in product(
+            [parser_without_subgroups, parser_with_subgroups],
+            product(
+                [True, False],
+                [True, False],
+                [True, False],
+                [True, False],
+                [True, False],
+                [True, False],
+                [True, False],
+                [True, False],
+            ),
+        ):
+            # initialize the command we will be parsing and the namespace
+            # we expect to get after parsing it
+            cmd = ["generate"]
+            expected_namespace = argparse.Namespace(subcommand="generate")
 
-    def test_generate_subparser_with_subgroups_option_and_short_flag(self):
-        """Test generate subparser with subgroups option and short flag."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate -g".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=False, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+            # if subgroups were specified, add the relevant long/short
+            # option to the command
+            specified_subgroups = subgroups or short_subgroups
+            if specified_subgroups:
+                cmd.append("--subgroups" if subgroups else "-g")
+            # set the "subgroups" parameter in the expected namespace
+            # to the correct value
+            if parser.prog == "with_sub":
+                expected_namespace.subgroups = specified_subgroups
 
-    def test_generate_subparser_with_subgroups_option_but_no_flag(self):
-        """Test generate subparser with subgroups option but no flag."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=False, subgroups=False
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+            # if quiet as specified, add the relevant long/short
+            # option to the command
+            if not quiet and not short_quiet:
+                expected_namespace.quiet = False
+            else:
+                expected_namespace.quiet = True
+                cmd.append("--quiet" if subgroups else "-q")
 
-    def test_generate_subparser_with_only_quiet_flag(self):
-        """Test generate subparser with only the quiet flag."""
-        parser = setup_rsmcmd_parser("test")
-        parsed_namespace = parser.parse_args("generate --quiet".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+            # if interactive was specified, add the relevant long/short
+            # option to the command
+            if not interactive and not short_interactive:
+                expected_namespace.interactive = False
+            else:
+                expected_namespace.interactive = True
+                cmd.append("--interactive" if subgroups else "-i")
 
-    def test_generate_subparser_with_subgroups_and_quiet_flags(self):
-        """Test generate subparser with subgroups and quiet flags."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate --subgroups -q".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=False, quiet=True, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+            # if output file was specified, add the relevant long/short
+            # option to the command
+            if not output_file and not short_output_file:
+                expected_namespace.output_file = None
+            else:
+                expected_namespace.output_file = open("dummy.json", "w", encoding="utf-8")
+                cmd.extend(["--output", "dummy.json"] if output_file else ["-o", "dummy.json"])
 
-    def test_generate_subparser_with_only_interactive_flag(self):
-        """Test generate subparser with only the interactive flag."""
-        parser = setup_rsmcmd_parser("test")
-        parsed_namespace = parser.parse_args("generate --interactive".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=True, quiet=False
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
-
-    def test_generate_subparser_with_only_interactive_short_flag(self):
-        """Test generate subparser with only the short interactive flag."""
-        parser = setup_rsmcmd_parser("test")
-        parsed_namespace = parser.parse_args("generate -i".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", interactive=True, quiet=False
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
-
-    def test_generate_subparser_with_subgroups_and_interactive_flags(self):
-        """Test generate subparser with subgroups and interactive flags."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate --interactive --subgroups".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", quiet=False, interactive=True, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
-
-    def test_generate_subparser_with_subgroups_and_interactive_short_flags(self):
-        """Test generate subparser with short subgroups and interactive flags."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate -i -g".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", quiet=False, interactive=True, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
-
-    def test_generate_subparser_with_subgroups_and_interactive_short_flags_together(
-        self,
-    ):
-        """Test generate subparser with short subgroups and interactive flags together."""
-        parser = setup_rsmcmd_parser("test", uses_subgroups=True)
-        parsed_namespace = parser.parse_args("generate -ig".split())
-        expected_namespace = argparse.Namespace(
-            subcommand="generate", quiet=False, interactive=True, subgroups=True
-        )
-        self.assertEqual(parsed_namespace, expected_namespace)
+            # for the parser that does not support subgroups, check that specifying
+            # any subgroup-related flags will exit; for all the other conditions
+            # simply check that the namespace we get from parsing the command
+            # matches the expected namespace
+            if parser.prog == "without_sub" and (subgroups or short_subgroups):
+                yield self.check_generate_subparser_exit, parser, cmd
+            else:
+                yield self.check_generate_subparser, parser, cmd, expected_namespace
 
 
 class TestBatchGenerateConfiguration(unittest.TestCase):
