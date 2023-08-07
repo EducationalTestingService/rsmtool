@@ -561,7 +561,7 @@ def main():  # noqa: D103
             "rsmpredict", as_string=True, suppress_warnings=args.quiet
         )
         configuration = (
-            generator.interact(output_file_name=args.output_file.name)
+            generator.interact(output_file_name=args.output_file.name if args.output_file else None)
             if args.interactive
             else generator.generate()
         )
