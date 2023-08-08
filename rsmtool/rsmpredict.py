@@ -173,13 +173,17 @@ def fast_predict(
     Raises
     ------
     ValueError
-        If ``input_features`` contains any non-numeric features; if
-        trimming/scaling is turned on but related parameters are either
+        If ``input_features`` contains any non-numeric features
+    ValueError
+        If trimming/scaling is turned on but related parameters are either
         not specified or cannot be found as attributes in ``modeler``/have
-        a value of ``None``; if trimming/scaling-related parameters are
-        specified but trimming/scaling is turned off; if feature
-        information is either not specified or cannot be found as an
-        attribute in ``modeler``/has a value of ``None``.
+        a value of ``None``
+    ValueError
+        If trimming/scaling-related parameters are specified but
+        trimming/scaling is turned off
+    ValueError
+        If feature information is either not specified or cannot be found
+        as an attribute in ``modeler``/has a value of ``None``
     """
     # initialize a logger if none provided
     logger = logger if logger else logging.getLogger(__name__)
@@ -192,16 +196,17 @@ def fast_predict(
     df_input_features["spkitemid"] = "RESPONSE"
 
     feature_info_error_message = (
-        "df_feature_info must be specified if it cannot be found as an attribute "
-        "in the modeler object with a non-None value"
+        "'df_feature_info' must be specified if it not found as an attribute in the "
+        "modeler object with a value that is not ``None``"
     )
-    try:
-        if df_feature_info is None:
-            df_feature_info = modeler.feature_info
-            if df_feature_info is None:
-                raise ValueError(feature_info_error_message) from None
-    except AttributeError:
-        raise ValueError(feature_info_error_message) from None
+    if df_feature_info is None:
+        try:
+            stored_feature_info = modeler.feature_info
+            assert stored_feature_info is not None
+        except (AttributeError, AssertionError):
+            raise ValueError(feature_info_error_message) from None
+        else:
+            df_feature_info = stored_feature_info
 
     # preprocess the input features so that they match what the model expects
     try:
@@ -217,9 +222,9 @@ def fast_predict(
     # compute scaled predictions if requested
     if scale:
         scale_args_error_message = (
-            "The train_predictions_mean/train_predictions_sd/h1_mean/h1_sd modeler "
-            "attributes must exist and not be None when scale=True and these values are"
-            "not explicitly specified"
+            "When 'scale' is set to True and no explicit values are provided, the "
+            "'train_predictions_mean', 'train_predictions_sd', 'h1_mean', and 'h1_sd' "
+            "modeler attributes must be present and not ``None``."
         )
         try:
             if train_predictions_mean is None:
@@ -254,8 +259,9 @@ def fast_predict(
     # trim both raw and scaled predictions if requested
     if trim:
         trim_args_error_message = (
-            "The trim_min/trim_max modeler attributes must exist and not be None when "
-            "trim=True and these values are not explicitly specified"
+            "When 'trim' is set to ``True`` and no explicit values are provided, the "
+            "'trim_min' and 'trim_max' modeler attributes must be present and not "
+            "``None``."
         )
         default_trim_tolerance = 0.4998
         if trim_tolerance is None:
