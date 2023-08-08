@@ -1,6 +1,6 @@
 package:
   name: rsmtool
-  version: 10.0.0
+  version: 11.0.1
 
 source:
   path: ../../../rsmtool
@@ -31,7 +31,6 @@ requirements:
     - python
     - jupyter
     - ipython
-    - nose
     - notebook
     - numpy
     - openpyxl
