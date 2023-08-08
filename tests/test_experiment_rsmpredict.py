@@ -287,8 +287,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
                 kwargs["trim_min"] = int(params["trim_min"])
                 kwargs["trim_max"] = int(params["trim_max"])
                 if use_default_trim_tolerance:
-                    if getattr(modeler, "trim_tolerance"):
-                        delattr(modeler, "trim_tolerance")
+                    delattr(modeler, "trim_tolerance")
                 elif "trim_tolerance" in params:
                     kwargs["trim_tolerance"] = float(params["trim_tolerance"])
 
@@ -378,8 +377,8 @@ class TestExperimentRsmpredict(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = fast_predict(input_features, modeler, df_feature_info)
 
-    def test_fast_predict_no_feature_info(self):
-        """Check case where there is no feature information."""
+    def test_fast_predict_missing_feature_info(self):
+        """Check case where there is feature information is missing."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
@@ -394,6 +393,35 @@ class TestExperimentRsmpredict(unittest.TestCase):
         # ``feature_info`` attribute
         modeler = Modeler.load_from_file(model_file)
         delattr(modeler, "feature_info")
+
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+        with self.assertRaises(ValueError):
+            _ = fast_predict(input_features, modeler)
+
+    def test_fast_predict_feature_info_none(self):
+        """Check case where there is feature information is ``None``."""
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        model_file = join(existing_experiment_dir, "lr.model")
+
+        # initialize the modeler instance with a bare learner, in which
+        # case no feature_info attribute will exist
+        modeler = Modeler.load_from_learner(Modeler.load_from_file(model_file).learner)
 
         input_features = {
             "FEATURE1": 6.0,
@@ -478,6 +506,43 @@ class TestExperimentRsmpredict(unittest.TestCase):
                     scale=True,
                 )
 
+    def test_fast_predict_scale_true_scale_attributes_none(self):
+        """Check case when scaling is turned on yet scaling-related parameters are ``None``."""
+        # Load existing model, save its feature info attribute (for later
+        # use), then reload from its learner attribute to mimic loading
+        # from a bare SKLL learner
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        modeler = Modeler.load_from_file(join(existing_experiment_dir, "lr.model"))
+        feature_info = modeler.feature_info
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+        modeler = Modeler.load_from_learner(modeler.learner)
+
+        # Make prediction with scaling even though scale-related
+        # attributes will have None values
+        with self.assertRaises(ValueError):
+            _ = fast_predict(
+                input_features,
+                modeler,
+                df_feature_info=feature_info,
+                scale=True,
+            )
+
     def test_fast_predict_trimming_params_but_trim_false(self):
         """Check case when trimming is turned off yet trimming-related parameters are used."""
         existing_experiment_dir = join(
@@ -547,3 +612,40 @@ class TestExperimentRsmpredict(unittest.TestCase):
                     modeler,
                     trim=True,
                 )
+
+    def test_fast_predict_trim_true_trim_attributes_none(self):
+        """Check case when trimming is turned on yet trimming-related parameters are ``None``."""
+        # Load existing model, save its feature info attribute (for later
+        # use), then reload from its learner attribute to mimic loading
+        # from a bare SKLL learner
+        existing_experiment_dir = join(
+            rsmtool_test_dir,
+            "data",
+            "experiments",
+            "lr-predict",
+            "existing_experiment",
+            "output",
+        )
+        modeler = Modeler.load_from_file(join(existing_experiment_dir, "lr.model"))
+        feature_info = modeler.feature_info
+        input_features = {
+            "FEATURE1": 6.0,
+            "FEATURE2": 1.0,
+            "FEATURE3": -0.2,
+            "FEATURE4": 0,
+            "FEATURE5": -0.1,
+            "FEATURE6": 5.0,
+            "FEATURE7": 12,
+            "FEATURE8": -7000,
+        }
+        modeler = Modeler.load_from_learner(modeler.learner)
+
+        # Make prediction with trimming even though trim-related
+        # attributes will have None values
+        with self.assertRaises(ValueError):
+            _ = fast_predict(
+                input_features,
+                modeler,
+                df_feature_info=feature_info,
+                trim=True,
+            )

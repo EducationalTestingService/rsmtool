@@ -41,6 +41,7 @@ class Modeler:
         The learner and the scaling-/trimming-related attributes are
         set to ``None``.
         """
+        self.feature_info = None
         self.learner = None
         self.trim_min = None
         self.trim_max = None
