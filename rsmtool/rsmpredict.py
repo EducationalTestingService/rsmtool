@@ -175,10 +175,11 @@ def fast_predict(
     ValueError
         If ``input_features`` contains any non-numeric features; if
         trimming/scaling is turned on but related parameters are either
-        not specified or cannot be found as attributes in ``modeler``;
-        if trimming/scaling-related parameters are specified but
-        trimming/scaling is turned off; if feature information is either
-        not specified or cannot be found as an attribute in ``modeler``.
+        not specified or cannot be found as attributes in ``modeler``/have
+        a value of ``None``; if trimming/scaling-related parameters are
+        specified but trimming/scaling is turned off; if feature
+        information is either not specified or cannot be found as an
+        attribute in ``modeler``/has a value of ``None``.
     """
     # initialize a logger if none provided
     logger = logger if logger else logging.getLogger(__name__)
@@ -190,14 +191,17 @@ def fast_predict(
     df_input_features = pd.DataFrame([input_features])
     df_input_features["spkitemid"] = "RESPONSE"
 
-    if df_feature_info is None:
-        try:
+    feature_info_error_message = (
+        "df_feature_info must be specified if it cannot be found as an attribute "
+        "in the modeler object with a non-None value"
+    )
+    try:
+        if df_feature_info is None:
             df_feature_info = modeler.feature_info
-        except AttributeError:
-            raise ValueError(
-                "df_feature_info must be specified if it cannot be found as an "
-                "attribute in the modeler object"
-            ) from None
+            if df_feature_info is None:
+                raise ValueError(feature_info_error_message) from None
+    except AttributeError:
+        raise ValueError(feature_info_error_message) from None
 
     # preprocess the input features so that they match what the model expects
     try:
@@ -212,6 +216,11 @@ def fast_predict(
 
     # compute scaled predictions if requested
     if scale:
+        scale_args_error_message = (
+            "The train_predictions_mean/train_predictions_sd/h1_mean/h1_sd modeler "
+            "attributes must exist and not be None when scale=True and these values are"
+            "not explicitly specified"
+        )
         try:
             if train_predictions_mean is None:
                 train_predictions_mean = modeler.train_predictions_mean
@@ -221,12 +230,13 @@ def fast_predict(
                 h1_mean = modeler.h1_mean
             if h1_sd is None:
                 h1_sd = modeler.h1_sd
+            if any(
+                arg is None
+                for arg in [train_predictions_mean, train_predictions_sd, h1_mean, h1_sd]
+            ):
+                raise ValueError(scale_args_error_message) from None
         except AttributeError:
-            raise ValueError(
-                "The train_predictions_mean/train_predictions_sd/h1_mean/h1_sd modeler"
-                " attributes must exist when scale=True and these values are not "
-                "explicitly specified"
-            ) from None
+            raise ValueError(scale_args_error_message) from None
         df_predictions["scale"] = (
             (df_predictions["raw"] - train_predictions_mean) / train_predictions_sd
         ) * h1_sd + h1_mean
@@ -243,10 +253,16 @@ def fast_predict(
 
     # trim both raw and scaled predictions if requested
     if trim:
+        trim_args_error_message = (
+            "The trim_min/trim_max modeler attributes must exist and not be None when "
+            "trim=True and these values are not explicitly specified"
+        )
         default_trim_tolerance = 0.4998
         if trim_tolerance is None:
             try:
                 trim_tolerance = modeler.trim_tolerance
+                if trim_tolerance is None:
+                    trim_tolerance = default_trim_tolerance
             except AttributeError:
                 trim_tolerance = default_trim_tolerance
         try:
@@ -254,11 +270,10 @@ def fast_predict(
                 trim_min = modeler.trim_min
             if trim_max is None:
                 trim_max = modeler.trim_max
+            if any(arg is None for arg in [trim_tolerance, trim_min, trim_max]):
+                raise ValueError(trim_args_error_message) from None
         except AttributeError:
-            raise ValueError(
-                "The trim_min/trim_max modeler attributes must exist when trim=True "
-                "and these values are not explicitly specified"
-            ) from None
+            raise ValueError(trim_args_error_message) from None
         for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance
