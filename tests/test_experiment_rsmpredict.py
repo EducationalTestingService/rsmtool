@@ -378,7 +378,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
             _ = fast_predict(input_features, modeler, df_feature_info)
 
     def test_fast_predict_missing_feature_info(self):
-        """Check case where there is feature information is missing."""
+        """Check case where feature information is missing."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
@@ -408,7 +408,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
             _ = fast_predict(input_features, modeler)
 
     def test_fast_predict_feature_info_none(self):
-        """Check case where there is feature information is ``None``."""
+        """Check case where feature information is ``None``."""
         existing_experiment_dir = join(
             rsmtool_test_dir,
             "data",
