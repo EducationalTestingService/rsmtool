@@ -15,5 +15,8 @@
     "custom_sections": null,
     "subgroups": [],
     "section_order": null,
-    "experiment_names": null
+    "experiment_names": null,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null
 }
