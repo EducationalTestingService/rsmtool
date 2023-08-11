@@ -71,6 +71,7 @@ Requirements
 - ``notebook``
 - ``seaborn``
 - ``shap``==0.42.0
+- ``wandb``
 
 Contributing
 ------------
