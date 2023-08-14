@@ -1,3 +1,4 @@
+import os
 import unittest
 from os.path import join
 from unittest.mock import Mock, patch
@@ -5,13 +6,20 @@ from unittest.mock import Mock, patch
 import pandas as pd
 
 from rsmtool.configuration_parser import Configuration
-from rsmtool.test_utils import rsmtool_test_dir
 from rsmtool.utils.wandb import (
     init_wandb_run,
     log_configuration_to_wandb,
     log_dataframe_to_wandb,
     log_report_to_wandb,
 )
+
+# allow test directory to be set via an environment variable
+# which is needed for package testing
+TEST_DIR = os.environ.get("TESTDIR", None)
+if TEST_DIR:
+    rsmtool_test_dir = TEST_DIR
+else:
+    from rsmtool.test_utils import rsmtool_test_dir
 
 
 class TestWandb(unittest.TestCase):

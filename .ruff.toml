@@ -1,3 +1,4 @@
+fix = true
 select = ["D", "E", "F", "I"]
 ignore = ["D212"]
 line-length = 100
