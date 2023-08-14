@@ -28,20 +28,21 @@ requirements:
     - pip
     - setuptools
   run:
-    - python
-    - jupyter
     - ipython
+    - jupyter
     - notebook
     - numpy
     - openpyxl
     - pandas
+    - python
     - seaborn
+    - shap==0.42.1
     - skll==4.0.0
     - statsmodels
     - tqdm
+    - wandb
     - xlrd
     - xlwt
-    - shap==0.42.1
 
 test:
   # Python imports
