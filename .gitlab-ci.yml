@@ -1,4 +1,4 @@
-image: continuumio/miniconda3:latest
+image: condaforge/mambaforge:latest
 
 stages:
   - test
@@ -11,7 +11,7 @@ variables:
 # set up basic job
 .runtests:
   before_script:
-    - "conda create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} --yes --quiet"
+    - "mamba create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} --yes --quiet"
     - /root/rsmenv/bin/pip install -e .
     - echo "import os" > sitecustomize.py
     - echo "try:" >> sitecustomize.py
