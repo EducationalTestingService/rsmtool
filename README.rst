@@ -59,8 +59,8 @@ To get started with RSMTool, please see the extensive `official documentation <h
 Requirements
 ------------
 
-- Python >=3.8, <3.11
-- ``numpy``
+- ``python>=3.8``
+- ``numpy<.1.25``
 - ``scipy``
 - ``scikit-learn``
 - ``statsmodels``
@@ -70,7 +70,7 @@ Requirements
 - ``jupyter``
 - ``notebook``
 - ``seaborn``
-- ``shap==0.42.0``
+- ``shap==0.42.1``
 - ``wandb``
 
 Contributing
