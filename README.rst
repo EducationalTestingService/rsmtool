@@ -17,7 +17,7 @@ Rater Scoring Modeling Tool
    :target: https://anaconda.org/ets/rsmtool
    :alt: Conda package for SKLL
 
-.. image:: https://img.shields.io/readthedocs/rsmtool/v10.0.0.svg
+.. image:: https://img.shields.io/readthedocs/rsmtool/v11.0.1.svg
    :target: https://rsmtool.readthedocs.io
    :alt: Docs
 
@@ -70,7 +70,8 @@ Requirements
 - ``jupyter``
 - ``notebook``
 - ``seaborn``
-- ``shap``==0.42.0
+- ``shap==0.42.0``
+- ``wandb``
 
 Contributing
 ------------

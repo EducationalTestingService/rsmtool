@@ -21,5 +21,8 @@
     "special_sections": null,
     "custom_sections": null,
     "subgroups": [],
-    "section_order": null
+    "section_order": null,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null
 }

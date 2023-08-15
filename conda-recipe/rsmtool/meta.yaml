@@ -1,6 +1,6 @@
 package:
   name: rsmtool
-  version: 10.0.0
+  version: 11.0.1
 
 source:
   path: ../../../rsmtool
@@ -28,21 +28,21 @@ requirements:
     - pip
     - setuptools
   run:
-    - python
-    - jupyter
     - ipython
-    - nose
+    - jupyter
     - notebook
-    - numpy
+    - numpy<1.25
     - openpyxl
     - pandas
+    - python
     - seaborn
+    - shap==0.42.1
     - skll==4.0.0
     - statsmodels
     - tqdm
+    - wandb
     - xlrd
     - xlwt
-    - shap==0.42.1
 
 test:
   # Python imports

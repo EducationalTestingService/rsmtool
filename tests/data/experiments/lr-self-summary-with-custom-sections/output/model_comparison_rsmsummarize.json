@@ -22,5 +22,8 @@
     "file_format": "csv",
     "special_sections": null,
     "subgroups": [],
-    "experiment_names": null
+    "experiment_names": null,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null
 }
