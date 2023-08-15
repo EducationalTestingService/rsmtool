@@ -31,7 +31,7 @@ requirements:
     - ipython
     - jupyter
     - notebook
-    - numpy
+    - numpy<1.25
     - openpyxl
     - pandas
     - python
