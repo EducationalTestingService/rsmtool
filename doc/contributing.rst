@@ -20,7 +20,7 @@ To set up a local development environment, follow the steps below:
 
 #. Run ``pip install -e .`` to install rsmtool into the environment in editable mode which is what we need for development.
 
-#. Run ``pre-commit install`` to install the git hooks for pre-commit checks.
+#. Run ``pre-commit install --hook-type pre-commit --hook-type commit-msg --overwrite --install-hooks`` to install the git hooks for pre-commit checks.
 
 #. Create a new git branch with a useful and descriptive name.
 
