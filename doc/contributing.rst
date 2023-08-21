@@ -41,7 +41,9 @@ The RSMTool codebase enforces a certain code style via pre-commit checks and thi
 
 #. The f-string specification is used for all format strings in the Python code as enforced by the `flynt <https://pypi.org/project/flynt/>`_ pre-commit check.
 
-#. Any `PEP 8 <https://peps.python.org/pep-0008/>`_ code style violations are checked using the `flake8 <https://flake8.pycqa.org/en/latest/>`_ pre-commit check.
+#. Any code violations for `PEP 8 <https://peps.python.org/pep-0008/>`_, `PEP 257 <https://peps.python.org/pep-0257/>`_, and import statements are checked using the `ruff <https://github.com/astral-sh/ruff-pre-commit>`_ pre-commit check.
+
+#. Commit messages must follow the `conventional commit specification <https://www.conventionalcommits.org/en/v1.0.0/#summary>`_. This is enforced by the `conventional-pre-commit <https://github.com/compilerla/conventional-pre-commit>`_ pre-commit check.
 
 #. The imports at the top of any Python files are grouped and sorted as follows: STDLIB, THIRDPARTY, FIRSTPARTY, LOCALFOLDER. As an example, consider the imports at the top of ``reporter.py`` which look like this:
 
