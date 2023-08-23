@@ -773,7 +773,6 @@ class Analyzer:
         human_score_sd = np.std(human_scores, ddof=1)
 
         if use_diff_std_means:
-
             # calculate the difference of standardized means
             smd_name = "DSM"
             smd = difference_of_standardized_means(
@@ -786,7 +785,6 @@ class Analyzer:
             )
 
         else:
-
             # calculate the standardized mean difference
             smd_name = "SMD"
             smd = standardized_mean_difference(
@@ -859,7 +857,7 @@ class Analyzer:
         """
         # if we only have a single value for human correlation and the index
         # is not in human-system values, we use the same HH value in all cases
-        if len(human_human_corr) == 1 and not human_human_corr.index[0] in human_system_corr.index:
+        if len(human_human_corr) == 1 and human_human_corr.index[0] not in human_system_corr.index:
             human_human_corr = pd.Series(
                 human_human_corr.values.repeat(len(human_system_corr)),
                 index=human_system_corr.index,
@@ -1147,7 +1145,6 @@ class Analyzer:
         # metrics only on the data that is double scored.
         df_human_human = pd.DataFrame()
         if include_second_score:
-
             df_single = df.drop("sc2", axis=1)
 
             df_human_system = df_single.apply(
@@ -1580,7 +1577,6 @@ class Analyzer:
         df_pcor_length = pd.DataFrame()
 
         if include_length:
-
             df_train_with_group_for_all = df_train_preprocess_length.copy()
             columns = selected_features + ["length"]
 
@@ -1596,7 +1592,6 @@ class Analyzer:
         score_corr_by_group_dict = {}
         include_length = "length" in df_train_preprocess_length
         for grouping_variable in subgroups:
-
             corr_by_group = self.compute_correlations_by_group(
                 df_train_preprocess_length,
                 selected_features,
@@ -1611,7 +1606,6 @@ class Analyzer:
         length_corr_by_group_dict = {}
         if include_length:
             for grouping_variable in subgroups:
-
                 corr_by_group = self.compute_correlations_by_group(
                     df_train_preprocess_length,
                     selected_features,
@@ -1644,7 +1638,6 @@ class Analyzer:
 
         # Add length correlation by group datasets
         for group in length_corr_by_group_dict:
-
             (length_marg_cors, length_part_cors, _) = length_corr_by_group_dict.get(
                 group, (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
             )
@@ -1658,7 +1651,6 @@ class Analyzer:
 
         # Add score correlations by group datasets
         for group in score_corr_by_group_dict:
-
             (
                 sc1_marg_cors,
                 sc1_part_cors,
@@ -1706,6 +1698,7 @@ class Analyzer:
             - degradation
             - disattenudated_correlations
             - confMatrix
+            - confMatrix_h1h2
             - score_dist
             - eval_by_*
             - consistency_by_*
@@ -1803,6 +1796,23 @@ class Analyzer:
             lambda s: s.value_counts() / len(df_test) * 100
         )
 
+        # compute a human1-human2 confusion matrix, if possible
+        if include_second_score:
+            df_preds_second_score_double_scored = df_preds_second_score.copy().dropna(
+                subset=["sc1", "sc2"]
+            )
+            for human in [1, 2]:
+                df_preds_second_score_double_scored[f"sc{human}_round"] = np.round(
+                    df_preds_second_score_double_scored[f"sc{human}"]
+                )
+            human1_scores = df_preds_second_score_double_scored["sc1_round"].astype("int64")
+            human2_scores = df_preds_second_score_double_scored["sc2_round"].astype("int64")
+            conf_matrix_h1h2 = confusion_matrix(human1_scores, human2_scores)
+            labels = sorted(pd.concat([human1_scores, human2_scores]).unique())
+            df_confmatrix_h1h2 = pd.DataFrame(
+                conf_matrix_h1h2, index=labels, columns=labels
+            ).transpose()
+
         # Replace any NaNs, which we might get because our model never
         # predicts a particular score label, with zeros.
         df_score_dist.fillna(0, inplace=True)
@@ -1841,6 +1851,9 @@ class Analyzer:
             )
 
             datasets.extend([{"name": "true_score_eval", "frame": df_prmse}])
+
+        if include_second_score:
+            datasets.extend([{"name": "confMatrix_h1h2", "frame": df_confmatrix_h1h2}])
 
         for group in eval_by_group_dict:
             eval_by_group, consistency_by_group = eval_by_group_dict[group]
@@ -1978,7 +1991,6 @@ class Analyzer:
         ]
 
         for group in data_composition_by_group_dict:
-
             datasets.append(
                 {
                     "name": f"data_composition_by_{group}",
@@ -2076,7 +2088,6 @@ class Analyzer:
         ]
 
         for group in data_composition_by_group_dict:
-
             datasets.append(
                 {
                     "name": f"data_composition_by_{group}",
