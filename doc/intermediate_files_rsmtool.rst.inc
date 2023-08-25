@@ -61,7 +61,7 @@ Unused columns
 ^^^^^^^^^^^^^^
 filenames: ``train_other_columns``, ``test_other_columns``
 
-These files contain all of the the columns from the original features files that are not present in the ``*_feature`` and ``*_metadata`` files. They only include the rows from the training and evaluation sets that were not filtered out.
+These files contain all of the columns from the original features files that are not present in the ``*_feature`` and ``*_metadata`` files. They only include the rows from the training and evaluation sets that were not filtered out.
 
 .. note::
 
@@ -141,7 +141,7 @@ Principal components analyses
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 filenames: ``pca``, ``pcavar``
 
-The first file contains the the results of a Principal Components Analysis (PCA) using pre-processed feature values from the training set and its singular value decomposition. The second file contains the eigenvalues and variance explained by each component.
+The first file contains the results of a Principal Components Analysis (PCA) using pre-processed feature values from the training set and its singular value decomposition. The second file contains the eigenvalues and variance explained by each component.
 
 Various correlations by subgroups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -225,7 +225,7 @@ Evaluation metrics
 
 - ``score_dist``: the distributions of the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
-- ``confMatrix``: the confusion matrix between the the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
+- ``confMatrix``: the confusion matrix between the human scores and the rounded raw/scaled predicted scores, depending on the value of ``use_scaled_predictions``.
 
 .. note::
 
@@ -246,6 +246,7 @@ These files are created only if a second human score has been made available via
 
 - ``degradation``:  shows the differences between human-human agreement and machine-human agreement for all association metrics and all forms of predicted scores.
 
+- ``confMatrix_h1h2``: the confusion matrix between the human scores for double-scored responses.
 
 .. _rsmtool_true_score_eval:
 
