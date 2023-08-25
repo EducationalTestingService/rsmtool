@@ -1801,12 +1801,8 @@ class Analyzer:
             df_preds_second_score_double_scored = df_preds_second_score.copy().dropna(
                 subset=["sc1", "sc2"]
             )
-            for human in [1, 2]:
-                df_preds_second_score_double_scored[f"sc{human}_round"] = np.round(
-                    df_preds_second_score_double_scored[f"sc{human}"]
-                )
-            human1_scores = df_preds_second_score_double_scored["sc1_round"].astype("int64")
-            human2_scores = df_preds_second_score_double_scored["sc2_round"].astype("int64")
+            human1_scores = df_preds_second_score_double_scored["sc1"].round().astype("int64")
+            human2_scores = df_preds_second_score_double_scored["sc2"].round().astype("int64")
             conf_matrix_h1h2 = confusion_matrix(human1_scores, human2_scores)
             labels = sorted(pd.concat([human1_scores, human2_scores]).unique())
             df_confmatrix_h1h2 = pd.DataFrame(
