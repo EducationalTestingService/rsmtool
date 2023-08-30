@@ -1165,7 +1165,7 @@ class Modeler:
         else:
             objective = "f1_score_micro" if not custom_objective else custom_objective
 
-        learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
+        learner.train(fs, grid_search=True, grid_objective=objective)
 
         # TODO: compute betas for linear SKLL models?
 
