@@ -1092,13 +1092,10 @@ class Modeler:
         self,
         model_name,
         df_train,
-        experiment_id,
-        filedir,
-        figdir,
-        file_format="csv",
         custom_fixed_parameters=None,
         custom_objective=None,
         predict_expected_scores=False,
+        grid_search_jobs=1
     ):
         """
         Train a SKLL classification or regression model.
@@ -1110,18 +1107,6 @@ class Modeler:
         df_train : pandas DataFrame
             Data frame containing the features on which
             to train the model.
-        experiment_id : str
-            The experiment ID.
-        filedir : str
-            Path to the "output" experiment output directory.
-        figdir : str
-            Path to the "figure" experiment output directory.
-        file_format : str, optional
-            The format in which to save files. For SKLL models,
-            this argument does not actually change the format of
-            the output files at this time, as no betas are computed.
-            One of {"csv", "tsv", "xlsx"}.
-            Defaults to "csv".
         custom_fixed_parameters : dict, optional
             A dictionary containing any fixed parameters for the SKLL
             model.
@@ -1165,7 +1150,7 @@ class Modeler:
         else:
             objective = "f1_score_micro" if not custom_objective else custom_objective
 
-        learner.train(fs, grid_search=True, grid_objective=objective)
+        learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=grid_search_jobs)
 
         # TODO: compute betas for linear SKLL models?
 
@@ -1210,7 +1195,7 @@ class Modeler:
 
         df_train = data_container["train_preprocessed_features"]
 
-        args = [model_name, df_train, experiment_id, filedir, figdir]
+        args = [model_name, df_train]
         kwargs = {"file_format": file_format}
 
         # add user-specified SKLL objective to the arguments if we are
@@ -1221,6 +1206,7 @@ class Modeler:
                     "custom_fixed_parameters": configuration["skll_fixed_parameters"],
                     "custom_objective": configuration["skll_objective"],
                     "predict_expected_scores": configuration["predict_expected_scores"],
+                    "grid_jobs": configuration["grid_search_jobs"]
                 }
             )
             model, chosen_objective = self.train_skll_model(*args, **kwargs)

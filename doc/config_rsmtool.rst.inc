@@ -374,6 +374,14 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 
     If ``use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
 
+.. _grid_search_jobs:
+
+grid_search_jobs *(Optional)*
+""""""""""""""""""""""
+Number of folds to run in parallel when using skll grid search. If set to ``None``, the number of grid search folds will
+be used. Defaults to 1, that is, no parallelization. For very large data sets, using parallel jobs may significantly improve
+running time.
+
 .. _use_wandb:
 
 use_wandb *(Optional)*
