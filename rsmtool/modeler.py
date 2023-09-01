@@ -967,9 +967,7 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_builtin_model(
-        self, model_name, df_train, experiment_id, filedir, file_format="csv"
-    ):
+    def train_builtin_model(self, model_name, df_train, experiment_id, filedir, file_format="csv"):
         """
         Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
@@ -1093,7 +1091,7 @@ class Modeler:
         custom_fixed_parameters=None,
         custom_objective=None,
         predict_expected_scores=False,
-        grid_search_jobs=1
+        grid_search_jobs=1,
     ):
         """
         Train a SKLL classification or regression model.
@@ -1197,22 +1195,21 @@ class Modeler:
         df_train = data_container["train_preprocessed_features"]
 
         args = [model_name, df_train]
-        kwargs = {"file_format": file_format}
 
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if is_skll_model(model_name):
-            kwargs.update(
-                {
-                    "custom_fixed_parameters": configuration["skll_fixed_parameters"],
-                    "custom_objective": configuration["skll_objective"],
-                    "predict_expected_scores": configuration["predict_expected_scores"],
-                    "grid_jobs": configuration["grid_search_jobs"]
-                }
-            )
+            kwargs = {
+                "custom_fixed_parameters": configuration["skll_fixed_parameters"],
+                "custom_objective": configuration["skll_objective"],
+                "predict_expected_scores": configuration["predict_expected_scores"],
+                "grid_search_jobs": configuration["grid_search_jobs"],
+            }
+
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration["skll_objective"] = chosen_objective
         else:
+            kwargs = {"file_format": file_format}
             args.extend([experiment_id, filedir])
             model = self.train_builtin_model(*args, **kwargs)
 
