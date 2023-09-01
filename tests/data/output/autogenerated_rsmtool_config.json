@@ -28,6 +28,7 @@
         "intermediate_file_paths",
         "sysinfo"
     ],
+    "grid_search_jobs": 1,
     "id_column": "spkitemid",
     "length_column": null,
     "min_items_per_candidate": null,
