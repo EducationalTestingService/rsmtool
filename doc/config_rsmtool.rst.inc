@@ -377,10 +377,9 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 .. _grid_search_jobs:
 
 grid_search_jobs *(Optional)*
-""""""""""""""""""""""
-Number of folds to run in parallel when using skll grid search. If set to ``None``, the number of grid search folds will
-be used. Defaults to 1, that is, no parallelization. For very large data sets, using parallel jobs may significantly improve
-running time.
+"""""""""""""""""""""""""""""
+Number of folds to run in parallel when using skll grid search. Defaults to 1 (no parallelization). For very large data
+sets, using parallel jobs may significantly improve running time.
 
 .. _use_wandb:
 

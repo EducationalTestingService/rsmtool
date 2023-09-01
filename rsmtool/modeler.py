@@ -968,7 +968,7 @@ class Modeler:
         return learner, fit, df_coef, used_features
 
     def train_builtin_model(
-        self, model_name, df_train, experiment_id, filedir, figdir, file_format="csv"
+        self, model_name, df_train, experiment_id, filedir, file_format="csv"
     ):
         """
         Train one of the :ref:`built-in linear regression models <builtin_models>`.
@@ -986,8 +986,6 @@ class Modeler:
             The experiment ID.
         filedir : str
             Path to the `output` experiment output directory.
-        figdir : str
-            Path to the `figure` experiment output directory.
         file_format : str, optional
             The format in which to save files. One of {"csv", "tsv", "xlsx"}.
             Defaults to "csv".
@@ -1118,6 +1116,9 @@ class Modeler:
         predict_expected_scores : bool, optional
             Whether we want the trained classifiers to predict expected scores.
             Defaults to ``False``.
+        grid_search_jobs : int
+            Number of folds to run in parallel when using ``skll`` grid search.
+            Defaults to 1.
 
         Returns
         -------
@@ -1212,6 +1213,7 @@ class Modeler:
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration["skll_objective"] = chosen_objective
         else:
+            args.extend([experiment_id, filedir])
             model = self.train_builtin_model(*args, **kwargs)
 
         return model
