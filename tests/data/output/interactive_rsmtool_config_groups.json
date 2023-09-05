@@ -32,7 +32,6 @@
         "intermediate_file_paths",
         "sysinfo"
     ],
-    "skll_grid_search_jobs": 1,
     "id_column": "ID",
     "length_column": null,
     "min_items_per_candidate": null,
@@ -44,6 +43,7 @@
     "select_transformations": false,
     "sign": null,
     "skll_fixed_parameters": {},
+    "skll_grid_search_jobs": 1,
     "skll_objective": null,
     "special_sections": null,
     "standardize_features": false,
