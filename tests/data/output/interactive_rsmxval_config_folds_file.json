@@ -15,7 +15,7 @@
     "flag_column_test": null,
     "folds": 5,
     "folds_file": "folds.csv",
-    "grid_search_jobs": 1,
+    "skll_grid_search_jobs": 1,
     "id_column": "ID",
     "length_column": "length",
     "min_items_per_candidate": null,

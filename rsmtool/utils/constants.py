@@ -63,7 +63,7 @@ DEFAULTS = {
     "background_kmeans_size": 500,  # size of k-means sample for background
     "num_features_to_display": 15,  # how many features should be displayed in rsmexplain plots
     "show_auto_cohorts": False,  # enables auto cohort plots for rsmexplain
-    "grid_search_jobs": 1,
+    "skll_grid_search_jobs": 1,
     "use_wandb": False,  # enables logging to Weights & Biases
     "wandb_project": None,
     "wandb_entity": None,
@@ -129,7 +129,7 @@ CHECK_FIELDS = {
             "candidate_column",
             "standardize_features",
             "min_items_per_candidate",
-            "grid_search_jobs",
+            "skll_grid_search_jobs",
             "use_wandb",
             "wandb_project",
             "wandb_entity",
@@ -169,7 +169,7 @@ CHECK_FIELDS = {
             "candidate_column",
             "standardize_features",
             "min_items_per_candidate",
-            "grid_search_jobs",
+            "skll_grid_search_jobs",
             "use_wandb",
             "wandb_project",
             "wandb_entity",

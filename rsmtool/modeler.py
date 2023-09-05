@@ -1091,7 +1091,7 @@ class Modeler:
         custom_fixed_parameters=None,
         custom_objective=None,
         predict_expected_scores=False,
-        grid_search_jobs=1,
+        skll_grid_search_jobs=1,
     ):
         """
         Train a SKLL classification or regression model.
@@ -1114,7 +1114,7 @@ class Modeler:
         predict_expected_scores : bool, optional
             Whether we want the trained classifiers to predict expected scores.
             Defaults to ``False``.
-        grid_search_jobs : int
+        skll_grid_search_jobs : int
             Number of folds to run in parallel when using ``skll`` grid search.
             Defaults to 1.
 
@@ -1149,7 +1149,9 @@ class Modeler:
         else:
             objective = "f1_score_micro" if not custom_objective else custom_objective
 
-        learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=grid_search_jobs)
+        learner.train(
+            fs, grid_search=True, grid_objective=objective, grid_jobs=skll_grid_search_jobs
+        )
 
         # TODO: compute betas for linear SKLL models?
 
@@ -1203,7 +1205,7 @@ class Modeler:
                 "custom_fixed_parameters": configuration["skll_fixed_parameters"],
                 "custom_objective": configuration["skll_objective"],
                 "predict_expected_scores": configuration["predict_expected_scores"],
-                "grid_search_jobs": configuration["grid_search_jobs"],
+                "skll_grid_search_jobs": configuration["skll_grid_search_jobs"],
             }
 
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
