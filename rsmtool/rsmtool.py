@@ -333,7 +333,7 @@ def run_experiment(
     (
         pred_analysis_config,
         pred_analysis_data_container,
-    ) = analyzer.run_prediction_analyses(new_pred_data_container, pred_config)
+    ) = analyzer.run_prediction_analyses(new_pred_data_container, pred_config, wandb_run)
 
     # Write out files
     writer.write_experiment_output(
