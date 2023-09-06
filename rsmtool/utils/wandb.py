@@ -7,7 +7,7 @@ import wandb
 
 # excluded dataframes will not be logged as tables or metrics.
 # confusion matrices are logged separately.
-EXCLUDE = ["confMatrix"]
+EXCLUDE = ["confMatrix", "confMatrix_h1h2"]
 
 # all values from these dataframes will be logged to the
 # run as metrics in addition to logging as a table artifact.
@@ -83,10 +83,10 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
                 metric_dict.update(
                     {f"{df_name}.{column}": value for _, value in col_dict.items() if value}
                 )
-                wandb_run.log(metric_dict)
+            wandb_run.log(metric_dict)
 
 
-def log_confusion_matrix(wandb_run, human_scores, system_scores, labels):
+def log_confusion_matrix(wandb_run, human_scores, system_scores, labels, name):
     """
     Log a confusion matrix to W&B if logging to W&B is enabled.
 
@@ -101,17 +101,19 @@ def log_confusion_matrix(wandb_run, human_scores, system_scores, labels):
     system_scores : Sequence
         The predicted scores for the responses in the data
     labels : Sequence
-        All the
+        A list of all the labels in the data
+    name : str
+        The chart title
     """
     if wandb_run:
         wandb_run.log(
             {
-                "conf_mat": wandb.plot.confusion_matrix(
+                name: wandb.plot.confusion_matrix(
                     probs=None,
                     y_true=human_scores,
                     preds=system_scores,
                     class_names=labels,
-                    title="Confusion Matrix",
+                    title=name,
                 )
             }
         )
