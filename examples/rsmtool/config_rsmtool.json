@@ -11,5 +11,5 @@
     "trim_max": 6,
     "id_column": "ID",
     "second_human_score_column": "score2",
-    "length_column": "LENGTH"
+    "length_column": "LENGTH
 }

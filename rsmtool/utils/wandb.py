@@ -100,8 +100,6 @@ def log_confusion_matrix(wandb_run, human_scores, system_scores, labels, name):
         The human scores for the responses in the data
     system_scores : Sequence
         The predicted scores for the responses in the data
-    labels : Sequence
-        A list of all the labels in the data
     name : str
         The chart title
     """
@@ -112,7 +110,6 @@ def log_confusion_matrix(wandb_run, human_scores, system_scores, labels, name):
                     probs=None,
                     y_true=human_scores,
                     preds=system_scores,
-                    class_names=labels,
                     title=name,
                 )
             }
