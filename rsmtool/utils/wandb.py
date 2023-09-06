@@ -11,7 +11,7 @@ EXCLUDE = ["confMatrix", "confMatrix_h1h2"]
 
 # all values from these dataframes will be logged to the
 # run as metrics in addition to logging as a table artifact.
-LOG_METRICS = ["eval_short", "eval_short", "consistency"]
+LOG_METRICS = ["consistency", "eval_short", "true_score_eval"]
 
 
 def init_wandb_run(config_obj):
