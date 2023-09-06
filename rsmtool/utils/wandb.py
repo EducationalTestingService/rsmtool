@@ -86,7 +86,7 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
             wandb_run.log(metric_dict)
 
 
-def log_confusion_matrix(wandb_run, human_scores, system_scores, labels, name):
+def log_confusion_matrix(wandb_run, human_scores, system_scores, name):
     """
     Log a confusion matrix to W&B if logging to W&B is enabled.
 
