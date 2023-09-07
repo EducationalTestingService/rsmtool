@@ -203,7 +203,9 @@ def run_evaluation(
     (
         pred_analysis_config,
         pred_analysis_data_container,
-    ) = analyzer.run_prediction_analyses(for_pred_data_container, analyzed_config)
+    ) = analyzer.run_prediction_analyses(
+        for_pred_data_container, analyzed_config, wandb_run=wandb_run
+    )
 
     writer.write_experiment_output(
         csvdir, pred_analysis_data_container, reset_index=True, file_format=file_format

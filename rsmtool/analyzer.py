@@ -20,6 +20,7 @@ from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
 
 from .container import DataContainer
+from .utils import wandb
 from .utils.metrics import (
     agreement,
     difference_of_standardized_means,
@@ -1670,7 +1671,7 @@ class Analyzer:
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_prediction_analyses(self, data_container, configuration):
+    def run_prediction_analyses(self, data_container, configuration, wandb_run=None):
         """
         Run all analyses on the system scores (predictions).
 
@@ -1686,6 +1687,12 @@ class Analyzer:
             The Configuration object.  This configuration object must include the
             following parameters (keys):  {"subgroups", "second_human_score_column",
             "use_scaled_predictions"}.
+
+        wandb_run : wandb.Run
+            The wandb run object if wandb is enabled, ``None`` otherwise.
+            If enabled, all the output data frames will be logged to
+            this run as tables.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -1790,6 +1797,10 @@ class Analyzer:
         conf_matrix = confusion_matrix(human_scores, system_scores)
         labels = sorted(pd.concat([human_scores, system_scores]).unique())
         df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
+        # log confusion matrix to W&B
+        wandb.log_confusion_matrix(
+            wandb_run, human_scores, system_scores, "Human-System Confusion Matrix"
+        )
 
         # compute the score distributions of the rounded human and system scores
         df_score_dist = df_preds[["sc1_round", f"{score_type}_trim_round"]].apply(
@@ -1808,6 +1819,9 @@ class Analyzer:
             df_confmatrix_h1h2 = pd.DataFrame(
                 conf_matrix_h1h2, index=labels, columns=labels
             ).transpose()
+            wandb.log_confusion_matrix(
+                wandb_run, human1_scores, human2_scores, "Human1-Human2 Confusion Matrix"
+            )
 
         # Replace any NaNs, which we might get because our model never
         # predicts a particular score label, with zeros.

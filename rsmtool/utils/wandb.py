@@ -5,7 +5,13 @@ Utility classes and functions for logging to Weights & Biases.
 """
 import wandb
 
-EXCLUDE_WANDB_LOG = ["confMatrix"]
+# excluded dataframes will not be logged as tables or metrics.
+# confusion matrices are logged separately.
+EXCLUDED = ["confMatrix", "confMatrix_h1h2"]
+
+# all values from these dataframes will be logged to the
+# run as metrics in addition to logging as a table artifact.
+METRICS_LOGGED = ["consistency", "eval_short", "true_score_eval"]
 
 
 def init_wandb_run(config_obj):
@@ -54,6 +60,10 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
     """
     Log a dataframe as a table to W&B if logging to W&B is enabled.
 
+    Dataframes are logged as a table artifact. Values from selected
+    dataframes will also be logged as metrics for easier comparison
+    between runs in the W&B project dashboard.
+
     Parameters
     ----------
     wandb_run : wandb.Run
@@ -63,9 +73,79 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
     df_name : str
         The name of the dataframe
     """
-    if wandb_run and df_name not in EXCLUDE_WANDB_LOG:
+    if wandb_run and df_name not in EXCLUDED:
         table = wandb.Table(dataframe=df, allow_mixed_types=True)
         wandb_run.log({df_name: table})
+        if df_name in METRICS_LOGGED:
+            indexed_df = df.set_index(df.columns[0])
+            metric_dict = {}
+            for column in indexed_df.columns:
+                col_dict = indexed_df[column].to_dict()
+                metric_dict.update(
+                    {
+                        get_metric_name(df_name, column, row): value
+                        for row, value in col_dict.items()
+                        if value
+                    }
+                )
+            wandb_run.log(metric_dict)
+
+
+def get_metric_name(df_name, col_name, row_name):
+    """
+    Generate the metric name for logging in W&B.
+
+    The name contains the dataframe, column and row names,
+    unless row name is empty or 0 (when dataframe has a single line)
+
+    Parameters
+    ----------
+    df_name : str
+        The dataframe name
+    col_name : str
+        The column name
+    row_name : Union[int,str]
+        The row name, or 0 for some single line dataframes.
+
+    Returns
+    -------
+    metric_name : str
+        The metric name
+    """
+    metric_name = f"{df_name}.{col_name}"
+    if row_name != "" and row_name != 0:
+        metric_name = f"{metric_name}.{row_name}"
+    return metric_name
+
+
+def log_confusion_matrix(wandb_run, human_scores, system_scores, name):
+    """
+    Log a confusion matrix to W&B if logging to W&B is enabled.
+
+    The confusion matrix is added as a custom chart.
+
+    Parameters
+    ----------
+    wandb_run : wandb.Run
+        The wandb run object, or None, if logging to W&B is disabled
+    human_scores : Sequence
+        The human scores for the responses in the data
+    system_scores : Sequence
+        The predicted scores for the responses in the data
+    name : str
+        The chart title
+    """
+    if wandb_run:
+        wandb_run.log(
+            {
+                name: wandb.plot.confusion_matrix(
+                    probs=None,
+                    y_true=human_scores,
+                    preds=system_scores,
+                    title=name,
+                )
+            }
+        )
 
 
 def log_report_to_wandb(wandb_run, report_name, report_path):

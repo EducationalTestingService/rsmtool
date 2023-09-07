@@ -7,6 +7,7 @@ import pandas as pd
 
 from rsmtool.configuration_parser import Configuration
 from rsmtool.utils.wandb import (
+    get_metric_name,
     init_wandb_run,
     log_configuration_to_wandb,
     log_dataframe_to_wandb,
@@ -118,3 +119,12 @@ class TestWandb(unittest.TestCase):
             # assert that no calls to wandb objects have been made
             mock_wandb_artifact.assert_not_called()
             mock_report_artifact.add_file.assert_not_called()
+
+    def test_get_metric_name(self):
+        """Test the method get_metric_name."""
+        # with a valid row name
+        self.assertEquals("df.col.row", get_metric_name("df", "col", "row"))
+        # with an empty row name
+        self.assertEquals("df.col", get_metric_name("df", "col", ""))
+        # with 0 as row name
+        self.assertEquals("df.col", get_metric_name("df", "col", 0))
