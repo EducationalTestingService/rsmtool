@@ -1689,7 +1689,7 @@ class Analyzer:
             "use_scaled_predictions"}.
 
         wandb_run : wandb.Run
-            The wandb run object if wandb is enabled, None otherwise.
+            The wandb run object if wandb is enabled, ``None`` otherwise.
             If enabled, all the output data frames will be logged to
             this run as tables.
             Defaults to ``None``.

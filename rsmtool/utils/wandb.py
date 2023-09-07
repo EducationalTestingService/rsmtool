@@ -7,11 +7,11 @@ import wandb
 
 # excluded dataframes will not be logged as tables or metrics.
 # confusion matrices are logged separately.
-EXCLUDE = ["confMatrix", "confMatrix_h1h2"]
+EXCLUDED = ["confMatrix", "confMatrix_h1h2"]
 
 # all values from these dataframes will be logged to the
 # run as metrics in addition to logging as a table artifact.
-LOG_METRICS = ["consistency", "eval_short", "true_score_eval"]
+METRICS_LOGGED = ["consistency", "eval_short", "true_score_eval"]
 
 
 def init_wandb_run(config_obj):
@@ -73,17 +73,49 @@ def log_dataframe_to_wandb(wandb_run, df, df_name):
     df_name : str
         The name of the dataframe
     """
-    if wandb_run and df_name not in EXCLUDE:
+    if wandb_run and df_name not in EXCLUDED:
         table = wandb.Table(dataframe=df, allow_mixed_types=True)
         wandb_run.log({df_name: table})
-        if df_name in LOG_METRICS:
+        if df_name in METRICS_LOGGED:
+            indexed_df = df.set_index(df.columns[0])
             metric_dict = {}
-            for column in df.columns:
-                col_dict = df[column].to_dict()
+            for column in indexed_df.columns:
+                col_dict = indexed_df[column].to_dict()
                 metric_dict.update(
-                    {f"{df_name}.{column}": value for _, value in col_dict.items() if value}
+                    {
+                        get_metric_name(df_name, column, row): value
+                        for row, value in col_dict.items()
+                        if value
+                    }
                 )
             wandb_run.log(metric_dict)
+
+
+def get_metric_name(df_name, col_name, row_name):
+    """
+    Generate the metric name for logging in W&B.
+
+    The name contains the dataframe, column and row names,
+    unless row name is empty or 0 (when dataframe has a single line)
+
+    Parameters
+    ----------
+    df_name : str
+        The dataframe name
+    col_name : str
+        The column name
+    row_name : str
+        The row name
+
+    Returns
+    -------
+    metric_name : str
+        The metric name
+    """
+    metric_name = f"{df_name}.{col_name}"
+    if row_name != "" and row_name != 0:
+        metric_name = f"{metric_name}.{row_name}"
+    return metric_name
 
 
 def log_confusion_matrix(wandb_run, human_scores, system_scores, name):
