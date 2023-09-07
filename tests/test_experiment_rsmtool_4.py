@@ -166,7 +166,7 @@ class TestExperimentRsmtool4(unittest.TestCase):
 
     @patch("wandb.init")
     @patch("wandb.plot.confusion_matrix")
-    def test_run_experiment_with_wandb(self, mock_wandb_init, mock_plot_conf_mat):
+    def test_run_experiment_with_wandb(self, mock_plot_conf_mat, mock_wandb_init):
         source = "wandb"
         experiment_id = "wandb"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
