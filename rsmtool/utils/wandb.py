@@ -104,8 +104,8 @@ def get_metric_name(df_name, col_name, row_name):
         The dataframe name
     col_name : str
         The column name
-    row_name : str
-        The row name
+    row_name : Union[int,str]
+        The row name, or 0 for some single line dataframes.
 
     Returns
     -------
