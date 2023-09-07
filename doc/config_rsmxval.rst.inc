@@ -66,6 +66,7 @@ In addition to the fields described so far, an ``rsmxval`` configuration file al
 - ``use_scaled_predictions``
 - ``use_thumbnails``
 - ``use_truncation_thresholds``
+- ``skll_grid_search_jobs``
 - ``use_wandb``
 - ``wandb_entity``
 - ``wandb_project``

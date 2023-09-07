@@ -967,9 +967,7 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_builtin_model(
-        self, model_name, df_train, experiment_id, filedir, figdir, file_format="csv"
-    ):
+    def train_builtin_model(self, model_name, df_train, experiment_id, filedir, file_format="csv"):
         """
         Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
@@ -986,8 +984,6 @@ class Modeler:
             The experiment ID.
         filedir : str
             Path to the `output` experiment output directory.
-        figdir : str
-            Path to the `figure` experiment output directory.
         file_format : str, optional
             The format in which to save files. One of {"csv", "tsv", "xlsx"}.
             Defaults to "csv".
@@ -1092,13 +1088,10 @@ class Modeler:
         self,
         model_name,
         df_train,
-        experiment_id,
-        filedir,
-        figdir,
-        file_format="csv",
         custom_fixed_parameters=None,
         custom_objective=None,
         predict_expected_scores=False,
+        skll_grid_search_jobs=1,
     ):
         """
         Train a SKLL classification or regression model.
@@ -1110,18 +1103,6 @@ class Modeler:
         df_train : pandas DataFrame
             Data frame containing the features on which
             to train the model.
-        experiment_id : str
-            The experiment ID.
-        filedir : str
-            Path to the "output" experiment output directory.
-        figdir : str
-            Path to the "figure" experiment output directory.
-        file_format : str, optional
-            The format in which to save files. For SKLL models,
-            this argument does not actually change the format of
-            the output files at this time, as no betas are computed.
-            One of {"csv", "tsv", "xlsx"}.
-            Defaults to "csv".
         custom_fixed_parameters : dict, optional
             A dictionary containing any fixed parameters for the SKLL
             model.
@@ -1133,6 +1114,9 @@ class Modeler:
         predict_expected_scores : bool, optional
             Whether we want the trained classifiers to predict expected scores.
             Defaults to ``False``.
+        skll_grid_search_jobs : int
+            Number of folds to run in parallel when using ``skll`` grid search.
+            Defaults to 1.
 
         Returns
         -------
@@ -1165,7 +1149,9 @@ class Modeler:
         else:
             objective = "f1_score_micro" if not custom_objective else custom_objective
 
-        learner.train(fs, grid_search=True, grid_objective=objective, grid_jobs=1)
+        learner.train(
+            fs, grid_search=True, grid_objective=objective, grid_jobs=skll_grid_search_jobs
+        )
 
         # TODO: compute betas for linear SKLL models?
 
@@ -1210,22 +1196,23 @@ class Modeler:
 
         df_train = data_container["train_preprocessed_features"]
 
-        args = [model_name, df_train, experiment_id, filedir, figdir]
-        kwargs = {"file_format": file_format}
+        args = [model_name, df_train]
 
         # add user-specified SKLL objective to the arguments if we are
         # training a SKLL model
         if is_skll_model(model_name):
-            kwargs.update(
-                {
-                    "custom_fixed_parameters": configuration["skll_fixed_parameters"],
-                    "custom_objective": configuration["skll_objective"],
-                    "predict_expected_scores": configuration["predict_expected_scores"],
-                }
-            )
+            kwargs = {
+                "custom_fixed_parameters": configuration["skll_fixed_parameters"],
+                "custom_objective": configuration["skll_objective"],
+                "predict_expected_scores": configuration["predict_expected_scores"],
+                "skll_grid_search_jobs": configuration["skll_grid_search_jobs"],
+            }
+
             model, chosen_objective = self.train_skll_model(*args, **kwargs)
             configuration["skll_objective"] = chosen_objective
         else:
+            kwargs = {"file_format": file_format}
+            args.extend([experiment_id, filedir])
             model = self.train_builtin_model(*args, **kwargs)
 
         return model

@@ -25,6 +25,7 @@
     "select_transformations": false,
     "sign": null,
     "skll_fixed_parameters": {},
+    "skll_grid_search_jobs": 1,
     "skll_objective": null,
     "standardize_features": true,
     "subgroups": [],
