@@ -216,7 +216,7 @@ class FeatureSpecsProcessor:
             Defaults to ``False``.
 
         Returns
-        ------
+        -------
         df_specs_new : pandas DataFrame
             The output data frame with normalized values.
 
@@ -419,7 +419,7 @@ class FeaturePreprocessor:
 
     @staticmethod
     def remove_outliers(values, mean=None, sd=None, sd_multiplier=4):  # noqa: D301
-        """
+        r"""
         Remove outliers from given array of values by clamping them.
 
         Clamp any given values that are
@@ -693,7 +693,7 @@ class FeaturePreprocessor:
     def filter_on_column(
         self, df, column, id_column, exclude_zeros=False, exclude_zero_sd=False
     ):  # noqa: D301
-        """
+        r"""
         Filter out rows containing non-numeric values.
 
         Filter out the rows in the given data frame that contain non-numeric
@@ -940,10 +940,10 @@ class FeaturePreprocessor:
                 key: list(map(convert_to_float, value)) for (key, value) in flag_column_dict.items()
             }
 
-            # and now convert the the values in the feature column
+            # and now convert the values in the feature column
             # in the data frame
             df_new = df[flag_columns].copy()
-            df_new = df_new.applymap(convert_to_float)
+            df_new = df_new.map(convert_to_float)
 
             # identify responses with values which satisfy the condition
             full_mask = df_new.isin(flag_column_dict_to_float)
