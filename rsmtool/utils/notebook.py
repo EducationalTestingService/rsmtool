@@ -23,7 +23,7 @@ def float_format_func(num, prec=3, scientific=False):
     """
     Format given float to the specified precision as a string.
 
-    Parameters:
+    Parameters
     ----------
     num : float
         The floating point number to format.
@@ -35,7 +35,7 @@ def float_format_func(num, prec=3, scientific=False):
         the rounded version is "0.000".
         Defaults to ``False``.
 
-    Returns:
+    Returns
     -------
     ans : str
         The formatted string representing the given number.
@@ -55,15 +55,15 @@ def int_or_float_format_func(num, prec=3):
     When displaying integers, use no decimal. For a float, round to the
     specified number of decimal places and convert to a string.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     num : float or int
         The number to format and display.
     prec : int, optional
         The number of decimal places to display if x is a float.
         Defaults to 3.
 
-    Returns:
+    Returns
     -------
     ans : str
         The formatted string representing the given number.
@@ -83,8 +83,8 @@ def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="b
     or above ``high``. If it does not meet those constraints, then
     a plain string is returned with specified number of decimal places.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     num : float
         The floating point number to format.
     low : float
@@ -102,8 +102,8 @@ def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="b
         One of "bold" or "color". These are the two classes
         available for the HTML span tag.
 
-    Returns:
-    --------
+    Returns
+    -------
     ans : str
         The plain or HTML string representing the given number.
     """
@@ -121,8 +121,8 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiate a ``custom_highlighter()`` with "bold" as default class.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     num : float
         The floating point number to format.
     low : float
@@ -138,8 +138,8 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
         If ``True``, use the absolute value of x for comparison.
         Defaults to ``False``.
 
-    Returns:
-    --------
+    Returns
+    -------
     ans : str
         The formatted highlighter with bold class as default.
     """
@@ -151,8 +151,8 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     """
     Instantiate a ``custom_highlighter()`` with "color" as the default class.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     num : float
         The floating point number to format.
     low : float
@@ -168,8 +168,8 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
         If ``True``, use the absolute value of x for comparison.
         Defaults to ``False``.
 
-    Returns:
-    --------
+    Returns
+    -------
     ans : str
         The formatted highlighter with color class as default.
     """
@@ -356,7 +356,7 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
         Defaults to ``{}``.
 
     Returns
-    ------
+    -------
     html_string : str
         HTML string with file descriptions and links.
     """
@@ -380,7 +380,7 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
 
         html_string += HTML_STRING.format(descriptive_name, relative_file, file_format)
 
-    return """<ul><html>""" + html_string + """</ul></html>"""
+    return """<ul>""" + html_string + """</ul>"""
 
 
 def show_files(output_dir, experiment_id, file_format, replace_dict={}):
