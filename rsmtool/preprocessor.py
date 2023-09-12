@@ -943,7 +943,7 @@ class FeaturePreprocessor:
             # and now convert the values in the feature column
             # in the data frame
             df_new = df[flag_columns].copy()
-            df_new = df_new.map(convert_to_float)
+            df_new = df_new.applymap(convert_to_float)
 
             # identify responses with values which satisfy the condition
             full_mask = df_new.isin(flag_column_dict_to_float)

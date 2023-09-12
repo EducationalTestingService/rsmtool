@@ -34,7 +34,11 @@
     "flag_column": null,
     "flag_column_test": null,
     "min_items_per_candidate": null,
-    "test_file": "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/final-model/dummy_test.csv",
+    "skll_grid_search_jobs": 1,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null,
+    "test_file": "/home/ec2-user/rsmtool/test_outputs/lr-xval-subgroups-with-int-ids/final-model/dummy_test.csv",
     "test_label_column": "score",
     "general_sections": [
         "feature_descriptives",
