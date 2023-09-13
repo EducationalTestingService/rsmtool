@@ -1,14 +1,14 @@
-                            OLS Regression Results                            
+                            OLS Regression Results
 ==============================================================================
 Dep. Variable:                  error   R-squared:                       0.001
 Model:                            OLS   Adj. R-squared:                 -0.007
 Method:                 Least Squares   F-statistic:                    0.1406
-Date:                Mon, 05 Dec 2022   Prob (F-statistic):              0.967
-Time:                        10:18:32   Log-Likelihood:                -481.78
+Date:                Mon, 11 Sep 2023   Prob (F-statistic):              0.967
+Time:                        15:20:10   Log-Likelihood:                -481.78
 No. Observations:                 500   AIC:                             973.6
 Df Residuals:                     495   BIC:                             994.6
-Df Model:                           4                                         
-Covariance Type:            nonrobust                                         
+Df Model:                           4
+Covariance Type:            nonrobust
 =======================================================================================
                           coef    std err          t      P>|t|      [0.025      0.975]
 ---------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ group[T.QUESTION_3]     0.0064      0.090      0.070      0.944      -0.171     
 group[T.QUESTION_4]    -0.0192      0.090     -0.213      0.832      -0.196       0.158
 group[T.QUESTION_5]     0.0382      0.090      0.424      0.672      -0.139       0.215
 ==============================================================================
-Omnibus:                       12.792   Durbin-Watson:                   2.018
+Omnibus:                       12.792   Durbin-Watson:                   2.006
 Prob(Omnibus):                  0.002   Jarque-Bera (JB):               17.107
 Skew:                           0.244   Prob(JB):                     0.000193
 Kurtosis:                       3.764   Cond. No.                         5.83

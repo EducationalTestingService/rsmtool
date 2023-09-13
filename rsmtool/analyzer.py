@@ -167,16 +167,16 @@ class Analyzer:
             df_full_crosstab.insert(0, header, df_full_crosstab.index)
 
         if not exclude_listwise:
-            # if we are not excluding listwise, rename the first cell so
+            # if we are not excluding listwise, set the first cell to None so
             # that it is not set to zero
             assert df_full_crosstab.loc["numeric non-zero human score", "all features numeric"] == 0
-            df_full_crosstab.loc["numeric non-zero human score", "all features numeric"] = "-"
+            df_full_crosstab.loc["numeric non-zero human score", "all features numeric"] = None
 
-            # if we are not excluding the zeros, rename the corresponding cells
+            # if we are not excluding the zeros, set the corresponding cells to None
             # so that they are not set to zero. We do not do this for listwise exclusion
             if not exclude_zero_scores:
                 assert df_full_crosstab.loc["zero human score", "all features numeric"] == 0
-                df_full_crosstab.loc["zero human score", "all features numeric"] = "-"
+                df_full_crosstab.loc["zero human score", "all features numeric"] = None
 
         return df_full_crosstab
 

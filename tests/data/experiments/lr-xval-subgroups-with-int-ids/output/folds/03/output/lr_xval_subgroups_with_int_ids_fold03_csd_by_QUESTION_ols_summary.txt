@@ -1,14 +1,14 @@
-                            OLS Regression Results                            
+                            OLS Regression Results
 ==============================================================================
 Dep. Variable:                  error   R-squared:                       0.176
 Model:                            OLS   Adj. R-squared:                  0.129
 Method:                 Least Squares   F-statistic:                     3.705
-Date:                Mon, 05 Dec 2022   Prob (F-statistic):           0.000311
-Time:                        10:18:19   Log-Likelihood:                -137.29
+Date:                Mon, 11 Sep 2023   Prob (F-statistic):           0.000311
+Time:                        15:19:54   Log-Likelihood:                -137.29
 No. Observations:                 166   AIC:                             294.6
 Df Residuals:                     156   BIC:                             325.7
-Df Model:                           9                                         
-Covariance Type:            nonrobust                                         
+Df Model:                           9
+Covariance Type:            nonrobust
 =======================================================================================
                           coef    std err          t      P>|t|      [0.025      0.975]
 ---------------------------------------------------------------------------------------

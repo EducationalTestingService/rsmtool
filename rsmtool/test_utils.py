@@ -1,3 +1,4 @@
+"""Utility functions for RSMTool tests."""
 import os
 import re
 import sys
@@ -34,7 +35,7 @@ section_regexp = re.compile(r"<h2>(.*?)</h2>")
 rsmtool_test_dir = Path(__file__).absolute().parent.parent.joinpath("tests")
 
 tools_with_input_data = ["rsmsummarize", "rsmcompare"]
-tools_with_output = ["rsmtool", "rsmeval", "rsmsummarize", "rsmpredict"]
+tools_with_output = ["rsmtool", "rsmeval", "rsmsummarize", "rsmpredict", "rsmxval", "rsmexplain"]
 
 # check if tests are being run in strict mode
 # if so, any warnings found in HTML
@@ -1451,110 +1452,149 @@ class FileUpdater(object):
         # locate the updated outputs for the experiment under the given
         # outputs directory, locate the existing experiment outputs
         # and define how we will refer to the test
+        all_updated_folders = []
+        test_name = source
         if file_type == "output":
-            updated_output_path = self.updated_outputs_directory / source / "output"
-            existing_output_path = self.tests_directory / "data" / "experiments" / source / "output"
-            test_name = source
+            # for xval we need to update data from several output folder
+            if "xval" in source:
+                updated_xval_path = self.updated_outputs_directory / source
+                for output_sub_folder in ["evaluation", "final-model", "fold-summary"]:
+                    updated_output_path = updated_xval_path / output_sub_folder / "output"
+                    existing_output_path = (
+                        self.tests_directory
+                        / "data"
+                        / "experiments"
+                        / source
+                        / "output"
+                        / output_sub_folder
+                        / "output"
+                    )
+                    all_updated_folders.append((updated_output_path, existing_output_path))
+                updated_folds_path = updated_xval_path / "folds"
+                for fold in os.listdir(updated_folds_path):
+                    updated_fold_path = updated_folds_path / fold / "output"
+                    existing_fold_path = (
+                        self.tests_directory
+                        / "data"
+                        / "experiments"
+                        / source
+                        / "output"
+                        / "folds"
+                        / fold
+                        / "output"
+                    )
+                    all_updated_folders.append((updated_fold_path, existing_fold_path))
+            # for all other experiment types, we havea  single output folder
+            else:
+                updated_output_path = self.updated_outputs_directory / source / "output"
+                existing_output_path = (
+                    self.tests_directory / "data" / "experiments" / source / "output"
+                )
+                all_updated_folders.append((updated_output_path, existing_output_path))
         else:
             updated_output_path = self.updated_outputs_directory / input_source / "output"
             existing_output_path = (
                 self.tests_directory / "data" / "experiments" / source / input_source / "output"
             )
-            test_name = f"{source}/{input_source}"
+            all_updated_folders.append((updated_output_path, existing_output_path))
+            test_name += f"/{input_source}"
 
-        # if the directory for this source does not exist on the updated output
-        # side, then that's a problem and something we should report on later
-        try:
-            assert updated_output_path.exists()
-        except AssertionError:
-            self.missing_or_empty_sources.append(test_name)
-            return
+        for updated_output_path, existing_output_path in all_updated_folders:
+            # if the directory for this source does not exist on the updated output
+            # side, then that's a problem and something we should report on later
+            try:
+                assert updated_output_path.exists()
+            except AssertionError:
+                self.missing_or_empty_sources.append(test_name)
+                return
 
-        # if the existing output path does not exist, then create it
-        try:
-            assert existing_output_path.exists()
-        except AssertionError:
-            sys.stderr.write(f'\nNo existing output for "{test_name}". Creating directory ...\n')
-            existing_output_path.mkdir(parents=True)
+            # if the existing output path does not exist, then create it
+            try:
+                assert existing_output_path.exists()
+            except AssertionError:
+                sys.stderr.write(
+                    f'\nNo existing output for "{test_name}". Creating directory ...\n'
+                )
+                existing_output_path.mkdir(parents=True)
 
-        # get a comparison betwen the two directories
-        dir_comparison = dircmp(updated_output_path, existing_output_path)
+            # get a comparison between the two directories
+            dir_comparison = dircmp(updated_output_path, existing_output_path)
 
-        # if no output was found in the updated outputs directory, that's
-        # likely to be a problem so save that source
-        if not dir_comparison.left_list:
-            self.missing_or_empty_sources.append(test_name)
-            return
+            # if no output was found in the updated outputs directory, that's
+            # likely to be a problem so save that source
+            if not dir_comparison.left_list:
+                self.missing_or_empty_sources.append(test_name)
+                return
 
-        # first delete the files that only exist in the existing output directory
-        # since those are likely old files from old versions that we do not need
-        existing_output_only_files = dir_comparison.right_only
-        for file in existing_output_only_files:
-            remove(existing_output_path / file)
+            # first delete the files that only exist in the existing output directory
+            # since those are likely old files from old versions that we do not need
+            existing_output_only_files = dir_comparison.right_only
+            for file in existing_output_only_files:
+                remove(existing_output_path / file)
 
-        # Next find all the NEW files in the updated outputs.
-        new_files = dir_comparison.left_only
+            # Next find all the NEW files in the updated outputs.
+            new_files = dir_comparison.left_only
 
-        # We also define several types of files we exclude.
-        # 1. we exclude OLS summary files
-        excluded_suffixes = ["_ols_summary.txt", ".ols", ".model", ".npy"]
+            # We also define several types of files we exclude.
+            # 1. we exclude OLS summary files
+            excluded_suffixes = ["_ols_summary.txt", ".ols", ".model", ".npy"]
 
-        # 2. for output files we exclude all json files.
-        # We keep these files if we are dealing with input files.
-        if file_type == "output":
-            excluded_suffixes.extend(
-                [
-                    "_rsmtool.json",
-                    "_rsmeval.json",
-                    "_rsmsummarize.json",
-                    "_rsmcompare.json",
-                    "_rsmxval.json",
-                ]
-            )
+            # 2. for output files we exclude all json files.
+            # We keep these files if we are dealing with input files.
+            if file_type == "output":
+                excluded_suffixes.extend(
+                    [
+                        "_rsmtool.json",
+                        "_rsmeval.json",
+                        "_rsmsummarize.json",
+                        "_rsmcompare.json",
+                        "_rsmxval.json",
+                    ]
+                )
 
-        new_files = [
-            f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)
-        ]
+            new_files = [
+                f for f in new_files if not any(f.endswith(suffix) for suffix in excluded_suffixes)
+            ]
 
-        # 3. We also exclude files related to model evaluations for SKLL models.
-        if skll:
-            new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
+            # 3. We also exclude files related to model evaluations for SKLL models.
+            if skll:
+                new_files = [f for f in new_files if not self.is_skll_excluded_file(f)]
 
-        # next we get the files that have changed and try to figure out if they
-        # have actually changed beyond a tolerance level that we care about for
-        # tests. To do this, we run the same function that we use when comparing
-        # the files in the actual test. However, for non-tabular files, we just
-        # assume that they have really changed since we have no easy way to compare.
-        changed_files = dir_comparison.diff_files
-        really_changed_files = []
-        for changed_file in changed_files:
-            include_file = True
-            updated_output_filepath = updated_output_path / changed_file
-            existing_output_filepath = existing_output_path / changed_file
-            file_format = updated_output_filepath.suffix.lstrip(".")
-            if file_format in ["csv", "tsv", "xlsx"]:
-                try:
-                    check_file_output(
-                        str(updated_output_filepath),
-                        str(existing_output_filepath),
-                        file_format=file_format,
-                    )
-                except AssertionError:
-                    pass
-                else:
-                    include_file = False
+            # next we get the files that have changed and try to figure out if they
+            # have actually changed beyond a tolerance level that we care about for
+            # tests. To do this, we run the same function that we use when comparing
+            # the files in the actual test. However, for non-tabular files, we just
+            # assume that they have really changed since we have no easy way to compare.
+            changed_files = dir_comparison.diff_files
+            really_changed_files = []
+            for changed_file in changed_files:
+                include_file = True
+                updated_output_filepath = updated_output_path / changed_file
+                existing_output_filepath = existing_output_path / changed_file
+                file_format = updated_output_filepath.suffix.lstrip(".")
+                if file_format in ["csv", "tsv", "xlsx"]:
+                    try:
+                        check_file_output(
+                            str(updated_output_filepath),
+                            str(existing_output_filepath),
+                            file_format=file_format,
+                        )
+                    except AssertionError:
+                        pass
+                    else:
+                        include_file = False
 
-            if include_file:
-                really_changed_files.append(changed_file)
+                if include_file:
+                    really_changed_files.append(changed_file)
 
-        # Copy over the new files as well as the really changed files
-        new_or_changed_files = new_files + really_changed_files
-        for file in new_or_changed_files:
-            copyfile(updated_output_path / file, existing_output_path / file)
+            # Copy over the new files as well as the really changed files
+            new_or_changed_files = new_files + really_changed_files
+            for file in new_or_changed_files:
+                copyfile(updated_output_path / file, existing_output_path / file)
 
-        # Update the lists with files that were changed for this source
-        self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
-        self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
+            # Update the lists with files that were changed for this source
+            self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
+            self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
 
     def update_test_data(self, source, test_tool, skll=False):
         """
@@ -1614,8 +1654,9 @@ class FileUpdater(object):
 
                     # now iterate over all the test methods in the test class
                     for class_member_name, class_member_object in getmembers(test_class):
-                        if isfunction(class_member_object) and class_member_name.startswith(
-                            "test_run_experiment"
+                        if isfunction(class_member_object) and (
+                            class_member_name.startswith("test_run_experiment")
+                            or class_member_name.startswith("test_run_cross_validation")
                         ):
                             function = class_member_object
 

@@ -1,9 +1,9 @@
 {
     "summary_id": "lr_xval_subgroups_with_int_ids_fold_summary",
     "experiment_dirs": [
-        "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/folds/01",
-        "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/folds/02",
-        "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/folds/03"
+        "/home/ec2-user/rsmtool/test_outputs/lr-xval-subgroups-with-int-ids/folds/01",
+        "/home/ec2-user/rsmtool/test_outputs/lr-xval-subgroups-with-int-ids/folds/02",
+        "/home/ec2-user/rsmtool/test_outputs/lr-xval-subgroups-with-int-ids/folds/03"
     ],
     "description": "Cross-validation with subgroups using a LinearRegression model. (Fold Summary)",
     "file_format": "csv",
@@ -15,5 +15,8 @@
     "custom_sections": null,
     "subgroups": [],
     "section_order": null,
-    "experiment_names": null
+    "experiment_names": null,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null
 }

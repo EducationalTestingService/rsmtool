@@ -882,7 +882,7 @@ class TestIntermediateFiles(unittest.TestCase):
             join("..", "output", files[0]), join("..", "output", files[1])
         )
         html_expected = "".join(html_expected.strip().split())
-        html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
+        html_expected = """<ul>""" + html_expected + """</ul>"""
         html_result = get_files_as_html(directory, "lr", "csv")
         html_result = "".join(html_result.strip().split())
         self.assertEqual(html_expected, html_result)
@@ -899,7 +899,7 @@ class TestIntermediateFiles(unittest.TestCase):
             join("..", "output", files[0]), join("..", "output", files[1])
         )
         html_expected = "".join(html_expected.strip().split())
-        html_expected = """<ul><html>""" + html_expected + """</ul></html>"""
+        html_expected = """<ul>""" + html_expected + """</ul>"""
         html_result = get_files_as_html(directory, "lr", "csv", replace_dict)
         html_result = "".join(item for item in html_result)
         html_result = "".join(html_result.strip().split())

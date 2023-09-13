@@ -1,5 +1,5 @@
 {
-    "train_file": "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/folds/02/train.csv",
+    "train_file": "test_outputs/lr-xval-subgroups-with-int-ids/folds/02/train.csv",
     "id_column": "ID",
     "use_scaled_predictions": true,
     "train_label_column": "score",
@@ -34,7 +34,11 @@
     "flag_column": null,
     "flag_column_test": null,
     "min_items_per_candidate": null,
-    "test_file": "/Users/nmadnani/work/rsmtool/tests/data/experiments/lr-xval-subgroups-with-int-ids/output/folds/02/test.csv",
+    "skll_grid_search_jobs": 1,
+    "use_wandb": false,
+    "wandb_project": null,
+    "wandb_entity": null,
+    "test_file": "test_outputs/lr-xval-subgroups-with-int-ids/folds/02/test.csv",
     "test_label_column": "score",
     "general_sections": [
         "all"

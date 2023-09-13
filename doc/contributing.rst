@@ -213,7 +213,7 @@ Advanced tips and tricks
 
 Here are some advanced tips and tricks when working with RSMTool tests.
 
-#. To run a specific test function in a specific test file, simply use ``nose2 --quiet tests test_X.Y.Z`` where ``test_X`` is the name of the test file, ``Y`` is the enclosing ``unittest.TestCase`` subclass, and ``Z`` is the desired test function. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other parameters in the ``params`` and run the ``test_run_experiment_parameterized()`` function as above.
+#. To run a specific test function in a specific test file, simply use ``nose2 --quiet -s tests test_X.Y.Z`` where ``test_X`` is the name of the test file, ``Y`` is the enclosing ``unittest.TestCase`` subclass, and ``Z`` is the desired test function. Note that this will not work for parameterized tests. If you want to run a specific parameterized test, you can comment out all of the other parameters in the ``params`` and run the ``test_run_experiment_parameterized()`` function as above.
 
 #. If you make any changes to the code that can change the output that the tests are expected to produce, you *must* re-run all of the tests and then update the *expected* test outputs using the ``update_files.py`` command as shown :ref:`above <update_files>`.
 
