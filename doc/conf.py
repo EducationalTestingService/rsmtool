@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx_rtd_theme",
     "sphinx_design",
 ]
 
@@ -112,19 +113,7 @@ autoclass_content = "both"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-for_dash = os.environ.get("DASH", None) == "True"
-if not on_rtd and not for_dash:
-    import sphinx_rtd_theme
-
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-elif for_dash:
-    import alabaster
-
-    html_theme = "alabaster"
-    html_theme_path = [alabaster.get_path()]
-    html_theme_options = {"nosidebar": True}
+html_theme = "sphinx_rtd_theme"
 
 # copy over any static assets
 html_static_path = ["assets"]
