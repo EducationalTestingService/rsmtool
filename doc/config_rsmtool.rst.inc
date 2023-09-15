@@ -377,7 +377,7 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 .. _skll_grid_search_jobs:
 
 skll_grid_search_jobs *(Optional)*
-"""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""
 Number of folds to run in parallel when using skll grid search. Defaults to 1 (no parallelization). For very large data
 sets, setting this option to a higher number (e.g., number of CPU cores) may significantly improve running time.
 
