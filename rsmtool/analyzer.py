@@ -1799,7 +1799,11 @@ class Analyzer:
         df_confmatrix = pd.DataFrame(conf_matrix, index=labels, columns=labels).transpose()
         # log confusion matrix to W&B
         wandb.log_confusion_matrix(
-            wandb_run, human_scores, system_scores, "Human-System Confusion Matrix"
+            wandb_run,
+            human_scores,
+            system_scores,
+            "Human-System Confusion Matrix",
+            configuration.context,
         )
 
         # compute the score distributions of the rounded human and system scores
@@ -1820,7 +1824,11 @@ class Analyzer:
                 conf_matrix_h1h2, index=labels, columns=labels
             ).transpose()
             wandb.log_confusion_matrix(
-                wandb_run, human1_scores, human2_scores, "Human1-Human2 Confusion Matrix"
+                wandb_run,
+                human1_scores,
+                human2_scores,
+                "Human1-Human2 Confusion Matrix",
+                configuration.context,
             )
 
         # Replace any NaNs, which we might get because our model never

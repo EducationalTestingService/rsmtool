@@ -172,7 +172,7 @@ def run_summary(
     # start a wandb run and log configuration
     if wandb_run is None:
         wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmsummarize")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # get the list of the experiment dirs
     experiment_dirs = configuration["experiment_dirs"]

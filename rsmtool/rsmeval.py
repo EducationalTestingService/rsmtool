@@ -108,13 +108,13 @@ def run_evaluation(
     # start a wandb run and log configuration
     if wandb_run is None:
         wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmeval")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
     # Get DataWriter object
-    writer = DataWriter(configuration["experiment_id"], wandb_run)
+    writer = DataWriter(configuration["experiment_id"], configuration.context, wandb_run)
 
     # Make sure prediction file can be located
     if not DataReader.locate_files(configuration["predictions_file"], configuration.configdir):

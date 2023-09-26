@@ -281,6 +281,13 @@ The values for a key can be string, integer, float, or boolean depending on what
 hyperparameter expects. Note that if this option is specified with the
 :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored.
 
+.. _skll_grid_search_jobs:
+
+skll_grid_search_jobs *(Optional)*
+""""""""""""""""""""""""""""""""""
+Number of folds to run in parallel when using skll grid search. Defaults to 1 (no parallelization). For very large data
+sets, setting this option to a higher number (e.g., number of CPU cores) may significantly improve running time.
+
 .. _skll_objective:
 
 skll_objective *(Optional)*
@@ -373,13 +380,6 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 .. note::
 
     If ``use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
-
-.. _skll_grid_search_jobs:
-
-skll_grid_search_jobs *(Optional)*
-""""""""""""""""""""""""""""""""""
-Number of folds to run in parallel when using skll grid search. Defaults to 1 (no parallelization). For very large data
-sets, setting this option to a higher number (e.g., number of CPU cores) may significantly improve running time.
 
 .. _use_wandb:
 
