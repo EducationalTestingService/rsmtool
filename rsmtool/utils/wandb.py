@@ -120,7 +120,7 @@ def get_metric_name(section, df_name, col_name, row_name):
     """
     metric_name = f"{df_name}.{col_name}"
     if section is not None and section != "":
-        metric_name = f"{section}.{metric_name}"
+        metric_name = f"{section}/{metric_name}"
     if row_name != "" and row_name != 0:
         metric_name = f"{metric_name}.{row_name}"
     return metric_name
