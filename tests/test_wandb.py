@@ -34,7 +34,7 @@ class TestWandb(unittest.TestCase):
             "train_file": "train.csv",
             "test_file": "test.csv",
         }
-        config_object = Configuration(config, context="test")
+        config_object = Configuration(config)
 
         mock_wandb_run = Mock()
         with patch(
@@ -43,7 +43,7 @@ class TestWandb(unittest.TestCase):
             init_wandb_run(config)
             log_configuration_to_wandb(mock_wandb_run, config_object)
         mock_wandb_init.assert_called_with(project="test_project", entity="test_entity")
-        mock_wandb_run.config.update.assert_called_with({"test": config_object.to_dict()})
+        mock_wandb_run.config.update.assert_called_with({"rsmtool": config_object.to_dict()})
 
     def test_init_wandb_run_wandb_disabled(self):
         config = {
@@ -123,10 +123,10 @@ class TestWandb(unittest.TestCase):
     def test_get_metric_name(self):
         """Test the method get_metric_name."""
         # with a valid row name
-        self.assertEquals("section.df.col.row", get_metric_name("section", "df", "col", "row"))
+        self.assertEquals("section/df.col.row", get_metric_name("section", "df", "col", "row"))
         # with an empty row name
-        self.assertEquals("section.df.col", get_metric_name("section", "df", "col", ""))
+        self.assertEquals("section/df.col", get_metric_name("section", "df", "col", ""))
         # with 0 as row name
-        self.assertEquals("section.df.col", get_metric_name("section", "df", "col", 0))
+        self.assertEquals("section/df.col", get_metric_name("section", "df", "col", 0))
         # with no section
         self.assertEquals("df.col.row", get_metric_name("", "df", "col", "row"))
