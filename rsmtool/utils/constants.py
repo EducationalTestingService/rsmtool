@@ -134,6 +134,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
+            "clamp_features",
         ],
     },
     "rsmxval": {
@@ -224,6 +225,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
+            "clamp_features",
         ],
     },
     "rsmcompare": {

@@ -5,6 +5,7 @@
     "input_features_file": "features.csv",
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
+    "clamp_features": true,
     "file_format": "csv",
     "flag_column": null,
     "human_score_column": "score",

@@ -1724,6 +1724,9 @@ class FeaturePreprocessor:
         # should we standardize the features
         standardize_features = config_obj["standardize_features"]
 
+        # should features be clamped?
+        clamp_features = config_obj.get("clamp_features", True)
+
         # if we are excluding zero scores but trim_min
         # is set to 0, then we need to warn the user
         if exclude_zero_scores and spec_trim_min == 0:
@@ -1989,6 +1992,7 @@ class FeaturePreprocessor:
             feature_specs,
             standardize_features,
             use_truncations,
+            clamp_features,
         )
 
         # configuration options that either override previous values or are
@@ -2487,6 +2491,9 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get("standardize_features", True)
 
+        # should features be clamped?
+        clamp_features = config_obj.get("clamp_features", True)
+
         # should we predict expected scores
         predict_expected_scores = config_obj["predict_expected_scores"]
 
@@ -2547,7 +2554,7 @@ class FeaturePreprocessor:
             )
 
         (df_features_preprocessed, df_excluded) = self.preprocess_new_data(
-            df_input, df_feature_info, standardize_features
+            df_input, df_feature_info, standardize_features, clamp_features
         )
 
         trim_min = df_postproc_params["trim_min"].values[0]

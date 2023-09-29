@@ -6,6 +6,7 @@
     "test_file": "test.csv",
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
+    "clamp_features": true,
     "custom_sections": null,
     "description": "an rsmtool test",
     "exclude_zero_scores": false,
