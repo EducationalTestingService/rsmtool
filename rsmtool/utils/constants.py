@@ -26,6 +26,7 @@ DEFAULTS = {
     "use_scaled_predictions_new": False,
     "select_transformations": False,
     "standardize_features": True,
+    "clamp_features": True,
     "use_thumbnails": False,
     "use_truncation_thresholds": False,
     "scale_with": None,
@@ -289,6 +290,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
+            "clamp_features",
         ],
     },
 }
@@ -421,12 +423,18 @@ INTERACTIVE_MODE_METADATA = {
     },
     "explain_data": {"label": "Path to file to be explained ", "type": "file"},
     "sample_range": {"label": "Range of specific row IDs to explain "},
-    "sample_size": {"label": "Size of random sample to be explained ", "type": "integer"},
+    "sample_size": {
+        "label": "Size of random sample to be explained ",
+        "type": "integer",
+    },
     "num_features_to_display": {
         "label": "Number of features to be displayed in plots (<u>15</u>)",
         "type": "integer",
     },
-    "show_auto_cohorts": {"label": "Show auto cohorts plot (true/<u>false</u>)", "type": "boolean"},
+    "show_auto_cohorts": {
+        "label": "Show auto cohorts plot (true/<u>false</u>)",
+        "type": "boolean",
+    },
 }
 
 # regular expression used to parse rsmexplain range values

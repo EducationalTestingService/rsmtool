@@ -7,6 +7,7 @@
     "experiment_dir": "ENTER_VALUE_HERE",
     // OPTIONAL: replace default values below based on your data.
     "background_kmeans_size": 500,
+    "clamp_features": true,
     "custom_sections": null,
     "description": "",
     "general_sections": [

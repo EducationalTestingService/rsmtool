@@ -1020,6 +1020,7 @@ class FeaturePreprocessor:
         exclude_zero_sd=False,
         raise_error=True,
         truncations=None,
+        clamp_features=True,
     ):
         """
         Remove outliers and transform the values in given numpy array.
@@ -1050,6 +1051,9 @@ class FeaturePreprocessor:
         truncations : pandas DataFrame, optional
             A set of pre-defined truncation values.
             Defaults to ``None``.
+        clamp_features : bool, optional
+            Clamp outlier values if set in the config file
+            Defaults to ``True``.
 
         Returns
         -------
@@ -1063,16 +1067,21 @@ class FeaturePreprocessor:
             If the preprocessed feature values have zero standard deviation
             and ``exclude_zero_sd`` is set to ``True``.
         """
-        if truncations is not None:
-            # clamp outlier values using the truncations set
-            features_no_outliers = self.remove_outliers_using_truncations(
-                values, feature_name, truncations
-            )
+        if clamp_features:
+            if truncations is not None:
+                # clamp outlier values using the truncations set
+                features_no_outliers = self.remove_outliers_using_truncations(
+                    values, feature_name, truncations
+                )
 
+            else:
+                # clamp any outlier values that are 4 standard deviations
+                # away from the mean
+                features_no_outliers = self.remove_outliers(
+                    values, mean=feature_mean, sd=feature_sd
+                )
         else:
-            # clamp any outlier values that are 4 standard deviations
-            # away from the mean
-            features_no_outliers = self.remove_outliers(values, mean=feature_mean, sd=feature_sd)
+            features_no_outliers = values
 
         # apply the requested transformation to the feature
         transformed_feature = FeatureTransformer().transform_feature(
@@ -1105,6 +1114,7 @@ class FeaturePreprocessor:
         df_feature_specs,
         standardize_features=True,
         use_truncations=False,
+        clamp_features=True,
     ):
         """
         Preprocess features in given data using corresponding specifications.
@@ -1132,6 +1142,10 @@ class FeaturePreprocessor:
             Whether we should use the truncation set
             for removing outliers.
             Defaults to ``False``.
+        clamp_features : bool, optional
+            Clamp outlier values if set in the config file
+            Defaults to ``True``.
+
 
         Returns
         -------
@@ -1178,6 +1192,7 @@ class FeaturePreprocessor:
                 train_feature_sd,
                 exclude_zero_sd=True,
                 truncations=truncations,
+                clamp_features=clamp_features,
             )
 
             testing_feature_values = df_test[feature_name].values
@@ -1188,6 +1203,7 @@ class FeaturePreprocessor:
                 train_feature_mean,
                 train_feature_sd,
                 truncations=truncations,
+                clamp_features=clamp_features,
             )
 
             # Standardize the features using the mean and sd computed on the
@@ -2646,6 +2662,9 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get("standardize_features", True)
 
+        # should features be clamped?
+        clamp_features = config_obj.get("clamp_features", True)
+
         # rename the ID columns in both frames
         df_background_preprocessed = self.rename_default_columns(
             df_background_features,
@@ -2689,10 +2708,10 @@ class FeaturePreprocessor:
 
         # now pre-process all the features that go into the model
         (df_background_preprocessed, _) = self.preprocess_new_data(
-            df_background_preprocessed, df_feature_info, standardize_features
+            df_background_preprocessed, df_feature_info, standardize_features, clamp_features
         )
         (df_explain_preprocessed, _) = self.preprocess_new_data(
-            df_explain_preprocessed, df_feature_info, standardize_features
+            df_explain_preprocessed, df_feature_info, standardize_features, clamp_features
         )
 
         # set ID column as index for the background and explain feature frames
@@ -2748,7 +2767,9 @@ class FeaturePreprocessor:
                 f"'rsmeval', 'rsmpredict', 'rsmexplain']. You specified `{context}`."
             )
 
-    def preprocess_new_data(self, df_input, df_feature_info, standardize_features=True):
+    def preprocess_new_data(
+        self, df_input, df_feature_info, standardize_features=True, clamp_features=True
+    ):
         """
         Preprocess feature values using the parameters in ``df_feature_info``.
 
@@ -2778,6 +2799,10 @@ class FeaturePreprocessor:
 
         standardize_features : bool, optional
             Whether the features should be standardized prior to prediction.
+            Defaults to ``True``.
+
+        clamp_features : bool, optional
+            Whether the features should be clamped prior to prediction.
             Defaults to ``True``.
 
         Returns
@@ -2881,6 +2906,7 @@ class FeaturePreprocessor:
                 train_feature_sd,
                 exclude_zero_sd=False,
                 raise_error=False,
+                clamp_features=clamp_features,
             )
 
             # filter the feature values once again to remove possible NaN and inf values that

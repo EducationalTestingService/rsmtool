@@ -6,6 +6,7 @@
     "experiment_dir": "/a/b",
     // OPTIONAL: replace default values below based on your data.
     "background_kmeans_size": 500,
+    "clamp_features": true,
     "custom_sections": null,
     "description": "explain test",
     "general_sections": [
