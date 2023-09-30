@@ -175,6 +175,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
+            "clamp_features",
         ],
     },
     "rsmeval": {

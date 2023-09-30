@@ -6,6 +6,7 @@
     "train_file": "ENTER_VALUE_HERE",
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
+    "clamp_features": true,
     "description": "",
     "exclude_zero_scores": true,
     "feature_subset": null,
