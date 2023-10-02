@@ -136,9 +136,9 @@ def log_confusion_matrix(wandb_run, human_scores, system_scores, name, section):
     ----------
     wandb_run : wandb.Run
         The wandb run object, or None, if logging to W&B is disabled
-    human_scores : Sequence
+    human_scores : pandas.Series
         The human scores for the responses in the data
-    system_scores : Sequence
+    system_scores : pandas.Series
         The predicted scores for the responses in the data
     name : str
         The chart title
@@ -150,8 +150,8 @@ def log_confusion_matrix(wandb_run, human_scores, system_scores, name, section):
             {
                 f"{section}/{name}": wandb.plot.confusion_matrix(
                     probs=None,
-                    y_true=human_scores,
-                    preds=system_scores,
+                    y_true=human_scores.values,
+                    preds=system_scores.values,
                     title=name,
                 )
             }
