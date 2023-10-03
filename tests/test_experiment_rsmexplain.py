@@ -48,6 +48,7 @@ class TestExperimentRsmexplain(unittest.TestCase):
             "sample_size": 10,
             "num_features_to_display": 15,
             "show_auto_cohorts": True,
+            "truncate_outliers": False,
         }
 
         config_obj = Configuration(config_dict, context="rsmexplain", configdir=configdir)
