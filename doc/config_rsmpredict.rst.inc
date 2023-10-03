@@ -74,6 +74,12 @@ subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups. For example, ``["prompt, gender, native_language, test_country"]``. All these columns will be included into the predictions file with the original names.
 
+.. _truncated_outliers_rsmpredict:
+
+truncated_outliers *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If this option is set to ``false`` outliers will not be truncated by truncating outliers that 4 standard deviations away from the mean. Defaults to ``true``.
+
 .. _use_wandb_rsmpredict:
 
 use_wandb *(Optional)*

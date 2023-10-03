@@ -200,6 +200,12 @@ Defaults to 0.4998.
 
     For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.
 
+.. _truncated_outliers_rsmeval:
+
+truncated_outliers *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If this option is set to ``false`` outliers will not be truncated by truncating outliers that 4 standard deviations away from the mean. Defaults to ``true``.
+
 .. _use_thumbnails_rsmeval:
 
 use_thumbnails *(Optional)*

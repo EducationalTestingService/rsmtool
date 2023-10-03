@@ -83,6 +83,7 @@ In addition to the fields described so far, an ``rsmxval`` configuration file al
 - ``trim_max``
 - ``trim_min``
 - ``trim_tolerance``
+- ``truncate_outliers``
 - ``use_scaled_predictions``
 - ``use_thumbnails``
 - ``use_truncation_thresholds``
