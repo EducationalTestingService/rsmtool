@@ -35,6 +35,7 @@
     "special_sections": null,
     "subgroups": [],
     "trim_tolerance": 0.4998,
+    "truncate_outliers": true,
     "use_thumbnails": false,
     "use_wandb": false,
     "wandb_entity": null,

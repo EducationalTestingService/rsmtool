@@ -1020,7 +1020,7 @@ class FeaturePreprocessor:
         exclude_zero_sd=False,
         raise_error=True,
         truncations=None,
-        clamp_features=True,
+        truncate_outliers=True,
     ):
         """
         Remove outliers and transform the values in given numpy array.
@@ -1051,8 +1051,8 @@ class FeaturePreprocessor:
         truncations : pandas DataFrame, optional
             A set of pre-defined truncation values.
             Defaults to ``None``.
-        clamp_features : bool, optional
-            Clamp outlier values if set in the config file
+        truncate_outliers : bool, optional
+            Truncate outlier values if set in the config file
             Defaults to ``True``.
 
         Returns
@@ -1067,7 +1067,7 @@ class FeaturePreprocessor:
             If the preprocessed feature values have zero standard deviation
             and ``exclude_zero_sd`` is set to ``True``.
         """
-        if clamp_features:
+        if truncate_outliers:
             if truncations is not None:
                 # clamp outlier values using the truncations set
                 features_no_outliers = self.remove_outliers_using_truncations(
@@ -1114,7 +1114,7 @@ class FeaturePreprocessor:
         df_feature_specs,
         standardize_features=True,
         use_truncations=False,
-        clamp_features=True,
+        truncate_outliers=True,
     ):
         """
         Preprocess features in given data using corresponding specifications.
@@ -1142,8 +1142,8 @@ class FeaturePreprocessor:
             Whether we should use the truncation set
             for removing outliers.
             Defaults to ``False``.
-        clamp_features : bool, optional
-            Clamp outlier values if set in the config file
+        truncate_outliers : bool, optional
+            Truncate outlier values if set in the config file
             Defaults to ``True``.
 
 
@@ -1192,7 +1192,7 @@ class FeaturePreprocessor:
                 train_feature_sd,
                 exclude_zero_sd=True,
                 truncations=truncations,
-                clamp_features=clamp_features,
+                truncate_outliers=truncate_outliers,
             )
 
             testing_feature_values = df_test[feature_name].values
@@ -1203,7 +1203,7 @@ class FeaturePreprocessor:
                 train_feature_mean,
                 train_feature_sd,
                 truncations=truncations,
-                clamp_features=clamp_features,
+                truncate_outliers=truncate_outliers,
             )
 
             # Standardize the features using the mean and sd computed on the
@@ -1724,8 +1724,8 @@ class FeaturePreprocessor:
         # should we standardize the features
         standardize_features = config_obj["standardize_features"]
 
-        # should features be clamped?
-        clamp_features = config_obj.get("clamp_features", True)
+        # should outliers be truncated?
+        truncate_outliers = config_obj.get("truncate_outliers", True)
 
         # if we are excluding zero scores but trim_min
         # is set to 0, then we need to warn the user
@@ -1992,7 +1992,7 @@ class FeaturePreprocessor:
             feature_specs,
             standardize_features,
             use_truncations,
-            clamp_features,
+            truncate_outliers,
         )
 
         # configuration options that either override previous values or are
@@ -2491,8 +2491,8 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get("standardize_features", True)
 
-        # should features be clamped?
-        clamp_features = config_obj.get("clamp_features", True)
+        # should outliers be truncated?
+        truncate_outliers = config_obj.get("truncate_outliers", True)
 
         # should we predict expected scores
         predict_expected_scores = config_obj["predict_expected_scores"]
@@ -2554,7 +2554,7 @@ class FeaturePreprocessor:
             )
 
         (df_features_preprocessed, df_excluded) = self.preprocess_new_data(
-            df_input, df_feature_info, standardize_features, clamp_features
+            df_input, df_feature_info, standardize_features, truncate_outliers
         )
 
         trim_min = df_postproc_params["trim_min"].values[0]
@@ -2669,8 +2669,8 @@ class FeaturePreprocessor:
         # should features be standardized?
         standardize_features = config_obj.get("standardize_features", True)
 
-        # should features be clamped?
-        clamp_features = config_obj.get("clamp_features", True)
+        # should outliers be truncated?
+        truncate_outliers = config_obj.get("truncate_outliers", True)
 
         # rename the ID columns in both frames
         df_background_preprocessed = self.rename_default_columns(
@@ -2715,10 +2715,10 @@ class FeaturePreprocessor:
 
         # now pre-process all the features that go into the model
         (df_background_preprocessed, _) = self.preprocess_new_data(
-            df_background_preprocessed, df_feature_info, standardize_features, clamp_features
+            df_background_preprocessed, df_feature_info, standardize_features, truncate_outliers
         )
         (df_explain_preprocessed, _) = self.preprocess_new_data(
-            df_explain_preprocessed, df_feature_info, standardize_features, clamp_features
+            df_explain_preprocessed, df_feature_info, standardize_features, truncate_outliers
         )
 
         # set ID column as index for the background and explain feature frames
@@ -2775,7 +2775,7 @@ class FeaturePreprocessor:
             )
 
     def preprocess_new_data(
-        self, df_input, df_feature_info, standardize_features=True, clamp_features=True
+        self, df_input, df_feature_info, standardize_features=True, truncate_outliers=True
     ):
         """
         Preprocess feature values using the parameters in ``df_feature_info``.
@@ -2808,8 +2808,8 @@ class FeaturePreprocessor:
             Whether the features should be standardized prior to prediction.
             Defaults to ``True``.
 
-        clamp_features : bool, optional
-            Whether the features should be clamped prior to prediction.
+        truncate_outliers : bool, optional
+            Whether the outlier should be truncated prior to prediction.
             Defaults to ``True``.
 
         Returns
@@ -2913,7 +2913,7 @@ class FeaturePreprocessor:
                 train_feature_sd,
                 exclude_zero_sd=False,
                 raise_error=False,
-                clamp_features=clamp_features,
+                truncate_outliers=truncate_outliers,
             )
 
             # filter the feature values once again to remove possible NaN and inf values that

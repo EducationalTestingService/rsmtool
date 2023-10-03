@@ -5,7 +5,6 @@
     "input_features_file": "features.csv",
     // OPTIONAL: replace default values below based on your data.
     "candidate_column": null,
-    "clamp_features": true,
     "file_format": "csv",
     "flag_column": null,
     "human_score_column": "score",
@@ -14,6 +13,7 @@
     "second_human_score_column": null,
     "standardize_features": true,
     "subgroups": [],
+    "truncate_outliers": true,
     "use_wandb": false,
     "wandb_entity": null,
     "wandb_project": null

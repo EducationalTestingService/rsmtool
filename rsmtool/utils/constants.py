@@ -26,7 +26,7 @@ DEFAULTS = {
     "use_scaled_predictions_new": False,
     "select_transformations": False,
     "standardize_features": True,
-    "clamp_features": True,
+    "truncate_outliers": True,
     "use_thumbnails": False,
     "use_truncation_thresholds": False,
     "scale_with": None,
@@ -134,7 +134,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
-            "clamp_features",
+            "truncate_outliers",
         ],
     },
     "rsmxval": {
@@ -175,7 +175,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
-            "clamp_features",
+            "truncate_outliers",
         ],
     },
     "rsmeval": {
@@ -209,6 +209,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
+            "truncate_outliers",
         ],
     },
     "rsmpredict": {
@@ -226,7 +227,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
-            "clamp_features",
+            "truncate_outliers",
         ],
     },
     "rsmcompare": {
@@ -293,7 +294,7 @@ CHECK_FIELDS = {
             "use_wandb",
             "wandb_project",
             "wandb_entity",
-            "clamp_features",
+            "truncate_outliers",
         ],
     },
 }
