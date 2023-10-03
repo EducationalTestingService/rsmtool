@@ -212,7 +212,7 @@ def generate_explanation(
     # start a wandb run and log configuration
     if wandb_run is None:
         wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmexplain")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # get the experiment ID
     experiment_id = configuration["experiment_id"]

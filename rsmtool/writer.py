@@ -16,7 +16,7 @@ from .utils.wandb import log_dataframe_to_wandb
 class DataWriter:
     """Class to write out DataContainer objects."""
 
-    def __init__(self, experiment_id=None, wandb_run=None):
+    def __init__(self, experiment_id=None, context=None, wandb_run=None):
         """
         Initialize the DataWriter object.
 
@@ -24,6 +24,8 @@ class DataWriter:
         ----------
         experiment_id : str
             The experiment name to be used in the output file names
+        context : str
+            The context in which this writer is used. Defaults to ``None``.
         wandb_run : wandb.Run
             The wandb run object if wandb is enabled, None otherwise.
             If enabled, all the output data frames will be logged to
@@ -31,6 +33,7 @@ class DataWriter:
             Defaults to ``None``.
         """
         self._id = experiment_id
+        self.context = context
         self.wandb_run = wandb_run
 
     @staticmethod
@@ -188,7 +191,7 @@ class DataWriter:
 
             # write out the frame to disk in the given file
             self.write_frame_to_file(df, outfile, file_format=file_format, index=index, **kwargs)
-            log_dataframe_to_wandb(self.wandb_run, df, dataframe_name)
+            log_dataframe_to_wandb(self.wandb_run, df, dataframe_name, self.context)
 
     def write_feature_csv(
         self,

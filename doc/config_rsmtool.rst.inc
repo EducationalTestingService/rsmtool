@@ -281,6 +281,13 @@ The values for a key can be string, integer, float, or boolean depending on what
 hyperparameter expects. Note that if this option is specified with the
 :ref:`built-in linear regression models <builtin_models>`, it will simply be ignored.
 
+.. _skll_grid_search_jobs:
+
+skll_grid_search_jobs *(Optional)*
+""""""""""""""""""""""""""""""""""
+Number of folds to run in parallel when using SKLL grid search. Defaults to 1 (no parallelization). For very large data
+sets, setting this option to a higher number (e.g., number of CPU cores) may significantly improve running time.
+
 .. _skll_objective:
 
 skll_objective *(Optional)*
@@ -374,19 +381,18 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 
     If ``use_truncation_thresholds`` is set, a ``features`` file _must_ be specified, and this file _must_ include ``min`` and ``max`` columns. If no ``feature`` file is specified or these columns are missing, an error will be raised.
 
-.. _skll_grid_search_jobs:
-
-skll_grid_search_jobs *(Optional)*
-""""""""""""""""""""""""""""""""""
-Number of folds to run in parallel when using skll grid search. Defaults to 1 (no parallelization). For very large data
-sets, setting this option to a higher number (e.g., number of CPU cores) may significantly improve running time.
-
 .. _use_wandb:
 
 use_wandb *(Optional)*
 """"""""""""""""""""""
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` can be specified in the appropriate configuration fields.
+
+The tables and plots will be logged in a section named `rsmtool` in a new run under the given project, and the report will be
+added to a `reports` section in that run. In addition, some evaluation metrics will be logged to the run's history for easy comparison between different runs
+in the project. With each metric name representing the context and the table from which the metric is taken, for example: ``rsmeval/consistency.SMD`` is the
+`SMD` metric from the `consistency` table calculated by `rsmtool`.
+Defaults to ``false``.
 
 .. _wandb_project:
 

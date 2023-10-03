@@ -90,7 +90,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     # If wandb logging is enabled, and wandb_run is not provided,
     # start a wandb run and log configuration
     wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmcompare")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # get the information about the "old" experiment
     experiment_id_old = configuration["experiment_id_old"]

@@ -359,10 +359,10 @@ def compute_and_save_predictions(
     # start a wandb run and log configuration
     if wandb_run is None:
         wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmpredict")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # Get DataWriter object
-    writer = DataWriter(experiment_id, wandb_run)
+    writer = DataWriter(experiment_id, configuration.context, wandb_run)
 
     # get the input file containing the feature values
     # for which we want to generate the predictions

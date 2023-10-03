@@ -143,7 +143,9 @@ use_wandb *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields.
+The report will be added to a `reports` section in a new run under the given project.
+Defaults to ``false``.
 
 .. _wandb_project_rsmcompare:
 

@@ -120,13 +120,13 @@ def run_experiment(
     # start a wandb run and log configuration
     if wandb_run is None:
         wandb_run = init_wandb_run(configuration)
-    log_configuration_to_wandb(wandb_run, configuration, "rsmtool")
+    log_configuration_to_wandb(wandb_run, configuration)
 
     # Get output format
     file_format = configuration.get("file_format", "csv")
 
     # Get DataWriter object
-    writer = DataWriter(configuration["experiment_id"], wandb_run)
+    writer = DataWriter(configuration["experiment_id"], configuration.context, wandb_run)
 
     # Get the paths and names for the DataReader
 
