@@ -79,8 +79,11 @@ A list of column names indicating grouping variables used for generating analyse
 use_wandb *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 
-If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+If set to ``true``, the generated report and the predictions table will be logged to `Weights & Biases <https://wandb.ai/>`__.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields.
+The predictions table will be logged in a section named `rsmpredict` in a new run under the given project, and the report will be
+added to a `reports` section in that run.
+Defaults to ``false``.
 
 .. _wandb_project_rsmpredict:
 

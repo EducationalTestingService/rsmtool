@@ -386,7 +386,13 @@ If set to ``true``, use the ``min`` and ``max`` columns specified in the ``featu
 use_wandb *(Optional)*
 """"""""""""""""""""""
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` can be specified in the appropriate configuration fields.
+
+The tables and plots will be logged in a section named `rsmtool` in a new run under the given project, and the report will be
+added to a `reports` section in that run. In addition, some evaluation metrics will be logged to the run's history for easy comparison between different runs
+in the project. With each metric name representing the context and the table from which the metric is taken, for example: ``rsmeval/consistency.SMD`` is the
+`SMD` metric from the `consistency` table calculated by `rsmtool`.
+Defaults to ``false``.
 
 .. _wandb_project:
 

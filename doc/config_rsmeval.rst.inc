@@ -212,7 +212,10 @@ use_wandb *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 
 If set to ``true``, the generated reports and all intermediate tables will be logged to `Weights & Biases <https://wandb.ai/>`__.
-The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields. Defaults to ``false``.
+The Weights & Biases :ref:`entity <wandb_entity>` and :ref:`project name <wandb_project>` should be specified in the appropriate configuration fields.
+The tables and plots will be logged in a section named `rsmeval` in a new run under the given project, and the report will be
+added to a `reports` section in that run. In addition, some evaluation metrics will be logged to the run's history, see more details
+:ref:`here <use_wandb>`. Defaults to ``false``.
 
 .. _wandb_project_rsmeval:
 
