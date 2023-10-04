@@ -1138,13 +1138,13 @@ class FeaturePreprocessor:
         standardize_features : bool, optional
             Whether to standardize the features.
             Defaults to ``True``.
+        truncate_outliers : bool, optional
+            Truncate outlier values if set in the config file
+            Defaults to ``True``.
         use_truncations : bool, optional
             Whether we should use the truncation set
             for removing outliers.
             Defaults to ``False``.
-        truncate_outliers : bool, optional
-            Truncate outlier values if set in the config file
-            Defaults to ``True``.
 
 
         Returns

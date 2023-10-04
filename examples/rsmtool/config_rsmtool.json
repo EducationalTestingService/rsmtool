@@ -12,6 +12,5 @@
     "id_column": "ID",
     "second_human_score_column": "score2",
     "length_column": "LENGTH",
-    "clamp_features": false,
     "standardize_features": false
 }
