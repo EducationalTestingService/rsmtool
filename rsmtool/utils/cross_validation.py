@@ -128,7 +128,6 @@ def create_xval_files(configuration, output_dir, logger=None):
     # iterate over each of the folds and generate an rsmtool configuration file
     # which is then saved to disk in a directory specific to each fold
     for fold_num, (fold_train_indices, fold_test_indices) in enumerate(fold_generator, start=1):
-
         # get the train and test files for this fold and
         # write them out to disk
         df_fold_train = df_train.loc[fold_train_indices]
@@ -239,6 +238,6 @@ def combine_fold_prediction_files(foldsdir, file_format="csv"):
 
     # concatenate all of the predictions into a single frame using
     # "spkitemid" column which must exist since this is the output of RSMTool
-    df_all_predictions = concat(prediction_dfs, keys="spkitemid").reset_index(drop=True)
+    df_all_predictions = concat(prediction_dfs).reset_index(drop=True)
 
     return df_all_predictions
