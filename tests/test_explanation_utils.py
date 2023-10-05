@@ -1,4 +1,3 @@
-import json
 import unittest
 from os import environ
 from os.path import join
@@ -10,7 +9,7 @@ from skll.data import FeatureSet, Reader
 from skll.learner import Learner
 
 from rsmtool.modeler import Modeler
-from rsmtool.rsmexplain import mask, select_examples, verify_config_features
+from rsmtool.rsmexplain import mask, select_examples
 
 # allow test directory to be set via an environment variable
 # which is needed for package testing
@@ -206,26 +205,3 @@ class TestExplainUtils(unittest.TestCase):
         computed_ids, computed_features = mask(model, background, feature_range=[5, 10])
         self.assertEqual(computed_ids, expected_ids)
         assert_array_equal(computed_features, expected_features)
-
-    def test_verify_config_features(self):
-        """Test verify_config_features when features are different."""
-        experiment_path = join(rsmtool_test_dir, "data", "experiments", "knn-explain-diff-std")
-        rsmtool_config_path = join(
-            experiment_path,
-            "existing_experiment",
-            "output",
-            "knn_diff_std_rsmtool.json",
-        )
-        rsmexplain_config_path = join(experiment_path, "rsmexplain.json")
-        expected_output = True
-
-        with open(rsmtool_config_path) as rsmtool_configfh, open(
-            rsmexplain_config_path
-        ) as rsmexplain_configfh:
-            rsmexplain_config = json.load(rsmexplain_configfh)
-            rsmtool_config = json.load(rsmtool_configfh)
-            computed_config = verify_config_features(
-                rsmexplain_config, rsmtool_config, "standardize_features"
-            )
-
-        self.assertEqual(computed_config["standardize_features"], expected_output)
