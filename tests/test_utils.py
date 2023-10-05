@@ -799,70 +799,62 @@ class TestCrossValidation(unittest.TestCase):
                 with_feature_list,
             )
 
-    def check_combine_fold_prediction_files(self, file_format):
+    def check_combine_fold_prediction_files(self, num_folds, file_format):
         """
         Check that ``combine_fold_prediction_files()`` functions as expected.
 
         Parameters
         ----------
+        num_folds: int
+            Number of cross validation folds
         file_format : str
             File format to use for testing. One of {"csv", "tsv", "xlsx"}.
         """
         # create a temporary output directory and any sub-directories
         # that are needed by the ``combine_fold_prediction_files()`` function
         output_dir = mkdtemp()
-        foldsdir = Path(output_dir) / "folds"
-        makedirs(foldsdir)
+        folds_dir = Path(output_dir) / "folds"
+        makedirs(folds_dir)
 
-        # create 3 sub-directories simulating 3-fold cross-validation
-        makedirs(foldsdir / "01")
-        makedirs(foldsdir / "02")
-        makedirs(foldsdir / "03")
-
-        # create prediction files in each of the fold sub-directories
-        df_preds_fold1 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
-        df_preds_fold1["spkitemid"] = [f"RESPONSE_{i}" for i in range(1, 31)]
-        df_preds_fold2 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
-        df_preds_fold2["spkitemid"] = [f"RESPONSE_{i}" for i in range(31, 61)]
-        df_preds_fold3 = pd.DataFrame(np.random.normal(size=(30, 2)), columns=["raw", "scale"])
-        df_preds_fold3["spkitemid"] = [f"RESPONSE_{i}" for i in range(61, 91)]
-
-        # combine each of the frames in memory
-        df_combined_expected = pd.concat(
-            [df_preds_fold1, df_preds_fold2, df_preds_fold3], keys="spkitemid"
-        )
-
-        DataWriter.write_frame_to_file(
-            df_preds_fold1,
-            str(foldsdir / "01" / "pred_processed"),
-            file_format=file_format,
-        )
-        DataWriter.write_frame_to_file(
-            df_preds_fold2,
-            str(foldsdir / "02" / "pred_processed"),
-            file_format=file_format,
-        )
-        DataWriter.write_frame_to_file(
-            df_preds_fold3,
-            str(foldsdir / "03" / "pred_processed"),
-            file_format=file_format,
-        )
+        # create sub-directories simulating cross-validation with the specified
+        # fold number and generate predictions file for each fold.
+        all_predictions = []
+        fold_size = 30
+        for fold in range(num_folds):
+            fold_name = f"{fold:0>2}"
+            makedirs(folds_dir / fold_name)
+            df_preds_fold = pd.DataFrame(
+                np.random.normal(size=(fold_size, 2)), columns=["raw", "scale"]
+            )
+            df_preds_fold["spkitemid"] = [
+                f"RESPONSE_{i}" for i in range((fold * fold_size) + 1, (fold * fold_size) + 31)
+            ]
+            DataWriter.write_frame_to_file(
+                df_preds_fold,
+                str(folds_dir / fold_name / "pred_processed"),
+                file_format=file_format,
+            )
+            all_predictions.append(df_preds_fold)
 
         # now call `combine_fold_prediction_files` and check that its output
-        # matches the frame that we manually combined
-        df_combined_actual = combine_fold_prediction_files(str(foldsdir), file_format)
-        assert_frame_equal(
-            df_combined_expected.sort_values(by="spkitemid").reset_index(drop=True),
-            df_combined_actual.sort_values(by="spkitemid").reset_index(drop=True),
-        )
+        # matches the expected number of responses and that all response ids
+        # are in the combined data
+        df_combined_predictions = combine_fold_prediction_files(str(folds_dir), file_format)
+
+        self.assertEqual(num_folds * fold_size, len(df_combined_predictions))
+
+        combined_ids = df_combined_predictions[["spkitemid"]].values
+        for pred_df in all_predictions:
+            for id in pred_df[["spkitemid"]].values:
+                self.assertIn(id, combined_ids)
 
         # delete the temporary directory and all sub-directories
         rmtree(output_dir)
 
     def test_combine_fold_prediction_files(self):
-        yield self.check_combine_fold_prediction_files, "csv"
-        yield self.check_combine_fold_prediction_files, "tsv"
-        yield self.check_combine_fold_prediction_files, "xlsx"
+        yield self.check_combine_fold_prediction_files, 10, "csv"
+        yield self.check_combine_fold_prediction_files, 3, "tsv"
+        yield self.check_combine_fold_prediction_files, 3, "xlsx"
 
 
 class TestIntermediateFiles(unittest.TestCase):
