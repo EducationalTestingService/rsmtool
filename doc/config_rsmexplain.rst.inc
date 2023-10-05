@@ -99,7 +99,7 @@ If this option is set to ``false``, the feature values for the responses in ``ba
 
 truncate_outliers *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``false``, outliers will not be truncated by truncating outliers that are 4 standard deviations away from the mean. Defaults to ``true``.
+If this option is set to ``false``, outliers (values more than 4 standard deviations away from the mean) in feature columns will _not_ be truncated. Defaults to ``true``.
 
 .. _use_wandb_rsmexplain:
 

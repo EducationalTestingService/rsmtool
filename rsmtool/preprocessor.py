@@ -1052,7 +1052,7 @@ class FeaturePreprocessor:
             A set of pre-defined truncation values.
             Defaults to ``None``.
         truncate_outliers : bool, optional
-            Truncate outlier values if set in the config file
+            Whether to truncate outlier values.
             Defaults to ``True``.
 
         Returns
@@ -2554,7 +2554,10 @@ class FeaturePreprocessor:
             )
 
         (df_features_preprocessed, df_excluded) = self.preprocess_new_data(
-            df_input, df_feature_info, standardize_features, truncate_outliers
+            df_input,
+            df_feature_info,
+            standardize_features=standardize_features,
+            truncate_outliers=truncate_outliers,
         )
 
         trim_min = df_postproc_params["trim_min"].values[0]
@@ -2715,10 +2718,16 @@ class FeaturePreprocessor:
 
         # now pre-process all the features that go into the model
         (df_background_preprocessed, _) = self.preprocess_new_data(
-            df_background_preprocessed, df_feature_info, standardize_features, truncate_outliers
+            df_background_preprocessed,
+            df_feature_info,
+            standardize_features=standardize_features,
+            truncate_outliers=truncate_outliers,
         )
         (df_explain_preprocessed, _) = self.preprocess_new_data(
-            df_explain_preprocessed, df_feature_info, standardize_features, truncate_outliers
+            df_explain_preprocessed,
+            df_feature_info,
+            standardize_features=standardize_features,
+            truncate_outliers=truncate_outliers,
         )
 
         # set ID column as index for the background and explain feature frames
@@ -2809,7 +2818,7 @@ class FeaturePreprocessor:
             Defaults to ``True``.
 
         truncate_outliers : bool, optional
-            Whether the outlier should be truncated prior to prediction.
+            Whether outlier should be truncated prior to prediction.
             Defaults to ``True``.
 
         Returns
