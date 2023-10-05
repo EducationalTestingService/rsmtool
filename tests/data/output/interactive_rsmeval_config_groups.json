@@ -36,7 +36,6 @@
         "L1"
     ],
     "trim_tolerance": 0.4998,
-    "truncate_outliers": true,
     "use_thumbnails": true,
     "use_wandb": false,
     "wandb_entity": null,
