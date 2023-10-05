@@ -156,3 +156,73 @@ class TestExperimentRsmexplain(unittest.TestCase):
             do_run_explain(source, config_dict)
             called_config = mock_generate_report.call_args[0][3]
             self.assertEqual(called_config["standardize_features"], False)
+
+    def test_run_rsmexplain_different_truncate_outliers_value(self):
+        """Check that rsmtool truncate outliers value overrides rsmexplain value."""
+        # set up a temporary directory since we will be using getcwd
+        temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+        old_file_dict = {
+            "experiment_dir": "data/experiments/knn-explain-diff-trunc/existing_experiment",
+            "background_data": "data/files/train.csv",
+            "explain_data": "data/files/test.csv",
+        }
+
+        new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
+
+        source = "knn-explain-diff-trunc"
+        config_dict = {
+            "description": "Explaning an KNeighborsRegressor model trained on all features.",
+            "experiment_dir": new_file_dict["experiment_dir"],
+            "experiment_id": "knn_diff_trunc",
+            "background_data": new_file_dict["background_data"],
+            "background_kmeans_size": 50,
+            "explain_data": new_file_dict["explain_data"],
+            "truncate_outliers": False,
+            "id_column": "ID",
+            "sample_size": 10,
+            "num_features_to_display": 15,
+            "show_auto_cohorts": True,
+        }
+
+        # check `truncate_outliers` in the config has been overridden to `True`
+        # since that was the value in rsmtool configuration
+        with patch("rsmtool.rsmexplain.generate_report") as mock_generate_report:
+            do_run_explain(source, config_dict)
+            called_config = mock_generate_report.call_args[0][3]
+            self.assertEqual(called_config["truncate_outliers"], True)
+
+    def test_run_rsmexplain_same_truncate_outliers_value(self):
+        """Check that rsmexplain truncate outliers value does not change if matching rsmtool."""
+        # set up a temporary directory since we will be using getcwd
+        temp_dir = tempfile.TemporaryDirectory(prefix=getcwd())
+
+        old_file_dict = {
+            "experiment_dir": "data/experiments/knn-explain-same-trunc/existing_experiment",
+            "background_data": "data/files/train.csv",
+            "explain_data": "data/files/test.csv",
+        }
+
+        new_file_dict = copy_data_files(temp_dir.name, old_file_dict, rsmtool_test_dir)
+
+        source = "knn-explain-same-trunc"
+        config_dict = {
+            "description": "Explaning an KNeighborsRegressor model trained on all features.",
+            "experiment_dir": new_file_dict["experiment_dir"],
+            "experiment_id": "knn_same_trunc",
+            "background_data": new_file_dict["background_data"],
+            "background_kmeans_size": 50,
+            "explain_data": new_file_dict["explain_data"],
+            "truncate_outliers": False,
+            "id_column": "ID",
+            "sample_size": 10,
+            "num_features_to_display": 15,
+            "show_auto_cohorts": True,
+        }
+
+        # check `truncate_outliers` in the config is the same `False` as it was
+        # before since that matches the value in rsmtool configuration
+        with patch("rsmtool.rsmexplain.generate_report") as mock_generate_report:
+            do_run_explain(source, config_dict)
+            called_config = mock_generate_report.call_args[0][3]
+            self.assertEqual(called_config["truncate_outliers"], False)
