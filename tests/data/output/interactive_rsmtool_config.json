@@ -48,6 +48,7 @@
     "trim_max": 1,
     "trim_min": 5,
     "trim_tolerance": 0.4998,
+    "truncate_outliers": true,
     "use_scaled_predictions": true,
     "use_thumbnails": false,
     "use_truncation_thresholds": false,

@@ -95,6 +95,12 @@ If this option is set to ``false``, the feature values for the responses in ``ba
 
     If ``experiment_dir`` contains the rsmtool configuration file, that file's value for ``standardize_features`` will override the value specified by the user. The reason is that if ``rsmtool`` trained the model with (or without) standardized features, then ``rsmexplain`` must do the same for the explanations to be meaningful.
 
+.. _truncate_outliers_rsmexplain:
+
+truncate_outliers *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If this option is set to ``false``, outliers (values more than 4 standard deviations away from the mean) in feature columns will _not_ be truncated. Defaults to ``true``.
+
 .. _use_wandb_rsmexplain:
 
 use_wandb *(Optional)*

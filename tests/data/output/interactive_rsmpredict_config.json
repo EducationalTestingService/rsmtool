@@ -13,6 +13,7 @@
     "second_human_score_column": null,
     "standardize_features": true,
     "subgroups": [],
+    "truncate_outliers": true,
     "use_wandb": false,
     "wandb_entity": null,
     "wandb_project": null

@@ -19,5 +19,6 @@
     "sample_ids": null,
     "use_wandb": false,
     "wandb_project": null,
-    "wandb_entity": null
+    "wandb_entity": null,
+    "truncate_outliers": false
 }

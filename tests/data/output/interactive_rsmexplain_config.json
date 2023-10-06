@@ -22,6 +22,7 @@
     "show_auto_cohorts": false,
     "special_sections": null,
     "standardize_features": true,
+    "truncate_outliers": true,
     "use_wandb": false,
     "wandb_entity": null,
     "wandb_project": null

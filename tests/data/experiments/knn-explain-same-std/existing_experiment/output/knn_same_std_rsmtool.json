@@ -16,6 +16,7 @@
     "exclude_zero_scores": true,
     "select_transformations": false,
     "standardize_features": false,
+    "truncate_outliers": true,
     "use_thumbnails": false,
     "use_truncation_thresholds": false,
     "predict_expected_scores": false,

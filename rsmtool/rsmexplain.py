@@ -133,7 +133,11 @@ def mask(learner, featureset, feature_range=None):
 
 
 def generate_explanation(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
+    config_file_or_obj_or_dict,
+    output_dir,
+    overwrite_output=False,
+    logger=None,
+    wandb_run=None,
 ):
     """
     Generate a shap.Explanation object.
@@ -265,35 +269,33 @@ def generate_explanation(
             f"generated during model training."
         )
 
-    # read the original rsmtool configuration file, if it exists, and figure
-    # out the value of `standardize_features` that was specified when running
-    # the original rsmtool experiment
-    rsmexplain_standardize_features = configuration["standardize_features"]
+    # read the original rsmtool configuration file, if it exists, and ensure
+    # that we use its value of `standardize_features` and `truncate_outliers`
+    # even if that means we have to override the values specified in the
+    # rsmexplain configuration file
     expected_config_file_path = join(experiment_output_dir, f"{experiment_id}_rsmtool.json")
     if exists(expected_config_file_path):
         with open(expected_config_file_path, "r") as rsmtool_configfh:
-            rsmtool_config = json.load(rsmtool_configfh)
-            rsmtool_standardize_features = rsmtool_config["standardize_features"]
+            rsmtool_configuration = json.load(rsmtool_configfh)
 
-        # use the original rsmtool experiment's value for `standardize_features`
-        # for rsmexplain as well; raise a warning if the values were different
-        # to begin with
-        if rsmexplain_standardize_features != rsmtool_standardize_features:
-            logger.warning(
-                f"overwriting current `standardize_features` value "
-                f"({rsmexplain_standardize_features}) to match "
-                f"value specified in original rsmtool experiment "
-                f"({rsmtool_standardize_features})."
-            )
-        configuration["standardize_features"] = rsmtool_standardize_features
+        for option in ["standardize_features", "truncate_outliers"]:
+            rsmtool_value = rsmtool_configuration[option]
+            rsmexplain_value = configuration[option]
+            if rsmexplain_value != rsmtool_value:
+                logger.warning(
+                    f"overwriting current `{option}` value "
+                    f"({rsmexplain_value}) to match "
+                    f"value specified in original rsmtool experiment "
+                    f"({rsmtool_value})."
+                )
+                configuration[option] = rsmtool_value
 
     # if the original experiment rsmtool does not exist, let the user know
     else:
         logger.warning(
-            f"cannot locate original rsmtool configuration; "
-            f"ensure that current value of "
-            f"`standardize_features` ({rsmexplain_standardize_features}) "
-            f"was the same when running rsmtool."
+            "cannot locate original rsmtool configuration; "
+            "ensure that the values of `standardize_features` "
+            "and `truncate_outliers` were the same as when running rsmtool."
         )
 
     # load the background and explain data sets
@@ -547,7 +549,12 @@ def main():
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
-    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + ["-h", "--help", "-V", "--version"]:
+    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + [
+        "-h",
+        "--help",
+        "-V",
+        "--version",
+    ]:
         args_to_pass = ["run"] + sys.argv[1:]
     else:
         args_to_pass = sys.argv[1:]
@@ -561,7 +568,9 @@ def main():
         logger.info(f"Output directory: {args.output_dir}")
 
         generate_explanation(
-            abspath(args.config_file), abspath(args.output_dir), overwrite_output=args.force_write
+            abspath(args.config_file),
+            abspath(args.output_dir),
+            overwrite_output=args.force_write,
         )
 
     else:
@@ -570,7 +579,10 @@ def main():
 
         # auto-generate an example configuration and print it to STDOUT
         generator = ConfigurationGenerator(
-            "rsmexplain", as_string=True, suppress_warnings=args.quiet, use_subgroups=False
+            "rsmexplain",
+            as_string=True,
+            suppress_warnings=args.quiet,
+            use_subgroups=False,
         )
         configuration = (
             generator.interact(output_file_name=args.output_file.name if args.output_file else None)

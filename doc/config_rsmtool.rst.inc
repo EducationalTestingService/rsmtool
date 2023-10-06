@@ -355,6 +355,12 @@ Defaults to 0.4998.
 
     For more fine-grained control over the trimming range, you can set ``trim_tolerance`` to `0` and use ``trim_min`` and ``trim_max`` to specify the exact floor and ceiling values.
 
+.. _truncate_outliers:
+
+truncate_outliers *(Optional)*
+"""""""""""""""""""""""""""""""
+If this option is set to ``false``, outliers (values more than 4 standard deviations away from the mean) in feature columns will _not_ be truncated. Defaults to ``true``.
+
 .. _use_scaled_predictions_rsmtool:
 
 use_scaled_predictions *(Optional)*
