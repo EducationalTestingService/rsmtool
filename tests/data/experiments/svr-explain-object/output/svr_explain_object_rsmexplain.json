@@ -9,6 +9,7 @@
     "sample_size": 10,
     "num_features_to_display": 15,
     "show_auto_cohorts": true,
+    "truncate_outliers": false,
     "standardize_features": true,
     "general_sections": [
         "all"
@@ -19,6 +20,5 @@
     "sample_ids": null,
     "use_wandb": false,
     "wandb_project": null,
-    "wandb_entity": null,
-    "truncate_outliers": false
+    "wandb_entity": null
 }

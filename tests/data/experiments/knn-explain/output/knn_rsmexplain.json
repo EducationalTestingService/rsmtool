@@ -10,6 +10,7 @@
     "num_features_to_display": 15,
     "show_auto_cohorts": true,
     "standardize_features": true,
+    "truncate_outliers": true,
     "general_sections": [
         "all"
     ],

@@ -14,6 +14,7 @@
     "use_scaled_predictions": false,
     "select_transformations": false,
     "standardize_features": true,
+    "truncate_outliers": true,
     "use_thumbnails": false,
     "use_truncation_thresholds": false,
     "predict_expected_scores": false,
