@@ -70,7 +70,7 @@ Requirements
 - ``jupyter``
 - ``notebook``
 - ``seaborn``
-- ``shap==0.42.1``
+- ``shap``
 - ``wandb``
 
 Contributing
