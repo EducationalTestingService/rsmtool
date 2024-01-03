@@ -1,9 +1,9 @@
 ipython
 nbconvert
 shap
-skll==4.0.0
-sphinx>=5.0,<6.0
-sphinx_rtd_theme==1.2.0
+skll==4.0.1
+sphinx
+sphinx_rtd_theme
 sphinx-design
 statsmodels
 wandb
