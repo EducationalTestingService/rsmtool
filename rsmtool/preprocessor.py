@@ -10,6 +10,7 @@ Classes for preprocessing input data in various contexts.
 
 import logging
 import re
+from sys import version_info
 
 import numpy as np
 import pandas as pd
@@ -943,7 +944,14 @@ class FeaturePreprocessor:
             # and now convert the values in the feature column
             # in the data frame
             df_new = df[flag_columns].copy()
-            df_new = df_new.map(convert_to_float)
+
+            # TODO: remove this when dropping python 3.8 support
+            # use `applymap()` for python 3.8 since `map()` was
+            # added in pandas 2.1.0 which is only for python 3.9+
+            if version_info[0] == 3 and version_info[1] == 8:
+                df_new = df_new.applymap(convert_to_float)
+            else:
+                df_new = df_new.map(convert_to_float)
 
             # identify responses with values which satisfy the condition
             full_mask = df_new.isin(flag_column_dict_to_float)
