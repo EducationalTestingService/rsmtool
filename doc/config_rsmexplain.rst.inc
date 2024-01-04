@@ -98,13 +98,13 @@ A list containing the order in which the sections in the report should be genera
 
     1. Either *all* pre-defined sections if a value for the :ref:`general_sections <general_sections_rsmexplain>` field is not specified OR the sections specified using :ref:`general_sections <general_sections_rsmexplain>`, and
 
-    2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmexplain>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
+    2. *All* custom section names specified using :ref:`custom_sections <custom_sections_rsmexplain>`, i.e., file prefixes only, without the path and without the `.ipynb` extension
 
 .. _show_auto_cohorts_rsmexplain:
 
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful for detecting interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. These plots are not shown by default because these plots may be unstable or provide misleading information if ``explain_data`` is not large enough. For smaller datasets, SHAP may not be able to detect strong feature interactions and compute clear cohorts. If that happens, the plots wil be too specific to be useful. If you have a large enough dataset, you can set this option to ``true`` and see if the plots are useful.
+If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful for detecting interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. These plots are not shown by default because these plots may be unstable or provide misleading information if ``explain_data`` is not large enough. For smaller datasets, SHAP may not be able to detect strong feature interactions and compute clear cohorts. If that happens, the plots will be too specific to be useful. If you have a large enough dataset, you can set this option to ``true`` and see if the plots are useful.
 
 .. important::
 
