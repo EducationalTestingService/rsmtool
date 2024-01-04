@@ -291,6 +291,7 @@ CHECK_FIELDS = {
             "general_sections",
             "custom_sections",
             "special_sections",
+            "section_order",
             "use_wandb",
             "wandb_project",
             "wandb_entity",
