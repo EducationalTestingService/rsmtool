@@ -508,11 +508,15 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     if configuration["show_auto_cohorts"] and not has_single_example:
         custom_report_sections.append(f"{explanation_notebooks_path}/auto_cohorts.ipynb")
 
+    # get user defined section order if available
+    section_order = configuration["section_order"]
+
     # define all of the chosen notebook sections
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
         special_report_sections,
         custom_report_sections,
+        section_order=section_order,
         context="rsmexplain",
     )
 
