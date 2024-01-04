@@ -44,10 +44,10 @@ Let's take a look at the options in our configuration file.
 - **Line 4**: We provide the ``experiment_id`` of the rsmtool experiment used to train the model. This can usually be read off the ``output/<experiment_id>.model`` file in the rsmtool experiment output directory.
 - **Line 5**: We provide the path to the data file that will be used as the background distribution.
 - **Line 6**: We provide the path to the data file that will be used to generate the explanations.
-- **Line 7**: This field indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
-- **Line 8**: This field indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from that file, we would use the :ref:`sample_ids <rsmexplain_sample_ids>` option instead.
-- **Line 9**: This field indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
-- **Line 10**: This field indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
+- **Line 7**: :ref:`This field <id_column_rsmexplain>` indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
+- **Line 8**: :ref:`This field <sample_size_rsmexplain>` indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from that file, we would use the :ref:`sample_ids <sample_ids_rsmexplain>` option instead.
+- **Line 9**: :ref:`This field <num_features_to_display_rsmexplain>` indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
+- **Line 10**: :ref:`This field <show_auto_cohorts_rsmexplain>` indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmexplain>`.
 
@@ -87,4 +87,4 @@ Our experiment report contains all the information we would need to explain the 
 
   .. note ::
 
-     We encourage you to re-run the tutorial by modifying the configuration file to explain multiple examples instead of a single one. You can do so either by setting :ref:`sample_size <rsmexplain_sample_size>` to a value larger than 1, by explicitly specifying multiple example indices via :ref:`sample_ids <rsmexplain_sample_ids>`, or by setting :ref:`sample_range <rsmexplain_sample_range>` to an appropriate range of example indices. For a multiple-example explanation run, the following plots will be displayed in the report: `global bar plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Global-bar-plot>`__, `beeswarm plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html>`__, and `heatmap plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/heatmap.html>`__.
+     We encourage you to re-run the tutorial by modifying the configuration file to explain multiple examples instead of a single one. You can do so either by setting :ref:`sample_size <sample_size_rsmexplain>` to a value larger than 1, by explicitly specifying multiple example indices via :ref:`sample_ids <sample_ids_rsmexplain>`, or by setting :ref:`sample_range <sample_range_rsmexplain>` to an appropriate range of example indices. For a multiple-example explanation run, the following plots will be displayed in the report: `global bar plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Global-bar-plot>`__, `beeswarm plot <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/beeswarm.html>`__, and `heatmap plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/heatmap.html>`__.
