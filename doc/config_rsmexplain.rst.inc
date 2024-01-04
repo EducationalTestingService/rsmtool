@@ -23,13 +23,15 @@ An identifier for the ``rsmexplain`` experiment. This will be used to name the r
 
 experiment_dir
 ~~~~~~~~~~~~~~
-The directory containing the rsmtool models we want to explain. This directory should contain an ``output`` sub-directory and that sub-directory should contain two files: the ``<experiment_id>.model`` and  ``<experiment_id>_feature.csv``. Note that ``<experiment_id>`` refers to the one defined in this same configuration file. As an example of this directory structure, take a look at the ``existing_experiment`` directory  `here <https://github.com/EducationalTestingService/rsmtool/tree/main/tests/data/experiments/svr-explain>`__
+The directory containing the rsmtool models we want to explain. This directory should contain an ``output`` sub-directory and that sub-directory should contain two files: the ``<experiment_id>.model`` and  ``<experiment_id>_feature.csv``. Note that ``<experiment_id>`` refers to the one defined in this same configuration file. As an example of this directory structure, take a look at the ``existing_experiment`` directory  `here <https://github.com/EducationalTestingService/rsmtool/tree/main/tests/data/experiments/svr-explain>`__.
 
 background_kmeans_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The size of the k-means sample for background sampling. Defaults to 500. We summarize the dataset specified in `background_data` with this many k-means clusters (each cluster is weighted by the number of data points it represents) and then use the summarized data set for sampling *instead* of the original. The k-means clustering allows us to speed up the explanation process but may sacrifice some accuracy. The default value of 500 has been shown to provide a good balance between speed and accuracy in our experiments. You may use a higher value if you have a very large or very diverse background dataset and you want to ensure that it's accurately summarized.
 
 .. warning:: ``background_kmeans_size`` *must* be smaller than the size of the original background data. If not, you may see errors like this: ``ValueError: n_samples=500 should be >= n_clusters=750.``
+
+.. _custom_sections_rsmexplain:
 
 custom_sections *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,6 +40,8 @@ A list of custom, user-defined sections to be included into the final report. Th
 description *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
 A brief description of the ``rsmexplain`` experiment that will be shown at the top of the report. The description can contain spaces and punctuation.
+
+.. _general_sections_rsmexplain:
 
 general_sections *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,29 +55,31 @@ RSMTool provides pre-defined sections for ``rsmexplain`` (listed below) and, by 
 
     - ``sysinfo``: Shows all Python packages along with versions installed in the current environment while generating the report.
 
-.. _rsmexplain_id_column:
+.. _id_column_rsmexplain:
 
 id_column *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 The name of the column containing the response IDs. Defaults to ``spkitemid``, i.e., if this is not specified, ``rsmexplain`` will look for a column called ``spkitemid`` in both ``background_data`` and ``explain_data`` files. Note that the name of the ``id_column`` must be the same in these two files.
 
+.. _num_features_to_display_rsmexplain:
+
 num_features_to_display *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Number of top features that should be displayed in ``rsmexplain`` plots. Defaults to 15.
 
-.. _rsmexplain_sample_ids:
+.. _sample_ids_rsmexplain:
 
 sample_ids *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~
-If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string. Note that the IDs must be values from the :ref:`id_column <rsmexplain_id_column>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"``, etc., and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5, EXAMPLE_10, EXAMPLE_12"``. Defaults to ``None``.
+If we want to explain a specific set of responses from the ``explain_data``, we can specify their IDs here as a comma-separated string. Note that the IDs must be values from the :ref:`id_column <id_column_rsmexplain>`. For example, if ``explain_data`` has IDs of the form ``"EXAMPLE_1"``, ``"EXAMPLE_2"``, etc., and we want to explain the fifth, tenth, and twelfth example, the value of this field must be set to ``"EXAMPLE_5, EXAMPLE_10, EXAMPLE_12"``. Defaults to ``None``.
 
-.. _rsmexplain_sample_range:
+.. _sample_range_rsmexplain:
 
 sample_range *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 If we want to explain a specific range of responses from the ``explain_data``, we can specify that range here. Note that the range is specified in terms of the *location* of the responses in the ``explain_data`` file and that the locations are zero-indexed. So, for example, to explain only the first 50 responses in the file, we should set a value of ``"0-49"`` for this option. Defaults to ``None``.
 
-.. _rsmexplain_sample_size:
+.. _sample_size_rsmexplain:
 
 sample_size *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,9 +89,27 @@ If we want to explain a random sample of the responses in explain_data, we can s
 
     Only one of ``sample_ids``, ``sample_range`` or ``sample_size`` must be specified. If none of them are specified, explanations will be generated for the entire set of responses in ``explain_data`` which could be very slow, depending on its size.
 
+.. _section_order_rsmexplain:
+
+section_order *(Optional)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A list containing the order in which the sections in the report should be generated. Any specified order must explicitly list:
+
+    1. Either *all* pre-defined sections if a value for the :ref:`general_sections <general_sections_rsmexplain>` field is not specified OR the sections specified using :ref:`general_sections <general_sections_rsmexplain>`, and
+
+    2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmexplain>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
+
+.. _show_auto_cohorts_rsmexplain:
+
 show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful for detecting interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. These plots are not shown by default because these plots may be unstable or provide misleading information if ``explain_data`` is not large enough. For smaller datasets, SHAP may not be able to detect strong feature interactions and compute clear cohorts. If that happens, the plots wil be too specific to be useful.
+If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful for detecting interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. These plots are not shown by default because these plots may be unstable or provide misleading information if ``explain_data`` is not large enough. For smaller datasets, SHAP may not be able to detect strong feature interactions and compute clear cohorts. If that happens, the plots wil be too specific to be useful. If you have a large enough dataset, you can set this option to ``true`` and see if the plots are useful.
+
+.. note::
+
+    By default, the section containing the auto cohort bar plots is treated as a custom section and added at the end of the report, *after* the system information section. If you wish the sections to appear in a different order, please use the :ref:`section order <section_order_rsmexplain>` option.
+
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
