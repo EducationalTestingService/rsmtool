@@ -47,7 +47,6 @@ Let's take a look at the options in our configuration file.
 - **Line 7**: :ref:`This field <id_column_rsmexplain>` indicates that the unique IDs for the responses in both data files are located in a column named ``ID``.
 - **Line 8**: :ref:`This field <sample_size_rsmexplain>` indicates that we wish to explain one *randomly chosen* example from the second data file. If we wish to explain a *specific* example from that file, we would use the :ref:`sample_ids <sample_ids_rsmexplain>` option instead.
 - **Line 9**: :ref:`This field <num_features_to_display_rsmexplain>` indicates the number of top features that should be displayed in the plots in the ``rsmexplain`` report.
-- **Line 10**: :ref:`This field <show_auto_cohorts_rsmexplain>` indicates whether to show the `automatically generated Cohort bar plots <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/bar.html#Cohort-bar-plot>`_ in the report.
 
 Documentation for all of the available configuration options is available :ref:`here <config_file_rsmexplain>`.
 
@@ -66,12 +65,12 @@ This should produce output like::
 
     Output directory: /Users/nmadnani/work/rsmtool/examples/rsmexplain
     Saving configuration file.
-    WARNING: The following extraneous features will be ignored: {'QUESTION', 'LENGTH', 'score', 'score2', 'L1'}
+    WARNING: The following extraneous features will be ignored: {'LENGTH', 'score2', 'score'}
     Pre-processing input features
-    WARNING: The following extraneous features will be ignored: {'QUESTION', 'LENGTH', 'score', 'score2', 'L1'}
+    WARNING: The following extraneous features will be ignored: {'LENGTH', 'score2', 'score'}
     Pre-processing input features
-    Generating SHAP explanations for 10 examples from ../../files/test.csv
-    100%|███████████████████████████████████████████████████████████████████████| 10/10 [00:00<00:00, 21.99it/s]
+    Generating SHAP explanations for 1 examples from ../rsmtool/test.csv
+    100%|███████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 21.99it/s]
     Merging sections
     Exporting HTML
     Success
