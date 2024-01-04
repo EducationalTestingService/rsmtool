@@ -19,6 +19,7 @@
     "sample_ids": null,
     "sample_range": null,
     "sample_size": null,
+    "section_order": null,
     "show_auto_cohorts": false,
     "special_sections": null,
     "standardize_features": true,
