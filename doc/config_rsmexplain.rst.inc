@@ -106,10 +106,9 @@ show_auto_cohorts *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If this option is set to ``true``, auto cohort bar plots will be displayed. These plots can be useful for detecting interaction effects between cohorts and features. If a cohort shows a high feature value, then there may be an interaction between that cohort and the feature. Defaults to ``false``. These plots are not shown by default because these plots may be unstable or provide misleading information if ``explain_data`` is not large enough. For smaller datasets, SHAP may not be able to detect strong feature interactions and compute clear cohorts. If that happens, the plots wil be too specific to be useful. If you have a large enough dataset, you can set this option to ``true`` and see if the plots are useful.
 
-.. note::
+.. important::
 
-    By default, the section containing the auto cohort bar plots is treated as a custom section and added at the end of the report, *after* the system information section. If you wish the sections to appear in a different order, please use the :ref:`section order <section_order_rsmexplain>` option.
-
+    By default, the auto cohort bar plots are treated as a custom section and added at the *end* of the report, *after* the system information section. The :ref:`section order <section_order_rsmexplain>` option can be used to move this section to a different place in the report. Use ``"auto_cohorts"`` as the name for this section when specifying an order.
 
 standardize_features *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
