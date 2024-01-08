@@ -1,4 +1,3 @@
-codecov
 doc2dash
 ipython
 jupyter

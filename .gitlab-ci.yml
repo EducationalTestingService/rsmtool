@@ -6,6 +6,7 @@ stages:
 variables:
   PYVERSION: "3.8"
   BINPATH: "/root/rsmenv/bin"
+  LOGCAPTURE_LEVEL: "WARNING"
   CODECOV_TOKEN: "488304b7-b1c5-4fc7-bfb6-9e7cbcb36a08"
 
 # set up basic job
@@ -13,6 +14,8 @@ variables:
   before_script:
     - "mamba create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} --yes"
     - /root/rsmenv/bin/pip install -e .
+    - /root/rsmenv/bin/curl -o /root/rsmenv/bin/codecov https://uploader.codecov.io/latest/linux/codecov
+    - chmod +x /root/rsmenv/bin/codecov
     - echo "import os" > sitecustomize.py
     - echo "try:" >> sitecustomize.py
     - echo "    import coverage" >> sitecustomize.py
@@ -22,6 +25,7 @@ variables:
     - echo "    pass" >> sitecustomize.py
   script:
     - "/root/rsmenv/bin/nose2 -s tests ${TESTFILES}"
+    - "/root/rsmenv/bin/coverage xml"
   after_script:
     - /root/rsmenv/bin/codecov
 
