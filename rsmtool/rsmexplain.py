@@ -525,8 +525,12 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     reporter.create_explanation_report(configuration, csvdir, reportdir)
 
 
-def main():
+def main(argv=None):
     """Run rsmexplain and generate explanation reports."""
+    # if no arguments are passed, then use sys.argv
+    if argv is None:
+        argv = sys.argv[1:]
+
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -546,22 +550,22 @@ def main():
     parser = setup_rsmcmd_parser("rsmexplain", uses_output_directory=True, allows_overwriting=True)
 
     # if no arguments provided then just show the help message
-    if len(sys.argv) < 2:
-        sys.argv.append("-h")
+    if len(argv) < 1:
+        argv.append("-h")
 
     # if the first argument is not one of the valid sub-commands
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
-    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + [
+    if argv[0] not in VALID_PARSER_SUBCOMMANDS + [
         "-h",
         "--help",
         "-V",
         "--version",
     ]:
-        args_to_pass = ["run"] + sys.argv[1:]
+        args_to_pass = ["run"] + argv
     else:
-        args_to_pass = sys.argv[1:]
+        args_to_pass = argv
     args = parser.parse_args(args=args_to_pass)
 
     if args.subcommand == "run":
