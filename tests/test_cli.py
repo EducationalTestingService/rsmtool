@@ -1,11 +1,19 @@
+import logging
 import os
-import shlex
-import subprocess
-import sys
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
 from tempfile import NamedTemporaryFile, TemporaryDirectory
+from unittest.mock import patch
 
+from rsmtool.rsmcompare import main as rsmcompare_main
+from rsmtool.rsmeval import main as rsmeval_main
+from rsmtool.rsmexplain import main as rsmexplain_main
+from rsmtool.rsmpredict import main as rsmpredict_main
+from rsmtool.rsmsummarize import main as rsmsummarize_main
+from rsmtool.rsmtool import main as rsmtool_main
+from rsmtool.rsmxval import main as rsmxval_main
 from rsmtool.test_utils import (
     check_file_output,
     check_generated_output,
@@ -26,6 +34,19 @@ else:
 # reports should not be ignored
 STRICT_MODE = os.environ.get("STRICT", None)
 IGNORE_WARNINGS = False if STRICT_MODE else True
+
+# create a dictionary mapping tool names to their main functions
+# NOTE: technically we could have just used `globals()` instead
+# of this dictionary, but that would not be as safe
+MAIN_FUNCTIONS = {
+    "rsmtool": rsmtool_main,
+    "rsmeval": rsmeval_main,
+    "rsmcompare": rsmcompare_main,
+    "rsmpredict": rsmpredict_main,
+    "rsmsummarize": rsmsummarize_main,
+    "rsmxval": rsmxval_main,
+    "rsmexplain": rsmexplain_main,
+}
 
 
 class TestToolCLI(unittest.TestCase):
@@ -60,24 +81,19 @@ class TestToolCLI(unittest.TestCase):
 
     def check_no_args(self, context):
         """Check running the tool with no arguments."""
-        # if the BINPATH environment variable is defined
-        # use that to construct the command instead of just
-        # the name; this is needed for the CI builds where
-        # we do not always activate the conda environment
-        binpath = os.environ.get("BINPATH", None)
-        if binpath is not None:
-            cmd = f"{binpath}/{context}"
-        else:
-            cmd = f"{context}"
+        # call the main function for the given context
+        # with no arguments and check that it exits
+        # with exit code 0 and prints out the usage
+        main_function = MAIN_FUNCTIONS[context]
+        with redirect_stdout(StringIO()) as captured_stdout:
+            with self.assertRaises(SystemExit) as excm:
+                main_function([])
 
-        proc = subprocess.run(
-            shlex.split(cmd, posix="win" not in sys.platform),
-            check=False,
-            stderr=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,
-        )
-        self.assertEqual(proc.returncode, 0)
-        self.assertTrue(b"usage: " + bytes(context, encoding="utf-8") in proc.stdout)
+        # check that the exit code is 0
+        self.assertEqual(excm.exception.code, 0)
+
+        # check that the appropriate usage was printed out
+        self.assertTrue(f"usage: {context}" in captured_stdout.getvalue().lower())
 
     def test_no_args(self):
         # test that the tool without any arguments prints help messag
@@ -265,18 +281,16 @@ class TestToolCLI(unittest.TestCase):
             expected_output = expectedfh.read().strip()
             self.assertEqual(output, expected_output)
 
-    def check_tool_cmd(
-        self, context, subcmd, output_dir=None, working_dir=None, generate_output_file=None
-    ):
+    def check_tool_cmd(self, context, args, output_dir=None, generate_output_file=None):
         """
-        Test that the ``subcmd`` invocation for ``context`` works as expected.
+        Test that the invocation for ``context`` with ``args`` works as expected.
 
         Parameters
         ----------
         context : str
             Name of the tool being tested.
-        subcmd : str
-            The tool command-line invocation that is being tested.
+        args : List[str]
+            The list of arguments to be passed to the tool.
         output_dir : str, optional
             Directory containing the output for "run" subcommands.
             Will be ``None`` for "generate" subcommands.
@@ -290,43 +304,35 @@ class TestToolCLI(unittest.TestCase):
            written to a specific output file.
            Defaults to ``None``.
         """
-        # if the BINPATH environment variable is defined
-        # use that to construct the command instead of just
-        # the name; this is needed for the CI builds where
-        # we do not always activate the conda environment
-        binpath = os.environ.get("BINPATH", None)
-        if binpath is not None:
-            cmd = f"{binpath}/{context} {subcmd}"
-        else:
-            cmd = f"{context} {subcmd}"
+        # get the main function for the given context
+        main_function = MAIN_FUNCTIONS[context]
+
+        # increase the logging level for the tool's logger since we don't
+        # want to see the logging messages when we run the tool for this test
+        context_logger = logging.getLogger(f"rsmtool.{context}")
+        context_logger.setLevel(logging.CRITICAL)
+
+        # do the same for the `utils.commandline` logger since we don't want to
+        # see the logging messages for configuration generation either
+        commandline_logger = logging.getLogger("rsmtool.utils.commandline")
+        commandline_logger.setLevel(logging.CRITICAL)
+
+        # call the main function for the given context with the arguments
+        # but redirect STDOUT and STDERR to StringIO objects
+        with redirect_stdout(StringIO()) as captured_stdout, redirect_stderr(StringIO()):
+            main_function(args)
+
+        # restore the logging level for both loggers
+        context_logger.setLevel(logging.INFO)
+        commandline_logger.setLevel(logging.INFO)
 
         # run different checks depending on the given command type
-        cmd_type = "generate" if " generate" in cmd else "run"
+        cmd_type = "generate" if "generate" in args else "run"
         if cmd_type == "run":
-            # for run subcommands, we can ignore the messages printed to stdout
-            proc = subprocess.run(
-                shlex.split(cmd, posix="win" not in sys.platform),
-                check=True,
-                cwd=working_dir,
-                stderr=subprocess.PIPE,
-                stdout=subprocess.DEVNULL,
-                encoding="utf-8",
-            )
-            # then check that the commmand ran successfully
-            self.assertTrue(proc.returncode == 0)
-            # and, finally, that the output was as expected
+            # check that the output generated is as expected
             self.validate_run_output(context, output_dir)
         else:
-            # for generate subcommands, we ignore the warnings printed to stderr
-            subgroups = "--subgroups" in cmd
-            proc = subprocess.run(
-                shlex.split(cmd, posix="win" not in sys.platform),
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                encoding="utf-8",
-            )
-            self.assertTrue(proc.returncode == 0)
+            subgroups = "--subgroups" in args
             # if an output file was specified, we get the output to validate
             # by reading that in instead of from STDOUT; in that case STDOUT
             # only contains a message which we can also validate
@@ -334,7 +340,7 @@ class TestToolCLI(unittest.TestCase):
                 with open(generate_output_file, "r") as outfh:
                     output_to_check = outfh.read().strip()
             else:
-                output_to_check = proc.stdout.strip()
+                output_to_check = captured_stdout.getvalue().strip()
 
             self.validate_generate_output(context, output_to_check, subgroups=subgroups)
 
@@ -357,8 +363,61 @@ class TestToolCLI(unittest.TestCase):
 
             # and test the default subcommand
             config_file = getattr(self, f"{context}_config_file")
-            subcmd = f"{config_file} {tempdir.name}"
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, None, None
+            args = [str(config_file), tempdir.name]
+            yield self.check_tool_cmd, context, args, tempdir.name, None
+
+    def check_run_without_output_directory(self, context, args):
+        """
+        Check that the "run" subcommand works without an output directory.
+
+        Parameters
+        ----------
+        context : str
+            Name of the tool being tested.
+        args : List[str]
+            The list of arguments to be passed to the tool.
+        """
+        # get the current working directory
+        current_dir = os.getcwd()
+
+        # patch the appropriate runner function for the tool being tested
+        if context == "rsmtool":
+            patcher = patch("rsmtool.rsmtool.run_experiment")
+        elif context == "rsmeval":
+            patcher = patch("rsmtool.rsmeval.run_evaluation")
+        elif context == "rsmcompare":
+            patcher = patch("rsmtool.rsmcompare.run_comparison")
+        elif context == "rsmsummarize":
+            patcher = patch("rsmtool.rsmsummarize.run_summary")
+        elif context == "rsmxval":
+            patcher = patch("rsmtool.rsmxval.run_cross_validation")
+        elif context == "rsmexplain":
+            patcher = patch("rsmtool.rsmexplain.generate_explanation")
+
+        # start the patcher
+        mocked_runner = patcher.start()
+
+        # increase the logging level for the tool's logger since we don't
+        # want to see the logging messages when we run the tool for this test
+        context_logger = logging.getLogger(f"rsmtool.{context}")
+        context_logger.setLevel(logging.CRITICAL)
+
+        # call the main function for the given context with the arguments
+        main_function = MAIN_FUNCTIONS[context]
+        main_function(args)
+
+        # restore the logging level for the tool's logger
+        context_logger.setLevel(logging.INFO)
+
+        # stop the patcher
+        patcher.stop()
+
+        # check that the runner was called with the right arguments
+        # including the current working directory as the output directory
+        config_file = mocked_runner.call_args[0][0]
+        output_dir = mocked_runner.call_args[0][1]
+        self.assertEqual(config_file, str(config_file))
+        self.assertEqual(output_dir, current_dir)
 
     def test_run_without_output_directory(self):
         # test that "run" subcommand works without an output directory
@@ -378,27 +437,27 @@ class TestToolCLI(unittest.TestCase):
 
             # and test the run subcommand without an output directory
             config_file = getattr(self, f"{context}_config_file")
-            subcmd = f"run {config_file}"
-            # we call check_tool_cmd with a working directory here to simulate
-            # the usage of the current working directory when the output directory
-            # is not specified
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, tempdir.name, None
+            args = ["run", str(config_file)]
+            yield self.check_run_without_output_directory, context, args
 
-    def check_run_bad_overwrite(self, cmd):
+    def check_run_bad_overwrite(self, context, args):
         """Check that the overwriting error is raised properly."""
-        with self.assertRaises(subprocess.CalledProcessError) as e:
-            _ = subprocess.run(
-                shlex.split(cmd, posix="win" not in sys.platform),
-                check=True,
-                stderr=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-            )
-            self.assertTrue("already contains" in e.msg)
-            self.assertTrue("OSError" in e.msg)
+        # increase the logging level for the tool's logger since we don't
+        # want to see the logging messages when we run the tool for this test
+        context_logger = logging.getLogger(f"rsmtool.{context}")
+        context_logger.setLevel(logging.CRITICAL)
+
+        # run the command and check that it fails with the expected error that
+        # the output directory already contains a non-empty output sub-directory
+        with self.assertRaisesRegex(OSError, "already contains a non-empty"):
+            main_function = MAIN_FUNCTIONS[context]
+            main_function(args)
+
+        # restore the logging level for the tool's logger
+        context_logger.setLevel(logging.INFO)
 
     def test_run_bad_overwrite(self):
         # test that the "run" command fails to overwrite when "-f" is not specified
-
         # this applies to all tools except rsmpredict, rsmcompare, and rsmxval
         for context in ["rsmtool", "rsmeval", "rsmsummarize", "rsmexplain"]:
             tempdir = TemporaryDirectory()
@@ -409,17 +468,10 @@ class TestToolCLI(unittest.TestCase):
             fake_file = Path(tempdir.name) / "output" / "foo.csv"
             fake_file.touch()
 
+            # now run the tool again and check that it fails
             config_file = getattr(self, f"{context}_config_file")
-            # if the BINPATH environment variable is defined
-            # use that to construct the command instead of just
-            # the name; this is needed for the CI builds where
-            # we do not always activate the conda environment
-            binpath = os.environ.get("BINPATH", None)
-            if binpath is not None:
-                cmd = f"{binpath}/{context} {config_file} {tempdir.name}"
-            else:
-                cmd = f"{context} {config_file} {tempdir.name}"
-            yield self.check_run_bad_overwrite, cmd
+            args = [str(config_file), tempdir.name]
+            yield self.check_run_bad_overwrite, context, args
 
     def test_run_good_overwrite(self):
         #  test that the "run" command does overwrite when "-f" is specified
@@ -435,19 +487,21 @@ class TestToolCLI(unittest.TestCase):
             fake_file.touch()
 
             config_file = getattr(self, f"{context}_config_file")
-            subcmd = f"{config_file} {tempdir.name} -f"
-            yield self.check_tool_cmd, context, subcmd, tempdir.name, None, None
+            args = [str(config_file), tempdir.name, "-f"]
+            yield self.check_tool_cmd, context, args, tempdir.name, None
 
     def test_rsmpredict_run_features_file(self):
         tempdir = TemporaryDirectory()
         self.temporary_directories.append(tempdir)
 
-        subcmd = (
-            f"{self.rsmpredict_config_file} {tempdir.name} "
-            f"--features {tempdir.name}/preprocessed_features.csv"
-        )
+        args = [
+            str(self.rsmpredict_config_file),
+            tempdir.name,
+            "--features",
+            f"{tempdir.name}/preprocessed_features.csv",
+        ]
 
-        self.check_tool_cmd("rsmpredict", subcmd, tempdir.name, None)
+        self.check_tool_cmd("rsmpredict", args, tempdir.name, None)
 
         # check the features file separately
         file1 = Path(tempdir.name) / "preprocessed_features.csv"
@@ -467,7 +521,7 @@ class TestToolCLI(unittest.TestCase):
             "rsmxval",
             "rsmexplain",
         ]:
-            yield self.check_tool_cmd, context, "generate", None, None, None
+            yield self.check_tool_cmd, context, ["generate"], None, None
 
     def test_generate_with_groups(self):
         # test that the "generate --subgroups" subcommand for all tools works
@@ -477,7 +531,7 @@ class TestToolCLI(unittest.TestCase):
         # rsmxval and rsmexplain; rsmxval does support subgroups but since it has no sections
         # fields, it's not relevant for this test
         for context in ["rsmtool", "rsmeval", "rsmcompare"]:
-            yield self.check_tool_cmd, context, "generate --subgroups", None, None, None
+            yield self.check_tool_cmd, context, ["generate", "--subgroups"], None, None
 
     def test_generate_with_output_file(self):
         # test that the "generate --output <file>" subcommand for all tools works
@@ -497,8 +551,7 @@ class TestToolCLI(unittest.TestCase):
             yield (
                 self.check_tool_cmd,
                 context,
-                f"generate --output {tempf.name}",
-                None,
+                ["generate", "--output", tempf.name],
                 None,
                 tempf.name,
             )
@@ -508,8 +561,8 @@ class TestToolCLI(unittest.TestCase):
         # as expected when written to output files
 
         # this applies to all tools except rsmpredict, rsmsummarize,
-        # rsmxval and rsmexplain; rsmxval does support subgroups but since it has no sections
-        # fields, it's not relevant for this test
+        # rsmxval and rsmexplain; rsmxval does support subgroups but
+        # since it has no sections fields, it's not relevant for this test
         for context in ["rsmtool", "rsmeval", "rsmcompare"]:
             tempf = NamedTemporaryFile(mode="w", suffix=".json", delete=False)
             tempf.close()
@@ -517,8 +570,7 @@ class TestToolCLI(unittest.TestCase):
             yield (
                 self.check_tool_cmd,
                 context,
-                f"generate --subgroups --output {tempf.name}",
-                None,
+                ["generate", "--subgroups", "--output", tempf.name],
                 None,
                 tempf.name,
             )
