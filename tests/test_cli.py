@@ -4,6 +4,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
+from shutil import rmtree
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from unittest.mock import patch
 
@@ -75,7 +76,7 @@ class TestToolCLI(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         for tempdir in cls.temporary_directories:
-            tempdir.cleanup()
+            rmtree(tempdir.name, ignore_errors=True)
         for tempfile in cls.temporary_files:
             os.unlink(tempfile)
 
