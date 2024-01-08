@@ -178,7 +178,11 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     )
 
 
-def main():  # noqa: D103
+def main(argv=None):  # noqa: D103
+    # if no arguments are passed, then use sys.argv
+    if argv is None:
+        argv = sys.argv[1:]
+
     # set up the basic logging configuration
     formatter = LogFormatter()
 
@@ -200,22 +204,22 @@ def main():  # noqa: D103
     parser = setup_rsmcmd_parser("rsmcompare", uses_output_directory=True, uses_subgroups=True)
 
     # if we have no arguments at all then just show the help message
-    if len(sys.argv) < 2:
-        sys.argv.append("-h")
+    if len(argv) < 1:
+        argv.append("-h")
 
     # if the first argument is not one of the valid sub-commands
     # or one of the valid optional arguments, then assume that they
     # are arguments for the "run" sub-command. This allows the
     # old style command-line invocations to work without modification.
-    if sys.argv[1] not in VALID_PARSER_SUBCOMMANDS + [
+    if argv[0] not in VALID_PARSER_SUBCOMMANDS + [
         "-h",
         "--help",
         "-V",
         "--version",
     ]:
-        args_to_pass = ["run"] + sys.argv[1:]
+        args_to_pass = ["run"] + argv
     else:
-        args_to_pass = sys.argv[1:]
+        args_to_pass = argv
     args = parser.parse_args(args=args_to_pass)
 
     # call the appropriate function based on which sub-command was run
