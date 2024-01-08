@@ -12,7 +12,7 @@ variables:
 # set up basic job
 .runtests:
   before_script:
-    - "mamba create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} --yes"
+    - "mamba create --prefix /root/rsmenv -c conda-forge -c ets --file requirements.txt python=${PYVERSION} curl --yes"
     - /root/rsmenv/bin/pip install -e .
     - /root/rsmenv/bin/curl -o /root/rsmenv/bin/codecov https://uploader.codecov.io/latest/linux/codecov
     - chmod +x /root/rsmenv/bin/codecov
