@@ -35,7 +35,12 @@ from rsmtool.utils.commandline import (
     InteractiveField,
     setup_rsmcmd_parser,
 )
-from rsmtool.utils.constants import CHECK_FIELDS, DEFAULTS, INTERACTIVE_MODE_METADATA
+from rsmtool.utils.constants import (
+    CHECK_FIELDS,
+    DEFAULTS,
+    INTERACTIVE_MODE_METADATA,
+    INTERMEDIATE_FILES_TO_DESCRIPTIONS,
+)
 from rsmtool.utils.conversion import convert_to_float, int_to_float, parse_range
 from rsmtool.utils.cross_validation import (
     combine_fold_prediction_files,
@@ -865,34 +870,62 @@ class TestIntermediateFiles(unittest.TestCase):
 
     def test_get_files_as_html(self):
         files, directory = self.get_files()
-        html_string = (
-            """<li><b>Betas</b>: <a href="{}" download>csv</a></li>"""
-            """<li><b>Eval</b>: <a href="{}" download>csv</a></li>"""
-        )
+        html_string = """
+            <tr>
+                <th style="text-align:left;">Filename</th>
+                <th style="text-align:left;">Description</th>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>betas</a>
+                   </td>
+                   <td style="text-align:left;">Betas</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>eval</a>
+                   </td>
+                   <td style="text-align:left;">Eval</td>
+            </tr>
+            """
 
         html_expected = html_string.format(
             join("..", "output", files[0]), join("..", "output", files[1])
         )
         html_expected = "".join(html_expected.strip().split())
-        html_expected = """<ul>""" + html_expected + """</ul>"""
+        html_expected = """<table>""" + html_expected + """</table>"""
         html_result = get_files_as_html(directory, "lr", "csv")
         html_result = "".join(html_result.strip().split())
         self.assertEqual(html_expected, html_result)
 
     def test_get_files_as_html_replace_dict(self):
         files, directory = self.get_files()
-        html_string = (
-            """<li><b>THESE BETAS</b>: <a href="{}" download>csv</a></li>"""
-            """<li><b>THESE EVALS</b>: <a href="{}" download>csv</a></li>"""
-        )
+        html_string = """
+            <tr>
+                <th style="text-align:left;">Filename</th>
+                <th style="text-align:left;">Description</th>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>betas</a>
+                   </td>
+                   <td style="text-align:left;">Standardized & relative regression coefficients</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>eval</a>
+                   </td>
+                   <td style="text-align:left;">Full set of evaluation metrics</td>
+            </tr>
+            """
 
-        replace_dict = {"betas": "THESE BETAS", "eval": "THESE EVALS"}
+        replace_dict = INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"]
         html_expected = html_string.format(
             join("..", "output", files[0]), join("..", "output", files[1])
         )
         html_expected = "".join(html_expected.strip().split())
-        html_expected = """<ul>""" + html_expected + """</ul>"""
-        html_result = get_files_as_html(directory, "lr", "csv", replace_dict)
+        html_expected = """<table>""" + html_expected + """</table>"""
+        html_result = get_files_as_html(directory, "lr", "csv", replace_dict=replace_dict)
         html_result = "".join(item for item in html_result)
         html_result = "".join(html_result.strip().split())
         self.assertEqual(html_expected, html_result)
