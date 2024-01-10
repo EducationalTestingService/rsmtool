@@ -865,6 +865,7 @@ class Reporter:
             "JSONS": all_experiments,
             "JAVASCRIPT_PATH": javascript_path,
             "OUTPUT_DIR": csvdir,
+            "CONTEXT": "rsmsummarize",
         }
 
         report_name = f"{config['summary_id']}_report"
