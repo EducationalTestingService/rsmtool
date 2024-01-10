@@ -8,6 +8,7 @@ Utility functions for use in RSMTool sections/notebooks.
 :organization: ETS
 """
 
+import re
 from math import ceil
 from os.path import exists, isabs, relpath
 from pathlib import Path
@@ -16,7 +17,16 @@ from textwrap import wrap
 
 from IPython.display import HTML, display
 
-HTML_STRING = """<li><b>{}</b>: <a href="{}" download>{}</a></li>"""
+from .constants import INTERMEDIATE_FILES_TO_DESCRIPTIONS
+
+INTERMEDIATE_TABLE_ROW_STRING = """
+<tr>
+    <td style="text-align:left;">
+        <a href="{}" download>{}</a>
+    </td>
+    <td style="text-align:left;">{}</td>
+</tr>
+"""
 
 
 def float_format_func(num, prec=3, scientific=False):
@@ -362,47 +372,88 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     """
     output_dir = Path(output_dir)
     parent_dir = output_dir.parent
-    files = output_dir.glob(f"*.{file_format}")
-    html_string = ""
-    for file in sorted(files):
+
+    # get the list of intermediate files generated for this experiment
+    files = list(output_dir.glob(f"*.{file_format}"))
+
+    # get the bare filenames for each file since we will need those for sorting
+    filenames = [file.stem.replace(f"{experiment_id}_", "") for file in files]
+
+    # initialize list to hold the generated HTML strings
+    html_strings = [
+        """
+        <tr>
+            <th style="text-align:left;">Filename</th>
+            <th style="text-align:left;">Description</th>
+        </tr>
+        """
+    ]
+
+    # iterate over the files and generate the HTML strings
+    for filename, file in sorted(zip(filenames, files)):
+        # get the path of the file relative to the parent of the "output"
+        # directory; these will be the targets of our links
         relative_file = ".." / file.relative_to(parent_dir)
+
+        # get the relatve names of the file without the experiment id prefix
+        # these are needed in case we do not have a pre-defined replacement
         relative_name = relative_file.stem.replace(f"{experiment_id}_", "")
 
-        # check if relative name is in the replacement dictionary and,
-        # if it is, use the more descriptive name in the replacement
-        # dictionary. Otherwise, normalize the file name and use that
-        # as the description instead.
-        if relative_name in replace_dict:
-            descriptive_name = replace_dict[relative_name]
-        else:
+        # if the name of the file contains "_by_<subgroup>", replace
+        # the subgroup with "ZZZ" to get the replacement key; otherwise,
+        # use the filename as the key; if neither form of the  key is
+        # found in the dictionary, use the filename itself as the description
+        try:
+            if m := re.search(r"_by_([^\._]+)", filename):
+                subgroup = m.group(1)
+                replacement_key = filename.replace(f"_by_{subgroup}", "_by_ZZZ")
+                # replace the "ZZZ" with the actual subgroup in the description
+                descriptive_name = replace_dict[replacement_key].replace("ZZZ", subgroup)
+            else:
+                replacement_key = filename
+                descriptive_name = replace_dict[filename]
+        except KeyError:
             descriptive_name_components = relative_name.split("_")
             descriptive_name = " ".join(descriptive_name_components).title()
 
-        html_string += HTML_STRING.format(descriptive_name, relative_file, file_format)
+        # generate a table row string for this file
+        html_strings.append(
+            INTERMEDIATE_TABLE_ROW_STRING.format(relative_file, filename, descriptive_name)
+        )
 
-    return """<ul>""" + html_string + """</ul>"""
+    # combine the HTML table row strings into a single HTML table
+    table_rows = "\n".join(html_strings)
+    return f"<table>{table_rows}</table>"
 
 
-def show_files(output_dir, experiment_id, file_format, replace_dict={}):
+def show_files(context, output_dir, experiment_id, file_format):
     """
-    Show files in a given directory as an HTML list in a Jupyter notebook.
+    Show files for given context and directory as a table in a Jupyter notebook.
 
     Parameters
     ----------
+    context: str
+        The tool context: one of {"rsmtool", "rsmeval", "rsmsummarize"}.
     output_dir : str
         The output directory.
     experiment_id : str
         The experiment ID.
     file_format : str
         The format of the output files.
-    replace_dict : dict, optional
-        A dictionary which makes file names to descriptions.
-        Defaults to ``{}``.
 
     Displays
     --------
     display : IPython.core.display.HTML
         The HTML file descriptions and links.
     """
-    html_string = get_files_as_html(output_dir, experiment_id, file_format, replace_dict)
+    # rsmeval files are basically the same as rsmtool
+    if context == "rsmeval":
+        context = "rsmtool"
+
+    html_string = get_files_as_html(
+        output_dir,
+        experiment_id,
+        file_format,
+        replace_dict=INTERMEDIATE_FILES_TO_DESCRIPTIONS[context],
+    )
     display(HTML(html_string))
