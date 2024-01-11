@@ -68,6 +68,7 @@ from rsmtool.utils.notebook import (
     get_files_as_html,
     get_thumbnail_as_html,
     int_or_float_format_func,
+    show_files,
 )
 from rsmtool.writer import DataWriter
 
@@ -863,13 +864,21 @@ class TestCrossValidation(unittest.TestCase):
 
 
 class TestIntermediateFiles(unittest.TestCase):
-    def get_files(self, file_format="csv"):
+    def check_get_files_as_html(self, expected_html_string, file_format="csv", replace_dict={}):
         directory = join(rsmtool_test_dir, "data", "output")
         files = sorted([f for f in listdir(directory) if f.endswith(file_format)])
-        return files, directory
+        html_expected = expected_html_string.format(
+            join("..", "output", files[0]),
+            join("..", "output", files[1]),
+            join("..", "output", files[2]),
+        )
+        html_expected = "".join(html_expected.strip().split())
+        html_expected = """<table>""" + html_expected + """</table>"""
+        html_computed = get_files_as_html(directory, "lr", "csv", replace_dict=replace_dict)
+        html_computed = "".join(html_computed.strip().split())
+        self.assertEqual(html_expected, html_computed)
 
     def test_get_files_as_html(self):
-        files, directory = self.get_files()
         html_string = """
             <tr>
                 <th style="text-align:left;">Filename</th>
@@ -883,23 +892,20 @@ class TestIntermediateFiles(unittest.TestCase):
             </tr>
             <tr>
                    <td style="text-align:left;">
+                       <a href="{}" download>data_composition_by_L1</a>
+                   </td>
+                   <td style="text-align:left;">Data Composition By L1</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
                        <a href="{}" download>eval</a>
                    </td>
                    <td style="text-align:left;">Eval</td>
             </tr>
             """
+        self.check_get_files_as_html(html_string)
 
-        html_expected = html_string.format(
-            join("..", "output", files[0]), join("..", "output", files[1])
-        )
-        html_expected = "".join(html_expected.strip().split())
-        html_expected = """<table>""" + html_expected + """</table>"""
-        html_result = get_files_as_html(directory, "lr", "csv")
-        html_result = "".join(html_result.strip().split())
-        self.assertEqual(html_expected, html_result)
-
-    def test_get_files_as_html_replace_dict(self):
-        files, directory = self.get_files()
+    def test_get_files_as_html_replace_dict_default(self):
         html_string = """
             <tr>
                 <th style="text-align:left;">Filename</th>
@@ -913,22 +919,73 @@ class TestIntermediateFiles(unittest.TestCase):
             </tr>
             <tr>
                    <td style="text-align:left;">
+                       <a href="{}" download>data_composition_by_L1</a>
+                   </td>
+                   <td style="text-align:left;">Data composition statistics by L1 subgroup</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
                        <a href="{}" download>eval</a>
                    </td>
                    <td style="text-align:left;">Full set of evaluation metrics</td>
             </tr>
             """
 
-        replace_dict = INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"]
-        html_expected = html_string.format(
-            join("..", "output", files[0]), join("..", "output", files[1])
+        self.check_get_files_as_html(
+            html_string, replace_dict=INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"]
         )
-        html_expected = "".join(html_expected.strip().split())
-        html_expected = """<table>""" + html_expected + """</table>"""
-        html_result = get_files_as_html(directory, "lr", "csv", replace_dict=replace_dict)
-        html_result = "".join(item for item in html_result)
-        html_result = "".join(html_result.strip().split())
-        self.assertEqual(html_expected, html_result)
+
+    def test_get_files_as_html_replace_dict_custom(self):
+        html_string = """
+            <tr>
+                <th style="text-align:left;">Filename</th>
+                <th style="text-align:left;">Description</th>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>betas</a>
+                   </td>
+                   <td style="text-align:left;">These are betas</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>data_composition_by_L1</a>
+                   </td>
+                   <td style="text-align:left;">These are data composition by L1</td>
+            </tr>
+            <tr>
+                   <td style="text-align:left;">
+                       <a href="{}" download>eval</a>
+                   </td>
+                   <td style="text-align:left;">These are eval metrics</td>
+            </tr>
+            """
+
+        replace_dict = {
+            "betas": "These are betas",
+            "data_composition_by_ZZZ": "These are data composition by ZZZ",
+            "eval": "These are eval metrics",
+        }
+        self.check_get_files_as_html(html_string, replace_dict=replace_dict)
+
+    def test_show_files_rsmeval(self):
+        # mock the `get_files_as_html()` function
+        with patch("rsmtool.utils.notebook.get_files_as_html", return_value="") as mock_get_files:
+            # call `show_files()` which will call `get_files_as_html()`
+            directory = join(rsmtool_test_dir, "data", "output")
+            _ = show_files("rsmeval", directory, "lr", "csv")
+
+            # check that the function was called with the expected arguments
+            # including the fact that replacement dictionary context is set
+            # to "rsmtool" when "rsmeval" is passed as expected
+            mock_get_files.assert_called_once()
+            self.assertEqual(mock_get_files.call_args[0][0], directory)
+            self.assertEqual(mock_get_files.call_args[0][1], "lr")
+            self.assertEqual(mock_get_files.call_args[0][2], "csv")
+            self.assertEqual(
+                mock_get_files.call_args[1]["replace_dict"],
+                INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"],
+            )
 
 
 class TestThumbnail(unittest.TestCase):
