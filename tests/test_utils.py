@@ -885,22 +885,22 @@ class TestIntermediateFiles(unittest.TestCase):
                 <th style="text-align:left;">Description</th>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>betas</a>
-                   </td>
-                   <td style="text-align:left;">Betas</td>
+                <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>betas</a>
+               </td>
+               <td style="text-align:left;">Betas</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>data_composition_by_L1</a>
-                   </td>
-                   <td style="text-align:left;">Data Composition By L1</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>data_composition_by_L1</a>
+               </td>
+               <td style="text-align:left;">Data Composition By L1</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>eval</a>
-                   </td>
-                   <td style="text-align:left;">Eval</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>eval</a>
+               </td>
+               <td style="text-align:left;">Eval</td>
             </tr>
             """
         self.check_get_files_as_html(html_string)
@@ -912,22 +912,22 @@ class TestIntermediateFiles(unittest.TestCase):
                 <th style="text-align:left;">Description</th>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>betas</a>
-                   </td>
-                   <td style="text-align:left;">Standardized & relative regression coefficients</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>betas</a>
+               </td>
+               <td style="text-align:left;">Standardized & relative regression coefficients</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>data_composition_by_L1</a>
-                   </td>
-                   <td style="text-align:left;">Data composition statistics by L1 subgroup</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>data_composition_by_L1</a>
+               </td>
+               <td style="text-align:left;">Data composition statistics by L1 subgroup</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>eval</a>
-                   </td>
-                   <td style="text-align:left;">Full set of evaluation metrics</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>eval</a>
+               </td>
+               <td style="text-align:left;">Full set of evaluation metrics</td>
             </tr>
             """
 
@@ -942,22 +942,22 @@ class TestIntermediateFiles(unittest.TestCase):
                 <th style="text-align:left;">Description</th>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>betas</a>
-                   </td>
-                   <td style="text-align:left;">These are betas</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>betas</a>
+               </td>
+               <td style="text-align:left;">These are betas</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>data_composition_by_L1</a>
-                   </td>
-                   <td style="text-align:left;">These are data composition by L1</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>data_composition_by_L1</a>
+               </td>
+               <td style="text-align:left;">These are data composition by L1</td>
             </tr>
             <tr>
-                   <td style="text-align:left;">
-                       <a href="{}" download>eval</a>
-                   </td>
-                   <td style="text-align:left;">These are eval metrics</td>
+               <td style="text-align:left;">
+                   <a href="{}" style="text-decoration: none;" download>eval</a>
+               </td>
+               <td style="text-align:left;">These are eval metrics</td>
             </tr>
             """
 
