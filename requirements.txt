@@ -3,7 +3,7 @@ ipython
 jupyter
 nose2
 notebook
-numpy
+numpy<2
 openpyxl
 pandas
 pre-commit
