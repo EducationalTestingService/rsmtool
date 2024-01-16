@@ -446,10 +446,6 @@ def show_files(context, output_dir, experiment_id, file_format):
     display : IPython.core.display.HTML
         The HTML file descriptions and links.
     """
-    # rsmeval files are basically the same as rsmtool
-    if context == "rsmeval":
-        context = "rsmtool"
-
     html_string = get_files_as_html(
         output_dir,
         experiment_id,

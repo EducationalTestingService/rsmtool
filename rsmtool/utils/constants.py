@@ -519,3 +519,6 @@ INTERMEDIATE_FILES_TO_DESCRIPTIONS = {
         "true_score_eval": "Metrics evaluating how well system scores predict true scores for each experiment",
     },
 }
+
+# rsmeval has the same intermediate files as rsmtool
+INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmeval"] = INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"]

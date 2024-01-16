@@ -984,7 +984,7 @@ class TestIntermediateFiles(unittest.TestCase):
             self.assertEqual(mock_get_files.call_args[0][2], "csv")
             self.assertEqual(
                 mock_get_files.call_args[1]["replace_dict"],
-                INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmtool"],
+                INTERMEDIATE_FILES_TO_DESCRIPTIONS["rsmeval"],
             )
 
 
