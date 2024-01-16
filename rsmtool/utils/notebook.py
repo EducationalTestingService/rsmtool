@@ -22,7 +22,7 @@ from .constants import INTERMEDIATE_FILES_TO_DESCRIPTIONS
 INTERMEDIATE_TABLE_ROW_STRING = """
 <tr>
     <td style="text-align:left;">
-        <a href="{}" download>{}</a>
+        <a href="{}" style="text-decoration: none;" download>{}</a>
     </td>
     <td style="text-align:left;">{}</td>
 </tr>
@@ -395,7 +395,7 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
         # directory; these will be the targets of our links
         relative_file = ".." / file.relative_to(parent_dir)
 
-        # get the relatve names of the file without the experiment id prefix
+        # get the relative names of the file without the experiment id prefix
         # these are needed in case we do not have a pre-defined replacement
         relative_name = relative_file.stem.replace(f"{experiment_id}_", "")
 
