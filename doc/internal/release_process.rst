@@ -44,7 +44,7 @@ This process is only meant for the project administrators, not users and develop
 
 #. Build the new conda package by running the following command in the ``conda-recipe`` directory (note that this assumes that you have cloned RSMTool in a directory named ``rsmtool``). You should delete the ``build`` directory before running the command below. Note that you may need to comment out lines in your `$HOME/.condarc` file if you are using ETS Artifactory and you get conflicts::
 
-    conda build -c conda-forge -c ets .
+    conda build -c conda-forge .
 
 #. This will create a noarch package with the path to the package printed out to the screen.
 
