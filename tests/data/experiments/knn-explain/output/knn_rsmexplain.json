@@ -16,6 +16,7 @@
     ],
     "special_sections": null,
     "custom_sections": null,
+    "section_order": null,
     "sample_range": null,
     "sample_ids": null,
     "use_wandb": false,
