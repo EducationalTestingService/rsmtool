@@ -59,19 +59,22 @@ To get started with RSMTool, please see the extensive `official documentation <h
 Requirements
 ------------
 
-- ``python>=3.8``
-- ``numpy<.1.25``
-- ``scipy``
-- ``scikit-learn``
-- ``statsmodels``
-- ``skll``
-- ``pandas``
 - ``ipython``
 - ``jupyter``
 - ``notebook``
+- ``numpy<2``
+- ``openpyxl``
+- ``pandas``
+- ``python>=3.8``
+- ``scikit-learn``
+- ``scipy``
 - ``seaborn``
 - ``shap``
+- ``skll==4.0.1``
+- ``statsmodels``
 - ``wandb``
+- ``xlrd``
+- ``xlwt``
 
 Contributing
 ------------
