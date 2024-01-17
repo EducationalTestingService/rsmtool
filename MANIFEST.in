@@ -1,5 +1,6 @@
 include requirements.txt
 recursive-include rsmtool/notebooks *
+prune tests
 prune rsmtool/notebooks/.ipynb_checkpoints
 prune rsmtool/notebooks/comparison/.ipynb_checkpoints
 prune rsmtool/notebooks/summary/.ipynb_checkpoints
