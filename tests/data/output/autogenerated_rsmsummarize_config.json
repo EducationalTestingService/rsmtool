@@ -19,7 +19,6 @@
         "sysinfo"
     ],
     "section_order": null,
-    "special_sections": null,
     "subgroups": [],
     "use_thumbnails": false,
     "use_wandb": false,
