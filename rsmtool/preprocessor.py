@@ -1772,7 +1772,6 @@ class FeaturePreprocessor:
         general_report_sections = config_obj["general_sections"]
 
         # what about the special or custom sections?
-        special_report_sections = config_obj["special_sections"]
 
         custom_report_section_paths = config_obj["custom_sections"]
 
@@ -1788,7 +1787,6 @@ class FeaturePreprocessor:
 
         chosen_notebook_files = Reporter().get_ordered_notebook_files(
             general_report_sections,
-            special_report_sections,
             custom_report_sections,
             section_order,
             subgroups,
@@ -2144,7 +2142,6 @@ class FeaturePreprocessor:
         general_report_sections = config_obj["general_sections"]
 
         # get any special sections that the user might have specified
-        special_report_sections = config_obj["special_sections"]
 
         # get any custom sections and locate them to make sure
         # that they exist, otherwise raise an exception
@@ -2163,7 +2160,6 @@ class FeaturePreprocessor:
         # ordered list of notebook files
         chosen_notebook_files = Reporter().get_ordered_notebook_files(
             general_report_sections,
-            special_report_sections,
             custom_report_sections,
             section_order,
             subgroups,

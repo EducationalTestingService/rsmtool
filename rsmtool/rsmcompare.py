@@ -135,9 +135,6 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     # are there specific general report sections we want to include?
     general_report_sections = configuration["general_sections"]
 
-    # what about the special or custom sections?
-    special_report_sections = configuration["special_sections"]
-
     custom_report_section_paths = configuration["custom_sections"]
 
     # if custom report sections exist, locate sections; otherwise, create empty list
@@ -160,7 +157,6 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
-        special_report_sections,
         custom_report_sections,
         section_order,
         subgroups,

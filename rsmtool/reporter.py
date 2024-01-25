@@ -343,7 +343,6 @@ class Reporter:
     def determine_chosen_sections(
         self,
         general_sections,
-        special_sections,
         custom_sections,
         subgroups,
         context="rsmtool",
@@ -355,8 +354,6 @@ class Reporter:
         ----------
         general_sections : list of str
             List of specified general section names.
-        special_sections : str
-            List of specified special section names, if any.
         custom_sections : list of str
             List of specified custom sections, if any.
         subgroups : list of str
@@ -416,33 +413,22 @@ class Reporter:
                 section for section in chosen_general_sections if section not in subgroup_sections
             ]
 
-        # 3. Include the specified (and valid) subset of the special sections
-        chosen_special_sections = []
-        if special_sections:
-            special_section_list = master_section_dict["special"][context]
-            self.check_section_names(special_sections, "special", context=context)
-            chosen_special_sections = [s for s in special_sections if s in special_section_list]
-
         # 4. For the custom sections use the basename and strip off the `.ipynb` extension
         chosen_custom_sections = []
         if custom_sections:
             chosen_custom_sections = [splitext(basename(cs))[0] for cs in custom_sections]
 
         # return the final list of chosen sections
-        chosen_sections = chosen_general_sections + chosen_special_sections + chosen_custom_sections
+        chosen_sections = chosen_general_sections + chosen_custom_sections
 
         return chosen_sections
 
-    def get_section_file_map(
-        self, special_sections, custom_sections, model_type=None, context="rsmtool"
-    ):
+    def get_section_file_map(self, custom_sections, model_type=None, context="rsmtool"):
         """
         Map section names to IPython notebook filenames.
 
         Parameters
         ----------
-        special_sections : list of str
-            List of special sections.
         custom_sections : list of str
             List of custom sections.
         model_type : str, optional
@@ -478,13 +464,6 @@ class Reporter:
                 selected_notebook_path, f"{model_type.lower()}_model.ipynb"
             )
 
-        # update the file map to include the special sections
-        if special_sections:
-            selected_special_notebook_path = notebook_path_dict["special"][context]
-            section_file_map.update(
-                {ss: join(selected_special_notebook_path, f"{ss}.ipynb") for ss in special_sections}
-            )
-
         # update the file map to include the custom sections with
         # the file names (without the `.ipynb` extension) as the
         # names (keys) and full paths as values
@@ -496,7 +475,6 @@ class Reporter:
     def get_ordered_notebook_files(
         self,
         general_sections,
-        special_sections=[],
         custom_sections=[],
         section_order=None,
         subgroups=[],
@@ -514,9 +492,6 @@ class Reporter:
         ----------
         general_sections : str
             List of specified general sections.
-        special_sections : list, optional
-            List of specified special sections, if any.
-            Defaults to ``[]``.
         custom_sections : list, optional
             List of specified custom sections, if any.
             Defaults to ``[]``.
@@ -546,7 +521,6 @@ class Reporter:
         """
         chosen_sections = self.determine_chosen_sections(
             general_sections,
-            special_sections,
             custom_sections,
             subgroups,
             context=context,
@@ -575,9 +549,7 @@ class Reporter:
         ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
 
         # get the section file map
-        section_file_map = self.get_section_file_map(
-            special_sections, custom_sections, model_type, context=context
-        )
+        section_file_map = self.get_section_file_map(custom_sections, model_type, context=context)
 
         # order the section list either according to the default
         # order in `ordered_section_list` or according to the custom

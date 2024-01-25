@@ -481,7 +481,6 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     # Initialize a reporter instance and add the sections:
     reporter = Reporter(logger=logger, wandb_run=wandb_run)
     general_report_sections = configuration["general_sections"]
-    special_report_sections = configuration["special_sections"]
 
     # get any custom sections and locate them to make sure
     # that they exist, otherwise raise an exception
@@ -514,7 +513,6 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     # define all of the chosen notebook sections
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
-        special_report_sections,
         custom_report_sections,
         section_order=section_order,
         context="rsmexplain",
