@@ -103,8 +103,6 @@ A list containing the order in which the sections in the report should be genera
 
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmcompare>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
-    3. *All* special sections specified using :ref:`special_sections <special_sections_rsmcompare>`.
-
 subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``.

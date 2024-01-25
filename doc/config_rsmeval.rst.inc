@@ -174,8 +174,6 @@ A list containing the order in which the sections in the report should be genera
 
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmeval>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
-    3. *All* special sections specified using :ref:`special_sections <special_sections_rsmeval>`.
-
 .. _subgroups_eval:
 
 subgroups *(Optional)*
