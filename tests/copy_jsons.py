@@ -2,7 +2,7 @@
 """
 Copy over JSON configuration files from tests and rename them.
 
-This utility script copies over json files from rsmextra/rsmtool tests and
+This utility script copies over json files from rsmtool tests and
 rename them so that they all have unique names which match the experiment ids
 with the tool name appended to the end
 
@@ -81,7 +81,6 @@ def copy_jsons(source_dir, target_dir):
 
     # iterate over jsons and copy as applicable
     for filename in dir_content:
-
         experiment_dir = basename(dirname(filename))
 
         # skip the experiments not applicable to rsmapp
@@ -150,5 +149,4 @@ def main():  # noqa: D103
 
 
 if __name__ == "__main__":
-
     main()

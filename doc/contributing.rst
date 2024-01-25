@@ -61,7 +61,6 @@ The RSMTool codebase enforces a certain code style via pre-commit checks and thi
         from nbconvert.exporters.templateexporter import default_filters
         from traitlets.config import Config
 
-        from . import HAS_RSMEXTRA
         from .reader import DataReader
 
     Rather than doing this grouping and sorting manually, we use the `isort <https://pycqa.github.io/isort/>`_ pre-commit hook to achieve this.
