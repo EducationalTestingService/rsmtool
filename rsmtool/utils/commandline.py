@@ -274,7 +274,7 @@ def setup_rsmcmd_parser(
             argparse_option_kwargs["default"] = f"{parser_option.default}"
         if parser_option.required is not None:
             try:
-                assert type(parser_option.required) == bool
+                assert isinstance(parser_option.required, bool)
             except AssertionError:
                 raise TypeError(
                     f"the 'required' field for CmdOption must be "
@@ -841,7 +841,6 @@ class ConfigurationGenerator:
 
     def _get_all_general_section_names(self):
         default_general_sections_value = DEFAULTS.get("general_sections", "")
-        default_special_sections_value = DEFAULTS.get("special_sections", "")
         default_custom_sections_value = DEFAULTS.get("custom_sections", "")
 
         # if we are told ot use subgroups then just make up a dummy subgroup
@@ -850,7 +849,6 @@ class ConfigurationGenerator:
         subgroups_value = ["GROUP"] if self.use_subgroups else DEFAULTS.get("subgroups", "")
         return Reporter().determine_chosen_sections(
             default_general_sections_value,
-            default_special_sections_value,
             default_custom_sections_value,
             subgroups_value,
             context=self.context,

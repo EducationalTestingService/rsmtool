@@ -196,9 +196,6 @@ def run_summary(
 
     general_report_sections = configuration["general_sections"]
 
-    # get any special sections that the user might have specified
-    special_report_sections = configuration["special_sections"]
-
     # get any custom sections and locate them to make sure
     # that they exist, otherwise raise an exception
     custom_report_section_paths = configuration["custom_sections"]
@@ -219,7 +216,6 @@ def run_summary(
     # ordered list of notebook files
     chosen_notebook_files = reporter.get_ordered_notebook_files(
         general_report_sections,
-        special_report_sections,
         custom_report_sections,
         section_order,
         subgroups,
