@@ -62,12 +62,10 @@ This process is only meant for the project administrators, not users and develop
 
 #. Make sure that the ReadTheDocs build for ``main`` passes by examining the badge at this `URL <https://img.shields.io/readthedocs/rsmtool/main.svg>`__ - this should say "passing" in green.
 
-#. Tag the latest commit in ``main`` with the appropriate release tag and publish the release on GitHub.
+#. Tag the latest commit in ``main`` with the appropriate release tag.
 
-#. Create a new documentation version in readthedocs.org for this new tag and make it version visible by default.
+#. Create a new release in Github based on this new tag and auto-generate the release notes. Edit the auto-generated release notes based on the format from the previous releases.
 
-#. Update the CI plan for RSMExtra (only needed for ETS users) to use this newly built RSMTool conda package. Do any other requisite changes for RSMExtra. Once everything is done, do a release of RSMExtra.
+#. Publish the release on GitHub.
 
-#. Update the RSMTool conda environment on the ETS linux servers with the latest packages for both RSMTool and RSMExtra.
-
-#. Send an email around at ETS announcing the release and the changes.
+#. Go to ReadTheDocs and re-run the build for the `main` branch. This will pull in the new tag. Once the new tag is visible in ReadTheDocs, create a new documentation version based on this tag and make it the default version.
