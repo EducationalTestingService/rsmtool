@@ -105,12 +105,6 @@ A list containing the order in which the sections in the report should be genera
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmcompare>`.
 
-.. _special_sections_rsmcompare:
-
-special_sections *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A list specifying special ETS-only comparison sections to be included into the final report. These sections are available *only* to ETS employees via the `rsmextra` package.
-
 subgroups *(Optional)*
 ~~~~~~~~~~~~~~~~~~~~~~
 A list of column names indicating grouping variables used for generating analyses specific to each of those defined subgroups.For example, ``["prompt, gender, native_language, test_country"]``.

@@ -176,12 +176,6 @@ A list containing the order in which the sections in the report should be genera
 
     3. *All* special sections specified using :ref:`special_sections <special_sections_rsmeval>`.
 
-.. _special_sections_rsmeval:
-
-special_sections *(Optional)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A list specifying special ETS-only sections to be included into the final report. These sections are available *only* to ETS employees via the ``rsmextra`` package.
-
 .. _subgroups_eval:
 
 subgroups *(Optional)*
