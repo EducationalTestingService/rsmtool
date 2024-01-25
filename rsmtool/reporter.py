@@ -251,6 +251,7 @@ class Reporter:
         """
         if sorted(chosen_sections) != sorted(section_order):
             # check for discrepancies and create a helpful error message
+            error_message = ""
             missing_sections = set(chosen_sections).difference(set(section_order))
             if missing_sections:
                 error_message_missing = (
@@ -259,6 +260,7 @@ class Reporter:
                     f"section order to include the following missing "
                     f"sections: {', '.join(missing_sections)}"
                 )
+                error_message += error_message_missing
 
             extra_sections = set(section_order).difference(set(chosen_sections))
             if extra_sections:
@@ -268,14 +270,13 @@ class Reporter:
                     f"sections are either unavailable or were not "
                     f"selected for this experiment {', '.join(extra_sections)}"
                 )
+                if error_message:
+                    error_message += "\n" + error_message_extra
+                else:
+                    error_message = error_message_extra
 
             # raise an appropriate error message or a combination of messages
-            if missing_sections and not extra_sections:
-                raise ValueError(error_message_missing)
-            elif extra_sections and not missing_sections:
-                raise ValueError(error_message_extra)
-            else:
-                raise ValueError(f"{error_message_missing}\n{error_message_extra}")
+            raise ValueError(error_message)
 
     @staticmethod
     def convert_ipynb_to_html(notebook_file, html_file):
@@ -535,18 +536,20 @@ class Reporter:
 
         # determine which order to use by default
         if context == "rsmtool":
-            ordered_section_list = ordered_section_list_rsmtool
+            default_section_list = ordered_section_list_rsmtool
         elif context == "rsmeval":
-            ordered_section_list = ordered_section_list_rsmeval
+            default_section_list = ordered_section_list_rsmeval
         elif context == "rsmcompare":
-            ordered_section_list = ordered_section_list_rsmcompare
+            default_section_list = ordered_section_list_rsmcompare
         elif context == "rsmsummarize":
-            ordered_section_list = ordered_section_list_rsmsummarize
+            default_section_list = ordered_section_list_rsmsummarize
         elif context == "rsmexplain":
-            ordered_section_list = ordered_section_list_rsmexplain
+            default_section_list = ordered_section_list_rsmexplain
 
         # add all custom sections to the end of the default ordered list
-        ordered_section_list.extend([splitext(basename(cs))[0] for cs in custom_sections])
+        ordered_section_list = default_section_list + [
+            splitext(basename(cs))[0] for cs in custom_sections
+        ]
 
         # get the section file map
         section_file_map = self.get_section_file_map(custom_sections, model_type, context=context)
