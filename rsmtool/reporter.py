@@ -23,91 +23,64 @@ from nbconvert.exporters.templateexporter import default_filters
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 from traitlets.config import Config
 
-from . import HAS_RSMEXTRA
 from .reader import DataReader
 from .utils.wandb import log_report_to_wandb
 
-if HAS_RSMEXTRA:
-    from rsmextra.settings import special_section_list_rsmtool  # noqa
-    from rsmextra.settings import (
-        ordered_section_list_with_special_sections_rsmcompare,
-        ordered_section_list_with_special_sections_rsmeval,
-        ordered_section_list_with_special_sections_rsmsummarize,
-        ordered_section_list_with_special_sections_rsmtool,
-        special_notebook_path,
-        special_section_list_rsmcompare,
-        special_section_list_rsmeval,
-        special_section_list_rsmsummarize,
-    )
+ordered_section_list_rsmtool = [
+    "data_description",
+    "data_description_by_group",
+    "feature_descriptives",
+    "features_by_group",
+    "preprocessed_features",
+    "dff_by_group",
+    "consistency",
+    "model",
+    "evaluation",
+    "true_score_evaluation",
+    "evaluation_by_group",
+    "fairness_analyses",
+    "pca",
+    "intermediate_file_paths",
+    "sysinfo",
+]
 
-    ordered_section_list_rsmtool = ordered_section_list_with_special_sections_rsmtool
-    ordered_section_list_rsmeval = ordered_section_list_with_special_sections_rsmeval
-    ordered_section_list_rsmcompare = ordered_section_list_with_special_sections_rsmcompare
-    ordered_section_list_rsmsummarize = ordered_section_list_with_special_sections_rsmsummarize
+ordered_section_list_rsmeval = [
+    "data_description",
+    "data_description_by_group",
+    "consistency",
+    "evaluation",
+    "true_score_evaluation",
+    "evaluation_by_group",
+    "fairness_analyses",
+    "intermediate_file_paths",
+    "sysinfo",
+]
 
-else:
-    ordered_section_list_rsmtool = [
-        "data_description",
-        "data_description_by_group",
-        "feature_descriptives",
-        "features_by_group",
-        "preprocessed_features",
-        "dff_by_group",
-        "consistency",
-        "model",
-        "evaluation",
-        "true_score_evaluation",
-        "evaluation_by_group",
-        "fairness_analyses",
-        "pca",
-        "intermediate_file_paths",
-        "sysinfo",
-    ]
+ordered_section_list_rsmcompare = [
+    "feature_descriptives",
+    "features_by_group",
+    "preprocessed_features",
+    "preprocessed_features_by_group",
+    "consistency",
+    "score_distributions",
+    "model",
+    "evaluation",
+    "true_score_evaluation",
+    "pca",
+    "notes",
+    "sysinfo",
+]
 
-    ordered_section_list_rsmeval = [
-        "data_description",
-        "data_description_by_group",
-        "consistency",
-        "evaluation",
-        "true_score_evaluation",
-        "evaluation_by_group",
-        "fairness_analyses",
-        "intermediate_file_paths",
-        "sysinfo",
-    ]
+ordered_section_list_rsmsummarize = [
+    "preprocessed_features",
+    "model",
+    "evaluation",
+    "true_score_evaluation",
+    "intermediate_file_paths",
+    "sysinfo",
+]
 
-    ordered_section_list_rsmcompare = [
-        "feature_descriptives",
-        "features_by_group",
-        "preprocessed_features",
-        "preprocessed_features_by_group",
-        "consistency",
-        "score_distributions",
-        "model",
-        "evaluation",
-        "true_score_evaluation",
-        "pca",
-        "notes",
-        "sysinfo",
-    ]
-
-    ordered_section_list_rsmsummarize = [
-        "preprocessed_features",
-        "model",
-        "evaluation",
-        "true_score_evaluation",
-        "intermediate_file_paths",
-        "sysinfo",
-    ]
-
-    ordered_section_list_rsmexplain = ["data_description", "shap_values", "shap_plots", "sysinfo"]
-
-    special_section_list_rsmtool = []
-    special_section_list_rsmcompare = []
-    special_section_list_rsmeval = []
-    special_section_list_rsmsummarize = []
-    special_section_list_rsmexplain = []
-    special_notebook_path = ""
+ordered_section_list_rsmexplain = ["data_description", "shap_values", "shap_plots", "sysinfo"]
 
 package_path = dirname(__file__)
 notebook_path = abspath(join(package_path, "notebooks"))
@@ -118,54 +91,15 @@ comparison_notebook_path = join(notebook_path, "comparison")
 summary_notebook_path = join(notebook_path, "summary")
 explanations_notebook_path = join(notebook_path, "explanations")
 
-# Define the general section list
-
-general_section_list_rsmtool = [
-    section
-    for section in ordered_section_list_rsmtool
-    if section not in special_section_list_rsmtool
-]
-
-general_section_list_rsmeval = [
-    section
-    for section in ordered_section_list_rsmeval
-    if section not in special_section_list_rsmeval
-]
-
-general_section_list_rsmcompare = [
-    section
-    for section in ordered_section_list_rsmcompare
-    if section not in special_section_list_rsmcompare
-]
-
-general_section_list_rsmsummarize = [
-    section
-    for section in ordered_section_list_rsmsummarize
-    if section not in special_section_list_rsmsummarize
-]
-
-general_section_list_rsmexplain = [
-    section
-    for section in ordered_section_list_rsmexplain
-    if section not in special_section_list_rsmexplain
-]
-
 # define a mapping from the tool name to the master
 # list for both general and special sections
 master_section_dict = {
     "general": {
-        "rsmtool": general_section_list_rsmtool,
-        "rsmeval": general_section_list_rsmeval,
-        "rsmcompare": general_section_list_rsmcompare,
-        "rsmsummarize": general_section_list_rsmsummarize,
-        "rsmexplain": general_section_list_rsmexplain,
-    },
-    "special": {
-        "rsmtool": special_section_list_rsmtool,
-        "rsmeval": special_section_list_rsmeval,
-        "rsmcompare": special_section_list_rsmcompare,
-        "rsmsummarize": special_section_list_rsmsummarize,
-        "rsmexplain": special_section_list_rsmexplain,
+        "rsmtool": ordered_section_list_rsmtool,
+        "rsmeval": ordered_section_list_rsmeval,
+        "rsmcompare": ordered_section_list_rsmcompare,
+        "rsmsummarize": ordered_section_list_rsmsummarize,
+        "rsmexplain": ordered_section_list_rsmexplain,
     },
 }
 
@@ -177,12 +111,6 @@ notebook_path_dict = {
         "rsmcompare": comparison_notebook_path,
         "rsmsummarize": summary_notebook_path,
         "rsmexplain": explanations_notebook_path,
-    },
-    "special": {
-        "rsmtool": special_notebook_path,
-        "rsmeval": special_notebook_path,
-        "rsmcompare": special_notebook_path,
-        "rsmsummarize": special_notebook_path,
     },
 }
 

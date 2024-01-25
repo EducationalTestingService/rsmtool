@@ -10,17 +10,7 @@ from rsmtool.reporter import (
     summary_notebook_path,
 )
 
-# Since we are in test mode, we want to add a placeholder
-# special section to the master section list so that the tests
-# will run irrespective of whether or not rsmextra is installed
-# We also set a placeholder special_notebook path
-
-for context in ["rsmtool", "rsmeval", "rsmcompare", "rsmsummarize"]:
-    master_section_dict["special"][context].append("placeholder_special_section")
-    notebook_path_dict["special"].update({context: "special_notebook_path"})
-
 # define the general sections lists to keep tests more readable
-
 general_section_list_rsmtool = master_section_dict["general"]["rsmtool"]
 general_section_list_rsmeval = master_section_dict["general"]["rsmeval"]
 general_section_list_rsmcompare = master_section_dict["general"]["rsmcompare"]

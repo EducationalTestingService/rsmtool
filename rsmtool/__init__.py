@@ -10,27 +10,12 @@ Set up RSMTool version and global imports.
 isort:skip_file
 """
 
-# do we have rsmextra installed? we try to import rsmextra here
-# to avoid doing this in each module.
-
 import re
 import warnings
 
-try:
-    import rsmextra  # noqa
-except ImportError:
-    HAS_RSMEXTRA = False
-else:
-    HAS_RSMEXTRA = True
-
 from .version import __version__
 
-if HAS_RSMEXTRA:
-    from rsmextra.version import __version__ as rsmextra_version  # noqa
-
-    VERSION_STRING = f"%(prog)s {__version__}; rsmextra {rsmextra_version}"
-else:
-    VERSION_STRING = f"%(prog)s {__version__}"
+VERSION_STRING = f"%(prog)s {__version__}"
 
 from .rsmcompare import run_comparison  # noqa
 

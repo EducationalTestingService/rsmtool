@@ -25,7 +25,6 @@ from sklearn.metrics import get_scorer_names
 from skll.learner import Learner
 from skll.metrics import _PREDEFINED_CUSTOM_METRICS
 
-from . import HAS_RSMEXTRA
 from .utils.constants import (
     BOOLEAN_FIELDS,
     CHECK_FIELDS,
@@ -35,9 +34,6 @@ from .utils.constants import (
 )
 from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
-
-if HAS_RSMEXTRA:
-    from rsmextra.settings import default_feature_sign, default_feature_subset_file
 
 
 def configure(context, config_file_or_obj_or_dict):
@@ -620,7 +616,7 @@ class Configuration:
         Remove any values that are ``None``.
 
         Parameters
-        -------
+        ----------
         keys : list
             A list of keys whose values to retrieve.
         names : list
@@ -901,44 +897,16 @@ class ConfigurationParser:
         # 6. Check for fields that require feature_subset_file and try
         # to use the default feature file
         if new_config["feature_subset"] and not new_config["feature_subset_file"]:
-            # Check if we have the default subset file from rsmextra
-            if HAS_RSMEXTRA:
-                default_basename = Path(default_feature_subset_file).name
-                new_config["feature_subset_file"] = default_feature_subset_file
-                cls.logger.warning(
-                    f"You requested feature subsets but did not specify "
-                    f"any feature file. The tool will use the default "
-                    f"feature file {default_basename} available via rsmextra."
-                )
-            else:
-                raise ValueError(
-                    "If you want to use feature subsets, you " "must specify a feature subset file"
-                )
+            raise ValueError(
+                "If you want to use feature subsets, you " "must specify a feature subset file"
+            )
 
         if new_config["sign"] and not new_config["feature_subset_file"]:
-            # Check if we have the default subset file from rsmextra
-            if HAS_RSMEXTRA:
-                default_basename = Path(default_feature_subset_file).name
-                new_config["feature_subset_file"] = default_feature_subset_file
-                cls.logger.warning(
-                    f"You specified the expected sign of correlation "
-                    f"but did not specify a feature subset file. The "
-                    f"tool will use the default feature subset file "
-                    f"{default_basename} available via rsmextra."
-                )
-            else:
-                raise ValueError(
-                    "If you want to specify the expected sign of "
-                    " correlation for each feature, you must "
-                    "specify a feature subset file"
-                )
-
-        # Use the default sign if we are using the default feature file
-        # and sign has not been specified in the config file
-        if HAS_RSMEXTRA:
-            default_feature = default_feature_subset_file
-            if new_config["feature_subset_file"] == default_feature and not new_config["sign"]:
-                new_config["sign"] = default_feature_sign
+            raise ValueError(
+                "If you want to specify the expected sign of "
+                " correlation for each feature, you must "
+                "specify a feature subset file"
+            )
 
         # 7. Check for fields that must be specified together
         if new_config["min_items_per_candidate"] and not new_config["candidate_column"]:
@@ -999,15 +967,7 @@ class ConfigurationParser:
                 )
             del dummy_learner
 
-        # 11. Check the fields that requires rsmextra
-        if not HAS_RSMEXTRA:
-            if new_config["special_sections"]:
-                raise ValueError(
-                    "Special sections are only available to ETS"
-                    " users by installing the rsmextra package."
-                )
-
-        # 12. Raise a warning if we are specifiying a feature file but also
+        # 11. Raise a warning if we are specifiying a feature file but also
         # telling the system to automatically select transformations
         if new_config["features"] and new_config["select_transformations"]:
             # Show a warning unless a user passed a list of features.

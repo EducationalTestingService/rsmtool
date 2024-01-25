@@ -85,8 +85,7 @@ def check_run_experiment(
         Defaults to "csv".
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input, if any.
@@ -180,8 +179,7 @@ def check_run_evaluation(
         Defaults to "csv".
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input, if any.
@@ -251,8 +249,7 @@ def check_run_explain(
         The experiment ID of the experiment.
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input.
@@ -317,8 +314,7 @@ def check_run_comparison(
         The experiment ID of the experiment.
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input.
@@ -377,8 +373,7 @@ def check_run_prediction(
         Defaults to "csv".
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input.
@@ -436,8 +431,7 @@ def check_run_summary(
         Defaults to "csv".
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict: configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input.
@@ -528,8 +522,7 @@ def check_run_cross_validation(
         Defaults to "csv".
     given_test_dir : str, optional
         Path where the test experiments are located. Unless specified, the
-        rsmtool test directory is used. This can be useful when using these
-        experiments to run tests for RSMExtra.
+        rsmtool test directory is used.
         Defaults to ``None``.
     config_obj_or_dict : configuration_parser.Configuration or dict, optional
         Configuration object or dictionary to use as an input, if any.
@@ -1317,8 +1310,7 @@ def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
         file type and the values are their paths relative to the ``tests``
         directory.
     given_test_dir : str
-        Directory where the the test experiments are located. This can be
-        useful when using these experiments to run tests for RSMExtra.
+        Directory where the the test experiments are located.
 
     Returns
     -------
