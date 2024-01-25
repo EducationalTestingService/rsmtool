@@ -20,7 +20,6 @@
     ],
     "use_thumbnails": false,
     "file_format": "csv",
-    "special_sections": null,
     "subgroups": [],
     "experiment_names": null,
     "use_wandb": false,

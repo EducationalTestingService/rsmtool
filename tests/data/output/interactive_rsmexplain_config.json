@@ -21,7 +21,6 @@
     "sample_size": null,
     "section_order": null,
     "show_auto_cohorts": false,
-    "special_sections": null,
     "standardize_features": true,
     "truncate_outliers": true,
     "use_wandb": false,

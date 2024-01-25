@@ -50,7 +50,6 @@
         "intermediate_file_paths",
         "sysinfo"
     ],
-    "special_sections": null,
     "custom_sections": null,
     "section_order": null
 }

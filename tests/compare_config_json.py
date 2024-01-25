@@ -36,7 +36,6 @@ PATH_FIELDS = [
 LIST_FIELDS = [
     "feature_prefix",
     "general_sections",
-    "special_sections",
     "custom_sections",
     "subgroups",
     "section_order",
@@ -49,7 +48,6 @@ def find_jsons(json_dir):
     json_file_dict = {}
     for dirpath, ___, filenames in dir_content:
         for filename in fnmatch.filter(filenames, "*.json"):
-
             # we are not interested in feature json files
             if dirpath == "Feature":
                 continue
