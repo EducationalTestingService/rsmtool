@@ -71,8 +71,6 @@ A list containing the order in which the sections in the report should be genera
 
     2. *All* custom section names specified using :ref:`custom_ sections <custom_sections_rsmsummarize>`, i.e., file prefixes only, without the path and without the `.ipynb` extension, and
 
-    3. *All* special sections specified using :ref:`special_sections <special_sections_rsmsummarize>`.
-
 .. _use_thumbnails_rsmsummarize:
 
 use_thumbnails *(Optional)*

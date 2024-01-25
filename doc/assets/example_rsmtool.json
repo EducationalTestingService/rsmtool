@@ -37,7 +37,6 @@
     "select_transformations": false,
     "sign": null,
     "skll_objective": null,
-    "special_sections": null,
     "standardize_features": true,
     "subgroups": [],
     "test_label_column": "score",
