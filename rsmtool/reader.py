@@ -49,16 +49,9 @@ def read_jsonlines(filename, converters=None):
     except ValueError:
         raise ValueError(
             "The jsonlines file is not formatted correctly. "
-            "Please check that each line ends with a comma, "
-            "there is no comma at the end of the last line, "
-            "and that all quotes match."
-        )
-
-    # make sure we didn't get a plain json
-    if type(df.columns) == pd.RangeIndex:
-        raise ValueError(
-            f"It looks like {filename} is a simple json file. Please "
-            f"check documentation (for the expected file format"
+            "Please check that it's not a plain JSON file, that "
+            "each line ends with a comma, that there is no comma "
+            "at the end of the last line, and that all quotes match."
         )
 
     dfs = []
@@ -293,7 +286,7 @@ class DataReader:
             (usually the directory of the config file)
 
         Returns
-        --------
+        -------
         retval :  str or list
             Absolute path to the experiment file or ``None``
             if the file could not be located. If ``filepaths``
@@ -320,7 +313,6 @@ class DataReader:
 
         located_paths = []
         for filepath in filepaths:
-
             retval = None
             alternate_path = abspath(join(configdir, filepath))
 
@@ -363,7 +355,6 @@ class DataReader:
             If any of the files in ``self.dataset_paths`` does not exist.
         """
         for idx, set_path in enumerate(self.dataset_paths):
-
             name = self.dataset_names[idx]
             converter = self.file_converters.get(name, None)
 
