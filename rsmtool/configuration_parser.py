@@ -904,7 +904,7 @@ class ConfigurationParser:
         if new_config["sign"] and not new_config["feature_subset_file"]:
             raise ValueError(
                 "If you want to specify the expected sign of "
-                " correlation for each feature, you must "
+                "correlation for each feature, you must "
                 "specify a feature subset file"
             )
 
