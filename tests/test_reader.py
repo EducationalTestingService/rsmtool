@@ -312,9 +312,12 @@ class TestJsonLines(unittest.TestCase):
     @staticmethod
     def create_jsonlines_file(jsondict):
         tempf = tempfile.NamedTemporaryFile(mode="w", suffix=".jsonlines", delete=False)
-        for entry in jsondict:
-            json.dump(entry, tempf)
-            tempf.write("\n")
+        if isinstance(jsondict, list):
+            for entry in jsondict:
+                json.dump(entry, tempf)
+                tempf.write("\n")
+        else:
+            json.dump(jsondict, tempf, indent=4)
         return tempf.name
 
     def check_jsonlines_output(self, jsondict):
