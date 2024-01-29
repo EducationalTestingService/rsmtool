@@ -15,8 +15,12 @@ import os
 import sys
 from os import listdir
 from os.path import abspath, exists, join, normpath
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Union
 
-from .configuration_parser import configure
+import wandb
+
+from .configuration_parser import Configuration, configure
 from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
@@ -25,7 +29,9 @@ from .utils.logging import LogFormatter
 from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 
-def check_experiment_dir(experiment_dir, experiment_name, configpath):
+def check_experiment_dir(
+    experiment_dir: str, experiment_name: str, configpath: str
+) -> List[Iterable[str]]:
     """
     Check that ``experiment_dir`` exists & contains output for ``experiment_name``.
 
@@ -40,9 +46,9 @@ def check_experiment_dir(experiment_dir, experiment_name, configpath):
 
     Returns
     -------
-    jsons : list of str
-        A list of paths to all JSON configuration files contained
-        in the output directory.
+    jsons : List[Iterable[str]]
+        A list of tuples containing JSON configuration files and optional
+        experiment names from in the output directory.
 
     Raises
     ------
@@ -92,8 +98,12 @@ def check_experiment_dir(experiment_dir, experiment_name, configpath):
 
 
 def run_summary(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
-):
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
+    output_dir: str,
+    overwrite_output=False,
+    logger: Optional[logging.Logger] = None,
+    wandb_run: Optional[wandb.Run] = None,
+) -> None:
     """
     Run rsmsummarize experiment using the given configuration.
 
@@ -104,7 +114,7 @@ def run_summary(
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -116,13 +126,13 @@ def run_summary(
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    overwrite_output : bool, optional
+    overwrite_output : bool
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
-    logger : logging object, optional
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : wandb.Run
+    wandb_run : Optional[wandb.Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -231,7 +241,14 @@ def run_summary(
     reporter.create_summary_report(configuration, all_experiments, csvdir)
 
 
-def main(argv=None):  # noqa: D103
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmsummarize`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
