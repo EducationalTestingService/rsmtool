@@ -18,13 +18,16 @@ import sys
 from os import listdir
 from os.path import abspath, basename, exists, join, normpath, splitext
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import shap
+import wandb
 from skll.data import FeatureSet
+from skll.learner import Learner
 
-from .configuration_parser import configure
+from .configuration_parser import Configuration, configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
@@ -36,13 +39,15 @@ from .utils.logging import LogFormatter
 from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 
-def select_examples(featureset, range_size=None):
+def select_examples(
+    featureset: FeatureSet, range_size: Optional[Union[int, Tuple[int, int]]] = None
+) -> Dict[int, str]:
     """
     Sample examples from the given featureset and return indices.
 
     Parameters
     ----------
-    featureset: skll.data.FeatureSet
+    featureset: FeatureSet
         The SKLL FeatureSet object from which we are sampling.
     range_size: Optional[Union[int, Tuple[int, int]]]
         A user defined sample size or range. If ``None``, all examples in the
@@ -82,7 +87,11 @@ def select_examples(featureset, range_size=None):
     return dict(zip(selected_positions, selected_ids))
 
 
-def mask(learner, featureset, feature_range=None):
+def mask(
+    learner: Learner,
+    featureset: FeatureSet,
+    feature_range: Optional[Union[int, Tuple[int, int]]] = None,
+) -> Tuple[Dict[int, str], np.ndarray]:
     """
     Sample examples from featureset used by learner.
 
@@ -93,11 +102,11 @@ def mask(learner, featureset, feature_range=None):
 
     Parameters
     ----------
-    learner : skll.learner.Learner
+    learner : Learner
         SKLL Learner object that we wish to explain the predictions of.
-    featureset : skll.data.FeatureSet
+    featureset : FeatureSet
         SKLL FeatureSet object from which to sample examples.
-    feature_range : Optional[int, Tuple[int, int]]
+    feature_range : Optional[Union[int, Tuple[int, int]]]
         If this is an integer, create a random sub-sample of that size. If this
         is a tuple, sub-sample the range of examples using the two values
         in the tuple. If this is ``None``, use all of the examples without
@@ -133,11 +142,11 @@ def mask(learner, featureset, feature_range=None):
 
 
 def generate_explanation(
-    config_file_or_obj_or_dict,
-    output_dir,
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
+    output_dir: str,
     overwrite_output=False,
-    logger=None,
-    wandb_run=None,
+    logger: Optional[logging.Logger] = None,
+    wandb_run: Optional[wandb.Run] = None,
 ):
     """
     Generate a shap.Explanation object.
@@ -148,7 +157,7 @@ def generate_explanation(
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either as a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -160,13 +169,14 @@ def generate_explanation(
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    logger : Optional[logging object]
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : wandb.Run
+    wandb_run : Optional[wandb.Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
-        wandb is enabled in the configuration. Defaults to ``None``.
+        wandb is enabled in the configuration.
+        Defaults to ``None``.
 
     Raises
     ------
@@ -358,13 +368,14 @@ def generate_explanation(
     )
 
     # get and parse the value of either the sample range or the sample size
+    range_size: Optional[Union[int, Tuple[int, int]]]
     if has_sample_size:
         range_size = int(configuration.get("sample_size"))
     elif has_sample_range:
         range_size = parse_range(configuration.get("sample_range"))
     elif has_sample_ids:
-        range_size = configuration.get("sample_ids").split(",")
-        range_size = tuple([id_.strip() for id_ in range_size])
+        range_size_strs = configuration.get("sample_ids").split(",")
+        range_size = tuple([id_.strip() for id_ in range_size_strs])
     else:
         range_size = None
         logger.warning(
@@ -415,7 +426,14 @@ def generate_explanation(
     generate_report(explanation, output_dir, ids, configuration, logger, wandb_run=wandb_run)
 
 
-def generate_report(explanation, output_dir, ids, configuration, logger=None, wandb_run=None):
+def generate_report(
+    explanation: shap.Explanation,
+    output_dir: str,
+    ids: Dict[int, str],
+    configuration: Configuration,
+    logger: Optional[logging.Logger] = None,
+    wandb_run: Optional[wandb.Run] = None,
+) -> None:
     """
     Generate an rsmexplain report.
 
@@ -523,8 +541,14 @@ def generate_report(explanation, output_dir, ids, configuration, logger=None, wa
     reporter.create_explanation_report(configuration, csvdir, reportdir)
 
 
-def main(argv=None):
-    """Run rsmexplain and generate explanation reports."""
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmexplain`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
