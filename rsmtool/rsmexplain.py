@@ -23,9 +23,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 import shap
-import wandb
 from skll.data import FeatureSet
 from skll.learner import Learner
+from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration, configure
 from .modeler import Modeler
@@ -146,7 +146,7 @@ def generate_explanation(
     output_dir: str,
     overwrite_output=False,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[wandb.Run] = None,
+    wandb_run: Optional[Run] = None,
 ):
     """
     Generate a shap.Explanation object.
@@ -169,10 +169,13 @@ def generate_explanation(
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
+    overwrite_output : bool
+        If ``True``, overwrite any existing output under ``output_dir``.
+        Defaults to ``False``.
     logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.Run]
+    wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration.
@@ -432,7 +435,7 @@ def generate_report(
     ids: Dict[int, str],
     configuration: Configuration,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[wandb.Run] = None,
+    wandb_run: Optional[Run] = None,
 ) -> None:
     """
     Generate an rsmexplain report.
@@ -448,14 +451,14 @@ def generate_report(
         names and base values.
     output_dir : str
         Path to the experiment output directory.
-    ids: dict
+    ids: Dict[int, str]
         Dictionary mapping new row indices to original FeatureSet ids.
     configuration: rsmtool.configuration_parser.Configuration
         The Configuration object for rsmexplain.
-    logger : logging object, optional
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : wandb.Run
+    wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -548,6 +551,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     Parameters
     ----------
     argv : Optional[List[str]]
+        List of arguments to use instead of ``sys.argv``.
+        Defaults to ``None``.
     """
     # if no arguments are passed, then use sys.argv
     if argv is None:

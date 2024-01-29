@@ -34,9 +34,9 @@ from os.path import abspath, exists, join
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import wandb
 from joblib.parallel import Parallel, delayed
 from tqdm import tqdm
+from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration, configure
 from .rsmeval import run_evaluation
@@ -50,7 +50,7 @@ from .utils.cross_validation import (
     process_fold,
 )
 from .utils.logging import LogFormatter, get_file_logger, tqdm_joblib
-from .utils.wandb import init_wandb_run, log_configuration_to_wandb
+from .utils.wandb import init_wandb_run, log_configuration_to_wandb, log_dataframe_to_wandb
 from .writer import DataWriter
 
 # a constant defining all of the sections we can use when
@@ -70,7 +70,7 @@ def run_cross_validation(
     config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
     output_dir: str,
     silence_tqdm=False,
-    wandb_run: Optional[wandb.Run] = None,
+    wandb_run: Optional[Run] = None,
 ) -> None:
     """
     Run cross-validation experiment.
@@ -94,7 +94,7 @@ def run_cross_validation(
         rsmtool for each fold. This option should only be used when
         running the unit tests.
         Defaults to ``False``.
-    wandb_run : wandb.Run
+    wandb_run : Run
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -201,9 +201,7 @@ def run_cross_validation(
         file_format=given_file_format,
         index=False,
     )
-    wandb.log_dataframe_to_wandb(
-        wandb_run, df_predictions, "xval_predictions", configuration.context
-    )
+    log_dataframe_to_wandb(wandb_run, df_predictions, "xval_predictions", configuration.context)
 
     # create a new rsmeval configuration dictionary;
     # note that we do not want to set "id_column" and "human_score_column"
@@ -278,6 +276,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     Parameters
     ----------
     argv : Optional[List[str]]
+        List of arguments to use instead of ``sys.argv``.
+        Defaults to ``None``.
     """
     # if no arguments are passed, then use sys.argv
     if argv is None:
