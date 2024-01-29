@@ -185,6 +185,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     Parameters
     ----------
     argv : Optional[List[str]]
+        List of arguments to use instead of ``sys.argv``.
+        Defaults to ``None``.
     """
     # if no arguments are passed, then use sys.argv
     if argv is None:

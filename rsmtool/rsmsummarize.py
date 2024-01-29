@@ -18,7 +18,7 @@ from os.path import abspath, exists, join, normpath
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union
 
-import wandb
+from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration, configure
 from .reader import DataReader
@@ -102,7 +102,7 @@ def run_summary(
     output_dir: str,
     overwrite_output=False,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[wandb.Run] = None,
+    wandb_run: Optional[Run] = None,
 ) -> None:
     """
     Run rsmsummarize experiment using the given configuration.
@@ -132,7 +132,7 @@ def run_summary(
     logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.Run]
+    wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -248,6 +248,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     Parameters
     ----------
     argv : Optional[List[str]]
+        List of arguments to use instead of ``sys.argv``.
+        Defaults to ``None``.
     """
     # if no arguments are passed, then use sys.argv
     if argv is None:

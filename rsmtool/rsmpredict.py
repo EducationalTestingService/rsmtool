@@ -14,12 +14,14 @@ import logging
 import os
 import sys
 from os.path import abspath, basename, dirname, exists, join, normpath, split, splitext
-from typing import Dict, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+from wandb.wandb_run import Run
 
-from .configuration_parser import configure
+from .configuration_parser import Configuration, configure
 from .modeler import Modeler
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
@@ -44,7 +46,7 @@ def fast_predict(
     h1_mean: Optional[float] = None,
     h1_sd: Optional[float] = None,
     logger: Optional[logging.Logger] = None,
-):
+) -> Dict[str, float]:
     """
     Compute predictions for a single instance against given model.
 
@@ -163,7 +165,7 @@ def fast_predict(
 
     Returns
     -------
-    dict[str, float]
+    Dict[str, float]
         A dictionary containing the raw, scaled, trimmed, and rounded
         predictions for the input features. It always contains the
         "raw" key and may contain the following additional keys depending
@@ -298,8 +300,12 @@ def fast_predict(
 
 
 def compute_and_save_predictions(
-    config_file_or_obj_or_dict, output_file, feats_file=None, logger=None, wandb_run=None
-):
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
+    output_file: str,
+    feats_file: Optional[str] = None,
+    logger: Optional[logging.Logger] = None,
+    wandb_run: Optional[Run] = None,
+) -> None:
     """
     Run rsmpredict using the given configuration.
 
@@ -310,7 +316,7 @@ def compute_and_save_predictions(
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -322,12 +328,12 @@ def compute_and_save_predictions(
         a dictionary, the reference path is set to the current directory.
     output_file : str
         The path to the output file.
-    feats_file : str, optional
+    feats_file : Optional[str]
         Path to the output file for saving preprocessed feature values.
-    logger : logging object, optional
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : wandb.Run
+    wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -506,7 +512,16 @@ def compute_and_save_predictions(
         )
 
 
-def main(argv=None):  # noqa: D103
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmpredict`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+        List of arguments to use instead of ``sys.argv``.
+        Defaults to ``None``.
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
