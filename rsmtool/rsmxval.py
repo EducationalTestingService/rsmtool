@@ -32,11 +32,11 @@ import sys
 from os import listdir, makedirs
 from os.path import abspath, exists, join
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
+import wandb
 from joblib.parallel import Parallel, delayed
 from tqdm import tqdm
-
-from rsmtool.utils import wandb
 
 from .configuration_parser import Configuration, configure
 from .rsmeval import run_evaluation
@@ -67,14 +67,17 @@ FINAL_MODEL_SECTION_LIST = [
 
 
 def run_cross_validation(
-    config_file_or_obj_or_dict, output_dir, silence_tqdm=False, wandb_run=None
-):
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
+    output_dir: str,
+    silence_tqdm=False,
+    wandb_run: Optional[wandb.Run] = None,
+) -> None:
     """
     Run cross-validation experiment.
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either as a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -86,7 +89,7 @@ def run_cross_validation(
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    silence_tqdm : bool, optional
+    silence_tqdm : bool
         Whether to silence the progress bar that is shown when running
         rsmtool for each fold. This option should only be used when
         running the unit tests.
@@ -268,7 +271,14 @@ def run_cross_validation(
     )
 
 
-def main(argv=None):  # noqa: D103
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmxval`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
