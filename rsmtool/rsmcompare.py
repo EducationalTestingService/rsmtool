@@ -13,8 +13,10 @@ import glob
 import logging
 import sys
 from os.path import abspath, exists, join, normpath
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
-from .configuration_parser import configure
+from .configuration_parser import Configuration, configure
 from .reader import DataReader
 from .reporter import Reporter
 from .utils.commandline import ConfigurationGenerator, setup_rsmcmd_parser
@@ -23,7 +25,7 @@ from .utils.logging import LogFormatter
 from .utils.wandb import init_wandb_run, log_configuration_to_wandb
 
 
-def check_experiment_id(experiment_dir, experiment_id):
+def check_experiment_id(experiment_dir: str, experiment_id: str) -> None:
     """
     Check that ``experiment_dir`` contains the outputs for ``experiment_id``.
 
@@ -50,7 +52,9 @@ def check_experiment_id(experiment_dir, experiment_id):
         )
 
 
-def run_comparison(config_file_or_obj_or_dict, output_dir):
+def run_comparison(
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path], output_dir: str
+) -> None:
     """
     Run an rsmcompare experiment using the given configuration.
 
@@ -59,7 +63,7 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -174,7 +178,14 @@ def run_comparison(config_file_or_obj_or_dict, output_dir):
     )
 
 
-def main(argv=None):  # noqa: D103
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmcompare`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
