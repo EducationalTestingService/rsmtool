@@ -14,9 +14,13 @@ import os
 import sys
 from os import listdir
 from os.path import abspath, exists, join
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import wandb
 
 from .analyzer import Analyzer
-from .configuration_parser import configure
+from .configuration_parser import Configuration, configure
 from .preprocessor import FeaturePreprocessor
 from .reader import DataReader
 from .reporter import Reporter
@@ -28,8 +32,12 @@ from .writer import DataWriter
 
 
 def run_evaluation(
-    config_file_or_obj_or_dict, output_dir, overwrite_output=False, logger=None, wandb_run=None
-):
+    config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
+    output_dir: str,
+    overwrite_output=False,
+    logger: Optional[logging.Logger] = None,
+    wandb_run: Optional[wandb.Run] = None,
+) -> None:
     """
     Run an rsmeval experiment using the given configuration.
 
@@ -38,7 +46,7 @@ def run_evaluation(
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Path, Dict[str, Any]]
         Path to the experiment configuration file either a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -50,13 +58,13 @@ def run_evaluation(
         a dictionary, the reference path is set to the current directory.
     output_dir : str
         Path to the experiment output directory.
-    overwrite_output : bool, optional
+    overwrite_output : bool
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
-    logger : logging object, optional
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : wandb.Run
+    wandb_run : Optional[wandb.Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
@@ -219,7 +227,14 @@ def run_evaluation(
     reporter.create_report(pred_analysis_config, csvdir, figdir, context="rsmeval")
 
 
-def main(argv=None):  # noqa: D103
+def main(argv: Optional[List[str]] = None) -> None:
+    """
+    Entry point for the ``rsmeval`` command-line tool.
+
+    Parameters
+    ----------
+    argv : Optional[List[str]]
+    """
     # if no arguments are passed, then use sys.argv
     if argv is None:
         argv = sys.argv[1:]
