@@ -44,7 +44,7 @@ from .constants import (
 CmdOption = namedtuple(
     "CmdOption",
     ["dest", "help", "shortname", "longname", "action", "default", "required", "nargs"],
-    defaults=(None,) * 6,
+    defaults=(None, None, None, None, None, None),
 )
 
 
