@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 from os.path import abspath, basename, dirname, exists, join, normpath, split, splitext
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -30,19 +31,19 @@ from .writer import DataWriter
 
 
 def fast_predict(
-    input_features,
-    modeler,
-    df_feature_info=None,
+    input_features: Dict[str, float],
+    modeler: Modeler,
+    df_feature_info: Optional[pd.DataFrame] = None,
     trim=False,
-    trim_min=None,
-    trim_max=None,
-    trim_tolerance=None,
+    trim_min: Optional[int] = None,
+    trim_max: Optional[int] = None,
+    trim_tolerance: Optional[float] = None,
     scale=False,
-    train_predictions_mean=None,
-    train_predictions_sd=None,
-    h1_mean=None,
-    h1_sd=None,
-    logger=None,
+    train_predictions_mean: Optional[float] = None,
+    train_predictions_sd: Optional[float] = None,
+    h1_mean: Optional[float] = None,
+    h1_sd: Optional[float] = None,
+    logger: Optional[logging.Logger] = None,
 ):
     """
     Compute predictions for a single instance against given model.
@@ -64,17 +65,17 @@ def fast_predict(
 
     Parameters
     ----------
-    input_features : dict[str, float]
+    input_features : Dict[str, float]
         A dictionary containing the features for the instance for which to
         generate the model predictions. The keys should be names of the
         features on which the model was trained and the values should
         be the *raw* feature values.
-    modeler : rsmtool.modeler.Modeler object
+    modeler : Modeler
         The RSMTool ``Modeler`` object from which the predictions are to be
         generated. This object should be created from the already existing
         ``.model`` file in the "output" directory of the previously run
         RSMTool experiment.
-    df_feature_info : pandas DataFrame, optional
+    df_feature_info : Optional[pandas.DataFrame]
         If ``None``, this function will try to extract this information
         from ``modeler``.
 
@@ -95,36 +96,36 @@ def fast_predict(
         "output" directory of the previously run RSMTool experiment.
 
         Defaults to ``None``.
-    trim : bool, optional
+    trim : bool
         Whether to trim the predictions. If ``True``, ``trim_min`` and
         ``trim_max`` must be specified or be available as attributes of
         the ``modeler``.
         Defaults to ``False``.
-    trim_min : int, optional
+    trim_min : Optional[int]
         The lowest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from
         ``modeler``. If ``None``, no such attribute exists, and
         ``trim=True``, a ``ValueError`` will be raised.
         Defaults to ``None``.
-    trim_max : int, optional
+    trim_max : Optional[int]
         The highest possible integer score that the machine should predict.
         If ``None``, this function will try to extract this value from
         ``modeler``. If ``None``, no such attribute exists, and
         ``trim=True``, a ``ValueError`` will be raised.
         Defaults to ``None``.
-    trim_tolerance : float, optional
+    trim_tolerance : Optional[float]
        The single numeric value that will be used to pad the trimming range
        specified in ``trim_min`` and ``trim_max``. If ``None``, this function
        will try to extract this value from ``modeler``. If no such attribute
        can be found, the value will default to ``0.4998``.
        Defaults to ``None``.
-    scale : bool, optional
+    scale : bool
         Whether to scale predictions. If ``True``, all of
         ``train_predictions_mean``, ``train_predictions_sd``, ``h1_mean``,
         and ``h1_sd`` must be specified or be available as attributes of
         ``modeler``.
         Defaults to ``False``.
-    train_predictions_mean : float, optional
+    train_predictions_mean : Optional[float]
        The mean of the predictions on the training set used to re-scale the
        predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
@@ -132,7 +133,7 @@ def fast_predict(
        from ``modeler``. If ``None``, no such attribute exists, and
        ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
-    train_predictions_sd : float, optional
+    train_predictions_sd : Optional[float]
        The standard deviation of the predictions on the training set used to
        re-scale the predictions. May be read from the "postprocessing_params.csv"
        file under the "output" directory of the RSMTool experiment used to train
@@ -140,7 +141,7 @@ def fast_predict(
        ``modeler``. If ``None`` and no such attribute exists, predictions will
        not be scaled.
        Defaults to ``None``.
-    h1_mean : float, optional
+    h1_mean : Optional[float]
        The mean of the human scores in the training set also used to re-scale
        the predictions. May be read from the "postprocessing_params.csv" file
        under the "output" directory of the RSMTool experiment used to train
@@ -148,7 +149,7 @@ def fast_predict(
        ``modeler``. If ``None``, no such attribute exists, and
        ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
-    h1_sd : float, optional
+    h1_sd : Optional[float]
        The standard deviation of the human scores in the training set used to
        re-scale the predictions. May be read from the "postprocessing_params.csv"
        file under the "output" directory of the RSMTool experiment used to train
@@ -156,7 +157,7 @@ def fast_predict(
        ``modeler``. If ``None``, no such attribute exists, and
        ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
-    logger : logging object, optional
+    logger : Optional[logging.Logger]
         A logging object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
 
