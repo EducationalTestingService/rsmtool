@@ -7,6 +7,7 @@ Convert older feature files in JSON to CSV/TSV/XLS/XLSX.
 
 :organization: ETS
 """
+
 import argparse
 import json
 import os
@@ -15,7 +16,7 @@ from os.path import splitext
 import pandas as pd
 
 
-def convert_feature_json_file(json_file, output_file, delete=False):
+def convert_feature_json_file(json_file: str, output_file: str, delete=False) -> None:
     """
     Convert given feature JSON file into tabular format.
 
@@ -27,7 +28,7 @@ def convert_feature_json_file(json_file, output_file, delete=False):
         Path to feature JSON file to be converted.
     output_file : str
         Path to CSV/TSV/XLSX output file.
-    delete : bool, optional
+    delete : bool
         Whether to delete the original file after conversion.
         Defaults to ``False``.
 
@@ -66,7 +67,8 @@ def convert_feature_json_file(json_file, output_file, delete=False):
         os.unlink(json_file)
 
 
-def main():  # noqa: D103
+def main() -> None:
+    """Entry point for the ``convert_feature_json`` command line utility."""
     parser = argparse.ArgumentParser(prog="convert_feature_json")
     parser.add_argument("json_file", help="The feature JSON file to convert " "to tabular format.")
     parser.add_argument(
