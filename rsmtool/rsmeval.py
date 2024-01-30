@@ -34,7 +34,7 @@ from .writer import DataWriter
 def run_evaluation(
     config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
     output_dir: str,
-    overwrite_output=False,
+    overwrite_output: bool = False,
     logger: Optional[logging.Logger] = None,
     wandb_run: Optional[Run] = None,
 ) -> None:

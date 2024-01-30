@@ -69,7 +69,7 @@ FINAL_MODEL_SECTION_LIST = [
 def run_cross_validation(
     config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path],
     output_dir: str,
-    silence_tqdm=False,
+    silence_tqdm: bool = False,
     wandb_run: Optional[Run] = None,
 ) -> None:
     """
