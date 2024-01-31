@@ -20,6 +20,7 @@ from copy import copy, deepcopy
 from os import getcwd
 from os.path import abspath
 from pathlib import Path
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 from sklearn.metrics import get_scorer_names
 from skll.learner import Learner
@@ -36,7 +37,9 @@ from .utils.files import parse_json_with_comments
 from .utils.models import is_skll_model
 
 
-def configure(context, config_file_or_obj_or_dict):
+def configure(
+    context: str, config_file_or_obj_or_dict: Union[str, "Configuration", Dict[str, Any], Path]
+) -> "Configuration":
     """
     Create a Configuration object.
 
@@ -49,7 +52,7 @@ def configure(context, config_file_or_obj_or_dict):
         The context that is being configured. Must be one of
         "rsmtool", "rsmeval", "rsmcompare", "rsmsummarize",
         "rsmpredict", or "rsmxval".
-    config_file_or_obj_or_dict : str or pathlib.Path or dict or Configuration
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either a a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -114,7 +117,14 @@ class Configuration:
     access these parameters.
     """
 
-    def __init__(self, configdict, *, configdir=None, context="rsmtool", logger=None):
+    def __init__(
+        self,
+        configdict: Dict[str, Any],
+        *,
+        configdir: Optional[Union[str, Path]] = None,
+        context: str = "rsmtool",
+        logger: Optional[logging.Logger] = None,
+    ):
         """
         Create an object of the `Configuration` class.
 
@@ -123,11 +133,11 @@ class Configuration:
 
         Parameters
         ----------
-        configdict : dict
+        configdict : Dict[str, Any]
             A dictionary of configuration parameters.
             The dictionary must be a valid configuration dictionary
             with default values filled as necessary.
-        configdir : str, optional, keyword-only
+        configdir : Optional[Union[str, Path]]
             The reference path used to resolve any relative paths
             in the configuration object. When ``None``, will be set during
             initialization to the current working directory.
@@ -136,7 +146,7 @@ class Configuration:
             The context of the tool. One of {"rsmtool", "rsmeval", "rsmcompare",
             "rsmpredict", "rsmsummarize"}.
             Defaults to "rsmtool".
-        logger : logging object, optional
+        logger : Optional[logging.Logger]
             A Logger object. If ``None`` is passed, get logger from ``__name__``.
             Defaults to ``None``.
         """
@@ -150,18 +160,18 @@ class Configuration:
         configdict = ConfigurationParser.process_config(configdict)
         configdict = ConfigurationParser.validate_config(configdict, context=context)
 
-        # set configdir to `cwd` if not given and let the user know
+        # set final config dir to `cwd` if not given and let the user know
         if configdir is None:
-            configdir = Path(getcwd())
-            self.logger.info(f"Configuration directory will be set to {configdir}")
+            final_configdir = Path(getcwd())
+            self.logger.info(f"Configuration directory will be set to {final_configdir}")
         else:
-            configdir = Path(configdir).resolve()
+            final_configdir = Path(configdir).resolve()
 
         self._config = configdict
-        self._configdir = configdir
+        self._configdir = final_configdir
         self._context = context
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         """
         Check if the configuration object contains a given key.
 
@@ -177,7 +187,7 @@ class Configuration:
         """
         return key in self._config
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         """
         Get configuration value for the given key.
 
@@ -193,7 +203,7 @@ class Configuration:
         """
         return self._config[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         """
         Set configuration value for the given key.
 
@@ -206,7 +216,7 @@ class Configuration:
         """
         self._config[key] = value
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Return the size of the configuration dictionary.
 
@@ -217,7 +227,7 @@ class Configuration:
         """
         return len(self._config)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return string representation of the configuration dictionary.
 
@@ -236,7 +246,7 @@ class Configuration:
         output_config = {k: v for k, v in self._config.items() if k in expected_fields}
         return json.dumps(output_config, indent=4, separators=(",", ": "))
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[str, None, None]:
         """
         Iterate through configuration object keys.
 
@@ -249,7 +259,7 @@ class Configuration:
             yield key
 
     @property
-    def configdir(self):
+    def configdir(self) -> str:
         """
         Get the path to configuration directory.
 
@@ -265,7 +275,7 @@ class Configuration:
         return str(self._configdir)
 
     @configdir.setter
-    def configdir(self, new_path):
+    def configdir(self, new_path: str) -> None:
         """
         Set a new configuration reference directory.
 
@@ -284,12 +294,12 @@ class Configuration:
         self._configdir = Path(abspath(new_path))
 
     @property
-    def context(self):
+    def context(self) -> str:
         """Get the context."""
         return self._context
 
     @context.setter
-    def context(self, new_context):
+    def context(self, new_context: str) -> None:
         """
         Set a new context.
 
@@ -300,7 +310,7 @@ class Configuration:
         """
         self._context = new_context
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Any = None) -> Any:
         """
         Get value or default for the given key.
 
@@ -308,7 +318,7 @@ class Configuration:
         ----------
         key : str
             Key to check in the Configuration object.
-        default, optional
+        default : Any
             The default value to return, if no key exists.
             Defaults to ``None``.
 
@@ -319,29 +329,29 @@ class Configuration:
         """
         return self._config.get(key, default)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Any]:
         """
         Get a dictionary representation of the configuration object.
 
         Returns
         -------
-        config : dict
+        config : Dict[str, Any]
             The configuration dictionary.
         """
         return self._config
 
-    def keys(self):
+    def keys(self) -> List[str]:
         """
         Return keys as a list.
 
         Returns
         -------
-        keys : list of str
+        keys : List[str]
             A list of keys in the configuration object.
         """
         return [k for k in self._config.keys()]
 
-    def values(self):
+    def values(self) -> List[Any]:
         """
         Return configuration values as a list.
 
@@ -352,19 +362,18 @@ class Configuration:
         """
         return [v for v in self._config.values()]
 
-    def items(self):
+    def items(self) -> List[Tuple[str, Any]]:
         """
         Return configuration items as a list of tuples.
 
         Returns
         -------
-        items : list of tuples
-            A list of (key, value) tuples in the
-            configuration object.
+        items : List[Tuple[str, Any]]
+            A list of (key, value) tuples in the configuration object.
         """
         return [(k, v) for k, v in self._config.items()]
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=None) -> Any:
         """
         Remove and return an element from the object having the given key.
 
@@ -372,24 +381,24 @@ class Configuration:
         ----------
         key : str
             Key to pop in the configuration object.
-        default, optional
+        default: Any
             The default value to return, if no key exists.
             Defaults to ``None``.
 
         Returns
         -------
-        value
+        value : Any
             The value removed from the object.
         """
         return self._config.pop(key, default)
 
-    def copy(self, deep=True):
+    def copy(self, deep: bool = True) -> "Configuration":
         """
         Return a copy of the object.
 
         Parameters
         ----------
-        deep : bool, optional
+        deep : bool
             Whether to perform a deep copy.
             Defaults to ``True``.
 
@@ -402,34 +411,33 @@ class Configuration:
             return deepcopy(self)
         return copy(self)
 
-    def save(self, output_dir=None):
+    def save(self, output_dir: Optional[str] = None) -> None:
         """
         Save the configuration file to the output directory specified.
 
         Parameters
         ----------
-        output_dir : str
-            The path to the output directory. If ``None``, the current
-            directory is used.
+        output_dir : Optional[str]
+            The path to the output directory. If ``None``, the current directory
+            is used.
             Defaults to ``None``.
         """
-        # save a copy of the main config into the output directory
-        if output_dir is None:
-            output_dir = Path(getcwd())
+        # use the current working directory if no output directory is specified
+        final_output_dir = Path(output_dir).resolve() if output_dir else Path(getcwd())
 
-        # Create output directory, if it does not exist
-        output_dir = Path(output_dir).resolve() / "output"
-        output_dir.mkdir(parents=True, exist_ok=True)
+        # Create sub-directory for the output files, if it does not exist
+        output_files_dir = Path(final_output_dir).resolve() / "output"
+        output_files_dir.mkdir(parents=True, exist_ok=True)
 
         id_field = ID_FIELDS[self._context]
         experiment_id = self._config[id_field]
         context = self._context
-        outjson = output_dir / f"{experiment_id}_{context}.json"
+        outjson = output_files_dir / f"{experiment_id}_{context}.json"
 
         with outjson.open(mode="w") as outfile:
             outfile.write(str(self))
 
-    def check_exclude_listwise(self):
+    def check_exclude_listwise(self) -> bool:
         """
         Check for candidate exclusion.
 
@@ -446,7 +454,9 @@ class Configuration:
             exclude_listwise = True
         return exclude_listwise
 
-    def check_flag_column(self, flag_column="flag_column", partition="unknown"):
+    def check_flag_column(
+        self, flag_column: str = "flag_column", partition: str = "unknown"
+    ) -> Dict[str, List[str]]:
         """
         Make sure the column name in ``flag_column`` is correctly specified.
 
@@ -469,8 +479,7 @@ class Configuration:
         Returns
         -------
         new_filtering_dict : dict
-            Properly formatted dictionary for the column
-            name in ``flag_column``.
+            Properly formatted dictionary for the column name in ``flag_column``.
 
         Raises
         ------
@@ -540,7 +549,7 @@ class Configuration:
                     )
         return new_filter_dict
 
-    def get_trim_min_max_tolerance(self):
+    def get_trim_min_max_tolerance(self) -> Tuple[float, float, float]:
         """
         Get trim min, trim max, and tolerance values.
 
@@ -570,7 +579,7 @@ class Configuration:
             spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
-    def get_rater_error_variance(self):
+    def get_rater_error_variance(self) -> float:
         """
         Get specified rater error variance, if any, and make sure it's numeric.
 
@@ -588,13 +597,13 @@ class Configuration:
 
         return rater_error_variance
 
-    def get_default_converter(self):
+    def get_default_converter(self) -> Dict[str, Any]:
         """
         Get default converter dictionary for data reader.
 
         Returns
         -------
-        default_converter : dict
+        default_converter : Dict[str, Any]
             The default converter for a train or test file.
         """
         string_columns = [self._config["id_column"]]
@@ -609,24 +618,26 @@ class Configuration:
 
         return dict([(column, str) for column in string_columns if column])
 
-    def get_names_and_paths(self, keys, names):
+    def get_names_and_paths(self, keys: List[str], names: List[str]) -> Tuple[List[str], List[str]]:
         """
-        Get a list of values for the given keys.
+        Get values (paths) for the given keys and names.
 
-        Remove any values that are ``None``.
+        This method is mainly used to retrieve values that are paths and
+        it skips any values that are ``None``.
 
         Parameters
         ----------
-        keys : list
+        keys : List[str]
             A list of keys whose values to retrieve.
-        names : list
-            The default value to use if key cannot be found.
-            Defaults to ``None``.
+        names : List[str]
+            The names corresponding to the keys.
 
         Returns
         -------
-        values : list
-            The list of values.
+        existing_names : List[str]
+            The names for values that were not ``None``.
+        existing_paths : List[str]
+            The paths (values) for the given keys (that were not ``None``.
 
         Raises
         ------
@@ -654,8 +665,7 @@ class Configuration:
         for idx, key in enumerate(keys):
             path = self._config.get(key)
 
-            # if the `features` field is a list,
-            # do not include it in the container
+            # if the `features` field is a list, do not include it in the container
             if key == "features":
                 if isinstance(path, list):
                     continue
@@ -673,17 +683,17 @@ class ConfigurationParser:
     # initialize class logger attribute to None
     logger = None
 
-    def __init__(self, pathlike, logger=None):
+    def __init__(self, pathlike: Union[str, Path], logger: Optional[logging.Logger] = None):
         """
         Instantiate a ``ConfigurationParser`` for a given config file path.
 
         Parameters
         ----------
-        pathlike : str or pathlib.Path
+        pathlike : Union[str, Path]
             A string containing the path to the configuration file
             that is to be parsed. A ``pathlib.Path`` instance is also
             acceptable.
-        logger : logging.Logger object, optional
+        logger : Optional[logging.Logger]
             Custom logger object to use, if not ``None``. Otherwise
             a new logger is created.
             Defaults to ``None``.
@@ -726,12 +736,12 @@ class ConfigurationParser:
         self.__class__.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
-    def _fix_json(json_string):
+    def _fix_json(json_string: str) -> str:
         """
-        Fix the configuration JSON.
+        Fix potential issues in configuration JSON.
 
-        Take a bit of JSON that might have bad quotes
-        or capitalized booleans and fixes that stuff.
+        Take a JSON string that might have bad quotes or capitalized booleans
+        and fix such issues so that the JSON can be parsed.
 
         Parameters
         ----------
@@ -748,7 +758,7 @@ class ConfigurationParser:
         json_string = json_string.replace("'", '"')
         return json_string
 
-    def _parse_json_file(self, filepath):
+    def _parse_json_file(self, filepath: Path) -> Dict[str, Any]:
         """
         Parse the configuration JSON.
 
@@ -757,13 +767,12 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        filepath : pathlib.Path
-            A ``pathlib.Path`` object containing the JSON configuration
-            filepath.
+        filepath : Path
+            A ``pathlib.Path`` object containing the JSON configuration filepath.
 
         Returns
         -------
-        configdict : dict
+        configdict : Dict[str, Any]
             A Python dictionary containing the parameters from the
             JSON configuration file.
 
@@ -784,7 +793,7 @@ class ConfigurationParser:
 
         return configdict
 
-    def parse(self, context="rsmtool"):
+    def parse(self, context: str = "rsmtool") -> Configuration:
         """
         Parse configuration file.
 
@@ -793,10 +802,10 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        context : str, optional
+        context : str
             Context of the tool in which we are validating. One of:
             {"rsmtool", "rsmeval", "rsmpredict", "rsmcompare",
-            "rsmsummarize", "rsmxval"}.
+            "rsmsummarize", "rsmxval", "rsmexplain"}.
             Defaults to "rsmtool".
 
         Returns
@@ -814,9 +823,9 @@ class ConfigurationParser:
         return Configuration(configdict, configdir=self._configdir, context=context)
 
     @classmethod
-    def validate_config(cls, config, context="rsmtool"):
+    def validate_config(cls, config: Dict[str, Any], context: str = "rsmtool") -> Dict[str, Any]:
         """
-        Validate configuration file.
+        Validate the given configuration dictionary.
 
         Ensure that all required fields are specified, add default values
         values for all unspecified fields, and ensure that all specified
@@ -824,25 +833,26 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        context : str, optional
+        config : Dict[str, Any]
+            Given configuration dictionary to be validated.
+        context : str
             Context of the tool in which we are validating.
             One of {"rsmtool", "rsmeval", "rsmpredict",
             "rsmcompare", "rsmsummarize"}.
             Defaults to "rsmtool".
-        inplace : bool
-            Maintain the state of the config object produced by
-            this method.
-            Defaults to ``True``.
 
         Returns
         -------
-        config_obj : Configuration
-            A configuration object
+        new_config : Dict[str, Any]
+            A copy of the given configuration dictionary with all required
+            fields specified and with the default values for unspecified
+            fields.
 
         Raises
         ------
         ValueError
-            If config does not exist, and no config passed.
+            If the Configuration object does not contain all required fields,
+            has any unrecognized fields, or has any fields with invalid values.
         """
         # make a copy of the given parameter dictionary
         new_config = deepcopy(config)
@@ -1035,9 +1045,9 @@ class ConfigurationParser:
         return new_config
 
     @classmethod
-    def process_config(cls, config):
+    def process_config(cls, config: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Process configuration file.
+        Process the given configuration dictionary.
 
         Converts fields which are read in as string to the
         appropriate format. Fields which can take multiple
@@ -1046,15 +1056,14 @@ class ConfigurationParser:
 
         Parameters
         ----------
-        inplace : bool
-            Maintain the state of the config object produced by
-            this method.
-            Defaults to ``True``.
+        config : Dict[str, Any]
+            Given Configuration dictionary to be processed.
 
         Returns
         -------
-        config_obj : Configuration
-            A configuration object
+        new_config : Dict[str, Any]
+            A copy of the given configuration dictionary with all
+            fields converted to the appropriate format.
 
         Raises
         ------
