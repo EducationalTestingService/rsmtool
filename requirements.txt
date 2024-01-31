@@ -13,6 +13,7 @@ skll==4.0.1
 sphinx
 sphinx-design
 sphinx_rtd_theme
+sphinx-autodoc-typehints
 statsmodels
 tqdm
 wandb
