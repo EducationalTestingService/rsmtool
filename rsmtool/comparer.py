@@ -12,6 +12,7 @@ import warnings
 from collections import defaultdict
 from copy import deepcopy
 from os.path import exists, join
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -87,8 +88,11 @@ class Comparer:
 
     @staticmethod
     def _modify_eval_columns_to_ensure_version_compatibilty(
-        df, rename_dict, existing_eval_cols, short_metrics_list, raise_warnings=True
-    ):
+        df: pd.DataFrame,
+        rename_dict: Dict[str, str],
+        existing_eval_cols: List[str],
+        short_metrics_list: List[str],
+    ) -> Tuple[Dict[str, str], List[str], List[str], str]:
         """
         Ensure that column names in eval data frames are backwards compatible.
 
@@ -101,17 +105,14 @@ class Comparer:
 
         Parameters
         ----------
-        df : pandas Data Frame
+        df : pandas.DataFrame
             The evaluation data frame.
-        rename_dict : dict
+        rename_dict : Dict[str, str]
             The rename dictionary.
-        existing_eval_cols : list
+        existing_eval_cols : List[str]
             The existing evaluation columns.
-        short_metrics_list : list
+        short_metrics_list : List[str]
             The list of columns for the short metrics file.
-        raise_warnings : bool, optional
-            Whether to raise warnings.
-            Defaults to ``True``.
 
         Returns
         -------
@@ -161,24 +162,23 @@ class Comparer:
         )
 
     @staticmethod
-    def make_summary_stat_df(df):
+    def make_summary_stat_df(df: pd.DataFrame) -> pd.DataFrame:
         """
         Compute summary statistics for the data in the given frame.
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Data frame containing numeric data.
 
         Returns
         -------
-        res : pandas DataFrame
+        res : pandas.DataFrame
             Data frame containing summary statistics for data
             in the input frame.
         """
         series = []
         for summary_func in [np.mean, np.std, np.median, np.min, np.max]:
-
             # apply function, but catch and ignore warnings
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
@@ -190,8 +190,11 @@ class Comparer:
 
     @staticmethod
     def compute_correlations_between_versions(
-        df_old, df_new, human_score="sc1", id_column="spkitemid"
-    ):
+        df_old: pd.DataFrame,
+        df_new: pd.DataFrame,
+        human_score: str = "sc1",
+        id_column: str = "spkitemid",
+    ) -> pd.DataFrame:
         """
         Compute correlations between old and new feature values.
 
@@ -201,16 +204,18 @@ class Comparer:
 
         Parameters
         ----------
-        df_old : pandas DataFrame
+        df_old : pandas.DataFrame
             Data frame with feature values for the 'old' model.
-        df_new : pandas DataFrame
+        df_new : pandas.DataFrame
             Data frame with feature values for the 'new' model.
-        human_score : str, optional
-            Name of the column containing human score. Defaults to "sc1".
-            Must be the same for both data sets.
-        id_column : str, optional
-            Name of the column containing id for each response. Defaults to
-            "spkitemid". Must be the same for both data sets.
+        human_score : str
+            Name of the column containing human score. Must be the same for both
+            data sets.
+            Defaults to ``"sc1"``.
+        id_column : str
+            Name of the column containing id for each response. Must be the same
+            for both data sets.
+            Defaults to ``"spkitemid"``.
 
         Returns
         -------
@@ -269,7 +274,6 @@ class Comparer:
         # we are using the same approach as used in analysis.py
         correlation_list = []
         for feature in features:
-
             # compute correlations
             df_cor = pd.DataFrame(
                 {
@@ -295,27 +299,29 @@ class Comparer:
         return df_correlations
 
     @staticmethod
-    def process_confusion_matrix(conf_matrix):
+    def process_confusion_matrix(conf_matrix: pd.DataFrame) -> pd.DataFrame:
         """
         Add "human" and "machine" to column names in the confusion matrix.
 
         Parameters
         ----------
-        conf_matrix : pandas DataFrame
+        conf_matrix : pandas.DataFrame
             data frame containing the confusion matrix.
 
         Returns
         -------
-        conf_matrix_renamed : pandas DataFrame
-            pandas Data Frame containing the confusion matrix
-            with the columns renamed.
+        conf_matrix_renamed : pandas.DataFrame
+            pandas Data Frame containing the confusion matrix with the columns
+            renamed.
         """
         conf_matrix_renamed = conf_matrix.copy()
         conf_matrix_renamed.index = [f"machine {n}" for n in conf_matrix.index]
         conf_matrix_renamed.columns = [f"human {x}" for x in conf_matrix.columns]
         return conf_matrix_renamed
 
-    def load_rsmtool_output(self, filedir, figdir, experiment_id, prefix, groups_eval):
+    def load_rsmtool_output(
+        self, filedir: str, figdir: str, experiment_id: str, prefix: str, groups_eval: List[str]
+    ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, str], str]:
         """
         Load all of the outputs of an rsmtool experiment.
 
@@ -331,23 +337,26 @@ class Comparer:
         experiment_id : str
             Original ``experiment_id`` used to generate the output files.
         prefix: str
-            Must be set to ``scale`` or ``raw``. Indicates whether the score
+            Must be set to ``"scale"`` or ``"raw"``. Indicates whether the score
             is scaled or not.
         groups_eval: list
             List of subgroup names used for subgroup evaluation.
 
         Returns
         -------
-        files : dict
-            A dictionary with outputs converted to pandas data
-            frames. If a particular type of output did not exist for the
+        files : Dict[str, pd.DataFrame]
+            A dictionary mapping data frame names converted to the actual pandas
+            data frames. If a particular type of output did not exist for the
             experiment, its value will be an empty data frame.
-        figs: dict
-            A dictionary with experiment figures.
+        figs: Dict[str, str]
+            A dictionary mapping figure names to the paths of the files
+            containing the figures.
+        file_format: str
+            The file format used for the output files, e.g., csv, tsv, or xlsx.
         """
         file_format = get_output_directory_extension(filedir, experiment_id)
 
-        files = defaultdict(pd.DataFrame)
+        files: Dict[str, pd.DataFrame] = defaultdict(pd.DataFrame)
         figs = {}
 
         # feature distributions and the inter-feature correlations
@@ -414,9 +423,9 @@ class Comparer:
             if exists(group_dis_corr_file):
                 df_dis_cor_group = DataReader.read_from_file(group_dis_corr_file, index_col=0)
                 files[f"df_disattenuated_correlations_by_{group}"] = df_dis_cor_group
-                files[
-                    f"df_disattenuated_correlations_by_{group}_overview"
-                ] = self.make_summary_stat_df(df_dis_cor_group)
+                files[f"df_disattenuated_correlations_by_{group}_overview"] = (
+                    self.make_summary_stat_df(df_dis_cor_group)
+                )
 
         # true score evaluations
         true_score_eval_file = join(filedir, f"{experiment_id}_true_score_eval.{file_format}")
@@ -483,7 +492,6 @@ class Comparer:
                     rename_dict,
                     existing_eval_cols,
                     short_metrics_list,
-                    raise_warnings=False,
                 )
 
                 df_eval = df_eval[existing_eval_cols_new]
