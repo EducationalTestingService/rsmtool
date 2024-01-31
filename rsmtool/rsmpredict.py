@@ -160,7 +160,7 @@ def fast_predict(
        ``scale=True``, a ``ValueError`` will be raised.
        Defaults to ``None``.
     logger : Optional[logging.Logger]
-        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
 
     Returns
@@ -331,7 +331,7 @@ def compute_and_save_predictions(
     feats_file : Optional[str]
         Path to the output file for saving preprocessed feature values.
     logger : Optional[logging.Logger]
-        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
     wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.

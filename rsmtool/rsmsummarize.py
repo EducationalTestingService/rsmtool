@@ -130,7 +130,7 @@ def run_summary(
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
     logger : Optional[logging.Logger]
-        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
     wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.
