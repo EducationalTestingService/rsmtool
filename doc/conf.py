@@ -37,12 +37,26 @@ from rsmtool.version import __version__ as version  # isort:skip # noqa
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
+    "sphinx.ext.intersphinx",
     "sphinx_design",
 ]
+
+# link to other projects' documentation
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "skll": ("https://skll.readthedocs.io/en/latest", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+}
+
+# some settings for sphinx_autodoc_typehints
+typehints_use_signature = True
+typehints_use_signature_return = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
