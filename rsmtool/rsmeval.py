@@ -46,7 +46,7 @@ def run_evaluation(
 
     Parameters
     ----------
-    config_file_or_obj_or_dict : Union[str, Path, Dict[str, Any]]
+    config_file_or_obj_or_dict : Union[str, Configuration, Dict[str, Any], Path]
         Path to the experiment configuration file either a string
         or as a ``pathlib.Path`` object. Users can also pass a
         ``Configuration`` object that is in memory or a Python dictionary
@@ -62,7 +62,7 @@ def run_evaluation(
         If ``True``, overwrite any existing output under ``output_dir``.
         Defaults to ``False``.
     logger : Optional[logging.Logger]
-        A logging object. If ``None`` is passed, get logger from ``__name__``.
+        A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
     wandb_run : Optional[Run]
         A wandb run object that will be used to log artifacts and tables.

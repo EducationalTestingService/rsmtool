@@ -137,7 +137,7 @@ class Configuration:
             "rsmpredict", "rsmsummarize"}.
             Defaults to "rsmtool".
         logger : logging object, optional
-            A logging object. If ``None`` is passed, get logger from ``__name__``.
+            A Logger object. If ``None`` is passed, get logger from ``__name__``.
             Defaults to ``None``.
         """
         if not isinstance(configdict, dict):
