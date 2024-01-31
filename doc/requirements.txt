@@ -5,5 +5,6 @@ skll==4.0.1
 sphinx
 sphinx_rtd_theme
 sphinx-design
+sphinx-autodoc-typehints
 statsmodels
 wandb
