@@ -11,6 +11,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 import logging
 import warnings
 from functools import partial
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -18,8 +19,10 @@ from scipy.stats import kurtosis, pearsonr
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
+from wandb.wandb_run import Run
 
-from .container import DataContainer
+from .configuration_parser import Configuration
+from .container import DataContainer, DatasetDict
 from .utils import wandb
 from .utils.metrics import (
     agreement,
@@ -34,12 +37,12 @@ from .utils.prmse import get_true_score_evaluations
 class Analyzer:
     """Class to perform analysis on all metrics, predictions, etc."""
 
-    def __init__(self, logger=None):
+    def __init__(self, logger: Optional[logging.Logger] = None):
         """Initialize the Analyzer object."""
         self.logger = logger if logger else logging.getLogger(__name__)
 
     @staticmethod
-    def check_frame_names(data_container, dataframe_names):
+    def check_frame_names(data_container: DataContainer, dataframe_names: List[str]) -> None:
         """
         Check that all specified dataframes are available.
 
@@ -48,9 +51,9 @@ class Analyzer:
 
         Parameters
         ----------
-        data_container : container.DataContainer
+        data_container : rsmtool.container.DataContainer
             A DataContainer object
-        dataframe_names : list of str
+        dataframe_names : List[str]
             The names of the DataFrames expected in the
             DataContainer object.
 
@@ -67,7 +70,7 @@ class Analyzer:
                 )
 
     @staticmethod
-    def check_param_names(configuration_obj, parameter_names):
+    def check_param_names(configuration_obj: Configuration, parameter_names: List[str]) -> None:
         """
         Check that all specified parameters are available.
 
@@ -76,9 +79,9 @@ class Analyzer:
 
         Parameters
         ----------
-        configuration_obj : configuration_parser.Configuration
+        configuration_obj : Configuration
             A configuration object
-        parameter_names : list of str
+        parameter_names : List[str]
             The names of the parameters (keys) expected in the
             Configuration object.
 
@@ -96,8 +99,12 @@ class Analyzer:
 
     @staticmethod
     def analyze_excluded_responses(
-        df, features, header, exclude_zero_scores=True, exclude_listwise=False
-    ):
+        df: pd.DataFrame,
+        features: List[str],
+        header: str,
+        exclude_zero_scores: bool = True,
+        exclude_listwise: bool = False,
+    ) -> pd.DataFrame:
         """
         Compute statistics for responses excluded from analyses.
 
@@ -107,28 +114,26 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Data frame containing the excluded responses
-        features : list of str
-            List of column names containing the features
-            to which we want to restrict the analyses.
+        features : List[str]
+            List of column names containing the features to which we want to
+            restrict the analyses.
         header : str
-            String to be used as the table header for the
-            output data frame.
-        exclude_zero_scores : bool, optional
-            Whether or not the zero-score responses
-            should be counted in the exclusion statistics.
+            String to be used as the table header for the output data frame.
+        exclude_zero_scores : bool
+            Whether or not the zero-score responses should be counted in the
+            exclusion statistics.
             Defaults to ``True``.
-        exclude_listwise : bool, optional
-            Whether or not the candidates were excluded
-            based on minimal number of responses.
+        exclude_listwise : bool
+            Whether or not the candidates were excluded based on minimal number
+            of responses.
             Defaults to ``False``.
 
         Returns
         -------
-        df_full_crosstab : pandas DataFrame
-            Two-dimensional data frame containing the
-            exclusion statistics.
+        df_full_crosstab : pandas.DataFrame
+            Two-dimensional data frame containing the exclusion statistics.
         """
         # create an empty output data frame
         df_full_crosstab = pd.DataFrame(
@@ -155,9 +160,9 @@ class Analyzer:
             null_feature_rows = df_features_only.isnull().any(axis=1)
             df_null_features = df_features_only[null_feature_rows]
             df["feat_category"] = "all features numeric"
-            df.loc[
-                df["spkitemid"].isin(df_null_features["spkitemid"]), "feat_category"
-            ] = "non-numeric feature values"
+            df.loc[df["spkitemid"].isin(df_null_features["spkitemid"]), "feat_category"] = (
+                "non-numeric feature values"
+            )
 
             # crosstabulate
             df_crosstab = pd.crosstab(df["score_category"], df["feat_category"])
@@ -181,7 +186,9 @@ class Analyzer:
         return df_full_crosstab
 
     @staticmethod
-    def analyze_used_responses(df_train, df_test, subgroups, candidate_column):
+    def analyze_used_responses(
+        df_train: pd.DataFrame, df_test: pd.DataFrame, subgroups: List[str], candidate_column: str
+    ) -> pd.DataFrame:
         """
         Compute statistics for responses used in analyses.
 
@@ -191,24 +198,19 @@ class Analyzer:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the response information
-            for the training set.
-        df_test : pandas DataFrame
-            Data frame containing the response information
-            for the test set.
-        subgroups : list of str
-            List of column names that contain grouping
-            information.
+        df_train : pandas.DataFrame
+            Data frame containing the response information for the training set.
+        df_test : pandas.DataFrame
+            Data frame containing the response information for the test set.
+        subgroups : List[str]
+            List of column names that contain grouping information.
         candidate_column : str
-            Column name that contains candidate
-            identification information.
+            Column name that contains candidate identification information.
 
         Returns
         -------
-        df_analysis : pandas DataFrame
-            Data frame containing information about the used
-            responses.
+        df_analysis : pandas.DataFrame
+            Data frame containing information about the used responses.
         """
         # create a basic data frame for responses only
         train_responses = set(df_train["spkitemid"])
@@ -254,26 +256,25 @@ class Analyzer:
         return df_analysis
 
     @staticmethod
-    def analyze_used_predictions(df_test, subgroups, candidate_column):
+    def analyze_used_predictions(
+        df_test: pd.DataFrame, subgroups: List[str], candidate_column: str
+    ) -> pd.DataFrame:
         """
         Compute various statistics for predictions used in analyses.
 
         Parameters
         ----------
-        df_test : pandas DataFrame
+        df_test : pandas.DataFrame
             Data frame containing the test set predictions.
-        subgroups : list of str
-            List of column names that contain grouping
-            information.
+        subgroups : List[str]
+            List of column names that contain grouping information.
         candidate_column : str
-            Column name that contains candidate
-            identification information.
+            Column name that contains candidate identification information.
 
         Returns
         -------
-        df_analysis : pandas DataFrame
-            Data frame containing information about the used
-            predictions.
+        df_analysis : pandas.DataFrame
+            Data frame containing information about the used predictions.
         """
         rows = [{"partition": "Evaluation", "responses": df_test["spkitemid"].size}]
 
@@ -291,23 +292,21 @@ class Analyzer:
         return df_analysis
 
     @staticmethod
-    def compute_basic_descriptives(df, selected_features):
+    def compute_basic_descriptives(df: pd.DataFrame, selected_features: List[str]) -> pd.DataFrame:
         """
         Compute basic descriptive statistics for columns in the given data frame.
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame containing the feature values.
-        selected_features : list of str
-            List of feature names for which to compute
-            the descriptives.
+        selected_features : List[str]
+            List of feature names for which to compute the descriptives.
 
         Returns
         -------
-        df_desc : pandas DataFrame
-            DataFrame containing the descriptives for
-            each of the features.
+        df_desc : pandas.DataFrame
+            DataFrame containing the descriptives for each of the features.
         """
         # select only feature columns
         df_desc = df[selected_features]
@@ -353,27 +352,27 @@ class Analyzer:
         return df_output
 
     @staticmethod
-    def compute_percentiles(df, selected_features, percentiles=None):
+    def compute_percentiles(
+        df: pd.DataFrame, selected_features: List[str], percentiles: Optional[List[int]] = None
+    ) -> pd.DataFrame:
         """
         Compute percentiles and outliers for columns in the given data frame.
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame containing the feature values.
-        selected_features : list of str
-            List of feature names for which to compute the
-            percentile descriptives.
-        percentiles : list of ints, optional
+        selected_features : List[str]
+            List of feature names for which to compute the percentile descriptives.
+        percentiles : Optional[List[int]
             The percentiles to calculate. If ``None``, use the percentiles
             {1, 5, 25, 50, 75, 95, 99}.
             Defaults to ``None``.
 
         Returns
         -------
-        df_output : pandas DataFrame
-            Data frame containing the percentile information
-            for each of the features.
+        df_output : pandas.DataFrame
+            Data frame containing the percentile information for each of the features.
         """
         # select only feature columns
         df_desc = df[selected_features]
@@ -418,7 +417,7 @@ class Analyzer:
         return df_output
 
     @staticmethod
-    def compute_outliers(df, selected_features):
+    def compute_outliers(df: pd.DataFrame, selected_features: List[str]) -> pd.DataFrame:
         """
         Compute number and percentage of outliers for given columns.
 
@@ -428,17 +427,15 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame containing the feature values.
-        selected_features : list of str
-            List of feature names for which to compute
-            outlier information.
+        selected_features : List[str]
+            List of feature names for which to compute outlier information.
 
         Returns
         -------
-        df_output : pandas DataFrame
-            Data frame containing outlier information
-            for each of the features.
+        df_output : pandas.DataFrame
+            Data frame containing outlier information for each of the features.
         """
         # select only feature columns
         df_desc = df[selected_features]
@@ -472,7 +469,9 @@ class Analyzer:
         return df_output
 
     @staticmethod
-    def compute_pca(df, selected_features):
+    def compute_pca(
+        df: pd.DataFrame, selected_features: List[str]
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Compute PCA decomposition of the given features.
 
@@ -482,17 +481,16 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame containing feature values.
-        selected_features : list of str
-            List of feature names to be used in the
-            PCA decomposition.
+        selected_features : List[str]
+            List of feature names to be used in the PCA decomposition.
 
         Returns
         -------
-        df_components : pandas DataFrame
+        df_components : pandas.DataFrame
             Data frame containing the PCA components.
-        df_variance : pandas DataFrame
+        df_variance : pandas.DataFrame
             Data frame containing the variance information.
         """
         # restrict to the given features
@@ -510,13 +508,13 @@ class Analyzer:
         df_components = df_components.transpose()
 
         # compute the variance data frame
-        df_variance = {
+        df_variance_dict = {
             "Eigenvalues": pca.explained_variance_,
             "Percentage of variance": pca.explained_variance_ratio_,
             "Cumulative percentage of " "variance": np.cumsum(pca.explained_variance_ratio_),
         }
 
-        df_variance = pd.DataFrame(df_variance)
+        df_variance = pd.DataFrame(df_variance_dict)
 
         # reorder the columns
         df_variance = df_variance[
@@ -534,7 +532,9 @@ class Analyzer:
         return df_components, df_variance
 
     @staticmethod
-    def correlation_helper(df, target_variable, grouping_variable, include_length=False):
+    def correlation_helper(
+        df: pd.DataFrame, target_variable: str, grouping_variable: str, include_length: bool = False
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Compute marginal and partial correlations for all columns.
 
@@ -547,30 +547,30 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame containing numeric feature values, the numeric
             `target variable` and the `grouping variable`.
         target_variable: str
             The name of the column used as a reference for computing correlations.
         grouping_variable: str
             The name of the column defining groups in the data
-        include_length: bool, optional
+        include_length: bool
             If True compute additional partial correlations of each column
             in the data frame against `target variable` only partialling out
             "length" column.
 
         Returns
         -------
-        df_target_cors : pandas DataFrame
+        df_target_cors : pandas.DataFrame
             Data frame containing Pearson's correlation coefficients for
             marginal correlations between features and `target_variable`.
-        df_target_partcors : pandas DataFrame
+        df_target_partcors : pandas.DataFrame
             Data frame containing Pearson's correlation coefficients for
             partial correlations between each feature and `target_variable`
             after controlling for all other features. If ``include_length`` is
             set to ``True``, the "length" column will not be included in the
             partial correlation computation.
-        df_target_partcors_no_length: pandas DataFrame
+        df_target_partcors_no_length: pandas.DataFrame
             If ``include_length`` is set to ``True``: Data frame containing
             Pearson's correlation coefficients for partial correlations
             between each feature and ``target_variable`` after controlling
@@ -629,25 +629,25 @@ class Analyzer:
 
     @staticmethod
     def metrics_helper(
-        human_scores,
-        system_scores,
-        population_human_score_sd=None,
-        population_system_score_sd=None,
-        population_human_score_mn=None,
-        population_system_score_mn=None,
-        smd_method="unpooled",
-        use_diff_std_means=False,
-    ):
+        human_scores: pd.Series,
+        system_scores: pd.Series,
+        population_human_score_sd: Optional[float] = None,
+        population_system_score_sd: Optional[float] = None,
+        population_human_score_mn: Optional[float] = None,
+        population_system_score_mn: Optional[float] = None,
+        smd_method: str = "unpooled",
+        use_diff_std_means: bool = False,
+    ) -> pd.Series:
         """
         Compute basic association metrics between system and human scores.
 
         Parameters
         ----------
-        human_scores : pandas Series
+        human_scores : pandas.Series
             Series containing numeric human (reference) scores.
-        system_scores: pandas Series
+        system_scores: pandas.Series
             Series containing numeric scores predicted by the model.
-        population_human_score_sd : float, optional
+        population_human_score_sd : Optional[float]
             Reference standard deviation for human scores.
             This must be specified when the function is used to compute
             association metrics for a subset of responses, for example,
@@ -659,7 +659,7 @@ class Analyzer:
             population and ``population_human_score_mn`` must also be specified.
             Otherwise, it is ignored.
             Defaults to ``None``.
-        population_system_score_sd : float, optional
+        population_system_score_sd : Optional[float]
             Reference standard deviation for system scores.
             This must be specified when the function is used to compute
             association metrics for a subset of responses, for example,
@@ -671,7 +671,7 @@ class Analyzer:
             ``population_system_score_mn`` must also be specified. Otherwise,
             it is ignored.
             Defaults to ``None``.
-        population_human_score_mn : float, optional
+        population_human_score_mn : Optional[float]
             Reference mean for human scores. This must be specified when the
             function is used to compute association metrics for a subset of
             responses, for example, responses from a particular demographic
@@ -680,7 +680,7 @@ class Analyzer:
             and  ``population_human_score_sd`` must also be specified.
             Otherwise, it is ignored.
             Defaults to ``None``.
-        population_system_score_mn : float, optional
+        population_system_score_mn : Optional[float]
             Reference mean for system scores. This must be specified when the
             function is used to compute association metrics for a subset of
             responses, for example, responses from a particular demographic
@@ -689,7 +689,7 @@ class Analyzer:
             and ``population_system_score_sd`` must also be specified. Otherwise,
             it is ignored.
             Defaults to ``None``.
-        smd_method : {"williamson", "johnson", "pooled", "unpooled"}, optional
+        smd_method : str
             The SMD method to use, only used if ``use_diff_std_means`` is
             ``False``. All methods have the same numerator
             mean(`y_pred`) - mean(`y_true_observed`) and the following
@@ -706,7 +706,7 @@ class Analyzer:
 
             Defaults to "unpooled".
 
-        use_diff_std_means : bool, optional
+        use_diff_std_means : bool
             Whether to use the difference of standardized means, rather than
             the standardized mean difference. This is most useful with subgroup
             analysis.
@@ -714,7 +714,7 @@ class Analyzer:
 
         Returns
         -------
-        metrics: pandas Series
+        metrics: pandas.Series
             Series containing different evaluation metrics comparing human
             and system scores. The following metrics are included:
 
@@ -832,7 +832,9 @@ class Analyzer:
         return metrics
 
     @staticmethod
-    def compute_disattenuated_correlations(human_system_corr, human_human_corr):
+    def compute_disattenuated_correlations(
+        human_system_corr: pd.Series, human_human_corr: pd.Series
+    ) -> pd.DataFrame:
         """
         Compute disattenuated correlations between human and system scores.
 
@@ -842,10 +844,10 @@ class Analyzer:
 
         Parameters
         ----------
-        human_system_corr : pandas Series
+        human_system_corr : pandas.Series
             Series containing of pearson's correlation coefficients human-system
             correlations.
-        human_human_corr : pandas Series
+        human_human_corr : pandas.Series
             Series containing of pearson's correlation coefficients for human-human
             correlations. This can contain a single value or have the index
             matching that of human-system correlations.
@@ -885,12 +887,12 @@ class Analyzer:
 
     def compute_correlations_by_group(
         self,
-        df,
-        selected_features,
-        target_variable,
-        grouping_variable,
-        include_length=False,
-    ):
+        df: pd.DataFrame,
+        selected_features: List[str],
+        target_variable: str,
+        grouping_variable: str,
+        include_length: bool = False,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Compute marginal and partial correlations against target variable.
 
@@ -900,25 +902,34 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame.
-        selected_features : list of str
-            List of feature names for which to compute
-            the correlations.
+        selected_features : List[str]
+            List of feature names for which to compute the correlations.
         target_variable : str
-            Feature name indicating the target variable i.e., the
-            dependent variable
+            Feature name indicating the target variable i.e., the dependent variable
         grouping_variable : str
             Feature name that contain the grouping information
-        include_length : bool, optional
-            Whether or not to include the length when
-            computing the partial correlations.
+        include_length : bool
+            Whether or not to include the length when computing the partial correlations.
             Defaults to ``False``.
 
         Returns
         -------
-        df_output : pandas DataFrame
-            Data frame containing the correlations.
+        df_target_cors : pandas.DataFrame
+            Data frame containing Pearson's correlation coefficients for
+            marginal correlations between features and `target_variable`.
+        df_target_partcors : pandas.DataFrame
+            Data frame containing Pearson's correlation coefficients for
+            partial correlations between each feature and `target_variable`
+            after controlling for all other features. If ``include_length`` is
+            set to ``True``, the "length" column will not be included in the
+            partial correlation computation.
+        df_target_partcors_no_length: pandas.DataFrame
+            If ``include_length`` is set to ``True``: Data frame containing
+            Pearson's correlation coefficients for partial correlations
+            between each feature and ``target_variable`` after controlling
+            for "length". Otherwise, it will be an empty data frame.
         """
         df_desc = df.copy()
 
@@ -937,16 +948,19 @@ class Analyzer:
         df_desc_combined.reset_index(drop=True, inplace=True)
 
         # compute the various (marginal and partial) correlations with score
-        ret = self.correlation_helper(
+        return self.correlation_helper(
             df_desc_combined,
             target_variable,
             grouping_variable,
             include_length=include_length,
         )
 
-        return ret
-
-    def filter_metrics(self, df_metrics, use_scaled_predictions=False, chosen_metric_dict=None):
+    def filter_metrics(
+        self,
+        df_metrics: pd.DataFrame,
+        use_scaled_predictions: bool = False,
+        chosen_metric_dict: Optional[Dict[str, List[str]]] = None,
+    ) -> pd.DataFrame:
         """
         Filter data frame to retain only the given metrics.
 
@@ -977,21 +991,26 @@ class Analyzer:
 
         Parameters
         ----------
-        df_metrics : pd.DataFrame
+        df_metrics : pandas.DataFrame
             The DataFrame to filter.
-        use_scaled_predictions : bool, optional
+        use_scaled_predictions : bool
             Whether to use scaled predictions.
             Defaults to ``False``.
-        chosen_metric_dict : dict, optional
-            The dictionary to map score types to metrics that should be
-            computer for them.
+        chosen_metric_dict : Optional[Dict[str, List[str]]]
+            The dictionary mapping each score type to the metrics that
+            should be computed for it.
             Defaults to ``None``.
+
+        Returns
+        -------
+        df_filtered_metrics : pandas.DataFrame
+            The filtered DataFrame.
 
         Note
         ----
         The last five metrics will be the `same` for all score types.
-        If ``chosen_metric_dict`` is not specified then, the following default
-        dictionary, containing the recommended metrics, is used::
+        If ``chosen_metric_dict`` is not specified, the following default
+        dictionary with the recommended metrics is used::
 
             {"X_trim": ["N", "h_mean", "h_sd", "sys_mean", "sys_sd", "wtkappa",
                           "corr", "RMSE", "R2", "SMD"],
@@ -1045,15 +1064,15 @@ class Analyzer:
 
     def compute_metrics(
         self,
-        df,
-        compute_shortened=False,
-        use_scaled_predictions=False,
+        df: pd.DataFrame,
+        compute_shortened: bool = False,
+        use_scaled_predictions: bool = False,
         include_second_score=False,
-        population_sd_dict=None,
-        population_mn_dict=None,
-        smd_method="unpooled",
-        use_diff_std_means=False,
-    ):
+        population_sd_dict: Optional[Dict[str, Optional[float]]] = None,
+        population_mn_dict: Optional[Dict[str, Optional[float]]] = None,
+        smd_method: str = "unpooled",
+        use_diff_std_means: bool = False,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Compute association metrics for scores in the given data frame.
 
@@ -1070,28 +1089,31 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame
-        compute_shortened : bool, optional
-            Also compute a shortened version of the full
-            metrics data frame.
+        compute_shortened : bool
+            Also compute a shortened version of the full metrics data frame.
             Defaults to ``False``.
-        use_scaled_predictions : bool, optional
-            Use evaluations based on scaled predictions in
-            the shortened version of the metrics data frame.
+        use_scaled_predictions : bool
+            Use evaluations based on scaled predictions in the shortened version
+            of the metrics data frame.
             Defaults to ``False``.
-        include_second_score : bool, optional
+        include_second_score : bool
             Second human score available.
             Defaults to ``False``.
-        population_sd_dict : dict, optional
-            Dictionary containing population standard deviation for each column containing
-            human or system scores. This is used to compute SMD for subgroups.
+        population_sd_dict : Optional[Dict[str, Optional[float, None]]]
+            Dictionary containing population standard deviation for each column
+            containing human or system scores. This is used to compute SMD for
+            subgroups. If ``None``, a dummy dictionary is created that sets
+            the standard deviation for all columns to ``None``.
             Defaults to ``None``.
-        population_mn_dict : dict, optional
+        population_mn_dict : Optional[Dict[str, Optional[float]]]
             Dictionary containing population mean for each column containing
             human or system scores. This is used to compute SMD for subgroups.
+            If ``None``, a dummy dictionary is created that sets the standard
+            deviation for all columns to ``None``.
             Defaults to ``None``.
-        smd_method : {"williamson", "johnson", pooled", "unpooled"}, optional
+        smd_method : str
             The SMD method to use, only used if ``use_diff_std_means`` is
             ``False``. All methods have the same numerator
             mean(`y_pred`) - mean(`y_true_observed`) and the following
@@ -1108,20 +1130,21 @@ class Analyzer:
 
             Defaults to "unpooled".
 
-        use_diff_std_means : bool, optional
-            Whether to use the difference of standardized means, rather than the standardized mean
-            difference. This is most useful with subgroup analysis.
+        use_diff_std_means : bool
+            Whether to use the difference of standardized means, rather than
+            the standardized mean difference. This is most useful with subgroup
+            analysis.
             Defaults to ``False``.
 
         Returns
         -------
-        df_human_system_eval : pandas DataFrame
+        df_human_system_eval : pandas.DataFrame
             Data frame containing the full set of evaluation
             metrics.
-        df_human_system_eval_filtered : pandas DataFrame
+        df_human_system_eval_filtered : pandas.DataFrame
             Data frame containing the human-human statistics
             but is empty if ``include_second_score`` is ``False``.
-        df_human_human_eval : pandas DataFrame
+        df_human_human_eval : pandas.DataFrame
             A shortened version of the first data frame but
             is empty if ``compute_shortened`` is ``False``.
         """
@@ -1279,11 +1302,11 @@ class Analyzer:
 
     def compute_metrics_by_group(
         self,
-        df_test,
-        grouping_variable,
-        use_scaled_predictions=False,
-        include_second_score=False,
-    ):
+        df_test: pd.DataFrame,
+        grouping_variable: str,
+        use_scaled_predictions: bool = False,
+        include_second_score: bool = False,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Compute a subset of evaluation metrics by subgroups.
 
@@ -1294,28 +1317,25 @@ class Analyzer:
 
         Parameters
         ----------
-        df_test : pandas DataFrame
+        df_test : pandas.DataFrame
             Input data frame.
         grouping_variable : str
-            Feature name indicating the column that
-            contains grouping information.
-        use_scaled_predictions : bool, optional
-            Include scaled predictions when computing
-            the evaluation metrics.
+            Feature name indicating the column that contains grouping information.
+        use_scaled_predictions : bool
+            Include scaled predictions when computing the evaluation metrics.
             Defaults to ``False``.
-        include_second_score : bool, optional
+        include_second_score : bool
             Include human-human association statistics.
             Defaults to ``False``.
 
         Returns
         -------
-        df_human_system_by_group : pandas DataFrame
-            Data frame containing the correlation
-            human-system association statistics.
-        df_human_human_by_group : pandas DataFrame
-            Data frame that either contains the human-human
-            statistics or is an empty data frame, depending
-            on whether ``include_second_score`` is `True``.
+        df_human_system_by_group : pandas.DataFrame
+            Data frame containing the correlation human-system association statistics.
+        df_human_human_by_group : pandas.DataFrame
+            Data frame that either contains the human-human statistics or is
+            an empty data frame, depending on whether ``include_second_score``
+            is `True``.
         """
         # get the population standard deviation that we will need to compute SMD for all columns
         # other than id and subgroup
@@ -1392,7 +1412,9 @@ class Analyzer:
 
         return (df_human_system_by_group, df_human_human_by_group)
 
-    def compute_degradation_and_disattenuated_correlations(self, df, use_all_responses=True):
+    def compute_degradation_and_disattenuated_correlations(
+        self, df: pd.DataFrame, use_all_responses: bool = True
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Compute the degradation in performance when using system score.
 
@@ -1411,17 +1433,17 @@ class Analyzer:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Input data frame.
-        use_all_responses : bool, optional
+        use_all_responses : bool
             Use the full data set instead of only using the double-scored subset.
             Defaults to ``True``.
 
         Returns
         -------
-        df_degradation : pandas DataFrame
+        df_degradation : pandas.DataFrame
             Data frame containing the degradation statistics.
-        df_correlations : pandas DataFrame
+        df_correlations : pandas.DataFrame
             Data frame containing the human-system correlations, human-human
             correlations and disattenuated correlation.
         """
@@ -1458,25 +1480,30 @@ class Analyzer:
 
         return (df_degradation, df_correlations)
 
-    def run_training_analyses(self, data_container, configuration):
+    def run_training_analyses(
+        self, data_container: DataContainer, configuration: Configuration
+    ) -> Tuple[Configuration, DataContainer]:
         """
         Run all analyses on the training data.
 
         Parameters
         ----------
-        data_container : container.DataContainer
-            The DataContainer object. This container must include the following
+        data_container : DataContainer
+            The DataContainer object which must include the following
             DataFrames: {"train_features", "train_metadata",
             "train_preprocessed_features", "train_length", "train_features"}.
 
-        configuration : configuration_parser.Configuration
-            The Configuration object. This configuration object must include the
-            following parameters (keys): {"length_column", "subgroups",
+        configuration : Configuration
+            The Configuration object which must include the following
+            parameters (keys): {"length_column", "subgroups",
             "selected_features"}.
 
         Returns
         -------
-        data_container : container.DataContainer
+        configuration : Configuration
+            The input Configuration object that is passed through unmodified.
+
+        data_container : DataContainer
             A new DataContainer object with the following DataFrames:
 
             - feature_descriptives
@@ -1496,9 +1523,6 @@ class Analyzer:
             - margcor_score_by_*
             - pcor_score_by_*
             - pcor_score_no_length_by_*
-
-        configuration : configuration_parser.Configuration
-            A new Configuration object.
         """
         frame_names = [
             "train_features",
@@ -1516,10 +1540,10 @@ class Analyzer:
 
         # only use the features selected by the model but keep their order the same
         # as in the original file as ordering may affect the sign in pca
-        df_train = data_container.train_features.copy()
-        df_train_length = data_container.train_length.copy()
-        df_train_metadata = data_container.train_metadata.copy()
-        df_train_preprocessed_features = data_container.train_preprocessed_features.copy()
+        df_train = data_container["train_features"].copy()
+        df_train_length = data_container["train_length"].copy()
+        df_train_metadata = data_container["train_metadata"].copy()
+        df_train_preprocessed_features = data_container["train_preprocessed_features"].copy()
 
         subgroups = configuration["subgroups"]
         selected_features = configuration["selected_features"]
@@ -1623,18 +1647,18 @@ class Analyzer:
 
         # Datasets to add
         datasets = [
-            {"name": "feature_descriptives", "frame": df_descriptives},
-            {"name": "feature_descriptivesExtra", "frame": df_percentiles},
-            {"name": "feature_outliers", "frame": df_outliers},
-            {"name": "cors_orig", "frame": df_pairwise_cors_orig},
-            {"name": "cors_processed", "frame": df_pairwise_cors_preprocess},
-            {"name": "margcor_score_all_data", "frame": df_margcor_sc1},
-            {"name": "pcor_score_all_data", "frame": df_pcor_sc1},
-            {"name": "pcor_score_no_length_all_data", "frame": df_pcor_sc1_no_length},
-            {"name": "margcor_length_all_data", "frame": df_margcor_length},
-            {"name": "pcor_length_all_data", "frame": df_pcor_length},
-            {"name": "pca", "frame": df_pca_components},
-            {"name": "pcavar", "frame": df_pca_variance},
+            DatasetDict({"name": "feature_descriptives", "frame": df_descriptives}),
+            DatasetDict({"name": "feature_descriptivesExtra", "frame": df_percentiles}),
+            DatasetDict({"name": "feature_outliers", "frame": df_outliers}),
+            DatasetDict({"name": "cors_orig", "frame": df_pairwise_cors_orig}),
+            DatasetDict({"name": "cors_processed", "frame": df_pairwise_cors_preprocess}),
+            DatasetDict({"name": "margcor_score_all_data", "frame": df_margcor_sc1}),
+            DatasetDict({"name": "pcor_score_all_data", "frame": df_pcor_sc1}),
+            DatasetDict({"name": "pcor_score_no_length_all_data", "frame": df_pcor_sc1_no_length}),
+            DatasetDict({"name": "margcor_length_all_data", "frame": df_margcor_length}),
+            DatasetDict({"name": "pcor_length_all_data", "frame": df_pcor_length}),
+            DatasetDict({"name": "pca", "frame": df_pca_components}),
+            DatasetDict({"name": "pcavar", "frame": df_pca_variance}),
         ]
 
         # Add length correlation by group datasets
@@ -1645,8 +1669,8 @@ class Analyzer:
 
             datasets.extend(
                 [
-                    {"name": f"margcor_length_by_{group}", "frame": length_marg_cors},
-                    {"name": f"pcor_length_by_{group}", "frame": length_part_cors},
+                    DatasetDict({"name": f"margcor_length_by_{group}", "frame": length_marg_cors}),
+                    DatasetDict({"name": f"pcor_length_by_{group}", "frame": length_part_cors}),
                 ]
             )
 
@@ -1660,43 +1684,52 @@ class Analyzer:
 
             datasets.extend(
                 [
-                    {"name": f"margcor_score_by_{group}", "frame": sc1_marg_cors},
-                    {"name": f"pcor_score_by_{group}", "frame": sc1_part_cors},
-                    {
-                        "name": f"pcor_score_no_length_by_{group}",
-                        "frame": sc1_part_cors_no_length,
-                    },
+                    DatasetDict({"name": f"margcor_score_by_{group}", "frame": sc1_marg_cors}),
+                    DatasetDict({"name": f"pcor_score_by_{group}", "frame": sc1_part_cors}),
+                    DatasetDict(
+                        {
+                            "name": f"pcor_score_no_length_by_{group}",
+                            "frame": sc1_part_cors_no_length,
+                        }
+                    ),
                 ]
             )
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_prediction_analyses(self, data_container, configuration, wandb_run=None):
+    def run_prediction_analyses(
+        self,
+        data_container: DataContainer,
+        configuration: Configuration,
+        wandb_run: Optional[Run] = None,
+    ) -> Tuple[Configuration, DataContainer]:
         """
         Run all analyses on the system scores (predictions).
 
         Parameters
         ----------
-        data_container : container.DataContainer
-            The DataContainer object. This container must include the following
+        data_container : DataContainer
+            The DataContainer object which must include the following
             DataFrames: {"train_features", "train_metadata",
-            "train_preprocessed_features", "train_length",
-            "train_features"}.
+            "train_preprocessed_features", "train_length", "train_features"}.
 
-        configuration : configuration_parser.Configuration
-            The Configuration object.  This configuration object must include the
-            following parameters (keys):  {"subgroups", "second_human_score_column",
+        configuration : Configuration
+            The Configuration object which must include the following
+            parameters (keys):  {"subgroups", "second_human_score_column",
             "use_scaled_predictions"}.
 
-        wandb_run : wandb.Run
+        wandb_run : wandb.wandb_run.Run
             The wandb run object if wandb is enabled, ``None`` otherwise.
-            If enabled, all the output data frames will be logged to
-            this run as tables.
+            If enabled, all the output data frames will be logged to this run
+            as tables.
             Defaults to ``None``.
 
         Returns
         -------
-        data_container : container.DataContainer
+        configuration : Configuration
+            The input Configuration object that is passed through unmodified.
+
+        data_container : DataContainer
             A new DataContainer object with the following DataFrames:
 
             - eval
@@ -1712,8 +1745,6 @@ class Analyzer:
             - disattenduated_correlations_by_*
             - true_score_eval
 
-        configuration : configuration_parser.Configuration
-            A new Configuration object.
         """
         frame_names = ["pred_test", "test_metadata", "test_human_scores"]
 
@@ -1727,9 +1758,9 @@ class Analyzer:
 
         self.check_param_names(configuration, param_names)
 
-        df_test = data_container.pred_test.copy()
-        df_test_metadata = data_container.test_metadata.copy()
-        df_test_human_scores = data_container.test_human_scores.copy()
+        df_test = data_container["pred_test"].copy()
+        df_test_metadata = data_container["test_metadata"].copy()
+        df_test_human_scores = data_container["test_human_scores"].copy()
 
         subgroups = configuration["subgroups"]
         use_scaled_predictions = configuration["use_scaled_predictions"]
@@ -1840,7 +1871,7 @@ class Analyzer:
         df_score_dist = df_score_dist[["score", "human", f"sys_{score_type}", "difference"]]
         df_score_dist.sort_values(by="score", inplace=True)
 
-        datasets = [
+        datasets: List[DatasetDict] = [
             {"name": "eval", "frame": df_human_system},
             {"name": "eval_short", "frame": df_human_system_short},
             {"name": "consistency", "frame": df_human_human},
@@ -1896,33 +1927,35 @@ class Analyzer:
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_data_composition_analyses_for_rsmtool(self, data_container, configuration):
+    def run_data_composition_analyses_for_rsmtool(
+        self, data_container: DataContainer, configuration: Configuration
+    ) -> Tuple[Configuration, DataContainer]:
         """
         Run all data composition analyses for RSMTool.
 
         Parameters
         ----------
-        data_container : container.DataContainer
-            The DataContainer object. This container must include the following
+        data_container : DataContainer
+            The DataContainer object which must include the following
             DataFrames: {"test_metadata", "train_metadata","train_excluded",
             "test_excluded", "train_features"}.
-        configuration : configuration_parser.Configuration
-            The Configuration object.  This configuration object must include the
+        configuration : Configuration
+            The Configuration object which must include the
             following parameters (keys): {"subgroups", "candidate_column",
             "exclude_zero_scores", "exclude_listwise"}.
 
         Returns
         -------
-        data_container : container.DataContainer
+        configuration : Configuration
+            The input Configuration object that is passed through unmodified.
+
+        data_container : DataContainer
             A new DataContainer object with the following DataFrames:
 
             - test_excluded_composition
             - train_excluded_composition
             - data_composition
             - data_composition_by_*
-
-        configuration : configuration_parser.Configuration
-            A new Configuration object.
         """
         frame_names = [
             "train_metadata",
@@ -1945,7 +1978,7 @@ class Analyzer:
 
         features = [
             column
-            for column in data_container.train_features.columns
+            for column in data_container["train_features"].columns
             if column not in ["spkitemid", "sc1"]
         ]
 
@@ -2000,48 +2033,52 @@ class Analyzer:
             df_crosstab_group.insert(0, grouping_variable, df_crosstab_group.index)
             data_composition_by_group_dict[grouping_variable] = df_crosstab_group
 
-        datasets = [
-            {"name": "test_excluded_composition", "frame": df_test_excluded},
-            {"name": "train_excluded_composition", "frame": df_train_excluded},
-            {"name": "data_composition", "frame": df_data_composition},
+        datasets: List[DatasetDict] = [
+            DatasetDict({"name": "test_excluded_composition", "frame": df_test_excluded}),
+            DatasetDict({"name": "train_excluded_composition", "frame": df_train_excluded}),
+            DatasetDict({"name": "data_composition", "frame": df_data_composition}),
         ]
 
         for group in data_composition_by_group_dict:
             datasets.append(
-                {
-                    "name": f"data_composition_by_{group}",
-                    "frame": data_composition_by_group_dict[group],
-                }
+                DatasetDict(
+                    {
+                        "name": f"data_composition_by_{group}",
+                        "frame": data_composition_by_group_dict[group],
+                    }
+                )
             )
 
         return configuration, DataContainer(datasets=datasets)
 
-    def run_data_composition_analyses_for_rsmeval(self, data_container, configuration):
+    def run_data_composition_analyses_for_rsmeval(
+        self, data_container: DataContainer, configuration: Configuration
+    ) -> Tuple[Configuration, DataContainer]:
         """
         Run all data composition analyses for RSMEval.
 
         Parameters
         ----------
-        data_container : container.DataContainer
-            The DataContainer object. This container must include the following
+        data_container : DataContainer
+            The DataContainer object which must include the following
             DataFrames: {"test_metadata", "test_excluded"}.
 
-        configuration : configuration_parser.Configuration
-            The Configuration object.  This configuration object must include the
+        configuration : Configuration
+            The Configuration object which must include the
             following parameters (keys): {"subgroups", "candidate_column",
             "exclude_zero_scores", "exclude_listwise"}.
 
         Returns
         -------
-        data_container : container.DataContainer
+        configuration : Configuration
+            The input Configuration object that is passed through unmodified.
+
+        data_container : DataContainer
             A new DataContainer object with the following DataFrames:
 
             - test_excluded_composition
             - data_composition
             - data_composition_by_*
-
-        configuration : configuration_parser.Configuration
-            A new Configuration object.
         """
         frame_names = ["test_metadata", "test_excluded"]
 
@@ -2098,17 +2135,19 @@ class Analyzer:
             df_crosstab_group.rename(columns={"spkitemid": "N responses"}, inplace=True)
             data_composition_by_group_dict[grouping_variable] = df_crosstab_group
 
-        datasets = [
-            {"name": "test_excluded_composition", "frame": df_test_excluded},
-            {"name": "data_composition", "frame": df_data_composition},
+        datasets: List[DatasetDict] = [
+            DatasetDict({"name": "test_excluded_composition", "frame": df_test_excluded}),
+            DatasetDict({"name": "data_composition", "frame": df_data_composition}),
         ]
 
         for group in data_composition_by_group_dict:
             datasets.append(
-                {
-                    "name": f"data_composition_by_{group}",
-                    "frame": data_composition_by_group_dict[group],
-                }
+                DatasetDict(
+                    {
+                        "name": f"data_composition_by_{group}",
+                        "frame": data_composition_by_group_dict[group],
+                    }
+                )
             )
 
         return configuration, DataContainer(datasets=datasets)
