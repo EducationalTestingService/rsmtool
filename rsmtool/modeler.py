@@ -12,6 +12,7 @@ import logging
 import pickle
 from math import log10, sqrt
 from os.path import join
+from typing import Any, Dict, List, Optional, Tuple
 
 import joblib
 import numpy as np
@@ -22,9 +23,11 @@ from scipy.optimize import nnls
 from sklearn.linear_model import LassoCV
 from skll.data import FeatureSet
 from skll.learner import Learner
+from statsmodels.regression.linear_model import RegressionResults
 
 from .analyzer import Analyzer
-from .container import DataContainer
+from .configuration_parser import Configuration
+from .container import DataContainer, DatasetDict
 from .preprocessor import FeaturePreprocessor
 from .utils.metrics import compute_expected_scores_from_model
 from .utils.models import is_skll_model
@@ -34,25 +37,27 @@ from .writer import DataWriter
 class Modeler:
     """Class to train model and generate predictions with built-in or SKLL models."""
 
-    def __init__(self, logger=None):
+    def __init__(self, logger: Optional[logging.Logger] = None) -> None:
         """
-        Initialize empty ``Modeler`` object.
+        Initialize empty Modeler object.
 
-        The learner and the scaling-/trimming-related attributes are
-        set to ``None``.
+        The learner and scaling-/trimming-related attributes are set to ``None``.
         """
-        self.feature_info = None
-        self.learner = None
-        self.trim_min = None
-        self.trim_max = None
-        self.trim_tolerance = None
-        self.train_predictions_mean = None
-        self.train_predictions_sd = None
-        self.h1_mean = None
-        self.h1_sd = None
-        self.logger = logger if logger else logging.getLogger(__name__)
+        self.feature_info: pd.DataFrame = None
+        self.learner: Learner = None
+        self.trim_min: Optional[int] = None
+        self.trim_max: Optional[int] = None
+        self.trim_tolerance: Optional[float] = None
+        self.train_predictions_mean: Optional[float] = None
+        self.train_predictions_sd: Optional[float] = None
+        self.h1_mean: Optional[float] = None
+        self.h1_sd: Optional[float] = None
+        if logger is None:
+            self.logger = logging.getLogger(__name__)
+        else:
+            self.logger = logger
 
-    def save(self, model_path):
+    def save(self, model_path: str) -> None:
         """
         Save an instance of this class to disk.
 
@@ -64,18 +69,18 @@ class Modeler:
         joblib.dump(self, model_path)
 
     @classmethod
-    def load_from_file(cls, path):
+    def load_from_file(cls, path: str) -> "Modeler":
         """
-        Load a modeler object from a file on disk.
+        Load a ``Modeler`` object from a file on disk.
 
-        The file must contain either ``Modeler`` or a SKLL ``Learner``,
+        The file must contain either a ``Modeler`` or a SKLL ``Learner``,
         in which case a ``Modeler`` object will be created from the
         ``Learner``.
 
         Parameters
         ----------
         path : str
-            File path.
+            File path from which to load the modeler object.
 
         Returns
         -------
@@ -105,9 +110,9 @@ class Modeler:
         return cls.load_from_learner(learner)
 
     @classmethod
-    def load_from_learner(cls, learner):
+    def load_from_learner(cls, learner: Learner) -> "Modeler":
         """
-        Create a new ``Modeler`` instance with a pre-populated learner.
+        Create a new ``Modeler`` object with a pre-populated learner.
 
         Parameters
         ----------
@@ -117,7 +122,7 @@ class Modeler:
         Returns
         -------
         modeler : Modeler
-            A ``Modeler`` object.
+            The newly created ``Modeler`` object.
 
         Raises
         ------
@@ -136,19 +141,19 @@ class Modeler:
         return modeler
 
     @staticmethod
-    def model_fit_to_dataframe(fit):
+    def model_fit_to_dataframe(fit: RegressionResults) -> pd.DataFrame:
         """
         Extract fit metrics from a ``statsmodels`` fit object into a data frame.
 
         Parameters
         ----------
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             Model fit object obtained from a linear model trained using
             ``statsmodels.OLS``.
 
         Returns
         -------
-        df_fit : pandas DataFrame
+        df_fit : pandas.DataFrame
             The output data frame with the main model fit metrics.
         """
         df_fit = pd.DataFrame({"N responses": [int(fit.nobs)]})
@@ -158,20 +163,20 @@ class Modeler:
         return df_fit
 
     @staticmethod
-    def ols_coefficients_to_dataframe(coefs):
+    def ols_coefficients_to_dataframe(coefs: pd.Series) -> pd.DataFrame:
         """
         Convert series containing OLS coefficients to a data frame.
 
         Parameters
         ----------
-        coefs : pandas Series
+        coefs : pandas.Series
             Series with feature names in the index and the coefficient
             values as the data, obtained from a linear model trained
             using ``statsmodels.OLS``.
 
         Returns
         -------
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame with two columns: the feature name and
             the coefficient value.
 
@@ -201,7 +206,7 @@ class Modeler:
         return df_coef
 
     @staticmethod
-    def skll_learner_params_to_dataframe(learner):
+    def skll_learner_params_to_dataframe(learner: Learner) -> pd.DataFrame:
         """
         Extract parameters from the given SKLL learner into a data frame.
 
@@ -212,9 +217,9 @@ class Modeler:
 
         Returns
         -------
-        df_coef : pandas DataFrame
-            The data frame containing the model parameters
-            from the given SKLL learner object.
+        df_coef : pandas.DataFrame
+            The data frame containing the model parameters from the given SKLL
+            Learner object.
 
         Note
         ----
@@ -245,15 +250,15 @@ class Modeler:
 
         return df_coef
 
-    def create_fake_skll_learner(self, df_coefficients):
+    def create_fake_skll_learner(self, df_coefficients: pd.DataFrame) -> Learner:
         """
         Create a fake SKLL linear regression learner from given coefficients.
 
         Parameters
         ----------
-        df_coefficients : pandas DataFrame
-            The data frame containing the linear coefficients
-            we want to create the fake SKLL model with.
+        df_coefficients : pandas.DataFrame
+            The data frame containing the linear coefficients we want to create
+            the fake SKLL model with.
 
         Returns
         -------
@@ -293,7 +298,9 @@ class Modeler:
         learner.model.intercept_ = intercept
         return learner
 
-    def train_linear_regression(self, df_train, feature_columns):
+    def train_linear_regression(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train a "LinearRegression" model.
 
@@ -301,21 +308,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statmodels.regression.linear_model.RegressionResults
             A ``statsmodels`` regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # get the feature columns
@@ -334,7 +340,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_equal_weights_lr(self, df_train, feature_columns):
+    def train_equal_weights_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train an "EqualWeightsLR" model.
 
@@ -342,21 +350,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A ``statsmodels`` regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # we first compute a single feature that is simply the sum of all features
@@ -388,7 +395,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_rebalanced_lr(self, df_train, feature_columns):
+    def train_rebalanced_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train a "RebalancedLR" model.
 
@@ -398,21 +407,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A ``statsmodels`` regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
              Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a plain Linear Regression model
@@ -461,7 +469,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_lasso_fixed_lambda_then_lr(self, df_train, feature_columns):
+    def train_lasso_fixed_lambda_then_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train a "LassoFixedLambdaThenLR" model.
 
@@ -471,21 +481,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A ``statsmodels`` regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             The model coefficients in a data_frame
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a Lasso Regression model with this featureset with a preset lambda
@@ -521,7 +530,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_positive_lasso_cv_then_lr(self, df_train, feature_columns):
+    def train_positive_lasso_cv_then_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train a "PositiveLassoCVThenLR" model.
 
@@ -531,21 +542,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A statsmodels regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a LassoCV outside of SKLL since it's not exposed there
@@ -576,7 +586,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_non_negative_lr(self, df_train, feature_columns):
+    def train_non_negative_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train an "NNLR" model.
 
@@ -590,21 +602,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A statsmodels regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
              Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # add an intercept to the features manually
@@ -614,7 +625,7 @@ class Modeler:
         y = df_train["sc1"].values
 
         # fit an NNLS model on this data
-        coefs, rnorm = nnls(X_plus_intercept, y)
+        coefs, _ = nnls(X_plus_intercept, y)
 
         # check whether the intercept is set to 0 and if so then we need
         # to flip the sign and refit the model to ensure that it is always
@@ -622,7 +633,7 @@ class Modeler:
         if coefs[0] == 0:
             intercepts = -1 * np.ones((len(df_train), 1))
             X_plus_intercept = np.concatenate([intercepts, X], axis=1)
-            coefs, rnorm = nnls(X_plus_intercept, y)
+            coefs, _ = nnls(X_plus_intercept, y)
 
         # separate the intercept and feature coefficients
         # intercept = coefs[0]
@@ -650,7 +661,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_non_negative_lr_iterative(self, df_train, feature_columns):
+    def train_non_negative_lr_iterative(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train an "NNLR_iterative" model.
 
@@ -664,21 +677,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A statsmodels regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         X = df_train[feature_columns]
@@ -715,7 +727,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_lasso_fixed_lambda_then_non_negative_lr(self, df_train, feature_columns):
+    def train_lasso_fixed_lambda_then_non_negative_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train an "LassoFixedLambdaThenNNLR" model.
 
@@ -724,21 +738,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object.
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A statsmodels regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a Lasso Regression model with a preset lambda
@@ -804,7 +817,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_lasso_fixed_lambda(self, df_train, feature_columns):
+    def train_lasso_fixed_lambda(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, None, pd.DataFrame, List[str]]:
         """
         Train a "LassoFixedLambda" model.
 
@@ -812,10 +827,9 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
@@ -823,11 +837,10 @@ class Modeler:
         learner : skll.learner.Learner
             The SKLL learner object
         fit : ``None``
-            This is always ``None`` since there is no OLS
-            model fitted in this case.
-        df_coef : pandas DataFrame
+            This is always ``None`` since there is no OLS model fitted in this case.
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a Lasso Regression model with a preset lambda
@@ -855,7 +868,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_positive_lasso_cv(self, df_train, feature_columns):
+    def train_positive_lasso_cv(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, None, pd.DataFrame, List[str]]:
         """
         Train a "PositiveLassoCV" model.
 
@@ -865,10 +880,9 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
@@ -876,11 +890,10 @@ class Modeler:
         learner : skll.learner.Learner
             The SKLL learner object
         fit : ``None``
-            This is always ``None`` since there is no OLS
-            model fitted in this case.
-        df_coef : pandas DataFrame
+            This is always ``None`` since there is no OLS model fitted in this case.
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train a LassoCV outside of SKLL since it's not exposed there
@@ -915,7 +928,9 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_score_weighted_lr(self, df_train, feature_columns):
+    def train_score_weighted_lr(
+        self, df_train: pd.DataFrame, feature_columns: List[str]
+    ) -> Tuple[Learner, RegressionResults, pd.DataFrame, List[str]]:
         """
         Train a "ScoreWeightedLR" model.
 
@@ -923,21 +938,20 @@ class Modeler:
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        feature_columns : list of str
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        feature_columns : List[str]
             A list of feature columns to use in training the model.
 
         Returns
         -------
         learner : skll.learner.Learner
             The SKLL learner object
-        fit : statsmodels.RegressionResults
+        fit : statsmodels.regression.linear_model.RegressionResults
             A statsmodels regression results object.
-        df_coef : pandas DataFrame
+        df_coef : pandas.DataFrame
             Data frame containing the model coefficients.
-        used_features : list of str
+        used_features : List[str]
             A list of features used in the final model.
         """
         # train weighted least squares regression
@@ -967,7 +981,14 @@ class Modeler:
 
         return learner, fit, df_coef, used_features
 
-    def train_builtin_model(self, model_name, df_train, experiment_id, filedir, file_format="csv"):
+    def train_builtin_model(
+        self,
+        model_name: str,
+        df_train: pd.DataFrame,
+        experiment_id: str,
+        filedir: str,
+        file_format: str = "csv",
+    ) -> Learner:
         """
         Train one of the :ref:`built-in linear regression models <builtin_models>`.
 
@@ -975,7 +996,7 @@ class Modeler:
         ----------
         model_name : str
             Name of the built-in model to train.
-        df_train : pandas DataFrame
+        df_train : pandas.DataFrame
             Data frame containing the features on which to train
             the model. The data frame must contain the ID column
             named "spkitemid" and the numeric label column named
@@ -984,9 +1005,10 @@ class Modeler:
             The experiment ID.
         filedir : str
             Path to the `output` experiment output directory.
-        file_format : str, optional
-            The format in which to save files. One of {"csv", "tsv", "xlsx"}.
-            Defaults to "csv".
+        file_format : str
+            The format in which to save files. One of {``"csv"``, ``"tsv"``,
+            ``"xlsx"``}.
+            Defaults to ``"csv"``.
 
         Returns
         -------
@@ -1042,13 +1064,13 @@ class Modeler:
             result = self.train_score_weighted_lr(df_train, feature_columns)
 
         writer = DataWriter(experiment_id)
-        frames = []
+        datasets = []
 
         # unpack all results
         learner, fit, df_coef, used_features = result
 
         # add raw coefficients to frame list
-        frames.append({"name": "coefficients", "frame": df_coef})
+        datasets.append(DatasetDict({"name": "coefficients", "frame": df_coef}))
 
         # compute the standardized and relative coefficients (betas) for the
         # non-intercept features and save to a file
@@ -1061,7 +1083,7 @@ class Modeler:
         df_betas.reset_index(inplace=True)
 
         # add betas to frame list
-        frames.append({"name": "betas", "frame": df_betas})
+        datasets.append(DatasetDict({"name": "betas", "frame": df_betas}))
 
         # save the OLS fit object and its summary to files
         if fit:
@@ -1075,9 +1097,9 @@ class Modeler:
             df_model_fit = self.model_fit_to_dataframe(fit)
 
             # add model_fit to frame list
-            frames.append({"name": "model_fit", "frame": df_model_fit})
+            datasets.append(DatasetDict({"name": "model_fit", "frame": df_model_fit}))
 
-        container = DataContainer(frames)
+        container = DataContainer(datasets=datasets)
         writer.write_experiment_output(filedir, container, file_format=file_format)
 
         self.learner = learner
@@ -1086,13 +1108,13 @@ class Modeler:
 
     def train_skll_model(
         self,
-        model_name,
-        df_train,
-        custom_fixed_parameters=None,
-        custom_objective=None,
-        predict_expected_scores=False,
-        skll_grid_search_jobs=1,
-    ):
+        model_name: str,
+        df_train: pd.DataFrame,
+        custom_fixed_parameters: Optional[Dict[str, Any]] = None,
+        custom_objective: Optional[str] = None,
+        predict_expected_scores: bool = False,
+        skll_grid_search_jobs: int = 1,
+    ) -> Tuple[Learner, str]:
         """
         Train a SKLL classification or regression model.
 
@@ -1100,29 +1122,28 @@ class Modeler:
         ----------
         model_name : str
             Name of the SKLL model to train.
-        df_train : pandas DataFrame
-            Data frame containing the features on which
-            to train the model.
-        custom_fixed_parameters : dict, optional
-            A dictionary containing any fixed parameters for the SKLL
-            model.
+        df_train : pandas.DataFrame
+            Data frame containing the features on which to train the model.
+        custom_fixed_parameters : Optional[Dict[str, Any]]
+            A dictionary containing any fixed parameters for the SKLL model.
             Defaults to ``None``.
-        custom_objective : str, optional
+        custom_objective : Optional[str]
             Name of custom user-specified objective. If not specified
             or ``None``, "neg_mean_squared_error" is used as the objective.
             Defaults to ``None``.
-        predict_expected_scores : bool, optional
+        predict_expected_scores : bool
             Whether we want the trained classifiers to predict expected scores.
             Defaults to ``False``.
         skll_grid_search_jobs : int
-            Number of folds to run in parallel when using ``skll`` grid search.
+            Number of folds to run in parallel when using SKLL grid search.
             Defaults to 1.
 
         Returns
         -------
-        learner_and_objective : tuple
-            A 2-tuple containing a SKLL Learner object of the appropriate type
-            and the chosen tuning objective.
+        learner: skll.learner.Learner
+            A SKLL Learner object of the appropriate type.
+        objective: str
+            The chosen tuning objective.
         """
         # Instantiate the given SKLL learner and set its probability value
         # and fixed parameters appropriately
@@ -1154,13 +1175,18 @@ class Modeler:
         )
 
         # TODO: compute betas for linear SKLL models?
-
         self.learner = learner
 
         # return the SKLL learner object and the chosen objective
         return learner, objective
 
-    def train(self, configuration, data_container, filedir, figdir, file_format="csv"):
+    def train(
+        self,
+        configuration: Configuration,
+        data_container: DataContainer,
+        filedir: str,
+        file_format: str = "csv",
+    ):
         """
         Train the given model on the given data and save the results.
 
@@ -1170,23 +1196,23 @@ class Modeler:
 
         Parameters
         ----------
-        configuration : configuration_parser.Configuration
+        configuration : Configuration
             A configuration object containing "experiment_id" and "model_name"
             parameters.
-        data_container : container.DataContainer
+        data_container : DataContainer
             A data container object containing "train_preprocessed_features"
             data set.
         filedir : str
             Path to the "output" experiment output directory.
-        figdir : str
-            Path to the "figure" experiment output directory.
-        file_format : str, optional
-            The format in which to save files. One of {"csv", "tsv", "xlsx"}.
-            Defaults to "csv".
+        file_format : str
+            The format in which to save files. One of {``"csv"``, ``"tsv"``,
+            ``"xlsx"``}.
+            Defaults to ``"csv"``.
 
         Returns
         -------
-        name : SKLL Learner object
+        model : skll.learner.Learner
+            The trained SKLL Learner object.
         """
         Analyzer.check_param_names(configuration, ["model_name", "experiment_id"])
         Analyzer.check_frame_names(data_container, ["train_preprocessed_features"])
@@ -1217,27 +1243,33 @@ class Modeler:
 
         return model
 
-    def predict(self, df, min_score=None, max_score=None, predict_expected=False):
+    def predict(
+        self,
+        df: pd.DataFrame,
+        min_score: Optional[int] = None,
+        max_score: Optional[int] = None,
+        predict_expected: bool = False,
+    ) -> pd.DataFrame:
         """
         Get raw predictions from given SKLL model on data in given data frame.
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named "spkitemid", and a label column named "sc1".
-        min_score : int, optional
+        min_score : Optional[int]
             Minimum score level to be used if computing expected scores.
             If ``None``, trying to compute expected scores will raise an
             exception.
             Defaults to ``None``.
-        max_score : int, optional
+        max_score : Optional[int]
             Maximum score level to be used if computing expected scores.
             If ``None``, trying to compute expected scores will raise an
             exception.
             Defaults to ``None``.
-        predict_expected : bool, optional
+        predict_expected : bool
             Predict expected scores for classifiers that return probability
             distributions over score. This will be ignored with a warning
             if the specified model does not support probability distributions.
@@ -1248,9 +1280,9 @@ class Modeler:
 
         Returns
         -------
-        df_predictions : pandas DataFrame
-            Data frame containing the raw predictions, the IDs, and the
-            human scores.
+        df_predictions : pandas.DataFrame
+            Data frame containing the raw predictions, the IDs, and the human
+            scores.
 
         Raises
         ------
@@ -1298,26 +1330,30 @@ class Modeler:
 
         return df_predictions
 
-    def predict_train_and_test(self, df_train, df_test, configuration):
+    def predict_train_and_test(
+        self, df_train: pd.DataFrame, df_test: pd.DataFrame, configuration: Configuration
+    ) -> Tuple[Configuration, DataContainer]:
         """
         Generate raw, scaled, and trimmed predictions on given data.
 
         Parameters
         ----------
-        df_train : pandas DataFrame
-            Data frame containing the pre-processed training
-            set features.
-        df_test : pandas DataFrame
-            Data frame containing the pre-processed test
-            set features.
-        configuration : configuration_parser.Configuration
-            A configuration object containing "trim_max"
-            and "trim_min" keys.
+        df_train : pandas.DataFrame
+            Data frame containing the pre-processed training set features.
+        df_test : pandas.DataFrame
+            Data frame containing the pre-processed test set features.
+        configuration : Configuration
+            A configuration object containing "trim_max" and "trim_min" keys.
 
         Returns
         -------
-        List of data frames containing predictions and other
-        information.
+        configuration : Configuration
+            A copy of the given configuration object also containing the
+            "train_predictions_mean", "train_predictions_sd", "human_labels_mean",
+            "human_labels_sd", "trim_min", and "trim_max" parameters.
+        data_container : DataContainer
+            A data container object containing the "pred_train", "pred_test",
+            and "postprocessing_params" data sets.
         """
         Analyzer.check_param_names(configuration, ["trim_max", "trim_min", "trim_tolerance"])
 
@@ -1390,9 +1426,9 @@ class Modeler:
         )
 
         datasets = [
-            {"name": "pred_train", "frame": df_train_predictions},
-            {"name": "pred_test", "frame": df_test_predictions},
-            {"name": "postprocessing_params", "frame": df_postproc_params},
+            DatasetDict({"name": "pred_train", "frame": df_train_predictions}),
+            DatasetDict({"name": "pred_test", "frame": df_test_predictions}),
+            DatasetDict({"name": "postprocessing_params", "frame": df_postproc_params}),
         ]
 
         # configuration options that are entirely for internal use
@@ -1409,46 +1445,46 @@ class Modeler:
 
         return new_configuration, DataContainer(datasets=datasets)
 
-    def get_feature_names(self):
+    def get_feature_names(self) -> Optional[List[str]]:
         """
         Get the feature names, if available.
 
         Returns
         -------
-        feature_names : list or ``None``
+        feature_names : Optional[List[str]]
             A list of feature names, or None if no learner was trained.
         """
         if self.learner is not None:
             return self.learner.feat_vectorizer.get_feature_names_out().tolist()
         return None
 
-    def get_intercept(self):
+    def get_intercept(self) -> Optional[float]:
         """
         Get the intercept of the model, if available.
 
         Returns
         -------
-        intercept : float or ``None``
+        intercept : Optional[float]
            The intercept of the model.
         """
         if self.learner is not None:
             return self.learner.model.intercept_
         return None
 
-    def get_coefficients(self):
+    def get_coefficients(self) -> Optional[np.ndarray]:
         """
         Get the coefficients of the model, if available.
 
         Returns
         -------
-        coefficients : np.array or ``None``
+        coefficients : Optional[np.ndarray]
            The coefficients of the model, if available.
         """
         if self.learner is not None:
             return self.learner.model.coef_
         return None
 
-    def scale_coefficients(self, configuration):
+    def scale_coefficients(self, configuration: Configuration) -> DataContainer:
         """
         Scale coefficients using human scores & training set predictions.
 
@@ -1457,13 +1493,13 @@ class Modeler:
 
         Parameters
         ----------
-        configuration : configuration_parser.Configuration
+        configuration : Configuration
             A configuration object containing the "train_predictions_mean",
             "train_predictions_sd", and "human_labels_sd" parameters.
 
         Returns
         -------
-        data_container : container.DataContainer
+        data_container : DataContainer
             A container object containing the "coefficients_scaled"
             dataset. The frame for this dataset contains the scaled
             coefficients and the feature names, along with the
@@ -1502,7 +1538,10 @@ class Modeler:
         new_intercept = intercept * (h1_sd / train_predictions_sd)
         new_intercept += train_predictions_mean * (1 - h1_sd / train_predictions_sd)
 
-        intercept_and_feature_names = ["Intercept"] + feature_names
+        intercept_and_feature_names = (
+            ["Intercept"] + feature_names if feature_names else ["Intercept"]
+        )
+
         intercept_and_feature_values = [new_intercept] + list(scaled_coefficients)
 
         # create a data frame with new values
@@ -1514,6 +1553,8 @@ class Modeler:
             columns=["feature", "coefficient"],
         )
 
-        scaled_dataset = [{"name": "coefficients_scaled", "frame": df_scaled_coefficients}]
+        scaled_dataset = [
+            DatasetDict({"name": "coefficients_scaled", "frame": df_scaled_coefficients})
+        ]
 
         return DataContainer(datasets=scaled_dataset)
