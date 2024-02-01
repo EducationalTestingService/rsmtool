@@ -52,6 +52,7 @@ intersphinx_mapping = {
     "skll": ("https://skll.readthedocs.io/en/latest", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+    "statsmodels": ("https://www.statsmodels.org/stable/", None),
 }
 
 # some settings for sphinx_autodoc_typehints
