@@ -222,7 +222,7 @@ def run_experiment(
     # Initialize modeler
     modeler = Modeler(logger=logger)
 
-    modeler.train(processed_config, processed_container, csvdir, figdir, file_format)
+    modeler.train(processed_config, processed_container, csvdir, file_format)
 
     # Identify the features used by the model
     selected_features = modeler.get_feature_names()
@@ -267,7 +267,9 @@ def run_experiment(
     )
 
     # Use only selected features for predictions
-    columns_for_prediction = ["spkitemid", "sc1"] + selected_features
+    columns_for_prediction = (
+        ["spkitemid", "sc1"] + selected_features if selected_features else ["spkitemid", "sc1"]
+    )
     train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
     test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
 

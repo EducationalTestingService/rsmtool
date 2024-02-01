@@ -551,7 +551,7 @@ class Configuration:
                     )
         return new_filter_dict
 
-    def get_trim_min_max_tolerance(self) -> Tuple[float, float, float]:
+    def get_trim_min_max_tolerance(self) -> Tuple[int, int, float]:
         """
         Get trim min, trim max, and tolerance values.
 
@@ -560,9 +560,9 @@ class Configuration:
 
         Returns
         -------
-        spec_trim_min : float
+        spec_trim_min : int
             Specified trim min value.
-        spec_trim_max : float
+        spec_trim_max : int
             Specified trim max value.
         spec_trim_tolerance: float
             Specified trim tolerance value.
