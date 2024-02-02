@@ -14,6 +14,8 @@ dataset is represented by three properties:
 :organization: ETS
 """
 
+from __future__ import annotations
+
 import warnings
 from copy import copy, deepcopy
 from typing import Dict, Generator, List, Optional, Tuple, TypedDict
@@ -113,7 +115,7 @@ class DataContainer:
         """
         return ", ".join(self._names)
 
-    def __add__(self, other: "DataContainer") -> "DataContainer":
+    def __add__(self, other: DataContainer) -> DataContainer:
         """
         Add another container object to instance.
 
@@ -164,7 +166,7 @@ class DataContainer:
             yield key
 
     @staticmethod
-    def to_datasets(data_container: "DataContainer") -> List[DatasetDict]:
+    def to_datasets(data_container: DataContainer) -> List[DatasetDict]:
         """
         Convert container object to a list of dataset dictionaries.
 
@@ -178,7 +180,7 @@ class DataContainer:
 
         Returns
         -------
-        datasets_dict : List[DatasetDict]
+        dataset_dicts : List[DatasetDict]
             A list of dataset dictionaries.
         """
         dataset_dicts: List[DatasetDict] = []
@@ -235,7 +237,7 @@ class DataContainer:
 
         Returns
         -------
-        path : str
+        path : Optional[str]
             The path for the named dataset.
         """
         if name not in self._names:
@@ -341,7 +343,7 @@ class DataContainer:
         """
         return [(name, self._dataframes[name]) for name in self._names]
 
-    def drop(self, name: str) -> "DataContainer":
+    def drop(self, name: str) -> DataContainer:
         """
         Drop a given dataset from the container and return instance.
 
@@ -365,7 +367,7 @@ class DataContainer:
             self._data_paths.pop(name)
         return self
 
-    def rename(self, name: str, new_name: str) -> "DataContainer":
+    def rename(self, name: str, new_name: str) -> DataContainer:
         """
         Rename a given dataset in the container and return instance.
 
@@ -390,7 +392,7 @@ class DataContainer:
             self.drop(name)
         return self
 
-    def copy(self, deep: bool = True) -> "DataContainer":
+    def copy(self, deep: bool = True) -> DataContainer:
         """
         Return a copy of the container object.
 

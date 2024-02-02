@@ -11,6 +11,8 @@ and creating configuration objects.
 :organization: ETS
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import re
@@ -38,8 +40,8 @@ from .utils.models import is_skll_model
 
 
 def configure(
-    context: str, config_file_or_obj_or_dict: Union[str, "Configuration", Dict[str, Any], Path]
-) -> "Configuration":
+    context: str, config_file_or_obj_or_dict: Union[str, Configuration, Dict[str, Any], Path]
+) -> Configuration:
     """
     Create a Configuration object.
 
@@ -357,7 +359,7 @@ class Configuration:
 
         Returns
         -------
-        values : list
+        values : List[Any]
             A list of values in the configuration object.
         """
         return [v for v in self._config.values()]
@@ -373,7 +375,7 @@ class Configuration:
         """
         return [(k, v) for k, v in self._config.items()]
 
-    def pop(self, key, default=None) -> Any:
+    def pop(self, key: str, default: Any = None) -> Any:
         """
         Remove and return an element from the object having the given key.
 
@@ -392,7 +394,7 @@ class Configuration:
         """
         return self._config.pop(key, default)
 
-    def copy(self, deep: bool = True) -> "Configuration":
+    def copy(self, deep: bool = True) -> Configuration:
         """
         Return a copy of the object.
 
@@ -474,11 +476,11 @@ class Configuration:
         partition: str
             The data partition which is filtered based on the flag column name.
             One of {"train", "test", "both", "unknown"}.
-            Defaults to "both".
+            Defaults to "unknown".
 
         Returns
         -------
-        new_filtering_dict : dict
+        new_filtering_dict : Dict[str, List[str]]
             Properly formatted dictionary for the column name in ``flag_column``.
 
         Raises

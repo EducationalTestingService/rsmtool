@@ -1067,7 +1067,7 @@ class Analyzer:
         df: pd.DataFrame,
         compute_shortened: bool = False,
         use_scaled_predictions: bool = False,
-        include_second_score=False,
+        include_second_score: bool = False,
         population_sd_dict: Optional[Dict[str, Optional[float]]] = None,
         population_mn_dict: Optional[Dict[str, Optional[float]]] = None,
         smd_method: str = "unpooled",
