@@ -779,7 +779,7 @@ class Modeler:
         y = df_train["sc1"].values
 
         # fit an NNLS model on this data
-        coefs, rnorm = nnls(X_plus_intercept, y)
+        coefs, _ = nnls(X_plus_intercept, y)
 
         # check whether the intercept is set to 0 and if so then we need
         # to flip the sign and refit the model to ensure that it is always
@@ -787,7 +787,7 @@ class Modeler:
         if coefs[0] == 0:
             intercepts = -1 * np.ones((len(df_train), 1))
             X_plus_intercept = np.concatenate([intercepts, X], axis=1)
-            coefs, rnorm = nnls(X_plus_intercept, y)
+            coefs, _ = nnls(X_plus_intercept, y)
 
         # separate the intercept and feature coefficients
         # even though we do not use intercept in the code

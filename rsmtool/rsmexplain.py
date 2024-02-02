@@ -353,10 +353,10 @@ def generate_explanation(
 
     # create featuresets from pre-processed background and explain features
     background_fs = FeatureSet.from_data_frame(
-        processed_container.background_features_preprocessed, "background"
+        processed_container["background_features_preprocessed"], "background"
     )
     explain_fs = FeatureSet.from_data_frame(
-        processed_container.explain_features_preprocessed, "explain"
+        processed_container["explain_features_preprocessed"], "explain"
     )
 
     # get the SKLL learner object for the rsmtool experiment and its feature names
