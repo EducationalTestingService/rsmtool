@@ -266,23 +266,34 @@ def fast_predict(
             "'trim_min' and 'trim_max' modeler attributes must be present and not "
             "``None``."
         )
+
+        # get the value of the trim tolerance if not provided
         default_trim_tolerance = 0.4998
         if trim_tolerance is None:
             try:
                 trim_tolerance = modeler.trim_tolerance
-                if trim_tolerance is None:
-                    trim_tolerance = default_trim_tolerance
+            # if the attribute is not present, use default value
             except AttributeError:
                 trim_tolerance = default_trim_tolerance
+            # if it is present but has a value of None, also use default value
+            else:
+                if trim_tolerance is None:
+                    trim_tolerance = default_trim_tolerance
+
+        # get the values of the trim min and max if not provided
         try:
             if trim_min is None:
                 trim_min = modeler.trim_min
             if trim_max is None:
                 trim_max = modeler.trim_max
-            if any(arg is None for arg in [trim_tolerance, trim_min, trim_max]):
-                raise ValueError(trim_args_error_message) from None
+        # raise an error if the attributes are not present
         except AttributeError:
             raise ValueError(trim_args_error_message) from None
+        # if they are present but have a value of None, also raise an error
+        else:
+            if trim_min is None or trim_max is None:
+                raise ValueError(trim_args_error_message) from None
+
         for column in df_predictions.columns:
             df_predictions[f"{column}_trim"] = preprocessor.trim(
                 df_predictions[column], trim_min, trim_max, trim_tolerance
@@ -494,7 +505,7 @@ def compute_and_save_predictions(
     )
 
     # save excluded responses to disk
-    if not processed_container.excluded.empty:
+    if not processed_container["excluded"].empty:
         # save the predictions to disk
         logger.info(
             f"Saving excluded responses to "

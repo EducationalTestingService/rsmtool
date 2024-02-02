@@ -19,6 +19,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from wandb.wandb_run import Run
 
+from rsmtool.container import DatasetDict
+
 from .analyzer import Analyzer
 from .configuration_parser import Configuration, configure
 from .modeler import Modeler
@@ -238,12 +240,14 @@ def run_experiment(
     features_data_container = processed_container.copy()
 
     # Get selected feature info, and write out to file
-    df_feature_info = features_data_container.feature_info.copy()
+    df_feature_info = features_data_container["feature_info"].copy()
     df_selected_feature_info = df_feature_info[df_feature_info["feature"].isin(selected_features)]
-    selected_feature_dataset_dict = {
-        "name": "selected_feature_info",
-        "frame": df_selected_feature_info,
-    }
+    selected_feature_dataset_dict = DatasetDict(
+        {
+            "name": "selected_feature_info",
+            "frame": df_selected_feature_info,
+        }
+    )
 
     features_data_container.add_dataset(selected_feature_dataset_dict, update=True)
 
@@ -270,8 +274,10 @@ def run_experiment(
     columns_for_prediction = (
         ["spkitemid", "sc1"] + selected_features if selected_features else ["spkitemid", "sc1"]
     )
-    train_for_prediction = processed_container.train_preprocessed_features[columns_for_prediction]
-    test_for_prediction = processed_container.test_preprocessed_features[columns_for_prediction]
+    train_for_prediction = processed_container["train_preprocessed_features"][
+        columns_for_prediction
+    ]
+    test_for_prediction = processed_container["test_preprocessed_features"][columns_for_prediction]
 
     logged_str = "Generating training and test set predictions"
     logged_str += " (expected scores)." if configuration["predict_expected_scores"] else "."
@@ -281,7 +287,7 @@ def run_experiment(
     )
 
     # Save modeler instance
-    modeler.feature_info = processed_container.feature_info.copy()
+    modeler.feature_info = processed_container["feature_info"].copy()
     modeler.feature_info.set_index("feature", inplace=True)
     (
         modeler.trim_min,

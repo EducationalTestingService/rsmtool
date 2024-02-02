@@ -214,10 +214,8 @@ class TestFeaturePreprocessor(unittest.TestCase):
         (
             output_df_with_zeros,
             output_excluded_df_with_zeros,
-        ) = self.fpp.filter_on_column(bad_df, "sc1", "spkitemlab", exclude_zeros=False)
-        output_df, output_excluded_df = self.fpp.filter_on_column(
-            bad_df, "sc1", "spkitemlab", exclude_zeros=True
-        )
+        ) = self.fpp.filter_on_column(bad_df, "sc1", exclude_zeros=False)
+        output_df, output_excluded_df = self.fpp.filter_on_column(bad_df, "sc1", exclude_zeros=True)
         assert_frame_equal(output_df_with_zeros, df_filtered_with_zeros)
         assert_frame_equal(output_df, df_filtered)
 
@@ -227,9 +225,7 @@ class TestFeaturePreprocessor(unittest.TestCase):
         expected_df_excluded = bad_df.copy()
         expected_df_excluded.drop("sc1", axis=1, inplace=True)
 
-        df_filtered, df_excluded = self.fpp.filter_on_column(
-            bad_df, "sc1", "spkitemlab", exclude_zeros=True
-        )
+        df_filtered, df_excluded = self.fpp.filter_on_column(bad_df, "sc1", exclude_zeros=True)
 
         self.assertTrue(df_filtered.empty)
         self.assertTrue("sc1" not in df_filtered.columns)
@@ -246,7 +242,7 @@ class TestFeaturePreprocessor(unittest.TestCase):
         bad_df = pd.DataFrame(data=data)
 
         output_df, output_excluded_df = self.fpp.filter_on_column(
-            bad_df, "feature_zero_sd", "id", exclude_zeros=False, exclude_zero_sd=True
+            bad_df, "feature_zero_sd", exclude_zeros=False, exclude_zero_sd=True
         )
 
         good_df = bad_df[["id", "feature_ok"]].copy()
@@ -265,7 +261,7 @@ class TestFeaturePreprocessor(unittest.TestCase):
         good_df.reset_index(drop=True, inplace=True)
 
         output_df, output_excluded_df = self.fpp.filter_on_column(
-            data, "feature_with_inf", "id", exclude_zeros=False, exclude_zero_sd=True
+            data, "feature_with_inf", exclude_zeros=False, exclude_zero_sd=True
         )
 
         assert_frame_equal(output_df, good_df)
