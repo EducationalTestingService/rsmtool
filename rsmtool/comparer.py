@@ -116,11 +116,11 @@ class Comparer:
 
         Returns
         -------
-        rename_dict_new : dict
+        rename_dict_new : Dict[str, str]
             The updated rename dictionary.
-        existing_eval_cols_new : list
+        existing_eval_cols_new : List[str]
             The updated existing evaluation columns
-        short_metrics_list_new : list
+        short_metrics_list_new : List[str]
             The updated list of columns for the short metrics file.
         smd_name : str
             The SMD column name (either 'SMD' or 'DSM')
@@ -336,10 +336,10 @@ class Comparer:
             Path to the directory containing output figures.
         experiment_id : str
             Original ``experiment_id`` used to generate the output files.
-        prefix: str
+        prefix : str
             Must be set to ``"scale"`` or ``"raw"``. Indicates whether the score
             is scaled or not.
-        groups_eval: list
+        groups_eval: List[str]
             List of subgroup names used for subgroup evaluation.
 
         Returns
