@@ -100,7 +100,7 @@ def run_comparison(
     experiment_id_old = configuration["experiment_id_old"]
     experiment_dir_old = DataReader.locate_files(
         configuration["experiment_dir_old"], configuration.configdir
-    )
+    )[0]
     if not experiment_dir_old:
         raise FileNotFoundError(
             f"The directory {configuration['experiment_dir_old']} " f"does not exist."
@@ -120,7 +120,7 @@ def run_comparison(
     experiment_id_new = configuration["experiment_id_new"]
     experiment_dir_new = DataReader.locate_files(
         configuration["experiment_dir_new"], configuration.configdir
-    )
+    )[0]
     if not experiment_dir_new:
         raise FileNotFoundError(
             f"The directory {configuration['experiment_dir_new']} " f"does not exist."

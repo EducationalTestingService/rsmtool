@@ -386,13 +386,13 @@ def compute_and_save_predictions(
     # for which we want to generate the predictions
     input_features_file = DataReader.locate_files(
         configuration["input_features_file"], configuration.configdir
-    )
+    )[0]
     if not input_features_file:
         raise FileNotFoundError(f"Input file {configuration['input_features_file']} does not exist")
 
     experiment_dir = DataReader.locate_files(
         configuration["experiment_dir"], configuration.configdir
-    )
+    )[0]
     if not experiment_dir:
         raise FileNotFoundError(f"The directory {configuration['experiment_dir']} does not exist.")
     else:

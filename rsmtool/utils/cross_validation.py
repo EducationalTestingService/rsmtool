@@ -5,6 +5,7 @@ Various utility functions used for cross-validation.
 
 :organization: ETS
 """
+
 import logging
 from pathlib import Path
 from shutil import copyfile
@@ -61,7 +62,7 @@ def create_xval_files(configuration, output_dir, logger=None):
     located_filepaths = {}
     located_filepaths["train"] = DataReader.locate_files(
         configuration.get("train_file"), configuration.configdir
-    )
+    )[0]
     if not located_filepaths["train"]:
         raise FileNotFoundError(
             f"The training data file was not found: " f"{repr(configuration.get('train_file'))}"
@@ -76,7 +77,7 @@ def create_xval_files(configuration, output_dir, logger=None):
         if additional_file := configuration.get(additional_filename):
             located_filepaths[additional_filename] = DataReader.locate_files(
                 additional_file, configuration.configdir
-            )
+            )[0]
 
     # read the training file into a dataframe making sure that the specified
     # ID column is read as a string

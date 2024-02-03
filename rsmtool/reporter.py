@@ -152,7 +152,7 @@ class Reporter:
         """
         custom_report_sections = []
         for cs_path in custom_report_section_paths:
-            cs_location = DataReader.locate_files(cs_path, configdir)
+            cs_location = DataReader.locate_files(cs_path, configdir)[0]
             if not cs_location:
                 raise FileNotFoundError(f"Error: custom section not found at {cs_path}.")
             else:
