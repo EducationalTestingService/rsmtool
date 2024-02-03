@@ -11,10 +11,11 @@ Classes for reading data files (or dictionaries) into DataContainer objects.
 import warnings
 from functools import partial
 from os.path import abspath, exists, join, splitext
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 
-from .container import DataContainer
+from .container import DataContainer, DatasetDict
 
 # allow older versions of pandas to work
 try:
@@ -23,7 +24,7 @@ except ImportError:
     from pandas.errors import DtypeWarning
 
 
-def read_jsonlines(filename, converters=None):
+def read_jsonlines(filename: str, converters: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
     """
     Read a data file in .jsonlines format into a data frame.
 
@@ -33,7 +34,7 @@ def read_jsonlines(filename, converters=None):
     ----------
     filename: str
         Name of file to read.
-    converters : dict, optional
+    converters : Optional[Dict[str, Any]]
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
         format as for ``pandas.read_csv()``.
@@ -41,7 +42,7 @@ def read_jsonlines(filename, converters=None):
 
     Returns
     -------
-    df : pandas DataFrame
+    df : pandas.DataFrame
          Data frame containing the data in the given file.
     """
     try:
@@ -78,7 +79,13 @@ def read_jsonlines(filename, converters=None):
     return df
 
 
-def try_to_load_file(filename, converters=None, raise_error=False, raise_warning=False, **kwargs):
+def try_to_load_file(
+    filename: str,
+    converters: Optional[Dict[str, Any]] = None,
+    raise_error: bool = False,
+    raise_warning: bool = False,
+    **kwargs,
+) -> Optional[pd.DataFrame]:
     """
     Read a single file, if it exists.
 
@@ -89,21 +96,21 @@ def try_to_load_file(filename, converters=None, raise_error=False, raise_warning
     ----------
     filename : str
         Name of file to read.
-    converters : dict, optional
+    converters : Optional[Dict[str, Any]]
         A dictionary specifying how the types of the columns
         in the file should be converted. Specified in the same
         format as for ``pandas.read_csv()``.
         Defaults to ``None``.
-    raise_error : bool, optional
+    raise_error : bool
         Raise an error if the file cannot be located.
         Defaults to ``False``.
-    raise_warning : bool, optional
+    raise_warning : bool
         Raise a warning if the file cannot be located.
         Defaults to ``False``.
 
     Returns
     -------
-    df : pandas DataFrame or ``None``
+    df : Optional[pandas.DataFrame]
         DataFrame containing the data in the given file,
         or ``None`` if the file does not exist.
 
@@ -112,31 +119,37 @@ def try_to_load_file(filename, converters=None, raise_error=False, raise_warning
     FileNotFoundError
         If ``raise_error`` is ``True`` and the file cannot be located.
     """
-    if exists(filename):
-        return DataReader.read_from_file(filename, converters, **kwargs)
-
     message = f"The file '{filename}' could not be located."
-    if raise_error:
-        raise FileNotFoundError(message)
-
-    if raise_warning:
-        warnings.warn(message)
+    if not exists(filename):
+        if raise_error:
+            raise FileNotFoundError(message)
+        if raise_warning:
+            warnings.warn(message)
+        return None
+    else:
+        return DataReader.read_from_file(filename, converters, **kwargs)
 
 
 class DataReader:
     """Class to generate DataContainer objects."""
 
-    def __init__(self, filepaths, framenames, file_converters=None):
+    def __init__(
+        self,
+        filepaths: List[str],
+        framenames: List[str],
+        file_converters: Optional[Dict[str, Dict[str, Any]]] = None,
+    ):
         """
         Initialize a DataReader object.
 
         Parameters
         ----------
-        filepaths : list of str
-            A list of paths to files that are to be read in.
-        framenames : list of str
+        filepaths : List[Optional[str]]
+            A list of paths to files that are to be read in. Some of the paths
+            can be empty strings.
+        framenames : List[str]
             A list of names for the data sets to be included in the container.
-        file_converters : dict of dicts, optional
+        file_converters : Optional[Dict[str, Dict[str, Any]]]
             A dictionary of file converter dicts. The keys are the data set
             names and the values are the converter dictionaries to be applied
             to the corresponding data set.
@@ -155,17 +168,14 @@ class DataReader:
             If any of the specified file paths is ``None``.
         """
         # Default datasets list
-        self.datasets = []
+        self.datasets: List[DatasetDict] = []
 
         # Make sure filepaths length matches frame names length
         assert len(filepaths) == len(framenames)
 
-        # Make sure that there are no Nones in the filepaths
-        if None in filepaths:
-            frames_with_no_path = [
-                framenames[i] for i in range(len(framenames)) if filepaths[i] is None
-            ]
-
+        # Make sure that there are no empty strings in the filepaths
+        frames_with_no_path = [framenames[i] for i in range(len(framenames)) if filepaths[i] == ""]
+        if frames_with_no_path:
             raise ValueError(f"No path specified for {' ,'.join(frames_with_no_path)}")
 
         # Assign names and paths lists
@@ -202,7 +212,7 @@ class DataReader:
         self.file_converters = {} if file_converters is None else file_converters
 
     @staticmethod
-    def read_from_file(filename, converters=None, **kwargs):
+    def read_from_file(filename: str, converters: Optional[Dict[str, Any]] = None, **kwargs):
         """
         Read a CSV/TSV/XLSX/JSONLINES/SAS7BDAT file and return a data frame.
 
@@ -210,7 +220,7 @@ class DataReader:
         ----------
         filename : str
             Name of file to read.
-        converters : dict, optional
+        converters : Optional[Dict[str, Any]]
             A dictionary specifying how the types of the columns
             in the file should be converted. Specified in the same
             format as for `pandas.read_csv()``.
@@ -218,7 +228,7 @@ class DataReader:
 
         Returns
         -------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Data frame containing the data in the given file.
 
         Raises
@@ -269,17 +279,17 @@ class DataReader:
         return df
 
     @staticmethod
-    def locate_files(filepaths, configdir):
+    def locate_files(filepaths: Union[str, List[str]], configdir: str) -> List[str]:
         """
         Locate an experiment file, or a list of experiment files.
 
         If the given path doesn't exist, then maybe the path is relative
-        to the path of the config file. If neither exists, then return
-        ``None``.
+        to the path of the config file. If neither exists, then return an
+        empty string.
 
         Parameters
         ----------
-        filepaths : str or list
+        filepaths : Union[str, List[str]]
             Name(s) of the experiment file we want to locate.
         configdir : str
             Path to the reference configuration directory
@@ -287,11 +297,10 @@ class DataReader:
 
         Returns
         -------
-        retval :  str or list
-            Absolute path to the experiment file or ``None``
-            if the file could not be located. If ``filepaths``
-            was a string, this method will return a string.
-            Otherwise, it will return a list.
+        retval : List[str]
+            List of absolute paths to the located files. If a file
+            does not exist, the corresponding element in the list
+            is an empty string.
 
         Raises
         ------
@@ -307,13 +316,10 @@ class DataReader:
 
         if isinstance(filepaths, str):
             filepaths = [filepaths]
-            return_string = True
-        else:
-            return_string = False
 
         located_paths = []
         for filepath in filepaths:
-            retval = None
+            retval = ""
             alternate_path = abspath(join(configdir, filepath))
 
             # if the given path exists as is, convert
@@ -328,25 +334,25 @@ class DataReader:
 
             located_paths.append(retval)
 
-        if return_string:
-            return located_paths[0]
-
         return located_paths
 
-    def read(self, kwargs_dict=None):
+    def read(self, kwargs_dict: Optional[Dict[str, Dict[str, Any]]] = None) -> DataContainer:
         """
         Read all files contained in ``self.dataset_paths``.
 
         Parameters
         ----------
-        kwargs_dict : dict of dicts, optional
-            Any additional keyword arguments to pass to a particular DataFrame.
-            These arguments will be passed to the pandas IO reader function.
+        kwargs_dict : Optional[Dict[str, Dict[str, Any]]]
+            Dictionary with the names of the datasets as keys and
+            dictionaries of keyword arguments to pass to the pandas
+            reader for each dataset as values. The keys in those
+            dictionaries are the names of the keyword arguments and
+            the values are the values of the keyword arguments.
             Defaults to ``None``.
 
         Returns
         -------
-        datacontainer : container.DataContainer
+        datacontainer : DataContainer
             A data container object.
 
         Raises
@@ -358,7 +364,7 @@ class DataReader:
             name = self.dataset_names[idx]
             converter = self.file_converters.get(name, None)
 
-            if not exists(set_path):
+            if not set_path or not exists(set_path):
                 raise FileNotFoundError(f"The file {set_path} does not exist")
 
             if kwargs_dict is not None:

@@ -247,7 +247,7 @@ def generate_explanation(
     # find the rsmtool experiment directory
     experiment_dir = DataReader.locate_files(
         configuration["experiment_dir"], configuration.configdir
-    )
+    )[0]
     if not experiment_dir:
         raise FileNotFoundError(f"The directory {configuration['experiment_dir']} does not exist.")
     else:
@@ -334,7 +334,7 @@ def generate_explanation(
     container = reader.read(kwargs_dict={"feature_info": {"index_col": 0}})
 
     # ensure that the background data is large enough for meaningful explanations
-    background_data_size = len(container.background_features)
+    background_data_size = len(container["background_features"])
     if background_data_size < 300:
         logger.error(
             f"The background data {background_data_path} contains only "

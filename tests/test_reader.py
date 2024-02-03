@@ -258,13 +258,7 @@ class TestDataReader(unittest.TestCase):
         config_dir = "output"
         result = DataReader.locate_files(paths, config_dir)
         assert isinstance(result, list)
-        self.assertEqual(result, [None, None])
-
-    def test_locate_files_str(self):
-        paths = "file1.csv"
-        config_dir = "output"
-        result = DataReader.locate_files(paths, config_dir)
-        self.assertEqual(result, None)
+        self.assertEqual(result, ["", ""])
 
     def test_locate_files_works(self):
         config_dir = "temp_output"
@@ -274,7 +268,7 @@ class TestDataReader(unittest.TestCase):
         full_path = os.path.abspath(os.path.join(config_dir, paths))
         open(full_path, "a").close()
 
-        result = DataReader.locate_files(paths, config_dir)
+        result = DataReader.locate_files(paths, config_dir)[0]
         rmtree(config_dir)
         self.assertEqual(result, full_path)
 
@@ -284,8 +278,8 @@ class TestDataReader(unittest.TestCase):
         with self.assertRaises(ValueError):
             DataReader.locate_files(paths, config_dir)
 
-    def test_setup_none_in_path(self):
-        paths = ["path1.csv", None, "path2.csv"]
+    def test_setup_empty_string_in_path(self):
+        paths = ["path1.csv", "", "path2.csv"]
         framenames = ["train", "test", "features"]
         with self.assertRaises(ValueError):
             DataReader(paths, framenames)

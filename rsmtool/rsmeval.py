@@ -125,7 +125,10 @@ def run_evaluation(
     writer = DataWriter(configuration["experiment_id"], configuration.context, wandb_run)
 
     # Make sure prediction file can be located
-    if not DataReader.locate_files(configuration["predictions_file"], configuration.configdir):
+    pred_file_location = DataReader.locate_files(
+        configuration["predictions_file"], configuration.configdir
+    )[0]
+    if not pred_file_location:
         raise FileNotFoundError(
             f"Error: Predictions file {configuration['predictions_file']} " f"not found."
         )
@@ -153,7 +156,7 @@ def run_evaluation(
     # If we want to do scaling, get the scale file
     if do_scaling:
         # Make sure scale file can be located
-        scale_file_location = DataReader.locate_files(scale_with, configuration.configdir)
+        scale_file_location = DataReader.locate_files(scale_with, configuration.configdir)[0]
         if not scale_file_location:
             raise FileNotFoundError(f"Could not find scaling file {scale_file_location}.")
 

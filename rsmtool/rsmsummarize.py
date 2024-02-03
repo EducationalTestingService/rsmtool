@@ -60,7 +60,7 @@ def check_experiment_dir(
         If ``experiment_dir`` contains several JSON configuration
         files instead of just one.
     """
-    full_path_experiment_dir = DataReader.locate_files(experiment_dir, configpath)
+    full_path_experiment_dir = DataReader.locate_files(experiment_dir, configpath)[0]
     if not full_path_experiment_dir:
         raise FileNotFoundError(f"The directory {experiment_dir} does not exist.")
     else:

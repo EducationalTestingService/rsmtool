@@ -1708,7 +1708,7 @@ class FeaturePreprocessor:
         feature_subset_file = config_obj["feature_subset_file"]
 
         if feature_subset_file is not None:
-            feature_subset_file = DataReader.locate_files(feature_subset_file, configdir)
+            feature_subset_file = DataReader.locate_files(feature_subset_file, configdir)[0]
 
         # get the column name for the labels for the training and testing data
         train_label_column = config_obj["train_label_column"]
@@ -2126,7 +2126,7 @@ class FeaturePreprocessor:
         """
         # get the directory where the config file lives
         configpath = config_obj.configdir
-        pred_file_location = DataReader.locate_files(config_obj["predictions_file"], configpath)
+        pred_file_location = DataReader.locate_files(config_obj["predictions_file"], configpath)[0]
 
         # get the column name for the labels for the training and testing data
         human_score_column = config_obj["human_score_column"]
