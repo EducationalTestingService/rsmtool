@@ -289,11 +289,14 @@ def run_experiment(
     # Save modeler instance
     modeler.feature_info = processed_container["feature_info"].copy()
     modeler.feature_info.set_index("feature", inplace=True)
-    (
-        modeler.trim_min,
-        modeler.trim_max,
-        modeler.trim_tolerance,
-    ) = configuration.get_trim_min_max_tolerance()
+
+    spec_trim_min, spec_trim_max, spec_trim_tolerance = configuration.get_trim_min_max_tolerance()
+    if spec_trim_min:
+        modeler.trim_min = spec_trim_min
+    if spec_trim_max:
+        modeler.trim_max = spec_trim_max
+    if spec_trim_tolerance:
+        modeler.trim_tolerance = spec_trim_tolerance
     pred_config_dict = pred_config.to_dict()
     for key, attr_name in [
         ("train_predictions_mean", "train_predictions_mean"),

@@ -37,8 +37,8 @@ def fast_predict(
     modeler: Modeler,
     df_feature_info: Optional[pd.DataFrame] = None,
     trim: bool = False,
-    trim_min: Optional[int] = None,
-    trim_max: Optional[int] = None,
+    trim_min: Optional[float] = None,
+    trim_max: Optional[float] = None,
     trim_tolerance: Optional[float] = None,
     scale: bool = False,
     train_predictions_mean: Optional[float] = None,
@@ -103,14 +103,14 @@ def fast_predict(
         ``trim_max`` must be specified or be available as attributes of
         the ``modeler``.
         Defaults to ``False``.
-    trim_min : Optional[int]
-        The lowest possible integer score that the machine should predict.
+    trim_min : Optional[float]
+        The lowest possible score that the machine should predict.
         If ``None``, this function will try to extract this value from
         ``modeler``. If ``None``, no such attribute exists, and
         ``trim=True``, a ``ValueError`` will be raised.
         Defaults to ``None``.
-    trim_max : Optional[int]
-        The highest possible integer score that the machine should predict.
+    trim_max : Optional[float]
+        The highest possible score that the machine should predict.
         If ``None``, this function will try to extract this value from
         ``modeler``. If ``None``, no such attribute exists, and
         ``trim=True``, a ``ValueError`` will be raised.

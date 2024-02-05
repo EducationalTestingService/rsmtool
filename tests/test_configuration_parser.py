@@ -1162,7 +1162,7 @@ class TestConfiguration(unittest.TestCase):
         }
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
-        self.assertEqual(trim_min_max_tolerance, (1, 6, 0.4998))
+        self.assertEqual(trim_min_max_tolerance, (1.0, 6.0, 0.4998))
 
     def test_get_trim_min_max_values_tolerance(self):
         dictionary = {
@@ -1176,7 +1176,7 @@ class TestConfiguration(unittest.TestCase):
         }
         config = Configuration(dictionary)
         trim_min_max_tolerance = config.get_trim_min_max_tolerance()
-        self.assertEqual(trim_min_max_tolerance, (1, 6, 0.51))
+        self.assertEqual(trim_min_max_tolerance, (1.0, 6.0, 0.51))
 
     def test_get_trim_tolerance_no_min_max(self):
         dictionary = {

@@ -197,6 +197,7 @@ def get_fairness_analyses(
         Name of the column containing system scores.
     human_score_column: str
         Name of the column containing human scores.
+        Dedaults to ``"sc1"``.
     base_group: Optional[str]
         Name of the group to use as the reference category. If ``None``, the
         group with the largest number of cases will be used as the reference
