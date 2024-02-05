@@ -551,7 +551,9 @@ class Configuration:
                     )
         return new_filter_dict
 
-    def get_trim_min_max_tolerance(self) -> Tuple[int, int, float]:
+    def get_trim_min_max_tolerance(
+        self,
+    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """
         Get trim min, trim max, and tolerance values.
 
@@ -560,11 +562,11 @@ class Configuration:
 
         Returns
         -------
-        spec_trim_min : int
+        spec_trim_min : Optional[float]
             Specified trim min value.
-        spec_trim_max : int
+        spec_trim_max : Optional[float]
             Specified trim max value.
-        spec_trim_tolerance: float
+        spec_trim_tolerance: Optional[float]
             Specified trim tolerance value.
         """
         config = self._config
@@ -572,6 +574,13 @@ class Configuration:
         spec_trim_min = config.get("trim_min", None)
         spec_trim_max = config.get("trim_max", None)
         spec_trim_tolerance = config.get("trim_tolerance", None)
+
+        if spec_trim_min:
+            spec_trim_min = float(spec_trim_min)
+        if spec_trim_max:
+            spec_trim_max = float(spec_trim_max)
+        if spec_trim_tolerance:
+            spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
     def get_rater_error_variance(self) -> float:

@@ -396,9 +396,9 @@ class FeaturePreprocessor:
     def trim(
         self,
         values: Union[List[float], np.ndarray],
-        trim_min: int,
-        trim_max: int,
-        tolerance: float = 0.4998,
+        trim_min: Optional[float],
+        trim_max: Optional[float],
+        tolerance: Optional[float] = 0.4998,
     ) -> np.ndarray:
         """
         Trim values in given numpy array.
@@ -410,13 +410,13 @@ class FeaturePreprocessor:
         ----------
         values : Union[List[float], numpy.ndarray]
             The values to trim.
-        trim_min : int
+        trim_min : Optional[float]
             The lowest score on the score point, used for
             trimming the raw regression predictions.
-        trim_max : float
+        trim_max : Optional[float]
             The highest score on the score point, used for
             trimming the raw regression predictions.
-        tolerance : float, optional
+        tolerance : Optional[float]
             The tolerance that will be used to compute the
             trim interval.
             Defaults to ``0.4998``.
@@ -424,10 +424,18 @@ class FeaturePreprocessor:
         Returns
         -------
         trimmed_values : numpy.ndarray
-            Numpy array containing the trimmed values.
+            Numpy array containing the trimmed values."
+
+        Raises
+        ------
+        ValueError
+            If ``trim_min``, ``trim_max``, or ``tolerance`` are not numeric.
         """
         if isinstance(values, list):
             values = np.array(values)
+
+        if trim_min is None or trim_max is None or tolerance is None:
+            raise ValueError("trim_min, trim_max, and tolerance must be numeric values.")
 
         new_max = trim_max + tolerance
         new_min = trim_min - tolerance
@@ -834,9 +842,9 @@ class FeaturePreprocessor:
         train_predictions_sd: float,
         human_labels_mean: float,
         human_labels_sd: float,
-        trim_min: int,
-        trim_max: int,
-        trim_tolerance: float = 0.4998,
+        trim_min: Optional[float],
+        trim_max: Optional[float],
+        trim_tolerance: Optional[float] = 0.4998,
     ) -> pd.DataFrame:
         """
         Process predictions to create scaled, trimmed and rounded predictions.
@@ -853,13 +861,13 @@ class FeaturePreprocessor:
             The mean of the human scores used to train the model.
         human_labels_sd : float
             The std. dev. of the human scores used to train the model.
-        trim_min : int
+        trim_min : Optional[float]
             The lowest score on the score point, used for trimming the raw
             regression predictions.
-        trim_max : int
+        trim_max : Optional[float]
             The highest score on the score point, used for trimming the raw
             regression predictions.
-        trim_tolerance: float
+        trim_tolerance: Optional[float]
             Tolerance to be added to trim_max and substracted from trim_min.
             Defaults to 0.4998.
 
@@ -1283,8 +1291,8 @@ class FeaturePreprocessor:
         candidate_column: str,
         requested_feature_names: List[str],
         reserved_column_names: List[str],
-        given_trim_min: int,
-        given_trim_max: int,
+        given_trim_min: Optional[float],
+        given_trim_max: Optional[float],
         flag_column_dict: Dict[str, Any],
         subgroups: List[str],
         exclude_zero_scores: bool = True,
@@ -1301,8 +1309,8 @@ class FeaturePreprocessor:
         pd.DataFrame,
         pd.DataFrame,
         pd.DataFrame,
-        int,
-        int,
+        float,
+        float,
         List[str],
     ]:
         """
@@ -1385,9 +1393,9 @@ class FeaturePreprocessor:
             Data frame with human scores filtered.
         df_responses_with_excluded_flags : pandas.DataFrame
             Data frame containing responses with excluded flags.
-        trim_min : int
+        trim_min : float
             The maximum trim value.
-        trim_max : int
+        trim_max : float
             The minimum trim value.
         feature_names : List[str]
             A list of feature names.

@@ -26,9 +26,9 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         The SKLL learner object to use for computing the expected scores.
     featureset : skll.data.FeatureSet
         The SKLL featureset object for which predictions are to be made.
-    min_score : int
+    min_score : float
         Minimum score level to be used for computing expected scores.
-    max_score : int
+    max_score : float
         Maximum score level to be used for computing expected scores.
 
     Returns
@@ -439,7 +439,7 @@ def difference_of_standardized_means(
 
 
 def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
-    """
+    r"""
     Calculate quadratic-weighted kappa for both discrete and continuous values.
 
     The formula to compute quadratic-weighted kappa for continuous values

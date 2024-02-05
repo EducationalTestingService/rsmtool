@@ -45,8 +45,8 @@ class Modeler:
         """
         self.feature_info: pd.DataFrame = None
         self.learner: Learner = None
-        self.trim_min: Optional[int] = None
-        self.trim_max: Optional[int] = None
+        self.trim_min: Optional[float] = None
+        self.trim_max: Optional[float] = None
         self.trim_tolerance: Optional[float] = None
         self.train_predictions_mean: Optional[float] = None
         self.train_predictions_sd: Optional[float] = None
@@ -1246,8 +1246,8 @@ class Modeler:
     def predict(
         self,
         df: pd.DataFrame,
-        min_score: Optional[int] = None,
-        max_score: Optional[int] = None,
+        min_score: Optional[float] = None,
+        max_score: Optional[float] = None,
         predict_expected: bool = False,
     ) -> pd.DataFrame:
         """
@@ -1259,12 +1259,12 @@ class Modeler:
             Data frame containing features on which to make the predictions.
             The data must contain pre-processed feature values, an ID column
             named "spkitemid", and a label column named "sc1".
-        min_score : Optional[int]
+        min_score : Optional[float]
             Minimum score level to be used if computing expected scores.
             If ``None``, trying to compute expected scores will raise an
             exception.
             Defaults to ``None``.
-        max_score : Optional[int]
+        max_score : Optional[float]
             Maximum score level to be used if computing expected scores.
             If ``None``, trying to compute expected scores will raise an
             exception.
@@ -1295,12 +1295,8 @@ class Modeler:
             distribution.
         ValueError
             If ``predict_expected`` is ``True`` but ``min_score`` and
-            ``max_score`` are not specified.
+            ``max_score`` are ``None``.
         """
-        # expected scores require specifying ``trim_min`` and ``trim_max``
-        if predict_expected and not (min_score and max_score):
-            raise ValueError("Must specify 'min_score' and 'max_score' for expected scores.")
-
         model = self.learner
 
         feature_columns = [c for c in df.columns if c not in ["spkitemid", "sc1"]]
@@ -1314,11 +1310,15 @@ class Modeler:
 
         fs = FeatureSet("data", ids=ids, labels=labels, features=features)
         # if we are predicting expected scores, then call a different function
-        predictions = (
-            compute_expected_scores_from_model(model, fs, min_score, max_score)
-            if predict_expected
-            else model.predict(fs)
-        )
+        if predict_expected:
+            if min_score is None or max_score is None:
+                raise ValueError("Must specify 'min_score' and 'max_score' for expected scores.")
+            else:
+                predictions = compute_expected_scores_from_model(
+                    model, fs, int(min_score), int(max_score)
+                )
+        else:
+            predictions = model.predict(fs)
 
         df_predictions = pd.DataFrame()
         df_predictions["spkitemid"] = ids
@@ -1367,14 +1367,14 @@ class Modeler:
 
         df_train_predictions = self.predict(
             df_train,
-            min_score=int(trim_min),
-            max_score=int(trim_max),
+            min_score=trim_min,
+            max_score=trim_max,
             predict_expected=predict_expected_scores,
         )
         df_test_predictions = self.predict(
             df_test,
-            min_score=int(trim_min),
-            max_score=int(trim_max),
+            min_score=trim_min,
+            max_score=trim_max,
             predict_expected=predict_expected_scores,
         )
 

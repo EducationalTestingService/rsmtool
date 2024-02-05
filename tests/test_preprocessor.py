@@ -970,6 +970,16 @@ class TestFeaturePreprocessor(unittest.TestCase):
         actual = self.fpp.trim(values, 1, 8, 0.25)
         assert_array_equal(actual, expected)
 
+    def test_trim_min_max_not_specified(self):
+        values = [1.8, 10.5, 1.4]
+        with self.assertRaises(ValueError):
+            self.fpp.trim(values, None, None)
+
+    def test_trim_none_tolerance(self):
+        values = [1.8, 10.5, 1.4]
+        with self.assertRaises(ValueError):
+            self.fpp.trim(values, 1, 6, None)
+
     def test_preprocess_feature_fail(self):
         np.random.seed(10)
         values = np.random.random(size=1000)
