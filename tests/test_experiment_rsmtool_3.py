@@ -241,7 +241,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
         source = "lr-wrong-path"
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(ValueError):
             do_run_experiment(source, experiment_id, config_file)
 
     def test_run_experiment_wrong_feature_file_path(self):
@@ -250,7 +250,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
         source = "lr-wrong-path-features"
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(ValueError):
             do_run_experiment(source, experiment_id, config_file)
 
     def test_run_experiment_lr_length_column_and_feature_list(self):
