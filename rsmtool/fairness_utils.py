@@ -187,7 +187,7 @@ def get_fairness_analyses(
 
     Parameters
     ----------
-    df: pandas DataFrame
+    df: pandas.DataFrame
         A dataframe containing columns with numeric human scores,
         columns with numeric system scores and a column with
         group membership.

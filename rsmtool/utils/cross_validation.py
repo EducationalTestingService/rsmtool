@@ -36,7 +36,7 @@ def create_xval_files(configuration, output_dir, logger=None):
 
     Returns
     -------
-    df_train : pandas DataFrame
+    df_train : pandas.DataFrame
         DataFrame containing the raw training data file.
     folds : int
         The number of folds for which the files were created.
@@ -224,7 +224,7 @@ def combine_fold_prediction_files(foldsdir, file_format="csv"):
 
     Returns
     -------
-    df_all_predictions : pandas DataFrame
+    df_all_predictions : pandas.DataFrame
         Data frame containing the combined predictions for all folds.
     """
     # initialize empty list to hold each prediction data frame

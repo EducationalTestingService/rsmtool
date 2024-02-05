@@ -7,6 +7,7 @@ Class for writing DataContainer frames to disk.
 
 :organization: ETS
 """
+
 from os import makedirs
 from os.path import join
 
@@ -43,7 +44,7 @@ class DataWriter:
 
         Parameters
         ----------
-        df : pandas DataFrame
+        df : pandas.DataFrame
             Data frame to write to disk
         name_prefix : str
             The complete prefix for the file to be written to disk.

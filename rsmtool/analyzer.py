@@ -854,7 +854,7 @@ class Analyzer:
 
         Returns
         -------
-        df_correlations: pandas DataFrame
+        df_correlations: pandas.DataFrame
             Data frame containing the human-system correlations, human-human
             correlations, and disattenuated correlations.
         """
