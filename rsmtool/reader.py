@@ -159,13 +159,13 @@ class DataReader:
         ------
         AssertionError
             If ``len(filepaths)`` does not equal ``len(framenames)``.
-        ValueError
-            If ``file_converters`` is not a dictionary or if any of its
-            values is not a dictionary.
         NameError
             If a key in ``file_converters`` does not exist in ``framenames``.
         ValueError
-            If any of the specified file paths is ``None``.
+            If ``file_converters`` is not a dictionary or if any of its
+            values is not a dictionary.
+        ValueError
+            If any of the specified file paths is an empty string.
         """
         # Default datasets list
         self.datasets: List[DatasetDict] = []
