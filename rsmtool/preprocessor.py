@@ -324,7 +324,7 @@ class FeatureSpecsProcessor:
 
         Returns
         -------
-        df_feature_specs : pandas DataFrame
+        df_feature_specs : pandas.DataFrame
             The output data frame containing the feature specifications.
         """
         # get feature sign information, if available

@@ -269,7 +269,7 @@ def get_true_score_evaluations(
 
     Parameters
     ----------
-    df: pandas DataFrame
+    df: pandas.DataFrame
         Input data frame. Must contain columns listed in
         ``system_score_columns`` and ``human_score_columns``.
     system_score_columns: str or list
@@ -290,7 +290,7 @@ def get_true_score_evaluations(
 
     Returns
     -------
-    prmse_metrics: pandas DataFrame
+    prmse_metrics: pandas.DataFrame
         DataFrame containing different evaluation metrics related to the evaluation
         of system scores against true scores. The column names are:
 

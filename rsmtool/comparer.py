@@ -219,7 +219,7 @@ class Comparer:
 
         Returns
         -------
-        df_correlations: pandas DataFrame
+        df_correlations: pandas.DataFrame
             Data frame with a row for each feature and the following columns:
                 - "N": total number of responses
                 - "human_old": correlation with human score in the old frame
