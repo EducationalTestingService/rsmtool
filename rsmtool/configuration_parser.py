@@ -572,13 +572,6 @@ class Configuration:
         spec_trim_min = config.get("trim_min", None)
         spec_trim_max = config.get("trim_max", None)
         spec_trim_tolerance = config.get("trim_tolerance", None)
-
-        if spec_trim_min:
-            spec_trim_min = float(spec_trim_min)
-        if spec_trim_max:
-            spec_trim_max = float(spec_trim_max)
-        if spec_trim_tolerance:
-            spec_trim_tolerance = float(spec_trim_tolerance)
         return (spec_trim_min, spec_trim_max, spec_trim_tolerance)
 
     def get_rater_error_variance(self) -> float:
