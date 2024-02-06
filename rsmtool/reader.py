@@ -119,8 +119,8 @@ def try_to_load_file(
     FileNotFoundError
         If ``raise_error`` is ``True`` and the file cannot be located.
     """
-    message = f"The file '{filename}' could not be located."
     if not exists(filename):
+        message = f"The file '{filename}' could not be located."
         if raise_error:
             raise FileNotFoundError(message)
         if raise_warning:
@@ -144,7 +144,7 @@ class DataReader:
 
         Parameters
         ----------
-        filepaths : List[Optional[str]]
+        filepaths : List[str]
             A list of paths to files that are to be read in. Some of the paths
             can be empty strings.
         framenames : List[str]
@@ -159,13 +159,13 @@ class DataReader:
         ------
         AssertionError
             If ``len(filepaths)`` does not equal ``len(framenames)``.
-        NameError
-            If a key in ``file_converters`` does not exist in ``framenames``.
         ValueError
             If ``file_converters`` is not a dictionary or if any of its
             values is not a dictionary.
+        NameError
+            If a key in ``file_converters`` does not exist in ``framenames``.
         ValueError
-            If any of the specified file paths is an empty string.
+            If any of the specified file paths is ``None``.
         """
         # Default datasets list
         self.datasets: List[DatasetDict] = []

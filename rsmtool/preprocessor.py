@@ -298,7 +298,7 @@ class FeatureSpecsProcessor:
         df: pd.DataFrame,
         feature_names: List[str],
         train_label: str,
-        feature_subset: pd.DataFrame = None,
+        feature_subset: Optional[pd.DataFrame] = None,
         feature_sign: Optional[int] = None,
     ) -> pd.DataFrame:
         """
@@ -328,7 +328,7 @@ class FeatureSpecsProcessor:
             The output data frame containing the feature specifications.
         """
         # get feature sign information, if available
-        if feature_sign:
+        if feature_sign and feature_subset is not None:
             # Convert to dictionary {feature:sign}
             sign_dict = dict(zip(feature_subset.Feature, feature_subset[f"Sign_{feature_sign}"]))
         # else create an empty dictionary
@@ -396,9 +396,9 @@ class FeaturePreprocessor:
     def trim(
         self,
         values: Union[List[float], np.ndarray],
-        trim_min: Optional[float],
-        trim_max: Optional[float],
-        tolerance: Optional[float] = 0.4998,
+        trim_min: float,
+        trim_max: float,
+        tolerance: float = 0.4998,
     ) -> np.ndarray:
         """
         Trim values in given numpy array.
@@ -410,13 +410,13 @@ class FeaturePreprocessor:
         ----------
         values : Union[List[float], numpy.ndarray]
             The values to trim.
-        trim_min : Optional[float]
+        trim_min : float
             The lowest score on the score point, used for
             trimming the raw regression predictions.
-        trim_max : Optional[float]
+        trim_max : float
             The highest score on the score point, used for
             trimming the raw regression predictions.
-        tolerance : Optional[float]
+        tolerance : float
             The tolerance that will be used to compute the
             trim interval.
             Defaults to ``0.4998``.
@@ -429,7 +429,7 @@ class FeaturePreprocessor:
         Raises
         ------
         ValueError
-            If ``trim_min``, ``trim_max``, or ``tolerance`` are not numeric.
+            If ``trim_min``, ``trim_max``, or ``tolerance`` are ``None``.
         """
         if isinstance(values, list):
             values = np.array(values)
@@ -466,7 +466,8 @@ class FeaturePreprocessor:
         Parameters
         ----------
         values : numpy.ndarray
-            The values from which to remove outliers.
+            The values from which to remove outliers, usually corresponding to
+            a given feature.
         mean : Optional[float]
             Use the given mean value when computing outliers instead of the mean
             from the data.
@@ -504,12 +505,14 @@ class FeaturePreprocessor:
         Remove outliers using pre-specified truncation groups.
 
         This is different from ``remove_outliers()`` which calculates the
-        outliers based on the training set.
+        outliers based on the training set rather than looking up the truncation
+        values from a pre-specified data frame.
 
         Parameters
         ----------
         values : numpy.ndarray
-            The values from which to remove outliers.
+            The values from which to remove outliers, usually corresponding
+            to a given feature.
         feature_name : str
             Name of the feature whose outliers are being clamped.
         truncations : pandas.DataFrame
@@ -842,9 +845,9 @@ class FeaturePreprocessor:
         train_predictions_sd: float,
         human_labels_mean: float,
         human_labels_sd: float,
-        trim_min: Optional[float],
-        trim_max: Optional[float],
-        trim_tolerance: Optional[float] = 0.4998,
+        trim_min: float,
+        trim_max: float,
+        trim_tolerance: float = 0.4998,
     ) -> pd.DataFrame:
         """
         Process predictions to create scaled, trimmed and rounded predictions.
@@ -861,13 +864,13 @@ class FeaturePreprocessor:
             The mean of the human scores used to train the model.
         human_labels_sd : float
             The std. dev. of the human scores used to train the model.
-        trim_min : Optional[float]
+        trim_min : float
             The lowest score on the score point, used for trimming the raw
             regression predictions.
-        trim_max : Optional[float]
+        trim_max : float
             The highest score on the score point, used for trimming the raw
             regression predictions.
-        trim_tolerance: Optional[float]
+        trim_tolerance: float
             Tolerance to be added to trim_max and substracted from trim_min.
             Defaults to 0.4998.
 
@@ -1350,9 +1353,9 @@ class FeaturePreprocessor:
             A list of requested feature names.
         reserved_column_names : List[str]
             A list of reserved column names.
-        given_trim_min : float
+        given_trim_min : Optional[float]
             The minimum trim value.
-        given_trim_max : float
+        given_trim_max : Optional[float]
             The maximum trim value.
         flag_column_dict : Dict[str, Any]
             A dictionary of flag columns.
@@ -1730,7 +1733,7 @@ class FeaturePreprocessor:
         (
             spec_trim_min,
             spec_trim_max,
-            spec_trim_tolerance,
+            _,
         ) = config_obj.get_trim_min_max_tolerance()
 
         # get the name of the optional column that
@@ -2165,12 +2168,21 @@ class FeaturePreprocessor:
         id_column = config_obj["id_column"]
 
         # get the specified trim min and max, if any
-        # and make sure they are numeric
+        # and make sure they are valid numbers and not None
         (
             spec_trim_min,
             spec_trim_max,
             spec_trim_tolerance,
         ) = config_obj.get_trim_min_max_tolerance()
+
+        # this should never happen since `trim_min` and `trim_max` are required
+        # fields for rsmeval and `trim_tolerance` always has a default value
+        # but we need to check it here to satisfy mypy
+        assert (
+            spec_trim_min is not None
+            and spec_trim_max is not None
+            and spec_trim_tolerance is not None
+        )
 
         # get the subgroups if any
         subgroups = config_obj.get("subgroups")
