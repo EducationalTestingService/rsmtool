@@ -362,6 +362,10 @@ def generate_explanation(
     # get the SKLL learner object for the rsmtool experiment and its feature names
     modeler = Modeler.load_from_file(join(experiment_output_dir, f"{experiment_id}.model"))
     learner = modeler.learner
+
+    # at this point learner should be a valid SKLL learner but let's confirm
+    # to satisfy mypy
+    assert learner is not None
     feature_names = list(learner.get_feature_names_out())
 
     # compute the background kmeans distribution

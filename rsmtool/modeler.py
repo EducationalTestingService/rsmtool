@@ -35,16 +35,27 @@ from .writer import DataWriter
 
 
 class Modeler:
-    """Class to train model and generate predictions with built-in or SKLL models."""
+    """
+    Class to train model and generate predictions with built-in or SKLL models.
+
+    Note
+    ----
+    The learner and scaling-/trimming-related attributes are set to ``None``.
+    """
 
     def __init__(self, logger: Optional[logging.Logger] = None) -> None:
         """
         Initialize empty Modeler object.
 
-        The learner and scaling-/trimming-related attributes are set to ``None``.
+        Parameters
+        ----------
+        logger : Optional[logging.Logger]
+            Logger object to use for logging messages. If ``None``, a new logger
+            instance will be created.
+            Defaults to ``None``.
         """
-        self.feature_info: pd.DataFrame = None
-        self.learner: Learner = None
+        self.feature_info: Optional[pd.DataFrame] = None
+        self.learner: Optional[Learner] = None
         self.trim_min: Optional[float] = None
         self.trim_max: Optional[float] = None
         self.trim_tolerance: Optional[float] = None
@@ -1287,6 +1298,8 @@ class Modeler:
         Raises
         ------
         ValueError
+            If no model has been trained yet.
+        ValueError
             If the model cannot predict probability distributions and
             ``predict_expected`` is set to ``True``.
         ValueError
@@ -1298,6 +1311,9 @@ class Modeler:
             ``max_score`` are ``None``.
         """
         model = self.learner
+
+        if model is None:
+            raise ValueError("No model has been trained yet.")
 
         feature_columns = [c for c in df.columns if c not in ["spkitemid", "sc1"]]
         features = df[feature_columns].to_dict(orient="records")
@@ -1362,6 +1378,10 @@ class Modeler:
             trim_max,
             trim_tolerance,
         ) = configuration.get_trim_min_max_tolerance()
+
+        # At this point, `trim_min` and `trim_max` are guaranteed to be
+        # valid numeric values but let's confirm to satisfy mypy
+        assert trim_min is not None and trim_max is not None and trim_tolerance is not None
 
         predict_expected_scores = configuration["predict_expected_scores"]
 
