@@ -12,7 +12,7 @@ from rsmtool.test_utils import do_run_experiment
 
 
 class TestComparer(unittest.TestCase):
-    """Test class for Comparer tests"""
+    """Test class for Comparer tests."""
 
     def test_make_summary_stat_df(self):
         array = np.random.multivariate_normal([100, 25], [[25, 0.5], [0.5, 1]], 5000)
@@ -197,7 +197,7 @@ class TestComparer(unittest.TestCase):
         experiment_id = "lr_subgroups_with_h2"
         test_dir = dirname(__file__)
         config_file = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, config_file)
         output_dir = join("test_outputs", source, "output")
         figure_dir = join("test_outputs", source, "figure")
 

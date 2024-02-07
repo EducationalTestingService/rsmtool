@@ -1,4 +1,5 @@
 """Utility functions for RSMTool tests."""
+
 import os
 import re
 import sys
@@ -12,10 +13,13 @@ from os import remove
 from os.path import basename, exists, join
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import numpy as np
 from bs4 import BeautifulSoup
 from pandas.testing import assert_frame_equal
+
+from rsmtool.configuration_parser import Configuration
 
 from .modeler import Modeler
 from .reader import DataReader
@@ -45,60 +49,61 @@ IGNORE_WARNINGS = False if STRICT_MODE else True
 
 
 def check_run_experiment(
-    source,
-    experiment_id,
-    subgroups=None,
-    consistency=False,
-    skll=False,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    experiment_id: str,
+    subgroups: Optional[List[str]] = None,
+    consistency: bool = False,
+    skll: bool = False,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmtool experiment test.
 
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment
-        configuration.
+        The name of the source directory containing the experiment configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    subgroups : list of str, optional
-        List of subgroup names used in the experiment. If specified,
-        outputs pertaining to subgroups are also checked as part of the
-        test.
+    subgroups : Optional[List[str]]
+        List of subgroup names used in the experiment. If specified, outputs
+        pertaining to subgroups are also checked as part of the test.
         Defaults to ``None``.
-    consistency : bool, optional
+    consistency : bool
         Whether to check consistency files as part of the experiment test.
         Generally, this should be true if the second human score column is
         specified.
         Defaults to ``False``.
-    skll : bool, optional
+    skll : bool
         Whether the model being used in the experiment is a SKLL model
         in which case the coefficients, predictions, etc. will not be
         checked since they can vary across machines, due to parameter tuning.
         Defaults to ``False``.
-    file_format : str, optional
+    file_format : str
         Which file format is being used for the output files of the experiment.
-        Defaults to "csv".
-    given_test_dir : str, optional
+        Defaults to ``"csv"``.
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input, if any.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
-        experiments.
+        using ``"source"`` and ``"experiment_id"``.
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the experiments.
         Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
@@ -106,9 +111,7 @@ def check_run_experiment(
 
     model_type = "skll" if skll else "rsmtool"
 
-    do_run_experiment(
-        source, experiment_id, config_input, suppress_warnings_for=suppress_warnings_for
-    )
+    do_run_experiment(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join("test_outputs", source, "output")
     expected_output_dir = join(test_dir, "data", "experiments", source, "output")
@@ -145,15 +148,14 @@ def check_run_experiment(
 
 
 def check_run_evaluation(
-    source,
-    experiment_id,
-    subgroups=None,
-    consistency=False,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    experiment_id: str,
+    consistency: bool = False,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmeval experiment test.
 
@@ -164,44 +166,41 @@ def check_run_evaluation(
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    subgroups : list of str, optional
-        List of subgroup names used in the experiment. If specified,
-        outputs pertaining to subgroups are also checked as part of the
-        test.
-        Defaults to ``None``.
-    consistency : bool, optional
+    consistency : bool
         Whether to check consistency files as part of the experiment test.
         Generally, this should be true if the second human score column is
         specified.
         Defaults to ``False``.
-    file_format : str, optional
+    file_format : str
         Which file format is being used for the output files of the experiment.
-        Defaults to "csv".
-    given_test_dir : str, optional
+        Defaults to ``"csv"``.
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input, if any.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
+        using ``"source"`` and ``"experiment_id"``.
         Defaults to ``None``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
         config_input = config_obj_or_dict
 
-    do_run_evaluation(
-        source, experiment_id, config_input, suppress_warnings_for=suppress_warnings_for
-    )
+    do_run_evaluation(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
     output_dir = join("test_outputs", source, "output")
     expected_output_dir = join(test_dir, "data", "experiments", source, "output")
@@ -230,13 +229,13 @@ def check_run_evaluation(
 
 
 def check_run_explain(
-    source,
-    experiment_id,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    experiment_id: str,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmexplain experiment test.
 
@@ -247,23 +246,27 @@ def check_run_explain(
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    given_test_dir : str, optional
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
+        using ``"source"`` and ``"experiment_id"``.
         Defaults to ``None``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
-        Defaults to ```[]``.
+        Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, "rsmexplain.json")
     else:
@@ -296,12 +299,12 @@ def check_run_explain(
 
 
 def check_run_comparison(
-    source,
-    experiment_id,
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    experiment_id: str,
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmcompare experiment test.
 
@@ -312,23 +315,27 @@ def check_run_comparison(
         configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    given_test_dir : str, optional
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
+        using ``"source"`` and ``"experiment_id"``.
         Defaults to ``None``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
-        Defaults to ```[]``.
+        Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, "rsmcompare.json")
     else:
@@ -350,13 +357,13 @@ def check_run_comparison(
 
 
 def check_run_prediction(
-    source,
-    excluded=False,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    excluded: bool = False,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmpredict experiment test.
 
@@ -365,29 +372,33 @@ def check_run_prediction(
     source : str
         The name of the source directory containing the experiment
         configuration.
-    excluded : bool, optional
+    excluded : bool
         Whether to check the excluded responses file as part of the test.
         Defaults to ``False``.
-    file_format : str, optional
+    file_format : str
         Which file format is being used for the output files of the experiment.
-        Defaults to "csv".
-    given_test_dir : str, optional
+        Defaults to ``"csv"``.
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
+        using ``"source"`` and ``"experiment_id"``.
         Defaults to ``None``.
-    suppress_warnings_for : list, optional
+    suppress_warnings_for : List[str]
         Categories for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, "rsmpredict.json")
     else:
@@ -412,12 +423,12 @@ def check_run_prediction(
 
 
 def check_run_summary(
-    source,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmsummarize experiment test.
 
@@ -426,26 +437,30 @@ def check_run_summary(
     source : str
         The name of the source directory containing the experiment
         configuration.
-    file_format : str, optional
+    file_format : str
         Which file format is being used for the output files of the experiment.
-        Defaults to "csv".
-    given_test_dir : str, optional
+        Defaults to ``"csv"``.
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict: configuration_parser.Configuration or dict, optional
+    config_obj_or_dict: Optional[Unit[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
+        using ``"source"`` and ``"experiment_id"``.
         Defaults to ``None``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, "rsmsummarize.json")
     else:
@@ -478,64 +493,67 @@ def check_run_summary(
 
 
 def check_run_cross_validation(
-    source,
-    experiment_id,
-    folds=5,
-    subgroups=None,
-    consistency=False,
-    skll=False,
-    file_format="csv",
-    given_test_dir=None,
-    config_obj_or_dict=None,
-    suppress_warnings_for=[],
-):
+    source: str,
+    experiment_id: str,
+    folds: int = 5,
+    subgroups: Optional[List[str]] = None,
+    consistency: bool = False,
+    skll: bool = False,
+    file_format: str = "csv",
+    given_test_dir: Optional[str] = None,
+    config_obj_or_dict: Optional[Union[Configuration, Dict[str, Any]]] = None,
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run a parameterized rsmxval experiment test.
 
     Parameters
     ----------
     source : str
-        The name of the source directory containing the experiment
-        configuration.
+        The name of the source directory containing the experiment configuration.
     experiment_id : str
         The experiment ID of the experiment.
-    folds : int, optional
+    folds : int
         Number of folds being used in the cross-validation experiment.
         Defaults to 5.
-    subgroups : list of str, optional
+    subgroups : Optional[List[str]]
         List of subgroup names used in the experiment. If specified,
         outputs pertaining to subgroups are also checked as part of the
         test.
         Defaults to ``None``.
-    consistency : bool, optional
+    consistency : bool
         Whether to check consistency files as part of the experiment test.
         Generally, this should be true if the second human score column is
         specified.
         Defaults to ``False``.
-    skll : bool, optional
+    skll : bool
         Whether the model being used in the experiment is a SKLL model
         in which case the coefficients, predictions, etc. will not be
         checked since they can vary across machines, due to parameter tuning.
         Defaults to ``False``.
-    file_format : str, optional
+    file_format : str
         Which file format is being used for the output files of the experiment.
-        Defaults to "csv".
-    given_test_dir : str, optional
+        Defaults to ``"csv"``.
+    given_test_dir : Optional[str]
         Path where the test experiments are located. Unless specified, the
         rsmtool test directory is used.
         Defaults to ``None``.
-    config_obj_or_dict : configuration_parser.Configuration or dict, optional
+    config_obj_or_dict : Optional[Union[Configuration, Dict[str, Any]]]
         Configuration object or dictionary to use as an input, if any.
         If ``None``, the function will construct a path to the config file
-        using ``source`` and ``experiment_id``.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+        using ``"source"`` and ``"experiment_id"``.
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
     # use the test directory from this file unless it's been overridden
-    test_dir = given_test_dir if given_test_dir else rsmtool_test_dir
+    if given_test_dir is None:
+        test_dir = str(rsmtool_test_dir)
+    else:
+        test_dir = given_test_dir
 
+    config_input: Union[str, Configuration, Dict[str, Any]]
     if config_obj_or_dict is None:
         config_input = join(test_dir, "data", "experiments", source, f"{experiment_id}.json")
     else:
@@ -543,9 +561,7 @@ def check_run_cross_validation(
 
     model_type = "skll" if skll else "rsmtool"
 
-    do_run_cross_validation(
-        source, experiment_id, config_input, suppress_warnings_for=suppress_warnings_for
-    )
+    do_run_cross_validation(source, config_input, suppress_warnings_for=suppress_warnings_for)
 
     output_prefix = join("test_outputs", source)
     expected_output_prefix = join(test_dir, "data", "experiments", source, "output")
@@ -671,7 +687,11 @@ def check_run_cross_validation(
             assert len(warning_msgs) == 0
 
 
-def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for=[]):
+def do_run_experiment(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmtool experiment automatically.
 
@@ -682,15 +702,13 @@ def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    experiment_id : str
-        Experiment ID to use when running.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object
         or a dictionary with keys corresponding to fields in the
         configuration file.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed
         when running the experiments. Note that ``RuntimeWarning``s
         are always suppressed.
         Defaults to ``[]``.
@@ -715,7 +733,11 @@ def do_run_experiment(source, experiment_id, config_input, suppress_warnings_for
         run_experiment(config_input, experiment_dir)
 
 
-def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for=[]):
+def do_run_evaluation(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmeval experiment automatically.
 
@@ -726,15 +748,13 @@ def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    experiment_id : str
-        Experiment ID to use when running.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object,
         or a dictionary with keys corresponding to fields in the
         configuration file.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed
         when running the experiments. Note that ``RuntimeWarning``s
         are always suppressed.
         Defaults to ``[]``.
@@ -759,7 +779,11 @@ def do_run_evaluation(source, experiment_id, config_input, suppress_warnings_for
         run_evaluation(config_input, experiment_dir)
 
 
-def do_run_explain(source, config_input, suppress_warnings_for=[]):
+def do_run_explain(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmexplain experiment automatically.
 
@@ -770,13 +794,13 @@ def do_run_explain(source, config_input, suppress_warnings_for=[]):
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object,
         or a dictionary with keys corresponding to fields in the
         configuration file
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
@@ -800,7 +824,11 @@ def do_run_explain(source, config_input, suppress_warnings_for=[]):
         generate_explanation(config_input, experiment_dir)
 
 
-def do_run_prediction(source, config_input, suppress_warnings_for=[]):
+def do_run_prediction(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmpredict experiment automatically.
 
@@ -811,13 +839,13 @@ def do_run_prediction(source, config_input, suppress_warnings_for=[]):
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object,
         or a dictionary with keys corresponding to fields in the
         configuration file
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
@@ -844,7 +872,11 @@ def do_run_prediction(source, config_input, suppress_warnings_for=[]):
         compute_and_save_predictions(config_input, output_file, feats_file)
 
 
-def do_run_comparison(source, config_input, suppress_warnings_for=[]):
+def do_run_comparison(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmcompre experiment automatically.
 
@@ -855,13 +887,13 @@ def do_run_comparison(source, config_input, suppress_warnings_for=[]):
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object,
         or a dictionary with keys corresponding to fields in the
         configuration file
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed
         when running the experiments. Note that ``RuntimeWarning``s
         are always suppressed.
         Defaults to ``[]``.
@@ -880,7 +912,11 @@ def do_run_comparison(source, config_input, suppress_warnings_for=[]):
         run_comparison(config_input, experiment_dir)
 
 
-def do_run_summary(source, config_input, suppress_warnings_for=[]):
+def do_run_summary(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+):
     """
     Run rsmsummarize experiment automatically.
 
@@ -891,13 +927,13 @@ def do_run_summary(source, config_input, suppress_warnings_for=[]):
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object,
         or a dictionary with keys corresponding to fields in the
         configuration file
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed when running the
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed when running the
         experiments.
         Defaults to ``[]``.
     """
@@ -921,7 +957,11 @@ def do_run_summary(source, config_input, suppress_warnings_for=[]):
         run_summary(config_input, experiment_dir)
 
 
-def do_run_cross_validation(source, experiment_id, config_input, suppress_warnings_for=[]):
+def do_run_cross_validation(
+    source: str,
+    config_input: Union[str, Configuration, Dict[str, Any]],
+    suppress_warnings_for: List[Type] = [],
+) -> None:
     """
     Run rsmxval experiment automatically.
 
@@ -932,15 +972,13 @@ def do_run_cross_validation(source, experiment_id, config_input, suppress_warnin
     ----------
     source : str
         Path to where the test experiment is located on disk.
-    experiment_id : str
-        Experiment ID to use when running.
-    config_input : str or Configuration or dict
+    config_input : Union[str, Configuration, Dict[str, Any]]
         Path to the experiment configuration file,
         or a ``configuration_parser.Configuration`` object
         or a dictionary with keys corresponding to fields in the
         configuration file.
-    suppress_warnings_for : list, optional
-        Categories for which warnings should be suppressed
+    suppress_warnings_for : List[Type]
+        Types for which warnings should be suppressed
         when running the experiments. Note that ``RuntimeWarning``s
         are always suppressed.
         Defaults to ``[]``.
@@ -972,7 +1010,7 @@ def do_run_cross_validation(source, experiment_id, config_input, suppress_warnin
         run_cross_validation(config_input, experiment_dir, silence_tqdm=True)
 
 
-def check_file_output(file1, file2, file_format="csv"):
+def check_file_output(file1: str, file2: str, file_format: str = "csv") -> None:
     """
     Check if the two given tabular files contain matching values.
 
@@ -986,9 +1024,9 @@ def check_file_output(file1, file2, file_format="csv"):
         Path to the first file.
     file2 : str
         Path to the second files.
-    file_format : str, optional
+    file_format : str
         The format of the output files.
-        Defaults to "csv".
+        Defaults to ``"csv"``.
     """
     # make sure that the main id columns are read as strings since
     # this may affect merging in custom notebooks
@@ -1045,7 +1083,7 @@ def check_file_output(file1, file2, file_format="csv"):
         raise
 
 
-def collect_warning_messages_from_report(html_file):
+def collect_warning_messages_from_report(html_file: str) -> List[str]:
     """
     Collect all warning messages from the given HTML report.
 
@@ -1056,7 +1094,7 @@ def collect_warning_messages_from_report(html_file):
 
     Returns
     -------
-    warnings_text : list of str
+    warnings_text : List[str]
         The list of collected warnings.
     """
     with open(html_file, "r") as htmlf:
@@ -1074,7 +1112,7 @@ def collect_warning_messages_from_report(html_file):
     return warnings_text
 
 
-def check_report(html_file, raise_errors=True, raise_warnings=True):
+def check_report(html_file: str, raise_errors: bool = True, raise_warnings: bool = True) -> None:
     """
     Raise ``AssertionError`` if given HTML report contains errors or warnings.
 
@@ -1082,13 +1120,11 @@ def check_report(html_file, raise_errors=True, raise_warnings=True):
     ----------
     html_file : str
         Path to the HTML report file on disk.
-    raise_errors : bool, optional
-        Whether to raise an ``AssertionError`` if there
-        are any errors in the report.
+    raise_errors : bool
+        Whether to raise an ``AssertionError`` if there are any errors in the report.
         Defaults to ``True``.
-    raise_warnings : bool, optional
-        Whether to raise an ``AssertionError`` if there
-        are any warnings in the report.
+    raise_warnings : bool
+        Whether to raise an ``AssertionError`` if there are any warnings in the report.
         Defaults to ``True``.
     """
     report_errors = 0
@@ -1125,7 +1161,9 @@ def check_report(html_file, raise_errors=True, raise_warnings=True):
         assert report_warnings == 0
 
 
-def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
+def check_scaled_coefficients(
+    output_dir: str, experiment_id: str, file_format: str = "csv"
+) -> None:
     """
     Check that predictions using scaled coefficients match scaled scores.
 
@@ -1135,9 +1173,9 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
          Path to the experiment output directory for a test.
     experiment_id : str
         The experiment ID.
-    file_format : str, optional
+    file_format : str
         The format of the output files.
-        Defaults to "csv".
+        Defaults to ``"csv"``.
     """
     preprocessed_test_file = join(
         output_dir, f"{experiment_id}_test_preprocessed_features.{file_format}"
@@ -1169,21 +1207,23 @@ def check_scaled_coefficients(output_dir, experiment_id, file_format="csv"):
     )
 
 
-def check_generated_output(generated_files, experiment_id, model_source, file_format="csv"):
+def check_generated_output(
+    generated_files: List[str], experiment_id: str, model_source: str, file_format: str = "csv"
+) -> None:
     """
     Check that all necessary output files have been generated.
 
     Parameters
     ----------
-    generated_files : list of str
+    generated_files : List[str]
         List of files generated by a test.
     experiment_id : str
         The experiment ID.
     model_source : str
-        One of "rsmtool" or "skll".
+        One of ``"rsmtool"`` or ``"skll"``.
     file_format : str, optional
         The format of the output files.
-        Defaults to "csv".
+        Defaults to ``"csv"``.
     """
     file_must_have_both = [
         f"_confMatrix.{file_format}",
@@ -1219,19 +1259,21 @@ def check_generated_output(generated_files, experiment_id, model_source, file_fo
     assert len(missing_file) == 0, f"Missing files: {','.join(missing_file)}"
 
 
-def check_consistency_files_exist(generated_files, experiment_id, file_format="csv"):
+def check_consistency_files_exist(
+    generated_files: List[str], experiment_id: str, file_format: str = "csv"
+) -> None:
     """
     Check that the consistency files were generated.
 
     Parameters
     ----------
-    generated_files : list of str
+    generated_files : List[str]
         List of files generated by a test.
     experiment_id : str
         The experiment ID.
-    file_format : str, optional
+    file_format : str
         The format of the output files.
-        Defaults to "csv".
+        Defaults to ``"csv"``.
     """
     file_must_have = [
         f"_consistency.{file_format}",
@@ -1246,22 +1288,23 @@ def check_consistency_files_exist(generated_files, experiment_id, file_format="c
     assert len(missing_file) == 0, f"Missing files: {','.join(missing_file)}"
 
 
-def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="csv"):
+def check_subgroup_outputs(
+    output_dir: str, experiment_id: str, subgroups: List[str], file_format: str = "csv"
+) -> None:
     """
     Check that the subgroup-related outputs are accurate.
 
     Parameters
     ----------
     output_dir : str
-        Path to the `output` experiment output directory for a test.
+        Path to the ``output`` experiment output directory for a test.
     experiment_id : str
         The experiment ID.
-    subgroups : list of str
-        List of column names that contain grouping
-        information.
-    file_format : str, optional
+    subgroups : List[str]
+        List of column names that contain grouping information.
+    file_format : str
         The format of the output files.
-        Defaults to "csv".
+        Defaults to ``"csv"``.
     """
     train_preprocessed_file = join(output_dir, f"{experiment_id}_train_metadata.{file_format}")
     train_preprocessed = DataReader.read_from_file(train_preprocessed_file, index_col=0)
@@ -1294,7 +1337,9 @@ def check_subgroup_outputs(output_dir, experiment_id, subgroups, file_format="cs
             assert length == partition_info.iloc[0][group]
 
 
-def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
+def copy_data_files(
+    temp_dir_name: str, input_file_dict: Dict[str, str], given_test_dir: str
+) -> Dict[str, str]:
     """
     Copy files from given test directory to a temporary directory.
 
@@ -1305,7 +1350,7 @@ def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
     ----------
     temp_dir_name : str
         Name of the temporary directory.
-    input_file_dict : dict
+    input_file_dict : Dict[str, str]
         A dictionary of files/directories to copy with keys as the
         file type and the values are their paths relative to the ``tests``
         directory.
@@ -1314,7 +1359,7 @@ def copy_data_files(temp_dir_name, input_file_dict, given_test_dir):
 
     Returns
     -------
-    output_file_dict : dict
+    output_file_dict : Dict[str, str]
         The dictionary with the same keys as
         ``input_file_dict`` and values being the copied paths.
     """
@@ -1349,7 +1394,7 @@ class FileUpdater(object):
 
     Attributes
     ----------
-    test_suffixes : list
+    test_suffixes : List[str]
         List of suffixes that will be added to the string
         "test_experiment_" and located in the ``tests_directory``
         to find the tests that are to be updated.
@@ -1359,30 +1404,47 @@ class FileUpdater(object):
     updated_outputs_directory : str
         Path to the directory containing the updated outputs for the
         experiment tests.
-    deleted_files : list
+    deleted_files : List[str]
         List of files deleted from ``tests directory``.
-    updated_files : list
+    updated_files : List[str]
         List of files that have either (really) changed in the updated outputs
         or been added in those outputs.
-    missing_or_empty_sources : list
+    missing_or_empty_sources : List[str]
         List of source names whose corresponding directories are either
         missing under ``updated_outputs_directory` or do exist but are
         empty.
     """
 
-    def __init__(self, test_suffixes, tests_directory, updated_outputs_directory):
-        """Instantiate a FileUpdater object."""
+    def __init__(
+        self, test_suffixes: List[str], tests_directory: str, updated_outputs_directory: str
+    ):
+        """
+        Instantiate a FileUpdater object.
+
+        Parameters
+        ----------
+        test_suffixes : List[str]
+            List of suffixes that will be added to the string
+            "test_experiment_" and located in the ``tests_directory``
+            to find the tests that are to be updated.
+        tests_directory : str
+            Path to the directory containing the tests whose outputs are
+            to be updated.
+        updated_outputs_directory : str
+            Path to the directory containing the updated outputs for the
+            experiment tests.
+        """
         self.test_suffixes = test_suffixes
         self.tests_directory = Path(tests_directory)
         self.updated_outputs_directory = Path(updated_outputs_directory)
-        self.missing_or_empty_sources = []
-        self.deleted_files = []
-        self.updated_files = []
+        self.missing_or_empty_sources: List[str] = []
+        self.deleted_files: List[Tuple[str, str]] = []
+        self.updated_files: List[Tuple[str, str]] = []
 
         # invalidate the file comparison cache
         clear_cache()
 
-    def is_skll_excluded_file(self, filename):
+    def is_skll_excluded_file(self, filename: str) -> bool:
         """
         Check whether given filename should be excluded for SKLL-based tests.
 
@@ -1394,8 +1456,7 @@ class FileUpdater(object):
         Returns
         -------
         exclude : bool
-            ``True`` if the file should be excluded.
-            ``False`` otherwise.
+            ``True`` if the file should be excluded. ``False`` otherwise.
         """
         possible_suffixes = [".model", ".npy"]
         possible_stems = [
@@ -1414,7 +1475,13 @@ class FileUpdater(object):
             file_stem.endswith(stem) for stem in possible_stems
         )
 
-    def update_source(self, source, skll=False, file_type="output", input_source=None):
+    def update_source(
+        self,
+        source: str,
+        skll: bool = False,
+        file_type: str = "output",
+        input_source: Optional[str] = None,
+    ) -> None:
         """
         Update test output or input data for test named ``source``.
 
@@ -1430,15 +1497,15 @@ class FileUpdater(object):
         ----------
         source : str
             Name of source directory.
-        skll : bool, optional
+        skll : bool
             Whether the given source is for a SKLL-based test.
             Defaults to ``False``.
-        file_type: str, optional
+        file_type: str
             Whether we are updating test output files or test input files.
-            Input files are updated for rsmtool and rsmcompare.
+            Input files are updated for ``rsmtool`` and ``rsmcompare``.
             Defaults to "output".
-        input_source: str, optional
-            The name of the source directory for input files
+        input_source: Optional[str]
+            The name of the source directory for input files.
             Defaults to ``None``.
         """
         # locate the updated outputs for the experiment under the given
@@ -1484,6 +1551,7 @@ class FileUpdater(object):
                 )
                 all_updated_folders.append((updated_output_path, existing_output_path))
         else:
+            assert input_source is not None
             updated_output_path = self.updated_outputs_directory / input_source / "output"
             existing_output_path = (
                 self.tests_directory / "data" / "experiments" / source / input_source / "output"
@@ -1588,7 +1656,7 @@ class FileUpdater(object):
             self.deleted_files.extend([(test_name, file) for file in existing_output_only_files])
             self.updated_files.extend([(test_name, file) for file in new_or_changed_files])
 
-    def update_test_data(self, source, test_tool, skll=False):
+    def update_test_data(self, source: str, test_tool: str, skll: bool = False) -> None:
         """
         Determine whether to update input or output data and run ``update_source()``.
 
@@ -1598,7 +1666,7 @@ class FileUpdater(object):
             Name of source directory.
         test_tool : str
             What tool is tested by this test.
-        skll : bool, optional
+        skll : bool
             Whether the given source is for a SKLL-based test.
             Defaults to ``False``.
         """

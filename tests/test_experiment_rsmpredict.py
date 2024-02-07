@@ -67,7 +67,7 @@ class TestExperimentRsmpredict(unittest.TestCase):
         rsmtool_config_file = join(
             rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
         )
-        do_run_experiment(source, experiment_id, rsmtool_config_file)
+        do_run_experiment(source, rsmtool_config_file)
         rsmpredict_config_file = join(
             rsmtool_test_dir, "data", "experiments", source, "rsmpredict.json"
         )

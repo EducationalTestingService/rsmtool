@@ -88,7 +88,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         source = "lr-with-notebook-rerun"
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, config_file)
 
         report_ipynb = join("test_outputs", source, "report", f"{experiment_id}_report.ipynb")
         report_html = join("test_outputs", source, "report", f"{experiment_id}_report.html")
@@ -106,7 +106,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         source = "lr-with-notebook-rerun-fail"
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, config_file)
 
         report_env = join("test_outputs", source, "report", ".environ.json")
         report_ipynb = join("test_outputs", source, "report", f"{experiment_id}_report.ipynb")
@@ -125,7 +125,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "lr_with_feature_subset_file"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_sc2_as_feature_name(self):
         # rsmtool experiment with sc2 used as a feature name
@@ -137,7 +137,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
             config_file = join(
                 rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json"
             )
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_subgroup_as_feature_name(self):
         # rsmtool experiment with a subgroup name used as feature
@@ -147,7 +147,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "lr_with_subgroup_as_feature_name"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_all_non_numeric_scores(self):
         # rsmtool experiment with all values for `sc1`
@@ -158,7 +158,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "lr_with_all_non_numeric_scores"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_one_fully_non_numeric_feature(self):
         # rsmtool experiment with all values for one of the
@@ -169,7 +169,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "lr_with_one_fully_non_numeric_feature"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_none_flagged(self):
         # rsmtool experiment where all responses have the bad flag
@@ -180,7 +180,7 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "lr_with_none_flagged"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_wrong_model_name(self):
         # rsmtool experiment with incorrect model name
@@ -188,4 +188,4 @@ class TestExperimentRsmtool1(unittest.TestCase):
         experiment_id = "wrong_model_name"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
