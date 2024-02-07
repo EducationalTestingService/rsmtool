@@ -26,18 +26,15 @@ class TestExperimentRsmeval(unittest.TestCase):
         {
             "source": "lr-eval-exclude-listwise",
             "experiment_id": "lr_eval_exclude_listwise",
-            "subgroups": ["QUESTION", "L1"],
         },
         {"source": "lr-eval-exclude-flags", "experiment_id": "lr_eval_exclude_flags"},
         {
             "source": "lr-eval-with-missing-scores",
             "experiment_id": "lr_eval_with_missing_scores",
-            "subgroups": ["QUESTION", "L1"],
         },
         {
             "source": "lr-eval-with-missing-data",
             "experiment_id": "lr_eval_with_missing_data",
-            "subgroups": ["QUESTION", "L1"],
         },
         {
             "source": "lr-eval-with-custom-order",
@@ -48,7 +45,6 @@ class TestExperimentRsmeval(unittest.TestCase):
         {
             "source": "lr-eval-with-custom-sections-and-order",
             "experiment_id": "lr_eval_with_custom_sections_and_order",
-            "subgroups": ["QUESTION", "L1"],
         },
         {"source": "lr-eval-tsv-input-files", "experiment_id": "lr_eval_tsv_input_files"},
         {"source": "lr-eval-xlsx-input-files", "experiment_id": "lr_eval_xlsx_input_files"},
@@ -73,7 +69,6 @@ class TestExperimentRsmeval(unittest.TestCase):
         {
             "source": "lr-eval-with-h2",
             "experiment_id": "lr_eval_with_h2",
-            "subgroups": ["QUESTION", "L1"],
             "consistency": "True",
         },
         {
@@ -103,12 +98,10 @@ class TestExperimentRsmeval(unittest.TestCase):
         {
             "source": "lr-eval-with-numeric-threshold",
             "experiment_id": "lr_evaluation_with_numeric_threshold",
-            "subgroups": ["QUESTION", "L1"],
         },
         {
             "source": "lr-eval-system-score-constant",
             "experiment_id": "lr_eval_system_score_constant",
-            "subgroups": ["QUESTION", "L1"],
             "consistency": "True",
             "suppress_warnings_for": [UserWarning],
         },
