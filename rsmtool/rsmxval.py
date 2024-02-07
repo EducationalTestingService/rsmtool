@@ -94,10 +94,11 @@ def run_cross_validation(
         rsmtool for each fold. This option should only be used when
         running the unit tests.
         Defaults to ``False``.
-    wandb_run : wandb.wandb_run.Run
+    wandb_run : Optional[wandb.wandb_run.Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
-        wandb is enabled in the configuration. Defaults to ``None``.
+        wandb is enabled in the configuration.
+        Defaults to ``None``.
 
     Raises
     ------
