@@ -9,19 +9,31 @@ Class for transforming features.
 """
 
 import logging
+from typing import Callable, Dict, Optional
 
 import numpy as np
+import pandas as pd
 from scipy.stats.stats import pearsonr
 
 
 class FeatureTransformer:
     """Encapsulate feature transformation methods."""
 
-    def __init__(self, logger=None):
-        """Initialize the FeatureTransformer object."""
+    def __init__(self, logger: Optional[logging.Logger] = None):
+        """
+        Initialize the FeatureTransformer object.
+
+        Parameters
+        ----------
+        logger : Optional[logging.Logger]
+            Logger object to use in the transformer. If not provided,
+            a logger will be created with the name of this class.
+        """
         self.logger = logger if logger else logging.getLogger(__name__)
 
-    def apply_sqrt_transform(self, name, values, raise_error=True):
+    def apply_sqrt_transform(
+        self, name: str, values: np.ndarray, raise_error: bool = True
+    ) -> np.ndarray:
         """
         Apply the "sqrt" transform to ``values``.
 
@@ -29,16 +41,16 @@ class FeatureTransformer:
         ----------
         name : str
             Name of the feature to transform.
-        values : np.array
+        values : numpy.ndarray
             Numpy array containing the feature values.
-        raise_error : bool, optional
+        raise_error : bool
             If ``True``, raises an error if the transform is applied to
             a feature that has negative values.
             Defaults to ``True``.
 
         Returns
         -------
-        new_data : np.array
+        new_data : numpy.ndarray
             Numpy array containing the transformed feature values.
 
         Raises
@@ -65,7 +77,9 @@ class FeatureTransformer:
             new_data = np.sqrt(values)
         return new_data
 
-    def apply_log_transform(self, name, values, raise_error=True):
+    def apply_log_transform(
+        self, name: str, values: np.ndarray, raise_error: bool = True
+    ) -> np.ndarray:
         """
         Apply the "log" transform to ``values``.
 
@@ -73,18 +87,17 @@ class FeatureTransformer:
         ----------
         name : str
             Name of the feature to transform.
-        values : np.array
+        values : numpy.ndarray
             Numpy array containing the feature values.
-        raise_error : bool, optional
+        raise_error : bool
             If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
             Defaults to ``True``.
 
         Returns
         -------
-        new_data : numpy array
-            Numpy array containing the transformed feature
-            values.
+        new_data : numpy.ndarray
+            Numpy array containing the transformed feature values.
 
         Raises
         ------
@@ -123,7 +136,9 @@ class FeatureTransformer:
         new_data = np.log(values)
         return new_data
 
-    def apply_inverse_transform(self, name, values, raise_error=True, sd_multiplier=4):
+    def apply_inverse_transform(
+        self, name: str, values: np.ndarray, raise_error: bool = True, sd_multiplier: int = 4
+    ) -> np.ndarray:
         """
         Apply the "inv" (inverse) transform to ``values``.
 
@@ -131,24 +146,22 @@ class FeatureTransformer:
         ----------
         name : str
             Name of the feature to transform.
-        values : np.array
+        values : numpy.ndarray
             Numpy array containing the feature values.
-        raise_error : bool, optional
-            If ``True``, raises an error if the transform is applied to
-            a feature that has zero values or to a feature that has
-           both positive and negative values.
+        raise_error : bool
+            If ``True``, raises an error if the transform is applied to a feature
+            that has zero values or to a feature that has both positive and
+            negative values.
             Defaults to ``True``.
-        sd_multiplier : int, optional
-            Use this std. dev. multiplier to compute the ceiling
-            and floor for outlier removal and check that these
-            are not equal to zero.
+        sd_multiplier : int
+            Use this std. dev. multiplier to compute the ceiling and floor for
+            outlier removal and check that these are not equal to zero.
             Defaults to 4.
 
         Returns
         -------
-        new_data : np.array
-            Numpy array containing the transformed feature
-            values.
+        new_data : numpy.ndarray
+            Numpy array containing the transformed feature values.
 
         Raises
         ------
@@ -202,7 +215,9 @@ class FeatureTransformer:
 
         return new_data
 
-    def apply_add_one_inverse_transform(self, name, values, raise_error=True):
+    def apply_add_one_inverse_transform(
+        self, name: str, values: np.ndarray, raise_error: bool = True
+    ) -> np.ndarray:
         """
         Apply the "addOneInv" (add one and invert) transform to ``values``.
 
@@ -210,16 +225,16 @@ class FeatureTransformer:
         ----------
         name : str
             Name of the feature to transform.
-        values : np.array
+        values : numpy.ndarray
             Numpy array containing the feature values.
-        raise_error : bool, optional
+        raise_error : bool
             If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
             Defaults to ``True``.
 
         Returns
         -------
-        new_data : np.array
+        new_data : numpy.ndarray
             Numpy array containing the transformed feature values.
 
         Raises
@@ -246,7 +261,9 @@ class FeatureTransformer:
         new_data = 1 / (values + 1)
         return new_data
 
-    def apply_add_one_log_transform(self, name, values, raise_error=True):
+    def apply_add_one_log_transform(
+        self, name: str, values: np.ndarray, raise_error: bool = True
+    ) -> np.ndarray:
         """
         Apply the "addOneLn" (add one and log) transform to ``values``.
 
@@ -254,16 +271,16 @@ class FeatureTransformer:
         ----------
         name : str
             Name of the feature to transform.
-        values : np.array
+        values : numpy.ndarray
             Numpy array containing the feature values.
-        raise_error : bool, optional
+        raise_error : bool
             If ``True``, raises an error if the transform is applied to
             a feature that has zero or negative values.
             Defaults to ``True``.
 
         Returns
         -------
-        new_data : np.array
+        new_data : numpy.ndarray
             Numpy array that contains the transformed feature values.
 
         Raises
@@ -290,7 +307,9 @@ class FeatureTransformer:
         new_data = np.log(values + 1)
         return new_data
 
-    def transform_feature(self, values, column_name, transform, raise_error=True):
+    def transform_feature(
+        self, values: np.ndarray, column_name: str, transform: str, raise_error: bool = True
+    ) -> np.ndarray:
         """
         Apply given transform to all values in the given numpy array.
 
@@ -298,21 +317,21 @@ class FeatureTransformer:
 
         Parameters
         ----------
-        values : numpy array
+        values : numpy.ndarray
             Numpy array containing the feature values.
         column_name : str
             Name of the feature to transform.
         transform : str
-            Name of the transform to apply. One of {"inv", "sqrt", "log",
-            "addOneInv", "addOneLn", "raw", "org"}.
-        raise_error : bool, optional
+            Name of the transform to apply. One of {``"inv"``, ``"sqrt"``,
+            ``"log"``, ``"addOneInv"``, ``"addOneLn"``, ``"raw"``, ``"org"``}.
+        raise_error : bool
             If ``True``, raise a ValueError if a transformation leads to
             invalid values or may change the ranking of the responses.
             Defaults to ``True``.
 
         Returns
         -------
-        new_data : np.array
+        new_data : numpy.ndarray
             Numpy array containing the transformed feature values.
 
         Raises
@@ -326,25 +345,27 @@ class FeatureTransformer:
         span both negative and positive values. Some transformations may
         throw errors for negative feature values.
         """
-        transforms = {
+        transforms: Dict[str, Callable] = {
             "inv": self.apply_inverse_transform,
             "sqrt": self.apply_sqrt_transform,
             "log": self.apply_log_transform,
             "addOneInv": self.apply_add_one_inverse_transform,
             "addOneLn": self.apply_add_one_log_transform,
-            "raw": lambda column_name, data, raise_error: data,
-            "org": lambda column_name, data, raise_error: data,
+            "raw": lambda data: data,
+            "org": lambda data: data,
         }
 
         # make sure we have a valid transform function
         if transform is None or transform not in transforms:
-            raise ValueError(f"Unrecognized feature transformation:  {transform}")
+            raise ValueError(f"Unrecognized feature transformation: {transform}")
 
-        transformer = transforms.get(transform)
+        transformer = transforms[transform]
         new_data = transformer(column_name, values, raise_error)
         return new_data
 
-    def find_feature_transform(self, feature_name, feature_value, scores):
+    def find_feature_transform(
+        self, feature_name: str, feature_value: pd.Series, scores: pd.Series
+    ) -> str:
         """
         Identify best transformation for feature given correlation with score.
 
@@ -355,9 +376,9 @@ class FeatureTransformer:
         ----------
         feature_name: str
             Name of feature for which to find the transformation.
-        feature_value: pandas Series
+        feature_value: pandas.Series
             Series containing feature values.
-        scores: pandas Series
+        scores: pandas.Series
             Numeric human scores.
 
         Returns
