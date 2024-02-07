@@ -16,12 +16,16 @@ import os
 import sys
 import warnings
 from os.path import abspath, basename, dirname, join, normpath, splitext
+from typing import Dict, List, Optional
 
 import nbformat
 from nbconvert.exporters import HTMLExporter, NotebookExporter
 from nbconvert.exporters.templateexporter import default_filters
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 from traitlets.config import Config
+from wandb.wandb_run import Run
+
+from rsmtool.configuration_parser import Configuration
 
 from .reader import DataReader
 from .utils.wandb import log_report_to_wandb
@@ -118,13 +122,26 @@ notebook_path_dict = {
 class Reporter:
     """Class to generate Jupyter notebook reports and convert them to HTML."""
 
-    def __init__(self, logger=None, wandb_run=None):
-        """Initialize the Reporter object."""
+    def __init__(self, logger: Optional[logging.Logger] = None, wandb_run: Optional[Run] = None):
+        """
+        Initialize the Reporter object.
+
+        Parameters
+        ----------
+        logger: Optional[logging.Logger]
+            A Logger object. If ``None`` is passed, get logger from ``__name__``.
+            Defaults to ``None``.
+        wandb_run: Optional[wandb.wandb_run.Run]
+            A wandb run object that will be used to log artifacts and tables.
+            If ``None`` is passed, a new wandb run will be initialized if
+            wandb is enabled in the configuration.
+            Defaults to ``None``.
+        """
         self.logger = logger if logger else logging.getLogger(__name__)
         self.wandb_run = wandb_run
 
     @staticmethod
-    def locate_custom_sections(custom_report_section_paths, configdir):
+    def locate_custom_sections(custom_report_section_paths: List[str], configdir: str) -> List[str]:
         """
         Locate custom report section files.
 
@@ -133,7 +150,7 @@ class Reporter:
 
         Parameters
         ----------
-        custom_report_section_paths : list of str
+        custom_report_section_paths : List[str]
             List of paths to IPython notebook
             files representing the custom sections.
         configdir : str
@@ -141,9 +158,8 @@ class Reporter:
 
         Returns
         -------
-        custom_report_sections :  list of str
-            List of absolute paths to the custom section
-            notebooks.
+        custom_report_sections : List[str]
+            List of absolute paths to the custom section notebooks.
 
         Raises
         ------
@@ -160,13 +176,13 @@ class Reporter:
         return custom_report_sections
 
     @staticmethod
-    def merge_notebooks(notebook_files, output_file):
+    def merge_notebooks(notebook_files: List[str], output_file: str) -> None:
         """
         Merge the given Jupyter notebooks into a single Jupyter notebook.
 
         Parameters
         ----------
-        notebook_files : list of str
+        notebook_files : List[str]
             List of paths to the input Jupyter notebook files.
         output_file : str
             Path to output Jupyter notebook file
@@ -197,7 +213,9 @@ class Reporter:
             outfh.write(output)
 
     @staticmethod
-    def check_section_names(specified_sections, section_type, context="rsmtool"):
+    def check_section_names(
+        specified_sections: List[str], section_type: str, context: str = "rsmtool"
+    ) -> None:
         """
         Validate the specified section names.
 
@@ -206,20 +224,20 @@ class Reporter:
 
         Parameters
         ----------
-        specified_sections : list of str
+        specified_sections : List[str]
             List of report section names.
         section_type : str
             One of "general" or "special".
-        context : str, optional
-            Context in which we are validating the section
-            names. One of {"rsmtool", "rsmeval", "rsmcompare"}.
-            Defaults to "rsmtool".
+        context : str
+            Context in which we are validating the section names. One of
+            {``"rsmtool"``, ``"rsmeval"``, ``"rsmcompare"``}.
+            Defaults to ``"rsmtool"``.
 
         Raises
         ------
         ValueError
-            If any of the section names of the given type
-            are not valid in the context of the given tool.
+            If any of the section names of the given type are not valid in the
+            context of the given tool.
         """
         master_section_list = master_section_dict[section_type][context]
         invalid_section_names = set(specified_sections).difference(master_section_list)
@@ -232,22 +250,22 @@ class Reporter:
             )
 
     @staticmethod
-    def check_section_order(chosen_sections, section_order):
+    def check_section_order(chosen_sections: List[str], section_order: List[str]) -> None:
         """
         Check the order of the specified sections.
 
         Parameters
         ----------
-        chosen_sections : list of str
+        chosen_sections : List[str]
             List of chosen section names.
-        section_order : list of str
+        section_order : List[str]
             An ordered list of the chosen section names.
 
         Raises
         ------
         ValueError
-            If any sections specified in the order are missing
-            from the list of chosen sections or vice versa.
+            If any sections specified in the order are missing from the list of
+            chosen sections or vice versa.
         """
         if sorted(chosen_sections) != sorted(section_order):
             # check for discrepancies and create a helpful error message
@@ -279,7 +297,7 @@ class Reporter:
             raise ValueError(error_message)
 
     @staticmethod
-    def convert_ipynb_to_html(notebook_file, html_file):
+    def convert_ipynb_to_html(notebook_file: str, html_file: str):
         """
         Convert given Jupyter notebook (``.ipynb``) to HTML file.
 
@@ -343,39 +361,38 @@ class Reporter:
 
     def determine_chosen_sections(
         self,
-        general_sections,
-        custom_sections,
-        subgroups,
-        context="rsmtool",
-    ):
+        general_sections: List[str],
+        custom_sections: List[str],
+        subgroups: List[str],
+        context: str = "rsmtool",
+    ) -> List[str]:
         """
         Compile a combined list of section names to be included in the report.
 
         Parameters
         ----------
-        general_sections : list of str
+        general_sections : List[str]
             List of specified general section names.
-        custom_sections : list of str
+        custom_sections : List[str]
             List of specified custom sections, if any.
-        subgroups : list of str
+        subgroups : List[str]
             List of column names that contain grouping
             information.
-        context : str, optional
-            Context of the tool in which we are validating.
-            One of  {"rsmtool", "rsmeval", "rsmcompare"}
-            Defaults to "rsmtool".
+        context : str
+            Context of the tool in which we are validating. One of
+            {``"rsmtool"``, ``"rsmeval"``, ``"rsmcompare"``}
+            Defaults to ``"rsmtool"``.
 
         Returns
         -------
-        chosen_sections : list of str
-            Final list of chosen sections that are to
-            be included in the HTML report.
+        chosen_sections : List[str]
+            Final list of chosen sections that are to be included in the HTML report.
 
         Raises
         ------
         ValueError
-            If a subgroup report section is requested but no
-            subgroups were specified in the configuration file.
+            If a subgroup report section is requested but no subgroups were
+            specified in the configuration file.
         """
         # 1. Include all general sections unless we are asked to include
         # a specific (and valid) subset.
@@ -424,29 +441,30 @@ class Reporter:
 
         return chosen_sections
 
-    def get_section_file_map(self, custom_sections, model_type=None, context="rsmtool"):
+    def get_section_file_map(
+        self, custom_sections: List[str], model_type: Optional[str] = None, context: str = "rsmtool"
+    ) -> Dict[str, str]:
         """
         Map section names to IPython notebook filenames.
 
         Parameters
         ----------
-        custom_sections : list of str
+        custom_sections : List[str]
             List of custom sections.
-        model_type : str, optional
-            Type of the model. One of {"BUILTIN", "SKLL", ``None``}.
-            We allow ``None`` here so that rsmeval can use the same
-            function.
+        model_type : Optional[str]
+            Type of the model. One of {``"BUILTIN"``, ``"SKLL"``, ``None``}. We allow
+            ``None`` here so that rsmeval can use the same function.
             Defaults to ``None``.
         context : str, optional
-            Context of the tool in which we are validating.
-            One of {"rsmtool", "rsmeval", "rsmcompare"}.
-            Defaults to "rsmtool".
+            Context of the tool in which we are validating. One of
+            {``"rsmtool"``, ``"rsmeval"``, ``"rsmcompare"``}.
+            Defaults to ``"rsmtool"``.
 
         Returns
         -------
         section_file_map : dict
-            Dictionary mapping each section name to the
-            corresponding IPython notebook filename.
+            Dictionary mapping each section name to the corresponding IPython
+            notebook filename.
         """
         # create the original section file map for general sections
         selected_notebook_path = notebook_path_dict["general"][context]
@@ -475,13 +493,13 @@ class Reporter:
 
     def get_ordered_notebook_files(
         self,
-        general_sections,
-        custom_sections=[],
-        section_order=None,
-        subgroups=[],
-        model_type=None,
-        context="rsmtool",
-    ):
+        general_sections: List[str],
+        custom_sections: List[str] = [],
+        section_order: Optional[List[str]] = None,
+        subgroups: List[str] = [],
+        model_type: Optional[str] = None,
+        context: str = "rsmtool",
+    ) -> List[str]:
         """
         Check all section names and the order of the sections.
 
@@ -491,34 +509,32 @@ class Reporter:
 
         Parameters
         ----------
-        general_sections : str
+        general_sections : List[str]
             List of specified general sections.
-        custom_sections : list, optional
+        custom_sections : List[str]
             List of specified custom sections, if any.
             Defaults to ``[]``.
-        section_order : list, optional
-            Ordered list in which the user wants the specified
-            sections.
+        section_order : Optional[List[str]]
+            Ordered list in which the user wants the specified sections.
             Defaults to ``None``.
-        subgroups : list, optional
-            List of column names that contain grouping
-            information.
+        subgroups : List[str]
+            List of column names that contain grouping information.
             Defaults to ``[]``.
-        model_type : None, optional
-            Type of the model. Possible values are
-            {"BUILTIN", "SKLL", ``None``.}. We allow ``None``
-            here so that rsmeval can use the same function.
+        model_type : Optional[List[str]]
+            Type of the model. Possible values are {``"BUILTIN"``, ``"SKLL"``,
+            ``None``.}. We allow ``None`` here so that rsmeval can use the
+            same function.
             Defaults to ``None``.
-        context : str, optional
-            Context of the tool in which we are validating.
-            One of {"rsmtool", "rsmeval", "rsmcompare"}.
-            Defaults to "rsmtool".
+        context : str
+            Context of the tool in which we are validating. One of {``"rsmtool"``,
+            ``"rsmeval"``, ``"rsmcompare"``}.
+            Defaults to ``"rsmtool"``.
 
         Returns
         -------
-        chosen_notebook_files : list of str
-            List of the IPython notebook files that have
-            to be rendered into the HTML report.
+        chosen_notebook_files : List[str]
+            List of the IPython notebook files that have to be rendered into
+            the HTML report.
         """
         chosen_sections = self.determine_chosen_sections(
             general_sections,
@@ -566,28 +582,30 @@ class Reporter:
 
         return chosen_notebook_files
 
-    def create_report(self, config, csvdir, figdir, context="rsmtool"):
+    def create_report(
+        self, config: Configuration, csvdir: str, figdir: str, context: str = "rsmtool"
+    ):
         """
         Generate HTML report for an rsmtool/rsmeval experiment.
 
         Parameters
         ----------
-        config : configuration_parser.Configuration
+        config : Configuration
             A configuration object
         csvdir : str
             The CSV output directory.
         figdir : str
             The figure output directory
         context : str
-            Context of the tool in which we are validating.
-            One of {"rsmtool", "rsmeval"}.
-            Defaults to "rsmtool".
+            Context of the tool in which we are validating. One of {``"rsmtool"``,
+            ``"rsmeval"``}.
+            Defaults to ``"rsmtool"``.
 
         Raises
         ------
         KeyError
-            If "test_file_location" or "pred_file_location" fields
-            are not specified in the configuration.
+            If the ``test_file_location`` or ``pred_file_location`` fields are
+            not specified in the given configuration.
         """
         test_file_location = config.get("test_file_location")
         if test_file_location is None:
@@ -617,8 +635,10 @@ class Reporter:
             used_trim_max,
             trim_tolerance,
         ) = config.get_trim_min_max_tolerance()
-        min_score = used_trim_min - trim_tolerance
-        max_score = used_trim_max + trim_tolerance
+
+        if used_trim_min and used_trim_max and trim_tolerance:
+            min_score = used_trim_min - trim_tolerance
+            max_score = used_trim_max + trim_tolerance
 
         environ_config = {
             "EXPERIMENT_ID": config["experiment_id"],
