@@ -186,7 +186,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_with_repeated_ids"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_lr_eval_all_non_numeric_scores(self):
         # rsmeval experiment with all values for the human
@@ -197,7 +197,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_all_non_numeric_scores"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_lr_eval_same_system_human_score(self):
         # rsmeval experiment with the same value supplied
@@ -207,7 +207,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_same_system_human_score"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_lr_eval_all_non_numeric_machine_scores(self):
         # rsmeval experiment with all the machine scores`
@@ -218,7 +218,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_all_non_numeric_machine_scores"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_eval_lr_with_missing_h2_column(self):
         # rsmeval experiment with `second_human_score_column`
@@ -228,7 +228,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_with_missing_h2_column"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(KeyError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_eval_lr_with_missing_candidate_column(self):
         # rsmeval experiment with `candidate_column`
@@ -238,7 +238,7 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_with_missing_candidate_column"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(KeyError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)
 
     def test_run_experiment_lr_eval_wrong_path(self):
         # basic rsmeval experiment with wrong path to the
@@ -248,4 +248,4 @@ class TestExperimentRsmeval(unittest.TestCase):
         experiment_id = "lr_eval_with_h2"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(FileNotFoundError):
-            do_run_evaluation(source, experiment_id, config_file)
+            do_run_evaluation(source, config_file)

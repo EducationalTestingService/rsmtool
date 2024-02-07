@@ -219,7 +219,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
         experiment_id = "lr_with_duplicate_feature_names"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_feature_json(self):
         # basic experiment with a LinearRegression model but using
@@ -231,9 +231,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
 
         # run this experiment but suppress the expected deprecation warnings
         with self.assertRaises(ValueError):
-            do_run_experiment(
-                source, experiment_id, config_file, suppress_warnings_for=[DeprecationWarning]
-            )
+            do_run_experiment(source, config_file, suppress_warnings_for=[DeprecationWarning])
 
     def test_run_experiment_wrong_train_file_path(self):
         # basic experiment with the path in train_file field pointing to
@@ -242,7 +240,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_wrong_feature_file_path(self):
         # basic experiment with the path in features field pointing to
@@ -251,7 +249,7 @@ class TestExperimentRsmtool3(unittest.TestCase):
         experiment_id = "lr"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_length_column_and_feature_list(self):
         # experiment with feature as list instead of file name
@@ -261,4 +259,4 @@ class TestExperimentRsmtool3(unittest.TestCase):
         experiment_id = "lr_with_length_and_feature"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)

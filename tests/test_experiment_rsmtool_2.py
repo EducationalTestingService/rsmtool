@@ -71,7 +71,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_length_and_feature"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_h2_column_and_feature(self):
         # rsmtool experiment that has second rater column but
@@ -80,7 +80,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_h2_and_feature"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_same_h1_and_h2(self):
         # rsmtool experiment that has label column
@@ -90,7 +90,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_same_h1_and_h2"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_repeated_ids(self):
         # rsmtool experiment with non-unique ids
@@ -98,7 +98,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_repeated_ids"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_sc1_as_feature_name(self):
         # rsmtool experiment with sc1 used as the name of a feature
@@ -106,7 +106,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_sc1_as_feature_name"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_length_as_feature_name(self):
         # rsmtool experiment with 'length' used as feature name
@@ -115,7 +115,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_length_as_feature_name"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_truncations_no_features_field(self):
         # rsmtool experiment with truncations, but no feature field
@@ -123,7 +123,7 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_truncations_no_features_field"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_lr_with_truncations_no_features_columns(self):
         # rsmtool experiment with truncations, but no min/max columns in feature file
@@ -131,4 +131,4 @@ class TestExperimentRsmtool2(unittest.TestCase):
         experiment_id = "lr_with_truncations_no_features_columns"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)

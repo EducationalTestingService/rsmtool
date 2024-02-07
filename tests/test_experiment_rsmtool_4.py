@@ -119,7 +119,7 @@ class TestExperimentRsmtool4(unittest.TestCase):
         experiment_id = "empWtDropNeg"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_requested_feature_zero_sd(self):
         # rsmtool experiment when a requested feature has zero sd
@@ -127,14 +127,14 @@ class TestExperimentRsmtool4(unittest.TestCase):
         experiment_id = "lr_with_requested_feature_with_zero_sd"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         with self.assertRaises(ValueError):
-            do_run_experiment(source, experiment_id, config_file)
+            do_run_experiment(source, config_file)
 
     def test_run_experiment_with_warnings(self):
         source = "lr-with-warnings"
         experiment_id = "lr_with_warnings"
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
 
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, config_file)
 
         html_file = join("test_outputs", source, "report", experiment_id + "_report.html")
         report_warnings = collect_warning_messages_from_report(html_file)
@@ -172,7 +172,7 @@ class TestExperimentRsmtool4(unittest.TestCase):
         config_file = join(rsmtool_test_dir, "data", "experiments", source, f"{experiment_id}.json")
         mock_wandb_run = Mock()
         mock_wandb_init.return_value = mock_wandb_run
-        do_run_experiment(source, experiment_id, config_file)
+        do_run_experiment(source, config_file)
         mock_wandb_init.assert_called_with(project="wandb_project", entity="wandb_entity")
         mock_wandb_run.log_artifact.assert_called_once()
         mock_plot_conf_mat.assert_called()
