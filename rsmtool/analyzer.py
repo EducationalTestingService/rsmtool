@@ -1718,7 +1718,7 @@ class Analyzer:
             parameters (keys):  {"subgroups", "second_human_score_column",
             "use_scaled_predictions"}.
 
-        wandb_run : wandb.wandb_run.Run
+        wandb_run : Optional[wandb.wandb_run.Run]
             The wandb run object if wandb is enabled, ``None`` otherwise.
             If enabled, all the output data frames will be logged to this run
             as tables.

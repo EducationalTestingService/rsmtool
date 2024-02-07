@@ -344,10 +344,11 @@ def compute_and_save_predictions(
     logger : Optional[logging.Logger]
         A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[Run]
+    wandb_run : Optional[wandb.wandb_run.Run]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
-        wandb is enabled in the configuration. Defaults to ``None``.
+        wandb is enabled in the configuration.
+        Defaults to ``None``.
 
     Raises
     ------
