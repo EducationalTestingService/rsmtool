@@ -10,6 +10,12 @@ Class for writing DataContainer frames to disk.
 
 from os import makedirs
 from os.path import join
+from typing import Dict, List, Optional, Union
+
+import pandas as pd
+from wandb.wandb_run import Run
+
+from rsmtool.container import DataContainer
 
 from .utils.wandb import log_dataframe_to_wandb
 
@@ -17,7 +23,12 @@ from .utils.wandb import log_dataframe_to_wandb
 class DataWriter:
     """Class to write out DataContainer objects."""
 
-    def __init__(self, experiment_id=None, context=None, wandb_run=None):
+    def __init__(
+        self,
+        experiment_id: Optional[str] = None,
+        context: Optional[str] = None,
+        wandb_run: Optional[Run] = None,
+    ):
         """
         Initialize the DataWriter object.
 
@@ -27,7 +38,7 @@ class DataWriter:
             The experiment name to be used in the output file names
         context : str
             The context in which this writer is used. Defaults to ``None``.
-        wandb_run : wandb.Run
+        wandb_run : Optional[wandb.wandb_run.Run]
             The wandb run object if wandb is enabled, None otherwise.
             If enabled, all the output data frames will be logged to
             this run as tables.
@@ -38,7 +49,9 @@ class DataWriter:
         self.wandb_run = wandb_run
 
     @staticmethod
-    def write_frame_to_file(df, name_prefix, file_format="csv", index=False, **kwargs):
+    def write_frame_to_file(
+        df: pd.DataFrame, name_prefix: str, file_format: str = "csv", index: bool = False, **kwargs
+    ) -> None:
         """
         Write given data frame to disk with given name and file format.
 
@@ -51,9 +64,9 @@ class DataWriter:
             This includes everything except the extension.
         file_format : str
             The file format (extension) for the file to be written to disk.
-            One of {"csv", "xlsx", "tsv"}.
-            Defaults to "csv".
-        index : bool, optional
+            One of {``"csv"``, ``"xlsx"``, `"tsv"`}.
+            Defaults to ``"csv"``.
+        index : bool
             Whether to include the index in the output file.
             Defaults to ``False``.
 
@@ -91,16 +104,16 @@ class DataWriter:
 
     def write_experiment_output(
         self,
-        csvdir,
-        container_or_dict,
-        dataframe_names=None,
-        new_names_dict=None,
-        include_experiment_id=True,
-        reset_index=False,
-        file_format="csv",
-        index=False,
+        csvdir: str,
+        container_or_dict: Union[DataContainer, Dict[str, pd.DataFrame]],
+        dataframe_names: Optional[List[str]] = None,
+        new_names_dict: Optional[Dict[str, str]] = None,
+        include_experiment_id: bool = True,
+        reset_index: bool = False,
+        file_format: str = "csv",
+        index: bool = False,
         **kwargs,
-    ):
+    ) -> None:
         """
         Write out each of the named frames to disk.
 
@@ -117,30 +130,29 @@ class DataWriter:
         csvdir : str
             Path to the output experiment sub-directory that will
             contain the CSV files corresponding to each of the data frames.
-        container_or_dict : container.DataContainer or dict
+        container_or_dict : Union[container.DataContainer, Dict[str, pd.DataFrame]]
             A DataContainer object or dict, where keys are data frame
-            names and values are ``pd.DataFrame`` objects.
-        dataframe_names : list of str, optional
+            names and values are pandas.DataFrame objects.
+        dataframe_names : Optional[List[str]]
             List of data frame names, one for each of the data frames.
             Defaults to ``None``.
-        new_names_dict : dict, optional
+        new_names_dict : Optional[Dict[str, str]]
             New dictionary with new names for the data frames, if desired.
             Defaults to ``None``.
-        include_experiment_id : str, optional
+        include_experiment_id : bool
             Whether to include the experiment ID in the file name.
             Defaults to ``True``.
-        reset_index : bool, optional
+        reset_index : bool
             Whether to reset the index of each data frame
             before writing to disk.
             Defaults to ``False``.
-        file_format : str, optional
+        file_format : str
             The file format in which to output the data.
-            One of {"csv", "xlsx", "tsv"}.
-            Defaults to "csv".
-        index : bool, optional
+            One of {``"csv"``, ``"xlsx"``, ``"tsv"``}.
+            Defaults to ``"csv"``.
+        index : bool
             Whether to include the index in the output file.
             Defaults to ``False``.
-
 
         Raises
         ------
@@ -152,7 +164,7 @@ class DataWriter:
 
         # If no `dataframe_names` specified, use all names
         if dataframe_names is None:
-            dataframe_names = container_or_dict.keys()
+            dataframe_names = list(container_or_dict.keys())
 
         # Otherwise, check to make sure all specified names
         # are actually in the DataContainer
@@ -196,12 +208,12 @@ class DataWriter:
 
     def write_feature_csv(
         self,
-        featuredir,
-        data_container,
-        selected_features,
-        include_experiment_id=True,
-        file_format="csv",
-    ):
+        featuredir: str,
+        data_container: DataContainer,
+        selected_features: List[str],
+        include_experiment_id: bool = True,
+        file_format: str = "csv",
+    ) -> None:
         """
         Write out the selected features to disk.
 
@@ -210,17 +222,17 @@ class DataWriter:
         featuredir : str
             Path to the experiment output directory where the
             feature JSON file will be saved.
-        data_container : container.DataContainer
+        data_container : DataContainer
             A data container object.
-        selected_features : list of str
+        selected_features : List[str]
             List of features that were selected for model building.
-        include_experiment_id : bool, optional
+        include_experiment_id : bool
             Whether to include the experiment ID in the file name.
             Defaults to ``True``.
-        file_format : str, optional
-            The file format in which to output the data.
-            One of {"csv", "tsv", "xlsx"}.
-            Defaults to "csv".
+        file_format : str
+            The file format in which to output the data. One of {``"csv"``, ``"tsv"``,
+            ``"xlsx"``}.
+            Defaults to ``"csv"``.
         """
         df_feature_specs = data_container["feature_specs"]
 

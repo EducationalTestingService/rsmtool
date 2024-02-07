@@ -229,6 +229,7 @@ def run_experiment(
 
     # Identify the features used by the model
     selected_features = modeler.get_feature_names()
+    assert selected_features is not None
 
     # Add selected features to processed configuration
     processed_config["selected_features"] = selected_features
