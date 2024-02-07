@@ -360,7 +360,8 @@ class FeatureTransformer:
             raise ValueError(f"Unrecognized feature transformation: {transform}")
 
         transformer = transforms[transform]
-        new_data = transformer(column_name, values, raise_error)
+        args = [column_name, values, raise_error] if transform not in ["raw", "org"] else [values]
+        new_data = transformer(*args)
         return new_data
 
     def find_feature_transform(
