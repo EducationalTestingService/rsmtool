@@ -51,11 +51,10 @@ class Analyzer:
 
         Parameters
         ----------
-        data_container : rsmtool.container.DataContainer
+        data_container : DataContainer
             A DataContainer object
         dataframe_names : List[str]
-            The names of the DataFrames expected in the
-            DataContainer object.
+            The names of the DataFrames expected in the DataContainer object.
 
         Raises
         ------

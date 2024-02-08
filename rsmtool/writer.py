@@ -34,10 +34,12 @@ class DataWriter:
 
         Parameters
         ----------
-        experiment_id : str
-            The experiment name to be used in the output file names
-        context : str
-            The context in which this writer is used. Defaults to ``None``.
+        experiment_id : Optional[str]
+            The experiment name to be used in the output file names.
+            Defaults to ``None``.
+        context : Optional[str]
+            The context in which this writer is used.
+            Defaults to ``None``.
         wandb_run : Optional[wandb.wandb_run.Run]
             The wandb run object if wandb is enabled, None otherwise.
             If enabled, all the output data frames will be logged to
@@ -64,7 +66,7 @@ class DataWriter:
             This includes everything except the extension.
         file_format : str
             The file format (extension) for the file to be written to disk.
-            One of {``"csv"``, ``"xlsx"``, `"tsv"`}.
+            One of {``"csv"``, ``"xlsx"``, ``"tsv"``}.
             Defaults to ``"csv"``.
         index : bool
             Whether to include the index in the output file.
