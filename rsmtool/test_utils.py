@@ -93,6 +93,7 @@ def check_run_experiment(
         Configuration object or dictionary to use as an input, if any.
         If ``None``, the function will construct a path to the config file
         using ``"source"`` and ``"experiment_id"``.
+        Defults to ``None``.
     suppress_warnings_for : List[Type]
         Types for which warnings should be suppressed when running the experiments.
         Defaults to ``[]``.
@@ -542,6 +543,7 @@ def check_run_cross_validation(
         Configuration object or dictionary to use as an input, if any.
         If ``None``, the function will construct a path to the config file
         using ``"source"`` and ``"experiment_id"``.
+        Defaults to ``None``.
     suppress_warnings_for : List[Type]
         Types for which warnings should be suppressed when running the
         experiments.

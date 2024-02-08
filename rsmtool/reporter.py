@@ -584,7 +584,7 @@ class Reporter:
 
     def create_report(
         self, config: Configuration, csvdir: str, figdir: str, context: str = "rsmtool"
-    ):
+    ) -> None:
         """
         Generate HTML report for an rsmtool/rsmeval experiment.
 
@@ -636,9 +636,14 @@ class Reporter:
             trim_tolerance,
         ) = config.get_trim_min_max_tolerance()
 
-        if used_trim_min and used_trim_max and trim_tolerance:
-            min_score = used_trim_min - trim_tolerance
-            max_score = used_trim_max + trim_tolerance
+        # at this point, all the trim parameters should be available
+        # but let's make sure for mypy
+        assert (
+            used_trim_min is not None and used_trim_max is not None and trim_tolerance is not None
+        )
+
+        min_score = used_trim_min - trim_tolerance
+        max_score = used_trim_max + trim_tolerance
 
         environ_config = {
             "EXPERIMENT_ID": config["experiment_id"],
