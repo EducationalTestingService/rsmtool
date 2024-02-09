@@ -9,10 +9,11 @@ Various RSMTool constants used across the codebase.
 """
 
 import re
+from typing import Any, Dict
 
 from .models import BUILTIN_MODELS, VALID_SKLL_MODELS
 
-DEFAULTS = {
+DEFAULTS: Dict[str, Any] = {
     "id_column": "spkitemid",
     "description": "",
     "description_old": "",
@@ -316,7 +317,7 @@ CONFIGURATION_DOCUMENTATION_SLUGS = {
 
 VALID_PARSER_SUBCOMMANDS = ["generate", "run"]
 
-INTERACTIVE_MODE_METADATA = {
+INTERACTIVE_MODE_METADATA: Dict[str, Dict[str, Any]] = {
     "experiment_id": {"label": "Experiment ID", "type": "id"},
     "comparison_id": {"label": "Comparison ID", "type": "id"},
     "summary_id": {"label": "Summary ID", "type": "id"},
