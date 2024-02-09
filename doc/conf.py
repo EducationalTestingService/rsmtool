@@ -51,6 +51,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "skll": ("https://skll.readthedocs.io/en/latest", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "prompt_toolkit": ("https://python-prompt-toolkit.readthedocs.io/en/stable/", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
     "statsmodels": ("https://www.statsmodels.org/stable/", None),
 }
