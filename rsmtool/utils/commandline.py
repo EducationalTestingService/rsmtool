@@ -16,6 +16,7 @@ import sys
 from collections import OrderedDict, namedtuple
 from itertools import chain, product
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from prompt_toolkit.completion import FuzzyWordCompleter, PathCompleter, WordCompleter
 from prompt_toolkit.formatted_text import HTML
@@ -49,12 +50,12 @@ CmdOption = namedtuple(
 
 
 def setup_rsmcmd_parser(
-    name,
-    uses_output_directory=True,
-    allows_overwriting=False,
-    extra_run_options=[],
-    uses_subgroups=False,
-):
+    name: str,
+    uses_output_directory: bool = True,
+    allows_overwriting: bool = False,
+    extra_run_options: List[CmdOption] = [],
+    uses_subgroups: bool = False,
+) -> argparse.ArgumentParser:
     """
     Create argument parsers for RSM command-line utilities.
 
@@ -84,22 +85,22 @@ def setup_rsmcmd_parser(
     ----------
     name : str
         The name of the command-line tool for which we need the parser.
-    uses_output_directory : bool, optional
+    uses_output_directory : bool
         Add the ``output_dir`` positional argument to the "run" subcommand
         parser. This argument means that the respective tool uses an output
         directory to store its various outputs.
         Defaults to ``True``.
-    allows_overwriting : bool, optional
+    allows_overwriting : bool
         Add the ``-f``/``-force_write`` optional argument to the "run" subcommand
         parser. This argument allows the output for the respective
         tool to be overwritten even if it already exists (file) or contains
         output (directory).
         Defaults to ``False``.
-    extra_run_options : list, optional
+    extra_run_options : List[CmdOption]
         Any additional options to be added to the "run" subcommand parser,
         each specified as a ``CmdOption`` instance.
         Defaults to ``[]``.
-    uses_subgroups : bool, optional
+    uses_subgroups : bool
         Add the ``--subgroups`` optional argument to the "generate" subcommand
         parser. This argument means that the tool for which we are automatically
         generating a configuration file includes additional information when
@@ -257,7 +258,7 @@ def setup_rsmcmd_parser(
         # construct the arguments and keyword arguments needed for the
         # `add_argument()` call to the parser
         argparse_option_args = []
-        argparse_option_kwargs = {}
+        argparse_option_kwargs: Dict[str, Any] = {}
 
         # first add the destination and the help string
         argparse_option_kwargs["dest"] = f"{parser_option.dest}"
@@ -338,7 +339,7 @@ class InteractiveField:
         For example,
     """
 
-    def __init__(self, field_name, field_type, field_metadata):
+    def __init__(self, field_name: str, field_type: str, field_metadata: Dict[str, Any]):
         """
         Create a new InteractiveField instance.
 
@@ -348,31 +349,30 @@ class InteractiveField:
         Parameters
         ----------
         field_name : str
-            The internal name of the field as used in the configuration
-            dictionary.
+            The internal name of the field as used in the configuration dictionary.
         field_type : str
-            One of "required" or "optional", depending on whether the
+            One of ``"required"`` or ``"optional"``, depending on whether the
             field is required or optional in the configuration.
-        field_metadata : dict
+        field_metadata : Dict[str, Any]
             A dictionary containing the pre-defined metadata attributes
             for the given field. This dictionary is required to have
-            the "label" key and can have the following optional
-            keys: "choices", "count", and "type". For descriptions of what
-            these keys mean, see the docstring for the ``InteractiveField``
+            the ``"label"`` key and can have the following optional
+            keys: ``"choices"``, ``"count"``, and ``"type"``. For descriptions
+            of what these keys mean, see the docstring for the ``InteractiveField``
             class. Examples of such dictionaries can be found in
             ``rsmtool.utils.constants.INTERACTIVE_MODE_METADATA``.
 
         Raises
         ------
         ValueError
-            If the list of choices is not available for a field
-            of type "choice".
+            If the list of choices is not available for a field of type
+            ``"choice"``.
         """
         # assign metadata attributes to class attributes
         self.field_name = field_name
         self.field_type = field_type
         self.label = field_metadata["label"]
-        self.choices = field_metadata.get("choices", [])
+        self.choices: List[str] = field_metadata.get("choices", [])
         self.count = field_metadata.get("count", "single")
         self.data_type = field_metadata.get("type", "text")
 
@@ -411,7 +411,7 @@ class InteractiveField:
             allow_empty = field_type == "optional"
             self.validator = self._make_integer_validator(allow_empty=allow_empty)
 
-    def _make_boolean_validator(self, allow_empty=False):
+    def _make_boolean_validator(self, allow_empty: bool = False) -> Validator:
         """
         Create a validator for boolean fields.
 
@@ -420,10 +420,10 @@ class InteractiveField:
 
         Parameters
         ----------
-        allow_empty : bool, optional
+        allow_empty : bool
             If ``True``, it will allow the user to also just press
-            enter (i.e., input a blank string), in addition to "true"
-            or "false".
+            enter (i.e., input a blank string), in addition to ``"true"``
+            or ``"false"``.
             Defaults to ``False``.
 
         Returns
@@ -441,7 +441,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_choice_validator(self, choices):
+    def _make_choice_validator(self, choices: List[str]) -> Validator:
         """
         Create a validator for choice fields.
 
@@ -450,7 +450,7 @@ class InteractiveField:
 
         Parameters
         ----------
-        choices : list
+        choices : List[str]
             List of possible values for the field.
 
         Returns
@@ -464,7 +464,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_directory_completer(self):
+    def _make_directory_completer(self) -> PathCompleter:
         """
         Create a completer for directory fields.
 
@@ -479,7 +479,7 @@ class InteractiveField:
         """
         return PathCompleter(expanduser=False, only_directories=True)
 
-    def _make_directory_validator(self):
+    def _make_directory_validator(self) -> Validator:
         """
         Create a validator for directory fields.
 
@@ -497,7 +497,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_file_completer(self):
+    def _make_file_completer(self) -> PathCompleter:
         """
         Create a completer for file fields.
 
@@ -526,7 +526,7 @@ class InteractiveField:
 
         return PathCompleter(expanduser=False, file_filter=valid_file)
 
-    def _make_file_validator(self, allow_empty=False):
+    def _make_file_validator(self, allow_empty: bool = False) -> Validator:
         """
         Create a validator for file fields.
 
@@ -535,7 +535,7 @@ class InteractiveField:
 
         Parameters
         ----------
-        allow_empty : bool, optional
+        allow_empty : bool
             If ``True``, it will allow the user to also just press
             enter (i.e., input a blank string)
             Defaults to ``False``.
@@ -568,7 +568,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_file_format_validator(self):
+    def _make_file_format_validator(self) -> Validator:
         """
         Create a validator for file format fields.
 
@@ -590,7 +590,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_id_validator(self):
+    def _make_id_validator(self) -> Validator:
         """
         Create a validator for id fields.
 
@@ -611,7 +611,7 @@ class InteractiveField:
         )
         return validator
 
-    def _make_integer_validator(self, allow_empty=False):
+    def _make_integer_validator(self, allow_empty: bool = False) -> Validator:
         """
         Create a validator for integer fields.
 
@@ -642,7 +642,7 @@ class InteractiveField:
         )
         return validator
 
-    def _get_user_input(self):
+    def _get_user_input(self) -> Union[List[str], str]:
         """
         Display appropriate label and collect user input.
 
@@ -652,7 +652,7 @@ class InteractiveField:
 
         Returns
         -------
-        user_input : list or str
+        user_input : Union[List[str], str]
             A string for fields that accepts a single input
             or a list of strings for fields that accept multiple
             inputs, e.g., subgroups.
@@ -703,7 +703,7 @@ class InteractiveField:
 
         return user_input
 
-    def _finalize(self, user_input):
+    def _finalize(self, user_input: Union[List[str], str]) -> Any:
         """
         Convert given input to appropriate type.
 
@@ -712,29 +712,29 @@ class InteractiveField:
 
         Parameters
         ----------
-        user_input : list or str
-            Description
+        user_input : Union[List[str], str]
+            The user input for the field that is to be converted.
 
         Returns
         -------
-        final value
+        final value: Any
             The converted value.
         """
         if (user_input == "" or user_input == []) and self.field_type == "optional":
             final_value = DEFAULTS.get(self.field_name)
         else:
             # boolean fields need to be converted to actual booleans
-            if self.data_type == "boolean":
+            if isinstance(user_input, str) and self.data_type == "boolean":
                 final_value = False if user_input == "false" else True
             # and integer fields to integers/None
-            elif self.data_type == "integer":
+            elif isinstance(user_input, str) and self.data_type == "integer":
                 final_value = int(user_input)
             else:
                 final_value = user_input
 
         return final_value
 
-    def get_value(self):
+    def get_value(self) -> Union[bool, int, str, List[str]]:
         """
         Get value of instantiated interactive field.
 
@@ -742,7 +742,7 @@ class InteractiveField:
 
         Returns
         -------
-        final_value : list or str
+        final_value : Union[bool, int, str, List[str]]
             The final value of the field which may be a list of
             strings or a string.
         """
@@ -770,24 +770,33 @@ class ConfigurationGenerator:
     context : str
         Name of the command-line tool for which we are generating the
         configuration file.
-    as_string : bool, optional
+    as_string : bool
         If ``True``, return a formatted and indented string representation
         of the configuration, rather than a dictionary. Note that this only
         affects the batch-mode generation. Interactive generation always
         returns a string.
         Defaults to ``False``.
-    suppress_warnings : bool, optional
+    suppress_warnings : bool
         If ``True``, do not generate any warnings for batch-mode generation.
         Defaults to ``False``.
-    use_subgroups : bool, optional
+    use_subgroups : bool
         If ``True``, include subgroup-related sections in the list of general sections
         in the configuration file.
         Defaults to ``False``.
     """
 
     def __init__(
-        self, context, as_string=False, suppress_warnings=False, use_subgroups=False
-    ):  # noqa
+        self,
+        context: str,
+        as_string: bool = False,
+        suppress_warnings: bool = False,
+        use_subgroups: bool = False,
+    ):
+        """
+        Create a new ConfigurationGenerator instance.
+
+        See attributes above.
+        """
         self.context = context
         self.use_subgroups = use_subgroups
         self.suppress_warnings = suppress_warnings
@@ -803,11 +812,11 @@ class ConfigurationGenerator:
 
     def _convert_to_string(
         self,
-        config_object,
-        insert_url_comment=True,
-        insert_required_comment=True,
+        config_object: Configuration,
+        insert_url_comment: bool = True,
+        insert_required_comment: bool = True,
         insert_optional_comment=True,
-    ):
+    ) -> str:
         configuration = str(config_object)
 
         # insert the URL comment first, right above the first required field
@@ -839,7 +848,7 @@ class ConfigurationGenerator:
 
         return configuration
 
-    def _get_all_general_section_names(self):
+    def _get_all_general_section_names(self) -> List[str]:
         default_general_sections_value = DEFAULTS.get("general_sections", "")
         default_custom_sections_value = DEFAULTS.get("custom_sections", "")
 
@@ -854,16 +863,18 @@ class ConfigurationGenerator:
             context=self.context,
         )
 
-    def interact(self, output_file_name=None):
+    def interact(self, output_file_name: Optional[str] = None) -> str:
         """
         Automatically generate an example configuration in interactive mode.
 
         Parameters
         ----------
-        output_file_name : str, optional
+        output_file_name : Optional[str]
             The file path where the configuration will eventually be saved.
             Note that this function just uses this name to inform the user.
-            The actual saving happens elsewhere.
+            The actual saving happens elsewhere. If ``None``, no message
+            about the output file is printed.
+            Defaults to ``None``.
 
         Returns
         -------
@@ -944,18 +955,19 @@ class ConfigurationGenerator:
         # a special wrapper method since we also want to insert comments
         return self._convert_to_string(config_object, insert_required_comment=False)
 
-    def generate(self):
+    def generate(self) -> Union[str, Dict[str, Any]]:
         """
         Automatically generate an example configuration in batch mode.
 
         Returns
         -------
-        configuration : dict or str
+        configuration : Union[str, Dict[str, Any]]
             The generated configuration either as a dictionary or
-            a formatted string, depending on the value of ``as_string``.
+            a formatted string, depending on the value of the ``as_string``
+            attribute.
         """
         # instantiate a dictionary that remembers key insertion order
-        configdict = OrderedDict()
+        configdict: Dict[str, Any] = OrderedDict()
 
         # insert the required fields first and give them a dummy value
         for required_field in self._required_fields:
@@ -977,6 +989,7 @@ class ConfigurationGenerator:
 
         # if we were asked for string output, then convert this dictionary to
         # a string that will also insert some useful comments
+        configuration: Union[str, Dict[str, Any]]
         if self.as_string:
             configuration = self._convert_to_string(config_object)
         # otherwise we just return the dictionary underlying the Configuration object
