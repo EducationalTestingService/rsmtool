@@ -29,10 +29,18 @@ class LogFormatter(logging.Formatter):
     err_fmt = "ERROR: %(msg)s"
     dbg_fmt = "DEBUG: %(module)s: %(lineno)d: %(msg)s"
 
-    def __init__(self, fmt="%(levelno)s: %(msg)s"):  # noqa: D107
+    def __init__(self, fmt="%(levelno)s: %(msg)s"):
+        """
+        Initialize the formatter.
+
+        Parameters
+        ----------
+        fmt : str
+            The format string to use for formatting the log record.
+        """
         logging.Formatter.__init__(self, fmt)
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         """
         Format the given record.
 
@@ -40,6 +48,11 @@ class LogFormatter(logging.Formatter):
         ----------
         record : logging.LogRecord
             The record to format.
+
+        Returns
+        -------
+        str
+            The formatted log record.
         """
         # Save the original format configured by the user
         # when the logger formatter was instantiated
@@ -71,7 +84,7 @@ class LogFormatter(logging.Formatter):
         return result
 
 
-def get_file_logger(logger_name, log_file_path):
+def get_file_logger(logger_name: str, log_file_path: str) -> logging.Logger:
     """
     Create and return a file-based logger.
 
@@ -88,7 +101,7 @@ def get_file_logger(logger_name, log_file_path):
 
     Returns
     -------
-    logger
+    logging.Logger
         A logging.Logger object attached to a file handler.
     """
     logger = logging.getLogger(logger_name)
