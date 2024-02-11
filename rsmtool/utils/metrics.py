@@ -9,12 +9,17 @@ Utility functions for computing various RSMTool metrics.
 """
 
 import warnings
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
+from skll.data import FeatureSet
+from skll.learner import Learner
 
 
-def compute_expected_scores_from_model(model, featureset, min_score, max_score):
+def compute_expected_scores_from_model(
+    model: Learner, featureset: FeatureSet, min_score: float, max_score: float
+) -> np.ndarray:
     """
     Compute expected scores using probability distributions over labels.
 
@@ -33,7 +38,7 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
 
     Returns
     -------
-    expected_scores: np.array
+    expected_scores: numpy.ndarray
         A numpy array containing the expected scores.
 
     Raises
@@ -45,6 +50,8 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
         does not match what the model predicts in its probability
         distribution.
     """
+    max_score = int(max_score)
+    min_score = int(min_score)
     if hasattr(model.model, "predict_proba"):
         # Tell the model we want probabiltiies as output. This is likely already set
         # to True but it might not be, e.g., when using rsmpredict.
@@ -75,18 +82,18 @@ def compute_expected_scores_from_model(model, featureset, min_score, max_score):
     return expected_scores
 
 
-def covariance_to_correlation(m):
+def covariance_to_correlation(cov: np.ndarray) -> np.ndarray:
     """
     Implement the R ``cov2cor`` function in Python.
 
     Parameters
     ----------
-    m : np.array
+    cov : numpy.ndarray
         The covariance matrix.
 
     Returns
     -------
-    retval : np.array
+    retval : numpy.ndarray
         The cross-correlation matrix.
 
     Raises
@@ -95,17 +102,17 @@ def covariance_to_correlation(m):
         If the input matrix is not square.
     """
     # make sure the matrix is square
-    numrows, numcols = m.shape
+    numrows, numcols = cov.shape
     if not numrows == numcols:
         raise ValueError("Input matrix must be square")
 
-    Is = np.sqrt(1 / np.diag(m))
-    retval = Is * m * np.repeat(Is, numrows).reshape(numrows, numrows)
+    Is = np.sqrt(1 / np.diag(cov))
+    retval = Is * cov * np.repeat(Is, numrows).reshape(numrows, numrows)
     np.fill_diagonal(retval, 1.0)
     return retval
 
 
-def partial_correlations(df):
+def partial_correlations(df: pd.DataFrame) -> pd.DataFrame:
     """
     Implement the R ``pcor`` function from ``ppcor`` package in Python.
 
@@ -114,12 +121,12 @@ def partial_correlations(df):
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df : pandas.DataFrame
         Data frame containing the feature values.
 
     Returns
     -------
-    df_pcor : pd.DataFrame
+    df_pcor : pandas.DataFrame
         Data frame containing the partial correlations of of each
         pair of variables in the given data frame ``df``,
         excluding all other variables.
@@ -165,17 +172,17 @@ def partial_correlations(df):
     return df_pcor
 
 
-def agreement(score1, score2, tolerance=0):
+def agreement(score1: List[int], score2: List[int], tolerance: int = 0) -> float:
     """
     Compute the agreement between two raters, under given tolerance.
 
     Parameters
     ----------
-    score1 : list of int
+    score1 : List[int]
         List of rater 1 scores
-    score2 : list of int
+    score2 : List[int]
         List of rater 2 scores
-    tolerance : int, optional
+    tolerance : int
         Difference in scores that is acceptable.
         Defaults to 0.
 
@@ -195,13 +202,13 @@ def agreement(score1, score2, tolerance=0):
 
 
 def standardized_mean_difference(
-    y_true_observed,
-    y_pred,
-    population_y_true_observed_sd=None,
-    population_y_pred_sd=None,
-    method="unpooled",
-    ddof=1,
-):
+    y_true_observed: np.ndarray,
+    y_pred: np.ndarray,
+    population_y_true_observed_sd: Optional[float] = None,
+    population_y_pred_sd: Optional[float] = None,
+    method: str = "unpooled",
+    ddof: int = 1,
+) -> float:
     """
     Compute the standardized mean difference between system and human scores.
 
@@ -210,40 +217,36 @@ def standardized_mean_difference(
 
     Parameters
     ----------
-    y_true_observed : array-like
+    y_true_observed : numpy.ndarray
         The observed scores for the group or subgroup.
-    y_pred : array-like
-        The predicted score for the group or subgroup.
-    population_y_true_observed_sd : float, optional
-        The population true score standard deviation.
-        When the SMD is being calculated for a subgroup,
-        this should be the standard deviation for the whole
-        population.
+    y_pred : numpy.ndarray
+        The predicted scores for the group or subgroup.
+    population_y_true_observed_sd : Optional[float]
+        The population true score standard deviation. When the SMD is being
+        calculated for a subgroup, this should be the standard deviation for
+        the whole population.
         Defaults to ``None``.
     population_y_pred_sd : float, optional
-        The predicted score standard deviation.
-        When the SMD is being calculated for a subgroup,
-        this should be the standard deviation for the whole
-        population.
+        The predicted score standard deviation. When the SMD is being calculated
+        for a subgroup, this should be the standard deviation for the whole population.
         Defaults to ``None``.
-    method : str, optional
+    method : str
         The SMD method to use. Possible options are:
 
-        - "williamson": Denominator is the pooled population standard deviation
+        - ``"williamson"``: Denominator is the pooled population standard deviation
           of ``y_true_observed`` and ``y_pred`` computed using
           ``population_y_true_observed_sd`` and ``population_y_pred_sd``.
-        - "johnson": Denominator is ``population_y_true_observed_sd``.
+        - ``"johnson"``: Denominator is ``population_y_true_observed_sd``.
         - "pooled": Denominator is the pooled standard deviation of
           ``y_true_observed`` and ``y_pred`` for this group.
-        - "unpooled": Denominator is the standard deviation of
+        - ``"unpooled"``: Denominator is the standard deviation of
           ``y_true_observed`` for this group.
 
-        Defaults to "unpooled".
+        Defaults to ``"unpooled"``.
 
-    ddof : int, optional
-        The delta degrees of freedom. The divisor used in
-        calculations is N - ddof, where N represents the
-        number of elements.
+    ddof : int
+        The delta degrees of freedom. The divisor used in calculations is N - ddof,
+        where N represents the number of elements.
         Defaults to 1.
 
     Returns
@@ -302,14 +305,14 @@ def standardized_mean_difference(
 
 
 def difference_of_standardized_means(
-    y_true_observed,
-    y_pred,
-    population_y_true_observed_mn=None,
-    population_y_pred_mn=None,
-    population_y_true_observed_sd=None,
-    population_y_pred_sd=None,
-    ddof=1,
-):
+    y_true_observed: np.ndarray,
+    y_pred: np.ndarray,
+    population_y_true_observed_mn: Optional[float] = None,
+    population_y_pred_mn: Optional[float] = None,
+    population_y_true_observed_sd: Optional[float] = None,
+    population_y_pred_sd: Optional[float] = None,
+    ddof: int = 1,
+) -> Optional[float]:
     """
     Calculate the difference between standardized means.
 
@@ -319,45 +322,36 @@ def difference_of_standardized_means(
 
     Parameters
     ----------
-    y_true_observed : array-like
+    y_true_observed : numpy.ndarray
         The observed scores for the group or subgroup.
-    y_pred : array-like
-        The predicted score for the group or subgroup.
-        The predicted scores.
-    population_y_true_observed_mn : float, optional
-        The population true score mean.
-        When the DSM is being calculated for a subgroup,
-        this should be the mean for the whole
-        population.
+    y_pred : numpy.ndarray
+        The predicted scores for the group or subgroup.
+    population_y_true_observed_mn : Optional[float]
+        The population true score mean. When the DSM is being calculated for a
+        subgroup, this should be the mean for the whole population.
         Defaults to ``None``.
-    population_y_pred_mn : float, optional
-        The predicted score mean.
-        When the DSM is being calculated for a subgroup,
-        this should be the mean for the whole
-        population.
+    population_y_pred_mn : Optional[float]
+        The predicted score mean. When the DSM is being calculated for a subgroup,
+        this should be the mean for the whole population.
         Defaults to ``None``.
-    population_y_true_observed_sd : float, optional
-        The population true score standard deviation.
-        When the DSM is being calculated for a subgroup,
-        this should be the standard deviation for the whole
-        population.
+    population_y_true_observed_sd : Optional[float]
+        The population true score standard deviation. When the DSM is being
+        calculated for a subgroup, this should be the standard deviation for the
+        whole population.
         Defaults to ``None``.
-    population_y_pred_sd : float, optional
-        The predicted score standard deviation.
-        When the DSM is being calculated for a subgroup,
-        this should be the standard deviation for the whole
-        population.
-        Defaults to None.
-    ddof : int, optional
-        The delta degrees of freedom. The divisor used in
-        calculations is N - ddof, where N represents the
-        number of elements.
+    population_y_pred_sd : Optional[float]
+        The predicted score standard deviation. When the DSM is being calculated
+        for a subgroup, this should be the standard deviation for the whole population.
+        Defaults to ``None``.
+    ddof : int
+        The delta degrees of freedom. The divisor used in calculations is N - ddof
+        where N represents the number of elements.
         Defaults to 1.
 
     Returns
     -------
-    difference_of_std_means : array-like
-        The difference of standardized means
+    difference_of_std_means : Optional[float]
+        The difference of standardized means.
 
     Raises
     ------
@@ -438,7 +432,9 @@ def difference_of_standardized_means(
     return difference_of_std_means
 
 
-def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
+def quadratic_weighted_kappa(
+    y_true_observed: np.ndarray, y_pred: np.ndarray, ddof: int = 0
+) -> float:
     r"""
     Calculate quadratic-weighted kappa for both discrete and continuous values.
 
@@ -462,11 +458,11 @@ def quadratic_weighted_kappa(y_true_observed, y_pred, ddof=0):  # noqa: D301
 
     Parameters
     ----------
-    y_true_observed : array-like
+    y_true_observed : numpy.ndarray
         The observed scores.
-    y_pred : array-like
+    y_pred : numpy.ndarray
         The predicted scores.
-    ddof : int, optional
+    ddof : int
         Means Delta Degrees of Freedom. The divisor used in
         calculations is N - ddof, where N represents the
         number of elements. When ddof is set to zero, the results
