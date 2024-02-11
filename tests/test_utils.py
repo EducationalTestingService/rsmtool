@@ -93,8 +93,8 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(convert_to_float(5.0), 5.0)
 
     def test_parse_range(self):
-        self.assertEqual(parse_range("5-10"), [5, 10])
-        self.assertEqual(parse_range("0-100"), [0, 100])
+        self.assertEqual(parse_range("5-10"), (5, 10))
+        self.assertEqual(parse_range("0-100"), (0, 100))
 
     def test_parse_range_invalid_1(self):
         with self.assertRaises(ValueError):

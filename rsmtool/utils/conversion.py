@@ -8,36 +8,38 @@ Utility classes and functions for type conversion.
 :organization: ETS
 """
 
+from typing import Any, Tuple
+
 from skll.data import safe_float as string_to_number
 
 from .constants import RSMEXPLAIN_RANGE_REGEXP
 
 
-def int_to_float(value):
+def int_to_float(value: Any) -> Any:
     """
     Convert integer to float, if possible.
 
     Parameters
     ----------
-    value
+    value: Any
         Name of the value we want to convert.
 
     Returns
     -------
-    value
+    value: Any
         Value converted to float, if possible
     """
-    return float(value) if type(value) == int else value
+    return float(value) if isinstance(value, int) else value
 
 
-def convert_to_float(value):
+def convert_to_float(value: Any) -> Any:
     """
     Convert value to float, if possible.
 
     Parameters
     ----------
     value
-        Name of the experiment file we want to locate.
+        Name of the value we want to convert
 
     Returns
     -------
@@ -47,7 +49,7 @@ def convert_to_float(value):
     return int_to_float(string_to_number(value))
 
 
-def parse_range(value):
+def parse_range(value: str) -> Tuple[int, int]:
     """
     Parse range strings used in rsmexplain.
 
@@ -81,4 +83,5 @@ def parse_range(value):
     if not valid_range:
         raise ValueError(f"invalid value '{value}' specified for range")
     else:
-        return [start_index, end_index]
+        assert isinstance(start_index, int) and isinstance(end_index, int)
+        return (start_index, end_index)
