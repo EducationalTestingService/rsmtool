@@ -13,11 +13,12 @@ import re
 from glob import glob
 from os.path import join
 from pathlib import Path
+from typing import Any, Dict, Union
 
 from .constants import POSSIBLE_EXTENSIONS
 
 
-def parse_json_with_comments(pathlike):
+def parse_json_with_comments(pathlike: Union[str, Path]) -> Dict[str, Any]:
     """
     Parse a JSON file after removing any comments.
 
@@ -27,13 +28,13 @@ def parse_json_with_comments(pathlike):
 
     Parameters
     ----------
-    filename : str or os.PathLike
+    filename : Union[str, Path]
         Path to the input JSON file either as a string
         or as a ``pathlib.Path`` object.
 
     Returns
     -------
-    obj : dict
+    obj : Dict[str, Any]
         JSON object representing the input file.
 
     Note
@@ -67,7 +68,7 @@ def parse_json_with_comments(pathlike):
         return config
 
 
-def has_files_with_extension(directory, ext):
+def has_files_with_extension(directory: str, ext: str) -> bool:
     """
     Check if the directory has any files with the given extension.
 
@@ -88,7 +89,7 @@ def has_files_with_extension(directory, ext):
     return len(files_with_extension) > 0
 
 
-def get_output_directory_extension(directory, experiment_id):
+def get_output_directory_extension(directory: str, experiment_id: str) -> str:
     """
     Check output directory to determine what file extensions exist.
 
@@ -110,14 +111,14 @@ def get_output_directory_extension(directory, experiment_id):
     Returns
     -------
     extension : str
-        The extension that output files in this directory
-        end with. One of {"csv", "tsv", "xlsx"}.
+        The extension that output files in this directory end with. One of
+        {``"csv"``, ``"tsv"``, ``"xlsx"``}.
 
     Raises
     ------
     ValueError
-        If any files in the directory have extensions
-        other than "csv", "tsv", or "xlsx".
+        If any files in the directory have extensions other than ``"csv"``,
+        `"tsv"``, or ``"xlsx"``.
     """
     extension = "csv"
     extensions_identified = {
