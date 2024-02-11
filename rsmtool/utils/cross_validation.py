@@ -9,30 +9,36 @@ Various utility functions used for cross-validation.
 import logging
 from pathlib import Path
 from shutil import copyfile
+from typing import Optional, Tuple
 
-from pandas import concat
+from pandas import DataFrame, concat
 from sklearn.model_selection import KFold, LeaveOneGroupOut
 from skll.config.utils import load_cv_folds
 
+from rsmtool.configuration_parser import Configuration
 from rsmtool.reader import DataReader
 from rsmtool.rsmtool import run_experiment
 from rsmtool.utils.logging import get_file_logger
 from rsmtool.writer import DataWriter
 
 
-def create_xval_files(configuration, output_dir, logger=None):
+def create_xval_files(
+    configuration: Configuration, output_dir: str, logger: Optional[logging.Logger] = None
+) -> Tuple[DataFrame, int]:
     """
     Create all files needed for the cross-validation experiment.
 
     Parameters
     ----------
-    configuration : rsmtool.configuration_parser.Configuration
+    configuration : Configuration
         A Configuration object holding the user-specified configuration
-        for "rsmxval".
+        for rsmxval.
     output_dir : str
-        Path to the output directory specified for "rsmxval".
-    logger : None, optional
-        Logger object used to log messages from this function.
+        Path to the output directory specified for rsmxval.
+    logger : Optional[logging.Logger]
+        Logger object used to log messages from this function. If ``None``,
+        a new logger is created.
+        Defaults to ``None``.
 
     Returns
     -------
@@ -186,7 +192,7 @@ def create_xval_files(configuration, output_dir, logger=None):
     return df_train, folds
 
 
-def process_fold(fold_num, foldsdir):
+def process_fold(fold_num: int, foldsdir: str) -> None:
     """
     Run RSMTool on the specified numbered fold.
 
@@ -206,10 +212,10 @@ def process_fold(fold_num, foldsdir):
 
     # run RSMTool on the given fold and have it log its output to the file
     config_file = fold_dir / "rsmtool.json"
-    run_experiment(config_file, fold_dir, False, logger=logger)
+    run_experiment(config_file, str(fold_dir), False, logger=logger)
 
 
-def combine_fold_prediction_files(foldsdir, file_format="csv"):
+def combine_fold_prediction_files(foldsdir: str, file_format: str = "csv") -> DataFrame:
     """
     Combine predictions from all folds into a single data frame.
 
@@ -219,8 +225,8 @@ def combine_fold_prediction_files(foldsdir, file_format="csv"):
         The directory which stores the output for each fold experiment.
     file_format : str
         The file format (extension) for the file to be written to disk.
-        One of {"csv", "xlsx", "tsv"}.
-        Defaults to "csv".
+        One of {``"csv"``, ``"xlsx"``, ``"tsv"``}.
+        Defaults to ``"csv"``.
 
     Returns
     -------
@@ -233,7 +239,7 @@ def combine_fold_prediction_files(foldsdir, file_format="csv"):
     # iterate over each fold in the given directory & read and save predictions
     for prediction_file in Path(foldsdir).glob(f"**/*pred_processed*.{file_format}"):
         df_fold_predictions = DataReader.read_from_file(
-            prediction_file, converters={"spkitemid": str}
+            str(prediction_file), converters={"spkitemid": str}
         )
         prediction_dfs.append(df_fold_predictions)
 
