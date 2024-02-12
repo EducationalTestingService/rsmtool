@@ -11,7 +11,7 @@ Classes for analyzing RSMTool predictions, metrics, etc.
 import logging
 import warnings
 from functools import partial
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -19,6 +19,7 @@ from scipy.stats import kurtosis, pearsonr
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix, mean_squared_error, r2_score
 from skll.metrics import kappa
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration
@@ -1700,7 +1701,7 @@ class Analyzer:
         self,
         data_container: DataContainer,
         configuration: Configuration,
-        wandb_run: Optional[Run] = None,
+        wandb_run: Union[Run, RunDisabled, None] = None,
     ) -> Tuple[Configuration, DataContainer]:
         """
         Run all analyses on the system scores (predictions).
@@ -1717,7 +1718,7 @@ class Analyzer:
             parameters (keys):  {"subgroups", "second_human_score_column",
             "use_scaled_predictions"}.
 
-        wandb_run : Optional[wandb.wandb_run.Run]
+        wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
             The wandb run object if wandb is enabled, ``None`` otherwise.
             If enabled, all the output data frames will be logged to this run
             as tables.

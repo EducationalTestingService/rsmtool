@@ -16,13 +16,14 @@ import os
 import sys
 import warnings
 from os.path import abspath, basename, dirname, join, normpath, splitext
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import nbformat
 from nbconvert.exporters import HTMLExporter, NotebookExporter
 from nbconvert.exporters.templateexporter import default_filters
 from nbformat.warnings import DuplicateCellId, MissingIDFieldWarning
 from traitlets.config import Config
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from rsmtool.configuration_parser import Configuration
@@ -122,7 +123,11 @@ notebook_path_dict = {
 class Reporter:
     """Class to generate Jupyter notebook reports and convert them to HTML."""
 
-    def __init__(self, logger: Optional[logging.Logger] = None, wandb_run: Optional[Run] = None):
+    def __init__(
+        self,
+        logger: Optional[logging.Logger] = None,
+        wandb_run: Union[Run, RunDisabled, None] = None,
+    ):
         """
         Initialize the Reporter object.
 
@@ -131,7 +136,7 @@ class Reporter:
         logger: Optional[logging.Logger]
             A Logger object. If ``None`` is passed, get logger from ``__name__``.
             Defaults to ``None``.
-        wandb_run: Optional[wandb.wandb_run.Run]
+        wandb_run: Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
             A wandb run object that will be used to log artifacts and tables.
             If ``None`` is passed, a new wandb run will be initialized if
             wandb is enabled in the configuration.

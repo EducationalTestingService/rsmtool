@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration, configure
@@ -315,7 +316,7 @@ def compute_and_save_predictions(
     output_file: str,
     feats_file: Optional[str] = None,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[Run] = None,
+    wandb_run: Union[Run, RunDisabled, None] = None,
 ) -> None:
     """
     Run rsmpredict using the given configuration.
@@ -344,7 +345,7 @@ def compute_and_save_predictions(
     logger : Optional[logging.Logger]
         A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.wandb_run.Run]
+    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration.

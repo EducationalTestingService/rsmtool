@@ -25,6 +25,7 @@ import pandas as pd
 import shap
 from skll.data import FeatureSet
 from skll.learner import Learner
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from .configuration_parser import Configuration, configure
@@ -146,7 +147,7 @@ def generate_explanation(
     output_dir: str,
     overwrite_output: bool = False,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[Run] = None,
+    wandb_run: Union[Run, RunDisabled, None] = None,
 ):
     """
     Generate a shap.Explanation object.
@@ -175,7 +176,7 @@ def generate_explanation(
     logger : Optional[logging.Logger]
         A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.wandb_run.Run]
+    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration.
@@ -439,7 +440,7 @@ def generate_report(
     ids: Dict[int, str],
     configuration: Configuration,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[Run] = None,
+    wandb_run: Union[Run, RunDisabled, None] = None,
 ) -> None:
     """
     Generate an rsmexplain report.
@@ -462,7 +463,7 @@ def generate_report(
     logger : Optional[logging.Logger]
         A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.wandb_run.Run]
+    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration. Defaults to ``None``.
