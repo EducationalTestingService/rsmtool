@@ -42,7 +42,7 @@ VALID_SKLL_MODELS = [
 ]
 
 
-def is_skll_model(model_name):
+def is_skll_model(model_name: str) -> bool:
     """
     Check whether the given model is a valid learner name in SKLL.
 
@@ -63,7 +63,7 @@ def is_skll_model(model_name):
     return hasattr(_skll_module, model_name) and model_name != "LinearRegression"
 
 
-def is_built_in_model(model_name):
+def is_built_in_model(model_name: str) -> bool:
     """
     Check whether the given model is a valid built-in model.
 
