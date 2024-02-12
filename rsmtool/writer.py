@@ -13,6 +13,7 @@ from os.path import join
 from typing import Dict, List, Optional, Union
 
 import pandas as pd
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from rsmtool.container import DataContainer
@@ -27,7 +28,7 @@ class DataWriter:
         self,
         experiment_id: Optional[str] = None,
         context: Optional[str] = None,
-        wandb_run: Optional[Run] = None,
+        wandb_run: Union[Run, RunDisabled, None] = None,
     ):
         """
         Initialize the DataWriter object.
@@ -40,7 +41,7 @@ class DataWriter:
         context : Optional[str]
             The context in which this writer is used.
             Defaults to ``None``.
-        wandb_run : Optional[wandb.wandb_run.Run]
+        wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
             The wandb run object if wandb is enabled, None otherwise.
             If enabled, all the output data frames will be logged to
             this run as tables.

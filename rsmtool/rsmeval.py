@@ -17,6 +17,7 @@ from os.path import abspath, exists, join
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from .analyzer import Analyzer
@@ -36,7 +37,7 @@ def run_evaluation(
     output_dir: str,
     overwrite_output: bool = False,
     logger: Optional[logging.Logger] = None,
-    wandb_run: Optional[Run] = None,
+    wandb_run: Union[Run, RunDisabled, None] = None,
 ) -> None:
     """
     Run an rsmeval experiment using the given configuration.
@@ -64,7 +65,7 @@ def run_evaluation(
     logger : Optional[logging.Logger]
         A Logger object. If ``None`` is passed, get logger from ``__name__``.
         Defaults to ``None``.
-    wandb_run : Optional[wandb.wandb_run.Run]
+    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
         A wandb run object that will be used to log artifacts and tables.
         If ``None`` is passed, a new wandb run will be initialized if
         wandb is enabled in the configuration.
