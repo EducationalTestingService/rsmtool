@@ -226,7 +226,7 @@ def standardized_mean_difference(
         calculated for a subgroup, this should be the standard deviation for
         the whole population.
         Defaults to ``None``.
-    population_y_pred_sd : float, optional
+    population_y_pred_sd : Optional[float]
         The predicted score standard deviation. When the SMD is being calculated
         for a subgroup, this should be the standard deviation for the whole population.
         Defaults to ``None``.

@@ -101,7 +101,7 @@ def true_score_variance(
     human_scores : numpy.ndarray
         Human ratings for each response of shape (n_samples, n_ratings).
 
-    variance_errors_human : float, optional
+    variance_errors_human : Optional[float]
         Estimated variance of errors in human scores. If ``None``, the variance
         will be estimated from the data. In this case at least some responses
         *must* have more than one human score.
@@ -227,7 +227,7 @@ def prmse_true(
         System scores for each response of shape (n_samples,).
     human_scores : numpy.ndarray
         Human ratings for each response of shape (n_samples, n_ratings).
-    variance_errors_human : float, optional
+    variance_errors_human : Optional[float]
         Estimated variance of errors in human scores. If ``None``, the variance
         will be estimated from the data. In this case at least some responses
         *must* have more than one human score.
@@ -296,7 +296,7 @@ def get_true_score_evaluations(
         which can only be computed when a subset of responses has two or more
         human ratings. If  ``human_score_columns`` is a single column name,
         ``variance_errors_human`` *must* also be specified.
-    variance_errors_human : float, optional
+    variance_errors_human : Optional[float]
         Estimated variance of errors in human scores. If ``None``, the variance
         will be estimated from the data in which case some responses *must* have
         more than one human rating.

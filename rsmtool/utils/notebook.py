@@ -264,7 +264,7 @@ def get_thumbnail_as_html(
         provided, it will be converted to a relative path.
     image_id : int
         The id of the <img> tag in the HTML. This must be unique for each <img> tag.
-    path_to_thumbnail : str, optional
+    path_to_thumbnail : str
         If you would like to use a different thumbnail image, specify the path
         to this thumbnail.
         Defaults to ``None``.
@@ -348,15 +348,10 @@ def show_thumbnail(
         provided, it will be converted to a relative path.
     image_id : int
         The id of the <img> tag in the HTML. This must be unique for each <img> tag.
-    path_to_thumbnail : str, optional
+    path_to_thumbnail : Optional[str]
         If you would like to use a different thumbnail image, specify the path
         to the thumbnail.
         Defaults to ``None``.
-
-    Displays
-    --------
-    display : IPython.core.display.HTML
-        The HTML for the thumbnail image.
     """
     display(HTML(get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail)))
 
@@ -457,11 +452,6 @@ def show_files(context: str, output_dir: str, experiment_id: str, file_format: s
         The experiment ID.
     file_format : str
         The format of the output files.
-
-    Displays
-    --------
-    display : IPython.core.display.HTML
-        The HTML file descriptions and links.
     """
     html_string = get_files_as_html(
         output_dir,
