@@ -14,6 +14,7 @@ from os.path import exists, isabs, relpath
 from pathlib import Path
 from string import Template
 from textwrap import wrap
+from typing import Dict, List, Optional, Tuple, Union
 
 from IPython.display import HTML, display
 
@@ -29,7 +30,7 @@ INTERMEDIATE_TABLE_ROW_STRING = """
 """
 
 
-def float_format_func(num, prec=3, scientific=False):
+def float_format_func(num: float, prec: int = 3, scientific: bool = False) -> str:
     """
     Format given float to the specified precision as a string.
 
@@ -37,12 +38,12 @@ def float_format_func(num, prec=3, scientific=False):
     ----------
     num : float
         The floating point number to format.
-    prec: int, optional
+    prec: int
         The number of decimal places to use when displaying the number.
         Defaults to 3.
-    scientific: bool, optional
-        Whether to display the number in scientific notiation if
-        the rounded version is "0.000".
+    scientific: bool
+        Whether to display the number in scientific notiation if the rounded
+        version is "0.000".
         Defaults to ``False``.
 
     Returns
@@ -58,7 +59,7 @@ def float_format_func(num, prec=3, scientific=False):
     return ans
 
 
-def int_or_float_format_func(num, prec=3):
+def int_or_float_format_func(num: Union[int, float], prec: int = 3) -> str:
     """
     Identify whether the number is float or integer.
 
@@ -67,9 +68,9 @@ def int_or_float_format_func(num, prec=3):
 
     Parameters
     ----------
-    num : float or int
+    num : Union[int, float]
         The number to format and display.
-    prec : int, optional
+    prec : int
         The number of decimal places to display if x is a float.
         Defaults to 3.
 
@@ -85,7 +86,14 @@ def int_or_float_format_func(num, prec=3):
     return ans
 
 
-def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="bold"):
+def custom_highlighter(
+    num: float,
+    low: float = 0,
+    high: float = 1,
+    prec: int = 3,
+    absolute: bool = False,
+    span_class: str = "bold",
+) -> str:
     """
     Convert float to an HTML <span> element with given class.
 
@@ -109,8 +117,9 @@ def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="b
         If ``True``, use the absolute value of x for comparison.
         Defaults to ``False``.
     span_class : str
-        One of "bold" or "color". These are the two classes
-        available for the HTML span tag.
+        One of ``"bold"`` or ``"color"``. These are the two classes available
+        for the HTML span tag.
+        Defaults to ``"bold"``.
 
     Returns
     -------
@@ -127,7 +136,9 @@ def custom_highlighter(num, low=0, high=1, prec=3, absolute=False, span_class="b
     return ans
 
 
-def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
+def bold_highlighter(
+    num: float, low: float = 0, high: float = 1, prec: int = 3, absolute: bool = False
+) -> str:
     """
     Instantiate a ``custom_highlighter()`` with "bold" as default class.
 
@@ -157,7 +168,9 @@ def bold_highlighter(num, low=0, high=1, prec=3, absolute=False):
     return ans
 
 
-def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
+def color_highlighter(
+    num: float, low: float = 0, high: float = 1, prec: int = 3, absolute: bool = False
+) -> str:
     """
     Instantiate a ``custom_highlighter()`` with "color" as the default class.
 
@@ -187,7 +200,9 @@ def color_highlighter(num, low=0, high=1, prec=3, absolute=False):
     return ans
 
 
-def compute_subgroup_plot_params(group_names, num_plots):
+def compute_subgroup_plot_params(
+    group_names: List[str], num_plots: int
+) -> Tuple[int, int, int, int, List[str]]:
     """
     Compute subgroup plot and figure parameters.
 
@@ -196,7 +211,7 @@ def compute_subgroup_plot_params(group_names, num_plots):
 
     Parameters
     ----------
-    group_names : list of str
+    group_names : List[str]
         A list of subgroup names for plots.
     num_plots : int
         The number of plots to compute.
@@ -211,7 +226,7 @@ def compute_subgroup_plot_params(group_names, num_plots):
         The number of rows for the plots.
     num_columns : int
         The number of columns for the plots.
-    wrapped_group_names : list of str
+    wrapped_group_names : List[str]
         A list of group names for plots.
     """
     wrapped_group_names = ["\n".join(wrap(str(gn), 20)) for gn in group_names]
@@ -231,7 +246,9 @@ def compute_subgroup_plot_params(group_names, num_plots):
     return (figure_width, figure_height, num_rows, num_columns, wrapped_group_names)
 
 
-def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
+def get_thumbnail_as_html(
+    path_to_image: str, image_id: int, path_to_thumbnail: Optional[str] = None
+) -> str:
     """
     Generate HTML for a clickable thumbnail of given image.
 
@@ -243,15 +260,13 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     Parameters
     ----------
     path_to_image : str
-        The absolute or relative path to the image.
-        If an absolute path is provided, it will be
-        converted to a relative path.
+        The absolute or relative path to the image. If an absolute path is
+        provided, it will be converted to a relative path.
     image_id : int
-        The id of the <img> tag in the HTML. This must
-        be unique for each <img> tag.
+        The id of the <img> tag in the HTML. This must be unique for each <img> tag.
     path_to_thumbnail : str, optional
-        If you would like to use a different thumbnail
-        image, specify the path to this thumbnail.
+        If you would like to use a different thumbnail image, specify the path
+        to this thumbnail.
         Defaults to ``None``.
 
     Returns
@@ -317,7 +332,9 @@ def get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail=None):
     return image
 
 
-def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
+def show_thumbnail(
+    path_to_image: str, image_id: int, path_to_thumbnail: Optional[str] = None
+) -> None:
     """
     Display the HTML for an image thumbnail in a Jupyter notebook.
 
@@ -327,15 +344,13 @@ def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     Parameters
     ----------
     path_to_image : str
-        The absolute or relative path to the image.
-        If an absolute path is provided, it will be
-        converted to a relative path.
+        The absolute or relative path to the image. If an absolute path is
+        provided, it will be converted to a relative path.
     image_id : int
-        The id of the <img> tag in the HTML. This must
-        be unique for each <img> tag.
+        The id of the <img> tag in the HTML. This must be unique for each <img> tag.
     path_to_thumbnail : str, optional
-        If you would like to use a different thumbnail
-        image, specify the path to the thumbnail.
+        If you would like to use a different thumbnail image, specify the path
+        to the thumbnail.
         Defaults to ``None``.
 
     Displays
@@ -346,7 +361,9 @@ def show_thumbnail(path_to_image, image_id, path_to_thumbnail=None):
     display(HTML(get_thumbnail_as_html(path_to_image, image_id, path_to_thumbnail)))
 
 
-def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
+def get_files_as_html(
+    output_dir: str, experiment_id: str, file_format: str, replace_dict: Dict[str, str] = {}
+) -> str:
     """
     Generate an HTML list for each output file in given directory.
 
@@ -361,8 +378,8 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
         The experiment ID.
     file_format : str
         The format of the output files.
-    replace_dict : dict, optional
-        A dictionary which makes file names to descriptions.
+    replace_dict : Dict[str, str]
+        A dictionary which maps file names to descriptions.
         Defaults to ``{}``.
 
     Returns
@@ -370,11 +387,11 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     html_string : str
         HTML string with file descriptions and links.
     """
-    output_dir = Path(output_dir)
-    parent_dir = output_dir.parent
+    output_path = Path(output_dir)
+    parent_dir = output_path.parent
 
     # get the list of intermediate files generated for this experiment
-    files = list(output_dir.glob(f"*.{file_format}"))
+    files = list(output_path.glob(f"*.{file_format}"))
 
     # get the bare filenames for each file since we will need those for sorting
     filenames = [file.stem.replace(f"{experiment_id}_", "") for file in files]
@@ -426,14 +443,14 @@ def get_files_as_html(output_dir, experiment_id, file_format, replace_dict={}):
     return f"<table>{table_rows}</table>"
 
 
-def show_files(context, output_dir, experiment_id, file_format):
+def show_files(context: str, output_dir: str, experiment_id: str, file_format: str) -> None:
     """
     Show files for given context and directory as a table in a Jupyter notebook.
 
     Parameters
     ----------
     context: str
-        The tool context: one of {"rsmtool", "rsmeval", "rsmsummarize"}.
+        The tool context: one of {``"rsmtool"``, ``"rsmeval"``, ``"rsmsummarize"``}.
     output_dir : str
         The output directory.
     experiment_id : str
