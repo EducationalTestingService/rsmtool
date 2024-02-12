@@ -13,42 +13,45 @@ The derivations and formulas were provided by Matt Johnson.
 """
 
 import warnings
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
 
 
-def get_n_human_scores(human_scores):
+def get_n_human_scores(human_scores: np.ndarray) -> np.ndarray:
     """
     Get the number of available human scores for each response.
 
     Parameters
     ----------
-    human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response.
+    human_scores : numpy.ndarray
+        Human ratings for each response of shape (n_samples, n_ratings).
 
     Returns
     -------
-    n_scores : array-like of shape (n_samples, )
-        Total number of not None human scores
+    n_scores : numpy.ndarray
+        Total number of human scores of shape (n_samples, ). Only includes
+        scores that are not NaN.
     """
     n_scores = (~np.isnan(human_scores)).sum(axis=1)
     return n_scores
 
 
-def variance_of_errors(human_scores):
+def variance_of_errors(human_scores: np.ndarray) -> Optional[float]:
     """
     Estimate the variance of errors in human scores.
 
     Parameters
     ----------
-    human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response.
+    human_scores : numpy.ndarray
+        Human ratings for each response of shape (n_samples, n_ratings).
 
     Returns
     -------
-    variance_of_errors : float
-        Estimated variance of errors in human scores.
+    variance_of_errors : Optional[float]
+        Estimated variance of errors in human scores. If the variance of errors
+        cannot be estimated from the data, returns ``None``.
     """
     # we first compute the total number of scores
     # available for each response
@@ -63,10 +66,9 @@ def variance_of_errors(human_scores):
     # if we don't have valid human scores
     if multiple_mask.sum() == 0:
         warnings.warn(
-            "True score evaluations cannot be "
-            "computed because none of the responses in the "
-            "evaluation set has valid "
-            "system scores and 2 human scores."
+            "True score evaluations cannot be computed because none of the "
+            "responses in the evaluation set has valid system scores and 2 "
+            "human scores."
         )
         return None
 
@@ -88,31 +90,32 @@ def variance_of_errors(human_scores):
         return variance_of_errors
 
 
-def true_score_variance(human_scores, variance_errors_human=None):
+def true_score_variance(
+    human_scores: np.ndarray, variance_errors_human: Optional[float] = None
+) -> Optional[float]:
     """
     Compute variance of true scores for multiple raters.
 
     Parameters
     ----------
-    human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response.
+    human_scores : numpy.ndarray
+        Human ratings for each response of shape (n_samples, n_ratings).
 
     variance_errors_human : float, optional
-        Estimated variance of errors in human scores.
-        If ``None``, the variance will be estimated
-        from the data. In this case at least some responses
-        must have more than one human score.
+        Estimated variance of errors in human scores. If ``None``, the variance
+        will be estimated from the data. In this case at least some responses
+        *must* have more than one human score.
         Defaults to ``None``.
 
 
     Returns
     -------
-    variance_true_scores : float
-        Variance of true scores.
+    variance_true_scores : Optional[float]
+        Variance of true scores. If the variance of errors in human scores
+        is not available and cannot be estimated from the data, returns ``None``.
     """
     # if we don't have variance of errors, compute it
     # from the data
-
     if variance_errors_human is None:
         variance_errors_human = variance_of_errors(human_scores)
 
@@ -159,31 +162,32 @@ def true_score_variance(human_scores, variance_errors_human=None):
         return variance_true_scores
 
 
-def mse_true(system, human_scores, variance_errors_human=None):
+def mse_true(
+    system: np.ndarray, human_scores: np.ndarray, variance_errors_human: Optional[float] = None
+) -> Optional[float]:
     """
     Compute mean squared error (MSE) when predicting true score from system score.
 
     Parameters
     ----------
-    system : array-like of shape (n_samples,)
-        System scores for each response.
-    human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response.
-    variance_errors_human : float, optional
-        Estimated variance of errors in human scores.
-        If ``None``, the variance will be estimated from
-        the data. In this case at least some responses must
-        have more than one human score.
+    system : numpy.ndarray
+        System scores for each response of shape (n_samples,).
+    human_scores : numpy.ndarray
+        Human ratings for each response of shape (n_samples, n_ratings).
+    variance_errors_human : Optional[float]
+        Estimated variance of errors in human scores. If ``None``, the variance
+        will be estimated from the data. In this case at least some responses
+        *must* have more than one human score.
         Defaults to ``None``.
 
     Returns
     -------
-    variance_true_scores : float
-        Variance of true scores.
+    variance_true_scores : Optional[float]
+        Variance of true scores. If the variance of errors in human scores
+        is not available and cannot be estimated from the data, returns ``None``.
     """
     # if we don't have variance of errors, compute it
     # from the data
-
     if variance_errors_human is None:
         variance_errors_human = variance_of_errors(human_scores)
 
@@ -205,7 +209,9 @@ def mse_true(system, human_scores, variance_errors_human=None):
     return mse
 
 
-def prmse_true(system, human_scores, variance_errors_human=None):
+def prmse_true(
+    system: np.ndarray, human_scores: np.ndarray, variance_errors_human: Optional[float] = None
+) -> Optional[float]:
     """
     Compute PRMSE when predicting true score from system scores.
 
@@ -217,21 +223,27 @@ def prmse_true(system, human_scores, variance_errors_human=None):
 
     Parameters
     ----------
-    system : array-like of shape (n_samples,)
-        System scores for each response.
-    human_scores : array-like of shape (n_samples, n_ratings)
-        Human ratings for each response.
+    system : numpy.ndarray
+        System scores for each response of shape (n_samples,).
+    human_scores : numpy.ndarray
+        Human ratings for each response of shape (n_samples, n_ratings).
     variance_errors_human : float, optional
-        Estimated variance of errors in human scores.
-        If ``None``, the variance will be estimated from
-        the data. In this case at least some responses must
-        have more than one human score.
+        Estimated variance of errors in human scores. If ``None``, the variance
+        will be estimated from the data. In this case at least some responses
+        *must* have more than one human score.
         Defaults to ``None``.
 
     Returns
     -------
-    prmse : float
-        Proportional reduction in mean squared error
+    prmse : Optional[float]
+        Proportional reduction in mean squared error. If the variance of errors
+        in human scores is not available and cannot be estimated from the data,
+        returns ``None``.
+
+    Raises
+    ------
+    ValueError
+        If variance of true scores or MSE could not be computed.
     """
     # check that human_scors is a two dimensional array
     # and reshape if necessary
@@ -253,39 +265,41 @@ def prmse_true(system, human_scores, variance_errors_human=None):
 
     else:
         variance_true = true_score_variance(human_scores, variance_errors_human)
-
         mse = mse_true(system, human_scores, variance_errors_human)
 
-        prmse = 1 - (mse / variance_true)
+        if not variance_true or not mse:
+            raise ValueError("Variance of true scores or MSE could not be computed. ")
 
+        prmse = 1 - (mse / variance_true)
         return prmse
 
 
 def get_true_score_evaluations(
-    df, system_score_columns, human_score_columns, variance_errors_human=None
-):
+    df: pd.DataFrame,
+    system_score_columns: Union[str, List[str]],
+    human_score_columns: Union[str, List[str]],
+    variance_errors_human: Optional[float] = None,
+) -> pd.DataFrame:
     """
     Generate true score evaluations for HTML reports.
 
     Parameters
     ----------
     df: pandas.DataFrame
-        Input data frame. Must contain columns listed in
-        ``system_score_columns`` and ``human_score_columns``.
-    system_score_columns: str or list
+        Input data frame. Must contain columns listed in ``system_score_columns``
+        and ``human_score_columns``.
+    system_score_columns: Union[str, List[str]
         System score column name or list of columns containing system scores.
-    human_score_columns: str or list
+    human_score_columns: Union[str, List[str]
         Human score column or list of columns containing human scores.
         True score evaluations require estimating variance of human errors,
-        which can only be computed when a subset of responses has
-        two or more human ratings. If  ``human_score_columns`` is
-        a single column name,  ``variance_errors_human`` must also
-        be specified.
+        which can only be computed when a subset of responses has two or more
+        human ratings. If  ``human_score_columns`` is a single column name,
+        ``variance_errors_human`` *must* also be specified.
     variance_errors_human : float, optional
-        Estimated variance of errors in human scores.
-        If ``None``, the variance will be estimated from
-        the data in which case some responses must have more
-        than one human rating.
+        Estimated variance of errors in human scores. If ``None``, the variance
+        will be estimated from the data in which case some responses *must* have
+        more than one human rating.
         Defaults to ``None``.
 
     Returns
@@ -294,16 +308,16 @@ def get_true_score_evaluations(
         DataFrame containing different evaluation metrics related to the evaluation
         of system scores against true scores. The column names are:
 
-        - "N": total number of responses
-        - "N raters": maximum number of ratings available for a single response
-        - "N_single": total number of responses with a single human score
-        - "N_multiple": total number of responses with more than one
+        - ``"N"``: total number of responses
+        - ``"N raters"``: maximum number of ratings available for a single response
+        - ``"N_single"``: total number of responses with a single human score
+        - ``"N_multiple"``: total number of responses with more than one
           human score
-        - "variance_of_errors": estimated variance of human errors
-        - "tru_var": estimated true score variance
-        - "mse_true": mean squared error when predicting true score from
+        - ``"variance_of_errors"``: estimated variance of human errors
+        - ``"tru_var"``: estimated true score variance
+        - ``"mse_true"``: mean squared error when predicting true score from
           machine score
-        - "prmse": proportional reduction in mean squared error when
+        - ``"prmse"``: proportional reduction in mean squared error when
           predicting true score
     """
     # check that if we only have one human column, we were also given
