@@ -1223,7 +1223,7 @@ def check_generated_output(
         The experiment ID.
     model_source : str
         One of ``"rsmtool"`` or ``"skll"``.
-    file_format : str, optional
+    file_format : str
         The format of the output files.
         Defaults to ``"csv"``.
     """
