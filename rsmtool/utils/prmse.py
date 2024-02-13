@@ -267,7 +267,7 @@ def prmse_true(
         variance_true = true_score_variance(human_scores, variance_errors_human)
         mse = mse_true(system, human_scores, variance_errors_human)
 
-        if not variance_true or not mse:
+        if variance_true is None or mse is None:
             raise ValueError("Variance of true scores or MSE could not be computed. ")
 
         prmse = 1 - (mse / variance_true)
@@ -319,6 +319,12 @@ def get_true_score_evaluations(
           machine score
         - ``"prmse"``: proportional reduction in mean squared error when
           predicting true score
+
+    Raises
+    ------
+    ValueError
+        If ``human_score_columns`` is a single column name and ``variance_errors_human``
+        is not specified.
     """
     # check that if we only have one human column, we were also given
     # variance of errors
