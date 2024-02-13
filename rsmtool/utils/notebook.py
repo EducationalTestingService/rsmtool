@@ -264,7 +264,7 @@ def get_thumbnail_as_html(
         provided, it will be converted to a relative path.
     image_id : int
         The id of the <img> tag in the HTML. This must be unique for each <img> tag.
-    path_to_thumbnail : str
+    path_to_thumbnail : Optional[str]
         If you would like to use a different thumbnail image, specify the path
         to this thumbnail.
         Defaults to ``None``.

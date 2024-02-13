@@ -22,7 +22,7 @@ def int_to_float(value: Any) -> Any:
     Parameters
     ----------
     value: Any
-        Name of the value we want to convert.
+        The value we want to convert.
 
     Returns
     -------
@@ -39,7 +39,7 @@ def convert_to_float(value: Any) -> Any:
     Parameters
     ----------
     value
-        Name of the value we want to convert
+        The value we want to convert
 
     Returns
     -------
@@ -64,6 +64,11 @@ def parse_range(value: str) -> Tuple[int, int]:
     -------
     Tuple[int, int]
         A tuple containing two integers.
+
+    Raises
+    ------
+    ValueError
+        If the range string is not valid.
     """
     valid_range = False
     if matchobj := RSMEXPLAIN_RANGE_REGEXP.match(value):
