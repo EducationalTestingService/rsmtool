@@ -69,7 +69,7 @@ def log_configuration_to_wandb(
 def log_dataframe_to_wandb(
     wandb_run: Union[Run, RunDisabled, None],
     df: pd.DataFrame,
-    frame_name: pd.DataFrame,
+    frame_name: str,
     section: Optional[str] = None,
 ) -> None:
     """

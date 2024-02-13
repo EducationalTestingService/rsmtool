@@ -118,7 +118,7 @@ def get_output_directory_extension(directory: str, experiment_id: str) -> str:
     ------
     ValueError
         If any files in the directory have extensions other than ``"csv"``,
-        `"tsv"``, or ``"xlsx"``.
+        ``"tsv"``, or ``"xlsx"``.
     """
     extension = "csv"
     extensions_identified = {

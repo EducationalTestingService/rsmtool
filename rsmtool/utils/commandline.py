@@ -446,7 +446,7 @@ class InteractiveField:
         Create a validator for choice fields.
 
         This private method creates a validator for a field
-        with ``data_type`` of "choice".
+        with ``data_type`` of "choices".
 
         Parameters
         ----------
@@ -620,7 +620,7 @@ class InteractiveField:
 
         Parameters
         ----------
-        allow_empty : bool, optional
+        allow_empty : bool
             If ``True``, it will allow the user to also just press
             enter (i.e., input a blank string)
             Defaults to ``False``.
@@ -743,8 +743,8 @@ class InteractiveField:
         Returns
         -------
         final_value : Union[bool, int, str, List[str]]
-            The final value of the field which may be a list of
-            strings or a string.
+            The final value of the field which may be a string, a boolean,
+            an integer, or a list of strings.
         """
         # use a while loop to keep asking for the user input
         # until the user either enters it or uses ctrl-D
@@ -815,8 +815,33 @@ class ConfigurationGenerator:
         config_object: Configuration,
         insert_url_comment: bool = True,
         insert_required_comment: bool = True,
-        insert_optional_comment=True,
+        insert_optional_comment: bool = True,
     ) -> str:
+        """
+        Convert the given configuration object to a formatted string.
+
+        Parameters
+        ----------
+        config_object : Configuration
+            The configuration object to be converted to a string.
+        insert_url_comment : bool
+            If ``True``, insert a comment with the URL to the documentation
+            right above the first required field.
+            Defaults to ``True``.
+        insert_required_comment : bool
+            If ``True``, insert a comment right above the first required field
+            indicating that it is required.
+            Defaults to ``True``.
+        insert_optional_comment : bool
+            If ``True``, insert a comment right above the first optional field
+            indicating that it is optional.
+            Defaults to ``True``.
+
+        Returns
+        -------
+        configuration : str
+            The configuration object as a formatted string.
+        """
         configuration = str(config_object)
 
         # insert the URL comment first, right above the first required field

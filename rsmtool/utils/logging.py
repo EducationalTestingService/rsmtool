@@ -29,7 +29,7 @@ class LogFormatter(logging.Formatter):
     err_fmt = "ERROR: %(msg)s"
     dbg_fmt = "DEBUG: %(module)s: %(lineno)d: %(msg)s"
 
-    def __init__(self, fmt="%(levelno)s: %(msg)s"):
+    def __init__(self, fmt: str = "%(levelno)s: %(msg)s"):
         """
         Initialize the formatter.
 
