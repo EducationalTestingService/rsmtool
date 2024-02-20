@@ -10,6 +10,7 @@ Classes for preprocessing input data in various contexts.
 
 import logging
 import re
+import warnings
 from sys import version_info
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -2339,7 +2340,14 @@ class FeaturePreprocessor:
                 "can be run. "
             )
 
-        with np.errstate(divide="ignore"):
+        # concatenate the excluded data frames but ignore the
+        # FutureWarning about the behavior of Dataframe concatenation
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="The behavior of Dataframe concatenation",
+                category=FutureWarning,
+            )
             df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
         # if requested, exclude the candidates with less than X responses
@@ -2360,8 +2368,17 @@ class FeaturePreprocessor:
             # redefine df_filtered_pred
             df_filtered_pred = df_filtered_candidates.copy()
 
-            # update df_excluded
-            df_excluded = pd.concat([df_excluded, df_excluded_candidates], sort=True)
+            # update df_excluded but ignore the FutureWarning about the
+            # behavior of Dataframe concatenation
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="The behavior of Dataframe concatenation",
+                    category=FutureWarning,
+                )
+                df_excluded = pd.concat([df_excluded, df_excluded_candidates], sort=True)
+
+            # make sure that `spkitemid` is the first column
             df_excluded = df_excluded[
                 ["spkitemid"] + [column for column in df_excluded if column != "spkitemid"]
             ]
@@ -2960,7 +2977,15 @@ class FeaturePreprocessor:
             )
             del df_filtered
             df_filtered = newdf
-            with np.errstate(divide="ignore"):
+
+            # concatenate the excluded data frames but ignore the
+            # FutureWarning about the behavior of Dataframe concatenation
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="The behavior of Dataframe concatenation",
+                    category=FutureWarning,
+                )
                 df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
         # make sure that the remaining data frame is not empty
