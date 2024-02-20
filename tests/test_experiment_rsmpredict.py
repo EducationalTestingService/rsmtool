@@ -38,10 +38,10 @@ class TestExperimentRsmpredict(unittest.TestCase):
     @params(
         {"source": "lr-predict"},
         {"source": "lr-predict-with-score"},
-        {"source": "lr-predict-missing-values", "excluded": "True"},
+        {"source": "lr-predict-missing-values", "excluded": True},
         {"source": "lr-predict-with-subgroups"},
         {"source": "lr-predict-with-candidate"},
-        {"source": "lr-predict-illegal-transformations", "excluded": "True"},
+        {"source": "lr-predict-illegal-transformations", "excluded": True},
         {"source": "lr-predict-tsv-input-files"},
         {"source": "lr-predict-xlsx-input-files"},
         {"source": "lr-predict-jsonlines-input-files"},
