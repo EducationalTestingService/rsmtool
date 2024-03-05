@@ -311,7 +311,7 @@ class DataReader:
         # at the same level as the main config file
         if not (isinstance(filepaths, str) or isinstance(filepaths, list)):
             raise ValueError(
-                f"The 'filepaths' argument must be a string or a list, " f"not {type(filepaths)}."
+                f"The 'filepaths' argument must be a string or a list, not {type(filepaths)}."
             )
 
         if isinstance(filepaths, str):
