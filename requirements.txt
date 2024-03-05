@@ -10,7 +10,7 @@ pre-commit
 pyarrow
 seaborn
 shap
-skll==4.0.1
+skll==5.0.1
 sphinx
 sphinx-design
 sphinx_rtd_theme
