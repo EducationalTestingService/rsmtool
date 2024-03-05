@@ -1420,7 +1420,7 @@ class FeaturePreprocessor:
         missing_columns = set(columns_to_check).difference(df.columns)
         if missing_columns:
             raise KeyError(
-                f"Columns {missing_columns} from the config file do not " f"exist in the data."
+                f"Columns {missing_columns} from the config file do not exist in the data."
             )
 
         # it is possible for the `id_column` and `candidate_column` to be
