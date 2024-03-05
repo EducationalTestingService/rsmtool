@@ -1,7 +1,7 @@
 {
     "experiment_id": "ASAP2",
-    "train_file": "../files/train.csv",
-    "test_file": "../files/test.csv",
+    "train_file": "../../../files/train.csv",
+    "test_file": "../../../files/test.csv",
     "model": "RandomForestRegressor",
     "description": "A model which uses all features and a random forest.",
     "test_label_column": "score",
@@ -11,5 +11,6 @@
     "trim_max": 6,
     "id_column": "ID",
     "second_human_score_column": "score2",
-    "length_column": "LENGTH"
+    "length_column": "LENGTH",
+    "features": ["FEATURE1", "FEATURE2", "FEATURE3", "FEATURE4", "FEATURE5", "FEATURE6", "FEATURE7", "FEATURE8"]
 }
