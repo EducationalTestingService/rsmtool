@@ -4,7 +4,7 @@ stages:
   - test
 
 variables:
-  PYVERSION: "3.8"
+  PYVERSION: "3.10"
   BINPATH: "/root/rsmenv/bin"
   LOGCAPTURE_LEVEL: "WARNING"
   CODECOV_TOKEN: "488304b7-b1c5-4fc7-bfb6-9e7cbcb36a08"
