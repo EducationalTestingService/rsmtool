@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+"""Setup script for the rsmtool package."""
 from setuptools import find_packages, setup
 
 # Get version without importing, which avoids dependency issues
@@ -6,12 +8,12 @@ exec(compile(open("rsmtool/version.py").read(), "rsmtool/version.py", "exec"))
 # (we use the above instead of execfile for Python 3.x compatibility)
 
 
-def readme():
+def readme():  # noqa: D103
     with open("README.rst") as f:
         return f.read()
 
 
-def requirements():
+def requirements():  # noqa: D103
     req_path = "requirements.txt"
     with open(req_path) as f:
         reqs = f.read().splitlines()
@@ -20,7 +22,7 @@ def requirements():
 
 setup(
     name="rsmtool",
-    version=__version__,  # noqa
+    version=__version__,  # type: ignore  # noqa
     description="Rater scoring modeling tool",
     long_description=readme(),
     keywords="scoring modeling",
@@ -54,10 +56,9 @@ setup(
         "Operating System :: Unix",
         "Operating System :: MacOS",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     zip_safe=False,
 )
