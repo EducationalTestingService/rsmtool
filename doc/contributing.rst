@@ -12,9 +12,9 @@ To set up a local development environment, follow the steps below:
 
 #. If you already have the ``conda`` package manager installed, skip to the next step. If you do not, follow the instructions on `this page <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ to install conda.
 
-#. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.txt`` file by running::
+#. Create a new conda environment (say, ``rsmdev``) and install the packages specified in the ``requirements.dev`` file by running::
 
-    conda create -n rsmdev -c conda-forge -c ets --file requirements.txt
+    conda create -n rsmdev -c conda-forge -c ets --file requirements.dev
 
 #. Activate the environment using ``conda activate rsmdev``.
 
