@@ -22,7 +22,19 @@ This process is only meant for the project administrators, not users and develop
 
 #. In the release branch:
 
-   - Update the version numbers in ``version.py``.
+   - Update the version number in ``version.py``.
+
+   - Make sure that `requirements.txt` only has the actual dependencies that
+     are needed to run RSMTool. Any dependencies needed only for
+     development/testing (e.g., `sphinx`, `nose2` etc.) should be moved to
+     `requirements.dev`. This means that `requirements.txt` *must* be a strict
+     subset of `requirements.dev`.
+
+   - Make sure the versions in `doc/requirements.txt` are up to date with
+     `requirements.txt` and only contains the dependencies needed to build the
+     documentation.
+
+   - Make sure `.readthedocs.yml` is still accurate.
 
    - Update the conda recipe.
 
