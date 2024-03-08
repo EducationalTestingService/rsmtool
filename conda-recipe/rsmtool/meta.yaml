@@ -1,6 +1,6 @@
 package:
   name: rsmtool
-  version: 11.3.0
+  version: 12.0.0
 
 source:
   path: ../../../rsmtool
@@ -24,7 +24,7 @@ build:
 
 requirements:
   build:
-    - python >=3.8
+    - python >=3.10
     - pip
     - setuptools
   run:
@@ -37,7 +37,7 @@ requirements:
     - python
     - seaborn
     - shap
-    - skll==4.0.1
+    - skll==5.0.1
     - statsmodels
     - tqdm
     - wandb
