@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """Setup script for the rsmtool package."""
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 # Get version without importing, which avoids dependency issues
 exec(compile(open("rsmtool/version.py").read(), "rsmtool/version.py", "exec"))
@@ -30,7 +30,7 @@ setup(
     maintainer="Nitin Madnani",
     maintainer_email="nmadnani@ets.org",
     license="Apache 2",
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     include_package_data=True,
     entry_points={
         "console_scripts": [
