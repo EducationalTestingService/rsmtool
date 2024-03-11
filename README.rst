@@ -70,7 +70,7 @@ Requirements
 - ``scipy``
 - ``seaborn``
 - ``shap``
-- ``skll==4.0.1``
+- ``skll==5.0.1``
 - ``statsmodels``
 - ``wandb``
 - ``xlrd``
