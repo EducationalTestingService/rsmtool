@@ -1522,17 +1522,19 @@ class FeaturePreprocessor:
             # and also replace any non-numeric feature values in already
             # excluded data with NaNs for consistency
             for feat in feature_names:
-                df_excluded[feat] = pd.to_numeric(df_excluded[feat], errors="coerce").astype(float)
-                newdf, newdf_excluded = self.filter_on_column(
-                    df_filtered,
-                    feat,
-                    exclude_zeros=False,
-                    exclude_zero_sd=exclude_zero_sd,
-                )
-                del df_filtered
-                df_filtered = newdf
-                with np.errstate(divide="ignore"):
-                    df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
+                # check if `df_filtered` contains data again after filtering out from previous iteration.
+                if len(df_filtered) != 0:
+                    df_excluded[feat] = pd.to_numeric(df_excluded[feat], errors="coerce").astype(float)
+                    newdf, newdf_excluded = self.filter_on_column(
+                        df_filtered,
+                        feat,
+                        exclude_zeros=False,
+                        exclude_zero_sd=exclude_zero_sd,
+                    )
+                    del df_filtered
+                    df_filtered = newdf
+                    with np.errstate(divide="ignore"):
+                        df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
             # make sure that the remaining data frame is not empty
             if len(df_filtered) == 0:
