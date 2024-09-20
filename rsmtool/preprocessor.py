@@ -363,6 +363,7 @@ class FeaturePreprocessor:
     def __init__(self, logger: Optional[logging.Logger] = None):
         """Initialize the FeaturePreprocessor object."""
         self.logger = logger if logger else logging.getLogger(__name__)
+        self.excluded_features = []
 
     def check_model_name(self, model_name: str) -> str:
         """
@@ -830,6 +831,7 @@ class FeaturePreprocessor:
                     f"training set is equal to 0."
                 )
                 drop_column = True
+                self.excluded_features.append(column)
 
         # if `drop_column` is true, then we need to drop the column
         if drop_column:
@@ -1522,17 +1524,19 @@ class FeaturePreprocessor:
             # and also replace any non-numeric feature values in already
             # excluded data with NaNs for consistency
             for feat in feature_names:
-                df_excluded[feat] = pd.to_numeric(df_excluded[feat], errors="coerce").astype(float)
-                newdf, newdf_excluded = self.filter_on_column(
-                    df_filtered,
-                    feat,
-                    exclude_zeros=False,
-                    exclude_zero_sd=exclude_zero_sd,
-                )
-                del df_filtered
-                df_filtered = newdf
-                with np.errstate(divide="ignore"):
-                    df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
+                # check if `df_filtered` contains data again after filtering out from previous iteration.
+                if len(df_filtered) != 0:
+                    df_excluded[feat] = pd.to_numeric(df_excluded[feat], errors="coerce").astype(float)
+                    newdf, newdf_excluded = self.filter_on_column(
+                        df_filtered,
+                        feat,
+                        exclude_zeros=False,
+                        exclude_zero_sd=exclude_zero_sd,
+                    )
+                    del df_filtered
+                    df_filtered = newdf
+                    with np.errstate(divide="ignore"):
+                        df_excluded = pd.concat([df_excluded, newdf_excluded], sort=True)
 
             # make sure that the remaining data frame is not empty
             if len(df_filtered) == 0:
@@ -2059,6 +2063,9 @@ class FeaturePreprocessor:
 
         for key, value in internal_options_dict.items():
             new_config_obj[key] = value
+        
+        # include the excluded features in the configuration
+        new_config_obj["excluded_features"] = self.excluded_features
 
         new_container_datasets = [
             DatasetDict({"name": "train_features", "frame": df_train_features}),

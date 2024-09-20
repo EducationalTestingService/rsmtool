@@ -680,6 +680,7 @@ class Reporter:
             "JAVASCRIPT_PATH": javascript_path,
             "OUTPUT_DIR": csvdir,
             "FIGURE_DIR": figdir,
+            "EXCLUDED_ZERO_FEATURE": config.get("excluded_features", None)
         }
 
         # get the report directory which is at the same level
