@@ -1,7 +1,7 @@
 ipython
 jupyter
 notebook
-numpy<2
+numpy
 openpyxl
 pandas
 pyarrow
