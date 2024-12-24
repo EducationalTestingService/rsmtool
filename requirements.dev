@@ -9,7 +9,7 @@ pre-commit
 pyarrow
 seaborn
 shap
-skll==5.0.1
+skll==5.1.0
 sphinx
 sphinx-autodoc-typehints
 sphinx-design

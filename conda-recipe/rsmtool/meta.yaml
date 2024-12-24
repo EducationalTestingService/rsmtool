@@ -37,7 +37,7 @@ requirements:
     - python
     - seaborn
     - shap
-    - skll==5.0.1
+    - skll==5.1.0
     - statsmodels
     - tqdm
     - wandb
