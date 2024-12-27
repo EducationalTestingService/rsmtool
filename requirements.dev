@@ -2,14 +2,14 @@ ipython
 jupyter
 nose2
 notebook
-numpy<2
+numpy
 openpyxl
 pandas
 pre-commit
 pyarrow
 seaborn
 shap
-skll==5.0.1
+skll==5.1.0
 sphinx
 sphinx-autodoc-typehints
 sphinx-design

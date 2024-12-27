@@ -62,7 +62,7 @@ Requirements
 - ``ipython``
 - ``jupyter``
 - ``notebook``
-- ``numpy<2``
+- ``numpy``
 - ``openpyxl``
 - ``pandas``
 - ``python>=3.8``

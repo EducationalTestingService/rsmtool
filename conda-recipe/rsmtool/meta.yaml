@@ -31,13 +31,13 @@ requirements:
     - ipython
     - jupyter
     - notebook
-    - numpy<2
+    - numpy
     - openpyxl
     - pandas
     - python
     - seaborn
     - shap
-    - skll==5.0.1
+    - skll==5.1.0
     - statsmodels
     - tqdm
     - wandb
