@@ -15,7 +15,26 @@ def convert(
     trim_tolerance: float,
     verify_correctness: bool = True,
 ) -> None:
-    # Convert a simple rsmtool model to onnx.
+    """Convert a simple rsmtool model to onnx.
+
+    Parameters
+    ----------
+    model_file:
+        Path to the file containing the SKLL learner.
+    feature_file:
+        Path to the file containing the feature statistics.
+    calibration_file:
+        Path to the file containing the label statistics.
+    trim_min,trim_max,trim_tolerance:
+        Trimming arguments for `fast_predict`.
+    verify_correctness:
+        Whether to verify that the converted model produces the same output.
+
+    Raises
+    ------
+    AssertionError
+        If an unsupported operation is encountered or the correctness test failed.
+    """
     import json
 
     import pandas as pd
@@ -124,6 +143,21 @@ def predict(
     model: InferenceSession,
     statistics: dict[str, np.ndarray | float | list[str]],
 ) -> float:
+    """Make a single prediction with the convered ONNX model.
+
+    Parameters
+    ----------
+    features:
+        Dictionary of the input features.
+    model:
+        ONNX inference session of the converted model.
+    statistics:
+        Dictionary containing the feature and label statistics.
+
+    Returns
+    -------
+        A single prediction.
+    """
     # get features in the expected order
     features = np.array([features[name] for name in statistics["feature_names"]])
 
@@ -136,7 +170,6 @@ def predict(
     features = (features - statistics["feature_means"]) / statistics["feature_stds"]
 
     # predict
-    # prediction = model.predict(features[None])
     prediction = model.run(None, {"X": features[None].astype(np.float32)})[0].item()
 
     # transform to human scale
