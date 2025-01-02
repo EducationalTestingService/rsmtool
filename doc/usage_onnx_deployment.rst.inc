@@ -14,3 +14,7 @@ Model export
 """"""""""""
 
 In this example, we use `skl2onnx https://pypi.org/project/skl2onnx/`_ to export the underlying scikit-learn model to ONNX. Should this process fail, it is possible to export the scikit-learn model with ``joblib`` (``scikit-learn`` will then be a runtime dependecy).
+
+Correctness
+"""""""""""
+The example script calls the converted model with many different inputs to verify that it produces the same output as the original RSMTool model.
