@@ -131,7 +131,7 @@ def convert(
         )["scale_trim"]
         rsm_duration += time() - start
 
-        assert np.isclose(onnx_prediction, rsm_prediction)
+        assert np.isclose(onnx_prediction, rsm_prediction), f"{onnx_prediction} vs {rsm_prediction}"
 
     print(f"ONNX duration: {round(onnx_duration/iterations, 5)}")
     print(f"RSMTool duration: {round(rsm_duration/iterations, 5)}")
@@ -175,7 +175,7 @@ def predict(
     # transform to human scale
     prediction = prediction * statistics["label_std"] + statistics["label_mean"]
 
-    # trim both raw and scaled predictions if requested
+    # trim prediction
     return np.clip(prediction, a_min=statistics["label_min"], a_max=statistics["label_max"])
 
 

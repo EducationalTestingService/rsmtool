@@ -16,3 +16,5 @@ In addition to providing the ``rsmtool`` utility training and evaluating regress
 .. include:: usage_rsmxval.rst.inc
 
 .. include:: usage_rsmexplain.rst.inc
+
+.. include:: usage_onnx_deployment.rst.inc
