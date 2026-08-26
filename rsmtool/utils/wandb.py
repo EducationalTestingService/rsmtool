@@ -9,7 +9,6 @@ from typing import Optional, Union
 
 import pandas as pd
 import wandb
-from wandb.sdk.lib import RunDisabled
 from wandb.wandb_run import Run
 
 from ..configuration_parser import Configuration
@@ -23,7 +22,7 @@ EXCLUDED = ["confMatrix", "confMatrix_h1h2"]
 METRICS_LOGGED = ["consistency", "eval_short", "true_score_eval"]
 
 
-def init_wandb_run(config_obj: Configuration) -> Union[Run, RunDisabled, None]:
+def init_wandb_run(config_obj: Configuration) -> Union[Run, None]:
     """
     Initialize a wandb run if logging to wandb is enabled in the configuration.
 
@@ -37,7 +36,7 @@ def init_wandb_run(config_obj: Configuration) -> Union[Run, RunDisabled, None]:
 
     Returns
     -------
-    Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
+    Union[wandb.wandb_run.Run, None]
         A wandb Run object, or ``None`` if logging to wandb is disabled.
     """
     use_wandb = config_obj["use_wandb"]
@@ -50,14 +49,14 @@ def init_wandb_run(config_obj: Configuration) -> Union[Run, RunDisabled, None]:
 
 
 def log_configuration_to_wandb(
-    wandb_run: Union[Run, RunDisabled, None], configuration: Configuration
+    wandb_run: Union[Run, None], configuration: Configuration
 ) -> None:
     """
     Log a configuration object to wandb if logging to wandb is enabled.
 
     Parameters
     ----------
-    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
+    wandb_run : Union[wandb.wandb_run.Run, None]
         The wandb Run object, or ``None``, if logging to wandb is disabled.
     configuration : rsmtool.configuration_parser.Configuration
         The Configuration object to log to the run.
@@ -67,7 +66,7 @@ def log_configuration_to_wandb(
 
 
 def log_dataframe_to_wandb(
-    wandb_run: Union[Run, RunDisabled, None],
+    wandb_run: Union[Run, None],
     df: pd.DataFrame,
     frame_name: str,
     section: Optional[str] = None,
@@ -81,7 +80,7 @@ def log_dataframe_to_wandb(
 
     Parameters
     ----------
-    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
+    wandb_run : Union[wandb.wandb_run.Run, None]
         The wandb Run object, or ``None``, if logging to wandb is disabled.
     df : pandas.DataFrame
         The dataframe object to log.
@@ -148,7 +147,7 @@ def get_metric_name(
 
 
 def log_confusion_matrix(
-    wandb_run: Union[Run, RunDisabled, None],
+    wandb_run: Union[Run, None],
     human_scores: pd.Series,
     system_scores: pd.Series,
     name: str,
@@ -161,7 +160,7 @@ def log_confusion_matrix(
 
     Parameters
     ----------
-    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
+    wandb_run : Union[wandb.wandb_run.Run, None]
         The wandb Run object, or ``None``, if logging to wandb is disabled.
     human_scores : pandas.Series
         The human scores for the responses in the data
@@ -186,7 +185,7 @@ def log_confusion_matrix(
 
 
 def log_report_to_wandb(
-    wandb_run: Union[Run, RunDisabled, None], report_name: str, report_path: str
+    wandb_run: Union[Run, None], report_name: str, report_path: str
 ):
     """
     Log a report to wandb if logging to wandb is enabled.
@@ -196,7 +195,7 @@ def log_report_to_wandb(
 
     Parameters
     ----------
-    wandb_run : Union[wandb.wandb_run.Run, wandb.sdk.lib.RunDisabled, None]
+    wandb_run : Union[wandb.wandb_run.Run, None]
         The wandb Run object, or ``None``, if logging to wandb is disabled.
     report_name: str
         The report's name to use in the log.
